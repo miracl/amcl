@@ -283,7 +283,7 @@ void FP_mod(BIG a,DBIG d)
     	d[DNLEN-1]=(chunk)sum&BMASK;
     */
 //	BIG_sducopy(a,d);
-    BIG_norm(a);
+//    BIG_norm(a);
 
 
     /* Faster to Combafy it.. Let the compiler unroll the loops! */
