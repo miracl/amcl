@@ -540,8 +540,12 @@ void BIG_mul(DBIG c,BIG a,BIG b)
 
 #ifdef COMBA
 
-    /* faster pseudo-Karatsuba method */
+    /* faster psuedo-Karatsuba method */
+#ifdef UNWOUND
 
+/* Insert output of faster.c here */
+
+#else
     for (i=0; i<NLEN; i++)
         d[i]=(dchunk)a[i]*b[i];
 
@@ -567,6 +571,8 @@ void BIG_mul(DBIG c,BIG a,BIG b)
         co=t>>BASEBITS;
     }
     c[2*NLEN-1]=(chunk)co;
+
+#endif
     /*
     	for (i=0;i<NLEN;i++)
     		d[i]=(dchunk)a[i]*b[i];
@@ -684,71 +690,44 @@ void BIG_sqr(DBIG c,BIG a)
 
 #ifdef COMBA
 
-    t=(dchunk)a[0]*a[0];
-    c[0]=(chunk)t&BMASK;
-    co=t>>BASEBITS;
-    t=(dchunk)a[1]*a[0];
-    t+=t;
-    t+=co;
-    c[1]=(chunk)t&BMASK;
-    co=t>>BASEBITS;
+#ifdef UNWOUND
 
-    last=NLEN-NLEN%2;
-    for (j=2; j<last; j+=2)
-    {
-        t=(dchunk)a[j]*a[0];
-        for (i=1; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
-        t+=t;
-        t+=co;
-        t+=(dchunk)a[j/2]*a[j/2];
-        c[j]=(chunk)t&BMASK;
-        co=t>>BASEBITS;
-        t=(dchunk)a[j+1]*a[0];
-        for (i=1; i<(j+2)/2; i++) t+=(dchunk)a[j+1-i]*a[i];
-        t+=t;
-        t+=co;
-        c[j+1]=(chunk)t&BMASK;
-        co=t>>BASEBITS;
-    }
-    j=last;
+/* Insert output of faster.c here */
+
+#else
+
+	t=(dchunk)a[0]*a[0];
+	c[0]=(chunk)t&BMASK; co=t>>BASEBITS;
+	t=(dchunk)a[1]*a[0]; t+=t; t+=co; 
+	c[1]=(chunk)t&BMASK; co=t>>BASEBITS;
+
+	last=NLEN-NLEN%2;
+	for (j=2;j<last;j+=2)
+	{
+		t=(dchunk)a[j]*a[0]; for (i=1;i<(j+1)/2;i++) t+=(dchunk)a[j-i]*a[i]; t+=t; t+=co;  t+=(dchunk)a[j/2]*a[j/2];
+		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
+		t=(dchunk)a[j+1]*a[0]; for (i=1;i<(j+2)/2;i++) t+=(dchunk)a[j+1-i]*a[i]; t+=t; t+=co; 
+		c[j+1]=(chunk)t&BMASK; co=t>>BASEBITS;	
+	}
+	j=last;
 #if NLEN%2==1
-    t=(dchunk)a[j]*a[0];
-    for (i=1; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
-    t+=t;
-    t+=co;
-    t+=(dchunk)a[j/2]*a[j/2];
-    c[j]=(chunk)t&BMASK;
-    co=t>>BASEBITS;
-    j++;
-    t=(dchunk)a[NLEN-1]*a[j-NLEN+1];
-    for (i=j-NLEN+2; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
-    t+=t;
-    t+=co;
-    c[j]=(chunk)t&BMASK;
-    co=t>>BASEBITS;
-    j++;
+	t=(dchunk)a[j]*a[0]; for (i=1;i<(j+1)/2;i++) t+=(dchunk)a[j-i]*a[i]; t+=t; t+=co;  t+=(dchunk)a[j/2]*a[j/2];
+	c[j]=(chunk)t&BMASK; co=t>>BASEBITS; j++;
+	t=(dchunk)a[NLEN-1]*a[j-NLEN+1]; for (i=j-NLEN+2;i<(j+1)/2;i++) t+=(dchunk)a[j-i]*a[i]; t+=t; t+=co; 
+	c[j]=(chunk)t&BMASK; co=t>>BASEBITS; j++;
 #endif
-    for (; j<DNLEN-2; j+=2)
-    {
-        t=(dchunk)a[NLEN-1]*a[j-NLEN+1];
-        for (i=j-NLEN+2; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
-        t+=t;
-        t+=co;
-        t+=(dchunk)a[j/2]*a[j/2];
-        c[j]=(chunk)t&BMASK;
-        co=t>>BASEBITS;
-        t=(dchunk)a[NLEN-1]*a[j-NLEN+2];
-        for (i=j-NLEN+3; i<(j+2)/2; i++) t+=(dchunk)a[j+1-i]*a[i];
-        t+=t;
-        t+=co;
-        c[j+1]=(chunk)t&BMASK;
-        co=t>>BASEBITS;
-    }
+	for (;j<DNLEN-2;j+=2)
+	{
+		t=(dchunk)a[NLEN-1]*a[j-NLEN+1]; for (i=j-NLEN+2;i<(j+1)/2;i++) t+=(dchunk)a[j-i]*a[i]; t+=t; t+=co; t+=(dchunk)a[j/2]*a[j/2];
+		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
+		t=(dchunk)a[NLEN-1]*a[j-NLEN+2]; for (i=j-NLEN+3;i<(j+2)/2;i++) t+=(dchunk)a[j+1-i]*a[i]; t+=t; t+=co;
+		c[j+1]=(chunk)t&BMASK; co=t>>BASEBITS;
+	}
 
-    t=(dchunk)a[NLEN-1]*a[NLEN-1]+co;
-    c[DNLEN-2]=(chunk)t&BMASK;
-    co=t>>BASEBITS;
-    c[DNLEN-1]=(chunk)co;
+	t=(dchunk)a[NLEN-1]*a[NLEN-1]+co;
+	c[DNLEN-2]=(chunk)t&BMASK; co=t>>BASEBITS;
+	c[DNLEN-1]=(chunk)co;
+#endif
 
 #else
     chunk carry;

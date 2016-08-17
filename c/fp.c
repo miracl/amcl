@@ -192,6 +192,12 @@ void FP_mod(BIG a,DBIG d)
 
 #ifdef COMBA
 
+#ifdef UNWOUND 
+
+/* Insert output of faster.c here */
+
+#else
+
     t=d[0];
     v[0]=((chunk)t*MConst)&BMASK;
     t+=(dchunk)v[0]*md[0];
@@ -218,6 +224,7 @@ void FP_mod(BIG a,DBIG d)
     }
     a[NLEN-1]=(chunk)c&BMASK;
 
+#endif
 
     /*
     	t=d[0]; d[0]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[0]*md[0]; c=(t>>BASEBITS)+d[1];
