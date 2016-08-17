@@ -496,7 +496,7 @@ typedef chunk DBIG[DNLEN]; /**< Define type DBIG as array of chunks */
 #define TMASK (((chunk)1<<TBITS)-1)  /**< Mask for active bits in top word */
 #define NEXCESS (1<<(CHUNK-BASEBITS-1)) /**< 2^(CHUNK-BASEBITS-1) - digit cannot be multiplied by more than this before normalisation */
 #define FEXCESS ((chunk)1<<(BASEBITS*NLEN-MBITS)) /**< 2^(BASEBITS*NLEN-MODBITS) - normalised BIG can be multiplied by more than this before reduction */
-#define OMASK ((chunk)(-1)<<TBITS)     /**<  for masking out overflow bits */
+#define OMASK (-((chunk)(1)<<TBITS))     /**<  for masking out overflow bits */
 
 /* catch field excesses */
 #define EXCESS(a) ((a[NLEN-1]&OMASK)>>(TBITS))   /**< Field Excess */
