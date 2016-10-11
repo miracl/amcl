@@ -543,7 +543,7 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *S,octet *F,octet *C,octet *D)
     char h[128];
     octet H= {0,sizeof(h),h};
 
-    BIG gx,gy,r,s,f,c,d,u,vx;
+    BIG gx,gy,r,s,f,c,d,u,vx,w;
     ECP G,V;
 
     hashit(sha,F,-1,NULL,&H,MODBYTES);
@@ -560,6 +560,7 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *S,octet *F,octet *C,octet *D)
     {
 
         BIG_randomnum(u,r,RNG);
+		BIG_randomnum(w,r,RNG); /* randomize calculation */
 #ifdef AES_S
         BIG_mod2m(u,2*AES_S);
 #endif
@@ -571,11 +572,13 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *S,octet *F,octet *C,octet *D)
         BIG_copy(c,vx);
         BIG_mod(c,r);
         if (BIG_iszilch(c)) continue;
+		BIG_modmul(u,u,w,r);
 
         BIG_invmodp(u,u,r);
         BIG_modmul(d,s,c,r);
 
         BIG_add(d,f,d);
+		BIG_modmul(d,d,w,r);
 
         BIG_modmul(d,u,d,r);
 

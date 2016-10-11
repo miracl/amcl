@@ -86,7 +86,7 @@
 
 /*** START OF USER CONFIGURABLE SECTION - set architecture and choose modulus and curve  ***/
 
-#define CHOICE BLS455	/**< Current choice of Field */
+#define CHOICE BN254	/**< Current choice of Field */
 /* For some moduli only one parameterisation of curve may supported. For others there is a choice of WEIERSTRASS, EDWARDS or MONTGOMERY curves. See above. */
 #define CURVETYPE WEIERSTRASS	/**< Note that not all curve types are supported - see above */
 
@@ -798,6 +798,14 @@ extern void BIG_cswap(BIG x,BIG y,int s);
 	@param s copy takes place if not equal to 0
  */
 extern void BIG_cmove(BIG x,BIG y,int s);
+/**	@brief Conditional copy of DBIG number
+ *
+	Conditionally copies second parameter to the first (without branching)
+	@param x a DBIG number
+	@param y another DBIG number
+	@param s copy takes place if not equal to 0
+ */
+extern void BIG_dcmove(BIG x,BIG y,int s);
 /**	@brief Convert from BIG number to byte array
  *
 	@param a byte array

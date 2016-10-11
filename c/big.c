@@ -207,6 +207,21 @@ void BIG_cmove(BIG f,BIG g,int d)
     }
 }
 
+/* Move g to f if d=1 */
+void BIG_dcmove(DBIG f,DBIG g,int d)
+{
+	int i;
+	chunk b=(chunk)-d;
+#ifdef DEBUG_NORM
+	for (i=0;i<=DNLEN;i++)
+#else
+	for (i=0;i<DNLEN;i++)
+#endif
+	{
+		f[i]^=(f[i]^g[i])&b;
+	}
+}
+
 /* convert BIG to/from bytes */
 /* SU= 64 */
 void BIG_toBytes(char *b,BIG a)
@@ -998,6 +1013,7 @@ int BIG_dnbits(BIG a)
 void BIG_mod(BIG b,BIG c)
 {
     int k=0;
+	BIG r;
 
     BIG_norm(b);
     if (BIG_comp(b,c)<0)
@@ -1012,11 +1028,17 @@ void BIG_mod(BIG b,BIG c)
     while (k>0)
     {
         BIG_fshr(c,1);
+// constant time...  
+		BIG_sub(r,b,c);
+		BIG_norm(r);
+		BIG_cmove(b,r,1-((r[NLEN-1]>>(CHUNK-1))&1));
+/*
         if (BIG_comp(b,c)>=0)
         {
             BIG_sub(b,b,c);
             BIG_norm(b);
         }
+*/
         k--;
     }
 }
@@ -1026,7 +1048,7 @@ void BIG_mod(BIG b,BIG c)
 void BIG_dmod(BIG a,DBIG b,BIG c)
 {
     int k=0;
-    DBIG m;
+    DBIG m,r;
     BIG_dnorm(b);
     BIG_dscopy(m,c);
 
@@ -1046,11 +1068,17 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
     while (k>0)
     {
         BIG_dshr(m,1);
+// constant time...    
+		BIG_dsub(r,b,m);
+		BIG_dnorm(r);
+		BIG_dcmove(b,r,1-((r[DNLEN-1]>>(CHUNK-1))&1));
+/*
         if (BIG_dcomp(b,m)>=0)
         {
             BIG_dsub(b,b,m);
             BIG_dnorm(b);
         }
+*/
         k--;
     }
     BIG_sdcopy(a,b);
@@ -1058,74 +1086,93 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
 
 /* Set a=b/c,  b is destroyed. Slow but rarely used. */
 /* SU= 136 */
+
 void BIG_ddiv(BIG a,DBIG b,BIG c)
 {
-    int k=0;
-    DBIG m;
-    BIG e;
-    BIG_dnorm(b);
-    BIG_dscopy(m,c);
+	int d,k=0;
+	DBIG m,r;
+	BIG e;
+	BIG_dnorm(b);
+	BIG_dscopy(m,c);
 
-    BIG_zero(a);
-    BIG_zero(e);
-    BIG_inc(e,1);
+	BIG_zero(a);
+	BIG_zero(e); BIG_inc(e,1);
 
-    while (BIG_dcomp(b,m)>=0)
-    {
-        BIG_fshl(e,1);
-        BIG_dshl(m,1);
-        k++;
-    }
+	while (BIG_dcomp(b,m)>=0)
+	{
+		BIG_fshl(e,1);
+		BIG_dshl(m,1);
+		k++;
+	}
 
-    while (k>0)
-    {
-        BIG_dshr(m,1);
-        BIG_fshr(e,1);
-        if (BIG_dcomp(b,m)>=0)
-        {
-            BIG_add(a,a,e);
-            BIG_norm(a);
-            BIG_dsub(b,b,m);
-            BIG_dnorm(b);
-        }
-        k--;
-    }
+	while (k>0)
+	{
+		BIG_dshr(m,1);
+		BIG_fshr(e,1);
+
+		BIG_dsub(r,b,m);
+		BIG_dnorm(r);
+		d=1-((r[DNLEN-1]>>(CHUNK-1))&1);
+		BIG_dcmove(b,r,d);
+
+		BIG_add(r,a,e);
+		BIG_norm(r);
+		BIG_cmove(a,r,d);
+/*
+		if (BIG_dcomp(b,m)>=0)
+		{
+			BIG_add(a,a,e);
+			BIG_norm(a);
+			BIG_dsub(b,b,m);
+			BIG_dnorm(b);
+		} */
+		k--;
+	}
 }
 
 /* SU= 136 */
 
 void BIG_sdiv(BIG a,BIG c)
 {
-    int k=0;
-    BIG m,e,b;
-    BIG_norm(a);
-    BIG_copy(b,a);
-    BIG_copy(m,c);
+	int d,k=0;
+	BIG m,e,b,r;
+	BIG_norm(a);
+	BIG_copy(b,a);
+	BIG_copy(m,c);
 
-    BIG_zero(a);
-    BIG_zero(e);
-    BIG_inc(e,1);
+	BIG_zero(a);
+	BIG_zero(e); BIG_inc(e,1);
 
-    while (BIG_comp(b,m)>=0)
-    {
-        BIG_fshl(e,1);
-        BIG_fshl(m,1);
-        k++;
-    }
+	while (BIG_comp(b,m)>=0)
+	{
+		BIG_fshl(e,1);
+		BIG_fshl(m,1);
+		k++;
+	}
 
-    while (k>0)
-    {
-        BIG_fshr(m,1);
-        BIG_fshr(e,1);
-        if (BIG_comp(b,m)>=0)
-        {
-            BIG_add(a,a,e);
-            BIG_norm(a);
-            BIG_sub(b,b,m);
-            BIG_norm(b);
-        }
-        k--;
-    }
+	while (k>0)
+	{
+		BIG_fshr(m,1);
+		BIG_fshr(e,1);
+
+		BIG_sub(r,b,m);
+		BIG_norm(r);
+		d=1-((r[NLEN-1]>>(CHUNK-1))&1);
+		BIG_cmove(b,r,d);
+
+		BIG_add(r,a,e);
+		BIG_norm(r);
+		BIG_cmove(a,r,d);
+/*
+		if (BIG_comp(b,m)>=0)
+		{
+			BIG_sub(b,b,m);
+			BIG_norm(b);
+			BIG_add(a,a,e);
+			BIG_norm(a);
+		} */
+		k--;
+	}
 }
 
 /* return LSB of a */
