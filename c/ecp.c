@@ -392,8 +392,8 @@ void ECP_affine(ECP *P)
     FP_one(one);
     if (BIG_comp(P->z,one)==0) return;
     BIG_rcopy(m,Modulus);
-    FP_redc(P->z);
 
+    FP_redc(P->z);
     BIG_invmodp(iz,P->z,m);
     FP_nres(iz);
 
@@ -408,8 +408,8 @@ void ECP_affine(ECP *P)
     FP_one(one);
     if (BIG_comp(P->z,one)==0) return;
     BIG_rcopy(m,Modulus);
-    FP_redc(P->z);
 
+    FP_redc(P->z);
     BIG_invmodp(iz,P->z,m);
     FP_nres(iz);
 
@@ -424,6 +424,7 @@ void ECP_affine(ECP *P)
     if (BIG_comp(P->z,one)==0) return;
 
     BIG_rcopy(m,Modulus);
+
     FP_redc(P->z);
     BIG_invmodp(iz,P->z,m);
     FP_nres(iz);

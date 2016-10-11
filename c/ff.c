@@ -484,6 +484,8 @@ static void FF_karmul_upper(BIG z[],BIG x[],BIG y[],BIG t[],int n)
     nd2=n/2;
     FF_radd(z,n,x,0,x,nd2,nd2);
     FF_radd(z,n+nd2,y,0,y,nd2,nd2);
+	FF_rnorm(z,n,nd2);
+	FF_rnorm(z,n+nd2,nd2);
 
     FF_karmul(t,0,z,n+nd2,z,n,t,n,nd2);  /* t = (a0+a1)(b0+b1) */
     FF_karmul(z,n,x,nd2,y,nd2,t,n,nd2); /* z[n]= a1*b1 */
