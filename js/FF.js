@@ -358,6 +358,8 @@ FF.prototype={
 		nd2=n/2;
 		this.radd(n,x,0,x,nd2,nd2);  
 		this.radd(n+nd2,y,0,y,nd2,nd2);
+		this.rnorm(n,nd2);
+		this.rnorm(n+nd2,nd2);
 
 		t.karmul(0,this,n+nd2,this,n,t,n,nd2);  /* t = (a0+a1)(b0+b1) */
 		this.karmul(n,x,nd2,y,nd2,t,n,nd2); /* z[n]= a1*b1 */

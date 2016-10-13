@@ -412,6 +412,8 @@ impl FF {
 		let nd2=n/2;
 		self.radd(n,x,0,x,nd2,nd2);
 		self.radd(n+nd2,y,0,y,nd2,nd2);
+		self.rnorm(n,nd2);
+		self.rnorm(n+nd2,nd2);
 
 		unsafe {			
 			(*t).karmul(0,self,n+nd2,self,n,t,n,nd2);  /* t = (a0+a1)(b0+b1) */

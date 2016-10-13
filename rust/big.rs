@@ -506,6 +506,7 @@ impl BIG {
     pub fn rmod(&mut self,n: &BIG) {
         let mut k=0;
         let mut m=BIG::new_copy(n);
+	let mut r=BIG::new();
         self.norm();
         if BIG::comp(self,&m)<0 {return}
         loop {
@@ -516,10 +517,16 @@ impl BIG {
     
         while k>0 {
             m.fshr(1);
+
+		r.copy(self);
+		r.sub(&m);
+		r.norm();
+		self.cmove(&r,(1-((r.w[rom::NLEN-1]>>(rom::CHUNK-1))&1)) as i32);
+/*
             if BIG::comp(self,&m)>=0 {
 				self.sub(&m);
 				self.norm();
-            }
+            } */
             k -= 1;
         }
     }
@@ -531,6 +538,7 @@ impl BIG {
         let mut e=BIG::new_int(1);
         let mut b=BIG::new_copy(self);
         let mut m=BIG::new_copy(n);
+	let mut r=BIG::new();
         self.zero();
     
         while BIG::comp(&b,&m)>=0 {
@@ -542,12 +550,23 @@ impl BIG {
         while k>0 {
             m.fshr(1);
             e.fshr(1);
+
+		r.copy(&b);
+		r.sub(&m);
+		r.norm();
+		let d=(1-((r.w[rom::NLEN-1]>>(rom::CHUNK-1))&1)) as i32;
+		b.cmove(&r,d);
+		r.copy(self);
+		r.add(&e);
+		r.norm();
+		self.cmove(&r,d);
+/*
             if BIG::comp(&b,&m)>=0 {
 				self.add(&e);
 				self.norm();
 				b.sub(&m);
 				b.norm();
-            }
+            } */
             k -= 1;
         }
     }

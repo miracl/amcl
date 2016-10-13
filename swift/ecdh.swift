@@ -428,6 +428,7 @@ final public class ECDH
     
         repeat {
             let u=BIG.randomnum(r,RNG);
+	    let w=BIG.randomnum(r,RNG);
   	    if ROM.AES_S>0
 	    {
 		u.mod2m(2*ROM.AES_S)
@@ -438,9 +439,11 @@ final public class ECDH
             c.copy(vx)
             c.mod(r)
             if c.iszilch() {continue}
+	    u.copy(BIG.modmul(u,w,r))
             u.invmodp(r)
             d.copy(BIG.modmul(s,c,r))
             d.add(f)
+	    d.copy(BIG.modmul(d,w,r))
             d.copy(BIG.modmul(u,d,r))
         } while d.iszilch()
     

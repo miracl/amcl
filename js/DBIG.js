@@ -100,6 +100,20 @@ DBIG.prototype={
 		return this;
 	},
 
+/* Conditional move of big depending on d using XOR - no branches */
+	cmove: function(b,d)
+	{
+		var i;
+		var c=d;
+		c=~(c-1);
+
+		for (i=0;i<ROM.DNLEN;i++)
+		{
+			this.w[i]^=(this.w[i]^b.w[i])&c;
+		}
+	},
+
+
 /* this+=x */
 	add: function(x) 
 	{
@@ -154,6 +168,7 @@ DBIG.prototype={
 		var k=0;  
 		this.norm();
 		var m=new DBIG(0);
+		var dr=new DBIG(0);
 		m.hcopy(c);
 		var r=new BIG(0);
 		r.hcopy(this);
@@ -170,11 +185,18 @@ DBIG.prototype={
 		while (k>0)
 		{
 			m.shr(1);
+
+			dr.copy(this);
+			dr.sub(m);
+			dr.norm();
+			this.cmove(dr,(1-((dr.w[ROM.DNLEN-1]>>(ROM.CHUNK-1))&1)));
+
+/*
 			if (DBIG.comp(this,m)>=0)
 			{
 				this.sub(m);
 				this.norm();
-			}
+			} */
 			k--;
 		}
 
@@ -185,8 +207,11 @@ DBIG.prototype={
 /* this/=c */
 	div: function(c)
 	{
+		var d=0;
 		var k=0;
 		var m=new DBIG(0); m.hcopy(c);
+		var dr=new DBIG(0);
+		var r=new BIG(0);
 		var a=new BIG(0);
 		var e=new BIG(1);
 		this.norm();
@@ -202,13 +227,24 @@ DBIG.prototype={
 		{
 			m.shr(1);
 			e.shr(1);
+
+			dr.copy(this);
+			dr.sub(m);
+			dr.norm();
+			d=(1-((dr.w[ROM.DNLEN-1]>>(ROM.CHUNK-1))&1));
+			this.cmove(dr,d);
+			r.copy(a);
+			r.add(e);
+			r.norm();
+			a.cmove(r,d);  
+/*
 			if (DBIG.comp(this,m)>0)
 			{
 				a.add(e);
 				a.norm();
 				this.sub(m);
 				this.norm();
-			}
+			}  */
 			k--;
 		}
 		return a;

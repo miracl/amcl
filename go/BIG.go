@@ -519,6 +519,7 @@ func (r *BIG) invmod2m() {
 
 /* reduce this mod m */
 func (r *BIG) mod(m *BIG) {
+	sr:=NewBIG()
 	r.norm()
 	if comp(r,m)<0 {return}
 
@@ -531,18 +532,26 @@ func (r *BIG) mod(m *BIG) {
 
 	for k>0 {
 		m.fshr(1);
+
+			sr.copy(r)
+			sr.sub(m)
+			sr.norm()
+			r.cmove(sr,int32(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1)));
+/*
 		if comp(r,m)>=0 {
 			r.sub(m)
 			r.norm()
-		}
+		} */
 		k--;
 	}
 }
 
 /* divide this by m */
 func (r *BIG) div(m *BIG) {
+	var d int32
 	k:=0
 	r.norm();
+	sr:=NewBIG();
 	e:=NewBIGint(1)
 	b:=NewBIGcopy(r)
 	r.zero();
@@ -556,12 +565,23 @@ func (r *BIG) div(m *BIG) {
 	for k>0 {
 		m.fshr(1)
 		e.fshr(1)
+
+		sr.copy(b);
+		sr.sub(m);
+		sr.norm();
+		d=int32(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1));
+		b.cmove(sr,d);
+		sr.copy(r);
+		sr.add(e);
+		sr.norm();
+		r.cmove(sr,d);
+/*
 		if comp(b,m)>=0 {
 			r.add(e)
 			r.norm()
 			b.sub(m)
 			b.norm()
-		}
+		} */
 		k--
 	}
 }

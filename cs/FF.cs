@@ -473,6 +473,8 @@ public sealed class FF
 		nd2 = n / 2;
 		radd(n,x,0,x,nd2,nd2);
 		radd(n + nd2,y,0,y,nd2,nd2);
+		rnorm(n,nd2);
+		rnorm(n+nd2,nd2);
 
 		t.karmul(0,this,n + nd2,this,n,t,n,nd2); // t = (a0+a1)(b0+b1)
 		karmul(n,x,nd2,y,nd2,t,n,nd2); // z[n]= a1*b1

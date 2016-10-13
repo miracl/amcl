@@ -26,6 +26,7 @@ a commercial license.
 package main
 
 import "strconv"
+//import "fmt"
 
 type DBIG struct {
 	w [2*NLEN]int64
@@ -117,6 +118,21 @@ func dcomp(a *DBIG,b *DBIG) int {
 	return 0
 }
 
+func (r *DBIG) cmove(g *DBIG,d int32){
+	var b=int64(-d)
+
+	for i:=0;i<DNLEN;i++ {
+		r.w[i]^=(r.w[i]^g.w[i])&b
+	}
+}
+
+/* Copy from another BIG */
+func (r *DBIG) copy(x *DBIG) {
+	for i:=0;i<DNLEN;i++ {
+		r.w[i]=x.w[i]
+	}
+}
+
 func (r *DBIG) add(x *DBIG) {
 	for i:=0;i<DNLEN;i++ {
 		r.w[i]=r.w[i]+x.w[i] 
@@ -158,6 +174,7 @@ func (r *DBIG) shr(k uint) {
 func (r *DBIG) mod(c *BIG) *BIG {
 	r.norm()
 	m:=NewDBIGscopy(c)
+	dr:=NewDBIG();
 
 	if dcomp(r,m)<0 {
 		return NewBIGdcopy(r)
@@ -173,10 +190,16 @@ func (r *DBIG) mod(c *BIG) *BIG {
 
 	for k>0 {
 		m.shr(1);
+
+		dr.copy(r);
+		dr.sub(m);
+		dr.norm();
+		r.cmove(dr,int32(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1)));
+/*
 		if dcomp(r,m)>=0 {
 			r.sub(m);
 			r.norm();
-		}
+		} */
 		k--;
 	}
 	return NewBIGdcopy(r)
@@ -184,10 +207,13 @@ func (r *DBIG) mod(c *BIG) *BIG {
 
 /* return this/c */
 func (r *DBIG) div(c *BIG) *BIG {
+	var d int32
 	k:=0
 	m:=NewDBIGscopy(c)
 	a:=NewBIGint(0)
 	e:=NewBIGint(1)
+	sr:=NewBIG()
+	dr:=NewDBIG()
 	r.norm()
 
 	for dcomp(r,m)>=0 {
@@ -199,12 +225,24 @@ func (r *DBIG) div(c *BIG) *BIG {
 	for k>0 {
 		m.shr(1)
 		e.shr(1)
+
+		dr.copy(r);
+		dr.sub(m);
+		dr.norm();
+		d=int32(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1));
+		r.cmove(dr,d);
+		sr.copy(a);
+		sr.add(e);
+		sr.norm();
+		a.cmove(sr,d);
+
+/*
 		if dcomp(r,m)>0 {
 			a.add(e)
 			a.norm()
 			r.sub(m)
 			r.norm()
-		}
+		} */
 		k--
 	}
 	return a

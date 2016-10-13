@@ -95,7 +95,7 @@ BIG.prototype={
 	cmove: function(b,d)
 	{
 		var i;
-		var t,c=d;
+		var c=d;
 		c=~(c-1);
 
 		for (i=0;i<ROM.NLEN;i++)
@@ -331,7 +331,7 @@ BIG.prototype={
 		m.w[ROM.NLEN]=carry;		
 		return m;
 	},
-/* divide by 4 */
+/* divide by 3 */
 	div3: function()
 	{	
 		var ak,base,carry=0;
@@ -391,6 +391,7 @@ BIG.prototype={
 	mod: function(m)
 	{
 		var k=0;  
+		var r=new BIG(0);
 
 		this.norm();
 		if (BIG.comp(this,m)<0) return;
@@ -403,11 +404,18 @@ BIG.prototype={
 		while (k>0)
 		{
 			m.fshr(1);
+
+			r.copy(this);
+			r.sub(m);
+			r.norm();
+			this.cmove(r,(1-((r.w[ROM.NLEN-1]>>(ROM.CHUNK-1))&1)));
+
+/*
 			if (BIG.comp(this,m)>=0)
 			{
 				this.sub(m);
 				this.norm();
-			}
+			} */
 			k--;
 		}
 	},
@@ -415,9 +423,11 @@ BIG.prototype={
 	div: function(m)
 	{
 		var k=0;
+		var d=0;
 		this.norm();
 		var e=new BIG(1);
 		var b=new BIG(0);
+		var r=new BIG(0);
 		b.copy(this);
 		this.zero();
 
@@ -432,13 +442,24 @@ BIG.prototype={
 		{
 			m.fshr(1);
 			e.fshr(1);
+
+			r.copy(b);
+			r.sub(m);
+			r.norm();
+			d=(1-((r.w[ROM.NLEN-1]>>(ROM.CHUNK-1))&1));
+			b.cmove(r,d);
+			r.copy(this);
+			r.add(e);
+			r.norm();
+			this.cmove(r,d); 
+/*
 			if (BIG.comp(b,m)>=0)
 			{
 				this.add(e);
 				this.norm();
 				b.sub(m);
 				b.norm();
-			}
+			} */
 			k--;
 		}
 	},

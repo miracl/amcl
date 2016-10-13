@@ -499,6 +499,7 @@ final class BIG{
     func mod(_ m: BIG)
     {
         var k=0
+	let r=BIG(0)
         norm()
         if (BIG.comp(self,m)<0) {return}
         repeat
@@ -510,11 +511,17 @@ final class BIG{
         while (k>0)
         {
             m.fshr(1)
+
+		r.copy(self)
+		r.sub(m)
+		r.norm()
+		cmove(r,Int32(1-((r.w[ROM.NLEN-1]>>Int32(ROM.CHUNK-1))&1)))
+/*
             if (BIG.comp(self,m)>=0)
             {
 				sub(m)
 				norm()
-            }
+            } */
             k -= 1
         }
     }
@@ -525,6 +532,7 @@ final class BIG{
         norm()
         let e=BIG(1)
         let b=BIG(self)
+	let r=BIG(0)
         zero()
     
         while (BIG.comp(b,m)>=0)
@@ -538,13 +546,24 @@ final class BIG{
         {
             m.fshr(1)
             e.fshr(1)
+
+		r.copy(b)
+		r.sub(m)
+		r.norm()
+		let d=Int32(1-((r.w[ROM.NLEN-1]>>Int32(ROM.CHUNK-1))&1))
+		b.cmove(r,d)
+		r.copy(self)
+		r.add(e)
+		r.norm()
+		cmove(r,d)
+/*
             if (BIG.comp(b,m)>=0)
             {
 				add(e)
 				norm()
 				b.sub(m)
 				b.norm()
-            }
+            } */
             k -= 1;
         }
     }

@@ -99,6 +99,20 @@ impl DBIG {
         for i in rom::DNLEN - m ..rom::DNLEN {self.w[i]=0}
     }
 
+/* Copy from another DBIG */
+	pub fn copy(&mut self,x: &DBIG) {
+		for i in 0 ..rom::DNLEN {
+			self.w[i]=x.w[i]
+		}
+	}
+
+	pub fn cmove(&mut self,g:&DBIG,d: i32) {
+		let b=-d;
+		for i in 0 ..rom::DNLEN {
+			self.w[i]^=(self.w[i]^g.w[i])&b;
+		}
+	}
+
 /* self-=x */
 	pub fn sub(&mut self,x:&DBIG) {
 		for i in 0 ..rom::DNLEN {
@@ -132,6 +146,7 @@ impl DBIG {
         let mut k=0;
         self.norm();
         let mut m=DBIG::new_scopy(c);
+	let mut dr=DBIG::new();
     
         if DBIG::comp(self,&m)<0 {
         	let r=BIG::new_dcopy(self);
@@ -146,10 +161,16 @@ impl DBIG {
     
         while k>0 {
             m.shr(1);
+
+		dr.copy(self);
+		dr.sub(&m);
+		dr.norm();
+		self.cmove(&dr,(1-((dr.w[rom::DNLEN-1]>>(rom::CHUNK-1))&1)) as i32);
+/*
             if DBIG::comp(self,&m)>=0 {
 				self.sub(&m);
 				self.norm();
-            }
+            } */
             k -= 1;
         }
         let r=BIG::new_dcopy(self);
@@ -162,6 +183,8 @@ impl DBIG {
         let mut m=DBIG::new_scopy(c);
         let mut a=BIG::new();
         let mut e=BIG::new_int(1);
+	let mut dr=DBIG::new();
+	let mut r=BIG::new();
         self.norm();
 
         while DBIG::comp(self,&m)>=0 {
@@ -173,12 +196,23 @@ impl DBIG {
         while k>0 {
             m.shr(1);
             e.shr(1);
+
+		dr.copy(self);
+		dr.sub(&m);
+		dr.norm();
+		let d=(1-((dr.w[rom::DNLEN-1]>>(rom::CHUNK-1))&1)) as i32;
+		self.cmove(&dr,d);
+		r.copy(&a);
+		r.add(&e);
+		r.norm();
+		a.cmove(&r,d);
+/*
             if DBIG::comp(self,&m)>0 {
                 a.add(&e);
                 a.norm();
                 self.sub(&m);
                 self.norm();
-            }
+            } */
             k-=1;
         }
         return a;

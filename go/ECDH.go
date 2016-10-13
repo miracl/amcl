@@ -402,6 +402,7 @@ func ECPSP_DSA(sha int,RNG *RAND,S []byte,F []byte,C []byte,D []byte) int {
 
 	for d.iszilch() {
 		u:=randomnum(r,RNG);
+		w:=randomnum(r,RNG);
 		if AES_S>0 {
 			u.mod2m(2*AES_S)
 		}			
@@ -411,9 +412,11 @@ func ECPSP_DSA(sha int,RNG *RAND,S []byte,F []byte,C []byte,D []byte) int {
 		c.copy(vx)
 		c.mod(r);
 		if c.iszilch() {continue}
+		u.copy(modmul(u,w,r))
 		u.invmodp(r)
 		d.copy(modmul(s,c,r))
 		d.add(f)
+		d.copy(modmul(d,w,r))
 		d.copy(modmul(u,d,r))
 	} 
        

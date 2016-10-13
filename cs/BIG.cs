@@ -657,6 +657,7 @@ public class BIG
 	public virtual void mod(BIG m)
 	{
 		int k = 0;
+		BIG r=new BIG(0);
 
 		norm();
 		if (comp(this,m) < 0)
@@ -672,11 +673,17 @@ public class BIG
 		while (k > 0)
 		{
 			m.fshr(1);
+
+			r.copy(this);
+			r.sub(m);
+			r.norm();
+			cmove(r,(int)(1-((r.w[ROM.NLEN-1]>>(ROM.CHUNK-1))&1)));
+/*
 			if (comp(this,m) >= 0)
 			{
 				sub(m);
 				norm();
-			}
+			} */
 			k--;
 		}
 	}
@@ -684,10 +691,11 @@ public class BIG
 /* divide this by m */
 	public virtual void div(BIG m)
 	{
-		int k = 0;
+		int d,k = 0;
 		norm();
 		BIG e = new BIG(1);
 		BIG b = new BIG(this);
+		BIG r=new BIG(0);
 		zero();
 
 		while (comp(b,m) >= 0)
@@ -701,13 +709,24 @@ public class BIG
 		{
 			m.fshr(1);
 			e.fshr(1);
+
+			r.copy(b);
+			r.sub(m);
+			r.norm();
+			d=(int)(1-((r.w[ROM.NLEN-1]>>(ROM.CHUNK-1))&1));
+			b.cmove(r,d);
+			r.copy(this);
+			r.add(e);
+			r.norm();
+			cmove(r,d);
+/*
 			if (comp(b,m) >= 0)
 			{
 				add(e);
 				norm();
 				b.sub(m);
 				b.norm();
-			}
+			} */
 			k--;
 		}
 	}

@@ -49,6 +49,23 @@ final class DBIG{
     {
         for i in 0 ..< ROM.DNLEN {w[i]=x[i]}
     }
+
+    func cmove(_ g: DBIG,_ d: Int32)
+    {
+        let b:Int32 = -d;
+    
+        for i in 0 ..< ROM.DNLEN
+        {
+            w[i]^=(w[i]^g.w[i])&b;
+        }
+    }
+
+/* Copy from another DBIG */
+    func copy(_ x: DBIG)
+    {
+        for i in 0 ..< ROM.DNLEN {w[i] = x.w[i]}
+    }
+
     /* this-=x */
     func sub(_ x: DBIG)
     {
@@ -119,6 +136,7 @@ final class DBIG{
         var k:Int=0
         norm()
         let m=DBIG(c)
+	let r=DBIG(0)
     
         if DBIG.comp(self,m)<0 {return BIG(self)}
     
@@ -132,11 +150,18 @@ final class DBIG{
         while (k>0)
         {
             m.shr(1)
+
+		r.copy(self)
+		r.sub(m)
+		r.norm()
+		cmove(r,Int32(1-((r.w[ROM.DNLEN-1]>>Int32(ROM.CHUNK-1))&1)))
+/*
+
             if (DBIG.comp(self,m)>=0)
             {
 				sub(m)
 				norm()
-            }
+            } */
             k -= 1;
         }
         return BIG(self)
@@ -148,6 +173,9 @@ final class DBIG{
         let m=DBIG(c)
         let a=BIG(0)
         let e=BIG(1)
+	let r=BIG(0)
+	let dr=DBIG(0)
+
         norm()
     
         while (DBIG.comp(self,m)>=0)
@@ -161,13 +189,24 @@ final class DBIG{
         {
             m.shr(1)
             e.shr(1)
+
+		dr.copy(self)
+		dr.sub(m)
+		dr.norm()
+		let d=Int32(1-((dr.w[ROM.DNLEN-1]>>Int32(ROM.CHUNK-1))&1))
+		cmove(dr,d)
+		r.copy(a)
+		r.add(e)
+		r.norm()
+		a.cmove(r,d)
+/*
             if (DBIG.comp(self,m)>0)
             {
 				a.add(e)
 				a.norm()
 				sub(m)
 				norm()
-            }
+            } */
             k -= 1
         }
         return a

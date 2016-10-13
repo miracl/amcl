@@ -409,7 +409,7 @@ var ECDH = {
 	ECPSP_DSA: function(sha,RNG,S,F,C,D)
 	{
 		var T=[];
-		var i,gx,gy,r,s,f,c,d,u,vx;
+		var i,gx,gy,r,s,f,c,d,u,vx,w;
 		var G,V;
 
 		var B=this.hashit(sha,F,0,null,ROM.MODBYTES);
@@ -430,6 +430,7 @@ var ECDH = {
 
 		do {
 			u=BIG.randomnum(r,RNG);
+			w=BIG.randomnum(r,RNG);
 			if (ROM.AES_S>0)
 			{
 				u.mod2m(2*ROM.AES_S);
@@ -440,9 +441,11 @@ var ECDH = {
 			c.copy(vx);
 			c.mod(r);
 			if (c.iszilch()) continue;
+			u=BIG.modmul(u,w,r);
 			u.invmodp(r);
 			d=BIG.modmul(s,c,r);
 			d.add(f);
+			d=BIG.modmul(d,w,r);
 			d=BIG.modmul(u,d,r);
 		} while (d.iszilch());
        

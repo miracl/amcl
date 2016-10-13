@@ -58,6 +58,13 @@ public class DBIG {
 		w[i]=x;
 	}
 
+/* Copy from another DBIG */
+	public void copy(DBIG x)
+	{
+		for (int i=0;i<ROM.DNLEN;i++)
+			w[i]=x.w[i];
+	}
+
 /* test this=0? */
 	public boolean iszilch() {
 		for (int i=0;i<ROM.DNLEN;i++)
@@ -159,6 +166,19 @@ public class DBIG {
 		return d;
 	}
 */
+
+	public void cmove(DBIG g,int d)
+	{
+		int i;
+		int b=-d;
+
+		for (i=0;i<ROM.DNLEN;i++)
+		{
+			w[i]^=(w[i]^g.w[i])&b;
+		}
+	}
+
+
 /* this+=x */
 	public void add(DBIG x) {
 		for (int i=0;i<ROM.DNLEN;i++)
@@ -197,6 +217,7 @@ public class DBIG {
 		int k=0;  
 		norm();
 		DBIG m=new DBIG(c);
+		DBIG r=new DBIG(0);
 
 		if (comp(this,m)<0) return new BIG(this);
 		
@@ -210,11 +231,18 @@ public class DBIG {
 		while (k>0)
 		{
 			m.shr(1);
+
+			r.copy(this);
+			r.sub(m);
+			r.norm();
+			cmove(r,1-((r.w[ROM.DNLEN-1]>>(ROM.CHUNK-1))&1));
+/*
 			if (comp(this,m)>=0)
 			{
 				sub(m);
 				norm();
 			}
+*/
 			k--;
 		}
 		return new BIG(this);
@@ -250,8 +278,10 @@ public class DBIG {
 /* return this/c */
 	public BIG div(BIG c)
 	{
-		int k=0;
+		int d,k=0;
 		DBIG m=new DBIG(c);
+		DBIG dr=new DBIG(0);
+		BIG r=new BIG(0);
 		BIG a=new BIG(0);
 		BIG e=new BIG(1);
 		norm();
@@ -267,13 +297,24 @@ public class DBIG {
 		{
 			m.shr(1);
 			e.shr(1);
+
+			dr.copy(this);
+			dr.sub(m);
+			dr.norm();
+			d=1-((dr.w[ROM.DNLEN-1]>>(ROM.CHUNK-1))&1);
+			cmove(dr,d);
+			r.copy(a);
+			r.add(e);
+			r.norm();
+			a.cmove(r,d);
+/*
 			if (comp(this,m)>0)
 			{
 				a.add(e);
 				a.norm();
 				sub(m);
 				norm();
-			}
+			} */
 			k--;
 		}
 		return a;

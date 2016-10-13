@@ -433,6 +433,7 @@ pub fn ecpsp_dsa(sha: usize,rng: &mut RAND,s: &[u8],f: &[u8],c: &mut [u8],d: &mu
 
 	while db.iszilch() {
 		let mut u=BIG::randomnum(&r,rng);
+		let mut w=BIG::randomnum(&r,rng);
 		if rom::AES_S>0 {
 			u.mod2m(2*rom::AES_S);
 		}			
@@ -442,9 +443,17 @@ pub fn ecpsp_dsa(sha: usize,rng: &mut RAND,s: &[u8],f: &[u8],c: &mut [u8],d: &mu
 		cb.copy(&vx);
 		cb.rmod(&r);
 		if cb.iszilch() {continue}
+
+		tb.copy(&BIG::modmul(&mut u,&mut w,&r));
+		u.copy(&tb);
+
 		u.invmodp(&r);
 		db.copy(&BIG::modmul(&mut sc,&mut cb,&r));
 		db.add(&fb);
+
+		tb.copy(&BIG::modmul(&mut db,&mut w,&r));
+		db.copy(&tb);
+
 		tb.copy(&BIG::modmul(&mut u,&mut db,&r));
 		db.copy(&tb);
 	} 

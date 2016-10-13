@@ -1013,7 +1013,7 @@ int BIG_dnbits(BIG a)
 void BIG_mod(BIG b,BIG c)
 {
     int k=0;
-	BIG r;
+	BIG r; /**/
 
     BIG_norm(b);
     if (BIG_comp(b,c)<0)
@@ -1028,6 +1028,7 @@ void BIG_mod(BIG b,BIG c)
     while (k>0)
     {
         BIG_fshr(c,1);
+
 // constant time...  
 		BIG_sub(r,b,c);
 		BIG_norm(r);
@@ -1090,8 +1091,8 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
 void BIG_ddiv(BIG a,DBIG b,BIG c)
 {
 	int d,k=0;
-	DBIG m,r;
-	BIG e;
+	DBIG m,dr;
+	BIG e,r;
 	BIG_dnorm(b);
 	BIG_dscopy(m,c);
 
@@ -1110,10 +1111,10 @@ void BIG_ddiv(BIG a,DBIG b,BIG c)
 		BIG_dshr(m,1);
 		BIG_fshr(e,1);
 
-		BIG_dsub(r,b,m);
-		BIG_dnorm(r);
-		d=1-((r[DNLEN-1]>>(CHUNK-1))&1);
-		BIG_dcmove(b,r,d);
+		BIG_dsub(dr,b,m);
+		BIG_dnorm(dr);
+		d=1-((dr[DNLEN-1]>>(CHUNK-1))&1);
+		BIG_dcmove(b,dr,d);
 
 		BIG_add(r,a,e);
 		BIG_norm(r);
