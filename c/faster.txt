@@ -8,7 +8,7 @@ and arch.h are settled), then compile and execute the program faster.c like
 this (using MinGW port of GCC as an example), in the same directory as 
 arch.h and amcl.h
 
-gcc -O2 faster.c -o faster.exe
+gcc -O2 -std=c99 faster.c -o faster.exe
 faster > t.txt
 
 Now extract the code fragments from t.txt and insert them where indicated

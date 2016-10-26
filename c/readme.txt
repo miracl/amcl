@@ -8,7 +8,7 @@ in arch.h
 Next - decide what you want to do. Edit amcl.h - note there is only
 one area where USER CONFIGURABLE input is requested.
 
-Here set the wordlength of your computer, and choose your curve.
+Here choose your curve.
 
 Once this is done, build the library, and compile and link your program 
 with an API file and the ROM file rom.c that contains curve constants.
