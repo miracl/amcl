@@ -517,23 +517,16 @@ void FP_reduce(BIG a)
 static int logb2(unsign32 v)
 {
 	int r;
-	static const sign8 MultiplyDeBruijnBitPosition2[32] = 
-	{
-		0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 
-		31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
-	};
-
 	v |= v >> 1;
 	v |= v >> 2;
 	v |= v >> 4;
 	v |= v >> 8;
 	v |= v >> 16;
-	v++;
 
-	r = (int)MultiplyDeBruijnBitPosition2[(v *  0x077CB531) >> 27];
-	r++;
-
-	return r;
+	v = v - ((v >> 1) & 0x55555555);                  
+	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);  
+	r = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; 
+	return r+1;
 }
 
 /* Set r=-a mod Modulus */
