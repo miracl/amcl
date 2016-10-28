@@ -34,7 +34,7 @@ AES.prototype={
 		this.mode=m;
 		for (i=0;i<16;i++)
 			this.f[i]=0;
-		if (this.mode!=this.ECB && iv!==null)
+		if (this.mode!=ROM.ECB && iv!==null)
 			for (i=0;i<16;i++)
 				this.f[i]=iv[i];
 	},
