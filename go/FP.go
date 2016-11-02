@@ -129,7 +129,7 @@ func (F *FP) mul(b *FP) {
 
 	if (ea+1)>FEXCESS/(eb+1) {
 		F.reduce()
-
+	}
 	d:=mul(F.x,b.x)
 	F.x.copy(mod(d))
 }
@@ -179,7 +179,7 @@ func (F *FP) sqr() {
 	ea:=EXCESS(F.x)
 	if (ea+1)>FEXCESS/(ea+1) {
 		F.reduce()
-	
+	}
 	d:=sqr(F.x)	
 	F.x.copy(mod(d))
 }
