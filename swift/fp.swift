@@ -133,12 +133,14 @@ final class FP {
 /* this*=b mod Modulus */
     func mul(_ b: FP)
     {
+	norm()
+	b.norm()
         let ea=BIG.EXCESS(x)
         let eb=BIG.EXCESS(b.x)
     
-        if (ea+1)>=(ROM.FEXCESS-1)/(eb+1) {reduce()}
-        else {norm()}
-        b.norm()
+	if Int64(ea+1)*Int64(eb+1)>Int64(ROM.FEXCESS) {reduce()}
+        /*if (ea+1)>=(ROM.FEXCESS-1)/(eb+1) {reduce()}*/
+
         let d=BIG.mul(x,b.x)
         x.copy(BIG.mod(d))
     }
@@ -189,9 +191,12 @@ final class FP {
 /* this*=this mod Modulus */
     func sqr()
     {
+	norm()
         let ea=BIG.EXCESS(x);
-        if (ea+1)>=(ROM.FEXCESS-1)/(ea+1) {reduce()}
-        else {norm()}
+
+	if Int64(ea+1)*Int64(ea+1)>Int64(ROM.FEXCESS) {reduce()}
+        /*if (ea+1)>=(ROM.FEXCESS-1)/(ea+1) {reduce()}*/
+      
         let d=BIG.sqr(x);
         x.copy(BIG.mod(d));
     }

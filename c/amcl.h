@@ -84,6 +84,11 @@
 #define BLS455 200   /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
 
 
+
+
+
+
+
 /*** START OF USER CONFIGURABLE SECTION - set architecture and choose modulus and curve  ***/
 
 #define CHOICE BN254	/**< Current choice of Field */
@@ -109,6 +114,11 @@
 // #define UNWOUND 
 
 /*** END OF USER CONFIGURABLE SECTION ***/
+
+
+
+
+
 
 
 

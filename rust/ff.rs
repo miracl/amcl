@@ -32,7 +32,7 @@ use rom;
 //mod rand;
 use rand::RAND;
 //mod hash256;
-use std::process;
+//use std::process;
 
 pub const BB:usize=rom::BASEBITS as usize;
 pub const P_MBITS:usize=(rom::MODBYTES as usize)*8;
@@ -412,8 +412,8 @@ impl FF {
 		let nd2=n/2;
 		self.radd(n,x,0,x,nd2,nd2);
 		self.radd(n+nd2,y,0,y,nd2,nd2);
-		self.rnorm(n,nd2);
-		self.rnorm(n+nd2,nd2);
+		self.rnorm(n,nd2 as isize);
+		self.rnorm(n+nd2,nd2 as isize);
 
 		unsafe {			
 			(*t).karmul(0,self,n+nd2,self,n,t,n,nd2);  /* t = (a0+a1)(b0+b1) */
@@ -771,7 +771,7 @@ impl FF {
 	pub fn power(&mut self,e: i32,p: &FF) {
 		let n=p.length;
 		let mut w=FF::new_int(n);
-		let mut nd=p.invmod2m();
+		let nd=p.invmod2m();
 		let mut f=true;
 		let mut ee=e;
 
@@ -920,7 +920,7 @@ impl FF {
 			s+=1;
 		}
 		if s==0 {return false}
-		for i in 0..10 {
+		for _ in 0..10 {
 			x.randomnum(&p,rng);
 
 			x.pow(&d,&p);

@@ -136,16 +136,19 @@ impl FP {
 /* this*=b mod Modulus */
     pub fn mul(&mut self,b: &mut FP)
     {
+
+	self.norm();
+	b.norm();
         let ea=BIG::excess(&(self.x));
         let eb=BIG::excess(&(b.x));
     
-        if (ea+1)>=(rom::FEXCESS-1)/(eb+1) {self.reduce()}
-        else {self.norm()}
-    
-        b.norm();
+	if ((ea+1) as i64)*((eb+1) as i64)>(rom::FEXCESS as i64) {self.reduce()} 
+        /* if (ea+1)>rom::FEXCESS/(eb+1) {self.reduce()} */
+
         let mut d=BIG::mul(&(self.x),&(b.x));
         self.x.copy(&BIG::modulo(&mut d))
     }
+
 /* this = -this mod Modulus */
     pub fn neg(&mut self) {
   		let mut p = BIG::new_ints(&rom::MODULUS);   
@@ -188,9 +191,11 @@ impl FP {
 
 /* self*=self mod Modulus */
     pub fn sqr(&mut self) {
+	self.norm();
         let ea=BIG::excess(&(self.x));
-        if (ea+1)>=(rom::FEXCESS-1)/(ea+1) {self.reduce()}
-        else {self.norm()}
+
+	if ((ea+1) as i64)*((ea+1) as i64)>(rom::FEXCESS as i64) {self.reduce()} 
+      /* if (ea+1)>=(rom::FEXCESS-1)/(ea+1) {self.reduce()} */
     
         let mut d=BIG::sqr(&(self.x));
         self.x.copy(&BIG::modulo(&mut d))

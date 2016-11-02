@@ -126,15 +126,18 @@ public final class FP {
 /* this*=b mod Modulus */
 	public void mul(FP b)
 	{
-		long ea=BIG.EXCESS(x);
-		long eb=BIG.EXCESS(b.x);
-
-		if ((ea+1)>=(ROM.FEXCESS-1)/(eb+1)) reduce();
-		else norm();
+		long ea,eb;
+		norm();
 		b.norm();
+		ea=BIG.EXCESS(x);
+		eb=BIG.EXCESS(b.x);
+
+		if ((ea+1)>ROM.FEXCESS/(eb+1)) reduce();
+
 		DBIG d=BIG.mul(x,b.x);
 		x.copy(BIG.mod(d));
 	}
+
 
 /* this*=c mod Modulus, where c is a small int */
 	public void imul(int c)
@@ -169,10 +172,11 @@ public final class FP {
 	public void sqr()
 	{
 		DBIG d;
-		long ea=BIG.EXCESS(x);
-		if ((ea+1)>=(ROM.FEXCESS-1)/(ea+1))
+		long ea;
+		norm();
+		ea=BIG.EXCESS(x);
+		if ((ea+1)>ROM.FEXCESS/(ea+1))
 			reduce();
-		else norm();
 	
 		d=BIG.sqr(x);	
 		x.copy(BIG.mod(d));

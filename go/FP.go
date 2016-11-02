@@ -121,13 +121,15 @@ func (F *FP) cmove(b *FP,d int32) {
 
 /* this*=b mod Modulus */
 func (F *FP) mul(b *FP) {
+
+	F.norm();
+	b.norm();
 	ea:=EXCESS(F.x)
 	eb:=EXCESS(b.x)
 
-	if (ea+1)>=(FEXCESS-1)/(eb+1) {
+	if (ea+1)>FEXCESS/(eb+1) {
 		F.reduce()
-	} else {F.norm()}
-	b.norm();
+
 	d:=mul(F.x,b.x)
 	F.x.copy(mod(d))
 }
@@ -173,13 +175,12 @@ func (F *FP) imul(c int) {
 
 /* this*=this mod Modulus */
 func (F *FP) sqr() {
+	F.norm();
 	ea:=EXCESS(F.x)
-	if (ea+1)>=(FEXCESS-1)/(ea+1) {
+	if (ea+1)>FEXCESS/(ea+1) {
 		F.reduce()
-	} else {F.norm()}
 	
 	d:=sqr(F.x)	
-
 	F.x.copy(mod(d))
 }
 

@@ -150,11 +150,14 @@ FP.prototype={
 /* this*=b mod Modulus */
 	mul: function(b)
 	{
+		this.norm();
+		b.norm();
 		var ea=BIG.EXCESS(this.f);
 		var eb=BIG.EXCESS(b.f);
-		if ((ea+1) >= Math.floor((ROM.FEXCESS-1)/(eb+1))) this.reduce();
-		else this.norm();
-		b.norm();
+
+		if ((ea+1)*(eb+1)>ROM.FEXCESS) this.reduce();
+		//if ((ea+1) >= Math.floor((ROM.FEXCESS-1)/(eb+1))) this.reduce();
+
 		var d=BIG.mul(this.f,b.f);
 		this.f.copy(BIG.mod(d));
 		return this;
@@ -195,9 +198,12 @@ FP.prototype={
 	sqr: function()
 	{
 		var d;
+		this.norm();
 		var ea=BIG.EXCESS(this.f);
-		if ((ea+1)>= Math.floor((ROM.FEXCESS-1)/(ea+1))) this.reduce();
-		else this.norm();
+
+		if ((ea+1)*(ea+1)>ROM.FEXCESS) this.reduce();
+		//if ((ea+1)>= Math.floor((ROM.FEXCESS-1)/(ea+1))) this.reduce();
+
 		d=BIG.sqr(this.f);
 		var t=BIG.mod(d); 
 		this.f.copy(t);

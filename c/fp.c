@@ -226,97 +226,10 @@ void FP_mod(BIG a,DBIG d)
 
 #endif
 
-    /*
-    	t=d[0]; d[0]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[0]*md[0]; c=(t>>BASEBITS)+d[1];
+#ifdef DEBUG_NORM
+    a[NLEN]=0;
+#endif
 
-    	for (k=1;k<NLEN;k++)
-    	{
-    		t = c+(dchunk)d[0]*md[k];
-    		for (i=1;i<k;i++) t+=(dchunk)d[i]*md[k-i];
-    		d[k]=((chunk)t*MConst)&BMASK; t+=(dchunk)d[k]*md[0]; c=(t>>BASEBITS)+d[k+1];
-    	}
-    	for (k=NLEN;k<2*NLEN-1;k++)
-    	{
-    		t = c;
-    		for (i=k-NLEN+1;i<NLEN;i++) t+=(dchunk)d[i]*md[k-i];
-    		d[k]=(chunk)t&BMASK; c=(t>>BASEBITS)+d[k+1];
-    	}
-    	d[2*NLEN-1]=(chunk)c&BMASK;
-    */
-    /*
-    	sum=d[0];
-    	if (MConst==-1) sp=(-(chunk)sum)&BMASK;
-    	else
-    	{
-    		if (MConst==1) sp=((chunk)sum)&BMASK;
-    		else sp=((chunk)sum*MConst)&BMASK;
-    	}
-    	d[0]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
-    	sum=d[1]+(sum>>BASEBITS);
-
-    	for (j=1;j<NLEN;j++)
-    	{
-    		sum+=(dchunk)d[0]*md[j];
-    		for (i=1;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
-    		if (MConst==-1) sp=(-(chunk)sum)&BMASK;
-    		else
-    		{
-    			if (MConst==1) sp=((chunk)sum)&BMASK;
-    			else sp=((chunk)sum*MConst)&BMASK;
-    		}
-    		d[j]=sp;
-    		dd[j]=(dchunk)sp*md[j];
-    		sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
-    		sum=d[j+1]+(sum>>BASEBITS);
-    	}
-
-    	for (j=NLEN;j<DNLEN-2;j++)
-    	{
-    		for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
-    		d[j]=(chunk)sum&BMASK;
-    		sum=d[j+1]+(sum>>BASEBITS);
-    	}
-
-    	sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
-    	d[DNLEN-2]=(chunk)sum&BMASK;
-    	sum=d[DNLEN-1]+(sum>>BASEBITS);
-    	d[DNLEN-1]=(chunk)sum&BMASK;
-    */
-//	BIG_sducopy(a,d);
-//    BIG_norm(a);
-
-
-    /* Faster to Combafy it.. Let the compiler unroll the loops! */
-    /*
-    	sum=d[0];
-    	for (j=0;j<NLEN;j++)
-    	{
-    		for (i=0;i<j;i++) sum+=(dchunk)d[i]*md[j-i];
-    		if (MConst==-1) sp=(-(chunk)sum)&BMASK;
-    		else
-    		{
-    			if (MConst==1) sp=((chunk)sum)&BMASK;
-    			else sp=((chunk)sum*MConst)&BMASK;
-    		}
-    		d[j]=sp; sum+=(dchunk)sp*md[0];  // no need for &BMASK here!
-    		sum=d[j+1]+(sum>>BASEBITS);
-    	}
-
-    	for (j=NLEN;j<DNLEN-2;j++)
-    	{
-    		for (i=j-NLEN+1;i<NLEN;i++) sum+=(dchunk)d[i]*md[j-i];
-    		d[j]=(chunk)sum&BMASK;
-    		sum=d[j+1]+(sum>>BASEBITS);
-    	}
-
-    	sum+=(dchunk)d[NLEN-1]*md[NLEN-1];
-    	d[DNLEN-2]=(chunk)sum&BMASK;
-    	sum=d[DNLEN-1]+(sum>>BASEBITS);
-    	d[DNLEN-1]=(chunk)sum&BMASK;
-
-    	BIG_sducopy(a,d);
-    	BIG_norm(a);
-    */
 #else
     int j;
     chunk m,carry;
@@ -378,31 +291,31 @@ int tdadd=0,rdadd=0,tdneg=0,rdneg=0;
 void FP_mul(BIG r,BIG a,BIG b)
 {
     DBIG d;
-    chunk ea=EXCESS(a);
-    chunk eb=EXCESS(b);
-    if ((ea+1)>=(FEXCESS-1)/(eb+1))
+    chunk ea,eb;
+    BIG_norm(a);
+    BIG_norm(b);	
+	ea=EXCESS(a);
+	eb=EXCESS(b);
+
+#ifdef DCHUNK
+	if ((dchunk)(ea+1)*(eb+1)>(dchunk)FEXCESS)
+#else
+    if ((ea+1)>FEXCESS/(eb+1))
+#endif
     {
 #ifdef DEBUG_REDUCE
-        printf("Product too large - reducing it %d %d\n",ea,eb);
+        printf("Product too large - reducing it %d %d %d\n",ea,eb,FEXCESS);
 #endif
         FP_reduce(a);  /* it is sufficient to fully reduce just one of them < p */
 #ifdef GET_STATS
         rmul++;
     }
-    else
-    {
-        BIG_norm(a);   /* change here */
-    }
+
     tmul++;
 #else
     }
-    else
-    {
-        BIG_norm(a);   /* change here */
-    }
 #endif
 
-    BIG_norm(b);
     BIG_mul(d,a,b);
     FP_mod(r,d);
 }
@@ -446,8 +359,14 @@ void FP_imul(BIG r,BIG a,int c)
 void FP_sqr(BIG r,BIG a)
 {
     DBIG d;
-    chunk ea=EXCESS(a);
-    if ((ea+1)>=(FEXCESS-1)/(ea+1))
+    chunk ea;
+	BIG_norm(a);
+	ea=EXCESS(a);
+#ifdef DCHUNK
+	if ((dchunk)(ea+1)*(ea+1)>(dchunk)FEXCESS)
+#else
+    if ((ea+1)>FEXCESS/(ea+1))
+#endif
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d\n",ea);
@@ -456,16 +375,8 @@ void FP_sqr(BIG r,BIG a)
 #ifdef GET_STATS
         rsqr++;
     }
-    else
-    {
-        BIG_norm(a);   /* change here */
-    }
     tsqr++;
 #else
-    }
-    else
-    {
-        BIG_norm(a);   /* change here */
     }
 #endif
 

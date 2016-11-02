@@ -41,7 +41,7 @@ pub const SHA256:usize=32;
 pub const SHA384:usize=48;
 pub const SHA512:usize=64;
 
-pub const RSA_HASH_TYPE:usize=SHA512;
+pub const RSA_HASH_TYPE:usize=SHA256;
 
 pub struct RsaPrivateKey {
 	p:FF,
@@ -378,7 +378,7 @@ pub fn decrypt(prv: &RsaPrivateKey,g: &[u8],f: &mut [u8]) {
 }
 
 use std::str;
-use std::process;
+//use std::process;
 
 fn main()
 {
