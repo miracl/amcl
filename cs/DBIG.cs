@@ -73,6 +73,14 @@ public class DBIG
 		w[i] += x;
 	}
 
+
+/* Copy from another DBIG */
+	public virtual void copy(DBIG x)
+	{
+		for (int i=0;i<ROM.DNLEN;i++)
+			w[i]=x.w[i];
+	}
+
 /* test this=0? */
 	public virtual bool iszilch()
 	{

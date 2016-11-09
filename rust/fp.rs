@@ -149,14 +149,30 @@ impl FP {
         self.x.copy(&BIG::modulo(&mut d))
     }
 
+    fn logb2(w: u32) -> usize {
+        let mut v=w;
+        v |= v >> 1;
+        v |= v >> 2;
+        v |= v >> 4;
+        v |= v >> 8;
+        v |= v >> 16;
+
+        v = v - ((v >> 1) & 0x55555555);                 
+        v = (v & 0x33333333) + ((v >> 2) & 0x33333333);  
+        let r= ((   ((v + (v >> 4)) & 0xF0F0F0F)   * 0x1010101) >> 24) as usize;
+        return r+1;    
+    }
+
 /* this = -this mod Modulus */
     pub fn neg(&mut self) {
   		let mut p = BIG::new_ints(&rom::MODULUS);   
     
         self.norm();
-    
-        let mut ov=BIG::excess(&(self.x));
-        let mut sb=1; while ov != 0 {sb += 1;ov>>=1}
+
+        let sb=FP::logb2(BIG::excess(&(self.x)) as u32);
+
+    //    let mut ov=BIG::excess(&(self.x));
+    //    let mut sb=1; while ov != 0 {sb += 1;ov>>=1}
     
         p.fshl(sb);
         self.x.rsub(&p);

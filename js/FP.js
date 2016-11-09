@@ -225,8 +225,10 @@ FP.prototype={
 		m.rcopy(ROM.Modulus);
 
 		this.norm();
-		ov=BIG.EXCESS(this.f); 
-		sb=1; while(ov!==0) {sb++;ov>>=1;} 
+		sb=FP.logb2(BIG.EXCESS(this.f));
+
+//		ov=BIG.EXCESS(this.f); 
+//		sb=1; while(ov!==0) {sb++;ov>>=1;} 
 
 		m.fshl(sb);
 		this.f.rsub(m);	
@@ -343,4 +345,16 @@ FP.prototype={
 
 };
 
+FP.logb2=function(v)
+{
+		v |= v >>> 1;
+		v |= v >>> 2;
+		v |= v >>> 4;
+		v |= v >>> 8;
+		v |= v >>> 16;
 
+		v = v - ((v >>> 1) & 0x55555555);                  
+		v = (v & 0x33333333) + ((v >>> 2) & 0x33333333);  
+		var r = ((v + (v >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24; 
+		return r+1;
+};

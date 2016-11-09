@@ -144,6 +144,22 @@ final class FP {
         let d=BIG.mul(x,b.x)
         x.copy(BIG.mod(d))
     }
+
+    static func logb2(_ w: UInt32) -> Int
+    {
+        var v = w
+        v |= (v >> 1)
+        v |= (v >> 2)
+        v |= (v >> 4)
+        v |= (v >> 8)
+        v |= (v >> 16)
+
+        v = v - ((v >> 1) & 0x55555555)                 
+        v = (v & 0x33333333) + ((v >> 2) & 0x33333333)  
+        let r = Int((   ((v + (v >> 4)) & 0xF0F0F0F)   &* 0x1010101) >> 24)
+        return (r+1)        
+    }
+
 /* this = -this mod Modulus */
     func neg()
     {
@@ -151,8 +167,9 @@ final class FP {
     
         norm();
     
-        var ov=BIG.EXCESS(x);
-        var sb=1; while(ov != 0) {sb += 1;ov>>=1}
+        let sb=FP.logb2(UInt32(BIG.EXCESS(x)))
+//       var ov=BIG.EXCESS(x);
+//       var sb=1; while(ov != 0) {sb += 1;ov>>=1}
     
         m.fshl(sb)
         x.rsub(m)

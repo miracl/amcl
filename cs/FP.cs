@@ -205,15 +205,31 @@ public sealed class FP
 		}
 	}
 
+	private static int logb2(uint v)
+	{
+		int r;
+		v |= v >> 1;
+		v |= v >> 2;
+		v |= v >> 4;
+		v |= v >> 8;
+		v |= v >> 16;
+
+		v = v - ((v >> 1) & 0x55555555);                  
+		v = (v & 0x33333333) + ((v >> 2) & 0x33333333);  
+		r = (int)(((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24); 
+		return r+1;
+	}
+
 /* this = -this mod Modulus */
 	public void neg()
 	{
 		int sb;
-		long ov;
 		BIG m = new BIG(p);
 
 		norm();
 
+		sb=logb2((uint)BIG.EXCESS(x));
+/*
 		ov = BIG.EXCESS(x);
 		sb = 1;
 		while (ov != 0)
@@ -221,7 +237,7 @@ public sealed class FP
 			sb++;
 			ov >>= 1;
 		}
-
+*/
 		m.fshl(sb);
 		x.rsub(m);
 

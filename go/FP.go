@@ -122,8 +122,8 @@ func (F *FP) cmove(b *FP,d int32) {
 /* this*=b mod Modulus */
 func (F *FP) mul(b *FP) {
 
-	F.norm();
-	b.norm();
+	F.norm()
+	b.norm()
 	ea:=EXCESS(F.x)
 	eb:=EXCESS(b.x)
 
@@ -134,14 +134,28 @@ func (F *FP) mul(b *FP) {
 	F.x.copy(mod(d))
 }
 
+func logb2(w uint32) uint {
+	v:=w
+	v |= (v >> 1)
+	v |= (v >> 2)
+	v |= (v >> 4)
+	v |= (v >> 8)
+	v |= (v >> 16)
+
+	v = v - ((v >> 1) & 0x55555555)                 
+	v = (v & 0x33333333) + ((v >> 2) & 0x33333333)  
+	r:= uint((   ((v + (v >> 4)) & 0xF0F0F0F)   * 0x1010101) >> 24)
+	return (r+1)
+}
+
 /* this = -this mod Modulus */
 func (F *FP) neg() {
 	m:=NewBIGcopy(&p)
-
 	F.norm()
+	sb:=logb2(uint32(EXCESS(F.x)))
 
-	ov:=EXCESS(F.x); 
-	sb:=uint(1); for ov!=0 {sb++;ov>>=1} 
+//	ov:=EXCESS(F.x); 
+//	sb:=uint(1); for ov!=0 {sb++;ov>>=1} 
 
 	m.fshl(sb)
 	F.x.rsub(m)		
