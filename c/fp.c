@@ -297,7 +297,7 @@ void FP_mul(BIG r,BIG a,BIG b)
 	ea=EXCESS(a);
 	eb=EXCESS(b);
 
-#ifdef DCHUNK
+#ifdef dchunk
 	if ((dchunk)(ea+1)*(eb+1)>(dchunk)FEXCESS)
 #else
     if ((ea+1)>FEXCESS/(eb+1))
@@ -362,7 +362,7 @@ void FP_sqr(BIG r,BIG a)
     chunk ea;
 	BIG_norm(a);
 	ea=EXCESS(a);
-#ifdef DCHUNK
+#ifdef dchunk
 	if ((dchunk)(ea+1)*(ea+1)>(dchunk)FEXCESS)
 #else
     if ((ea+1)>FEXCESS/(ea+1))
