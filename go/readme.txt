@@ -14,13 +14,13 @@ are provided there, if you are willing to use one of these.
 
 For a quick jumpstart:-
 
-go run MPIN.go PAIR.go FP12.go FP4.go FP2.go FP.go BIG.go DBIG.go ECP.go ECP2.go HASH256.go HASH384.go HASH512.go AES.go RAND.go ROM.go
+go run TestMPIN.go MPIN.go PAIR.go FP12.go FP4.go FP2.go FP.go BIG.go DBIG.go ECP.go ECP2.go HASH256.go HASH384.go HASH512.go AES.go RAND.go ROM.go
 
 or 
 
-go run ECDH.go FP.go BIG.go DBIG.go ECP.go HASH256.go HASH384.go HASH512.go AES.go RAND.go ROM.go
+go run TestECDH.go ECDH.go FP.go BIG.go DBIG.go ECP.go HASH256.go HASH384.go HASH512.go AES.go RAND.go ROM.go
 
 or
 
-go run RSA.go FF.go BIG.go DBIG.go HASH256.go HASH384.go HASH512.go AES.go RAND.go ROM.go
+go run TestRSA.go RSA.go FF.go BIG.go DBIG.go HASH256.go HASH384.go HASH512.go AES.go RAND.go ROM.go
 

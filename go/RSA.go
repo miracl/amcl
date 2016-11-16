@@ -21,7 +21,7 @@ under the License.
 
 package main
 
-import "fmt"
+//import "fmt"
 
 const RSA_RFS int=int(MODBYTES)*FFLEN
 const RSA_SHA256 int=32
@@ -157,13 +157,6 @@ func RSA_MGF1(sha int,Z []byte,olen int,K []byte) {
 		}
 	}	
 }
-
-func RSA_printBinary(array []byte) {
-	for i:=0;i<len(array);i++ {
-		fmt.Printf("%02x", array[i])
-	}
-	fmt.Printf("\n")
-}  
 
 /* SHAXXX identifier strings */
 var SHA256ID= [...]byte {0x30,0x31,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01,0x05,0x00,0x04,0x20}
@@ -368,69 +361,3 @@ func RSA_DECRYPT(PRIV *rsa_private_key,G []byte,F []byte) {
 	g.toBytes(F)
 }
 
-func main() {
-
-	var sha=RSA_HASH_TYPE
-	message:="Hello World\n"
-
-	pub:=New_rsa_public_key(FFLEN)
-	priv:=New_rsa_private_key(HFLEN)
-
-	var ML [RSA_RFS]byte
-	var C [RSA_RFS]byte
-	var S [RSA_RFS]byte
-	var RAW [100]byte
-	
-	rng:=NewRAND()
-
-	rng.Clean();
-	for i:=0;i<100;i++ {RAW[i]=byte(i)}
-
-	rng.Seed(100,RAW[:]);
-//for (i=0;i<10;i++)
-//{
-	fmt.Printf("Generating public/private key pair\n")
-	RSA_KEY_PAIR(rng,65537,priv,pub)
-
-	M:=[]byte(message)
-
-	fmt.Printf("Encrypting test string\n")
-	E:=RSA_OAEP_ENCODE(sha,M,rng,nil) /* OAEP encode message M to E  */
-
-	RSA_ENCRYPT(pub,E,C[:])    /* encrypt encoded message */
-	fmt.Printf("Ciphertext= 0x"); RSA_printBinary(C[:])
-
-	fmt.Printf("Decrypting test string\n");
-	RSA_DECRYPT(priv,C[:],ML[:])
-	MS:=RSA_OAEP_DECODE(sha,nil,ML[:]) /* OAEP decode message  */
-
-	message=string(MS)
-	fmt.Printf(message)
-
-	fmt.Printf("Signing message\n")
-	PKCS15(sha,M,C[:]); 
-
-	RSA_DECRYPT(priv,C[:],S[:])  /* create signature in S */ 
-
-	fmt.Printf("Signature= 0x"); RSA_printBinary(S[:])
-
-	RSA_ENCRYPT(pub,S[:],ML[:])
-
-	cmp:=true
-	if len(C)!=len(ML) {
-		cmp=false
-	} else {
-		for j:=0;j<len(C);j++ {
-			if C[j]!=ML[j] {cmp=false}
-		}
-	}
-	if cmp {
-		fmt.Printf("Signature is valid")
-	} else {
-		fmt.Printf("Signature is INVALID")
-	}
-
-
-//}
-	RSA_PRIVATE_KEY_KILL(priv)
-}
