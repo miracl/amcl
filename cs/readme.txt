@@ -1,8 +1,8 @@
 AMCL is very simple to build for C#.
 
-NOTE: The C# code was automatically generated from the Java64 code using 
-the Java to C# Converter from Tangible Software Solutions. A few minor
-fix-ups were required.
+NOTE: The C# code is automatically generated from the Java64 code using 
+the Java to C# Converter from Tangible Software Solutions. We noted a few minor
+fix-ups that were required when we tried the current version of the Converter.
 
 
 ** In HASH384.cs and HASH512.cs change long to ulong. Remove castes in S() and R(). Add (ulong) caste in process()
@@ -13,19 +13,16 @@ fix-ups were required.
 ** In TestMPIN.java change line Scanner ...; pin=scan.next(); to pin = int.Parse(Console.ReadLine());
 
 
-First - decide the modulus and curve type you want to use. Edit ROM.cs 
-where indicated. You will probably want to use one of the curves whose 
-details are already in there.
 
-Three example API files are provided, MPIN.cs which 
+Three example API files will be generated, MPIN.cs which 
 supports our M-Pin (tm) protocol, ECDH.cs which supports elliptic 
 curve key exchange, digital signature and public key crypto, and RSA.cs
 which supports the RSA method.
 
-In the ROM.cs file you must provide the curve constants. Several examples
-are provided there, if you are willing to use one of these.
+In the ROM.cs file you must provide the curve constants for the curve you want to use. 
+Several examples are provided in the Java64 code, if you are willing to convert and use one of these.
 
-For a quick jumpstart:-
+When the translation is complete, for a quick jumpstart:-
 
 csc TestMPIN.cs MPIN.cs FP.cs BIG.cs DBIG.cs AES.cs HASH256.cs HASH384.cs HASH512.cs RAND.cs ROM.cs StringHelperClass.cs ECP.cs FP2.cs ECP2.cs FP4.cs FP12.cs PAIR.cs RectangularArrays.cs
 
