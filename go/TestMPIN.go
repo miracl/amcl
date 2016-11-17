@@ -125,8 +125,9 @@ func main() {
 		fmt.Printf("Decoded Time Permit TP: 0x");  MPIN_printBinary(PERMIT[:])
 	}
 
-	fmt.Printf("\nPIN= ");
-	fmt.Scanf("%d",&pin);
+	pin=0
+	fmt.Printf("\nPIN= ")
+	fmt.Scanf("%d",&pin)
 
 	pxID:=xID[:]
 	pxCID:=xCID[:]
