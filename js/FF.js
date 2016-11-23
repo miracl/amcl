@@ -303,7 +303,9 @@ FF.prototype={
 		}
 		nd2=n/2;
 		this.radd(vp,x,xp,x,xp+nd2,nd2);
+		this.rnorm(vp,nd2);                   /* Important - required for 32-bit build */
 		this.radd(vp+nd2,y,yp,y,yp+nd2,nd2);
+		this.rnorm(vp+nd2,nd2);               /* Important - required for 32-bit build */
 		t.karmul(tp,this,vp,this,vp+nd2,t,tp+n,nd2);
 		this.karmul(vp,x,xp,y,yp,t,tp+n,nd2);
 		this.karmul(vp+n,x,xp+nd2,y,yp+nd2,t,tp+n,nd2);
@@ -347,6 +349,7 @@ FF.prototype={
 		t.karmul_lower(tp,x,xp+nd2,y,yp,t,tp+n,nd2);
 		this.rinc(vp+nd2,t,tp,nd2);
 		t.karmul_lower(tp,x,xp,y,yp+nd2,t,tp+n,nd2);
+
 		this.rinc(vp+nd2,t,tp,nd2);
 		this.rnorm(vp+nd2,-nd2);  /* truncate it */
 	},
@@ -549,8 +552,10 @@ FF.prototype={
 	{
 		var n=m.length;
 		var d=new FF(2*n);
+
 		this.mod(m);
 		d.dscopy(this);
+
 		this.copy(d.reduce(m,ND));
 		this.mod(m);
 	},
@@ -723,13 +728,20 @@ FF.prototype={
 			if (e%2==1) 
 			{
 				if (f) this.copy(w);
-				else this.modmul(w,p,ND);
+				else 
+				{
+					ROM.debug=true;
+					this.modmul(w,p,ND);
+					ROM.debug=false;
+				}
 				f=false;
+
 			}
 			e>>=1;
 			if (e===0) break;
 			w.modsqr(p,ND);
 		}
+
 		this.redc(p,ND);
 	},
 
