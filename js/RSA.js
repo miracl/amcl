@@ -40,7 +40,7 @@ RSA= {
 	SHA384 : 48,
 	SHA512 : 64,
 
-	HASH_TYPE:48,
+	HASH_TYPE:32,
 
 /* SHAXXX identifier strings */
 	SHA256ID : [0x30,0x31,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01,0x05,0x00,0x04,0x20],
@@ -271,7 +271,9 @@ RSA= {
 		seedlen=hlen;
 		var CHASH=[];
 		seedlen=hlen=sha;
+
 		if (olen<seedlen+hlen+1) return null;
+
 		var DBMASK=[];
 		for (i=0;i<olen-seedlen;i++) DBMASK[i]=0;
 
@@ -317,6 +319,7 @@ RSA= {
 		}
 
 		t=DBMASK[k];
+
 		if (!comp || x!==0 || t!=0x01) 
 		{
 			for (i=0;i<olen-seedlen;i++) DBMASK[i]=0;
@@ -350,7 +353,9 @@ RSA= {
 		var f=new FF(n);
 
 		FF.fromBytes(f,F);
-		f.power(PUB.e,PUB.n);
+
+		f.power(PUB.e,PUB.n);	
+		
 		f.toBytes(G);
 	},
 

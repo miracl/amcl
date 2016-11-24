@@ -8,4 +8,5 @@
 TestRSA()
 TestECDH()
 TestMPIN()
-
+//BenchtestEC()
+//BenchtestPAIR()

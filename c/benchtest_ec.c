@@ -8,96 +8,10 @@
 #include <time.h>
 
 #include "amcl.h"
+#include "rsa.h"
 
 #define MIN_TIME 10.0
 #define MIN_ITERS 10 
-
-/* generate an RSA key pair */
-
-void rsa_key_pair(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB)
-{ /* IEEE1363 A16.11/A16.12 more or less */
-    BIG t[HFLEN],p1[HFLEN],q1[HFLEN];
-    
-	for (;;)
-	{
-
-		FF_random(PRIV->p,RNG,HFLEN);
-		while (FF_lastbits(PRIV->p,2)!=3) FF_inc(PRIV->p,1,HFLEN);
-		while (!FF_prime(PRIV->p,RNG,HFLEN))
-			FF_inc(PRIV->p,4,HFLEN);
-		
-		FF_copy(p1,PRIV->p,HFLEN);
-		FF_dec(p1,1,HFLEN);
-
-		if (FF_cfactor(p1,e,HFLEN)) continue;
-		break;
-	}
-
-	for (;;)
-	{
-		FF_random(PRIV->q,RNG,HFLEN);
-		while (FF_lastbits(PRIV->q,2)!=3) FF_inc(PRIV->q,1,HFLEN);
-		while (!FF_prime(PRIV->q,RNG,HFLEN))
-			FF_inc(PRIV->q,4,HFLEN);
-
-		FF_copy(q1,PRIV->q,HFLEN);	
-		FF_dec(q1,1,HFLEN);
-		if (FF_cfactor(q1,e,HFLEN)) continue;
-
-		break;
-	}
-
-	FF_mul(PUB->n,PRIV->p,PRIV->q,HFLEN);
-	PUB->e=e;
-
-	FF_copy(t,p1,HFLEN);
-	FF_shr(t,HFLEN);
-	FF_init(PRIV->dp,e,HFLEN);
-	FF_invmodp(PRIV->dp,PRIV->dp,t,HFLEN);
-	if (FF_parity(PRIV->dp)==0) FF_add(PRIV->dp,PRIV->dp,t,HFLEN);
-	FF_norm(PRIV->dp,HFLEN);
-
-	FF_copy(t,q1,HFLEN);
-	FF_shr(t,HFLEN);
-	FF_init(PRIV->dq,e,HFLEN);
-	FF_invmodp(PRIV->dq,PRIV->dq,t,HFLEN);
-	if (FF_parity(PRIV->dq)==0) FF_add(PRIV->dq,PRIV->dq,t,HFLEN);
-	FF_norm(PRIV->dq,HFLEN);
-
-	FF_invmodp(PRIV->c,PRIV->p,PRIV->q,HFLEN);
-
-	return;
-}
-
-/* RSA decryption with the private key */
-void rsa_decrypt(rsa_private_key *PRIV,BIG g[])
-{
-	BIG t[FFLEN],jp[HFLEN],jq[HFLEN];
-	
-	FF_dmod(jp,g,PRIV->p,HFLEN);
-	FF_dmod(jq,g,PRIV->q,HFLEN);
-
-	FF_skpow(jp,jp,PRIV->dp,PRIV->p,HFLEN);
-	FF_skpow(jq,jq,PRIV->dq,PRIV->q,HFLEN);
-
-
-	FF_zero(g,FFLEN);
-	FF_copy(g,jp,HFLEN);
-	FF_mod(jp,PRIV->q,HFLEN);
-	if (FF_comp(jp,jq,HFLEN)>0)
-		FF_add(jq,jq,PRIV->q,HFLEN);
-	FF_sub(jq,jq,jp,HFLEN);
-	FF_norm(jq,HFLEN);
-
-	FF_mul(t,PRIV->c,jq,HFLEN);
-	FF_dmod(jq,t,PRIV->q,HFLEN);
-
-	FF_mul(t,jq,PRIV->p,HFLEN);
-	FF_add(g,t,g,FFLEN);
-	FF_norm(g,FFLEN);
-
-	return;
-}
 
 int main()
 {
@@ -112,7 +26,10 @@ int main()
 	unsigned long ran;
     rsa_public_key pub;
     rsa_private_key priv;
-	BIG plain[FFLEN],cipher[FFLEN],clone[FFLEN];
+    char m[RFS],d[RFS],c[RFS];
+    octet M= {0,sizeof(m),m};
+    octet D= {0,sizeof(d),d};
+    octet C= {0,sizeof(c),c};
 
 #if CHOICE==NIST256 
 	printf("NIST256 Curve\n");
@@ -242,7 +159,7 @@ int main()
 	iterations=0;
     start=clock();
     do {
-		rsa_key_pair(&RNG,65537,&priv,&pub);
+		RSA_KEY_PAIR(&RNG,65537,&priv,&pub);
 		iterations++;
 		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
     } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
@@ -250,12 +167,15 @@ int main()
     printf("RSA gen - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
-    FF_randomnum(plain,pub.n,&RNG,FFLEN);
+    //FF_randomnum(plain,pub.n,&RNG,FFLEN);
+
+	M.len=RFS;
+	for (i=0;i<RFS;i++) M.val[i]=i%128;
 
 	iterations=0;
     start=clock();
     do {
-		FF_power(cipher,plain,65537,pub.n,FFLEN);
+		RSA_ENCRYPT(&pub,&M,&C);
 		iterations++;
 		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
     } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
@@ -263,13 +183,10 @@ int main()
     printf("RSA enc - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
-	FF_copy(clone,cipher,FFLEN);
-
 	iterations=0;
     start=clock();
     do {
-		FF_copy(cipher,clone,FFLEN);
-		rsa_decrypt(&priv,cipher);
+		RSA_DECRYPT(&priv,&C,&D);
 		iterations++;
 		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
     } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
@@ -277,10 +194,13 @@ int main()
     printf("RSA dec - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
-	if (FF_comp(plain,cipher,FFLEN)!=0)
+	for (i=0;i<RFS;i++)
 	{
-		printf("FAILURE - RSA decryption\n");
-		return 0;
+		if (M.val[i]!=D.val[i])
+		{
+			printf("FAILURE - RSA decryption\n");
+			return 0;
+		}
 	}
 
 	printf("All tests pass\n");

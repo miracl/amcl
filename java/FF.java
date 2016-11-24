@@ -348,6 +348,7 @@ public final class FF {
 
 	public static void fromBytes(FF x,byte[] b)
 	{
+
 		for (int i=0;i<x.length;i++)
 		{
 			x.v[i]=BIG.frombytearray(b,(x.length-i-1)*ROM.MODBYTES);
@@ -423,6 +424,7 @@ public final class FF {
 		t.karmul_lower(tp,x,xp+nd2,y,yp,t,tp+n,nd2);
 		rinc(vp+nd2,t,tp,nd2);
 		t.karmul_lower(tp,x,xp,y,yp+nd2,t,tp+n,nd2);
+
 		rinc(vp+nd2,t,tp,nd2);
 		rnorm(vp+nd2,-nd2);  /* truncate it */
 	}
@@ -521,15 +523,14 @@ public final class FF {
 
 		r.sducopy(this);
 		m.karmul_lower(0,this,0,ND,0,t,0,n);
-
 		karmul_upper(N,m,t,n);
 		m.sducopy(this);
+
 		r.add(N);
 		r.sub(m);
 		r.norm();
 
 		return r;
-
 	}
 
 /* Set r=this mod b */
@@ -654,6 +655,7 @@ public final class FF {
 		FF d=new FF(2*n);
 		mod(m);
 		d.dscopy(this);
+
 		copy(d.reduce(m,ND));
 		mod(m);
 	}
@@ -824,13 +826,20 @@ public final class FF {
 			if (e%2==1)
 			{
 				if (f) copy(w);
-				else modmul(w,p,ND);
+				else
+				{
+					ROM.debug=true;
+					modmul(w,p,ND);
+					ROM.debug=false;
+				}
 				f=false;
+
 			}
 			e>>=1;
 			if (e==0) break;
 			
 			w.modsqr(p,ND);	
+
 		}
 		redc(p,ND);
 	}

@@ -452,6 +452,7 @@ BIG.prototype={
 			r.add(e);
 			r.norm();
 			this.cmove(r,d); 
+
 /*
 			if (BIG.comp(b,m)>=0)
 			{
@@ -460,6 +461,8 @@ BIG.prototype={
 				b.sub(m);
 				b.norm();
 			} */
+
+
 			k--;
 		}
 	},

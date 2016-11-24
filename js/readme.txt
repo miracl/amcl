@@ -26,3 +26,12 @@ For quick jumpstart:-
 
 Run Chrome browser and navigate to TestECDH.html
 
+or TestMPIN.html
+
+or BenchtestEC.html
+
+or BenchtestPAIR.html
+
+You might need to wait a couple of minutes for the output to appear.
+
+

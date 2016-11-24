@@ -19,36 +19,19 @@ under the License.
 
 use std::time::{SystemTime};
 use std::time::UNIX_EPOCH;
-use std::io;
 
-mod fp;
-//use fp::FP;
-mod ecp;
 use ecp::ECP;
-mod fp2;
 use fp2::FP2;
-mod ecp2;
 use ecp2::ECP2;
-mod fp4;
 use fp4::FP4;
-mod fp12;
 use fp12::FP12;
-mod big;
 use big::BIG;
-mod dbig;
-mod rand;
 use rand::RAND;
-mod hash256;
 use hash256::HASH256;
-mod hash384;
 use hash384::HASH384;
-mod hash512;
 use hash512::HASH512;
-mod rom;
-mod aes;
-//use aes::AES;
-mod pair;
-
+use pair;
+use rom;
 
 /* MPIN API Functions */
 
@@ -59,58 +42,58 @@ pub const PINERROR:bool=true;
 pub const FULL: bool=true;
 pub const SINGLE_PASS:bool=false;
 
-pub const MPIN_EFS: usize=rom::MODBYTES as usize;
-pub const MPIN_EGS: usize=rom::MODBYTES as usize;
-pub const MPIN_PAS: usize=16;
-pub const MPIN_BAD_PARAMS: isize=-11;
-pub const MPIN_INVALID_POINT: isize=-14;
-pub const MPIN_WRONG_ORDER: isize=-18;
-pub const MPIN_BAD_PIN: isize=-19;
-pub const MPIN_SHA256: usize=32;
-pub const MPIN_SHA384: usize=48;
-pub const MPIN_SHA512: usize=64;
+pub const EFS: usize=rom::MODBYTES as usize;
+pub const EGS: usize=rom::MODBYTES as usize;
+pub const PAS: usize=16;
+pub const BAD_PARAMS: isize=-11;
+pub const INVALID_POINT: isize=-14;
+pub const WRONG_ORDER: isize=-18;
+pub const BAD_PIN: isize=-19;
+pub const SHA256: usize=32;
+pub const SHA384: usize=48;
+pub const SHA512: usize=64;
 
 /* Configure your PIN here */
 
-pub const MPIN_MAXPIN: i32=10000;  /* PIN less than this */
-pub const MPIN_PBLEN: i32=14;      /* Number of bits in PIN */
-pub const MPIN_TS: usize=10;         /* 10 for 4 digit PIN, 14 for 6-digit PIN - 2^TS/TS approx = sqrt(MAXPIN) */
-pub const MPIN_TRAP:usize=200;      /* 200 for 4 digit PIN, 2000 for 6-digit PIN  - approx 2*sqrt(MAXPIN) */
+pub const MAXPIN: i32=10000;  /* PIN less than this */
+pub const PBLEN: i32=14;      /* Number of bits in PIN */
+pub const TS: usize=10;         /* 10 for 4 digit PIN, 14 for 6-digit PIN - 2^TS/TS approx = sqrt(MAXPIN) */
+pub const TRAP:usize=200;      /* 200 for 4 digit PIN, 2000 for 6-digit PIN  - approx 2*sqrt(MAXPIN) */
 
-pub const MPIN_HASH_TYPE: usize=MPIN_SHA256;
+pub const HASH_TYPE: usize=SHA256;
 
 #[allow(non_snake_case)]
-fn mpin_hash(sha: usize,c: &mut FP4,U: &mut ECP,r: &mut [u8]) -> bool {
-	let mut w:[u8;MPIN_EFS]=[0;MPIN_EFS];
-	let mut t:[u8;6*MPIN_EFS]=[0;6*MPIN_EFS];
+fn hash(sha: usize,c: &mut FP4,U: &mut ECP,r: &mut [u8]) -> bool {
+	let mut w:[u8;EFS]=[0;EFS];
+	let mut t:[u8;6*EFS]=[0;6*EFS];
 
-	c.geta().geta().tobytes(&mut w); for i in 0..MPIN_EFS {t[i]=w[i]}
-	c.geta().getb().tobytes(&mut w); for i in MPIN_EFS..2*MPIN_EFS {t[i]=w[i-MPIN_EFS]}
-	c.getb().geta().tobytes(&mut w); for i in 2*MPIN_EFS..3*MPIN_EFS {t[i]=w[i-2*MPIN_EFS]}
-	c.getb().getb().tobytes(&mut w); for i in 3*MPIN_EFS..4*MPIN_EFS {t[i]=w[i-3*MPIN_EFS]}
+	c.geta().geta().tobytes(&mut w); for i in 0..EFS {t[i]=w[i]}
+	c.geta().getb().tobytes(&mut w); for i in EFS..2*EFS {t[i]=w[i-EFS]}
+	c.getb().geta().tobytes(&mut w); for i in 2*EFS..3*EFS {t[i]=w[i-2*EFS]}
+	c.getb().getb().tobytes(&mut w); for i in 3*EFS..4*EFS {t[i]=w[i-3*EFS]}
 
-	U.getx().tobytes(&mut w); for i in 4*MPIN_EFS..5*MPIN_EFS {t[i]=w[i-4*MPIN_EFS]}
-	U.gety().tobytes(&mut w); for i in 5*MPIN_EFS..6*MPIN_EFS {t[i]=w[i-5*MPIN_EFS]}
+	U.getx().tobytes(&mut w); for i in 4*EFS..5*EFS {t[i]=w[i-4*EFS]}
+	U.gety().tobytes(&mut w); for i in 5*EFS..6*EFS {t[i]=w[i-5*EFS]}
 
-	if sha==MPIN_SHA256 {
+	if sha==SHA256 {
 		let mut h=HASH256::new();
 		h.process_array(&t);
 		let sh=h.hash();
-		for i in 0..MPIN_PAS {r[i]=sh[i]}	
+		for i in 0..PAS {r[i]=sh[i]}	
 		return true;	
 	}
-	if sha==MPIN_SHA384 {
+	if sha==SHA384 {
 		let mut h=HASH384::new();
 		h.process_array(&t);
 		let sh=h.hash();
-		for i in 0..MPIN_PAS {r[i]=sh[i]}		
+		for i in 0..PAS {r[i]=sh[i]}		
 		return true;
 	}
-	if sha==MPIN_SHA512 {
+	if sha==SHA512 {
 		let mut h=HASH512::new();
 		h.process_array(&t);
 		let sh=h.hash();
-		for i in 0..MPIN_PAS {r[i]=sh[i]}
+		for i in 0..PAS {r[i]=sh[i]}
 		return true;		
 	}
 	return false;
@@ -122,7 +105,7 @@ fn mpin_hash(sha: usize,c: &mut FP4,U: &mut ECP,r: &mut [u8]) -> bool {
 fn hashit(sha: usize,n: usize,id: &[u8],w: &mut [u8]) -> bool {
 	let mut r:[u8;64]=[0;64];
 	let mut didit=false;
-	if sha==MPIN_SHA256 {
+	if sha==SHA256 {
 		let mut h=HASH256::new();
 		if n>0 {h.process_num(n as i32)}
 		h.process_array(id);
@@ -130,7 +113,7 @@ fn hashit(sha: usize,n: usize,id: &[u8],w: &mut [u8]) -> bool {
         for i in 0..sha {r[i]=hs[i];}	
         didit=true;
 	}
-	if sha==MPIN_SHA384 {
+	if sha==SHA384 {
 		let mut h=HASH384::new();
 		if n>0 {h.process_num(n as i32)}
 		h.process_array(id);
@@ -138,7 +121,7 @@ fn hashit(sha: usize,n: usize,id: &[u8],w: &mut [u8]) -> bool {
         for i in 0..sha {r[i]=hs[i];}			
 		didit=true;
 	}
-	if sha==MPIN_SHA512 {
+	if sha==SHA512 {
 		let mut h=HASH512::new();
 		if n>0 {h.process_num(n as i32)}
 		h.process_array(id);
@@ -180,7 +163,7 @@ fn mapit(h: &[u8]) -> ECP {
 }
 
 /* return time in slots since epoch */
-fn today() -> usize {
+pub fn today() -> usize {
   	return (SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()/(60*1440)) as usize;
 }
 
@@ -217,7 +200,7 @@ fn unmap(u: &mut BIG,P: &mut ECP) -> i32 {
 	return r as i32;
 }
 
-pub fn mpin_hash_id(sha: usize,id: &[u8],w: &mut [u8]) -> bool {
+pub fn hash_id(sha: usize,id: &[u8],w: &mut [u8]) -> bool {
 	return hashit(sha,0,id,w);
 }
 
@@ -225,16 +208,16 @@ pub fn mpin_hash_id(sha: usize,id: &[u8],w: &mut [u8]) -> bool {
 /* Elliptic curve point E in format (0x04,x,y} is converted to form {0x0-,u,v} */
 /* Note that u and v are indistinguisible from random strings */
 #[allow(non_snake_case)]
-pub fn mpin_encoding(rng: &mut RAND,e: &mut [u8]) ->isize {
-	let mut t:[u8;MPIN_EFS]=[0;MPIN_EFS];
+pub fn encoding(rng: &mut RAND,e: &mut [u8]) ->isize {
+	let mut t:[u8;EFS]=[0;EFS];
 
-	for i in 0..MPIN_EFS {t[i]=e[i+1]}
+	for i in 0..EFS {t[i]=e[i+1]}
 	let mut u=BIG::frombytes(&t);
-	for i in 0..MPIN_EFS {t[i]=e[i+MPIN_EFS+1]}
+	for i in 0..EFS {t[i]=e[i+EFS+1]}
 	let mut v=BIG::frombytes(&t);
 		
 	let mut P=ECP::new_bigs(&u,&v);
-	if P.is_infinity() {return MPIN_INVALID_POINT}
+	if P.is_infinity() {return INVALID_POINT}
 
 	let p=BIG::new_ints(&rom::MODULUS);
 	u=BIG::randomnum(&p,rng);
@@ -249,22 +232,22 @@ pub fn mpin_encoding(rng: &mut RAND,e: &mut [u8]) ->isize {
 	v.inc(m+1);
 	e[0]=(su+2*sv) as u8;
 	u.tobytes(&mut t);
-	for i in 0..MPIN_EFS {e[i+1]=t[i]}
+	for i in 0..EFS {e[i+1]=t[i]}
 	v.tobytes(&mut t);
-	for i in 0..MPIN_EFS {e[i+MPIN_EFS+1]=t[i]}		
+	for i in 0..EFS {e[i+EFS+1]=t[i]}		
 		
 	return 0;
 }
 
 #[allow(non_snake_case)]
-pub fn mpin_decoding(d: &mut [u8]) -> isize {
-	let mut t:[u8;MPIN_EFS]=[0;MPIN_EFS];
+pub fn decoding(d: &mut [u8]) -> isize {
+	let mut t:[u8;EFS]=[0;EFS];
 
-	if (d[0]&0x04)!=0 {return MPIN_INVALID_POINT}
+	if (d[0]&0x04)!=0 {return INVALID_POINT}
 
-	for i in 0..MPIN_EFS {t[i]=d[i+1]}
+	for i in 0..EFS {t[i]=d[i+1]}
 	let mut u=BIG::frombytes(&t);
-	for i in 0..MPIN_EFS {t[i]=d[i+MPIN_EFS+1]}
+	for i in 0..EFS {t[i]=d[i+EFS+1]}
 	let mut v=BIG::frombytes(&t);
 
 	let su=(d[0]&1) as i32;
@@ -276,20 +259,20 @@ pub fn mpin_decoding(d: &mut [u8]) -> isize {
 	v=P.gety();
 	d[0]=0x04;
 	u.tobytes(&mut t);
-	for i in 0..MPIN_EFS {d[i+1]=t[i]}
+	for i in 0..EFS {d[i+1]=t[i]}
 	v.tobytes(&mut t);
-	for i in 0..MPIN_EFS {d[i+MPIN_EFS+1]=t[i]}		
+	for i in 0..EFS {d[i+EFS+1]=t[i]}		
 		
 	return 0;
 }
 
 /* R=R1+R2 in group G1 */
 #[allow(non_snake_case)]
-pub fn mpin_recombine_g1(r1: &[u8],r2: &[u8],r: &mut [u8]) -> isize {
+pub fn recombine_g1(r1: &[u8],r2: &[u8],r: &mut [u8]) -> isize {
 	let mut P=ECP::frombytes(&r1);
 	let mut Q=ECP::frombytes(&r2);
 
-	if P.is_infinity() || Q.is_infinity() {return MPIN_INVALID_POINT}
+	if P.is_infinity() || Q.is_infinity() {return INVALID_POINT}
 
 	P.add(&mut Q);
 
@@ -299,11 +282,11 @@ pub fn mpin_recombine_g1(r1: &[u8],r2: &[u8],r: &mut [u8]) -> isize {
 
 /* W=W1+W2 in group G2 */
 #[allow(non_snake_case)]
-pub fn mpin_recombine_g2(w1: &[u8],w2: &[u8],w: &mut [u8]) -> isize {
+pub fn recombine_g2(w1: &[u8],w2: &[u8],w: &mut [u8]) -> isize {
 	let mut P=ECP2::frombytes(&w1);
 	let mut Q=ECP2::frombytes(&w2);
 
-	if P.is_infinity() || Q.is_infinity() {return MPIN_INVALID_POINT}
+	if P.is_infinity() || Q.is_infinity() {return INVALID_POINT}
 
 	P.add(&mut Q);
 	
@@ -312,7 +295,7 @@ pub fn mpin_recombine_g2(w1: &[u8],w2: &[u8],w: &mut [u8]) -> isize {
 }
 	
 /* create random secret S */
-pub fn mpin_random_generate(rng: &mut RAND,s: &mut [u8]) -> isize {
+pub fn random_generate(rng: &mut RAND,s: &mut [u8]) -> isize {
 	let r=BIG::new_ints(&rom::CURVE_ORDER);
 	let mut sc=BIG::randomnum(&r,rng);
 	if rom::AES_S>0 {
@@ -322,16 +305,9 @@ pub fn mpin_random_generate(rng: &mut RAND,s: &mut [u8]) -> isize {
 	return 0;
 }
 
-pub fn printbinary(array: &[u8]) {
-	for i in 0..array.len() {
-		print!("{:02X}", array[i])
-	}
-	println!("")
-} 
-
 /* Extract Server Secret SST=S*Q where Q is fixed generator in G2 and S is master secret */
 #[allow(non_snake_case)]
-pub fn mpin_get_server_secret(s: &[u8],sst: &mut [u8]) -> isize {
+pub fn get_server_secret(s: &[u8],sst: &mut [u8]) -> isize {
 
 	let mut Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
 
@@ -348,7 +324,7 @@ pub fn mpin_get_server_secret(s: &[u8],sst: &mut [u8]) -> isize {
  if type=0 W=x*G where G is point on the curve, else W=x*M(G), where M(G) is mapping of octet G to point on the curve
 */
 #[allow(non_snake_case)]
-pub fn mpin_get_g1_multiple(rng: Option<&mut RAND>,typ: usize,x: &mut [u8],g: &[u8],w: &mut [u8]) -> isize {
+pub fn get_g1_multiple(rng: Option<&mut RAND>,typ: usize,x: &mut [u8],g: &[u8],w: &mut [u8]) -> isize {
 	let mut sx:BIG;
 	let r=BIG::new_ints(&rom::CURVE_ORDER);
 
@@ -366,7 +342,7 @@ pub fn mpin_get_g1_multiple(rng: Option<&mut RAND>,typ: usize,x: &mut [u8],g: &[
 
 	if typ==0 {
 		P=ECP::frombytes(g);
-		if P.is_infinity() {return MPIN_INVALID_POINT}
+		if P.is_infinity() {return INVALID_POINT}
 	} else {
 		P=mapit(g)
 	}
@@ -380,21 +356,21 @@ pub fn mpin_get_g1_multiple(rng: Option<&mut RAND>,typ: usize,x: &mut [u8],g: &[
 
 /* Client secret CST=S*H(CID) where CID is client ID and S is master secret */
 /* CID is hashed externally */
-pub fn mpin_get_client_secret(s: &mut [u8],cid: &[u8],cst: &mut [u8]) -> isize {
-	return mpin_get_g1_multiple(None,1,s,cid,cst);
+pub fn get_client_secret(s: &mut [u8],cid: &[u8],cst: &mut [u8]) -> isize {
+	return get_g1_multiple(None,1,s,cid,cst);
 }
 
 /* Extract PIN from TOKEN for identity CID */
 #[allow(non_snake_case)]
-pub fn mpin_extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isize {
+pub fn extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isize {
 	let mut P=ECP::frombytes(&token);
 	const RM:usize=rom::MODBYTES as usize;
 	let mut h:[u8;RM]=[0;RM];
-	if P.is_infinity() {return MPIN_INVALID_POINT}
+	if P.is_infinity() {return INVALID_POINT}
 	hashit(sha,0,cid,&mut h);
 	let mut R=mapit(&h);
 
-	R=R.pinmul(pin%MPIN_MAXPIN,MPIN_PBLEN);
+	R=R.pinmul(pin%MAXPIN,PBLEN);
 	P.sub(&mut R);
 
 	P.tobytes(token);
@@ -404,9 +380,9 @@ pub fn mpin_extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isiz
 
 /* Functions to support M-Pin Full */
 #[allow(non_snake_case)]
-pub fn mpin_precompute(token: &[u8],cid: &[u8],g1: &mut [u8],g2: &mut [u8]) -> isize {
+pub fn precompute(token: &[u8],cid: &[u8],g1: &mut [u8],g2: &mut [u8]) -> isize {
 	let mut T=ECP::frombytes(&token);
-	if T.is_infinity() {return MPIN_INVALID_POINT} 
+	if T.is_infinity() {return INVALID_POINT} 
 
 	let mut P=mapit(&cid);
 
@@ -425,7 +401,7 @@ pub fn mpin_precompute(token: &[u8],cid: &[u8],g1: &mut [u8],g2: &mut [u8]) -> i
 
 /* Time Permit CTT=S*(date|H(CID)) where S is master secret */
 #[allow(non_snake_case)]
-pub fn mpin_get_client_permit(sha: usize,date: usize,s: &[u8],cid: &[u8],ctt: &mut [u8]) ->isize {
+pub fn get_client_permit(sha: usize,date: usize,s: &[u8],cid: &[u8],ctt: &mut [u8]) ->isize {
 	const RM:usize=rom::MODBYTES as usize;
 	let mut h:[u8;RM]=[0;RM];	
 	hashit(sha,date,cid,&mut h);
@@ -438,7 +414,7 @@ pub fn mpin_get_client_permit(sha: usize,date: usize,s: &[u8],cid: &[u8],ctt: &m
 
 /* Implement step 1 on client side of MPin protocol */
 #[allow(non_snake_case)]
-pub fn mpin_client_1(sha: usize,date: usize,client_id: &[u8],rng: Option<&mut RAND>,x: &mut [u8],pin: usize,token: &[u8],sec: &mut [u8],xid: Option<&mut [u8]>,xcid: Option<&mut [u8]>,permit: Option<&[u8]>) ->isize {
+pub fn client_1(sha: usize,date: usize,client_id: &[u8],rng: Option<&mut RAND>,x: &mut [u8],pin: usize,token: &[u8],sec: &mut [u8],xid: Option<&mut [u8]>,xcid: Option<&mut [u8]>,permit: Option<&[u8]>) ->isize {
 	let r=BIG::new_ints(&rom::CURVE_ORDER);
 		
 	let mut sx:BIG;
@@ -461,13 +437,13 @@ pub fn mpin_client_1(sha: usize,date: usize,client_id: &[u8],rng: Option<&mut RA
 	let mut P=mapit(&h);
 	
 	let mut T=ECP::frombytes(&token);
-	if T.is_infinity() {return MPIN_INVALID_POINT}
+	if T.is_infinity() {return INVALID_POINT}
 
-	let mut W=P.pinmul((pin as i32)%MPIN_MAXPIN,MPIN_PBLEN);
+	let mut W=P.pinmul((pin as i32)%MAXPIN,PBLEN);
 	T.add(&mut W);
 	if date!=0 {
 		if let Some(rpermit)=permit {W=ECP::frombytes(&rpermit);}
-		if W.is_infinity() {return MPIN_INVALID_POINT}
+		if W.is_infinity() {return INVALID_POINT}
 		T.add(&mut W);
 		let mut h2:[u8;RM]=[0;RM];		
 		hashit(sha,date,&h,&mut h2);
@@ -495,7 +471,7 @@ pub fn mpin_client_1(sha: usize,date: usize,client_id: &[u8],rng: Option<&mut RA
 
 /* Outputs H(CID) and H(T|H(CID)) for time permits. If no time permits set HID=HTID */
 #[allow(non_snake_case)]
-pub fn mpin_server_1(sha: usize,date: usize,cid: &[u8],hid: &mut [u8],htid: Option<&mut [u8]>) {
+pub fn server_1(sha: usize,date: usize,cid: &[u8],hid: &mut [u8],htid: Option<&mut [u8]>) {
 	const RM:usize=rom::MODBYTES as usize;
 	let mut h:[u8;RM]=[0;RM];
 
@@ -515,10 +491,10 @@ pub fn mpin_server_1(sha: usize,date: usize,cid: &[u8],hid: &mut [u8],htid: Opti
 
 /* Implement step 2 on client side of MPin protocol */
 #[allow(non_snake_case)]
-pub fn mpin_client_2(x: &[u8],y: &[u8],sec: &mut [u8]) -> isize {
+pub fn client_2(x: &[u8],y: &[u8],sec: &mut [u8]) -> isize {
 	let mut r=BIG::new_ints(&rom::CURVE_ORDER);
 	let mut P=ECP::frombytes(sec);
-	if P.is_infinity() {return MPIN_INVALID_POINT}
+	if P.is_infinity() {return INVALID_POINT}
 
 	let mut px=BIG::frombytes(x);
 	let py=BIG::frombytes(y);
@@ -534,12 +510,12 @@ pub fn mpin_client_2(x: &[u8],y: &[u8],sec: &mut [u8]) -> isize {
 }
 
 /* return time since epoch */
-pub fn mpin_get_time() -> usize {
+pub fn get_time() -> usize {
   	return (SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()) as usize;	
 }
 
 /* Generate Y = H(epoch, xCID/xID) */
-pub fn mpin_get_y(sha: usize,timevalue: usize,xcid: &[u8],y: &mut [u8]) {
+pub fn get_y(sha: usize,timevalue: usize,xcid: &[u8],y: &mut [u8]) {
 	const RM:usize=rom::MODBYTES as usize;
 	let mut h:[u8;RM]=[0;RM];
 
@@ -556,38 +532,38 @@ pub fn mpin_get_y(sha: usize,timevalue: usize,xcid: &[u8],y: &mut [u8]) {
 
 /* Implement step 2 of MPin protocol on server side */
 #[allow(non_snake_case)]
-pub fn mpin_server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],xid: Option<&[u8]>,xcid: Option<&[u8]>,msec: &[u8],e: Option<&mut [u8]>,f: Option<&mut [u8]>) -> isize {
+pub fn server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],xid: Option<&[u8]>,xcid: Option<&[u8]>,msec: &[u8],e: Option<&mut [u8]>,f: Option<&mut [u8]>) -> isize {
 //	q:=NewBIGints(Modulus)
 	let mut Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
 
 	let mut sQ=ECP2::frombytes(&sst);
-	if sQ.is_infinity() {return MPIN_INVALID_POINT}	
+	if sQ.is_infinity() {return INVALID_POINT}	
 
 	let mut R:ECP;
 	if date!=0 {
 		if let Some(rxcid)=xcid {R=ECP::frombytes(&rxcid);}
-		else {return MPIN_BAD_PARAMS}
+		else {return BAD_PARAMS}
 	} else {
 		if let Some(rxid)=xid {R=ECP::frombytes(&rxid)}
-		else {return MPIN_BAD_PARAMS}
+		else {return BAD_PARAMS}
 	}
-	if R.is_infinity() {return MPIN_INVALID_POINT}
+	if R.is_infinity() {return INVALID_POINT}
 
 	let mut sy=BIG::frombytes(&y);
 	let mut P:ECP;
 	if date!=0 {
 		if let Some(rhtid)=htid {P=ECP::frombytes(&rhtid)}
-		else {return MPIN_BAD_PARAMS}
+		else {return BAD_PARAMS}
 	} else {
 		P=ECP::frombytes(&hid);
 	}
 	
-	if P.is_infinity() {return MPIN_INVALID_POINT}
+	if P.is_infinity() {return INVALID_POINT}
 
 	P=pair::g1mul(&mut P,&mut sy);
 	P.add(&mut R);
 	R=ECP::frombytes(&msec);
-	if R.is_infinity() {return MPIN_INVALID_POINT}
+	if R.is_infinity() {return INVALID_POINT}
 
 	let mut g:FP12;
 //		FP12 g1=new FP12(0);
@@ -604,9 +580,9 @@ pub fn mpin_server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[
 					g.tobytes(re);
 					if date!=0 {
 						P=ECP::frombytes(&hid);
-						if P.is_infinity() {return MPIN_INVALID_POINT}		
+						if P.is_infinity() {return INVALID_POINT}		
 						R=ECP::frombytes(&rxid);
-						if R.is_infinity() {return MPIN_INVALID_POINT}			
+						if R.is_infinity() {return INVALID_POINT}			
 						P=pair::g1mul(&mut P,&mut sy);
 						P.add(&mut R);									
 					}
@@ -618,22 +594,22 @@ pub fn mpin_server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[
 			}
 		}
 	
-		return MPIN_BAD_PIN;
+		return BAD_PIN;
 	}
 
 	return 0;
 }
 
 /* Pollards kangaroos used to return PIN error */
-pub fn mpin_kangaroo(e: &[u8],f: &[u8]) -> isize {
+pub fn kangaroo(e: &[u8],f: &[u8]) -> isize {
 	let mut ge=FP12::frombytes(e);
 	let mut gf=FP12::frombytes(f);
-	let mut distance: [isize;MPIN_TS]=[0;MPIN_TS];
+	let mut distance: [isize;TS]=[0;TS];
 	let mut t=FP12::new_copy(&gf);
 
-	let mut table: [FP12;MPIN_TS]=[FP12::new();MPIN_TS];
+	let mut table: [FP12;TS]=[FP12::new();TS];
 	let mut s:isize=1;
-	for m in 0..MPIN_TS {
+	for m in 0..TS {
 		distance[m]=s;
 		table[m]=FP12::new_copy(&t);
 		s*=2;
@@ -642,18 +618,18 @@ pub fn mpin_kangaroo(e: &[u8],f: &[u8]) -> isize {
 	t.one();
 	let mut dn:isize=0;
 	let mut i:usize;
-	for _ in 0..MPIN_TRAP {
-		i=(t.geta().geta().geta().lastbits(20)%(MPIN_TS as i32)) as usize;
+	for _ in 0..TRAP {
+		i=(t.geta().geta().geta().lastbits(20)%(TS as i32)) as usize;
 		t.mul(&mut table[i]);
 		dn+=distance[i];
 	}
 	gf.copy(&t); gf.conj();
 	let mut steps:usize=0; let mut dm:isize=0;
 	let mut res:isize=0;
-	while dm-dn<MPIN_MAXPIN as isize {
+	while dm-dn<MAXPIN as isize {
 		steps+=1;
-		if steps>4*MPIN_TRAP {break}
-		i=(ge.geta().geta().geta().lastbits(20)%(MPIN_TS as i32)) as usize;
+		if steps>4*TRAP {break}
+		i=(ge.geta().geta().geta().lastbits(20)%(TS as i32)) as usize;
 		ge.mul(&mut table[i]);
 		dm+=distance[i];
 		if ge.equals(&mut t) {
@@ -666,13 +642,13 @@ pub fn mpin_kangaroo(e: &[u8],f: &[u8]) -> isize {
 		}
 
 	}
-	if steps>4*MPIN_TRAP || dm-dn>=MPIN_MAXPIN as isize {res=0 }    // Trap Failed  - probable invalid token
+	if steps>4*TRAP || dm-dn>=MAXPIN as isize {res=0 }    // Trap Failed  - probable invalid token
 	return res;
 }
 
 /* Hash the M-Pin transcript - new */
 
-fn mpin_hash_all(sha: usize,hid: &[u8],xid: &[u8],xcid: Option<&[u8]>,sec: &[u8],y: &[u8],r: &[u8],w: &[u8],h: &mut[u8]) -> bool {
+pub fn hash_all(sha: usize,hid: &[u8],xid: &[u8],xcid: Option<&[u8]>,sec: &[u8],y: &[u8],r: &[u8],w: &[u8],h: &mut[u8]) -> bool {
 	let mut tlen:usize=0;
 	const RM:usize=rom::MODBYTES as usize;	
 	let mut t: [u8;10*RM+4]=[0;10*RM+4];
@@ -704,7 +680,7 @@ fn mpin_hash_all(sha: usize,hid: &[u8],xid: &[u8],xcid: Option<&[u8]>,sec: &[u8]
 /* calculate common key on client side */
 /* wCID = w.(A+AT) */
 #[allow(non_snake_case)]
-pub fn mpin_client_key(sha: usize,g1: &[u8],g2: &[u8],pin: usize,r: &[u8],x: &[u8],h: &[u8],wcid: &[u8],ck: &mut [u8]) -> isize {
+pub fn client_key(sha: usize,g1: &[u8],g2: &[u8],pin: usize,r: &[u8],x: &[u8],h: &[u8],wcid: &[u8],ck: &mut [u8]) -> isize {
 
 	let mut g1=FP12::frombytes(&g1);
 	let mut g2=FP12::frombytes(&g2);
@@ -713,7 +689,7 @@ pub fn mpin_client_key(sha: usize,g1: &[u8],g2: &[u8],pin: usize,r: &[u8],x: &[u
 	let h=BIG::frombytes(&h);
 
 	let mut W=ECP::frombytes(&wcid);
-	if W.is_infinity() {return MPIN_INVALID_POINT} 
+	if W.is_infinity() {return INVALID_POINT} 
 
 	W=pair::g1mul(&mut W,&mut x);
 
@@ -733,7 +709,7 @@ pub fn mpin_client_key(sha: usize,g1: &[u8],g2: &[u8],pin: usize,r: &[u8],x: &[u
 	let mut b=BIG::new_copy(&z);
 	b.div(&mut m);
 
-	g2.pinpow(pin as i32,MPIN_PBLEN);
+	g2.pinpow(pin as i32,PBLEN);
 	g1.mul(&mut g2);
 
 	let mut c=g1.trace();
@@ -748,7 +724,7 @@ pub fn mpin_client_key(sha: usize,g1: &[u8],g2: &[u8],pin: usize,r: &[u8],x: &[u
 
 	c=c.xtr_pow2(&cp,&cpm1,&cpm2,&mut a,&mut b);
 
-	mpin_hash(sha,&mut c,&mut W,ck);
+	hash(sha,&mut c,&mut W,ck);
 
 	return 0
 }
@@ -756,13 +732,13 @@ pub fn mpin_client_key(sha: usize,g1: &[u8],g2: &[u8],pin: usize,r: &[u8],x: &[u
 /* calculate common key on server side */
 /* Z=r.A - no time permits involved */
 #[allow(non_snake_case)]
-pub fn mpin_server_key(sha: usize,z: &[u8],sst: &[u8],w: &[u8],h: &[u8],hid: &[u8],xid: &[u8],xcid: Option<&[u8]>,sk: &mut [u8]) -> isize {
+pub fn server_key(sha: usize,z: &[u8],sst: &[u8],w: &[u8],h: &[u8],hid: &[u8],xid: &[u8],xcid: Option<&[u8]>,sk: &mut [u8]) -> isize {
 	let mut sQ=ECP2::frombytes(&sst);
-	if sQ.is_infinity() {return MPIN_INVALID_POINT} 
+	if sQ.is_infinity() {return INVALID_POINT} 
 	let mut R=ECP::frombytes(&z);
-	if R.is_infinity() {return MPIN_INVALID_POINT} 
+	if R.is_infinity() {return INVALID_POINT} 
 	let mut A=ECP::frombytes(&hid);
-	if A.is_infinity() {return MPIN_INVALID_POINT} 
+	if A.is_infinity() {return INVALID_POINT} 
 
 	let mut U=ECP::new();
 	if let Some(rxcid)=xcid {
@@ -771,7 +747,7 @@ pub fn mpin_server_key(sha: usize,z: &[u8],sst: &[u8],w: &[u8],h: &[u8],hid: &[u
 		U.copy(&ECP::frombytes(&xid));
 	}
 	
-	if U.is_infinity() {return MPIN_INVALID_POINT} 
+	if U.is_infinity() {return INVALID_POINT} 
 
 	let mut w=BIG::frombytes(&w);
 	let mut h=BIG::frombytes(&h);
@@ -784,178 +760,9 @@ pub fn mpin_server_key(sha: usize,z: &[u8],sst: &[u8],w: &[u8],h: &[u8],hid: &[u
 
 	let mut c=g.trace();
 
-	mpin_hash(sha,&mut c,&mut U,sk);
+	hash(sha,&mut c,&mut U,sk);
 
 	return 0
 }
 
 
-fn main()
-{
-	let mut raw:[u8;100]=[0;100];	
-	let mut s:[u8;MPIN_EGS]=[0;MPIN_EGS];
-	const RM:usize=rom::MODBYTES as usize;
-	let mut hcid:[u8;RM]=[0;RM];
-	let mut hsid:[u8;RM]=[0;RM];
-
-	const EGS:usize=MPIN_EGS;
-	const EFS:usize=MPIN_EFS;
-	const G1S:usize=2*EFS+1; /* Group 1 Size */
-	const G2S:usize=4*EFS; /* Group 2 Size */
-	const EAS:usize=16;
-
-	let mut sst:[u8;G2S]=[0;G2S];
-	let mut token: [u8;G1S]=[0;G1S];	
-	let mut permit:[u8;G1S]=[0;G1S];	
-	let mut g1: [u8;12*EFS]=[0;12*EFS];
-	let mut g2: [u8;12*EFS]=[0;12*EFS];	
-	let mut xid: [u8;G1S]=[0;G1S];
-	let mut xcid: [u8;G1S]=[0;G1S];	
-	let mut x: [u8;EGS]=[0;EGS];	
-	let mut y: [u8;EGS]=[0;EGS];
-	let mut sec: [u8;G1S]=[0;G1S];	
-	let mut r: [u8;EGS]=[0;EGS];
-	let mut z: [u8;G1S]=[0;G1S];	
-	let mut hid: [u8;G1S]=[0;G1S];
-	let mut htid: [u8;G1S]=[0;G1S];
-	let mut rhid: [u8;G1S]=[0;G1S];
-	let mut w: [u8;EGS]=[0;EGS];
-	let mut t: [u8;G1S]=[0;G1S];
-	let mut e: [u8;12*EFS]=[0;12*EFS];
-	let mut f: [u8;12*EFS]=[0;12*EFS];
-	let mut h: [u8;RM]=[0;RM];
-	let mut ck: [u8;EAS]=[0;EAS];
-	let mut sk: [u8;EAS]=[0;EAS];	
-
-
-	let sha=MPIN_HASH_TYPE;
-	let mut rng=RAND::new();
-	rng.clean();
-	for i in 0..100 {raw[i]=(i+1) as u8}
-
-	rng.seed(100,&raw);	
-
-/* Trusted Authority set-up */
-
-	mpin_random_generate(&mut rng,&mut s);
-	print!("Master Secret s: 0x");  printbinary(&s);
-
-/* Create Client Identity */
- 	let name= "testUser@miracl.com";
- 	let client_id=name.as_bytes();
-
-	print!("Client ID= "); printbinary(&client_id); 
-
-
-	mpin_hash_id(sha,&client_id,&mut hcid);  /* Either Client or TA calculates Hash(ID) - you decide! */
-		
-/* Client and Server are issued secrets by DTA */
-	mpin_get_server_secret(&s,&mut sst);
-	print!("Server Secret SS: 0x");  printbinary(&sst);	
-
-	mpin_get_client_secret(&mut s,&hcid,&mut token);
-	print!("Client Secret CS: 0x"); printbinary(&token); 
-
-/* Client extracts PIN from secret to create Token */
-	let pin:i32=1234;
-	println!("Client extracts PIN= {}",pin);
-	let mut rtn=mpin_extract_pin(sha,&client_id,pin,&mut token);
-	if rtn != 0 {
-		println!("FAILURE: EXTRACT_PIN rtn: {}",rtn);
-	}
-
-	print!("Client Token TK: 0x"); printbinary(&token); 
-
-	if FULL {
-		mpin_precompute(&token,&hcid,&mut g1,&mut g2);
-	}
-
-	let mut date=0;
-	if PERMITS {
-		date=today();
-/* Client gets "Time Token" permit from DTA */ 
-		mpin_get_client_permit(sha,date,&s,&hcid,&mut permit);
-		print!("Time Permit TP: 0x");  printbinary(&permit);
-
-/* This encoding makes Time permit look random - Elligator squared */
-		mpin_encoding(&mut rng,&mut permit);
-		print!("Encoded Time Permit TP: 0x"); printbinary(&permit);
-		mpin_decoding(&mut permit);
-		print!("Decoded Time Permit TP: 0x"); printbinary(&permit);
-	}
-
-	print!("\nPIN= "); let _ =io::Write::flush(&mut io::stdout());
-    let mut input_text = String::new();
-    let _ = io::stdin().read_line(&mut input_text);
-
-    let pin=input_text.trim().parse::<usize>().unwrap();
-
-	println!("MPIN Multi Pass");
-/* Send U=x.ID to server, and recreate secret from token and pin */
-	rtn=mpin_client_1(sha,date,&client_id,Some(&mut rng),&mut x,pin,&token,&mut sec,Some(&mut xid[..]),Some(&mut xcid[..]),Some(&permit[..]));
-	if rtn != 0 {
-		println!("FAILURE: CLIENT_1 rtn: {}",rtn);
-	}
-  
-	if FULL {
-		mpin_hash_id(sha,&client_id,&mut hcid);
-		mpin_get_g1_multiple(Some(&mut rng),1,&mut r,&hcid,&mut z);  /* Also Send Z=r.ID to Server, remember random r */
-	}
-  
-/* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
-		
-	mpin_server_1(sha,date,&client_id,&mut hid,Some(&mut htid[..]));
-
-
-    if date!=0 {rhid.clone_from_slice(&htid[..]);}
-    else {rhid.clone_from_slice(&hid[..]);}
-    	
-/* Server generates Random number Y and sends it to Client */
-	mpin_random_generate(&mut rng,&mut y);
-  
-	if FULL {
-		mpin_hash_id(sha,&client_id,&mut hsid);
-		mpin_get_g1_multiple(Some(&mut rng),0,&mut w,&rhid,&mut t);  /* Also send T=w.ID to client, remember random w  */
-	}
-  
-/* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
-	rtn=mpin_client_2(&x,&y,&mut sec);
-	if rtn != 0 {
-		println!("FAILURE: CLIENT_2 rtn: {}",rtn);
-	}
-  
-/* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
-/* If PIN error not required, set E and F = null */
-  
-	if !PINERROR {
-		rtn=mpin_server_2(date,&hid,Some(&htid[..]),&y,&sst,Some(&xid[..]),Some(&xcid[..]),&sec,None,None);
-	} else {
-		rtn=mpin_server_2(date,&hid,Some(&htid[..]),&y,&sst,Some(&xid[..]),Some(&xcid[..]),&sec,Some(&mut e),Some(&mut f));
-	}
-
-	if rtn == MPIN_BAD_PIN {
-		println!("Server says - Bad Pin. I don't know you. Feck off.");
-		if PINERROR {
-			let err=mpin_kangaroo(&e,&f);
-			if err!=0 {println!("(Client PIN is out by {})",err)}
-		}
-		return;
-	} else {
-		println!("Server says - PIN is good! You really are {}",name);
-	}
-
-	if  FULL {
-
-		let mut pxcid=None;
-		if PERMITS {pxcid=Some(&xcid[..])};
-
-		mpin_hash_all(sha,&hcid,&xid,pxcid,&sec,&y,&z,&t,&mut h);	
-		mpin_client_key(sha,&g1,&g2,pin,&r,&x,&h,&t,&mut ck);
-		print!("Client Key =  0x");  printbinary(&ck);
-
-		mpin_hash_all(sha,&hsid,&xid,pxcid,&sec,&y,&z,&t,&mut h);			
-		mpin_server_key(sha,&z,&sst,&w,&h,&hid,&xid,pxcid,&mut sk);
-		print!("Server Key =  0x"); printbinary(&sk);
-	}
-
-}

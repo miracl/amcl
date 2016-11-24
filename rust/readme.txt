@@ -15,13 +15,19 @@ are provided there, if you are willing to use one of these.
 
 For a quick jumpstart:-
 
-rustc -O -A dead_code mpin.rs
+rustc -O -A dead_code TestMPIN.rs
 
 or 
 
-rustc -O -A dead_code ecdh.rs
+rustc -O -A dead_code TestECDH.rs
 
 or
 
-rustc -O -A dead_code rsa.rs
+rustc -O -A dead_code TestRSA.rs
+
+also
+
+rustc -O -A dead_code BenchtestEC.rs
+
+rustc -O -A dead_code BenchtestPAIR.rs
 

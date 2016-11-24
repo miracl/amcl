@@ -21,19 +21,19 @@ under the License.
 //use big::BIG;
 //mod dbig;
 //use dbig::DBIG;
-mod ff;
+//mod ff;
 use ff::FF;
-mod big;
-mod dbig;
-mod rom;
-//use rom;
-mod rand;
+//mod big;
+//mod dbig;
+//mod rom;
+use rom;
+//mod rand;
 use rand::RAND;
-mod hash256;
+//mod hash256;
 use hash256::HASH256;
-mod hash384;
+//mod hash384;
 use hash384::HASH384;
-mod hash512;
+//mod hash512;
 use hash512::HASH512;
 
 pub const RFS:usize =(rom::MODBYTES as usize)*rom::FFLEN;
@@ -41,7 +41,7 @@ pub const SHA256:usize=32;
 pub const SHA384:usize=48;
 pub const SHA512:usize=64;
 
-pub const RSA_HASH_TYPE:usize=SHA256;
+pub const HASH_TYPE:usize=SHA256;
 
 pub struct RsaPrivateKey {
 	p:FF,
@@ -171,13 +171,6 @@ pub fn mgf1(sha: usize,z: &[u8],olen: usize,k: &mut [u8]) {
 		}
 	}	
 }
-
-pub fn printbinary(array: &[u8]) {
-	for i in 0..array.len() {
-		print!("{:02X}", array[i]);
-	}
-	println!("");
-} 
 
 /* SHAXXX identifier strings */
 const SHA256ID:[u8;19]= [0x30,0x31,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01,0x05,0x00,0x04,0x20];
@@ -375,73 +368,5 @@ pub fn decrypt(prv: &RsaPrivateKey,g: &[u8],f: &mut [u8]) {
 	r.norm();
 
 	r.tobytes(f);
-}
-
-use std::str;
-//use std::process;
-
-fn main()
-{
-	let sha=RSA_HASH_TYPE;
-	let message:&[u8] = b"Hello World\n";
-
-	let mut pbc=new_public_key(rom::FFLEN);
-	let mut prv=new_private_key(rom::HFLEN);
-
-	let mut ml:[u8;RFS]=[0;RFS];
-	let mut ms:[u8;RFS]=[0;RFS];	
-	let mut c: [u8;RFS]=[0;RFS];
-	let mut s: [u8;RFS]=[0;RFS];
-	let mut e: [u8;RFS]=[0;RFS];
-
-	let mut raw:[u8;100]=[0;100];
-	
-	let mut rng=RAND::new();
-
-	rng.clean();
-	for i in 0..100 {raw[i]=i as u8}
-
-	rng.seed(100,&raw);
-
-	println!("Generating public/private key pair");
-	key_pair(&mut rng,65537,&mut prv,&mut pbc);
-
-	println!("Encrypting test string\n");
-	oaep_encode(sha,&message,&mut rng,None,&mut e); /* OAEP encode message M to E  */
-
-	encrypt(&pbc,&e,&mut c);    /* encrypt encoded message */
-	print!("Ciphertext= 0x"); printbinary(&c);
-
-	println!("Decrypting test string");
-	decrypt(&prv,&c,&mut ml);
-	let mlen=oaep_decode(sha,None,&mut ml); /* OAEP decode message  */
-
-	let mess=str::from_utf8(&ml[0..mlen]).unwrap();
-	print!("{}",&mess);
-
-	println!("Signing message");
-	pkcs15(sha,message,&mut c); 
-
-	decrypt(&prv,&c,&mut s);  /* create signature in S */ 
-
-	print!("Signature= 0x"); printbinary(&s);
-
-	encrypt(&pbc,&s,&mut ms);
-
-	let mut cmp=true;
-	if c.len()!=ms.len() {
-		cmp=false;
-	} else {
-		for j in 0..c.len() {
-			if c[j]!=ms[j] {cmp=false}
-		}
-	}
-	if cmp {
-		println!("Signature is valid");
-	} else {
-		println!("Signature is INVALID");
-	}
-
-	private_key_kill(&mut prv);
 }
 

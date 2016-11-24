@@ -56,6 +56,8 @@
 	var E=RSA.OAEP_ENCODE(sha,M,rng,null); /* OAEP encode message m to e  */
 	window.document.write("Encoding= 0x" + RSA.bytestohex(E) + "<br>");  
 
+	window.document.write("Public key= 0x"+pub.n.toString() + "<br>"); 
+
 	start=new Date().getTime();	
 	RSA.ENCRYPT(pub,E,C);     /* encrypt encoded message */
 	end=new Date().getTime();	
@@ -71,7 +73,17 @@
 	time=end-start;
 	window.document.write("Time in ms= "+time+"<br>");
 
-	var MS=RSA.OAEP_DECODE(sha,null,ML); /* OAEP encode message m to e  */
+	var cmp=true;
+	if (E.length!=ML.length) cmp=false;
+	else
+	{
+		for (var j=0;j<E.length;j++)
+			if (E[j]!=ML[j]) cmp=false;
+	}
+	if (cmp) window.document.write("Decryption is OK <br>");
+	else window.document.write("Decryption Failed <br>");
+
+	var MS=RSA.OAEP_DECODE(sha,null,ML); /* OAEP decode message  */
 	window.document.write("Decoding= 0x" + RSA.bytestohex(MS) + "<br>");  
 
 	window.document.write("message= "+RSA.bytestostring(MS) + "<br>");  
@@ -86,7 +98,7 @@
 
 	RSA.ENCRYPT(pub,S,ML); 
 
-	var cmp=true;
+	cmp=true;
 	if (C.length!=ML.length) cmp=false;
 	else
 	{

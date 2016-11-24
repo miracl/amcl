@@ -30,3 +30,14 @@ del *.class
 javac TestECDH.java
 java TestECDH
 
+del *.class
+javac TestMPIN.java
+java TestMPIN
+
+del *.class
+javac BenchtestEC.java
+java BenchtestEC
+
+del *.class
+javac BenchtestPAIR.java
+java BenchtestPAIR

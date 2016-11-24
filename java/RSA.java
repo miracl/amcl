@@ -18,8 +18,8 @@ under the License.
 */
 
 /* RSA API high-level functions  */
-
-final class rsa_private_key
+/*
+public final class rsa_private_key
 {
     public FF p,q,dp,dq,c;
 	
@@ -33,7 +33,7 @@ final class rsa_private_key
 	}
 }
 
-final class rsa_public_key
+public final class rsa_public_key
 {
     public int e;
     public FF n;
@@ -44,7 +44,7 @@ final class rsa_public_key
 		n=new FF(m);
 	}
 }
-
+*/
 public final class RSA {
 
 	public static final int RFS=ROM.MODBYTES*ROM.FFLEN;
@@ -52,7 +52,7 @@ public final class RSA {
 	public static final int SHA384=48;
 	public static final int SHA512=64;
 
-	public static final int HASH_TYPE=SHA512;
+	public static final int HASH_TYPE=SHA256;
 
 /* Hash number (optional) and string to array size of Bigs */
 
@@ -223,6 +223,7 @@ public final class RSA {
 		hlen=sha;
 		byte[] SEED=new byte[hlen];
 		seedlen=hlen;
+
 		if (mlen>olen-hlen-seedlen-1) return new byte[0]; 
 
 		byte[] DBMASK=new byte[olen-seedlen];
@@ -350,7 +351,6 @@ public final class RSA {
 	{
 		int n=PUB.n.getlen();
 		FF f=new FF(n);
-
 		FF.fromBytes(f,F);
 		f.power(PUB.e,PUB.n);
 		f.toBytes(G);

@@ -19,32 +19,6 @@
 
 /* RSA API high-level functions  */
 
-final class rsa_private_key
-{
-    public FF p,q,dp,dq,c;
-	
-	public rsa_private_key(int n)
-	{
-		p=new FF(n);
-		q=new FF(n);
-		dp=new FF(n);
-		dq=new FF(n);
-		c=new FF(n);
-	}
-}
-
-final class rsa_public_key
-{
-    public int e;
-    public FF n;
-
-	public rsa_public_key(int m)
-	{
-		e=0;
-		n=new FF(m);
-	}
-}
-
 public final class RSA {
 
 	public static final int RFS=ROM.MODBYTES*ROM.FFLEN;
@@ -52,7 +26,7 @@ public final class RSA {
 	public static final int SHA384=48;
 	public static final int SHA512=64;
 
-	public static final int HASH_TYPE=SHA512;
+	public static final int HASH_TYPE=SHA256;
 
 /* Hash number (optional) and string to array size of Bigs */
 

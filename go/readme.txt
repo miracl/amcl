@@ -24,3 +24,8 @@ or
 
 go run TestRSA.go RSA.go FF.go BIG.go DBIG.go HASH256.go HASH384.go HASH512.go AES.go RAND.go ROM.go
 
+also
+
+go run BenchtestEC.go RSA.go FF.go FP.go BIG.go DBIG.go ECP.go HASH256.go HASH384.go HASH512.go AES.go RAND.go ROM.go
+
+go run BenchtestPAIR.go PAIR.go FP12.go FP4.go FP2.go FP.go BIG.go DBIG.go ECP.go ECP2.go HASH256.go HASH384.go HASH512.go AES.go RAND.go ROM.go

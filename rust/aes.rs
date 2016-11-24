@@ -17,25 +17,25 @@ specific language governing permissions and limitations
 under the License.
 */
 
-pub const AES_ECB: usize=0;
-pub const AES_CBC: usize=1;
-pub const AES_CFB1: usize=2;
-pub const AES_CFB2: usize=3;
-pub const AES_CFB4: usize=5;
-pub const AES_OFB1: usize=14;
-pub const AES_OFB2: usize=15;
-pub const AES_OFB4: usize=17;
-pub const AES_OFB8:usize=21;
-pub const AES_OFB16: usize=29;
-pub const AES_CTR1: usize=30;
-pub const AES_CTR2: usize=31;
-pub const AES_CTR4: usize=33;
-pub const AES_CTR8: usize=37;
-pub const AES_CTR16: usize=45;
+pub const ECB: usize=0;
+pub const CBC: usize=1;
+pub const CFB1: usize=2;
+pub const CFB2: usize=3;
+pub const CFB4: usize=5;
+pub const OFB1: usize=14;
+pub const OFB2: usize=15;
+pub const OFB4: usize=17;
+pub const OFB8:usize=21;
+pub const OFB16: usize=29;
+pub const CTR1: usize=30;
+pub const CTR2: usize=31;
+pub const CTR4: usize=33;
+pub const CTR8: usize=37;
+pub const CTR16: usize=45;
 
-const AES_INCO : [u8;4] = [0xB,0xD,0x9,0xE];  /* Inverse Coefficients */
+const INCO : [u8;4] = [0xB,0xD,0x9,0xE];  /* Inverse Coefficients */
 
-const AES_PTAB : [u8;256] = [
+const PTAB : [u8;256] = [
      1, 3, 5, 15, 17, 51, 85, 255, 26, 46, 114, 150, 161, 248, 19, 53,
      95, 225, 56, 72, 216, 115, 149, 164, 247, 2, 6, 10, 30, 34, 102, 170,
      229, 52, 92, 228, 55, 89, 235, 38, 106, 190, 217, 112, 144, 171, 230, 49,
@@ -53,7 +53,7 @@ const AES_PTAB : [u8;256] = [
      18, 54, 90, 238, 41, 123, 141, 140, 143, 138, 133, 148, 167, 242, 13, 23,
      57, 75, 221, 124, 132, 151, 162, 253, 28, 36, 108, 180, 199, 82, 246, 1];
 
-const AES_LTAB : [u8;256] = [
+const LTAB : [u8;256] = [
       0, 255, 25, 1, 50, 2, 26, 198, 75, 199, 27, 104, 51, 238, 223, 3,
      100, 4, 224, 14, 52, 141, 129, 239, 76, 113, 8, 200, 248, 105, 28, 193,
      125, 194, 29, 181, 249, 185, 39, 106, 77, 228, 166, 114, 154, 201, 9, 120,
@@ -72,7 +72,7 @@ const AES_LTAB : [u8;256] = [
      103, 74, 237, 222, 197, 49, 254, 24, 13, 99, 140, 128, 192, 247, 112, 7];
 
 
-const AES_FBSUB : [u8;256] = [
+const FBSUB : [u8;256] = [
      99, 124, 119, 123, 242, 107, 111, 197, 48, 1, 103, 43, 254, 215, 171, 118,
      202, 130, 201, 125, 250, 89, 71, 240, 173, 212, 162, 175, 156, 164, 114, 192,
      183, 253, 147, 38, 54, 63, 247, 204, 52, 165, 229, 241, 113, 216, 49, 21,
@@ -90,7 +90,7 @@ const AES_FBSUB : [u8;256] = [
      225, 248, 152, 17, 105, 217, 142, 148, 155, 30, 135, 233, 206, 85, 40, 223,
      140, 161, 137, 13, 191, 230, 66, 104, 65, 153, 45, 15, 176, 84, 187, 22];
 
-const AES_RBSUB : [u8;256] = [
+const RBSUB : [u8;256] = [
      82, 9, 106, 213, 48, 54, 165, 56, 191, 64, 163, 158, 129, 243, 215, 251,
      124, 227, 57, 130, 155, 47, 255, 135, 52, 142, 67, 68, 196, 222, 233, 203,
      84, 123, 148, 50, 166, 194, 35, 61, 238, 76, 149, 11, 66, 250, 195, 78,
@@ -108,9 +108,9 @@ const AES_RBSUB : [u8;256] = [
      160, 224, 59, 77, 174, 42, 245, 176, 200, 235, 187, 60, 131, 83, 153, 97,
      23, 43, 4, 126, 186, 119, 214, 38, 225, 105, 20, 99, 85, 33, 12, 125];
 
-const AES_RCO : [u8;16] = [1,2,4,8,16,32,64,128,27,54,108,216,171,77,154,47];
+const RCO : [u8;16] = [1,2,4,8,16,32,64,128,27,54,108,216,171,77,154,47];
 
-const AES_FTABLE : [u32;256] = [
+const FTABLE : [u32;256] = [
     0xa56363c6,0x847c7cf8,0x997777ee,0x8d7b7bf6,0xdf2f2ff,0xbd6b6bd6,
     0xb16f6fde,0x54c5c591,0x50303060,0x3010102,0xa96767ce,0x7d2b2b56,
     0x19fefee7,0x62d7d7b5,0xe6abab4d,0x9a7676ec,0x45caca8f,0x9d82821f,
@@ -155,7 +155,7 @@ const AES_FTABLE : [u32;256] = [
     0xc6424284,0xb86868d0,0xc3414182,0xb0999929,0x772d2d5a,0x110f0f1e,
     0xcbb0b07b,0xfc5454a8,0xd6bbbb6d,0x3a16162c];
 
-const AES_RTABLE : [u32;256] = [
+const RTABLE : [u32;256] = [
     0x50a7f451,0x5365417e,0xc3a4171a,0x965e273a,0xcb6bab3b,0xf1459d1f,
     0xab58faac,0x9303e34b,0x55fa3020,0xf66d76ad,0x9176cc88,0x254c02f5,
     0xfcd7e54f,0xd7cb2ac5,0x80443526,0x8fa362b5,0x495ab1de,0x671bba25,
@@ -236,20 +236,20 @@ impl AES {
 	fn bmul(x: u8,y: u8) -> u8 { /* x.y= AntiLog(Log(x) + Log(y)) */
         let ix=(x as usize)&0xff;
         let iy=(y as usize)&0xff;
-        let lx=(AES_LTAB[ix] as usize)&0xff;
-        let ly=(AES_LTAB[iy] as usize)&0xff;
+        let lx=(LTAB[ix] as usize)&0xff;
+        let ly=(LTAB[iy] as usize)&0xff;
     
         if x != 0 && y != 0 {
-			return AES_PTAB[(lx+ly)%255];
+			return PTAB[(lx+ly)%255];
 		} else {return 0}
 	}	
 
 	fn subbyte(a: u32) -> u32 {
         let mut b=AES::unpack(a);
-        b[0]=AES_FBSUB[b[0] as usize];
-        b[1]=AES_FBSUB[b[1] as usize];
-        b[2]=AES_FBSUB[b[2] as usize];
-        b[3]=AES_FBSUB[b[3] as usize];
+        b[0]=FBSUB[b[0] as usize];
+        b[1]=FBSUB[b[1] as usize];
+        b[2]=FBSUB[b[2] as usize];
+        b[3]=FBSUB[b[3] as usize];
         return AES::pack(b);
 	}   
 
@@ -262,7 +262,7 @@ impl AES {
 
 	fn invmixcol(x: u32) -> u32 { /* matrix Multiplication */
         let mut b:[u8;4]=[0;4];
-        let mut m=AES::pack(AES_INCO);
+        let mut m=AES::pack(INCO);
         b[3]=AES::product(m,x);
         m=AES::rotl24(m);
         b[2]=AES::product(m,x);
@@ -297,7 +297,7 @@ impl AES {
 	pub fn reset(&mut self,m: usize,iv: Option<[u8;16]>) { /* reset mode, or reset iv */
 		self.mode=m;
         for i in 0..16 {self.f[i]=0}
-        if self.mode != AES_ECB
+        if self.mode != ECB
         {
         	if let Some(x) = iv {
         		for i in 0..16 {self.f[i]=x[i]}
@@ -328,7 +328,7 @@ impl AES {
         j=nk;
 		let mut k=0;    
         while j<n  {      	
-            self.fkey[j]=self.fkey[j-nk]^AES::subbyte(AES::rotl24(self.fkey[j-1]))^(AES_RCO[k] as u32);
+            self.fkey[j]=self.fkey[j-nk]^AES::subbyte(AES::rotl24(self.fkey[j-1]))^(RCO[k] as u32);
             for i in 1..nk {
             	if (i+j) >= n {break}       	
                 self.fkey[i+j]=self.fkey[i+j-nk]^self.fkey[i+j-1];             
@@ -374,13 +374,13 @@ impl AES {
     
     /* State alternates between p and q */
         for _ in 1..self.nr {
-            q[0]=self.fkey[k]^AES_FTABLE[(p[0]&0xff) as usize]^AES::rotl8(AES_FTABLE[((p[1]>>8)&0xff) as usize])^AES::rotl16(AES_FTABLE[((p[2]>>16)&0xff) as usize])^AES::rotl24(AES_FTABLE[((p[3]>>24)&0xff) as usize]);
+            q[0]=self.fkey[k]^FTABLE[(p[0]&0xff) as usize]^AES::rotl8(FTABLE[((p[1]>>8)&0xff) as usize])^AES::rotl16(FTABLE[((p[2]>>16)&0xff) as usize])^AES::rotl24(FTABLE[((p[3]>>24)&0xff) as usize]);
             
-            q[1]=self.fkey[k+1]^AES_FTABLE[(p[1]&0xff) as usize]^AES::rotl8(AES_FTABLE[((p[2]>>8)&0xff) as usize])^AES::rotl16(AES_FTABLE[((p[3]>>16)&0xff) as usize])^AES::rotl24(AES_FTABLE[((p[0]>>24)&0xff) as usize]);
+            q[1]=self.fkey[k+1]^FTABLE[(p[1]&0xff) as usize]^AES::rotl8(FTABLE[((p[2]>>8)&0xff) as usize])^AES::rotl16(FTABLE[((p[3]>>16)&0xff) as usize])^AES::rotl24(FTABLE[((p[0]>>24)&0xff) as usize]);
             
-            q[2]=self.fkey[k+2]^AES_FTABLE[(p[2]&0xff) as usize]^AES::rotl8(AES_FTABLE[((p[3]>>8)&0xff) as usize])^AES::rotl16(AES_FTABLE[((p[0]>>16)&0xff) as usize])^AES::rotl24(AES_FTABLE[((p[1]>>24)&0xff) as usize]);
+            q[2]=self.fkey[k+2]^FTABLE[(p[2]&0xff) as usize]^AES::rotl8(FTABLE[((p[3]>>8)&0xff) as usize])^AES::rotl16(FTABLE[((p[0]>>16)&0xff) as usize])^AES::rotl24(FTABLE[((p[1]>>24)&0xff) as usize]);
             
-            q[3]=self.fkey[k+3]^AES_FTABLE[(p[3]&0xff) as usize]^AES::rotl8(AES_FTABLE[((p[0]>>8)&0xff) as usize])^AES::rotl16(AES_FTABLE[((p[1]>>16)&0xff) as usize])^AES::rotl24(AES_FTABLE[((p[2]>>24)&0xff) as usize]);
+            q[3]=self.fkey[k+3]^FTABLE[(p[3]&0xff) as usize]^AES::rotl8(FTABLE[((p[0]>>8)&0xff) as usize])^AES::rotl16(FTABLE[((p[1]>>16)&0xff) as usize])^AES::rotl24(FTABLE[((p[2]>>24)&0xff) as usize]);
             
             k+=4;
             for j in 0..4 {
@@ -390,13 +390,13 @@ impl AES {
     
     /* Last Round */
     
-        q[0]=self.fkey[k]^(AES_FBSUB[(p[0]&0xff) as usize] as u32)^AES::rotl8((AES_FBSUB[((p[1]>>8)&0xff) as usize]) as u32)^AES::rotl16((AES_FBSUB[((p[2]>>16)&0xff) as usize]) as u32)^AES::rotl24((AES_FBSUB[((p[3]>>24)&0xff) as usize]) as u32);
+        q[0]=self.fkey[k]^(FBSUB[(p[0]&0xff) as usize] as u32)^AES::rotl8((FBSUB[((p[1]>>8)&0xff) as usize]) as u32)^AES::rotl16((FBSUB[((p[2]>>16)&0xff) as usize]) as u32)^AES::rotl24((FBSUB[((p[3]>>24)&0xff) as usize]) as u32);
     
-        q[1]=self.fkey[k+1]^(AES_FBSUB[(p[1]&0xff) as usize] as u32)^AES::rotl8((AES_FBSUB[((p[2]>>8)&0xff) as usize]) as u32)^AES::rotl16((AES_FBSUB[((p[3]>>16)&0xff) as usize]) as u32)^AES::rotl24((AES_FBSUB[((p[0]>>24)&0xff) as usize]) as u32);
+        q[1]=self.fkey[k+1]^(FBSUB[(p[1]&0xff) as usize] as u32)^AES::rotl8((FBSUB[((p[2]>>8)&0xff) as usize]) as u32)^AES::rotl16((FBSUB[((p[3]>>16)&0xff) as usize]) as u32)^AES::rotl24((FBSUB[((p[0]>>24)&0xff) as usize]) as u32);
     
-        q[2]=self.fkey[k+2]^(AES_FBSUB[(p[2]&0xff) as usize] as u32)^AES::rotl8((AES_FBSUB[((p[3]>>8)&0xff) as usize]) as u32)^AES::rotl16((AES_FBSUB[((p[0]>>16)&0xff) as usize]) as u32)^AES::rotl24((AES_FBSUB[((p[1]>>24)&0xff) as usize]) as u32);
+        q[2]=self.fkey[k+2]^(FBSUB[(p[2]&0xff) as usize] as u32)^AES::rotl8((FBSUB[((p[3]>>8)&0xff) as usize]) as u32)^AES::rotl16((FBSUB[((p[0]>>16)&0xff) as usize]) as u32)^AES::rotl24((FBSUB[((p[1]>>24)&0xff) as usize]) as u32);
     
-        q[3]=self.fkey[k+3]^(AES_FBSUB[(p[3]&0xff) as usize] as u32)^AES::rotl8((AES_FBSUB[((p[0]>>8)&0xff) as usize]) as u32)^AES::rotl16((AES_FBSUB[((p[1]>>16)&0xff) as usize]) as u32)^AES::rotl24((AES_FBSUB[((p[2]>>24)&0xff) as usize]) as u32);
+        q[3]=self.fkey[k+3]^(FBSUB[(p[3]&0xff) as usize] as u32)^AES::rotl8((FBSUB[((p[0]>>8)&0xff) as usize]) as u32)^AES::rotl16((FBSUB[((p[1]>>16)&0xff) as usize]) as u32)^AES::rotl24((FBSUB[((p[2]>>24)&0xff) as usize]) as u32);
     
         j=0;
         for i in 0..4 {
@@ -425,14 +425,14 @@ impl AES {
     /* State alternates between p and q */
         for _ in 1..self.nr {
             
-            q[0]=self.rkey[k]^AES_RTABLE[(p[0]&0xff) as usize]^AES::rotl8(AES_RTABLE[((p[3]>>8)&0xff) as usize])^AES::rotl16(AES_RTABLE[((p[2]>>16)&0xff) as usize])^AES::rotl24(AES_RTABLE[((p[1]>>24)&0xff) as usize]);
+            q[0]=self.rkey[k]^RTABLE[(p[0]&0xff) as usize]^AES::rotl8(RTABLE[((p[3]>>8)&0xff) as usize])^AES::rotl16(RTABLE[((p[2]>>16)&0xff) as usize])^AES::rotl24(RTABLE[((p[1]>>24)&0xff) as usize]);
             
-            q[1]=self.rkey[k+1]^AES_RTABLE[(p[1]&0xff) as usize]^AES::rotl8(AES_RTABLE[((p[0]>>8)&0xff) as usize])^AES::rotl16(AES_RTABLE[((p[3]>>16)&0xff) as usize])^AES::rotl24(AES_RTABLE[((p[2]>>24)&0xff) as usize]);
+            q[1]=self.rkey[k+1]^RTABLE[(p[1]&0xff) as usize]^AES::rotl8(RTABLE[((p[0]>>8)&0xff) as usize])^AES::rotl16(RTABLE[((p[3]>>16)&0xff) as usize])^AES::rotl24(RTABLE[((p[2]>>24)&0xff) as usize]);
             
         
-            q[2]=self.rkey[k+2]^AES_RTABLE[(p[2]&0xff) as usize]^AES::rotl8(AES_RTABLE[((p[1]>>8)&0xff) as usize])^AES::rotl16(AES_RTABLE[((p[0]>>16)&0xff) as usize])^AES::rotl24(AES_RTABLE[((p[3]>>24)&0xff) as usize]);
+            q[2]=self.rkey[k+2]^RTABLE[(p[2]&0xff) as usize]^AES::rotl8(RTABLE[((p[1]>>8)&0xff) as usize])^AES::rotl16(RTABLE[((p[0]>>16)&0xff) as usize])^AES::rotl24(RTABLE[((p[3]>>24)&0xff) as usize]);
        
-            q[3]=self.rkey[k+3]^AES_RTABLE[(p[3]&0xff) as usize]^AES::rotl8(AES_RTABLE[((p[2]>>8)&0xff) as usize])^AES::rotl16(AES_RTABLE[((p[1]>>16)&0xff) as usize])^AES::rotl24(AES_RTABLE[((p[0]>>24)&0xff) as usize]);
+            q[3]=self.rkey[k+3]^RTABLE[(p[3]&0xff) as usize]^AES::rotl8(RTABLE[((p[2]>>8)&0xff) as usize])^AES::rotl16(RTABLE[((p[1]>>16)&0xff) as usize])^AES::rotl24(RTABLE[((p[0]>>24)&0xff) as usize]);
             
     
             k+=4;
@@ -443,14 +443,14 @@ impl AES {
     
     /* Last Round */
         
-        q[0]=self.rkey[k]^(AES_RBSUB[(p[0]&0xff) as usize] as u32)^AES::rotl8((AES_RBSUB[((p[3]>>8)&0xff) as usize]) as u32)^AES::rotl16((AES_RBSUB[((p[2]>>16)&0xff) as usize]) as u32)^AES::rotl24((AES_RBSUB[((p[1]>>24)&0xff) as usize]) as u32);
+        q[0]=self.rkey[k]^(RBSUB[(p[0]&0xff) as usize] as u32)^AES::rotl8((RBSUB[((p[3]>>8)&0xff) as usize]) as u32)^AES::rotl16((RBSUB[((p[2]>>16)&0xff) as usize]) as u32)^AES::rotl24((RBSUB[((p[1]>>24)&0xff) as usize]) as u32);
         
-        q[1]=self.rkey[k+1]^(AES_RBSUB[(p[1]&0xff) as usize] as u32)^AES::rotl8((AES_RBSUB[((p[0]>>8)&0xff) as usize]) as u32)^AES::rotl16((AES_RBSUB[((p[3]>>16)&0xff) as usize]) as u32)^AES::rotl24((AES_RBSUB[((p[2]>>24)&0xff) as usize]) as u32);
+        q[1]=self.rkey[k+1]^(RBSUB[(p[1]&0xff) as usize] as u32)^AES::rotl8((RBSUB[((p[0]>>8)&0xff) as usize]) as u32)^AES::rotl16((RBSUB[((p[3]>>16)&0xff) as usize]) as u32)^AES::rotl24((RBSUB[((p[2]>>24)&0xff) as usize]) as u32);
         
         
-        q[2]=self.rkey[k+2]^(AES_RBSUB[(p[2]&0xff) as usize] as u32)^AES::rotl8((AES_RBSUB[((p[1]>>8)&0xff) as usize]) as u32)^AES::rotl16((AES_RBSUB[((p[0]>>16)&0xff) as usize]) as u32)^AES::rotl24((AES_RBSUB[((p[3]>>24)&0xff) as usize]) as u32);
+        q[2]=self.rkey[k+2]^(RBSUB[(p[2]&0xff) as usize] as u32)^AES::rotl8((RBSUB[((p[1]>>8)&0xff) as usize]) as u32)^AES::rotl16((RBSUB[((p[0]>>16)&0xff) as usize]) as u32)^AES::rotl24((RBSUB[((p[3]>>24)&0xff) as usize]) as u32);
 
-        q[3]=self.rkey[k+3]^(AES_RBSUB[((p[3])&0xff) as usize] as u32)^AES::rotl8((AES_RBSUB[((p[2]>>8)&0xff) as usize]) as u32)^AES::rotl16((AES_RBSUB[((p[1]>>16)&0xff) as usize]) as u32)^AES::rotl24((AES_RBSUB[((p[0]>>24)&0xff) as usize]) as u32);
+        q[3]=self.rkey[k+3]^(RBSUB[((p[3])&0xff) as usize] as u32)^AES::rotl8((RBSUB[((p[2]>>8)&0xff) as usize]) as u32)^AES::rotl16((RBSUB[((p[1]>>16)&0xff) as usize]) as u32)^AES::rotl24((RBSUB[((p[0]>>24)&0xff) as usize]) as u32);
     
         j=0;
         for i in 0..4 {
@@ -469,19 +469,19 @@ impl AES {
         let mut fell_off: u32=0;
 
         match self.mode {
-        	AES_ECB => {
+        	ECB => {
             	self.ecb_encrypt(buff);
             	return 0;
         	},
-        	AES_CBC => {
+        	CBC => {
             	for j in 0..16 {buff[j]^=self.f[j]}
             	self.ecb_encrypt(buff);
             	for j in 0..16 {self.f[j]=buff[j]}
             	return 0;
         	},
     
-        	AES_CFB1 | AES_CFB2 | AES_CFB4 => {
-            	let bytes=self.mode-AES_CFB1+1;
+        	CFB1 | CFB2 | CFB4 => {
+            	let bytes=self.mode-CFB1+1;
             	for j in 0..bytes {fell_off=(fell_off<<8)|(self.f[j] as u32)}
             	for j in 0..16 {st[j]=self.f[j]}
             	for j in bytes..16 {self.f[j-bytes]=self.f[j]}
@@ -493,8 +493,8 @@ impl AES {
             	return fell_off;
         	},
     
-        	AES_OFB1 | AES_OFB2 | AES_OFB4 | AES_OFB8 | AES_OFB16 => {
-           		let bytes=self.mode-AES_OFB1+1;
+        	OFB1 | OFB2 | OFB4 | OFB8 | OFB16 => {
+           		let bytes=self.mode-OFB1+1;
              	for j in 0..16 {st[j]=self.f[j]}
             	self.ecb_encrypt(&mut st);
            		for j in 0..bytes {buff[j]^=st[j]}       
@@ -505,8 +505,8 @@ impl AES {
             	return 0;
         	},
     
-			AES_CTR1 | AES_CTR2 | AES_CTR4 | AES_CTR8 | AES_CTR16 => {
-	    		let bytes=self.mode-AES_CTR1+1;
+			CTR1 | CTR2 | CTR4 | CTR8 | CTR16 => {
+	    		let bytes=self.mode-CTR1+1;
 	    		for j in 0..16 {st[j]=self.f[j]}
 	    		self.ecb_encrypt(&mut st);
 	    		for j in 0..bytes {buff[j]^=st[j]}
@@ -530,11 +530,11 @@ impl AES {
        	let mut fell_off: u32=0;
 
         match self.mode {
-        	AES_ECB => {
+        	ECB => {
             	self.ecb_decrypt(buff);
             	return 0;
             },
-        	AES_CBC => {
+        	CBC => {
             	for j in 0..16 {
 					st[j]=self.f[j];
 					self.f[j]=buff[j];
@@ -546,8 +546,8 @@ impl AES {
             	}
             	return 0;
            	},
-        	AES_CFB1 | AES_CFB2 | AES_CFB4 => {
-            	let bytes=self.mode-AES_CFB1+1;
+        	CFB1 | CFB2 | CFB4 => {
+            	let bytes=self.mode-CFB1+1;
             	for j in 0..bytes {fell_off=(fell_off<<8)|(self.f[j] as u32)}
             	for j in 0..16 {st[j]=self.f[j]}
             	for j in bytes..16 {self.f[j-bytes]=self.f[j]}
@@ -558,8 +558,8 @@ impl AES {
             	}
             	return fell_off;
             },
-        	AES_OFB1 | AES_OFB2 | AES_OFB4 | AES_OFB8 | AES_OFB16 => {
-           		let bytes=self.mode-AES_OFB1+1;
+        	OFB1 | OFB2 | OFB4 | OFB8 | OFB16 => {
+           		let bytes=self.mode-OFB1+1;
              	for j in 0..16 {st[j]=self.f[j]}
             	self.ecb_encrypt(&mut st);
            		for j in 0..bytes {buff[j]^=st[j]}       
@@ -569,8 +569,8 @@ impl AES {
             	return 0;
             },
 
-			AES_CTR1 | AES_CTR2 | AES_CTR4 | AES_CTR8 | AES_CTR16 => {
-	    		let bytes=self.mode-AES_CTR1+1;
+			CTR1 | CTR2 | CTR4 | CTR8 | CTR16 => {
+	    		let bytes=self.mode-CTR1+1;
 	    		for j in 0..16 {st[j]=self.f[j]}
 	    		self.ecb_encrypt(&mut st);
 	    		for j in 0..bytes {buff[j]^=st[j]}
@@ -604,7 +604,7 @@ fn main()
 	for i in 0..16 {block[i]=i as u8}
 
 	let mut aes=AES::new();
-	aes.init(AES_CTR16,32,&key,Some(iv));
+	aes.init(CTR16,32,&key,Some(iv));
 
 	println!("Plain= ");
 	for i in 0..16 {print!("{:02x} ",block[i])}
@@ -616,7 +616,7 @@ fn main()
 	for i in 0..16 {print!("{:02x} ",block[i])}
 	println!("");	
 
-	aes.reset(AES_CTR16,Some(iv));
+	aes.reset(CTR16,Some(iv));
 	aes.decrypt(&mut block);
 
 	println!("Decrypt= ");

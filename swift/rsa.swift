@@ -64,7 +64,7 @@ final public class RSA {
     static public let SHA384=48
     static public let SHA512=64
     
-    static public let HASH_TYPE=SHA384
+    static public let HASH_TYPE=SHA256
     
     /* Hash number (optional) and string to array size of Bigs */
  

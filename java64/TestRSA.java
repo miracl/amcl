@@ -55,6 +55,8 @@ public class TestRSA
 
 		byte[] E=RSA.OAEP_ENCODE(sha,M,rng,null); /* OAEP encode message M to E  */
 
+		if (E.length==0) System.out.println("Encoding failed\n");
+
 		RSA.ENCRYPT(pub,E,C);     /* encrypt encoded message */
 		System.out.print("Ciphertext= 0x"); RSA.printBinary(C);
 

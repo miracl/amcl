@@ -575,6 +575,40 @@ pub fn g2mul(P: &mut ECP2,e: &mut BIG) -> ECP2 {
 	return R;
 }
 
+/* f=f^e */
+/* Note that this method requires a lot of RAM! Better to use compressed XTR method, see FP4.java */
+pub fn gtpow(d: &mut FP12,e: &mut BIG) -> FP12 {
+	let mut r=FP12::new();
+	if rom::USE_GS_GT {
+		let mut g:[FP12;4]=[FP12::new(),FP12::new(),FP12::new(),FP12::new()];
+		let mut f = FP2::new_bigs(&BIG::new_ints(&rom::CURVE_FRA),&BIG::new_ints(&rom::CURVE_FRB));
+		let q=BIG::new_ints(&rom::CURVE_ORDER);
+		let mut t=BIG::new();
+		let mut u=gs(e);
+		let mut w=FP12::new();
+
+		g[0].copy(&d);
+		for i in 1..4 {
+			w.copy(&g[i-1]);
+			g[i].copy(&w);
+			g[i].frob(&mut f);
+		}
+		for i in 0..4 {
+			let np=u[i].nbits();
+			t.copy(&BIG::modneg(&mut u[i],&q));
+			let nn=t.nbits();
+			if nn<np {
+				u[i].copy(&t);
+				g[i].conj();
+			}
+		}
+		r.copy(&FP12::pow4(&mut g,&u));
+	} else {
+		r.copy(&d.pow(e));
+	}
+	return r;
+}
+
 /*
 #[allow(non_snake_case)]
 fn main()

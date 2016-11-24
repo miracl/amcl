@@ -28,7 +28,7 @@ const RSA_SHA256 int=32
 const RSA_SHA384 int=48
 const RSA_SHA512 int=64
 
-const RSA_HASH_TYPE int=RSA_SHA512
+const RSA_HASH_TYPE int=RSA_SHA256
 
 
 type rsa_private_key struct {

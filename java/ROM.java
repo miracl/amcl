@@ -38,16 +38,16 @@ public class ROM
 
 /*** Enter Some Field details here  ***/
 // BN254 Curve
-//	public static final int MODBITS=254; /* Number of bits in Modulus */
-//	public static final int MOD8=3;  /* Modulus mod 8 */
-//	public static final int BASEBITS=29; /* Almost always 29, 28 for NIST521 */
-//	public static final int AES_S=0;  /* AES equivalaent strength if significantly less than group size */
-
-// BLS455 Curve
-	public static final int MODBITS=455; /* Number of bits in Modulus */
+	public static final int MODBITS=254; /* Number of bits in Modulus */
 	public static final int MOD8=3;  /* Modulus mod 8 */
 	public static final int BASEBITS=29; /* Almost always 29, 28 for NIST521 */
-	public static final int AES_S=128;
+	public static final int AES_S=0;  /* AES equivalaent strength if significantly less than group size */
+
+// BLS455 Curve
+//	public static final int MODBITS=455; /* Number of bits in Modulus */
+//	public static final int MOD8=3;  /* Modulus mod 8 */
+//	public static final int BASEBITS=29; /* Almost always 29, 28 for NIST521 */
+//	public static final int AES_S=128;
 
 // BN454 Curve
 //	public static final int MODBITS=454; /* Number of bits in Modulus */
@@ -235,9 +235,9 @@ public class ROM
 //	public static final int MConst=0x15F615E5;
 
 // BN254 Curve Modulus
-//	public static final int MODTYPE=NOT_SPECIAL;
-//	public static final int[] Modulus= {0x13,0x18000000,0x4E9,0x2000000,0x8612,0x6C00000,0x6E8D1,0x10480000,0x252364};
-//	public static final int MConst=0x179435E5;
+	public static final int MODTYPE=NOT_SPECIAL;
+	public static final int[] Modulus= {0x13,0x18000000,0x4E9,0x2000000,0x8612,0x6C00000,0x6E8D1,0x10480000,0x252364};
+	public static final int MConst=0x179435E5;
 
 // BN454 Curve Modulus
 //	public static final int MODTYPE=NOT_SPECIAL;
@@ -245,9 +245,9 @@ public class ROM
 //	public static final int MConst=0x179435E5;
 
 // BLS455 Curve Modulus
-	public static final int MODTYPE=NOT_SPECIAL;
-	public static final int[] Modulus= {0x2AB,0x1500000C,0xAAA55AA,0xB12AAD6,0x6D1BA6C,0xCCA5674,0x12E2CF6E,0xA9F9662,0x34BD939,0x12D8EAB1,0xFD9978E,0x9240600,0xE0F95B,0xAAB9550,0x55555E5,0xAAAAB};
-	public static final int MConst=0x1F4017FD;
+//	public static final int MODTYPE=NOT_SPECIAL;
+//	public static final int[] Modulus= {0x2AB,0x1500000C,0xAAA55AA,0xB12AAD6,0x6D1BA6C,0xCCA5674,0x12E2CF6E,0xA9F9662,0x34BD939,0x12D8EAB1,0xFD9978E,0x9240600,0xE0F95B,0xAAB9550,0x55555E5,0xAAAAB};
+//	public static final int MConst=0x1F4017FD;
 
 
 // BNT Curve Modulus
@@ -537,7 +537,7 @@ public class ROM
 */
 
 // BN254 Curve
-/*
+
 	public static final int CURVETYPE=WEIERSTRASS;
 	public static final int CURVE_PAIRING_TYPE=BN_CURVE;
 	public static final int CURVE_A = 0;
@@ -564,7 +564,7 @@ public class ROM
 	public static final boolean USE_GS_G2 =true;
 	public static final boolean USE_GS_GT =true;	
 	public static final boolean GT_STRONG=false;
-*/
+
 // BN454 Curve
 /*
 	public static final int CURVETYPE=WEIERSTRASS;
@@ -596,7 +596,7 @@ public class ROM
 	public static final boolean GT_STRONG=false;
 */
 // BLS455 Curve
-
+/*
 	public static final int CURVETYPE=WEIERSTRASS;
 	public static final int CURVE_PAIRING_TYPE=BLS_CURVE;
 	public static final int CURVE_A = 0;
@@ -626,7 +626,7 @@ public class ROM
 	public static final boolean USE_GS_G2 =true;
 	public static final boolean USE_GS_GT =true;	
 	public static final boolean GT_STRONG=false;
-
+*/
 
 // BNT Curve
 /*

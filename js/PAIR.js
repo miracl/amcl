@@ -408,6 +408,7 @@ PAIR.glv= function(e)
 		var t=new BIG(0);
 		var q=new BIG(0); q.rcopy(ROM.CURVE_Order);
 		var v=[];
+
 		for (i=0;i<2;i++)
 		{
 			t.rcopy(ROM.CURVE_W[i]);
@@ -502,6 +503,7 @@ PAIR.G1mul= function(P,e)
 		var cru=new FP(bcru);
 		var t=new BIG(0);
 		var u=PAIR.glv(e);
+
 		Q.getx().mul(cru);
 
 		np=u[0].nbits();

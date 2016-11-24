@@ -132,7 +132,7 @@ impl GCM {
         
 		self.a=AES::new();
 
-        self.a.init(aes::AES_ECB,nk,key,None);
+        self.a.init(aes::ECB,nk,key,None);
         self.a.ecb_encrypt(&mut h);    /* E(K,0) */
         self.precompute(&h);
         

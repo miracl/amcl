@@ -17,6 +17,6 @@ ar r amcl.a rand.o aes.o gcm.o oct.o rom.o
 
 gcc -std=c99 -O3 testecdh.c ecdh.c amcl.a -o testecdh.exe
 gcc -std=c99 -O3 testrsa.c rsa.c amcl.a -o testrsa.exe
-gcc -std=c99 -O3 benchtest_ec.c amcl.a -o benchtest_ec.exe
+gcc -std=c99 -O3 benchtest_ec.c rsa.c amcl.a -o benchtest_ec.exe
 
 del *.o

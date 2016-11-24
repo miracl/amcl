@@ -506,7 +506,7 @@ impl BIG {
     pub fn rmod(&mut self,n: &BIG) {
         let mut k=0;
         let mut m=BIG::new_copy(n);
-	let mut r=BIG::new();
+	    let mut r=BIG::new();
         self.norm();
         if BIG::comp(self,&m)<0 {return}
         loop {
