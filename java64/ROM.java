@@ -49,10 +49,17 @@ public class ROM
 //	public static final int AES_S=128;
 
 // BLS455 Curve
-	public static final int MODBITS=455; /* Number of bits in Modulus */
+//	public static final int MODBITS=455; /* Number of bits in Modulus */
+//	public static final int MOD8=3;  /* Modulus mod 8 */
+//	public static final int BASEBITS=60;
+//	public static final int AES_S=128;
+
+// BLS383 Curve
+	public static final int MODBITS=383; /* Number of bits in Modulus */
 	public static final int MOD8=3;  /* Modulus mod 8 */
-	public static final int BASEBITS=60;
-	public static final int AES_S=128;
+	public static final int BASEBITS=56; 
+	public static final int AES_S=0;
+
 
 // HIFIVE Curve
 //	public static final int MODBITS=336;
@@ -244,9 +251,15 @@ public class ROM
 //	public static final long MConst=0xF33C46ED79435E5L;
 
 // BLS455 Curve
+//	public static final int MODTYPE=NOT_SPECIAL;
+//	public static final long[] Modulus= {0xAA00001800002ABL,0xC589556B2AA956AL,0xB9994ACE86D1BA6L,0x3954FCB314B8B3DL,0xE3A5B1D56234BD9L,0x95B49203003F665L,0x57955572AA00E0FL,0x555559555L};
+//	public static final long MConst=0xB3EF8137F4017FDL;
+
+// BLS383 Curve
 	public static final int MODTYPE=NOT_SPECIAL;
-	public static final long[] Modulus= {0xAA00001800002ABL,0xC589556B2AA956AL,0xB9994ACE86D1BA6L,0x3954FCB314B8B3DL,0xE3A5B1D56234BD9L,0x95B49203003F665L,0x57955572AA00E0FL,0x555559555L};
-	public static final long MConst=0xB3EF8137F4017FDL;
+	public static final long[] Modulus= {0xACAAB52AAD556BL,0x1BB01475F75D7AL,0xCF73083D5D7520L,0x531820F99EB16L,0x2C01355A68EA32L,0x5C6105C552A785L,0x7AC52080A9F7L};
+	public static final long MConst=0xA59AB3B123D0BDL;
+
 
 // BNT Curve
 //	public static final int MODTYPE=NOT_SPECIAL;
@@ -614,8 +627,41 @@ public static final long[][][] CURVE_BB={{{0x74F71E8D2FE08DL,0xD43492B2CB35FAL,0
 
 */
 
-// BLS455 Curve
+// BLS383 Curve
 
+	public static final int CURVETYPE=WEIERSTRASS;
+	public static final int CURVE_PAIRING_TYPE=BLS_CURVE;
+	public static final int CURVE_A = 0;
+
+	public static final long[] CURVE_Order={0xFFF80000FFF001L,0xBFDE0070FE7800L,0x3000049C5EDF1CL,0xC40007F910007AL,0x14641004CL,0x0L,0x0L};
+	public static final long[] CURVE_B= {0x9L,0x0L,0x0L,0x0L,0x0L,0x0L,0x0L};
+	public static final long[] CURVE_Cof= {0x2A00000052BL,0x5560AAAAAB2CA0L,0x6055L,0x0L,0x0L,0x0L,0x0L};
+	public static final long[] CURVE_Gx={0xD59B348D10786BL,0x3477C0E3F54AD0L,0xBF25B734578B9BL,0x4F6AC007BB6F65L,0xEFD5830FF57E9CL,0xADB9F88FB6EC02L,0xB08CEE4BC98L};
+	public static final long[] CURVE_Gy={0x5DA023D145DDBL,0x13F518C5FEF7CCL,0x56EC3462B2A66FL,0x96F3019C7A925FL,0x9061047981223EL,0x4810AD8F5BE59L,0x1F3909337671L};
+
+	public static final long[] CURVE_Bnx={0x1000000040L,0x110L,0x0L,0x0L,0x0L,0x0L,0x0L};
+	public static final long[] CURVE_Cru={0xA3AAC4EDA155A9L,0xDF2FE8761E5E3DL,0xBCDFAADE632625L,0x5123128D3035A6L,0xDBF3A2BBEAD683L,0x5C5FAB20424190L,0x7AC52080A9F7L};
+	public static final long[] CURVE_Fra={0x2BA59A92B4508BL,0x63DB7A06EEF343L,0x40341CB1DFBC74L,0x1639E9D32D55D3L,0xB19B3F05CC36D4L,0xF323EE4D86AB98L,0x5A5FB198672L};
+	public static final long[] CURVE_Frb={0x81051A97F904E0L,0xB7D49A6F086A37L,0x8F3EEB8B7DB8ABL,0xEEF7983C6C9543L,0x7A65F6549CB35DL,0x693D1777CBFBECL,0x751F25672384L};
+	public static final long[] CURVE_Pxa={0x6059885BAC9472L,0x7C4D31DE2DC36DL,0xBDC90C308C88A7L,0x29F01971C688FCL,0x3693539C43F167L,0xD81E5A561EB8BFL,0x4D50722B56BFL};
+	public static final long[] CURVE_Pxb={0x9B4BD7A272AB23L,0x7AF19D4F44DCE8L,0x3F6F7B93206A34L,0x571DD3E2A819FBL,0x3A2BA3B635D7EEL,0xAC28C780C1A126L,0xEE3617C3E5BL};
+	public static final long[] CURVE_Pya={0x81D230977BD4FDL,0xB660720DFDFC6L,0x41FC9590C89A0CL,0x2E1FBCF878287AL,0x11C23014EEE65L,0x28878816BB325EL,0x8F40859A05CL};
+	public static final long[] CURVE_Pyb={0xA5E20A252C4CE6L,0x5907A74AFF40C8L,0x41760A42448EF3L,0xFFEF82B0FDA199L,0xA0F29A18D4EA49L,0xAC7F7B86E4997BL,0x1DCABBA88C12L};
+// not used
+	public static final long[][] CURVE_W={{},{}};
+	public static final long[][][] CURVE_SB={{{},{}},{{},{}}};
+	public static final long[][] CURVE_WB={{},{},{},{}};
+	public static final long[][][] CURVE_BB={{{},{},{},{}},{{},{},{},{}},{{},{},{},{}},{{},{},{},{}}};
+
+	public static final boolean USE_GLV =true;
+	public static final boolean USE_GS_G2 =true;
+	public static final boolean USE_GS_GT =true;	
+	public static final boolean GT_STRONG=false;
+
+
+
+// BLS455 Curve
+/*
 	public static final int CURVETYPE=WEIERSTRASS;
 	public static final int CURVE_PAIRING_TYPE=BLS_CURVE;
 	public static final int CURVE_A = 0;
@@ -644,7 +690,7 @@ public static final long[][][] CURVE_BB={{{0x74F71E8D2FE08DL,0xD43492B2CB35FAL,0
 	public static final boolean USE_GS_G2 =true;
 	public static final boolean USE_GS_GT =true;	
 	public static final boolean GT_STRONG=false;
-
+*/
 	public static boolean debug=false;
 
 }
