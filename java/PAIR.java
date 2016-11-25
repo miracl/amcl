@@ -404,8 +404,7 @@ public final class PAIR {
 				v[i]=new BIG(d.div(q));
 				u[i]=new BIG(0);
 			}
-System.out.println("v[0]= "+v[0].toString());
-System.out.println("v[1]= "+v[1].toString());
+
 			u[0].copy(e);
 			for (i=0;i<2;i++)
 				for (j=0;j<2;j++)
@@ -488,10 +487,8 @@ System.out.println("v[1]= "+v[1].toString());
 			BIG q=new BIG(ROM.CURVE_Order);
 			FP cru=new FP(new BIG(ROM.CURVE_Cru));
 			BIG t=new BIG(0);
-System.out.println("e= "+e.toString());
+
 			BIG[] u=glv(e);
-System.out.println("u[0]= "+u[0].toString());
-System.out.println("u[1]= "+u[1].toString());
 			Q.getx().mul(cru);
 
 			np=u[0].nbits();
