@@ -1,7 +1,16 @@
-AMCL is very simple to build for Java. This version is optimal for a 32-bit 
-(or less) Virtual Machine.
+AMCL is very simple to build for Java. 
 
-First - decide the modulus type and curve type you want to use. Edit ROM.java 
+The first decision is whether to do a 32-bit or 64-bit build. In general a 
+64-bit build will probably be faster if both your processor and operating 
+system are 64-bit. Otherwise a 32-bit build is probably best.
+
+For a 32-bit build, copy BIG32.java, DBIG32.java and ROM32.java to BIG.java,
+DBIG.java and ROM.java respectively.
+
+For a 64-bit build, copy BIG64.java, DBIG64.java and ROM64.java to BIG.java,
+DBIG.java and ROM.java respectively.
+
+Next - decide the modulus type and curve type you want to use. Edit ROM.java 
 where indicated. You might want to use one of the curves whose details are
 already in there.
 
@@ -29,6 +38,10 @@ For a quick jumpstart:-
 del *.class
 javac TestECDH.java
 java TestECDH
+
+del *.class
+javac TestRSA.java
+java TestRSA
 
 del *.class
 javac TestMPIN.java

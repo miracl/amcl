@@ -18,33 +18,7 @@ under the License.
 */
 
 /* RSA API high-level functions  */
-/*
-public final class rsa_private_key
-{
-    public FF p,q,dp,dq,c;
-	
-	public rsa_private_key(int n)
-	{
-		p=new FF(n);
-		q=new FF(n);
-		dp=new FF(n);
-		dq=new FF(n);
-		c=new FF(n);
-	}
-}
 
-public final class rsa_public_key
-{
-    public int e;
-    public FF n;
-
-	public rsa_public_key(int m)
-	{
-		e=0;
-		n=new FF(m);
-	}
-}
-*/
 public final class RSA {
 
 	public static final int RFS=ROM.MODBYTES*ROM.FFLEN;

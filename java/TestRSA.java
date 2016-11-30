@@ -57,8 +57,6 @@ public class TestRSA
 
 		if (E.length==0) System.out.println("Encoding failed\n");
 
-		//System.out.println("Encoding= 0x"); RSA.printBinary(E);
-
 		RSA.ENCRYPT(pub,E,C);     /* encrypt encoded message */
 		System.out.print("Ciphertext= 0x"); RSA.printBinary(C);
 

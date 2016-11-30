@@ -117,7 +117,7 @@ public class HASH512 {
 		e=h[4]; f=h[5]; g=h[6]; hh=h[7];
 
 		for (j=0;j<80;j++)
-		{ /* 64 times - mush it up */
+		{ /* 80 times - mush it up */
 			t1=hh+Sig1(e)+Ch(e,f,g)+K[j]+w[j];
 			t2=Sig0(a)+Maj(a,b,c);
 			hh=g; g=f; f=e;

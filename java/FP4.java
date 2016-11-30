@@ -502,6 +502,7 @@ public final class FP4 {
 		r=r.xtr_pow(d);
 		return r;
 	}
+
 /*
 	public static void main(String[] args) {
 		BIG m=new BIG(ROM.Modulus);

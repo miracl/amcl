@@ -504,7 +504,7 @@ public class MPIN
 	{
 		byte[] h=hashit(sha,0,CID);
 		ECP R,P=mapit(h);
-	
+
 		P.toBytes(HID);   // new
 		if (date!=0)
 		{
@@ -553,7 +553,6 @@ public class MPIN
 		if (R.is_infinity()) return INVALID_POINT;
 
 		FP12 g;
-//		FP12 g1=new FP12(0);
 
 		g=PAIR.ate2(Q,R,sQ,P);
 		g=PAIR.fexp(g);
@@ -609,7 +608,6 @@ public class MPIN
 			t.mul(table[i]);
 			dn+=distance[i];
 		}
-
 		gf.copy(t); gf.conj();
 		steps=0; dm=0;
 		res=0;
@@ -661,7 +659,6 @@ public class MPIN
 		return 0;
 	}
 
-
 /* Hash the M-Pin transcript - new */
 
 	public static byte[] HASH_ALL(int sha,byte[] HID,byte[] xID,byte[] xCID,byte[] SEC,byte[] Y,byte[] R,byte[] W)
@@ -692,7 +689,6 @@ public class MPIN
 
 		return hashit(sha,0,T);
 	}
-
 
 /* calculate common key on client side */
 /* wCID = w.(A+AT) */
@@ -795,7 +791,7 @@ public class MPIN
 	}
 
 /* Generate Y = H(epoch, xCID/xID) */
-	public static void GET_Y(int sha,int TimeValue,byte[] xCID,byte[] Y)	
+	public static void GET_Y(int sha,int TimeValue,byte[] xCID,byte[] Y)
 	{
 		byte[] h = hashit(sha,TimeValue,xCID);
 		BIG y = BIG.fromBytes(h);

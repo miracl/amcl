@@ -193,7 +193,6 @@ public final class FP12 {
 
 		b.copy(C); b.add(D);
 		c.add(A);
-
 		norm();
 	}
 
@@ -248,7 +247,6 @@ public final class FP12 {
 
 		z3.times_i();
 		a.copy(z0); a.add(z3);
-
 		norm();
 	}
 

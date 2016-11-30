@@ -17,22 +17,12 @@ specific language governing permissions and limitations
 under the License.
 */
 
-/* Java Large Finite Field arithmetic */
+/* Large Finite Field arithmetic */
 /* AMCL mod p functions */
 
 public final class FF {
 	private final BIG[] v;
 	private final int length;
-
-	private static final int P_MBITS=ROM.MODBYTES*8;
-	private static final int P_OMASK=((int)(-1)<<(P_MBITS%ROM.BASEBITS));
-	private static final int P_FEXCESS=((int)1<<(ROM.BASEBITS*ROM.NLEN-P_MBITS));
-	private static final int P_TBITS=(P_MBITS%ROM.BASEBITS);
-
-	public int P_EXCESS() 
-	{
-		return ((v[length-1].get(ROM.NLEN-1)&P_OMASK)>>(P_TBITS));
-	}
 
 /* Constructors */
 	public FF(int n)
@@ -40,14 +30,6 @@ public final class FF {
 		v=new BIG[n];
 		for (int i=0;i<n;i++)
 			v[i]=new BIG(0);
-		length=n;
-	}
-
-	public FF(int [][] x,int n)
-	{
-		v=new BIG[n];
-		for (int i=0;i<n;i++)
-			v[i]=new BIG(x[i]);
 		length=n;
 	}
 
@@ -60,8 +42,8 @@ public final class FF {
 	public void set(int m)
 	{
 		zero();
-		v[0].set(0,(int)(m&ROM.BMASK));
-		v[0].set(1,(int)(m>>ROM.BASEBITS));
+		v[0].set(0,(m&ROM.BMASK));
+		v[0].set(1,(m>>ROM.BASEBITS));
 	}
 
 /* copy from FF b */
@@ -257,14 +239,13 @@ public final class FF {
 		}
 		for (i=0;i<n-1;i++)
 		{
-			carry=v[vp+i].norm();  
-			v[vp+i].xortop(carry<<P_TBITS);
+			carry=(int)v[vp+i].norm();  
+			v[vp+i].xortop(carry,ROM.P_TBITS);
 			v[vp+i+1].inc(carry);
 		}
-		carry=v[vp+n-1].norm();
+		carry=(int)v[vp+n-1].norm();
 		if (trunc) 
-			v[vp+n-1].xortop(carry<<P_TBITS);
-
+			v[vp+n-1].xortop(carry,ROM.P_TBITS);
 	}
 
 	public void norm()
@@ -278,9 +259,9 @@ public final class FF {
 		int i,carry,delay_carry=0;
 		for (i=0;i<length-1;i++)
 		{
-			carry=v[i].fshl(1);
+			carry=(int)v[i].fshl(1);
 			v[i].inc(delay_carry);
-			v[i].xortop(carry<<P_TBITS);
+			v[i].xortop(carry,ROM.P_TBITS);
 			delay_carry=carry;
 		}
 		v[length-1].fshl(1);
@@ -291,11 +272,11 @@ public final class FF {
 
 	public void shr()
 	{
-		int i,carry;
-		for (i=length-1;i>0;i--)
+		int carry;
+		for (int i=length-1;i>0;i--)
 		{
-			carry=v[i].fshr(1);
-			v[i-1].ortop(carry<<P_TBITS);
+			carry=(int)v[i].fshr(1);
+			v[i-1].xortop(carry,ROM.P_TBITS);
 		}
 		v[0].fshr(1);
 	}
@@ -307,24 +288,11 @@ public final class FF {
 		String s="";
 		for (int i=length-1;i>=0;i--)
 		{
-			s+=v[i].toString();
+			s+=v[i].toString(); //s+=" ";
 		}
 		return s;
 	}
-/*
-	public String toStr(int n)
-	{
-		FF t=new FF(n);
-		for (int i=0;i<n;i++) t.v[i]=v[i];
-		t.norm();
-		String s="";	
-		for (int i=t.length-1;i>=0;i--)
-		{
-			s+=t.v[i].toString();
-		}
-		return s;
-	}
-*/
+
 /*
 	public String toRawString(int len) 
 	{
@@ -348,7 +316,6 @@ public final class FF {
 
 	public static void fromBytes(FF x,byte[] b)
 	{
-
 		for (int i=0;i<x.length;i++)
 		{
 			x.v[i]=BIG.frombytearray(b,(x.length-i-1)*ROM.MODBYTES);
@@ -381,6 +348,7 @@ public final class FF {
 		rnorm(vp,nd2);                   /* Important - required for 32-bit build */
 		radd(vp+nd2,y,yp,y,yp+nd2,nd2);
 		rnorm(vp+nd2,nd2);               /* Important - required for 32-bit build */
+
 		t.karmul(tp,this,vp,this,vp+nd2,t,tp+n,nd2);
 		karmul(vp,x,xp,y,yp,t,tp+n,nd2);
 		karmul(vp+n,x,xp+nd2,y,yp+nd2,t,tp+n,nd2);
@@ -434,20 +402,17 @@ public final class FF {
 		int nd2;
  
 		nd2=n/2;
-		radd(n,x,0,x,nd2,nd2);  
+		radd(n,x,0,x,nd2,nd2);
 		radd(n+nd2,y,0,y,nd2,nd2);
 		rnorm(n,nd2);
 		rnorm(n+nd2,nd2);
-		
+
 		t.karmul(0,this,n+nd2,this,n,t,n,nd2);  /* t = (a0+a1)(b0+b1) */
-	
 		karmul(n,x,nd2,y,nd2,t,n,nd2); /* z[n]= a1*b1 */
-									/* z[0-nd2]=l(a0b0) z[nd2-n]= h(a0b0)+l(t)-l(a0b0)-l(a1b1) */									
-		t.rdec(0,this,n,n);              /* t=t-a1b1  */							
+									/* z[0-nd2]=l(a0b0) z[nd2-n]= h(a0b0)+l(t)-l(a0b0)-l(a1b1) */
+		t.rdec(0,this,n,n);              /* t=t-a1b1  */
 		rinc(nd2,this,0,nd2);   /* z[nd2-n]+=l(a0b0) = h(a0b0)+l(t)-l(a1b1)  */
-
-		rdec(nd2,t,0,nd2);   /* z[nd2-n]=h(a0b0)+l(t)-l(a1b1)-l(t-a1b1)=h(a0b0) */		
-
+		rdec(nd2,t,0,nd2);   /* z[nd2-n]=h(a0b0)+l(t)-l(a1b1)-l(t-a1b1)=h(a0b0) */
 		rnorm(0,-n);					/* a0b0 now in z - truncate it */
 		t.rdec(0,this,0,n);         /* (a0+a1)(b0+b1) - a0b0 */
 		rinc(nd2,t,0,n);
@@ -655,7 +620,6 @@ public final class FF {
 		FF d=new FF(2*n);
 		mod(m);
 		d.dscopy(this);
-
 		copy(d.reduce(m,ND));
 		mod(m);
 	}
@@ -674,7 +638,6 @@ public final class FF {
 		FF b=new FF(n);
 		FF c=new FF(n);
 		FF U=new FF(n);
-
 		FF t;
 
 		U.zero();
@@ -684,11 +647,12 @@ public final class FF {
 		for (i=1;i<n;i<<=1)
 		{
 			b.copy(this); b.mod2m(i);
-			t=mul(U,b); 			
-			
+			t=mul(U,b);
+
 			t.shrw(i); b.copy(t);
 			c.copy(this); c.shrw(i); c.mod2m(i);
 			c.lmul(U); c.mod2m(i);
+
 			b.add(c); b.norm();
 			b.lmul(U); b.mod2m(i);
 
@@ -727,9 +691,7 @@ public final class FF {
 	/* this*=y mod p */
 	public void modmul(FF y,FF p,FF nd)
 	{
-		int ex=P_EXCESS();
-		int ey=y.P_EXCESS();
-		if ((ex+1)>=(P_FEXCESS-1)/(ey+1)) mod(p);
+		if (BIG.ff_pexceed(v[length-1],y.v[y.length-1])) mod(p);
 		FF d=mul(this,y);
 		copy(d.reduce(p,nd));
 	}
@@ -737,8 +699,7 @@ public final class FF {
 	/* this*=y mod p */
 	public void modsqr(FF p,FF nd)
 	{
-		int ex=P_EXCESS();
-		if ((ex+1)>=(P_FEXCESS-1)/(ex+1)) mod(p);
+		if (BIG.ff_sexceed(v[length-1])) mod(p);
 		FF d=sqr(this);
 		copy(d.reduce(p,nd));
 	}
@@ -768,9 +729,7 @@ public final class FF {
 
 			R1.copy(this);
 			cswap(R0,R1,b);
-
 		}
-
 		copy(R0);
 		redc(p,ND);
 	}
@@ -809,9 +768,9 @@ public final class FF {
 	public void power(int e,FF p)
 	{
 		int n=p.length;
-		boolean f=true;
 		FF w=new FF(n);
 		FF ND=p.invmod2m();
+		boolean f=true;
 
 		w.copy(this);
 		w.nres(p);
@@ -826,20 +785,12 @@ public final class FF {
 			if (e%2==1)
 			{
 				if (f) copy(w);
-				else
-				{
-					ROM.debug=true;
-					modmul(w,p,ND);
-					ROM.debug=false;
-				}
+				else modmul(w,p,ND);
 				f=false;
-
 			}
 			e>>=1;
 			if (e==0) break;
-			
-			w.modsqr(p,ND);	
-
+			w.modsqr(p,ND);
 		}
 		redc(p,ND);
 	}
@@ -929,7 +880,7 @@ public final class FF {
 		}
 		while (comp(x,y)>0);
 
-		g=x.v[0].get(0);
+		g=(int)x.v[0].get(0);
 		r=igcd(s,g);
 		if (r>1) return true;
 		return false;
@@ -961,11 +912,11 @@ public final class FF {
 			s++;
 		}
 		if (s==0) return false;
-
 		for (i=0;i<10;i++)
 		{
 			x.randomnum(p,rng);
 			x.pow(d,p);
+
 			if (comp(x,unity)==0 || comp(x,nm1)==0) continue;
 			loop=false;
 			for (j=1;j<s;j++)
@@ -979,39 +930,5 @@ public final class FF {
 		}
 		return true;
 	}
-
-
-//	public static final int[][] P ={{0x1670957,0x1568CD3C,0x2595E5,0xEED4F38,0x1FC9A971,0x14EF7E62,0xA503883,0x9E1E05E,0xBF59E3},{0x1844C908,0x1B44A798,0x3A0B1E7,0xD1B5B4E,0x1836046F,0x87E94F9,0x1D34C537,0xF7183B0,0x46D07},{0x17813331,0x19E28A90,0x1473A4D6,0x1CACD01F,0x1EEA8838,0xAF2AE29,0x1F85292A,0x1632585E,0xD945E5},{0x919F5EF,0x1567B39F,0x19F6AD11,0x16CE47CF,0x9B36EB1,0x35B7D3,0x483B28C,0xCBEFA27,0xB5FC21}};
-/*
-	public static final int[][] P= {{0x156FFDDF,0x5EC1ED,0xC6702D0,0x1C42FB6,0x1A3A50F0,0x1EE1811F,0x1AB28D94,0x1BE439E1,0x56790},{0x1D781CB3,0x1E3D731B,0x153A96F6,0x9AC443F,0x10628677,0x1F21365D,0x97B4301,0xDAD3A12,0xD6C46E},{0x833D55D,0xD44CF7B,0x4373422,0x22718D3,0x1E4CF3CA,0xB774703,0x117E2980,0x10C0F2A7,0x10D8B7},{0x1A784949,0x1483C3BF,0x7938D16,0x18E0E7B5,0x111E4EF6,0x20163B4,0x95FEBE,0x129E8526,0xF48167}};
-
-	public static void main(String[] args) {
-		byte[] raw=new byte[100];
-		RAND rng=new RAND();
-
-		rng.clean();
-		for (int i=0;i<100;i++) raw[i]=(byte)i;
-
-		rng.seed(100,raw);
-
-		int n=4;
-
-		FF x=new FF(n);
-		x.set(3);
-	
-		FF p=new FF(P,n);
-
-	//	if (prime(p,rng)) System.out.println("p is a prime");
-
-		FF e=new FF(n);
-		e.copy(p);
-		e.dec(1); e.norm();
-
-		System.out.println("e= "+e.toString());	
-
-		x.skpow(e,p);
-		System.out.println("x= "+x.toString());	
-
-    } */
 
 }

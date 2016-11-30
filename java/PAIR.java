@@ -404,7 +404,6 @@ public final class PAIR {
 				v[i]=new BIG(d.div(q));
 				u[i]=new BIG(0);
 			}
-
 			u[0].copy(e);
 			for (i=0;i<2;i++)
 				for (j=0;j<2;j++)
@@ -487,7 +486,6 @@ public final class PAIR {
 			BIG q=new BIG(ROM.CURVE_Order);
 			FP cru=new FP(new BIG(ROM.CURVE_Cru));
 			BIG t=new BIG(0);
-
 			BIG[] u=glv(e);
 			Q.getx().mul(cru);
 
