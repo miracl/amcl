@@ -286,8 +286,9 @@ public final class ECP2 {
 		w2.add(w2);
 		w3.sub(x);
 		y.copy(w8); y.mul(w3);
-		w2.norm();
+	//	w2.norm();
 		y.sub(w2);
+
 		y.norm();
 		z.norm();
 

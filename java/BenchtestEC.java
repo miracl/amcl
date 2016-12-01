@@ -21,6 +21,7 @@ under the License.
 
 public class BenchtestEC
 {
+/* generate an RSA key pair */
 	public static final int MIN_TIME=10; /* seconds */
 	public static final int MIN_ITERS=10; 
 

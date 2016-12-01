@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-/* Small Finite Field arithmetic */
+/* Finite Field arithmetic */
 /* AMCL mod p functions */
 
 public final class FP {
@@ -71,22 +71,13 @@ public final class FP {
 		}
 	}
 
-	public BIG tobig()
-	{
-		BIG r=new BIG(x);
-		return r;
-	}
-
-
 /* convert back to regular form */
 	public BIG redc()
 	{
-//System.out.printf("Into redc");
 		if (ROM.MODTYPE!=ROM.PSEUDO_MERSENNE && ROM.MODTYPE!=ROM.GENERALISED_MERSENNE)
 		{
 			DBIG d=new DBIG(x);
-			BIG w=BIG.mod(d);
-			return w;
+			return BIG.mod(d);
 		}
 		else 
 		{
@@ -140,14 +131,10 @@ public final class FP {
 /* this*=b mod Modulus */
 	public void mul(FP b)
 	{
-		int ea,eb;
 		norm();
 		b.norm();
 
-		ea=BIG.EXCESS(x);
-		eb=BIG.EXCESS(b.x);
-
-		if ((long)(ea+1)*(eb+1)>ROM.FEXCESS) reduce();
+		if (BIG.pexceed(x,b.x)) reduce();
 
 		DBIG d=BIG.mul(x,b.x);
 		x.copy(BIG.mod(d));
@@ -163,14 +150,13 @@ public final class FP {
 			c=-c;
 			s=true;
 		}
-		int afx=(BIG.EXCESS(x)+1)*(c+1)+1;
-		if (c<ROM.NEXCESS && afx<ROM.FEXCESS)
+		if (c<ROM.NEXCESS && ((BIG.EXCESS(x)+1)*(c+1)+1)<ROM.FEXCESS)
 		{
 			x.imul(c);
 		}
 		else
 		{
-			if (afx<ROM.FEXCESS) x.pmul(c);
+			if (((BIG.EXCESS(x)+1)*(c+1)+1)<ROM.FEXCESS) x.pmul(c);
 			else
 			{
 				DBIG d=x.pxmul(c);
@@ -185,11 +171,9 @@ public final class FP {
 	public void sqr()
 	{
 		DBIG d;
-		int ea;
 		norm();
-		ea=BIG.EXCESS(x);
-		if ((long)(ea+1)*(ea+1)>ROM.FEXCESS)
-			reduce();
+
+		if (BIG.sexceed(x)) reduce();
 
 		d=BIG.sqr(x);	
 		x.copy(BIG.mod(d));
@@ -200,7 +184,6 @@ public final class FP {
 		x.add(b.x);
 		if (BIG.EXCESS(x)+2>=ROM.FEXCESS) reduce();
 	}
-
 
 // https://graphics.stanford.edu/~seander/bithacks.html
 // constant time log to base 2 (or number of bits in)
@@ -227,8 +210,7 @@ public final class FP {
 		BIG m=new BIG(p);
 
 		norm();
-
-		sb=logb2(BIG.EXCESS(x));
+		sb=logb2((int)BIG.EXCESS(x));
 /*
 		ov=BIG.EXCESS(x); 
 		sb=1; while(ov!=0) {sb++;ov>>=1;} 

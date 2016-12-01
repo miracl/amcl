@@ -98,12 +98,12 @@ public final class FP2 {
 		a=new FP(c);
 		b=new FP(0);
 	}
-
+/*
 	public BIG geta()
 	{
 		return a.tobig();
 	}
-
+*/
 /* extract a */
 	public BIG getA()
 	{ 
@@ -192,10 +192,10 @@ public final class FP2 {
 	public void sqr()
 	{
 		norm();
-
 		FP w1=new FP(a);
 		FP w3=new FP(a);
 		FP mb=new FP(b);
+
 		w3.mul(b);
 		w1.add(b);
 		mb.neg();
@@ -227,7 +227,6 @@ public final class FP2 {
 		a.copy(w1);	a.add(mw);
 
 		norm();
-
 	}
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */

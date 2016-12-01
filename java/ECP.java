@@ -421,7 +421,6 @@ public final class ECP {
 			w2.add(w2);
 			w3.sub(x);
 			y.copy(w8); y.mul(w3);
-			//w2.norm();
 			y.sub(w2);
 			y.norm();
 			z.norm();
@@ -466,7 +465,6 @@ public final class ECP {
 			B.sub(z);
 			BB.copy(B); BB.sqr();
 			C.copy(AA); C.sub(BB);
-			//C.norm();
 
 			x.copy(AA); x.mul(BB);
 
@@ -723,7 +721,6 @@ public final class ECP {
 
 	public ECP mul(BIG e) {
 		if (e.iszilch() || is_infinity()) return new ECP();
-
 		ECP P=new ECP();
 		if (ROM.CURVETYPE==ROM.MONTGOMERY)
 		{
@@ -763,7 +760,6 @@ public final class ECP {
 // precompute table 
 			Q.copy(this);
 			Q.dbl();
-//System.out.println("Q= "+Q.toString());
 			W[0]=new ECP();
 			W[0].copy(this);
 
@@ -773,10 +769,11 @@ public final class ECP {
 				W[i].copy(W[i-1]);
 				W[i].add(Q);
 			}
-//System.out.println("W[1]= "+W[1].toString());
+
 // convert the table to affine 
 			if (ROM.CURVETYPE==ROM.WEIERSTRASS) 
 				multiaffine(8,W);
+
 // make exponent odd - add 2P if even, P if odd 
 			t.copy(e);
 			s=t.parity();

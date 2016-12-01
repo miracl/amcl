@@ -18,7 +18,6 @@ under the License.
 */
 
 
-
 /*
  * Implementation of the AES-GCM Encryption/Authentication
  *

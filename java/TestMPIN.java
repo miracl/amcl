@@ -88,9 +88,9 @@ public class TestMPIN
 		byte[] CLIENT_ID = IDstr.getBytes();   
 
 		byte[] HCID=MPIN.HASH_ID(sha,CLIENT_ID);  /* Either Client or TA calculates Hash(ID) - you decide! */
-		
-		System.out.print("Client ID= "); printBinary(CLIENT_ID);
+
 		System.out.print("Client ID Hash= "); printBinary(HCID);
+		System.out.print("Client ID= "); printBinary(CLIENT_ID);
 
 /* Client and Server are issued secrets by DTA */
 		MPIN.GET_SERVER_SECRET(S,SST);
@@ -107,7 +107,7 @@ public class TestMPIN
 		if (rtn != 0)
 			System.out.println("FAILURE: EXTRACT_PIN rtn: " + rtn);
 
-		System.out.print("Client Token TK: 0x"); printBinary(TOKEN); 
+		System.out.print("Client Token TK: 0x"); printBinary(TOKEN);
 
 		if (FULL)
 		{

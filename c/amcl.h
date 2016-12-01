@@ -82,7 +82,7 @@
 /* BLS-12 Curves */
 #define BLS_CURVES 200
 #define BLS455 200   /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
-
+#define BLS383 201   /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
 
 
 
@@ -91,7 +91,7 @@
 
 /*** START OF USER CONFIGURABLE SECTION - set architecture and choose modulus and curve  ***/
 
-#define CHOICE BN254	/**< Current choice of Field */
+#define CHOICE BN254_CX	/**< Current choice of Field */
 /* For some moduli only one parameterisation of curve may supported. For others there is a choice of WEIERSTRASS, EDWARDS or MONTGOMERY curves. See above. */
 #define CURVETYPE WEIERSTRASS	/**< Note that not all curve types are supported - see above */
 
@@ -419,6 +419,26 @@
 #endif
 #if CHUNK == 64
 #define BASEBITS 60			/**< Numbers represented to base 2*BASEBITS */
+#endif
+#endif
+#endif
+
+
+#if CHOICE==BLS383
+#define MBITS 383	/**< Number of bits in Modulus */
+#define MOD8 3		/**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL /**< Modulus type */
+#if CURVETYPE!=WEIERSTRASS
+ #error Not supported
+#else
+#if CHUNK==16
+ #error Not supported
+#endif
+#if CHUNK == 32
+#define BASEBITS 28			/**< Numbers represented to base 2*BASEBITS */
+#endif
+#if CHUNK == 64
+#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif

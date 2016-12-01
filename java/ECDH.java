@@ -335,15 +335,11 @@ public final class ECDH {
 		else
 		{
 			s=BIG.randomnum(r,RNG);
-		//	s.toBytes(T);
-		//	for (int i=0;i<EGS;i++) S[i]=T[i];
 		}
 
 		if (ROM.AES_S>0)
 		{
 			s.mod2m(2*ROM.AES_S);
-		//	s.toBytes(T);
-		//	for (int i=0;i<EGS;i++) S[i]=T[i];
 		}
 		s.toBytes(S);
 
@@ -430,7 +426,6 @@ public final class ECDH {
 			{
 				u.mod2m(2*ROM.AES_S);
 			}			
-
 			V.copy(G);
 			V=V.mul(u);   		
 			vx=V.getX();

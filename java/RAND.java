@@ -159,5 +159,3 @@ public class RAND {
 			System.out.format("%03d ",rng.getByte());
 	} */
 }
-
-
