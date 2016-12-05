@@ -24,8 +24,6 @@ package main
 
 //import "fmt"
 
-var p BIG=BIG{w: [NLEN]int64(Modulus)}
-
 type FP struct {
 	x *BIG
 }
@@ -58,9 +56,10 @@ func (F *FP) toString() string {
 /* convert to Montgomery n-residue form */
 func (F *FP) nres() {
 	if MODTYPE!=PSEUDO_MERSENNE && MODTYPE!=GENERALISED_MERSENNE {
+		p:=NewBIGints(Modulus);
 		d:=NewDBIGscopy(F.x)
 		d.shl(uint(NLEN)*BASEBITS)
-		F.x.copy(d.mod(&p))
+		F.x.copy(d.mod(p))
 	}
 }
 
@@ -77,7 +76,8 @@ func (F *FP) redc() *BIG {
 
 /* reduce this mod Modulus */
 func (F *FP) reduce() {
-	F.x.mod(&p)
+	p:=NewBIGints(Modulus)
+	F.x.mod(p)
 }
 
 /* test this=0? */
@@ -107,12 +107,12 @@ func (F *FP) norm() {
 }
 
 /* swap FPs depending on d */
-func (F *FP) cswap(b *FP,d int32) {
+func (F *FP) cswap(b *FP,d int) {
 	F.x.cswap(b.x,d);
 }
 
 /* copy FPs depending on d */
-func (F *FP) cmove(b *FP,d int32) {
+func (F *FP) cmove(b *FP,d int) {
 	F.x.cmove(b.x,d)
 }
 
@@ -121,12 +121,7 @@ func (F *FP) mul(b *FP) {
 
 	F.norm()
 	b.norm()
-	ea:=EXCESS(F.x)
-	eb:=EXCESS(b.x)
-
-	if (ea+1)>FEXCESS/(eb+1) {
-		F.reduce()
-	}
+	if pexceed(F.x,b.x) {F.reduce()}
 	d:=mul(F.x,b.x)
 	F.x.copy(mod(d))
 }
@@ -147,7 +142,8 @@ func logb2(w uint32) uint {
 
 /* this = -this mod Modulus */
 func (F *FP) neg() {
-	m:=NewBIGcopy(&p)
+	p:=NewBIGints(Modulus)
+	m:=NewBIGcopy(p)
 	F.norm()
 	sb:=logb2(uint32(EXCESS(F.x)))
 
@@ -169,15 +165,16 @@ func (F *FP) imul(c int) {
 		c=-c
 		s=true
 	}
-	afx:=(EXCESS(F.x)+1)*(int64(c)+1)+1;
+	afx:=(EXCESS(F.x)+1)*(cast_to_chunk(c)+1)+1;
 	if (c<NEXCESS && afx<FEXCESS) {
 		F.x.imul(c);
 	} else {
 		if (afx<FEXCESS) {
 			F.x.pmul(c)
 		} else {
+			p:=NewBIGints(Modulus);
 			d:=F.x.pxmul(c)
-			F.x.copy(d.mod(&p))
+			F.x.copy(d.mod(p))
 		}
 	}
 	if s {F.neg()}
@@ -187,10 +184,7 @@ func (F *FP) imul(c int) {
 /* this*=this mod Modulus */
 func (F *FP) sqr() {
 	F.norm();
-	ea:=EXCESS(F.x)
-	if (ea+1)>FEXCESS/(ea+1) {
-		F.reduce()
-	}
+	if sexceed(F.x) {F.reduce()}
 	d:=sqr(F.x)	
 	F.x.copy(mod(d))
 }
@@ -214,7 +208,8 @@ func (F *FP) div2() {
 	if (F.x.parity()==0) {
 		F.x.fshr(1)
 	} else {
-		F.x.add(&p)
+		p:=NewBIGints(Modulus);
+		F.x.add(p)
 		F.x.norm()
 		F.x.fshr(1)
 	}
@@ -222,8 +217,9 @@ func (F *FP) div2() {
 
 /* this=1/this mod Modulus */
 func (F *FP) inverse() {
+	p:=NewBIGints(Modulus);
 	r:=F.redc()
-	r.invmodp(&p)
+	r.invmodp(p)
 	F.x.copy(r)
 	F.nres()
 }
@@ -249,14 +245,16 @@ func (F *FP) pow(e *BIG) *FP {
 		if e.iszilch() {break}
 		m.sqr();
 	}
-	r.x.mod(&p);
+	p:=NewBIGints(Modulus);
+	r.x.mod(p);
 	return r;
 }
 
 /* return sqrt(this) mod Modulus */
 func (F *FP) sqrt() *FP {
 	F.reduce();
-	b:=NewBIGcopy(&p)
+	p:=NewBIGints(Modulus);
+	b:=NewBIGcopy(p)
 	if MOD8==5 {
 		b.dec(5); b.norm(); b.shr(3)
 		i:=NewFPcopy(F); i.x.shl(1)
@@ -276,5 +274,6 @@ func (F *FP) sqrt() *FP {
 /* return jacobi symbol (this/Modulus) */
 func (F *FP) jacobi() int {
 	w:=F.redc();
-	return w.jacobi(&p)
+	p:=NewBIGints(Modulus);
+	return w.jacobi(p)
 }

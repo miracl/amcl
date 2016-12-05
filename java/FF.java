@@ -239,11 +239,11 @@ public final class FF {
 		}
 		for (i=0;i<n-1;i++)
 		{
-			carry=(int)v[vp+i].norm();  
+			carry=v[vp+i].norm();  
 			v[vp+i].xortop(carry,ROM.P_TBITS);
 			v[vp+i+1].inc(carry);
 		}
-		carry=(int)v[vp+n-1].norm();
+		carry=v[vp+n-1].norm();
 		if (trunc) 
 			v[vp+n-1].xortop(carry,ROM.P_TBITS);
 	}
@@ -259,7 +259,7 @@ public final class FF {
 		int i,carry,delay_carry=0;
 		for (i=0;i<length-1;i++)
 		{
-			carry=(int)v[i].fshl(1);
+			carry=v[i].fshl(1);
 			v[i].inc(delay_carry);
 			v[i].xortop(carry,ROM.P_TBITS);
 			delay_carry=carry;
@@ -275,7 +275,7 @@ public final class FF {
 		int carry;
 		for (int i=length-1;i>0;i--)
 		{
-			carry=(int)v[i].fshr(1);
+			carry=v[i].fshr(1);
 			v[i-1].xortop(carry,ROM.P_TBITS);
 		}
 		v[0].fshr(1);

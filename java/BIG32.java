@@ -20,7 +20,7 @@ under the License.
 /* AMCL BIG number class */ 
 
 public class BIG {
-	private int[] w=new int[ROM.NLEN];
+	protected int[] w=new int[ROM.NLEN];
 /* Constructors */
 
 	public BIG()
@@ -68,12 +68,7 @@ public class BIG {
 	{
 		w[ROM.NLEN-1]^=((int)x<<s);
 	}
-/*
-	public void ortop(int x)
-	{
-		w[ROM.NLEN-1]|=x;
-	}
-*/
+
 /* calculate Field Excess */
 	public static int EXCESS(BIG a)
 	{
@@ -149,6 +144,11 @@ public class BIG {
 		}
 	}
 
+    public static int cast_to_chunk(int x)
+	{
+		return (int)x;
+	}
+
 /* normalise BIG - force all digits < 2^BASEBITS */
 	public int norm() {
 		int d,carry=0;
@@ -159,25 +159,7 @@ public class BIG {
 			carry=d>>ROM.BASEBITS;
 		}
 		w[ROM.NLEN-1]=(w[ROM.NLEN-1]+carry);
-		return (w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS));  
-	}
-
-/* Shift right by less than a word */
-	public int fshr(int k) {
-		int r=w[0]&(((int)1<<k)-1); /* shifted out part */
-		for (int i=0;i<ROM.NLEN-1;i++)
-			w[i]=(w[i]>>k)|((w[i+1]<<(ROM.BASEBITS-k))&ROM.BMASK);
-		w[ROM.NLEN-1]=w[ROM.NLEN-1]>>k;
-		return r;
-	}
-
-/* Shift right by less than a word */
-	public int fshl(int k) {
-		w[ROM.NLEN-1]=((w[ROM.NLEN-1]<<k))|(w[ROM.NLEN-2]>>(ROM.BASEBITS-k));
-		for (int i=ROM.NLEN-2;i>0;i--)
-			w[i]=((w[i]<<k)&ROM.BMASK)|(w[i-1]>>(ROM.BASEBITS-k));
-		w[0]=(w[0]<<k)&ROM.BMASK; 
-		return (w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS)); /* return excess - only used in FF.java */
+		return (int)(w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS));  
 	}
 
 /* return number of bits */
@@ -284,19 +266,6 @@ public class BIG {
 				if (i+j<ROM.NLEN) carry=c.muladd(a.w[i],b.w[j],carry,i+j);
 		}
 		return c;
-	}
-
-/* set x = x mod 2^m */
-	public void mod2m(int m)
-	{
-		int i,wd,bt;
-		int msk;
-	
-		wd=m/ROM.BASEBITS;
-		bt=m%ROM.BASEBITS;
-		msk=((int)1<<bt)-1;
-		w[wd]&=msk;
-		for (i=wd+1;i<ROM.NLEN;i++) w[i]=0;
 	}
 
 /* return a*b as DBIG */
@@ -458,21 +427,45 @@ public class BIG {
 		return b;
 	}
 
-/* return n-th bit */
-	public int bit(int n)
-	{
-		if ((w[n/ROM.BASEBITS]&((int)1<<(n%ROM.BASEBITS)))>0) return 1;
-		else return 0;
-	}
-
-
 
 
 /****************************************************************************/
 
 
+/* set x = x mod 2^m */
+	public void mod2m(int m)
+	{
+		int i,wd,bt;
+		wd=m/ROM.BASEBITS;
+		bt=m%ROM.BASEBITS;
+		w[wd]&=((cast_to_chunk(1)<<bt)-1);
+		for (i=wd+1;i<ROM.NLEN;i++) w[i]=0;
+	}
 
+/* return n-th bit */
+	public int bit(int n)
+	{
+		if ((w[n/ROM.BASEBITS]&(cast_to_chunk(1)<<(n%ROM.BASEBITS)))>0) return 1;
+		else return 0;
+	}
 
+/* Shift right by less than a word */
+	public int fshr(int k) {
+		int r=(int)(w[0]&((cast_to_chunk(1)<<k)-1)); /* shifted out part */
+		for (int i=0;i<ROM.NLEN-1;i++)
+			w[i]=(w[i]>>k)|((w[i+1]<<(ROM.BASEBITS-k))&ROM.BMASK);
+		w[ROM.NLEN-1]=w[ROM.NLEN-1]>>k;
+		return r;
+	}
+
+/* Shift right by less than a word */
+	public int fshl(int k) {
+		w[ROM.NLEN-1]=((w[ROM.NLEN-1]<<k))|(w[ROM.NLEN-2]>>(ROM.BASEBITS-k));
+		for (int i=ROM.NLEN-2;i>0;i--)
+			w[i]=((w[i]<<k)&ROM.BMASK)|(w[i-1]>>(ROM.BASEBITS-k));
+		w[0]=(w[0]<<k)&ROM.BMASK; 
+		return (int)(w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS)); /* return excess - only used in FF.java */
+	}
 
 /* test for zero */
 	public boolean iszilch() {

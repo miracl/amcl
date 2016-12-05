@@ -33,7 +33,7 @@ public class BenchtestPAIR
 		double dur;
 
 		rng.clean();
-		for (i=0;i<100;i++) RAW[i]=(byte)(i+1);
+		for (i=0;i<100;i++) RAW[i]=(byte)(i);
 		rng.seed(100,RAW);	
 
 		if (ROM.CURVE_PAIRING_TYPE==ROM.BN_CURVE)
@@ -73,7 +73,6 @@ public class BenchtestPAIR
 		System.out.format(" %8.2f ms per iteration\n",dur);
 	
 		ECP2 Q=new ECP2(new FP2(new BIG(ROM.CURVE_Pxa),new BIG(ROM.CURVE_Pxb)),new FP2(new BIG(ROM.CURVE_Pya),new BIG(ROM.CURVE_Pyb)));
-
 		ECP2 W=PAIR.G2mul(Q,r);
 
 		if (!W.is_infinity())
@@ -92,7 +91,7 @@ public class BenchtestPAIR
 		dur=(double)elapsed/iterations;
 		System.out.format("G2 mul              - %8d iterations  ",iterations);
 		System.out.format(" %8.2f ms per iteration\n",dur);
-	
+
 		FP12 w=PAIR.ate(Q,P);
 		w=PAIR.fexp(w);
 
@@ -177,11 +176,13 @@ public class BenchtestPAIR
 		Q.copy(W);
 
 		P=PAIR.G1mul(P,s);
+
 		g=PAIR.ate(Q,P);
 		g=PAIR.fexp(g);
 
 		P.copy(G);
 		Q=PAIR.G2mul(Q,s);
+
 		w=PAIR.ate(Q,P);
 		w=PAIR.fexp(w);
 
@@ -202,6 +203,6 @@ public class BenchtestPAIR
 			return;
 		}
 
-		System.out.print("All tests pass\n");
+		System.out.print("All tests pass\n"); 
 	}
 }

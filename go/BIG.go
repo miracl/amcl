@@ -24,8 +24,36 @@ package main
 import "strconv"
 //import "fmt"
 
-type BIG struct {
-	w [NLEN]int64
+/* normalise BIG - force all digits < 2^BASEBITS */
+func (r *BIG) norm() int {
+	var carry =cast_to_chunk(0)
+	for i:=0;i<NLEN-1;i++ {
+		d:=r.w[i]+carry
+		r.w[i]=d&BMASK
+		carry=d>>BASEBITS
+	}
+	r.w[NLEN-1]=(r.w[NLEN-1]+carry)
+	return int(r.w[NLEN-1]>>((8*MODBYTES)%BASEBITS))  
+}
+
+/* Shift right by less than a word */
+func (r *BIG) fshr(k uint) int {
+	w:=r.w[0]&((cast_to_chunk(1)<<k)-1) /* shifted out part */
+	for i:=0;i<NLEN-1;i++ {
+		r.w[i]=(r.w[i]>>k)|((r.w[i+1]<<(BASEBITS-k))&BMASK)
+	}
+	r.w[NLEN-1]=r.w[NLEN-1]>>k
+	return int(w)
+}
+
+/* Shift right by less than a word */
+func (r *BIG) fshl(k uint) int {
+	r.w[NLEN-1]=((r.w[NLEN-1]<<k))|(r.w[NLEN-2]>>(BASEBITS-k))
+	for i:=NLEN-2;i>0;i-- {
+		r.w[i]=((r.w[i]<<k)&BMASK)|(r.w[i-1]>>(BASEBITS-k))
+	}
+	r.w[0]=(r.w[0]<<k)&BMASK
+	return int(r.w[NLEN-1]>>((8*MODBYTES)%BASEBITS)) /* return excess - only used in ff.c */
 }
 
 func NewBIG() *BIG {
@@ -38,7 +66,7 @@ func NewBIG() *BIG {
 
 func NewBIGint(x int) *BIG {
 	b:=new(BIG)
-	b.w[0]=int64(x)
+	b.w[0]=cast_to_chunk(x)
 	for i:=1;i<NLEN;i++ {
 		b.w[i]=0
 	}
@@ -59,30 +87,6 @@ func NewBIGdcopy(x *DBIG) *BIG {
 		b.w[i]=x.w[i]
 	}
 	return b
-}
-
-func NewBIGints(x [NLEN]int64) *BIG {
-	b:=new(BIG)
-	for i:=0;i<NLEN;i++ {
-		b.w[i]=x[i]
-	}
-	return b	
-}
-
-func (r *BIG) get(i int) int64 {
-	return r.w[i] 
-}
-
-func (r *BIG) set(i int,x int64) {
-	r.w[i]=x	
-}
-
-func (r *BIG) xortop(x int64) {
-	r.w[NLEN-1]^=x
-}
-
-func (r *BIG) ortop(x int64) {
-	r.w[NLEN-1]|=x
 }
 
 /* test for zero */
@@ -132,27 +136,9 @@ func (r *BIG) dcopy(x *DBIG) {
 	}
 }
 
-/* calculate Field Excess */
-func EXCESS(a *BIG) int64 {
-	return ((a.w[NLEN-1]&OMASK)>>(MODBITS%BASEBITS))
-}
-
-/* normalise BIG - force all digits < 2^BASEBITS */
-func (r *BIG) norm() int64 {
-	var carry int64=0
-	for i:=0;i<NLEN-1;i++ {
-		d:=r.w[i]+carry
-		r.w[i]=d&BMASK
-		carry=d>>BASEBITS
-	}
-	r.w[NLEN-1]=(r.w[NLEN-1]+carry)
-
-	return (r.w[NLEN-1]>>((8*MODBYTES)%BASEBITS))  
-}
-
 /* Conditional swap of two bigs depending on d using XOR - no branches */
-func (r *BIG) cswap(b *BIG,d int32) {
-	var c=int64(d)
+func (r *BIG) cswap(b *BIG,d int) {
+	var c=cast_to_chunk(d)
 	c=^(c-1)
 
 	for i:=0;i<NLEN;i++ {
@@ -162,22 +148,12 @@ func (r *BIG) cswap(b *BIG,d int32) {
 	}
 }
 
-func (r *BIG) cmove(g *BIG,d int32){
-	var b=int64(-d)
+func (r *BIG) cmove(g *BIG,d int){
+	var b=cast_to_chunk(-d)
 
 	for i:=0;i<NLEN;i++ {
 		r.w[i]^=(r.w[i]^g.w[i])&b
 	}
-}
-
-/* Shift right by less than a word */
-func (r *BIG) fshr(k uint) int64 {
-	w:=r.w[0]&((int64(1)<<k)-1) /* shifted out part */
-	for i:=0;i<NLEN-1;i++ {
-		r.w[i]=(r.w[i]>>k)|((r.w[i+1]<<(BASEBITS-k))&BMASK)
-	}
-	r.w[NLEN-1]=r.w[NLEN-1]>>k
-	return w
 }
 
 /* general shift right */
@@ -191,15 +167,6 @@ func (r *BIG) shr(k uint) {
 	for i:=NLEN-m;i<NLEN;i++ {r.w[i]=0}
 }
 
-/* Shift right by less than a word */
-func (r *BIG) fshl(k uint) int64 {
-	r.w[NLEN-1]=((r.w[NLEN-1]<<k))|(r.w[NLEN-2]>>(BASEBITS-k))
-	for i:=NLEN-2;i>0;i-- {
-		r.w[i]=((r.w[i]<<k)&BMASK)|(r.w[i-1]>>(BASEBITS-k))
-	}
-	r.w[0]=(r.w[0]<<k)&BMASK
-	return (r.w[NLEN-1]>>((8*MODBYTES)%BASEBITS)) /* return excess - only used in ff.c */
-}
 
 /* general shift left */
 func (r *BIG) shl(k uint) {
@@ -246,7 +213,7 @@ func (r *BIG) toString() string {
 		b:=NewBIGcopy(r)
 		
 		b.shr(uint(i*4))
-		s+=strconv.FormatInt(b.w[0]&15,16)
+		s+=strconv.FormatInt(int64(b.w[0]&15),16)
 	}
 	return s
 }
@@ -269,13 +236,21 @@ func (r *BIG) plus(x *BIG) *BIG {
 /* this+=x, where x is int */
 func (r *BIG) inc(x int) {
 	r.norm();
-	r.w[0]+=int64(x);
+	r.w[0]+=cast_to_chunk(x);
 }
 
-/* this+=x, where x is int64 */
-func (r *BIG) incl(x int64) {
-	r.norm();
-	r.w[0]+=x;
+/* this*=c and catch overflow in DBIG */
+func (r *BIG) pxmul(c int) *DBIG {
+	m:=NewDBIG()	
+	var carry =cast_to_chunk(0)
+	for j:=0;j<NLEN;j++ {
+
+		carry,m.w[j]=muladd(r.w[j],cast_to_chunk(c),carry,m.w[j])
+		//carry=m.muladd(r.w[j],cast_to_chunk(c),carry,j)
+
+	}
+	m.w[NLEN]=carry;		
+	return m;
 }
 
 /* return this-x */
@@ -304,13 +279,13 @@ func (r *BIG) rsub(x *BIG) {
 /* this-=x, where x is int */
 func (r *BIG) dec(x int) {
 	r.norm();
-	r.w[0]-=int64(x);
+	r.w[0]-=cast_to_chunk(x)
 } 
 
 /* this*=x, where x is small int<NEXCESS */
 func (r *BIG) imul(c int) {
 	for i:=0;i<NLEN;i++{ 
-		r.w[i]*=int64(c);
+		r.w[i]*=cast_to_chunk(c)
 	}
 }
 
@@ -329,9 +304,9 @@ func (r *BIG) tobytearray(b []byte,n int) {
 func frombytearray(b []byte,n int) *BIG {
 	m:=NewBIG();
 	for i:=0;i<int(MODBYTES);i++ {
-		m.fshl(8); m.w[0]+=int64(b[i+n]&0xff)
+		m.fshl(8); m.w[0]+=cast_to_chunk(int(b[i+n]&0xff))
 	}
-	return m; 
+	return m
 }
 
 func (r *BIG) toBytes(b []byte) {
@@ -342,55 +317,11 @@ func fromBytes(b []byte) *BIG {
 	return frombytearray(b,0)
 }
 
-/* set this[i]+=x*y+c, and return high part */
-
-func (r *BIG) muladd(a int64,b int64,c int64,i int) int64 {
-	x0:=a&HMASK
-	x1:=(a>>HBITS)
-	y0:=b&HMASK;
-	y1:=(b>>HBITS)
-	bot:=x0*y0
-	top:=x1*y1
-	mid:=x0*y1+x1*y0
-	x0=mid&HMASK;
-	x1=(mid>>HBITS)
-	bot+=x0<<HBITS; bot+=c; bot+=r.w[i] 
-	top+=x1;
-	carry:=bot>>BASEBITS
-	bot&=BMASK
-	top+=carry
-	r.w[i]=bot
-	return top
-}
-
-/* this*=x, where x is >NEXCESS */
-func (r *BIG) pmul(c int) int64 {
-	var carry int64=0
-	r.norm();
-	for i:=0;i<NLEN;i++ {
-		ak:=r.w[i]
-		r.w[i]=0
-		carry=r.muladd(ak,int64(c),carry,i)
-	}
-	return carry
-}
-
-/* this*=c and catch overflow in DBIG */
-func (r *BIG) pxmul(c int) *DBIG {
-	m:=NewDBIG()	
-	var carry int64=0
-	for j:=0;j<NLEN;j++ {
-		carry=m.muladd(r.w[j],int64(c),carry,j)
-	}
-	m.w[NLEN]=carry;		
-	return m;
-}
-
 /* divide by 3 */
 func (r *BIG) div3() int {	
-	var carry int64=0
+	var carry =cast_to_chunk(0)
 	r.norm();
-	base:=(int64(1)<<BASEBITS)
+	base:=(cast_to_chunk(1)<<BASEBITS)
 	for i:=NLEN-1;i>=0;i-- {
 		ak:=(carry*base+r.w[i])
 		r.w[i]=ak/3;
@@ -401,12 +332,15 @@ func (r *BIG) div3() int {
 
 /* return a*b where result fits in a BIG */
 func smul(a *BIG,b *BIG) *BIG {
-	var carry int64
+	var carry =cast_to_chunk(0)
 	c:=NewBIG()
 	for i:=0;i<NLEN;i++ {
 		carry=0;
 		for j:=0;j<NLEN;j++ {
-			if i+j<NLEN {carry=c.muladd(a.w[i],b.w[j],carry,i+j)}
+			if i+j<NLEN {
+				carry,c.w[i+j]=muladd(a.w[i],b.w[j],carry,c.w[i+j])
+				//carry=c.muladd(a.w[i],b.w[j],carry,i+j)
+			}
 		}
 	}
 	return c;
@@ -430,7 +364,7 @@ func (r *BIG) parity() int {
 
 /* return n-th bit */
 func (r *BIG) bit(n int) int {
-	if (r.w[n/int(BASEBITS)]&(int64(1)<<(uint(n)%BASEBITS)))>0 {return 1}
+	if (r.w[n/int(BASEBITS)]&(cast_to_chunk(1)<<(uint(n)%BASEBITS)))>0 {return 1}
 	return 0;
 }
 
@@ -446,7 +380,7 @@ func (r *BIG) lastbits(n int) int {
 func (r *BIG) mod2m(m uint) {
 	wd:=int(m/BASEBITS)
 	bt:=m%BASEBITS
-	msk:=(int64(1)<<bt)-1
+	msk:=(cast_to_chunk(1)<<bt)-1
 	r.w[wd]&=msk
 	for i:=wd+1;i<NLEN;i++ {r.w[i]=0}
 }
@@ -533,7 +467,7 @@ func (r *BIG) mod(m *BIG) {
 			sr.copy(r)
 			sr.sub(m)
 			sr.norm()
-			r.cmove(sr,int32(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1)));
+			r.cmove(sr,int(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1)));
 /*
 		if comp(r,m)>=0 {
 			r.sub(m)
@@ -545,7 +479,7 @@ func (r *BIG) mod(m *BIG) {
 
 /* divide this by m */
 func (r *BIG) div(m *BIG) {
-	var d int32
+	var d int
 	k:=0
 	r.norm();
 	sr:=NewBIG();
@@ -566,7 +500,7 @@ func (r *BIG) div(m *BIG) {
 		sr.copy(b);
 		sr.sub(m);
 		sr.norm();
-		d=int32(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1));
+		d=int(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1));
 		b.cmove(sr,d);
 		sr.copy(r);
 		sr.add(e);
@@ -594,7 +528,7 @@ func random(rng *RAND) *BIG {
 			r=rng.GetByte()
 		} else {r>>=1}
 
-		b:=int64(r&1)
+		b:=cast_to_chunk(int(r&1))
 		m.shl(1); m.w[0]+=b// m.inc(b)
 		j++; j&=7; 
 	}
@@ -611,7 +545,7 @@ func randomnum(q *BIG,rng *RAND) *BIG {
 			r=rng.GetByte();
 		} else {r>>=1}
 
-		b:=int64(r&1)
+		b:=cast_to_chunk(int(r&1))
 		d.shl(1); d.w[0]+=b// m.inc(b);
 		j++; j&=7 
 	}
@@ -659,119 +593,6 @@ func nafbits(x *BIG,x3 *BIG ,i int) [3]int {
 	return n;
 }
 */
-/* return a*b as DBIG */
-func mul(a *BIG,b *BIG) *DBIG {
-	c:=NewDBIG()
-	var carry int64
-//	a.norm()
-//	b.norm()
-
-	for i:=0;i<NLEN;i++ {
-		carry=0
-		for j:=0;j<NLEN;j++ {
-			carry=c.muladd(a.w[i],b.w[j],carry,i+j)
-		}
-		c.w[NLEN+i]=carry
-	}
-	
-	return c
-}
-
-/* return a^2 as DBIG */
-func sqr(a *BIG ) *DBIG {
-	c:=NewDBIG()
-	var carry int64
-//	a.norm()
-	for i:=0;i<NLEN;i++ {
-		carry=0;
-		for j:=i+1;j<NLEN;j++ {
-			carry=c.muladd(2*a.w[i],a.w[j],carry,i+j)
-		}
-		c.w[NLEN+i]=carry
-	}
-
-	for i:=0;i<NLEN;i++ {
-		c.w[2*i+1]+=c.muladd(a.w[i],a.w[i],0,2*i)
-	}
-	c.norm()
-	return c
-}
-
-/* reduce a DBIG to a BIG using the appropriate form of the modulus */
-func mod(d *DBIG) *BIG {
-	var b *BIG
-	if MODTYPE==PSEUDO_MERSENNE {
-		t:=d.split(MODBITS)
-		b=NewBIGdcopy(d)
-
-		v:=t.pmul(int(MConst))
-		tw:=t.w[NLEN-1]
-		t.w[NLEN-1]&=TMASK
-		t.w[0]+=(MConst*((tw>>TBITS)+(v<<(BASEBITS-TBITS))))
-
-		b.add(t)
-	}
-	if MODTYPE==MONTGOMERY_FRIENDLY {
-		for i:=0;i<NLEN;i++ {
-			d.w[NLEN+i]+=d.muladd(d.w[i],MConst-1,d.w[i],NLEN+i-1)
-		}
-		b=NewBIG()
-
-		for i:=0;i<NLEN;i++ {
-			b.w[i]=d.w[NLEN+i]
-		}
-	}
-
-	if MODTYPE==GENERALISED_MERSENNE {
-		t:=d.split(MODBITS)
-		b=NewBIGdcopy(d)
-		b.add(t);
-		dd:=NewDBIGscopy(t)
-		dd.shl(MODBITS/2)
-
-		tt:=dd.split(MODBITS)
-		lo:=NewBIGdcopy(dd)
-		b.add(tt)
-		b.add(lo)
-		b.norm()
-		tt.shl(MODBITS/2)
-		b.add(tt)
-
-		carry:=b.w[NLEN-1]>>TBITS
-		b.w[NLEN-1]&=TMASK
-		b.w[0]+=carry
-			
-		b.w[224/BASEBITS]+=carry<<(224%BASEBITS);
-	}
-
-	if MODTYPE==NOT_SPECIAL {
-		md:=NewBIGints(Modulus)
-		var carry,m int64
-		for i:=0;i<NLEN;i++ {
-			if (MConst==-1) { 
-				m=(-d.w[i])&BMASK
-			} else {
-				if (MConst==1) {
-					m=d.w[i]
-				} else {m=(MConst*d.w[i])&BMASK}
-			}
-
-			carry=0
-			for j:=0;j<NLEN;j++ {
-				carry=d.muladd(m,md.w[j],carry,i+j)
-			}
-			d.w[NLEN+i]+=carry
-		}
-
-		b=NewBIG()
-		for i:=0;i<NLEN;i++ {
-			b.w[i]=d.w[NLEN+i]
-		}
-		
-	}
-	b.norm()
-	return b
-}
 
 /* return a*b mod m */
 func modmul(a,b,m *BIG) *BIG {

@@ -22,28 +22,34 @@ under the License.
 public class DBIG {
 	protected long[] w=new long[ROM.DNLEN];
 
-/* get and set digits of this */
-	public long get(int i)
-	{
-		return w[i]; 
-	}
-
-	public void set(int i,long x)
-	{
-		w[i]=x;
-	}
-
 /* normalise this */
 	public void norm() {
 		long d,carry=0;
 		for (int i=0;i<ROM.DNLEN-1;i++)
 		{
 			d=w[i]+carry;
-			w[i]=d&ROM.BMASK;
 			carry=d>>ROM.BASEBITS;
+			w[i]=d&ROM.BMASK;
 		}
 		w[ROM.DNLEN-1]=(w[ROM.DNLEN-1]+carry);
 	}
+
+
+/*
+	public String toRawString()
+	{
+		DBIG b=new DBIG(this);
+		String s="(";
+		for (int i=0;i<ROM.DNLEN-1;i++)
+		{
+			s+=Long.toHexString(b.w[i]); s+=",";
+		}
+		s+=Long.toHexString(b.w[ROM.DNLEN-1]); s+=")";
+		return s;
+	}
+*/
+
+/****************************************************************************/
 
 /* return number of bits in this */
 	public int nbits() {
@@ -70,62 +76,21 @@ public class DBIG {
 		{
 			b=new DBIG(this);
 			b.shr(i*4);
-			s+=Long.toHexString(b.w[0]&15);
+			s+=Integer.toHexString((int)(b.w[0]&15));
 		}
-		return s;
-	}
-
-	public String toRawString()
-	{
-		DBIG b=new DBIG(this);
-		String s="(";
-		for (int i=0;i<ROM.DNLEN-1;i++)
-		{
-			s+=Long.toHexString(b.w[i]); s+=",";
-		}
-		s+=Long.toHexString(b.w[ROM.DNLEN-1]); s+=")";
 		return s;
 	}
 
 	public void cmove(DBIG g,int d)
 	{
 		int i;
-		long b=-d;
+		//long b=-d;
 
 		for (i=0;i<ROM.DNLEN;i++)
 		{
-			w[i]^=(w[i]^g.w[i])&b;
+			w[i]^=(w[i]^g.w[i])&BIG.cast_to_chunk(-d);
 		}
 	}
-
-/* set this[i]+=x*y+c, and return high part */
-/* This is time critical */
-/* What if you knew the bottom half in advance ?? */
-	public long muladd(long a,long b,long c,int i)
-	{
-		long x0,x1,y0,y1;
-		x0=a&ROM.HMASK;
-		x1=(a>>ROM.HBITS);
-		y0=b&ROM.HMASK;
-		y1=(b>>ROM.HBITS);
-		long bot=x0*y0;
-		long top=x1*y1;
-		long mid=x0*y1+x1*y0;
-		x0=mid&ROM.HMASK;
-		x1=(mid>>ROM.HBITS);
-		bot+=x0<<ROM.HBITS; bot+=c; bot+=w[i];
-		top+=x1;
-		long carry=bot>>ROM.BASEBITS;
-		bot&=ROM.BMASK;
-		top+=carry;
-		w[i]=bot;
-		return top;
-	}
-
-
-
-/****************************************************************************/
-
 
 /* Constructors */
 	public DBIG(int x)
@@ -144,10 +109,10 @@ public class DBIG {
 	public DBIG(BIG x)
 	{
 		for (int i=0;i<ROM.NLEN-1;i++)
-			w[i]=x.get(i);
+			w[i]=x.w[i]; //get(i);
 
-		w[ROM.NLEN-1]=x.get(ROM.NLEN-1)&ROM.BMASK; /* top word normalized */
-		w[ROM.NLEN]=x.get(ROM.NLEN-1)>>ROM.BASEBITS;
+		w[ROM.NLEN-1]=x.w[(ROM.NLEN-1)]&ROM.BMASK; /* top word normalized */
+		w[ROM.NLEN]=(x.w[(ROM.NLEN-1)]>>ROM.BASEBITS);
 
 		for (int i=ROM.NLEN+1;i<ROM.DNLEN;i++) w[i]=0;
 	}
@@ -163,7 +128,8 @@ public class DBIG {
 		{
 			nw=(w[i]>>m)|carry;
 			carry=(w[i]<<(ROM.BASEBITS-m))&ROM.BMASK;
-			t.set(i-ROM.NLEN+1,nw);
+			t.w[i-ROM.NLEN+1]=nw;
+			//t.set(i-ROM.NLEN+1,nw);
 		}
 		w[ROM.NLEN-1]&=(((long)1<<m)-1);
 		return t;

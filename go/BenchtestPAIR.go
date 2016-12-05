@@ -72,7 +72,6 @@ func main() {
 	fmt.Printf(" %8.2f ms per iteration\n",dur)
 
 	Q:=NewECP2fp2s(NewFP2bigs(NewBIGints(CURVE_Pxa),NewBIGints(CURVE_Pxb)),NewFP2bigs(NewBIGints(CURVE_Pya),NewBIGints(CURVE_Pyb)))
-
 	W:=G2mul(Q,r)
 
 	if !W.is_infinity() {
@@ -178,11 +177,13 @@ func main() {
 	Q.copy(W)
 
 	P=G1mul(P,s)
+
 	g=ate(Q,P)
 	g=fexp(g)
 
 	P.copy(G)
 	Q=G2mul(Q,s)
+
 	w=ate(Q,P)
 	w=fexp(w)
 
@@ -201,5 +202,5 @@ func main() {
 		return
 	}
 
-	fmt.Printf("All tests pass\n")
+	fmt.Printf("All tests pass\n") 
 }

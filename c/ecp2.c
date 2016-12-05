@@ -340,9 +340,7 @@ int ECP2_dbl(ECP2 *P)
 
     FP2_add(&w2,&w2,&w2);
     FP2_sub(&w3,&w3,&(P->x));
-
     FP2_mul(&(P->y),&w8,&w3);
-
     FP2_sub(&(P->y),&(P->y),&w2);
 
 

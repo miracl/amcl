@@ -101,7 +101,7 @@ func (E *ECP) is_infinity() bool {
 }
 
 /* Conditional swap of P and Q dependant on d */
-func (E *ECP) cswap(Q *ECP,d int32) {
+func (E *ECP) cswap(Q *ECP,d int) {
 	E.x.cswap(Q.x,d)
 	if CURVETYPE!=MONTGOMERY {E.y.cswap(Q.y,d)}
 	E.z.cswap(Q.z,d)
@@ -115,7 +115,7 @@ func (E *ECP) cswap(Q *ECP,d int32) {
 }
 
 /* Conditional move of Q to P dependant on d */
-func (E *ECP) cmove(Q *ECP,d int32) {
+func (E *ECP) cmove(Q *ECP,d int) {
 	E.x.cmove(Q.x,d)
 	if CURVETYPE!=MONTGOMERY {E.y.cmove(Q.y,d)}
 	E.z.cmove(Q.z,d);
@@ -127,10 +127,10 @@ func (E *ECP) cmove(Q *ECP,d int32) {
 }
 
 /* return 1 if b==c, no branching */
-func teq(b int32,c int32) int32 {
+func teq(b int32,c int32) int {
 	x:=b^c
 	x-=1  // if x=0, x now -1
-	return ((x>>31)&1)
+	return int((x>>31)&1)
 }
 
 /* this=P */
@@ -172,7 +172,7 @@ func (E *ECP) selector(W []*ECP,b int32) {
  
 	MP.copy(E);
 	MP.neg()
-	E.cmove(MP,(m&1));
+	E.cmove(MP,int(m&1));
 }
 
 /* set this=O */
@@ -676,7 +676,7 @@ func (E *ECP) pinmul(e int32,bts int32) *ECP {
 		R1:=NewECP(); R1.copy(E)
 
 		for i:=bts-1;i>=0;i-- {
-			b:=(e>>uint32(i))&1
+			b:=int((e>>uint32(i))&1)
 			P.copy(R1)
 			P.add(R0)
 			R0.cswap(R1,b)
@@ -704,7 +704,7 @@ func (E *ECP) mul(e *BIG) *ECP {
 		D.copy(E); D.affine()
 		nb:=e.nbits()
 		for i:=nb-2;i>=0;i-- {
-			b:=int32(e.bit(i))
+			b:=int(e.bit(i))
 			P.copy(R1)
 			P.dadd(R0,D)
 			R0.cswap(R1,b)
@@ -746,8 +746,8 @@ func (E *ECP) mul(e *BIG) *ECP {
 
 // make exponent odd - add 2P if even, P if odd 
 		t.copy(e)
-		s:=int32(t.parity())
-		t.inc(1); t.norm(); ns:=int32(t.parity()); mt.copy(t); mt.inc(1); mt.norm()
+		s:=int(t.parity())
+		t.inc(1); t.norm(); ns:=int(t.parity()); mt.copy(t); mt.inc(1); mt.norm()
 		t.cmove(mt,s)
 		Q.cmove(E,ns)
 		C.copy(Q)
@@ -818,14 +818,14 @@ func (E *ECP) mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 
 // if multiplier is odd, add 2, else add 1 to multiplier, and add 2P or P to correction 
 
-	s:=int32(te.parity());
-	te.inc(1); te.norm(); ns:=int32(te.parity()); mt.copy(te); mt.inc(1); mt.norm()
+	s:=int(te.parity());
+	te.inc(1); te.norm(); ns:=int(te.parity()); mt.copy(te); mt.inc(1); mt.norm()
 	te.cmove(mt,s)
 	T.cmove(E,ns)
 	C.copy(T)
 
-	s=int32(tf.parity())
-	tf.inc(1); tf.norm(); ns=int32(tf.parity()); mt.copy(tf); mt.inc(1); mt.norm()
+	s=int(tf.parity())
+	tf.inc(1); tf.norm(); ns=int(tf.parity()); mt.copy(tf); mt.inc(1); mt.norm()
 	tf.cmove(mt,s)
 	S.cmove(Q,ns)
 	C.add(S)

@@ -1017,7 +1017,7 @@ extern void BIG_shl(BIG x,int s);
 	@param s Number of bits to shift
 	@return Overflow bits
  */
-extern chunk BIG_fshl(BIG x,int s);
+extern int BIG_fshl(BIG x,int s);
 /**	@brief Shifts a DBIG left by any number of bits - input must be normalised, output normalised
  *
 	@param x DBIG number to be shifted
@@ -1037,7 +1037,7 @@ extern void BIG_shr(BIG x,int s);
 	@param s Number of bits to shift
 	@return Shifted out bits
  */
-extern chunk BIG_fshr(BIG x,int s);
+extern int BIG_fshr(BIG x,int s);
 /**	@brief Shifts a DBIG right by any number of bits - input must be normalised, output normalised
  *
 	@param x DBIG number to be shifted
@@ -1060,7 +1060,7 @@ extern chunk BIG_split(BIG x,BIG y,DBIG z,int s);
 	All digits of the input BIG are reduced mod 2^BASEBITS
 	@param x BIG number to be normalised
  */
-extern chunk BIG_norm(BIG x);
+extern int BIG_norm(BIG x);
 /**	@brief Normalizes a DBIG number - output normalised
  *
 	All digits of the input DBIG are reduced mod 2^BASEBITS

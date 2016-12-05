@@ -25,10 +25,6 @@ package main
 import "strconv"
 //import "fmt"
 
-type DBIG struct {
-	w [2*NLEN]int64
-}
-
 func NewDBIG() *DBIG {
 	b:=new(DBIG)
 	for i:=0;i<DNLEN;i++ {
@@ -57,30 +53,9 @@ func NewDBIGscopy(x *BIG) *DBIG {
 	return b
 }
 
-/* set this[i]+=x*y+c, and return high part */
-
-func (r *DBIG) muladd(a int64,b int64,c int64,i int) int64 {
-	x0:=a&HMASK
-	x1:=(a>>HBITS)
-	y0:=b&HMASK;
-	y1:=(b>>HBITS)
-	bot:=x0*y0
-	top:=x1*y1
-	mid:=x0*y1+x1*y0
-	x0=mid&HMASK;
-	x1=(mid>>HBITS)
-	bot+=x0<<HBITS; bot+=c; bot+=r.w[i] 
-	top+=x1;
-	carry:=bot>>BASEBITS
-	bot&=BMASK
-	top+=carry
-	r.w[i]=bot
-	return top
-}
-
 /* normalise this */
 func (r *DBIG) norm() {
-	var carry int64=0
+	var carry =cast_to_chunk(0)
 	for i:=0;i<DNLEN-1;i++ {
 		d:=r.w[i]+carry
 		r.w[i]=d&BMASK
@@ -100,8 +75,16 @@ func (r *DBIG) split(n uint) *BIG {
 		carry=(r.w[i]<<(BASEBITS-m))&BMASK;
 		t.set(i-NLEN+1,nw);
 	}
-	r.w[NLEN-1]&=((int64(1)<<m)-1)
+	r.w[NLEN-1]&=((cast_to_chunk(1)<<m)-1)
 	return t;
+}
+
+func (r *DBIG) cmove(g *DBIG,d int){
+	var b=cast_to_chunk(-d)
+
+	for i:=0;i<DNLEN;i++ {
+		r.w[i]^=(r.w[i]^g.w[i])&b
+	}
 }
 
 /* Compare a and b, return 0 if a==b, -1 if a<b, +1 if a>b. Inputs must be normalised */
@@ -113,14 +96,6 @@ func dcomp(a *DBIG,b *DBIG) int {
 		} else  {return -1}
 	}
 	return 0
-}
-
-func (r *DBIG) cmove(g *DBIG,d int32){
-	var b=int64(-d)
-
-	for i:=0;i<DNLEN;i++ {
-		r.w[i]^=(r.w[i]^g.w[i])&b
-	}
 }
 
 /* Copy from another BIG */
@@ -191,7 +166,7 @@ func (r *DBIG) mod(c *BIG) *BIG {
 		dr.copy(r);
 		dr.sub(m);
 		dr.norm();
-		r.cmove(dr,int32(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1)));
+		r.cmove(dr,int(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1)));
 /*
 		if dcomp(r,m)>=0 {
 			r.sub(m);
@@ -204,7 +179,7 @@ func (r *DBIG) mod(c *BIG) *BIG {
 
 /* return this/c */
 func (r *DBIG) div(c *BIG) *BIG {
-	var d int32
+	var d int
 	k:=0
 	m:=NewDBIGscopy(c)
 	a:=NewBIGint(0)
@@ -226,7 +201,7 @@ func (r *DBIG) div(c *BIG) *BIG {
 		dr.copy(r);
 		dr.sub(m);
 		dr.norm();
-		d=int32(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1));
+		d=int(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1));
 		r.cmove(dr,d);
 		sr.copy(a);
 		sr.add(e);
@@ -262,7 +237,7 @@ func (r *DBIG) toString() string {
 		b:=NewDBIGcopy(r)
 		
 		b.shr(uint(i*4))
-		s+=strconv.FormatInt(b.w[0]&15,16)
+		s+=strconv.FormatInt(int64(b.w[0]&15),16)
 	}
 	return s
 }

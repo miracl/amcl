@@ -91,7 +91,7 @@ func (F *FP2) iszilch() bool {
 	return (F.a.iszilch() && F.b.iszilch())
 }
 
-func (F *FP2) cmove(g *FP2,d int32) {
+func (F *FP2) cmove(g *FP2,d int) {
 	F.a.cmove(g.a,d)
 	F.b.cmove(g.b,d)
 }

@@ -22,21 +22,11 @@ package main
 //import "fmt"
 //import "os"
 
-const P_MBITS uint=MODBYTES*8
-const P_MB uint=(P_MBITS%BASEBITS)
-const P_OMASK int64=(int64(-1)<<(P_MBITS%BASEBITS))
-const P_FEXCESS int64=(int64(1)<<(BASEBITS*uint(NLEN)-P_MBITS))
-const P_TBITS uint=(P_MBITS%BASEBITS)
-
 //var debug bool = false
 
 type FF struct {
 	length int
 	v []*BIG
-}
-
-func (F *FF) P_EXCESS() int64 {
-	return ((F.v[F.length-1].get(NLEN-1)&P_OMASK)>>(P_MB))
 }
 
 /* Constructors */
@@ -48,7 +38,7 @@ func NewFFint(n int) *FF {
 	F.length=n
 	return F
 }
-
+/*
 func NewFFints(x [][NLEN]int64,n int) *FF {
 	F:=new(FF)
 	for i:=0;i<n;i++ {
@@ -57,7 +47,7 @@ func NewFFints(x [][NLEN]int64,n int) *FF {
 	F.length=n
 	return F
 }
-
+*/
 /* set to zero */
 func (F *FF) zero() {
 	for i:=0;i<F.length;i++ {
@@ -72,7 +62,7 @@ func (F *FF) getlen() int {
 /* set to integer */
 func (F *FF) set(m int) {
 	F.zero()
-	F.v[0].set(0,int64(m))
+	F.v[0].set(0,cast_to_chunk(m))
 }
 
 /* copy from FF b */
@@ -208,21 +198,20 @@ func (F *FF) revsub(b *FF) {
 /* normalise - but hold any overflow in top part unless n<0 */
 func (F *FF) rnorm(vp int,n int) {
 	trunc:=false
-	var carry int64
+	var carry int
 	if n<0 { /* -v n signals to do truncation */
 		n=-n
 		trunc=true
 	}
 	for i:=0;i<n-1;i++ {
 		carry=F.v[vp+i].norm()
-		F.v[vp+i].xortop(carry<<P_TBITS)
-		F.v[vp+i+1].incl(carry)
+		F.v[vp+i].xortop(cast_to_chunk(carry)<<P_TBITS)
+		F.v[vp+i+1].inc(carry)
 	}
 	carry=F.v[vp+n-1].norm()
 	if trunc {
-		F.v[vp+n-1].xortop(carry<<P_TBITS)
+		F.v[vp+n-1].xortop(cast_to_chunk(carry)<<P_TBITS)
 	}
-
 }
 
 func (F *FF) norm() {
@@ -246,7 +235,7 @@ func (F *FF) shl() {
 	for i:=0;i<F.length-1;i++ {
 		carry:=F.v[i].fshl(1)
 		F.v[i].inc(delay_carry)
-		F.v[i].xortop(carry<<P_TBITS)
+		F.v[i].xortop(cast_to_chunk(carry)<<P_TBITS)
 		delay_carry=int(carry)
 	}
 	F.v[F.length-1].fshl(1)
@@ -258,7 +247,7 @@ func (F *FF) shl() {
 func (F *FF) shr() {
 	for i:=F.length-1;i>0;i-- {
 		carry:=F.v[i].fshr(1)
-		F.v[i-1].ortop(carry<<P_TBITS)
+		F.v[i-1].xortop(cast_to_chunk(carry)<<P_TBITS)
 	}
 	F.v[0].fshr(1)
 }
@@ -287,7 +276,7 @@ func ff_fromBytes(x *FF,b []byte) {
 }
 
 /* in-place swapping using xor - side channel resistant - lengths must be the same */
-func ff_cswap(a *FF,b *FF,d int32) {
+func ff_cswap(a *FF,b *FF,d int) {
 	for i:=0;i<a.length;i++ {
 		a.v[i].cswap(b.v[i],d)
 	}
@@ -614,23 +603,15 @@ func (F *FF) randomnum(p *FF,rng *RAND) {
 
 /* this*=y mod p */
 func (F *FF) modmul(y *FF,p *FF,nd *FF) {
-	ex:=F.P_EXCESS()
-	ey:=y.P_EXCESS()
-	if ((ex+1)>=(P_FEXCESS-1)/(ey+1)) {
-		F.mod(p)
-	}
+	if ff_pexceed(F.v[F.length-1],y.v[y.length-1]) {F.mod(p)}
 	d:=ff_mul(F,y)
 	F.copy(d.reduce(p,nd))
 }
 
 /* this*=y mod p */
 func (F *FF) modsqr(p *FF,nd *FF) {
-	ex:=F.P_EXCESS()
-	if ((ex+1)>=(P_FEXCESS-1)/(ex+1)) {
-		F.mod(p)
-	}
+	if ff_sexceed(F.v[F.length-1]) {F.mod(p)}
 	d:=ff_sqr(F)
-//if debug {fmt.Printf("d= "+d.toString()+"\n")}
 	F.copy(d.reduce(p,nd))
 }
 
@@ -648,7 +629,7 @@ func (F *FF) skpow(e *FF,p *FF) {
 	R1.nres(p)
 
 	for i:=int(8*MODBYTES)*n-1;i>=0;i-- {
-		b:=int32(e.v[i/BIGBITS].bit(i%BIGBITS))
+		b:=int(e.v[i/BIGBITS].bit(i%BIGBITS))
 		F.copy(R0)
 		F.modmul(R1,p,ND)
 
@@ -676,7 +657,7 @@ func (F *FF) skpows(e *BIG,p *FF) {
 	R1.nres(p)
 
 	for i:=int(8*MODBYTES)-1;i>=0;i-- {
-		b:=int32(e.bit(i))
+		b:=int(e.bit(i))
 		F.copy(R0)
 		F.modmul(R1,p,ND)
 

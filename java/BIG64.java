@@ -20,7 +20,7 @@ under the License.
 /* AMCL BIG number class */ 
 
 public class BIG {
-	private long[] w=new long[ROM.NLEN];
+	protected long[] w=new long[ROM.NLEN];
 /* Constructors */
 	public BIG()
 	{
@@ -67,12 +67,6 @@ public class BIG {
 	{
 		w[ROM.NLEN-1]^=((long)x<<s);
 	}
-/*
-	public void ortop(long x)
-	{
-		w[ROM.NLEN-1]|=x;
-	}
-*/
 
 /* calculate Field Excess */
 	public static long EXCESS(BIG a)
@@ -110,7 +104,7 @@ public class BIG {
 		long ea,eb;
 		ea=FF_EXCESS(a);
 		eb=FF_EXCESS(b);
-		if ((ea+1)>(ROM.P_FEXCESS-1)/(eb+1)) return true;
+		if ((ea+1)>ROM.P_FEXCESS/(eb+1)) return true;
 		return false;
 	}
 
@@ -119,7 +113,7 @@ public class BIG {
 	{
 		long ea;
 		ea=EXCESS(a);
-		if ((ea+1)>(ROM.P_FEXCESS-1)/(ea+1)) return true;
+		if ((ea+1)>ROM.P_FEXCESS/(ea+1)) return true;
 		return false;
 	}
 
@@ -149,35 +143,22 @@ public class BIG {
 		}
 	}
 
+    public static long cast_to_chunk(int x)
+	{
+		return (long)x;
+	}
+
 /* normalise BIG - force all digits < 2^BASEBITS */
-	public long norm() {
+	public int norm() {
 		long d,carry=0;
 		for (int i=0;i<ROM.NLEN-1;i++)
 		{
 			d=w[i]+carry;
 			w[i]=d&ROM.BMASK;
-			carry=d>>ROM.BASEBITS;
+			carry=(d>>ROM.BASEBITS);
 		}
 		w[ROM.NLEN-1]=(w[ROM.NLEN-1]+carry);
-		return (w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS));  
-	}
-
-/* Shift right by less than a word */
-	public long fshr(int k) {
-		long r=w[0]&(((long)1<<k)-1); /* shifted out part */
-		for (int i=0;i<ROM.NLEN-1;i++)
-			w[i]=(w[i]>>k)|((w[i+1]<<(ROM.BASEBITS-k))&ROM.BMASK);
-		w[ROM.NLEN-1]=w[ROM.NLEN-1]>>k;
-		return r;
-	}
-
-/* Shift right by less than a word */
-	public long fshl(int k) {
-		w[ROM.NLEN-1]=((w[ROM.NLEN-1]<<k))|(w[ROM.NLEN-2]>>(ROM.BASEBITS-k));
-		for (int i=ROM.NLEN-2;i>0;i--)
-			w[i]=((w[i]<<k)&ROM.BMASK)|(w[i-1]>>(ROM.BASEBITS-k));
-		w[0]=(w[0]<<k)&ROM.BMASK; 
-		return (w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS)); /* return excess - only used in FF.java */
+		return (int)(w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS));  
 	}
 
 /* return number of bits */
@@ -225,7 +206,7 @@ public class BIG {
 	}
 
 /* set this[i]+=x*y+c, and return high part */
-
+/*
 	public long muladd(long a,long b,long c,int i)
 	{
 		long x0,x1,y0,y1;
@@ -248,17 +229,50 @@ public class BIG {
 		w[i]=bot;
 		return top;
 	}
+*/
+
+	public static long[] muladd(long a,long b,long c,long r)
+	{
+		long x0,x1,y0,y1;
+		long[] tb=new long[2];
+		x0=a&ROM.HMASK;
+		x1=(a>>ROM.HBITS);
+		y0=b&ROM.HMASK;
+		y1=(b>>ROM.HBITS);
+		long bot=x0*y0;
+		long top=x1*y1;
+		long mid=x0*y1+x1*y0;
+		x0=mid&ROM.HMASK;
+		x1=(mid>>ROM.HBITS);
+		bot+=x0<<ROM.HBITS; bot+=c; bot+=r;
+		top+=x1;
+		long carry=bot>>ROM.BASEBITS;
+		bot&=ROM.BMASK;
+		top+=carry;
+		tb[0]=top;
+		tb[1]=bot;
+		return tb;
+	}
+
+
+
 
 /* this*=x, where x is >NEXCESS */
 	public long pmul(int c)
 	{
 		long ak,carry=0;
+		long[] cr=new long[2];
 		norm();
 		for (int i=0;i<ROM.NLEN;i++)
 		{
 			ak=w[i];
 			w[i]=0;
-			carry=muladd(ak,(long)c,carry,i);
+
+			cr=muladd(ak,(long)c,carry,w[i]);
+			carry=cr[0];
+			w[i]=cr[1];
+
+			//carry=muladd(ak,(long)c,carry,i);
 		}
 		return carry;
 	}
@@ -267,9 +281,15 @@ public class BIG {
 	public DBIG pxmul(int c)
 	{
 		DBIG m=new DBIG(0);	
+		long[] cr=new long[2];
 		long carry=0;
 		for (int j=0;j<ROM.NLEN;j++)
-			carry=m.muladd(w[j],(long)c,carry,j);
+		{
+			cr=muladd(w[j],(long)c,carry,m.w[j]);
+			carry=cr[0];
+			m.w[j]=cr[1];
+			//carry=m.muladd(w[j],(long)c,carry,j);
+		}
 		m.w[ROM.NLEN]=carry;		
 		return m;
 	}
@@ -293,27 +313,21 @@ public class BIG {
 	public static BIG smul(BIG a,BIG b)
 	{
 		long carry;
+		long[] cr=new long[2];
 		BIG c=new BIG(0);
 		for (int i=0;i<ROM.NLEN;i++)
 		{
 			carry=0;
 			for (int j=0;j<ROM.NLEN;j++)
-				if (i+j<ROM.NLEN) carry=c.muladd(a.w[i],b.w[j],carry,i+j);
+				if (i+j<ROM.NLEN)
+				{
+					cr=muladd(a.w[i],b.w[j],carry,c.w[i+j]);
+					carry=cr[0];
+					c.w[i+j]=cr[1];
+					//carry=c.muladd(a.w[i],b.w[j],carry,i+j);
+				}
 		}
 		return c;
-	}
-
-/* set x = x mod 2^m */
-	public void mod2m(int m)
-	{
-		int i,wd,bt;
-		long msk;
-	
-		wd=m/ROM.BASEBITS;
-		bt=m%ROM.BASEBITS;
-		msk=((long)1<<bt)-1;
-		w[wd]&=msk;
-		for (i=wd+1;i<ROM.NLEN;i++) w[i]=0;
 	}
 
 /* return a*b as DBIG */
@@ -321,6 +335,7 @@ public class BIG {
 	{
 		DBIG c=new DBIG(0);
 		long carry;
+		long[] cr=new long[2];
 //		a.norm();
 //		b.norm();
 
@@ -328,7 +343,12 @@ public class BIG {
 		{
 			carry=0;
 			for (int j=0;j<ROM.NLEN;j++)
-				carry=c.muladd(a.w[i],b.w[j],carry,i+j);
+			{
+				cr=muladd(a.w[i],b.w[j],carry,c.w[i+j]);
+				carry=cr[0];
+				c.w[i+j]=cr[1];
+				//carry=c.muladd(a.w[i],b.w[j],carry,i+j);
+			}
 			c.w[ROM.NLEN+i]=carry;
 		}
 
@@ -340,18 +360,28 @@ public class BIG {
 	{
 		DBIG c=new DBIG(0);
 		long carry;
+		long[] cr=new long[2];
 	//	a.norm();
 		for (int i=0;i<ROM.NLEN;i++)
 		{
 			carry=0;
 			for (int j=i+1;j<ROM.NLEN;j++)
-				carry=c.muladd(2*a.w[i],a.w[j],carry,i+j);
+			{
+				cr=muladd(2*a.w[i],a.w[j],carry,c.w[i+j]);
+				carry=cr[0];
+				c.w[i+j]=cr[1];
+				//carry=c.muladd(2*a.w[i],a.w[j],carry,i+j);
+			}
 			c.w[ROM.NLEN+i]=carry;
 		}
 
 		for (int i=0;i<ROM.NLEN;i++)
-			c.w[2*i+1]+=c.muladd(a.w[i],a.w[i],0,2*i);
-
+		{
+			cr=muladd(a.w[i],a.w[i],0,c.w[2*i]);
+			c.w[2*i+1]+=cr[0];
+			c.w[2*i]=cr[1];
+			//c.w[2*i+1]+=c.muladd(a.w[i],a.w[i],0,2*i);
+		}
 		c.norm(); 
 		return c;
 	}
@@ -376,9 +406,15 @@ public class BIG {
 		}
 		if (ROM.MODTYPE==ROM.MONTGOMERY_FRIENDLY)
 		{
+			long[] cr=new long[2];
 			for (int i=0;i<ROM.NLEN;i++)
-				d.w[ROM.NLEN+i]+=d.muladd(d.w[i],ROM.MConst-1,d.w[i],ROM.NLEN+i-1);
-			
+			{
+				cr=muladd(d.w[i],ROM.MConst-1,d.w[i],d.w[ROM.NLEN+i-1]);
+				d.w[ROM.NLEN+i]+=cr[0];
+				d.w[ROM.NLEN+i-1]=cr[1];
+
+				//d.w[ROM.NLEN+i]+=d.muladd(d.w[i],ROM.MConst-1,d.w[i],ROM.NLEN+i-1);
+			}
 			b=new BIG(0);
 
 			for (int i=0;i<ROM.NLEN;i++ )
@@ -412,6 +448,7 @@ public class BIG {
 		{
 			BIG md=new BIG(ROM.Modulus);
 			long m,carry;
+			long[] cr=new long[2];
 			for (int i=0;i<ROM.NLEN;i++) 
 			{
 				if (ROM.MConst==-1) m=(-d.w[i])&ROM.BMASK;
@@ -423,7 +460,12 @@ public class BIG {
 
 				carry=0;
 				for (int j=0;j<ROM.NLEN;j++)
-					carry=d.muladd(m,md.w[j],carry,i+j);
+				{
+					cr=muladd(m,md.w[j],carry,d.w[i+j]);
+					carry=cr[0];
+					d.w[i+j]=cr[1];
+					//carry=d.muladd(m,md.w[j],carry,i+j);
+				}
 				d.w[ROM.NLEN+i]+=carry;
 			}
 
@@ -436,20 +478,43 @@ public class BIG {
 		return b;
 	}
 
-/* return n-th bit */
-	public int bit(int n)
-	{
-		if ((w[n/ROM.BASEBITS]&((long)1<<(n%ROM.BASEBITS)))>0) return 1;
-		else return 0;
-	}
-
-
-
 
 /****************************************************************************/
 
+/* set x = x mod 2^m */
+	public void mod2m(int m)
+	{
+		int i,wd,bt;
+		wd=m/ROM.BASEBITS;
+		bt=m%ROM.BASEBITS;
+		w[wd]&=((cast_to_chunk(1)<<bt)-1);
+		for (i=wd+1;i<ROM.NLEN;i++) w[i]=0;
+	}
 
+/* return n-th bit */
+	public int bit(int n)
+	{
+		if ((w[n/ROM.BASEBITS]&(cast_to_chunk(1)<<(n%ROM.BASEBITS)))>0) return 1;
+		else return 0;
+	}
 
+/* Shift right by less than a word */
+	public int fshr(int k) {
+		int r=(int)(w[0]&((cast_to_chunk(1)<<k)-1)); /* shifted out part */
+		for (int i=0;i<ROM.NLEN-1;i++)
+			w[i]=(w[i]>>k)|((w[i+1]<<(ROM.BASEBITS-k))&ROM.BMASK);
+		w[ROM.NLEN-1]=w[ROM.NLEN-1]>>k;
+		return r;
+	}
+
+/* Shift right by less than a word */
+	public int fshl(int k) {
+		w[ROM.NLEN-1]=((w[ROM.NLEN-1]<<k))|(w[ROM.NLEN-2]>>(ROM.BASEBITS-k));
+		for (int i=ROM.NLEN-2;i>0;i--)
+			w[i]=((w[i]<<k)&ROM.BMASK)|(w[i-1]>>(ROM.BASEBITS-k));
+		w[0]=(w[0]<<k)&ROM.BMASK; 
+		return (int)(w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS)); /* return excess - only used in FF.java */
+	}
 
 /* test for zero */
 	public boolean iszilch() {

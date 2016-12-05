@@ -65,7 +65,7 @@ func (E *ECP2) neg() {
 }
 
 /* Conditional move of Q to P dependant on d */
-func (E *ECP2) cmove(Q *ECP2,d int32) {
+func (E *ECP2) cmove(Q *ECP2,d int) {
 	E.x.cmove(Q.x,d)
 	E.y.cmove(Q.y,d)
 	E.z.cmove(Q.z,d)
@@ -96,7 +96,7 @@ func (E *ECP2) selector(W []*ECP2,b int32) {
  
 	MP.copy(E)
 	MP.neg()
-	E.cmove(MP,(m&1))
+	E.cmove(MP,int(m&1))
 }
 
 /* Test if P == Q */
@@ -264,7 +264,7 @@ func (E *ECP2) dbl() int {
 	w3.copy(E.x); w3.mul(w2)
 	w3.imul(4)
 	w1.copy(w3); w1.neg()
-	//	w1.norm();
+	w1.norm();
 
 	E.x.copy(w8); E.x.sqr()
 	E.x.add(w1)
@@ -459,8 +459,8 @@ func (E *ECP2) mul(e *BIG) *ECP2 {
 
 /* make exponent odd - add 2P if even, P if odd */
 	t.copy(e)
-	s:=int32(t.parity())
-	t.inc(1); t.norm(); ns:=int32(t.parity()); mt.copy(t); mt.inc(1); mt.norm()
+	s:=int(t.parity())
+	t.inc(1); t.norm(); ns:=int(t.parity()); mt.copy(t); mt.inc(1); mt.norm()
 	t.cmove(mt,s)
 	Q.cmove(E,ns)
 	C.copy(Q)
