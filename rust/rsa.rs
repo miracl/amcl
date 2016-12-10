@@ -52,7 +52,7 @@ pub struct RsaPrivateKey {
 }
 
 pub struct RsaPublicKey {
-	e: i32,
+	e: isize,
 	n: FF
 }
 
@@ -94,7 +94,7 @@ fn hashit(sha: usize,a: Option<&[u8]>,n: isize,w: &mut [u8]) {
 	}
 }
 
-pub fn key_pair(rng: &mut RAND,e: i32,prv: &mut RsaPrivateKey,pbc: &mut RsaPublicKey) { /* IEEE1363 A16.11/A16.12 more or less */
+pub fn key_pair(rng: &mut RAND,e: isize,prv: &mut RsaPrivateKey,pbc: &mut RsaPublicKey) { /* IEEE1363 A16.11/A16.12 more or less */
 	let n=pbc.n.getlen()/2;
 	let mut t=FF::new_int(n);
 	let mut p1=FF::new_int(n);

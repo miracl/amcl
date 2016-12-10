@@ -64,7 +64,7 @@ fn main()
 		println!("Weierstrass parameterization");
 	}		
 	if rom::CURVETYPE==rom::EDWARDS {
-		println!("Edwards parameterization\n");
+		println!("Edwards parameterization");
 	}
 	if rom::CURVETYPE==rom::MONTGOMERY {
 		println!("Montgomery parameterization");

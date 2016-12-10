@@ -40,7 +40,7 @@ impl FP {
 		}
 	}
 
-	pub fn new_int(a:i32) -> FP {
+	pub fn new_int(a:isize) -> FP {
 		let mut f=FP::new(); 
 		f.x.inc(a);
 		f.nres();
@@ -124,26 +124,21 @@ impl FP {
         self.x.norm();
     }
 /* swap FPs depending on d */
-    pub fn cswap(&mut self,b: &mut FP,d: i32) {
+    pub fn cswap(&mut self,b: &mut FP,d: isize) {
         self.x.cswap(&mut (b.x),d);
     }
     
 /* copy FPs depending on d */
-    pub fn cmove(&mut self,b: &FP,d: i32) {
+    pub fn cmove(&mut self,b: &FP,d: isize) {
         self.x.cmove(&(b.x),d);
     }
 
 /* this*=b mod Modulus */
     pub fn mul(&mut self,b: &mut FP)
     {
-
-	self.norm();
-	b.norm();
-        let ea=BIG::excess(&(self.x));
-        let eb=BIG::excess(&(b.x));
-    
-	if ((ea+1) as i64)*((eb+1) as i64)>(rom::FEXCESS as i64) {self.reduce()} 
-        /* if (ea+1)>rom::FEXCESS/(eb+1) {self.reduce()} */
+        self.norm();
+        b.norm();
+        if BIG::pexceed(&(self.x),&(b.x)) {self.reduce()}
 
         let mut d=BIG::mul(&(self.x),&(b.x));
         self.x.copy(&BIG::modulo(&mut d))
@@ -181,7 +176,7 @@ impl FP {
     }
 
     /* this*=c mod Modulus, where c is a small int */
-    pub fn imul(&mut self,c: i32) {
+    pub fn imul(&mut self,c: isize) {
         let mut cc=c;
         self.norm();
         let mut s=false;
@@ -189,7 +184,7 @@ impl FP {
             cc = -cc;
             s=true;
         }
-        let afx=(BIG::excess(&(self.x))+1)*(cc+1)+1;
+        let afx=(BIG::excess(&(self.x))+1)*(BIG::cast_to_chunk(cc)+1)+1;
         if cc<rom::NEXCESS && afx<rom::FEXCESS {
             self.x.imul(cc);
         } else {
@@ -207,12 +202,9 @@ impl FP {
 
 /* self*=self mod Modulus */
     pub fn sqr(&mut self) {
-	self.norm();
-        let ea=BIG::excess(&(self.x));
+        self.norm();
+        if BIG::sexceed(&(self.x)) {self.reduce()}
 
-	if ((ea+1) as i64)*((ea+1) as i64)>(rom::FEXCESS as i64) {self.reduce()} 
-      /* if (ea+1)>=(rom::FEXCESS-1)/(ea+1) {self.reduce()} */
-    
         let mut d=BIG::sqr(&(self.x));
         self.x.copy(&BIG::modulo(&mut d))
     }

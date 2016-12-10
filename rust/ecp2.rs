@@ -109,7 +109,7 @@ impl ECP2 {
 	}	
 
 /* Conditional move of Q to self dependant on d */
-	pub fn cmove(&mut self,Q: &ECP2,d: i32) {
+	pub fn cmove(&mut self,Q: &ECP2,d: isize) {
 		self.x.cmove(&Q.x,d);
 		self.y.cmove(&Q.y,d);
 		self.z.cmove(&Q.z,d);
@@ -122,10 +122,10 @@ impl ECP2 {
 	}
 
 /* return 1 if b==c, no branching */
-	fn teq(b: i32,c: i32) -> i32 {
+	fn teq(b: i32,c: i32) -> isize {
 		let mut x=b^c;
 		x-=1;  // if x=0, x now -1
-		return (x>>31)&1;
+		return ((x>>31)&1) as isize;
 	}
 
 /* Constant time select from pre-computed table */
@@ -147,7 +147,7 @@ impl ECP2 {
  
 		MP.copy(self);
 		MP.neg();
-		self.cmove(&MP,(m&1));
+		self.cmove(&MP,(m&1) as isize);
 	}	
 
 /* Test if P == Q */
@@ -498,7 +498,7 @@ impl ECP2 {
 /* convert exponent to signed 4-bit window */
 		for i in 0..nb {
 			w[i]=(t.lastbits(5)-16) as i8;
-			t.dec(w[i] as i32); t.norm();
+			t.dec(w[i] as isize); t.norm();
 			t.fshr(4);	
 		}
 		w[nb]=(t.lastbits(5)) as i8;
@@ -577,7 +577,7 @@ impl ECP2 {
 		for j in 0..nb {
 			for i in 0..4 {
 				a[i]=(t[i].lastbits(2)-2) as i8;
-				t[i].dec(a[i] as i32); t[i].norm();
+				t[i].dec(a[i] as isize); t[i].norm();
 				t[i].fshr(1);
 			}
 			w[j]=8*a[0]+4*a[1]+2*a[2]+a[3];

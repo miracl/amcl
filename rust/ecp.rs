@@ -71,7 +71,7 @@ impl ECP {
 	}
 
 /* set (x,y) from BIG and a bit */
-	pub fn new_bigint(ix: &BIG,s: i32) -> ECP {
+	pub fn new_bigint(ix: &BIG,s: isize) -> ECP {
 		let mut E=ECP::new();
 		E.x.bcopy(ix); 
 		E.z.one(); 
@@ -157,7 +157,7 @@ impl ECP {
  	}
 
 /* Conditional swap of P and Q dependant on d */
-	pub fn cswap(&mut self,Q: &mut ECP,d: i32) {
+	pub fn cswap(&mut self,Q: &mut ECP,d: isize) {
 		self.x.cswap(&mut Q.x,d);
 		if rom::CURVETYPE!=rom::MONTGOMERY {self.y.cswap(&mut Q.y,d)}
 		self.z.cswap(&mut Q.z,d);
@@ -171,7 +171,7 @@ impl ECP {
 	}
 
 /* Conditional move of Q to P dependant on d */
-	pub fn cmove(&mut self,Q: &ECP,d: i32) {
+	pub fn cmove(&mut self,Q: &ECP,d: isize) {
 		self.x.cmove(&Q.x,d);
 		if rom::CURVETYPE!=rom::MONTGOMERY {self.y.cmove(&Q.y,d)}
 		self.z.cmove(&Q.z,d);
@@ -183,10 +183,10 @@ impl ECP {
 	}
 
 /* return 1 if b==c, no branching */
-	fn teq(b: i32,c: i32) -> i32 {
+	fn teq(b: i32,c: i32) -> isize {
 		let mut x=b^c;
 		x-=1;  // if x=0, x now -1
-		return (x>>31)&1;
+		return ((x>>31)&1) as isize;
 	}
 
 /* this=P */
@@ -232,7 +232,7 @@ impl ECP {
  
 		MP.copy(self);
 		MP.neg();
-		self.cmove(&MP,(m&1));
+		self.cmove(&MP,(m&1) as isize);
 	}
 
 /* Test P == Q */
@@ -301,7 +301,7 @@ impl ECP {
 	}
 
 /* get sign of Y */
-	pub fn gets(&mut self) -> i32 {
+	pub fn gets(&mut self) -> isize {
 		self.affine();
 		let y=self.gety();
 		return y.parity();
@@ -687,7 +687,7 @@ impl ECP {
 			let mut R1=ECP::new(); R1.copy(&self);
 
 			for i in (0..bts).rev() {
-				let b=(e>>i)&1;
+				let b=((e>>i)&1) as isize;
 				P.copy(&R1);
 				P.add(&mut R0);
 				R0.cswap(&mut R1,b);
@@ -768,7 +768,7 @@ impl ECP {
 // convert exponent to signed 4-bit window 
 			for i in 0..nb {
 				w[i]=(t.lastbits(5)-16) as i8;
-				t.dec(w[i] as i32); t.norm();
+				t.dec(w[i] as isize); t.norm();
 				t.fshr(4);	
 			}
 			w[nb]=t.lastbits(5) as i8;
@@ -847,10 +847,10 @@ impl ECP {
 // convert exponent to signed 2-bit window 
 		for i in 0..nb {
 			let a=te.lastbits(3)-4;
-			te.dec(a as i32); te.norm();
+			te.dec(a); te.norm();
 			te.fshr(2);
 			let b=tf.lastbits(3)-4;
-			tf.dec(b as i32); tf.norm();
+			tf.dec(b); tf.norm();
 			tf.fshr(2);
 			w[i]=(4*a+b) as i8;
 		}

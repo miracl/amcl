@@ -51,7 +51,7 @@ impl FP12 {
 		}
 	}
 
-	pub fn new_int(a: i32) -> FP12 {
+	pub fn new_int(a: isize) -> FP12 {
 		let mut f=FP12::new();
 		f.a.copy(&FP4::new_int(a));
 		f.b.zero();
@@ -555,7 +555,7 @@ impl FP12 {
 		for j in 0..nb {
 			for i in 0..4 {
 				a[i]=(t[i].lastbits(2)-2) as i8;
-				t[i].dec(a[i] as i32); t[i].norm();
+				t[i].dec(a[i] as isize); t[i].norm();
 				t[i].fshr(1);
 			}
 			w[j]=8*a[0]+4*a[1]+2*a[2]+a[3];

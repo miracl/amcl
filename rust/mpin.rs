@@ -170,7 +170,7 @@ pub fn today() -> usize {
 /* these next two functions help to implement elligator squared - http://eprint.iacr.org/2014/043 */
 /* maps a random u to a point on the curve */
 #[allow(non_snake_case)]
-fn emap(u: &BIG,cb: i32) -> ECP {
+fn emap(u: &BIG,cb: isize) -> ECP {
 	let mut P:ECP;
 	let mut x=BIG::new_copy(u);
 	let mut p=BIG::new_ints(&rom::MODULUS);
@@ -185,7 +185,7 @@ fn emap(u: &BIG,cb: i32) -> ECP {
 
 /* returns u derived from P. Random value in range 1 to return value should then be added to u */
 #[allow(non_snake_case)]
-fn unmap(u: &mut BIG,P: &mut ECP) -> i32 {
+fn unmap(u: &mut BIG,P: &mut ECP) -> isize {
 	let s=P.gets();
 	let mut R:ECP;
 	let mut r=0;
@@ -197,7 +197,7 @@ fn unmap(u: &mut BIG,P: &mut ECP) -> i32 {
 		R=ECP::new_bigint(u,s);
 		if !R.is_infinity() {break}
 	}
-	return r as i32;
+	return r as isize;
 }
 
 pub fn hash_id(sha: usize,id: &[u8],w: &mut [u8]) -> bool {
@@ -222,13 +222,13 @@ pub fn encoding(rng: &mut RAND,e: &mut [u8]) ->isize {
 	let p=BIG::new_ints(&rom::MODULUS);
 	u=BIG::randomnum(&p,rng);
 
-	let mut su=rng.getbyte() as i32; /*if (su<0) su=-su;*/ su%=2;
+	let mut su=rng.getbyte() as isize; /*if (su<0) su=-su;*/ su%=2;
 		
 	let mut W=emap(&mut u,su);
 	P.sub(&mut W);
 	let sv=P.gets();
 	let rn=unmap(&mut v,&mut P);
-	let mut m=rng.getbyte() as i32; /*if (m<0) m=-m;*/ m%=rn;
+	let mut m=rng.getbyte() as isize; /*if (m<0) m=-m;*/ m%=rn;
 	v.inc(m+1);
 	e[0]=(su+2*sv) as u8;
 	u.tobytes(&mut t);
@@ -250,8 +250,8 @@ pub fn decoding(d: &mut [u8]) -> isize {
 	for i in 0..EFS {t[i]=d[i+EFS+1]}
 	let mut v=BIG::frombytes(&t);
 
-	let su=(d[0]&1) as i32;
-	let sv=((d[0]>>1)&1) as i32;
+	let su=(d[0]&1) as isize;
+	let sv=((d[0]>>1)&1) as isize;
 	let mut W=emap(&mut u,su);
 	let mut P=emap(&mut v,sv);
 	P.add(&mut W);
@@ -619,7 +619,7 @@ pub fn kangaroo(e: &[u8],f: &[u8]) -> isize {
 	let mut dn:isize=0;
 	let mut i:usize;
 	for _ in 0..TRAP {
-		i=(t.geta().geta().geta().lastbits(20)%(TS as i32)) as usize;
+		i=(t.geta().geta().geta().lastbits(20)%(TS as isize)) as usize;
 		t.mul(&mut table[i]);
 		dn+=distance[i];
 	}
@@ -629,7 +629,7 @@ pub fn kangaroo(e: &[u8],f: &[u8]) -> isize {
 	while dm-dn<MAXPIN as isize {
 		steps+=1;
 		if steps>4*TRAP {break}
-		i=(ge.geta().geta().geta().lastbits(20)%(TS as i32)) as usize;
+		i=(ge.geta().geta().geta().lastbits(20)%(TS as isize)) as usize;
 		ge.mul(&mut table[i]);
 		dm+=distance[i];
 		if ge.equals(&mut t) {

@@ -19,9 +19,11 @@ under the License.
 
 use rom;
 
+use rom::Chunk;
+
 //#[derive(Copy, Clone)]
 pub struct DBIG {
- 	pub w: [i32; rom::DNLEN]
+ 	pub w: [Chunk; rom::DNLEN]
 }
 
 //mod big;
@@ -52,15 +54,8 @@ impl DBIG {
     	return b; 	
     }
 
-/* set self.w[i]+=x*y+c, and return high part */
-	pub fn muladd(&mut self,x: i32,y: i32,c: i32, i:usize) -> i32 {
-        let prod:i64 = (x as i64)*(y as i64)+(c as i64)+(self.w[i] as i64);
-        self.w[i]=(prod&(rom::BMASK as i64)) as i32;
-        return (prod>>rom::BASEBITS) as i32;
-    }
-
 /* split DBIG at position n, return higher half, keep lower half */
-    pub fn split(&mut self,n: i32) -> BIG
+    pub fn split(&mut self,n: usize) -> BIG
     {
         let mut t=BIG::new();
         let m=n%rom::BASEBITS;
@@ -71,27 +66,28 @@ impl DBIG {
             carry= (self.w[i]<<(rom::BASEBITS-m))&rom::BMASK;
             t.set(i-rom::NLEN+1,nw);
         }
-        self.w[rom::NLEN-1]&=((1<<m)-1) as i32;
+        self.w[rom::NLEN-1]&=((BIG::cast_to_chunk(1)<<m)-1);
         return t;
     }
 
 /* general shift left */
     pub fn shl(&mut self,k: usize)
     {
-		let n:i32=(k as i32)%rom::BASEBITS;
-		let m:usize=((k as i32)/rom::BASEBITS) as usize;
+        let n=k%rom::BASEBITS; 
+        let m=k/rom::BASEBITS; 
         self.w[rom::DNLEN-1]=((self.w[rom::DNLEN-1-m]<<n))|(self.w[rom::DNLEN-m-2]>>(rom::BASEBITS-n));
         for i in (m+1..rom::DNLEN-1).rev() {
             self.w[i]=((self.w[i-m]<<n)&rom::BMASK)|(self.w[i-m-1]>>(rom::BASEBITS-n));
         }
+  
         self.w[m]=(self.w[0]<<n)&rom::BMASK;
         for i in 0 ..m {self.w[i]=0}
     }
 
 /* general shift right */
     pub fn shr(&mut self,k: usize) {
-		let n:i32=(k as i32)%rom::BASEBITS;
-		let m:usize=((k as i32)/rom::BASEBITS) as usize;
+		let n=k%rom::BASEBITS;
+		let m=k/rom::BASEBITS;
         for i in 0 ..rom::DNLEN-m-1 {
             self.w[i]=(self.w[m+i]>>n)|((self.w[m+i+1]<<(rom::BASEBITS-n))&rom::BMASK);
         }
@@ -106,8 +102,8 @@ impl DBIG {
 		}
 	}
 
-	pub fn cmove(&mut self,g:&DBIG,d: i32) {
-		let b=-d;
+	pub fn cmove(&mut self,g:&DBIG,d: isize) {
+		let b=BIG::cast_to_chunk(-d);
 		for i in 0 ..rom::DNLEN {
 			self.w[i]^=(self.w[i]^g.w[i])&b;
 		}
@@ -132,7 +128,7 @@ impl DBIG {
 
 /* normalise BIG - force all digits < 2^rom::BASEBITS */
     pub fn norm(&mut self) {
-        let mut carry:i32=0;
+        let mut carry=BIG::cast_to_chunk(0);
         for i in 0 ..rom::DNLEN-1 {
             let d=self.w[i]+carry;
             self.w[i]=d&rom::BMASK;
@@ -165,7 +161,7 @@ impl DBIG {
 		dr.copy(self);
 		dr.sub(&m);
 		dr.norm();
-		self.cmove(&dr,(1-((dr.w[rom::DNLEN-1]>>(rom::CHUNK-1))&1)) as i32);
+		self.cmove(&dr,(1-((dr.w[rom::DNLEN-1]>>(rom::CHUNK-1))&1)) as isize);
 /*
             if DBIG::comp(self,&m)>=0 {
 				self.sub(&m);
@@ -200,7 +196,7 @@ impl DBIG {
 		dr.copy(self);
 		dr.sub(&m);
 		dr.norm();
-		let d=(1-((dr.w[rom::DNLEN-1]>>(rom::CHUNK-1))&1)) as i32;
+		let d=(1-((dr.w[rom::DNLEN-1]>>(rom::CHUNK-1))&1)) as isize;
 		self.cmove(&dr,d);
 		r.copy(&a);
 		r.add(&e);

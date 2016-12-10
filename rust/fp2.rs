@@ -44,7 +44,7 @@ impl FP2 {
 		}
 	}
 
-	pub fn new_int(a: i32) -> FP2 {
+	pub fn new_int(a: isize) -> FP2 {
 		let mut f=FP2::new();
 		f.a.copy(&FP::new_int(a));
 		f.b.zero();
@@ -104,7 +104,7 @@ impl FP2 {
 		return self.a.iszilch() && self.b.iszilch();
 	}	
 
-	pub fn cmove(&mut self,g:&FP2,d: i32) {
+	pub fn cmove(&mut self,g:&FP2,d: isize) {
 		self.a.cmove(&g.a,d);
 		self.b.cmove(&g.b,d);
 	}		
@@ -193,7 +193,7 @@ impl FP2 {
 	}
 
 /* self*=i, where i is an int */
-	pub fn imul(&mut self,c: i32) {
+	pub fn imul(&mut self,c: isize) {
 		self.a.imul(c);
 		self.b.imul(c);
 	}

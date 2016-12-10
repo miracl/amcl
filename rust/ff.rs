@@ -34,18 +34,10 @@ use rand::RAND;
 //mod hash256;
 //use std::process;
 
-pub const BB:usize=rom::BASEBITS as usize;
-pub const P_MBITS:usize=(rom::MODBYTES as usize)*8;
-pub const P_MB: usize=(P_MBITS%BB);
-pub const P_OMASK:i32=((-1)<<(P_MBITS%BB));
-pub const P_FEXCESS: i32=(1<<(BB*rom::NLEN-P_MBITS));
-pub const P_TBITS: usize=(P_MBITS%BB);
 
 //static mut debug:bool=false;
 
 impl FF { 
-
-
 
 /* Constructors */
 	pub fn new_int(n:usize) -> FF {
@@ -56,7 +48,7 @@ impl FF {
 		f.length=n;
 		return f;
 	}
-
+/*
 	pub fn new_ints(x: &[&[i32];rom::NLEN],n: usize) -> FF {
 		let mut f=FF{v:Vec::new(),length:0};
 		for i in 0..n {
@@ -65,11 +57,7 @@ impl FF {
 		f.length=n;
 		return f;
 	}
-
-	pub fn p_excess(&self) -> i32 {
-		return (self.v[self.length-1].get(rom::NLEN-1)&P_OMASK)>>(P_MB);
-	}
-
+*/
 	pub fn zero(&mut self) {
 		for i in 0..self.length {
 			self.v[i].zero();
@@ -81,9 +69,9 @@ impl FF {
 	}
 
 /* set to integer */
-	pub fn set(&mut self,m:i32) {
+	pub fn set(&mut self,m:isize) {
 		self.zero();
-		self.v[0].set(0,m);
+		self.v[0].set(0,BIG::cast_to_chunk(m));
 	}
 
 /* copy from FF b */
@@ -152,11 +140,11 @@ impl FF {
 	}
 
 /* extract last bit */
-	pub fn parity(&self) -> i32 {
+	pub fn parity(&self) -> isize {
 		return self.v[0].parity();
 	}
 
-	pub fn lastbits(&mut self,m: usize) -> i32 {
+	pub fn lastbits(&mut self,m: usize) -> isize {
 		return self.v[0].lastbits(m);
 	}
 
@@ -235,7 +223,7 @@ impl FF {
 /* normalise - but hold any overflow in top part unless n<0 */
 	pub fn rnorm(&mut self,vp: usize,n: isize) {
 		let mut trunc=false;
-		let mut carry:i32;
+		let mut carry:isize;
 		let mut nn:usize=n as usize; 
 		if n<0 { /* -v n signals to do truncation */
 			nn=(-n) as usize;
@@ -243,12 +231,12 @@ impl FF {
 		}
 		for i in 0..nn-1 {
 			carry=self.v[vp+i].norm();
-			self.v[vp+i].xortop(carry<<P_TBITS);
+			self.v[vp+i].xortop(BIG::cast_to_chunk(carry)<<rom::P_TBITS);
 			self.v[vp+i+1].inc(carry);
 		}
 		carry=self.v[vp+nn-1].norm();
 		if trunc {
-			self.v[vp+nn-1].xortop(carry<<P_TBITS);
+			self.v[vp+nn-1].xortop(BIG::cast_to_chunk(carry)<<rom::P_TBITS);
 		}
 	}
 
@@ -258,24 +246,24 @@ impl FF {
 	}
 
 /* increment/decrement by a small integer */
-	pub fn inc(&mut self,m: i32) {
+	pub fn inc(&mut self,m: isize) {
 		self.v[0].inc(m);
 		self.norm();
 	}
 
-	pub fn dec(&mut self,m: i32) {
+	pub fn dec(&mut self,m: isize) {
 		self.v[0].dec(m);
 		self.norm();
 	}
 
 /* shift left by one bit */
 	pub fn shl(&mut self) {
-		let mut delay_carry:i32=0;
+		let mut delay_carry:isize=0;
 		for i in 0..self.length-1 {
 			let carry=self.v[i].fshl(1);
 			self.v[i].inc(delay_carry);
-			self.v[i].xortop(carry<<P_TBITS);
-			delay_carry=carry as i32
+			self.v[i].xortop(BIG::cast_to_chunk(carry)<<rom::P_TBITS);
+			delay_carry=carry;
 		}
 		self.v[self.length-1].fshl(1);
 		self.v[self.length-1].inc(delay_carry);
@@ -287,7 +275,7 @@ impl FF {
 		let mut i=self.length-1;
 		while i>0 {
 			let carry=self.v[i].fshr(1);
-			self.v[i-1].ortop(carry<<P_TBITS);
+			self.v[i-1].xortop(BIG::cast_to_chunk(carry)<<rom::P_TBITS);
 			i-=1;
 		}
 		self.v[0].fshr(1);
@@ -337,7 +325,7 @@ impl FF {
 	}
 
 /* in-place swapping using xor - side channel resistant - lengths must be the same */
-	pub fn cswap(a: &mut FF,b: &mut FF,d: i32) {
+	pub fn cswap(a: &mut FF,b: &mut FF,d: isize) {
 		for i in 0..a.length {
 			a.v[i].cswap(&mut b.v[i],d);
 		}
@@ -682,9 +670,7 @@ impl FF {
 
 /* this*=y mod p */
 	pub fn modmul(&mut self,y: &FF,p: &FF,nd: &FF) {
-		let ex=self.p_excess();
-		let ey=y.p_excess();
-		if (ex+1)>=(P_FEXCESS-1)/(ey+1) {
+		if BIG::ff_pexceed(&self.v[self.length-1],&y.v[y.length-1]) {
 			self.rmod(p)
 		}
 		let mut d=FF::mul(&self,y);
@@ -693,8 +679,7 @@ impl FF {
 
 /* this*=y mod p */
 	pub fn modsqr(&mut self,p: &FF,nd: &FF) {
-		let ex=self.p_excess();
-		if (ex+1)>=(P_FEXCESS-1)/(ex+1) {
+		if BIG::ff_sexceed(&self.v[self.length-1]) {
 			self.rmod(p);
 		}
 		let mut d=FF::sqr(&self);
@@ -717,7 +702,7 @@ impl FF {
 
 		let mut i=8*(rom::MODBYTES as usize)*n-1;
 		loop {
-			let b=(e.v[i/(rom::BIGBITS as usize)]).bit(i%(rom::BIGBITS as usize)) as i32;
+			let b=(e.v[i/(rom::BIGBITS as usize)]).bit(i%(rom::BIGBITS as usize)) as isize;
 			self.copy(&r0);
 			self.modmul(&r1,p,&nd);
 
@@ -748,7 +733,7 @@ impl FF {
 
 		let mut i=8*(rom::MODBYTES as usize)-1;
 		loop {
-			let b=e.bit(i) as i32;
+			let b=e.bit(i);
 			self.copy(&r0);
 			self.modmul(&r1,p,&nd);
 
@@ -768,7 +753,7 @@ impl FF {
 
 
 /* raise to an integer power - right-to-left method */
-	pub fn power(&mut self,e: i32,p: &FF) {
+	pub fn power(&mut self,e: isize,p: &FF) {
 		let n=p.length;
 		let mut w=FF::new_int(n);
 		let nd=p.invmod2m();
@@ -811,7 +796,7 @@ impl FF {
 		let mut i=8*(rom::MODBYTES as usize)*n-1;
 		loop {
 			self.modsqr(p,&nd);
-			let b=(e.v[i/(rom::BIGBITS as usize)]).bit(i%(rom::BIGBITS as usize)) as i32;			
+			let b=(e.v[i/(rom::BIGBITS as usize)]).bit(i%(rom::BIGBITS as usize)) as isize;			
 			if b==1 {self.modmul(&w,p,&nd)}
 			if i==0 {break}
 			i-=1;				
@@ -853,14 +838,13 @@ impl FF {
 		self.redc(p,&nd);
 	}
 
-	pub fn igcd(x: i32,y: i32) -> i32 { /* integer GCD, returns GCD of x and y */
+	pub fn igcd(x: isize,y: isize) -> isize { /* integer GCD, returns GCD of x and y */
 
-		if y==0 {return x}
-		let mut r: i32;		
+		if y==0 {return x}	
 		let mut xx=x;
 		let mut yy=y;		
 		loop {
-			r=xx%yy;
+			let r=xx%yy;
 			if r==0 {break}
 			xx=yy;yy=r;
 		}
@@ -868,7 +852,7 @@ impl FF {
 	}
 
 /* quick and dirty check for common factor with n */
-	pub fn cfactor(&self,s: i32) -> bool {
+	pub fn cfactor(&self,s: isize) -> bool {
 		let n=self.length;
 
 		let mut x=FF::new_int(n);
@@ -889,7 +873,7 @@ impl FF {
 			while !x.iszilch() && x.parity()==0 {x.shr()}
 		}
 
-		let g=x.v[0].get(0);
+		let g=x.v[0].get(0) as isize;
 		let r=FF::igcd(s,g);
 		if r>1 {return true}
 		return false

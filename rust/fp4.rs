@@ -46,7 +46,7 @@ impl FP4 {
 		}
 	}
 
-	pub fn new_int(a: i32) -> FP4 {
+	pub fn new_int(a: isize) -> FP4 {
 		let mut f=FP4::new();
 		f.a.copy(&FP2::new_int(a));
 		f.b.zero();
@@ -195,7 +195,7 @@ impl FP4 {
 	}
 
 /* self*=i, where i is an int */
-	pub fn imul(&mut self,c: i32) {
+	pub fn imul(&mut self,c: isize) {
 		self.a.imul(c);
 		self.b.imul(c);
 	}

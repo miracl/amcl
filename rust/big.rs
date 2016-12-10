@@ -18,10 +18,14 @@ under the License.
 */
 
 use rom;
+use rom::Chunk;
+
+#[cfg(D32)]
+use rom::DChunk;
 
 #[derive(Copy, Clone)]
 pub struct BIG {
- 	pub w: [i32; rom::NLEN]
+ 	pub w: [Chunk; rom::NLEN]
 }
 
 //mod dbig;
@@ -39,11 +43,11 @@ impl BIG {
 
     pub fn new_int(x:i32) -> BIG {
     	let mut s= BIG::new();
-    	s.w[0]=x;
+    	s.w[0]=x as Chunk;
     	return s;
     }
 
-    pub fn new_ints(a:&[i32]) -> BIG {
+    pub fn new_ints(a:&[Chunk]) -> BIG {
     	let mut s= BIG::new();
     	for i in 0..rom::NLEN {s.w[i]=a[i]}
     	return s;
@@ -67,19 +71,23 @@ impl BIG {
     	return s;	
     } 
 
-	pub fn get(&self,i:usize) -> i32 {
+    pub fn cast_to_chunk(x:isize) -> Chunk {
+        return x as Chunk;
+    }
+
+	pub fn get(&self,i:usize) -> Chunk {
 		return self.w[i]; 
 	}
 
-	pub fn set(&mut self,i:usize,x:i32) {
+	pub fn set(&mut self,i:usize,x:Chunk) {
 		self.w[i]=x;	
 	}
 
-	pub fn xortop(&mut self,x:i32) {
+	pub fn xortop(&mut self,x:Chunk) {
 		self.w[rom::NLEN-1]^=x;
 	}
 
-	pub fn ortop(&mut self,x:i32) {
+	pub fn ortop(&mut self,x:Chunk) {
 		self.w[rom::NLEN-1]|=x;
 	}
 
@@ -128,26 +136,119 @@ impl BIG {
     }
 
 /* calculate Field Excess */
-	pub fn excess(a:&BIG) ->i32 {
+	pub fn excess(a:&BIG) ->Chunk {
 		return (a.w[rom::NLEN-1]&rom::OMASK)>>(rom::MODBITS%rom::BASEBITS)
 	}
 
+    pub fn ff_excess(a:&BIG) ->Chunk {
+        return (a.w[rom::NLEN-1]&rom::OMASK)>>(rom::P_MB)
+    }
+
+#[cfg(D32)]
+    pub fn pexceed(a: &BIG,b: &BIG) -> bool {
+        let ea=BIG::excess(a);
+        let eb=BIG::excess(b);        
+        if ((ea+1) as DChunk)*((eb+1) as DChunk) > rom::FEXCESS as DChunk {return true}
+        return false
+    }
+
+#[cfg(D32)]
+    pub fn sexceed(a: &BIG) -> bool {
+        let ea=BIG::excess(a);
+        if ((ea+1) as DChunk)*((ea+1) as DChunk) > rom::FEXCESS as DChunk {return true}
+        return false
+    }
+
+#[cfg(D32)]
+    pub fn ff_pexceed(a: &BIG,b: &BIG) -> bool {
+        let ea=BIG::ff_excess(a);
+        let eb=BIG::ff_excess(b);
+        if ((ea+1) as DChunk)*((eb+1) as DChunk) > rom::P_FEXCESS as DChunk {return true}
+        return false;
+    }
+
+#[cfg(D32)]
+    pub fn ff_sexceed(a: &BIG) -> bool {
+        let ea=BIG::ff_excess(a);
+        if ((ea+1) as DChunk)*((ea+1) as DChunk) > rom::P_FEXCESS as DChunk {return true}
+        return false;
+    }
+
+/* Get top and bottom half of =x*y+c+r */
+#[cfg(D32)]
+    pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
+        let prod:DChunk = (a as DChunk)*(b as DChunk)+(c as DChunk)+(r as DChunk);
+        let bot=(prod&(rom::BMASK as DChunk)) as Chunk;
+        let top=(prod>>rom::BASEBITS) as Chunk;   
+        return (top,bot);     
+    }
+
+#[cfg(D64)]
+    pub fn pexceed(a: &BIG,b: &BIG) -> bool {
+        let ea=BIG::excess(a);
+        let eb=BIG::excess(b);        
+        if (ea+1) > rom::FEXCESS/(eb+1) {return true}
+        return false
+    }
+
+#[cfg(D64)]
+    pub fn sexceed(a: &BIG) -> bool {
+        let ea=BIG::excess(a);
+        if (ea+1) > rom::FEXCESS/(ea+1) {return true}
+        return false
+    }
+
+#[cfg(D64)]
+    pub fn ff_pexceed(a: &BIG,b: &BIG) -> bool {
+        let ea=BIG::ff_excess(a);
+        let eb=BIG::ff_excess(b);
+        if (ea+1) > rom::P_FEXCESS/(eb+1) {return true}
+        return false;
+    }
+
+#[cfg(D64)]
+    pub fn ff_sexceed(a: &BIG) -> bool {
+        let ea=BIG::ff_excess(a);
+        if (ea+1) > rom::P_FEXCESS/(ea+1) {return true}
+        return false;
+    }    
+
+#[cfg(D64)]
+    pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
+        let x0=a&rom::HMASK;
+        let x1=(a>>rom::HBITS);
+        let y0=b&rom::HMASK;
+        let y1=(b>>rom::HBITS);
+        let mut bot=x0*y0;
+        let mut top=x1*y1;
+        let mid=x0*y1+x1*y0;
+        let u0=mid&rom::HMASK;
+        let u1=(mid>>rom::HBITS);
+        bot+= (u0 <<rom::HBITS);
+        bot+=c; bot+=r;
+        top+=u1;
+        let carry=bot>>rom::BASEBITS;
+        bot&=rom::BMASK;
+        top+=carry;
+        return (top,bot);
+    }
+
 /* normalise BIG - force all digits < 2^rom::BASEBITS */
-    pub fn norm(&mut self) -> i32
+    pub fn norm(&mut self) -> isize
     {
-        let mut carry:i32=0;
+        let mut carry=BIG::cast_to_chunk(0);
         for i in 0 ..rom::NLEN-1 {
             let d=self.w[i]+carry;
             self.w[i]=d&rom::BMASK;
             carry=d>>rom::BASEBITS;
         }
         self.w[rom::NLEN-1]+=carry;
-        return self.w[rom::NLEN-1]>>((8*rom::MODBYTES)%rom::BASEBITS);
+        return (self.w[rom::NLEN-1]>>((8*rom::MODBYTES)%rom::BASEBITS)) as isize;
     }
 
 /* Conditional swap of two bigs depending on d using XOR - no branches */
-	pub fn cswap(&mut self,b: &mut BIG,d: i32) {
-		let mut c=d;
+	pub fn cswap(&mut self,b: &mut BIG,d: isize) {
+		let mut c=BIG::cast_to_chunk(d);
 		c=!(c-1);
 		for i in 0 ..rom::NLEN {
 			let t=c&(self.w[i]^b.w[i]);
@@ -156,28 +257,28 @@ impl BIG {
 		}
 	}
 
-	pub fn cmove(&mut self,g:&BIG,d: i32) {
-		let b=-d;
+	pub fn cmove(&mut self,g:&BIG,d: isize) {
+		let b=BIG::cast_to_chunk(-d);
 		for i in 0 ..rom::NLEN {
 			self.w[i]^=(self.w[i]^g.w[i])&b;
 		}
 	}
 
 /* Shift right by less than a word */
-	pub fn fshr(&mut self, k: usize) -> i32 {
-		let n:i32 = k as i32;
+	pub fn fshr(&mut self, k: usize) -> isize {
+		let n = k;
 		let w=self.w[0]&((1<<n)-1); /* shifted out part */
 		for i in 0 ..rom::NLEN-1 {
 			self.w[i]=(self.w[i]>>k)|((self.w[i+1]<<(rom::BASEBITS-n))&rom::BMASK);
 		}
 		self.w[rom::NLEN-1]=self.w[rom::NLEN-1]>>k;
-		return w;
+		return w as isize;
 	}
 
  /* general shift right */
 	pub fn shr(&mut self,k:usize) {
-		let n:i32 =(k as i32)%rom::BASEBITS;
-		let m:usize =((k as i32)/rom::BASEBITS) as usize;
+		let n=k%rom::BASEBITS;
+		let m=k/rom::BASEBITS;
 		for i in 0 ..rom::NLEN-m-1 {
 			self.w[i]=(self.w[m+i]>>n)|((self.w[m+i+1]<<(rom::BASEBITS-n))&rom::BMASK)
 		}
@@ -187,20 +288,20 @@ impl BIG {
 	}	
 
 /* Shift right by less than a word */
-	pub fn fshl(&mut self,k:usize) -> i32 {
-		let n:i32 = k as i32;
+	pub fn fshl(&mut self,k:usize) -> isize {
+		let n=k;
 		self.w[rom::NLEN-1]=((self.w[rom::NLEN-1]<<n))|(self.w[rom::NLEN-2]>>(rom::BASEBITS-n));
 		for i in (1 ..rom::NLEN-1).rev() {
 			self.w[i]=((self.w[i]<<k)&rom::BMASK)|(self.w[i-1]>>(rom::BASEBITS-n));
 		}
 		self.w[0]=(self.w[0]<<n)&rom::BMASK;
-		return self.w[rom::NLEN-1]>>((8*rom::MODBYTES)%rom::BASEBITS) /* return excess - only used in ff.c */
+		return (self.w[rom::NLEN-1]>>((8*rom::MODBYTES)%rom::BASEBITS)) as isize /* return excess - only used in ff.c */
 	}
 
 /* general shift left */
 	pub fn shl(&mut self,k: usize) {
-		let n:i32=(k as i32)%rom::BASEBITS;
-		let m:usize=((k as i32)/rom::BASEBITS) as usize;
+		let n=k%rom::BASEBITS;
+		let m=k/rom::BASEBITS;
 
 		self.w[rom::NLEN-1]=self.w[rom::NLEN-1-m]<<n;
 		if rom::NLEN>=m+2 {self.w[rom::NLEN-1]|=self.w[rom::NLEN-m-2]>>(rom::BASEBITS-n)}
@@ -217,7 +318,7 @@ impl BIG {
 		self.norm();
 		while (k as isize)>=0 && self.w[k]==0 {k=k-1}
 		if (k as isize) <0 {return 0}
-		let mut bts=(rom::BASEBITS as usize)*k;
+		let mut bts=rom::BASEBITS*k;
 		let mut c=self.w[k];
 		while c!=0 {c/=2; bts+=1;}
 		return bts;
@@ -266,9 +367,9 @@ impl BIG {
 		return s;
 	}
 
-    pub fn inc(&mut self,x:i32) {
+    pub fn inc(&mut self,x:isize) {
     	self.norm();
-    	self.w[0]+=x;
+    	self.w[0]+=BIG::cast_to_chunk(x);
     }
 
 /* return self-x */
@@ -295,15 +396,15 @@ impl BIG {
 	} 
 
 /* self-=x, where x is int */
-	pub fn dec(&mut self,x:i32) {
+	pub fn dec(&mut self,x:isize) {
 		self.norm();
-		self.w[0]-=x;
+		self.w[0]-=BIG::cast_to_chunk(x);
 	} 
 
 /* self*=x, where x is small int<NEXCESS */
-	pub fn imul(&mut self,c: i32) {
+	pub fn imul(&mut self,c: isize) {
 		for i in 0 ..rom::NLEN { 
-			self.w[i]*=c;
+			self.w[i]*=BIG::cast_to_chunk(c);
 		}
 	}
 
@@ -322,7 +423,7 @@ impl BIG {
 	pub fn frombytearray(b: &[u8],n:usize) -> BIG {
 		let mut m=BIG::new();
 		for i in 0 ..(rom::MODBYTES as usize) {
-			m.fshl(8); m.w[0]+=(b[i+n]&0xff) as i32;
+			m.fshl(8); m.w[0]+=(b[i+n]&0xff) as Chunk;
 		}
 		return m; 
 	}
@@ -335,42 +436,40 @@ impl BIG {
 		return BIG::frombytearray(b,0)
 	}
 
-/* set self.w[i]+=x*y+c, and return high part */
-
-	pub fn muladd(&mut self,x: i32,y: i32,c: i32, i:usize) -> i32 {
-        let prod:i64 = (x as i64)*(y as i64)+(c as i64)+(self.w[i] as i64);
-        self.w[i]=(prod&(rom::BMASK as i64)) as i32;
-        return (prod>>rom::BASEBITS) as i32;
-    }
 
 /* self*=x, where x is >NEXCESS */
-    pub fn pmul(&mut self,c: i32) -> i32 {
-        let mut carry:i32=0;
+    pub fn pmul(&mut self,c: isize) -> Chunk {
+        let mut carry=BIG::cast_to_chunk(0);
         self.norm();
         for i in 0 ..rom::NLEN {
             let ak=self.w[i];
             self.w[i]=0;
-            carry=self.muladd(ak,c,carry,i);
+            //carry=self.muladd(ak,BIG::cast_to_chunk(c),carry,i);
+            let tuple=BIG::muladd(ak,BIG::cast_to_chunk(c),carry,self.w[i]);
+            carry=tuple.0; self.w[i]=tuple.1;
         }
         return carry;
     }  
 
 /* self*=c and catch overflow in DBIG */
-    pub fn pxmul(&mut self,c: i32) -> DBIG
+    pub fn pxmul(&mut self,c: isize) -> DBIG
     {
         let mut m=DBIG::new();
-        let mut carry:i32=0;
+        let mut carry=BIG::cast_to_chunk(0);
         for j in 0 ..rom::NLEN {
-            carry=m.muladd(self.w[j],c,carry,j);
+            //carry=m.muladd(self.w[j],BIG::cast_to_chunk(c),carry,j);
+
+            let tuple=BIG::muladd(self.w[j],BIG::cast_to_chunk(c),carry,m.w[j]);
+            carry=tuple.0; m.w[j]=tuple.1; 
         }
         m.w[rom::NLEN]=carry;
         return m;
     }
 
 /* divide by 3 */
-    pub fn div3(&mut self) -> i32
+    pub fn div3(&mut self) -> Chunk
     {
-        let mut carry:i32=0;
+        let mut carry=BIG::cast_to_chunk(0);
         self.norm();
         let base=1<<rom::BASEBITS;
         for i in (0 ..rom::NLEN).rev() {
@@ -385,9 +484,14 @@ impl BIG {
     pub fn smul(a: &BIG,b: &BIG) -> BIG {
         let mut c=BIG::new();
         for i in 0 ..rom::NLEN {
-            let mut carry:i32=0;
+            let mut carry=BIG::cast_to_chunk(0);
             for j in 0 ..rom::NLEN {
-                if i+j<rom::NLEN {carry=c.muladd(a.w[i],b.w[j],carry,i+j)}
+                if i+j<rom::NLEN {
+                    //carry=c.muladd(a.w[i],b.w[j],carry,i+j);
+
+                    let tuple=BIG::muladd(a.w[i],b.w[j],carry,c.w[i+j]);
+                    carry=tuple.0; c.w[i+j]=tuple.1;
+                }
             }
         }
         return c;
@@ -406,16 +510,16 @@ impl BIG {
 /* set x = x mod 2^m */
     pub fn mod2m(&mut self,m: usize)
     {
-        let wd=m/(rom::BASEBITS as usize);
-        let bt=(m as i32)%rom::BASEBITS;
+        let wd=m/rom::BASEBITS;
+        let bt=m%rom::BASEBITS;
         let msk=(1<<bt)-1;
         self.w[wd]&=msk;
         for i in wd+1 ..rom::NLEN {self.w[i]=0}
     }
 
 /* Arazi and Qi inversion mod 256 */
-    pub fn invmod256(a: i32) -> i32 {
-        let mut t1:i32=0;
+    pub fn invmod256(a: isize) -> isize {
+        let mut t1:isize=0;
         let mut c=(a>>1)&1;
         t1+=c;
         t1&=1;
@@ -449,22 +553,22 @@ impl BIG {
     }
 
 /* return parity */
-    pub fn parity(&self) -> i32 {
-        return self.w[0]%2;
+    pub fn parity(&self) -> isize {
+        return (self.w[0]%2) as isize;
     }
 
 /* return n-th bit */
-    pub fn bit(&self,n: usize) -> i32 {
-        if (self.w[n/(rom::BASEBITS as usize)]&(1<<((n as i32)%rom::BASEBITS)))>0 {return 1;}
+    pub fn bit(&self,n: usize) -> isize {
+        if (self.w[n/(rom::BASEBITS as usize)]&(1<<(n%rom::BASEBITS)))>0 {return 1;}
         else {return 0;}
     }
 
 /* return n last bits */
-    pub fn lastbits(&mut self,n: usize) -> i32
+    pub fn lastbits(&mut self,n: usize) -> isize
     {
-        let msk:i32 =((1<<n)-1) as i32;
+        let msk =BIG::cast_to_chunk((1<<n)-1);
         self.norm();
-        return self.w[0]&msk;
+        return (self.w[0]&msk) as isize;
     }
 
 /* a=1/a mod 2^256. This is very fast! */
@@ -521,7 +625,7 @@ impl BIG {
 		r.copy(self);
 		r.sub(&m);
 		r.norm();
-		self.cmove(&r,(1-((r.w[rom::NLEN-1]>>(rom::CHUNK-1))&1)) as i32);
+		self.cmove(&r,(1-((r.w[rom::NLEN-1]>>(rom::CHUNK-1))&1)) as isize);
 /*
             if BIG::comp(self,&m)>=0 {
 				self.sub(&m);
@@ -538,7 +642,7 @@ impl BIG {
         let mut e=BIG::new_int(1);
         let mut b=BIG::new_copy(self);
         let mut m=BIG::new_copy(n);
-	let mut r=BIG::new();
+        let mut r=BIG::new();
         self.zero();
     
         while BIG::comp(&b,&m)>=0 {
@@ -554,7 +658,7 @@ impl BIG {
 		r.copy(&b);
 		r.sub(&m);
 		r.norm();
-		let d=(1-((r.w[rom::NLEN-1]>>(rom::CHUNK-1))&1)) as i32;
+		let d=(1-((r.w[rom::NLEN-1]>>(rom::CHUNK-1))&1)) as isize;
 		b.cmove(&r,d);
 		r.copy(self);
 		r.add(&e);
@@ -582,7 +686,7 @@ impl BIG {
                 r=rng.getbyte()
             } else {r>>=1}
 
-            let b=(r&1) as i32;
+            let b=BIG::cast_to_chunk((r as isize)&1);
             m.shl(1); m.w[0]+=b;// m.inc(b)
             j+=1; j&=7; 
         }
@@ -599,7 +703,7 @@ impl BIG {
                 r=rng.getbyte();
             } else {r>>=1}
 
-            let b=(r&1) as i32;
+            let b=BIG::cast_to_chunk((r as isize)&1);
             d.shl(1); d.w[0]+=b; // m.inc(b);
             j+=1; j&=7; 
         }
@@ -702,102 +806,231 @@ impl BIG {
     }
 
    /* return a*b as DBIG */
+#[cfg(D32)]
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
-        let rm=rom::BMASK as i64;
+        let rm=rom::BMASK as DChunk;
         let rb=rom::BASEBITS;
      //   a.norm();
      //   b.norm();
 
-        let mut d: [i64; rom::DNLEN] = [0; rom::DNLEN];
+        let mut d: [DChunk; rom::DNLEN] = [0; rom::DNLEN];
         for i in 0 ..rom::NLEN {
-            d[i]=(a.w[i] as i64)*(b.w[i] as i64);
+            d[i]=(a.w[i] as DChunk)*(b.w[i] as DChunk);
         }
         let mut s=d[0];
-        let mut t=s; c.w[0]=(t&rm) as i32; 
+        let mut t=s; c.w[0]=(t&rm) as Chunk; 
         let mut co=t>>rb;
         for k in 1 ..rom::NLEN {
             s+=d[k]; t=co+s;
             for i in 1+k/2..k+1
-                {t+=((a.w[i]-a.w[k-i]) as i64)*((b.w[k-i]-b.w[i]) as i64)}
-            c.w[k]=(t&rm) as i32; co=t>>rb;
+                {t+=((a.w[i]-a.w[k-i]) as DChunk)*((b.w[k-i]-b.w[i]) as DChunk)}
+            c.w[k]=(t&rm) as Chunk; co=t>>rb;
         }
         for k in rom::NLEN ..2*rom::NLEN-1 {
             s-=d[k-rom::NLEN]; t=co+s;
             let mut i=1+k/2;
             while i<rom::NLEN {
-                t+=((a.w[i]-a.w[k-i]) as i64)*((b.w[k-i]-b.w[i]) as i64);
+                t+=((a.w[i]-a.w[k-i]) as DChunk)*((b.w[k-i]-b.w[i]) as DChunk);
                 i+=1;
             }
         
-            c.w[k]=(t&rm) as i32; co=t>>rb;
+            c.w[k]=(t&rm) as Chunk; co=t>>rb;
         }
-        c.w[2*rom::NLEN-1]=co as i32;
+        c.w[2*rom::NLEN-1]=co as Chunk;
         return c;
     }
 
-    /* return a^2 as DBIG */
+/* return a^2 as DBIG */
+#[cfg(D32)]  
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();
-        let rm=rom::BMASK as i64;
+        let rm=rom::BMASK as DChunk;
         let rb=rom::BASEBITS;
     //    a.norm();
  
-        let mut t=(a.w[0] as i64)*(a.w[0] as i64);
-        c.w[0]=(t&rm) as i32; let mut co=t>>rb;
-        t=(a.w[1] as i64)*(a.w[0] as i64); t+=t; t+=co;
-        c.w[1]=(t&rm) as i32; co=t>>rb;
+        let mut t=(a.w[0] as DChunk)*(a.w[0] as DChunk);
+        c.w[0]=(t&rm) as Chunk; let mut co=t>>rb;
+        t=(a.w[1] as DChunk)*(a.w[0] as DChunk); t+=t; t+=co;
+        c.w[1]=(t&rm) as Chunk; co=t>>rb;
         
         let last=rom::NLEN-(rom::NLEN%2);
         let mut j=2;
         while j<last {
-            t=(a.w[j] as i64)*(a.w[0] as i64); for i in 1 ..(j+1)/2 {t+=(a.w[j-i] as i64)*(a.w[i] as i64)} ; t+=t; t+=co; t+=(a.w[j/2] as i64)*(a.w[j/2] as i64);
-            c.w[j]=(t&rm) as i32; co=t>>rb;
-            t=(a.w[j+1] as i64)*(a.w[0] as i64); for i in 1 ..(j+2)/2 {t+=(a.w[j+1-i] as i64)*(a.w[i] as i64)} ; t+=t; t+=co;
-            c.w[j+1]=(t&rm) as i32; co=t>>rb;
+            t=(a.w[j] as DChunk)*(a.w[0] as DChunk); for i in 1 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk);
+            c.w[j]=(t&rm) as Chunk; co=t>>rb;
+            t=(a.w[j+1] as DChunk)*(a.w[0] as DChunk); for i in 1 ..(j+2)/2 {t+=(a.w[j+1-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co;
+            c.w[j+1]=(t&rm) as Chunk; co=t>>rb;
             j+=2;
         }
         j=last;
         if rom::NLEN%2==1 {
-            t=(a.w[j] as i64)*(a.w[0] as i64); for i in 1 ..(j+1)/2 {t+=(a.w[j-i] as i64)*(a.w[i] as i64)} ; t+=t; t+=co; t+=(a.w[j/2] as i64)*(a.w[j/2] as i64);
-            c.w[j]=(t&rm) as i32; co=t>>rb; j += 1;
-            t=(a.w[rom::NLEN-1] as i64)*(a.w[j-rom::NLEN+1] as i64); for i in j-rom::NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as i64)*(a.w[i] as i64)}; t+=t; t+=co;
-            c.w[j]=(t&rm) as i32; co=t>>rb; j += 1;
+            t=(a.w[j] as DChunk)*(a.w[0] as DChunk); for i in 1 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk);
+            c.w[j]=(t&rm) as Chunk; co=t>>rb; j += 1;
+            t=(a.w[rom::NLEN-1] as DChunk)*(a.w[j-rom::NLEN+1] as DChunk); for i in j-rom::NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk)}; t+=t; t+=co;
+            c.w[j]=(t&rm) as Chunk; co=t>>rb; j += 1;
         }
         while j<rom::DNLEN-2 {
-            t=(a.w[rom::NLEN-1] as i64)*(a.w[j-rom::NLEN+1] as i64); for i in j-rom::NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as i64)*(a.w[i] as i64)} ; t+=t; t+=co; t+=(a.w[j/2] as i64)*(a.w[j/2] as i64);
-            c.w[j]=(t&rm) as i32; co=t>>rb;
-            t=(a.w[rom::NLEN-1] as i64)*(a.w[j-rom::NLEN+2] as i64); for i in j-rom::NLEN+3 ..(j+2)/2 {t+=(a.w[j+1-i] as i64)*(a.w[i] as i64)} ; t+=t; t+=co;
-            c.w[j+1]=(t&rm) as i32; co=t>>rb;
+            t=(a.w[rom::NLEN-1] as DChunk)*(a.w[j-rom::NLEN+1] as DChunk); for i in j-rom::NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk);
+            c.w[j]=(t&rm) as Chunk; co=t>>rb;
+            t=(a.w[rom::NLEN-1] as DChunk)*(a.w[j-rom::NLEN+2] as DChunk); for i in j-rom::NLEN+3 ..(j+2)/2 {t+=(a.w[j+1-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co;
+            c.w[j+1]=(t&rm) as Chunk; co=t>>rb;
             j+=2;
         }
-        t=(a.w[rom::NLEN-1] as i64)*(a.w[rom::NLEN-1] as i64)+co;
-        c.w[rom::DNLEN-2]=(t&rm) as i32; co=t>>rb;
-        c.w[rom::DNLEN-1]=co as i32;
+        t=(a.w[rom::NLEN-1] as DChunk)*(a.w[rom::NLEN-1] as DChunk)+co;
+        c.w[rom::DNLEN-2]=(t&rm) as Chunk; co=t>>rb;
+        c.w[rom::DNLEN-1]=co as Chunk;
         
         return c;
     }
 
+
+#[cfg(D32)]
+    fn monty(d: &mut DBIG) -> BIG {
+        let mut b=BIG::new();           
+        let md=BIG::new_ints(&rom::MODULUS);
+        let rm=rom::BMASK as DChunk;
+        let rb=rom::BASEBITS;
+
+        let mut dd: [DChunk; rom::NLEN] = [0; rom::NLEN];
+        let mut v: [Chunk; rom::NLEN] = [0; rom::NLEN];
+            
+        b.zero();
+            
+        let mut t=d.w[0] as DChunk; v[0]=(((t&rm) as Chunk)*rom::MCONST)&rom::BMASK; t+=(v[0] as DChunk)*(md.w[0] as DChunk); let mut c=(d.w[1] as DChunk)+(t>>rb); let mut s:DChunk=0;
+        for k in 1 ..rom::NLEN {
+            t=c+s+(v[0] as DChunk)*(md.w[k] as DChunk);
+            let mut i=1+k/2;
+            while i<k {
+                t+=((v[k-i]-v[i]) as DChunk)*((md.w[i]-md.w[k-i]) as DChunk);
+                i+=1;
+            }
+            v[k]=(((t&rm) as Chunk)*rom::MCONST)&rom::BMASK; t+=(v[k] as DChunk)*(md.w[0] as DChunk); c=(d.w[k+1] as DChunk)+(t>>rb);
+            dd[k]=(v[k] as DChunk)*(md.w[k] as DChunk); s+=dd[k];
+        }
+            
+        for k in rom::NLEN ..2*rom::NLEN-1
+        {
+            t=c+s;
+            let mut i=1+k/2;
+            while i<rom::NLEN {
+                t+=((v[k-i]-v[i]) as DChunk)*((md.w[i]-md.w[k-i]) as DChunk);
+                i+=1;
+            }
+            b.w[k-rom::NLEN]=(t&rm) as Chunk; c=(d.w[k+1] as DChunk)+(t>>rb); s-=dd[k-rom::NLEN+1];
+        }
+        b.w[rom::NLEN-1]=(c&rm) as Chunk;  
+        b.norm();
+        return b;
+    }
+
+
+/* return a*b as DBIG */
+#[cfg(D64)]
+    pub fn mul(a: &BIG,b: &BIG) -> DBIG {
+        let mut c=DBIG::new();
+        let mut carry =BIG::cast_to_chunk(0);
+
+        for i in 0 ..rom::NLEN {
+            carry=0;
+            for j in 0 ..rom::NLEN {
+                let tuple=BIG::muladd(a.w[i],b.w[j],carry,c.w[i+j]);
+                carry=tuple.0; c.w[i+j]=tuple.1;
+            }
+            c.w[rom::NLEN+i]=carry;
+        }
+        return c;
+    } 
+
+/* return a^2 as DBIG */
+#[cfg(D64)]
+    pub fn sqr(a: &BIG) -> DBIG {
+        let mut c=DBIG::new();
+        let mut carry =BIG::cast_to_chunk(0);
+
+        for i in 0 ..rom::NLEN {
+            carry=0;
+            for j in i+1 ..rom::NLEN {
+                let tuple=BIG::muladd(2*a.w[i],a.w[j],carry,c.w[i+j]);
+                carry=tuple.0; c.w[i+j]=tuple.1;
+            //carry,c.w[i+j]=muladd(2*a.w[i],a.w[j],carry,c.w[i+j])
+            //carry=c.muladd(2*a.w[i],a.w[j],carry,i+j)
+            }
+            c.w[rom::NLEN+i]=carry;
+        }
+
+        for i in 0 ..rom::NLEN {
+            let tuple=BIG::muladd(a.w[i],a.w[i],0,c.w[2*i]);
+            c.w[2*i]=tuple.1;
+            c.w[2*i+1]+=tuple.0;
+        //c.w[2*i+1]+=c.muladd(a.w[i],a.w[i],0,2*i)
+        }
+        c.norm();
+        return c;
+    } 
+
+#[cfg(D64)]
+    fn monty(d: &mut DBIG) -> BIG {
+        let mut b=BIG::new();     
+        let md=BIG::new_ints(&rom::MODULUS);
+        let mut carry=BIG::cast_to_chunk(0);
+        let mut m=BIG::cast_to_chunk(0);
+        for i in 0 ..rom::NLEN {
+            if rom::MCONST==-1 { 
+                m=(-d.w[i])&rom::BMASK;
+            } else {
+                if (rom::MCONST==1) {
+                    m=d.w[i];
+                } else {
+                    m=(rom::MCONST*d.w[i])&rom::BMASK;
+                }
+            }
+
+            carry=0;
+            for j in 0 ..rom::NLEN {
+                let tuple=BIG::muladd(m,md.w[j],carry,d.w[i+j]);
+                carry=tuple.0; d.w[i+j]=tuple.1;
+                //carry,d.w[i+j]=muladd(m,md.w[j],carry,d.w[i+j])
+                //carry=d.muladd(m,md.w[j],carry,i+j)
+            }
+            d.w[rom::NLEN+i]+=carry;
+        }
+
+        for i in 0 ..rom::NLEN {
+            b.w[i]=d.w[rom::NLEN+i];
+        } 
+        b.norm();
+        return b;  
+    }
+
+
 /* reduce a DBIG to a BIG using the appropriate form of the modulus */
+/* dd */
     pub fn modulo(d: &mut DBIG) -> BIG {
-        let mut b=BIG::new();
+    
         if rom::MODTYPE==rom::PSEUDO_MERSENNE {
+            let mut b=BIG::new();
             let mut t=d.split(rom::MODBITS);
             b.dcopy(&d);
-            let v=t.pmul(rom::MCONST);
+            let v=t.pmul(rom::MCONST as isize);
             let tw=t.w[rom::NLEN-1];
             t.w[rom::NLEN-1] &= rom::TMASK;
-            t.inc(rom::MCONST*((tw>>rom::TBITS)+(v<<(rom::BASEBITS-rom::TBITS))));
+            t.w[0]+=rom::MCONST*((tw>>rom::TBITS)+(v<<(rom::BASEBITS-rom::TBITS)));
     
             b.add(&t);
             b.norm();
+            return b;
         }
     
         if rom::MODTYPE==rom::MONTGOMERY_FRIENDLY
         {
+            let mut b=BIG::new();
             for i in 0 ..rom::NLEN {
                 let x=d.w[i];
-                d.w[rom::NLEN+i]+=d.muladd(x,rom::MCONST-1,x,rom::NLEN+i-1);
+                //d.w[rom::NLEN+i]+=d.muladd(x,rom::MCONST-1,x,rom::NLEN+i-1);
+
+                let tuple=BIG::muladd(x,rom::MCONST-1,x,d.w[rom::NLEN+i-1]);
+                d.w[rom::NLEN+i]+=tuple.0; d.w[rom::NLEN+i-1]=tuple.1;
             }
     
             b.zero();
@@ -806,10 +1039,12 @@ impl BIG {
                 b.w[i]=d.w[rom::NLEN+i];
             }
             b.norm();
+            return b;
         }
             
         if rom::MODTYPE==rom::GENERALISED_MERSENNE
         { // GoldiLocks Only
+            let mut b=BIG::new();            
             let t=d.split(rom::MODBITS);
             let rm2=(rom::MODBITS/2) as usize;
             b.dcopy(&d);
@@ -831,44 +1066,13 @@ impl BIG {
             
             b.w[(224/rom::BASEBITS) as usize]+=carry<<(224%rom::BASEBITS);
             b.norm();
+            return b;
         }
        
         if rom::MODTYPE==rom::NOT_SPECIAL {
-            let md=BIG::new_ints(&rom::MODULUS);
-            let rm=rom::BMASK as i64;
-            let rb=rom::BASEBITS;
-
-            let mut dd: [i64; rom::NLEN] = [0; rom::NLEN];
-            let mut v: [i32; rom::NLEN] = [0; rom::NLEN];
-            
-            b.zero();
-            
-            let mut t=d.w[0] as i64; v[0]=(((t&rm) as i32)*rom::MCONST)&rom::BMASK; t+=(v[0] as i64)*(md.w[0] as i64); let mut c=(d.w[1] as i64)+(t>>rb); let mut s:i64=0;
-            for k in 1 ..rom::NLEN {
-                t=c+s+(v[0] as i64)*(md.w[k] as i64);
-                let mut i=1+k/2;
-                while i<k {
-                    t+=((v[k-i]-v[i]) as i64)*((md.w[i]-md.w[k-i]) as i64);
-                    i+=1;
-                }
-                v[k]=(((t&rm) as i32)*rom::MCONST)&rom::BMASK; t+=(v[k] as i64)*(md.w[0] as i64); c=(d.w[k+1] as i64)+(t>>rb);
-                dd[k]=(v[k] as i64)*(md.w[k] as i64); s+=dd[k];
-            }
-            
-            for k in rom::NLEN ..2*rom::NLEN-1
-            {
-                t=c+s;
-                let mut i=1+k/2;
-                while i<rom::NLEN {
-                    t+=((v[k-i]-v[i]) as i64)*((md.w[i]-md.w[k-i]) as i64);
-                    i+=1;
-                }
-                b.w[k-rom::NLEN]=(t&rm) as i32; c=(d.w[k+1] as i64)+(t>>rb); s-=dd[k-rom::NLEN+1];
-            }
-            b.w[rom::NLEN-1]=(c&rm) as i32;  
-            b.norm();
+            return BIG::monty(d);
         }     
-        return b;
+        return BIG::new();
     }
 
     /* return a*b mod m */
