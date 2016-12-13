@@ -35,7 +35,7 @@ also
 
 rustc --cfg D32 -O -A dead_code BenchtestEC.rs
 
-rustc --cfg D32-O -A dead_code BenchtestPAIR.rs
+rustc --cfg D32 -O -A dead_code BenchtestPAIR.rs
 
 
 For a 64-bit build copy rom64.rs to rom.rs, and use instead the 
