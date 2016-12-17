@@ -22,14 +22,10 @@ pub struct FP {
  	x:BIG
 }
 
-//mod big;
 use big::BIG;
-//mod dbig;
 use dbig::DBIG;
-//mod rom;
 use rom;
-//mod rand;
-//mod hash256;
+use rom::Chunk;
 
 impl FP {
 
@@ -184,7 +180,7 @@ impl FP {
             cc = -cc;
             s=true;
         }
-        let afx=(BIG::excess(&(self.x))+1)*(BIG::cast_to_chunk(cc)+1)+1;
+        let afx=(BIG::excess(&(self.x))+1)*((cc as Chunk)+1)+1;
         if cc<rom::NEXCESS && afx<rom::FEXCESS {
             self.x.imul(cc);
         } else {

@@ -31,15 +31,10 @@ final class FF {
     var v = [BIG]()
     var length:Int=1
     
-    private static let P_MBITS:Int32=ROM.MODBYTES*8
-    private static let P_OMASK=(Int32(-1)<<(P_MBITS%ROM.BASEBITS))
-    private static let P_FEXCESS=(Int32(1)<<(ROM.BASEBITS*Int32(ROM.NLEN)-P_MBITS))
-    private static let P_TBITS=(P_MBITS%ROM.BASEBITS)
-    
-    func P_EXCESS() -> Int32
+ /*   func P_EXCESS() -> Int32
     {
         return ((v[length-1].w[ROM.NLEN-1]&FF.P_OMASK)>>FF.P_TBITS)
-    }
+    } */
     /* Constructors */
     init(_ n: Int)
     {
@@ -50,7 +45,7 @@ final class FF {
         length=n;
     }
     
-    init(_ x: [[Int32]],n: Int)
+    init(_ x: [[Chunk]],n: Int)
     {
         for i in 0 ..< n
         {
@@ -74,11 +69,10 @@ final class FF {
     }
     
     /* set to integer */
-    func set(_ m: Int32)
+    func set(_ m: Int)
     {
         zero();
-        v[0].set(0,(m&ROM.BMASK));
-        v[0].set(1,(m>>ROM.BASEBITS));
+        v[0].set(0,Chunk(m));
     }
     
     /* copy from FF b */
@@ -154,14 +148,14 @@ final class FF {
     }
     
     /* extract last bit */
-    func parity() -> Int32
+    func parity() -> Int
     {
         return v[0].parity()
     }
     
-    func lastbits(_ m: Int) ->Int32
+    func lastbits(_ m: Int) ->Int
     {
-        return v[0].lastbits(m);
+        return v[0].lastbits(UInt(m));
     }
     
     /* compare x and y - must be normalised, and of same length */
@@ -242,12 +236,12 @@ final class FF {
         for i in 0 ..< nn-1
         {
             let carry=v[vp+i].norm();
-            v[vp+i].xortop(carry<<FF.P_TBITS)
+            v[vp+i].xortop(Chunk(carry)<<Chunk(ROM.P_TBITS))
             v[vp+i+1].inc(carry)
         }
         let carry=v[vp+nn-1].norm();
         if (trunc)
-            {v[vp+nn-1].xortop(carry<<FF.P_TBITS)}
+            {v[vp+nn-1].xortop(Chunk(carry)<<Chunk(ROM.P_TBITS))}
     }
     
     func norm()
@@ -256,13 +250,13 @@ final class FF {
     }
     
     /* increment/decrement by a small integer */
-    func inc(_ m: Int32)
+    func inc(_ m: Int)
     {
         v[0].inc(m);
         norm();
     }
     
-    func dec(_ m: Int32)
+    func dec(_ m: Int)
     {
         v[0].dec(m);
         norm();
@@ -271,12 +265,12 @@ final class FF {
     /* shift left by one bit */
     func shl()
     {
-        var delay_carry:Int32=0;
+        var delay_carry=0;
         for i in 0 ..< length-1
         {
             let carry=v[i].fshl(1)
             v[i].inc(delay_carry);
-            v[i].xortop(carry<<FF.P_TBITS);
+            v[i].xortop(Chunk(carry)<<Chunk(ROM.P_TBITS));
             delay_carry=carry;
         }
         v[length-1].fshl(1)
@@ -289,7 +283,7 @@ final class FF {
         for i in (1...length-1).reversed()
         {
             let carry=v[i].fshr(1);
-            v[i-1].ortop(carry<<FF.P_TBITS);
+            v[i-1].ortop(Chunk(carry)<<Chunk(ROM.P_TBITS));
         }
         v[0].fshr(1);
     }
@@ -323,7 +317,7 @@ final class FF {
     }
     
     /* in-place swapping using xor - side channel resistant - lengths must be the same */
-    private static func cswap(_ a: FF,_ b:FF,_ d:Int32)
+    private static func cswap(_ a: FF,_ b:FF,_ d:Int)
     {
         for i in 0 ..< a.length
         {
@@ -496,7 +490,7 @@ final class FF {
         x.copy(self)
         x.norm()
         m.dsucopy(b)
-        var k=ROM.BIGBITS*n
+        var k=Int(ROM.BIGBITS)*n
     
         while (k>0)
         {
@@ -671,9 +665,10 @@ final class FF {
     /* this*=y mod p */
     func modmul(_ y: FF,_ p:FF,_ nd: FF)
     {
-        let ex=P_EXCESS();
-        let ey=y.P_EXCESS();
-        if ((ex+1)>=(FF.P_FEXCESS-1)/(ey+1)) {mod(p)}
+        if BIG.ff_pexceed(v[length-1],y.v[y.length-1]) {mod(p)}
+       // let ex=P_EXCESS();
+       //let ey=y.P_EXCESS();
+       // if ((ex+1)>=(FF.P_FEXCESS-1)/(ey+1)) {mod(p)}
         let d=FF.mul(self,y);
         copy(d.reduce(p,nd));
     }
@@ -681,8 +676,9 @@ final class FF {
     /* this*=y mod p */
     func modsqr(_ p: FF,_ nd:FF)
     {
-        let ex=P_EXCESS();
-        if ((ex+1)>=(FF.P_FEXCESS-1)/(ex+1)) {mod(p)}
+        if BIG.ff_sexceed(v[length-1]) {mod(p)}
+ //       let ex=P_EXCESS();
+   //     if ((ex+1)>=(FF.P_FEXCESS-1)/(ex+1)) {mod(p)}
         let d=FF.sqr(self);
         copy(d.reduce(p,nd));
     }
@@ -703,7 +699,7 @@ final class FF {
     
         for i in (0...8*Int(ROM.MODBYTES)*n-1).reversed()
         {
-            let b=Int32(e.v[i/ROM.BIGBITS].bit(i%ROM.BIGBITS))
+            let b=Int(e.v[i/Int(ROM.BIGBITS)].bit(UInt(i%Int(ROM.BIGBITS))))
             copy(R0)
             modmul(R1,p,ND)
     
@@ -735,7 +731,7 @@ final class FF {
     
         for i in (0...8*Int(ROM.MODBYTES)-1).reversed()
         {
-            let b=Int32(e.bit(i))
+            let b=(e.bit(UInt(i)))
             copy(R0)
             modmul(R1,p,ND)
     
@@ -750,7 +746,7 @@ final class FF {
     }
     
     /* raise to an integer power - right-to-left method */
-    func power(_ e:Int32,_ p:FF)
+    func power(_ e:Int,_ p:FF)
     {
         let n=p.length
         var f=true
@@ -799,7 +795,7 @@ final class FF {
       //  for var i=8*Int(ROM.MODBYTES)*n-1;i>=0;i--
         {
             modsqr(p,ND)
-            let b=e.v[i/ROM.BIGBITS].bit(i%ROM.BIGBITS)
+            let b=e.v[i/Int(ROM.BIGBITS)].bit(UInt(i%Int(ROM.BIGBITS)))
             if (b==1) {modmul(w,p,ND)}
         }
         redc(p,ND);
@@ -824,8 +820,8 @@ final class FF {
         for i in (0...8*Int(ROM.MODBYTES)-1).reversed()
     //    for var i=8*Int(ROM.MODBYTES)-1;i>=0;i--
         {
-            let eb=e.bit(i)
-            let fb=f.bit(i)
+            let eb=e.bit(UInt(i))
+            let fb=f.bit(UInt(i))
             modsqr(p,ND)
             if (eb==1)
             {
@@ -839,7 +835,7 @@ final class FF {
         }
         redc(p,ND)
     }
-    static func igcd(_ x:Int32,_ y:Int32) -> Int32
+    static func igcd(_ x:Int,_ y:Int) -> Int
     { /* integer GCD, returns GCD of x and y */
         var xx=x;
         var yy=y;
@@ -853,7 +849,7 @@ final class FF {
     }
    
     /* quick and dirty check for common factor with n */
-    func cfactor(_ s: Int32) -> Bool
+    func cfactor(_ s: Int) -> Bool
     {
         let n=length;
         let x=FF(n);
@@ -870,7 +866,7 @@ final class FF {
             while ( (!x.iszilch()) && x.parity()==0) {x.shr()}
         } while (FF.comp(x,y)>0);
         let g=x.v[0].get(0);
-        let r=FF.igcd(s,g);
+        let r=FF.igcd(s,Int(g));
         
         if (r>1) {return true}
         return false;
@@ -888,7 +884,7 @@ final class FF {
         let unity=FF(n)
         let nm1=FF(n)
     
-        let sf:Int32=4849845; /* 3*5*.. *19 */
+        let sf:Int=4849845; /* 3*5*.. *19 */
         p.norm();
         if (p.cfactor(sf)) {return false}
         unity.one();

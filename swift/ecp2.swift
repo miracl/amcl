@@ -60,7 +60,7 @@ final class ECP2 {
         z.zero()
     }
     /* Conditional move of Q to P dependant on d */
-    func cmove(_ Q:ECP2,_ d:Int32)
+    func cmove(_ Q:ECP2,_ d:Int)
     {
         x.cmove(Q.x,d);
         y.cmove(Q.y,d);
@@ -73,11 +73,11 @@ final class ECP2 {
     }
     
     /* return 1 if b==c, no branching */
-    private static func teq(_ b:Int32,_ c:Int32) -> Int32
+    private static func teq(_ b:Int32,_ c:Int32) -> Int
     {
         var x=b^c
         x-=1  // if x=0, x now -1
-        return ((x>>31)&1)
+        return Int((x>>31)&1)
     }
     /* Constant time select from pre-computed table */
     func select(_ W:[ECP2],_ b:Int32)
@@ -99,7 +99,7 @@ final class ECP2 {
     
         MP.copy(self)
         MP.neg()
-        cmove(MP,(m&1))
+        cmove(MP,Int(m&1))
     }
  
     /* Test if P == Q */
@@ -504,7 +504,7 @@ final class ECP2 {
         for i in 0 ..< nb
         {
             w[i]=Int8(t.lastbits(5)-16)
-            t.dec(Int32(w[i])); t.norm()
+            t.dec(Int(w[i])); t.norm()
             t.fshr(4)
         }
         w[nb]=Int8(t.lastbits(5))
@@ -587,10 +587,11 @@ final class ECP2 {
     /* convert exponent to signed 1-bit window */
         for j in 0 ..< nb
         {
-            for i in 0 ..< 4
-            {
-				a[i]=(t[i].lastbits(2)-2)
-				t[i].dec(a[i]); t[i].norm()
+            for i in 0 ..< 4 {
+				a[i]=Int32(t[i].lastbits(2)-2)
+                
+				t[i].dec(Int(a[i]))
+                t[i].norm()
 				t[i].fshr(1)
             }
             w[j]=Int8(8*a[0]+4*a[1]+2*a[2]+a[3])

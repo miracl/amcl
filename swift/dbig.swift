@@ -25,34 +25,34 @@
 //
 
 final class DBIG{
-    var w=[Int32](repeating: 0,count: ROM.DNLEN)
+    var w=[Chunk](repeating: 0,count: ROM.DNLEN)
     init() {
         for i in 0 ..< ROM.DNLEN {w[i]=0}
     }
-    init(_ x: Int32)
+    init(_ x: Int)
     {
-        w[0]=x;
+        w[0]=Chunk(x);
         for i in 1 ..< ROM.DNLEN {w[i]=0}
     }
     init(_ x: BIG)
     {
         for i in 0 ..< ROM.NLEN {w[i]=x.w[i]}
         w[ROM.NLEN-1]=x.w[ROM.NLEN-1]&ROM.BMASK
-        w[ROM.NLEN]=x.w[ROM.NLEN-1]>>ROM.BASEBITS
+        w[ROM.NLEN]=x.w[ROM.NLEN-1]>>Chunk(ROM.BASEBITS)
         for i in ROM.NLEN+1 ..< ROM.DNLEN {w[i]=0}
     }
     init(_ x: DBIG)
     {
         for i in 0 ..< ROM.DNLEN {w[i]=x.w[i]}
     }
-    init(_ x: [Int32])
+    init(_ x: [Chunk])
     {
         for i in 0 ..< ROM.DNLEN {w[i]=x[i]}
     }
 
-    func cmove(_ g: DBIG,_ d: Int32)
+    func cmove(_ g: DBIG,_ d: Int)
     {
-        let b:Int32 = -d;
+        let b = Chunk(-d)
     
         for i in 0 ..< ROM.DNLEN
         {
@@ -74,36 +74,36 @@ final class DBIG{
             w[i]-=x.w[i]
         }
     }
-    func muladd(_ x: Int32,_ y: Int32,_ c: Int32,_ i: Int) -> Int32
+/*    func muladd(_ x: Int32,_ y: Int32,_ c: Int32,_ i: Int) -> Int32
     {
         let prod:Int64 = Int64(x)*Int64(y)+Int64(c)+Int64(w[i])
         w[i]=Int32(prod&Int64(ROM.BMASK))
         return Int32(prod>>Int64(ROM.BASEBITS))
-    }
+    } */
     /* general shift left */
-    func shl(_ k: Int)
+    func shl(_ k: UInt)
     {
-        let n=Int32(k)%ROM.BASEBITS
-        let m=(k/Int(ROM.BASEBITS))
-        w[ROM.DNLEN-1]=((w[ROM.DNLEN-1-m]<<n))|(w[ROM.DNLEN-m-2]>>(ROM.BASEBITS-n))
+        let n=k%ROM.BASEBITS
+        let m=Int(k/ROM.BASEBITS)
+        w[ROM.DNLEN-1]=((w[ROM.DNLEN-1-m]<<Chunk(n)))|(w[ROM.DNLEN-m-2]>>Chunk(ROM.BASEBITS-n))
         for i in (m+1...ROM.DNLEN-2).reversed()
      //   for var i=ROM.DNLEN-2;i>m;i--
         {
-            w[i]=((w[i-m]<<n)&ROM.BMASK)|(w[i-m-1]>>(ROM.BASEBITS-n))
+            w[i]=((w[i-m]<<Chunk(n))&ROM.BMASK)|(w[i-m-1]>>Chunk(ROM.BASEBITS-n))
         }
-        w[m]=(w[0]<<n)&ROM.BMASK
+        w[m]=(w[0]<<Chunk(n))&ROM.BMASK
         for i in 0 ..< m {w[i]=0}
     }
     /* general shift right */
-    func shr(_ k: Int)
+    func shr(_ k: UInt)
     {
-        let n=Int32(k)%ROM.BASEBITS
-        let m=(k/Int(ROM.BASEBITS))
+        let n=k%ROM.BASEBITS
+        let m=Int(k/ROM.BASEBITS)
         for i in 0 ..< ROM.DNLEN-m-1
         {
-            w[i]=(w[m+i]>>n)|((w[m+i+1]<<(ROM.BASEBITS-n))&ROM.BMASK)
+            w[i]=(w[m+i]>>Chunk(n))|((w[m+i+1]<<Chunk(ROM.BASEBITS-n))&ROM.BMASK)
         }
-        w[ROM.DNLEN - m - 1]=w[ROM.DNLEN-1]>>n
+        w[ROM.DNLEN - m - 1]=w[ROM.DNLEN-1]>>Chunk(n)
         for i in ROM.DNLEN - m ..< ROM.DNLEN {w[i]=0}
     }
     /* Compare a and b, return 0 if a==b, -1 if a<b, +1 if a>b. Inputs must be normalised */
@@ -121,12 +121,12 @@ final class DBIG{
     /* normalise BIG - force all digits < 2^BASEBITS */
     func norm()
     {
-        var carry:Int32=0
+        var carry:Chunk=0
         for i in 0 ..< ROM.DNLEN-1
         {
             let d=w[i]+carry
             w[i]=d&ROM.BMASK
-            carry=d>>ROM.BASEBITS
+            carry=d>>Chunk(ROM.BASEBITS)
         }
         w[ROM.DNLEN-1]+=carry
     }
@@ -136,7 +136,7 @@ final class DBIG{
         var k:Int=0
         norm()
         let m=DBIG(c)
-	let r=DBIG(0)
+        let r=DBIG(0)
     
         if DBIG.comp(self,m)<0 {return BIG(self)}
     
@@ -154,7 +154,7 @@ final class DBIG{
 		r.copy(self)
 		r.sub(m)
 		r.norm()
-		cmove(r,Int32(1-((r.w[ROM.DNLEN-1]>>Int32(ROM.CHUNK-1))&1)))
+		cmove(r,Int(1-((r.w[ROM.DNLEN-1]>>Chunk(ROM.CHUNK-1))&1)))
 /*
 
             if (DBIG.comp(self,m)>=0)
@@ -173,8 +173,8 @@ final class DBIG{
         let m=DBIG(c)
         let a=BIG(0)
         let e=BIG(1)
-	let r=BIG(0)
-	let dr=DBIG(0)
+        let r=BIG(0)
+        let dr=DBIG(0)
 
         norm()
     
@@ -193,7 +193,7 @@ final class DBIG{
 		dr.copy(self)
 		dr.sub(m)
 		dr.norm()
-		let d=Int32(1-((dr.w[ROM.DNLEN-1]>>Int32(ROM.CHUNK-1))&1))
+		let d=Int(1-((dr.w[ROM.DNLEN-1]>>Chunk(ROM.CHUNK-1))&1))
 		cmove(dr,d)
 		r.copy(a)
 		r.add(e)
@@ -213,20 +213,20 @@ final class DBIG{
     }
     
     /* split DBIG at position n, return higher half, keep lower half */
-    func split(_ n: Int32) -> BIG
+    func split(_ n: UInt) -> BIG
     {
         let t=BIG(0)
         let m=n%ROM.BASEBITS
-        var carry=w[ROM.DNLEN-1]<<(ROM.BASEBITS-m)
+        var carry=w[ROM.DNLEN-1]<<Chunk(ROM.BASEBITS-m)
     
         for i in (ROM.NLEN-1...ROM.DNLEN-2).reversed()
       //  for var i=ROM.DNLEN-2;i>=ROM.NLEN-1;i--
         {
-            let nw=(w[i]>>m)|carry;
-            carry=(w[i]<<(ROM.BASEBITS-m))&ROM.BMASK;
+            let nw=(w[i]>>Chunk(m))|carry;
+            carry=(w[i]<<Chunk(ROM.BASEBITS-m))&ROM.BMASK;
             t.set(i-ROM.NLEN+1,nw);
         }
-        w[ROM.NLEN-1]&=Int32((Int32(1)<<m)-1);
+        w[ROM.NLEN-1]&=((1<<Chunk(m))-1);
         return t;
     }
     /* return number of bits */
@@ -254,7 +254,7 @@ final class DBIG{
     //    for var i=len-1;i>=0;i--
         {
             let b = DBIG(self)
-            b.shr(i*4)
+            b.shr(UInt(i*4))
             let n=String(b.w[0]&15,radix:16,uppercase:false)
             s+=n
         }

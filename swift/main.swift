@@ -5,8 +5,9 @@
 //  Copyright (c) 2015 Michael Scott. All rights reserved.
 //
 
+BenchtestPAIR()
+BenchtestEC()
 TestRSA()
 TestECDH()
 TestMPIN()
-//BenchtestEC()
-//BenchtestPAIR()
+

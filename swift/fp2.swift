@@ -35,7 +35,7 @@ final class FP2
     private var b:FP
 
     /* Constructors */
-    init(_ c: Int32)
+    init(_ c: Int)
     {
         a=FP(c)
         b=FP(0)
@@ -78,7 +78,7 @@ final class FP2
         return (a.iszilch() && b.iszilch())
     }
     
-    func cmove(_ g:FP2,_ d:Int32)
+    func cmove(_ g:FP2,_ d:Int)
     {
         a.cmove(g.a,d)
         b.cmove(g.b,d)
@@ -190,7 +190,7 @@ final class FP2
     }
     
     /* self*=i, where i is an int */
-    func imul(_ c:Int32)
+    func imul(_ c:Int)
     {
         a.imul(c);
         b.imul(c);

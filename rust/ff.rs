@@ -29,6 +29,7 @@ use big::BIG;
 //use dbig::DBIG;
 //mod rom;
 use rom;
+use rom::Chunk;
 //mod rand;
 use rand::RAND;
 //mod hash256;
@@ -71,7 +72,7 @@ impl FF {
 /* set to integer */
 	pub fn set(&mut self,m:isize) {
 		self.zero();
-		self.v[0].set(0,BIG::cast_to_chunk(m));
+		self.v[0].set(0,m as Chunk);
 	}
 
 /* copy from FF b */
@@ -231,12 +232,12 @@ impl FF {
 		}
 		for i in 0..nn-1 {
 			carry=self.v[vp+i].norm();
-			self.v[vp+i].xortop(BIG::cast_to_chunk(carry)<<rom::P_TBITS);
+			self.v[vp+i].xortop((carry as Chunk)<<rom::P_TBITS);
 			self.v[vp+i+1].inc(carry);
 		}
 		carry=self.v[vp+nn-1].norm();
 		if trunc {
-			self.v[vp+nn-1].xortop(BIG::cast_to_chunk(carry)<<rom::P_TBITS);
+			self.v[vp+nn-1].xortop((carry as Chunk)<<rom::P_TBITS);
 		}
 	}
 
@@ -262,7 +263,7 @@ impl FF {
 		for i in 0..self.length-1 {
 			let carry=self.v[i].fshl(1);
 			self.v[i].inc(delay_carry);
-			self.v[i].xortop(BIG::cast_to_chunk(carry)<<rom::P_TBITS);
+			self.v[i].xortop((carry as Chunk)<<rom::P_TBITS);
 			delay_carry=carry;
 		}
 		self.v[self.length-1].fshl(1);
@@ -275,7 +276,7 @@ impl FF {
 		let mut i=self.length-1;
 		while i>0 {
 			let carry=self.v[i].fshr(1);
-			self.v[i-1].xortop(BIG::cast_to_chunk(carry)<<rom::P_TBITS);
+			self.v[i-1].xortop((carry as Chunk)<<rom::P_TBITS);
 			i-=1;
 		}
 		self.v[0].fshr(1);

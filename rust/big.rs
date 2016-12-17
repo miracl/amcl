@@ -41,7 +41,7 @@ impl BIG {
          }
     }
 
-    pub fn new_int(x:i32) -> BIG {
+    pub fn new_int(x:isize) -> BIG {
     	let mut s= BIG::new();
     	s.w[0]=x as Chunk;
     	return s;
@@ -70,10 +70,6 @@ impl BIG {
     	for i in 0..rom::NLEN {s.w[i]=y.w[i]}
     	return s;	
     } 
-
-    pub fn cast_to_chunk(x:isize) -> Chunk {
-        return x as Chunk;
-    }
 
 	pub fn get(&self,i:usize) -> Chunk {
 		return self.w[i]; 
@@ -136,11 +132,11 @@ impl BIG {
     }
 
 /* calculate Field Excess */
-	pub fn excess(a:&BIG) ->Chunk {
+	pub fn excess(a:&BIG) -> Chunk {
 		return (a.w[rom::NLEN-1]&rom::OMASK)>>(rom::MODBITS%rom::BASEBITS)
 	}
 
-    pub fn ff_excess(a:&BIG) ->Chunk {
+    pub fn ff_excess(a:&BIG) -> Chunk {
         return (a.w[rom::NLEN-1]&rom::OMASK)>>(rom::P_MB)
     }
 
@@ -233,10 +229,11 @@ impl BIG {
         return (top,bot);
     }
 
-/* normalise BIG - force all digits < 2^rom::BASEBITS */
+/* 
+alise BIG - force all digits < 2^rom::BASEBITS */
     pub fn norm(&mut self) -> isize
     {
-        let mut carry=BIG::cast_to_chunk(0);
+        let mut carry=0 as Chunk;
         for i in 0 ..rom::NLEN-1 {
             let d=self.w[i]+carry;
             self.w[i]=d&rom::BMASK;
@@ -248,7 +245,7 @@ impl BIG {
 
 /* Conditional swap of two bigs depending on d using XOR - no branches */
 	pub fn cswap(&mut self,b: &mut BIG,d: isize) {
-		let mut c=BIG::cast_to_chunk(d);
+		let mut c= d as Chunk;
 		c=!(c-1);
 		for i in 0 ..rom::NLEN {
 			let t=c&(self.w[i]^b.w[i]);
@@ -258,7 +255,7 @@ impl BIG {
 	}
 
 	pub fn cmove(&mut self,g:&BIG,d: isize) {
-		let b=BIG::cast_to_chunk(-d);
+		let b= -d as Chunk;
 		for i in 0 ..rom::NLEN {
 			self.w[i]^=(self.w[i]^g.w[i])&b;
 		}
@@ -369,7 +366,7 @@ impl BIG {
 
     pub fn inc(&mut self,x:isize) {
     	self.norm();
-    	self.w[0]+=BIG::cast_to_chunk(x);
+    	self.w[0]+=x as Chunk; 
     }
 
 /* return self-x */
@@ -398,13 +395,13 @@ impl BIG {
 /* self-=x, where x is int */
 	pub fn dec(&mut self,x:isize) {
 		self.norm();
-		self.w[0]-=BIG::cast_to_chunk(x);
+		self.w[0]-= x as Chunk;
 	} 
 
 /* self*=x, where x is small int<NEXCESS */
 	pub fn imul(&mut self,c: isize) {
 		for i in 0 ..rom::NLEN { 
-			self.w[i]*=BIG::cast_to_chunk(c);
+			self.w[i]*=c as Chunk;
 		}
 	}
 
@@ -439,13 +436,11 @@ impl BIG {
 
 /* self*=x, where x is >NEXCESS */
     pub fn pmul(&mut self,c: isize) -> Chunk {
-        let mut carry=BIG::cast_to_chunk(0);
+        let mut carry=0 as Chunk;
         self.norm();
         for i in 0 ..rom::NLEN {
             let ak=self.w[i];
-            self.w[i]=0;
-            //carry=self.muladd(ak,BIG::cast_to_chunk(c),carry,i);
-            let tuple=BIG::muladd(ak,BIG::cast_to_chunk(c),carry,self.w[i]);
+            let tuple=BIG::muladd(ak,c as Chunk,carry,0 as Chunk);
             carry=tuple.0; self.w[i]=tuple.1;
         }
         return carry;
@@ -455,11 +450,9 @@ impl BIG {
     pub fn pxmul(&mut self,c: isize) -> DBIG
     {
         let mut m=DBIG::new();
-        let mut carry=BIG::cast_to_chunk(0);
+        let mut carry=0 as Chunk;
         for j in 0 ..rom::NLEN {
-            //carry=m.muladd(self.w[j],BIG::cast_to_chunk(c),carry,j);
-
-            let tuple=BIG::muladd(self.w[j],BIG::cast_to_chunk(c),carry,m.w[j]);
+            let tuple=BIG::muladd(self.w[j],c as Chunk,carry,m.w[j]);
             carry=tuple.0; m.w[j]=tuple.1; 
         }
         m.w[rom::NLEN]=carry;
@@ -469,7 +462,7 @@ impl BIG {
 /* divide by 3 */
     pub fn div3(&mut self) -> Chunk
     {
-        let mut carry=BIG::cast_to_chunk(0);
+        let mut carry=0 as Chunk;
         self.norm();
         let base=1<<rom::BASEBITS;
         for i in (0 ..rom::NLEN).rev() {
@@ -484,11 +477,9 @@ impl BIG {
     pub fn smul(a: &BIG,b: &BIG) -> BIG {
         let mut c=BIG::new();
         for i in 0 ..rom::NLEN {
-            let mut carry=BIG::cast_to_chunk(0);
+            let mut carry=0 as Chunk; 
             for j in 0 ..rom::NLEN {
                 if i+j<rom::NLEN {
-                    //carry=c.muladd(a.w[i],b.w[j],carry,i+j);
-
                     let tuple=BIG::muladd(a.w[i],b.w[j],carry,c.w[i+j]);
                     carry=tuple.0; c.w[i+j]=tuple.1;
                 }
@@ -566,7 +557,7 @@ impl BIG {
 /* return n last bits */
     pub fn lastbits(&mut self,n: usize) -> isize
     {
-        let msk =BIG::cast_to_chunk((1<<n)-1);
+        let msk =  ((1<<n)-1) as Chunk; 
         self.norm();
         return (self.w[0]&msk) as isize;
     }
@@ -686,7 +677,7 @@ impl BIG {
                 r=rng.getbyte()
             } else {r>>=1}
 
-            let b=BIG::cast_to_chunk((r as isize)&1);
+            let b= (r as Chunk)&1; 
             m.shl(1); m.w[0]+=b;// m.inc(b)
             j+=1; j&=7; 
         }
@@ -703,7 +694,7 @@ impl BIG {
                 r=rng.getbyte();
             } else {r>>=1}
 
-            let b=BIG::cast_to_chunk((r as isize)&1);
+            let b= (r as Chunk)&1;
             d.shl(1); d.w[0]+=b; // m.inc(b);
             j+=1; j&=7; 
         }
@@ -923,13 +914,14 @@ impl BIG {
         b.norm();
         return b;
     }
+    
 
 
 /* return a*b as DBIG */
 #[cfg(D64)]
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
-        let mut carry =BIG::cast_to_chunk(0);
+        let mut carry = 0 as Chunk;
 
         for i in 0 ..rom::NLEN {
             carry=0;
@@ -946,7 +938,7 @@ impl BIG {
 #[cfg(D64)]
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();
-        let mut carry =BIG::cast_to_chunk(0);
+        let mut carry = 0 as Chunk;
 
         for i in 0 ..rom::NLEN {
             carry=0;
@@ -973,8 +965,8 @@ impl BIG {
     fn monty(d: &mut DBIG) -> BIG {
         let mut b=BIG::new();     
         let md=BIG::new_ints(&rom::MODULUS);
-        let mut carry=BIG::cast_to_chunk(0);
-        let mut m=BIG::cast_to_chunk(0);
+        let mut carry=0 as Chunk; 
+        let mut m=0 as Chunk;
         for i in 0 ..rom::NLEN {
             if rom::MCONST==-1 { 
                 m=(-d.w[i])&rom::BMASK;
@@ -990,8 +982,6 @@ impl BIG {
             for j in 0 ..rom::NLEN {
                 let tuple=BIG::muladd(m,md.w[j],carry,d.w[i+j]);
                 carry=tuple.0; d.w[i+j]=tuple.1;
-                //carry,d.w[i+j]=muladd(m,md.w[j],carry,d.w[i+j])
-                //carry=d.muladd(m,md.w[j],carry,i+j)
             }
             d.w[rom::NLEN+i]+=carry;
         }
@@ -1027,7 +1017,6 @@ impl BIG {
             let mut b=BIG::new();
             for i in 0 ..rom::NLEN {
                 let x=d.w[i];
-                //d.w[rom::NLEN+i]+=d.muladd(x,rom::MCONST-1,x,rom::NLEN+i-1);
 
                 let tuple=BIG::muladd(x,rom::MCONST-1,x,d.w[rom::NLEN+i-1]);
                 d.w[rom::NLEN+i]+=tuple.0; d.w[rom::NLEN+i-1]=tuple.1;

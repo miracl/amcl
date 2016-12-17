@@ -29,8 +29,8 @@ import Foundation
 
 public func BenchtestEC()
 {
-    let pub=rsa_public_key(ROM.FFLEN)
-    let priv=rsa_private_key(ROM.HFLEN)
+    let pub=rsa_public_key(Int(ROM.FFLEN))
+    let priv=rsa_private_key(Int(ROM.HFLEN))
     var C=[UInt8](repeating: 0,count: RSA.RFS)
     var P=[UInt8](repeating: 0,count: RSA.RFS)
     var M=[UInt8](repeating: 0,count: RSA.RFS)
@@ -156,3 +156,6 @@ public func BenchtestEC()
        print("All tests pass")
     }
 }
+
+//BenchtestEC()
+

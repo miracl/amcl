@@ -12,7 +12,10 @@ file from the C version of the library for more curves.
 Three example API files are provided, mpin.rs which 
 supports our M-Pin (tm) protocol, ecdh.rs which supports elliptic 
 curve key exchange, digital signature and public key crypto, and rsa.rs
-which supports the RSA method.
+which supports the RSA method. The first can be tested using the 
+TestMPIN.rs driver program, the second can be tested using TestECDH.rs,
+and the third with TestRSA.rs
+
 
 In the rom32.rs/rom64.rs file you must provide the curve constants. Several 
 examples are provided there, if you are willing to use one of these.

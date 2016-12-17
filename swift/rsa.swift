@@ -47,7 +47,7 @@ final public class rsa_private_key {
 
 final public class rsa_public_key
 {
-    var e:Int32
+    var e:Int
     var n:FF
     
     public init(_ m:Int)
@@ -59,12 +59,12 @@ final public class rsa_public_key
 
 final public class RSA {
     
-    static public let RFS=Int(ROM.MODBYTES)*ROM.FFLEN
+    static public let RFS=Int(ROM.MODBYTES*ROM.FFLEN)
     static public let SHA256=32
     static public let SHA384=48
     static public let SHA512=64
     
-    static public let HASH_TYPE=SHA256
+    static public let HASH_TYPE=SHA384
     
     /* Hash number (optional) and string to array size of Bigs */
  
@@ -99,7 +99,7 @@ final public class RSA {
 
     /* generate an RSA key pair */
     
-    static public func KEY_PAIR(_ rng: RAND,_ e:Int32,_ PRIV:rsa_private_key,_ PUB:rsa_public_key)
+    static public func KEY_PAIR(_ rng: RAND,_ e:Int,_ PRIV:rsa_private_key,_ PUB:rsa_public_key)
     { /* IEEE1363 A16.11/A16.12 more or less */
     
         let n=PUB.n.getlen()/2;
@@ -193,7 +193,7 @@ final public class RSA {
     static public func PKCS15(_ sha:Int,_ m:[UInt8],_ w:inout [UInt8])->Bool
     {
         let hlen=sha
-        let olen=ROM.FF_BITS/8
+        let olen=Int(ROM.FF_BITS/8)
         let idlen=19;
         
         if olen<idlen+hlen+10 {return false}

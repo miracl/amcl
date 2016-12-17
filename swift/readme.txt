@@ -1,30 +1,61 @@
 AMCL is very simple to build for Swift.
 
-First - decide the modulus and curve type you want to use. Edit rom.swift 
-where indicated (3 places). You will probably want to use one of the curves whose 
-details are already in there.
+
+This version supports both 32-bit and 64-bit builds. 
+If your processor and 
+operating system are both 64-bit, a 64-bit build 
+will probably be best. 
+Otherwise use a 32-bit build.
+
+
+First - decide the modulus and curve type you want to use. Edit rom32.swift 
+
+or rom64.swift where indicated. You will probably want to use one of the 
+curves 
+whose details are already in there. You might want to "raid" the 
+rom
+file from the C version of the library for more curves.
 
 Three example API files are provided, mpin.swift which 
 supports our M-Pin (tm) protocol, ecdh.swift which supports elliptic 
 curve key exchange, digital signature and public key crypto, and rsa.swift
 which supports the RSA method. The first  can be tested using the 
-TestMPIN.swift driver programs, the second can be tested using TestECDH.swift,
+TestMPIN.swift driver programs, the second can be tested using TestECDH.swift, 
+
 and the third with TestRSA.swift
 
-In the rom.swift file you must provide the curve constants. Several examples
-are provided there, if you are willing to use one of these.
+In the rom32.swift/rom64.swift file you must provide the curve constants. 
 
-To run inside Xcode simply copy all of the .swift files into a project, 
-and execute the main program. This runs TestRSA, TestECDH and TestMPIN 
-in that order.
+Several examples are provided there, if you are willing to use one of these.
+
+For a quick jumpstart:-
 
 
-For a quick jumpstart from a terminal window - first edit TestMPIN.swift, TestRSA.swift and TestECDH.swift
-where indicated
+Copy rom32.swift to rom.swift for a 32-bit build.
 
-From a terminal window in a /lib directory create a dynamic library using the command
 
-swiftc big.swift rom.swift dbig.swift rand.swift hash256.swift hash384.swift hash512.swift fp.swift fp2.swift ecp.swift ecp2.swift aes.swift gcm.swift fp4.swift fp12.swift ff.swift pair.swift rsa.swift ecdh.swift mpin.swift -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name amcl
+
+If using Xcode, load all of the swift files into a project. In "Build 
+Options",
+under "Swift Compiler - Custom Flags", set the compilation 
+condition D32. Then 
+build the project. 
+
+
+
+For a 64-bit build copy rom64.swift instead, and set D64 in Xcode. 
+
+Then build 
+and run the program main.swift
+
+
+
+
+Alternatively from a terminal window in a /lib directory create a dynamic 
+
+library using the command
+
+swiftc -DD32 big.swift rom.swift dbig.swift rand.swift hash256.swift hash384.swift hash512.swift fp.swift fp2.swift ecp.swift ecp2.swift aes.swift gcm.swift fp4.swift fp12.swift ff.swift pair.swift rsa.swift ecdh.swift mpin.swift -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name amcl
 
 This creates the files 
 
@@ -37,15 +68,36 @@ TestECDH.swift
 TestRSA.swift
 TestMPIN.swift
 
-And create and run the projects by issuing the commands
+
+Edit these files to uncomment the line
+
+ 
+
+import amcl
+
+ 
+
+at the start of the program, and 
+
+
+
+TestXXXX()
+
+
+
+at the end of the program
+
+
+Finally create and run the projects by issuing the commands
 
 swift -lamcl -I. TestMPIN.swift 
 swift -lamcl -I. TestECDH.swift 
 swift -lamcl -I. TestRSA.swift 
 
+
+
+
 Note that classes and methods that need to be exposed to consuming programs, 
 should be made "public" when and if needed. Here we have done this as needed 
 just for these example programs
-
-
 

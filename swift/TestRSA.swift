@@ -33,8 +33,8 @@ public func TestRSA()
 
     var message="Hello World\n"
 
-    let pub=rsa_public_key(ROM.FFLEN)
-    let priv=rsa_private_key(ROM.HFLEN)
+    let pub=rsa_public_key(Int(ROM.FFLEN))
+    let priv=rsa_private_key(Int(ROM.HFLEN))
 
     var ML=[UInt8](repeating: 0,count: RFS)
     var C=[UInt8](repeating: 0,count: RFS)

@@ -191,7 +191,7 @@ final public class MPIN
 
     // these next two functions help to implement elligator squared - http://eprint.iacr.org/2014/043
     // maps a random u to a point on the curve
-    static func map(_ u:BIG,_ cb:Int32) -> ECP
+    static func map(_ u:BIG,_ cb:Int) -> ECP
     {
         let x=BIG(u)
         let p=BIG(ROM.Modulus)
@@ -207,7 +207,7 @@ final public class MPIN
     }
 
     // returns u derived from P. Random value in range 1 to return value should then be added to u
-    static func unmap(_ u:inout BIG,_ P:ECP) -> Int32
+    static func unmap(_ u:inout BIG,_ P:ECP) -> Int
     {
         let s=P.getS()
         var r:Int32=0
@@ -221,7 +221,7 @@ final public class MPIN
             R=ECP(u,s)
             if !R.is_infinity() {break}
         }
-        return r
+        return Int(r)
     }
     
     static public func HASH_ID(_ sha:Int,_ ID:[UInt8]) -> [UInt8]
@@ -250,12 +250,12 @@ final public class MPIN
         var su=rng.getByte();
         su%=2
     
-        let W=MPIN.map(u,Int32(su))
+        let W=MPIN.map(u,Int(su))
         P.sub(W);
         let sv=P.getS();
         let rn=MPIN.unmap(&v,P)
         let m=rng.getByte();
-        let incr:Int32=1+Int32(m)%rn
+        let incr=1+Int(m)%rn
         v.inc(incr)
         E[0]=(su+UInt8(2*sv))
         u.toBytes(&T)
@@ -279,8 +279,8 @@ final public class MPIN
     
         let su=D[0]&1
         let sv=(D[0]>>1)&1
-        let W=map(u,Int32(su))
-        let P=map(v,Int32(sv))
+        let W=map(u,Int(su))
+        let P=map(v,Int(sv))
         P.add(W)
         u=P.getX()
         v=P.getY()

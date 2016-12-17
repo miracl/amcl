@@ -50,7 +50,7 @@ final class ECP {
     }
  
     /* Conditional swap of P and Q dependant on d */
-    private func cswap(_ Q: ECP,_ d:Int32)
+    private func cswap(_ Q: ECP,_ d:Int)
     {
         x.cswap(Q.x,d);
         if ROM.CURVETYPE != ROM.MONTGOMERY {y.cswap(Q.y,d)}
@@ -67,7 +67,7 @@ final class ECP {
     }
     
     /* Conditional move of Q to P dependant on d */
-    private func cmove(_ Q: ECP,_ d:Int32)
+    private func cmove(_ Q: ECP,_ d:Int)
     {
         x.cmove(Q.x,d);
         if ROM.CURVETYPE != ROM.MONTGOMERY {y.cmove(Q.y,d)}
@@ -82,11 +82,11 @@ final class ECP {
     }
     
     /* return 1 if b==c, no branching */
-    private static func teq(_ b: Int32,_ c:Int32) -> Int32
+    private static func teq(_ b: Int32,_ c:Int32) -> Int
     {
         var x=b^c
         x-=1  // if x=0, x now -1
-        return ((x>>31)&1)
+        return Int((x>>31)&1)
     }
  
     /* self=P */
@@ -131,7 +131,7 @@ final class ECP {
     
         MP.copy(self)
         MP.neg()
-        cmove(MP,(m&1))
+        cmove(MP,Int(m&1))
     }
     
     /* Test P == Q */
@@ -247,7 +247,7 @@ final class ECP {
     }
     
     /* set (x,y) from BIG and a bit */
-    init(_ ix: BIG,_ s:Int32)
+    init(_ ix: BIG,_ s:Int)
     {
         x=FP(ix)
         let rhs=ECP.RHS(x)
@@ -320,7 +320,7 @@ final class ECP {
     }
     
     /* get sign of Y */
-    func getS() -> Int32
+    func getS() -> Int
     {
         affine()
         let y=getY()
@@ -717,7 +717,7 @@ final class ECP {
     func pinmul(_ e:Int32,_ bts:Int32) -> ECP
     {
         if ROM.CURVETYPE==ROM.MONTGOMERY
-            {return self.mul(BIG(e))}
+            {return self.mul(BIG(Int(e)))}
         else
         {
             let P=ECP()
@@ -726,7 +726,7 @@ final class ECP {
     
             for i in (0...bts-1).reversed()
             {
-				let b=(e>>i)&1;
+				let b=Int(e>>i)&1;
 				P.copy(R1);
 				P.add(R0);
 				R0.cswap(R1,b);
@@ -759,7 +759,7 @@ final class ECP {
             
             for i in (0...nb-2).reversed()
             {
-				let b=e.bit(i)
+				let b=e.bit(UInt(i))
                 //print("\(b)")
 				P.copy(R1)
 				P.dadd(R0,D)
@@ -816,7 +816,8 @@ final class ECP {
             for i in 0 ..< nb
             {
 				w[i]=Int8(t.lastbits(5)-16);
-				t.dec(Int32(w[i])); t.norm();
+				t.dec(Int(w[i]));
+                t.norm();
 				t.fshr(4);
             }
             w[nb]=Int8(t.lastbits(5))

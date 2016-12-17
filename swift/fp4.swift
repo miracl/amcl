@@ -33,7 +33,7 @@ final class FP4 {
     private final var b:FP2
 
     /* constructors */
-    init(_ c:Int32)
+    init(_ c:Int)
     {
         a=FP2(c)
         b=FP2(0)
@@ -168,7 +168,7 @@ final class FP4 {
         b.mul(s)
     }
     /* self*=c where c is int */
-    func imul(_ c:Int32)
+    func imul(_ c:Int)
     {
         a.imul(c)
         b.imul(c)
@@ -344,7 +344,7 @@ final class FP4 {
         //for var i=nb-1;i>=0;i--
         while i>=0
         {
-            if (v.bit(i) != 1)
+            if (v.bit(UInt(i)) != 1)
             {
 				t.copy(b)
 				conj()

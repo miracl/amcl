@@ -26,14 +26,14 @@
 //
 
 final class BIG{
-    var w=[Int32](repeating: 0,count: ROM.NLEN)
+    var w=[Chunk](repeating: 0,count: ROM.NLEN)
 /* Constructors */
     init() {
         for i in 0 ..< ROM.NLEN {w[i]=0}
     }
-    init(_ x: Int32)
+    init(_ x: Int)
     {
-        w[0]=x;
+        w[0]=Chunk(x);
         for i in 1 ..< ROM.NLEN {w[i]=0}
     }
     init(_ x: BIG)
@@ -44,32 +44,123 @@ final class BIG{
     {
         for i in 0 ..< ROM.NLEN {w[i]=x.w[i]}
     }
-    init(_ x: [Int32])
+    init(_ x: [Chunk])
     {
         for i in 0 ..< ROM.NLEN {w[i]=x[i]}
     }
-    func get(_ i: Int) -> Int32
+    func get(_ i: Int) -> Chunk
     {
         return w[i]
     }
-    func set(_ i: Int,_ x: Int32)
+    func set(_ i: Int,_ x: Chunk)
     {
         w[i]=x
     }
-    func xortop(_ x: Int32)
+    func xortop(_ x: Chunk)
     {
         w[ROM.NLEN-1]^=x
     }
-    func ortop(_ x: Int32)
+    func ortop(_ x: Chunk)
     {
         w[ROM.NLEN-1]|=x
     }
 /* calculate Field Excess */
-    static func EXCESS(_ a: BIG) -> Int32
+    static func EXCESS(_ a: BIG) -> Chunk
     {
-        return ((a.w[ROM.NLEN-1] & ROM.OMASK)>>Int32(ROM.MODBITS%ROM.BASEBITS))
+        return ((a.w[ROM.NLEN-1] & ROM.OMASK)>>Chunk(ROM.MODBITS%ROM.BASEBITS))
     }
-/* test for zero */
+    static func FF_EXCESS(_ a: BIG) -> Chunk
+    {
+        return ((a.w[ROM.NLEN-1] & ROM.OMASK)>>Chunk(ROM.P_MBITS%ROM.BASEBITS))
+    }
+#if D32
+    static func pexceed(_ a: BIG,_ b : BIG) -> Bool
+    {
+        let ea=BIG.EXCESS(a)
+        let eb=BIG.EXCESS(b)
+        if (DChunk(ea)+1)*(DChunk(eb)+1) > DChunk(ROM.FEXCESS) {return true}
+        return false;
+    }
+    static func sexceed(_ a: BIG) -> Bool
+    {
+        let ea=BIG.EXCESS(a)
+        if (DChunk(ea)+1)*(DChunk(ea)+1) > DChunk(ROM.FEXCESS) {return true}
+        return false;
+    }
+
+    static func ff_pexceed(_ a: BIG,_ b : BIG) -> Bool
+    {
+        let ea=BIG.FF_EXCESS(a)
+        let eb=BIG.FF_EXCESS(b)
+        if (DChunk(ea)+1)*(DChunk(eb)+1) > DChunk(ROM.P_FEXCESS) {return true}
+        return false;
+    }
+    static func ff_sexceed(_ a: BIG) -> Bool
+    {
+        let ea=BIG.FF_EXCESS(a)
+        if (DChunk(ea)+1)*(DChunk(ea)+1) > DChunk(ROM.P_FEXCESS) {return true}
+        return false;
+    }
+    static func muladd(_ a: Chunk,_ b: Chunk,_ c: Chunk,_ r: Chunk) -> (Chunk,Chunk)
+    {
+        let prod:DChunk = DChunk(a)*DChunk(b)+DChunk(c)+DChunk(r)
+        let bot=Chunk(prod&DChunk(ROM.BMASK))
+        let top=Chunk(prod>>DChunk(ROM.BASEBITS))
+        return (top,bot)
+    }
+#endif
+#if D64
+
+    static func pexceed(_ a: BIG,_ b : BIG) -> Bool
+    {
+        let ea=BIG.EXCESS(a)
+        let eb=BIG.EXCESS(b)
+        if (ea+1) > ROM.FEXCESS/(eb+1) {return true}
+        return false;
+    }
+    static func sexceed(_ a: BIG) -> Bool
+    {
+        let ea=BIG.EXCESS(a)
+        if (ea+1) > ROM.FEXCESS/(ea+1) {return true}
+        return false;
+    }
+    
+    static func ff_pexceed(_ a: BIG,_ b : BIG) -> Bool
+    {
+        let ea=BIG.FF_EXCESS(a)
+        let eb=BIG.FF_EXCESS(b)
+        if (ea+1) > ROM.P_FEXCESS/(eb+1) {return true}
+        return false;
+    }
+    static func ff_sexceed(_ a: BIG) -> Bool
+    {
+        let ea=BIG.FF_EXCESS(a)
+        if (ea+1) > ROM.P_FEXCESS/(ea+1) {return true}
+        return false;
+    }
+    
+    static func muladd(_ a: Chunk,_ b: Chunk,_ c: Chunk,_ r: Chunk) -> (Chunk,Chunk)
+    {
+        let x0=a&ROM.HMASK;
+        let x1=(a>>Chunk(ROM.HBITS))
+        let y0=b&ROM.HMASK;
+        let y1=(b>>Chunk(ROM.HBITS))
+        var bot=x0*y0
+        var top=x1*y1
+        let mid=x0*y1+x1*y0
+        let u0=mid&ROM.HMASK
+        let u1=(mid>>Chunk(ROM.HBITS))
+        bot=bot+(u0<<Chunk(ROM.HBITS))
+        bot+=c; bot+=r
+        top+=u1
+        let carry=bot>>Chunk(ROM.BASEBITS)
+        bot &= ROM.BMASK
+        top+=carry
+        return (top,bot)
+    }
+    
+#endif
+    /* test for zero */
     func iszilch() -> Bool
     {
         for i in 0 ..< ROM.NLEN {if w[i] != 0 {return false}}
@@ -103,9 +194,9 @@ final class BIG{
         for i in 0 ..< ROM.NLEN {w[i] = x.w[i]}
     }
 /* Conditional swap of two bigs depending on d using XOR - no branches */
-    func cswap(_ b: BIG,_ d: Int32)
+    func cswap(_ b: BIG,_ d: Int)
     {
-        var c:Int32 = d
+        var c = Chunk(d)
         c = ~(c-1)
         for i in 0 ..< ROM.NLEN
         {
@@ -114,77 +205,76 @@ final class BIG{
             b.w[i]^=t
         }
     }
-    func cmove(_ g: BIG,_ d: Int32)
+    func cmove(_ g: BIG,_ d: Int)
     {
-        let b:Int32 = -d;
-    
+        let b=Chunk(-d)
         for i in 0 ..< ROM.NLEN
         {
             w[i]^=(w[i]^g.w[i])&b;
         }
     }
 /* normalise BIG - force all digits < 2^BASEBITS */
-    func norm() -> Int32
+    func norm() -> Int
     {
-        var carry:Int32=0
+        var carry=Chunk(0);
         for i in 0 ..< ROM.NLEN-1
         {
             let d=w[i]+carry
             w[i]=d&ROM.BMASK
-            carry=d>>ROM.BASEBITS
+            carry=d>>Chunk(ROM.BASEBITS)
         }
         w[ROM.NLEN-1]+=carry
-        return (w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS))
+        return Int(w[ROM.NLEN-1]>>Chunk((8*ROM.MODBYTES)%ROM.BASEBITS))
     }
 /* Shift right by less than a word */
-    func fshr(_ k: Int) -> Int32
+    func fshr(_ k: UInt) -> Int
     {
-        let kw=Int32(k)
-        let r=w[0]&((Int32(1)<<kw)-1)
+        let kw=Chunk(k);
+        let r=w[0]&((Chunk(1)<<kw)-1)
         for i in 0 ..< ROM.NLEN-1
         {
-            w[i]=(w[i]>>kw)|((w[i+1]<<(ROM.BASEBITS-kw))&ROM.BMASK)
+            w[i]=(w[i]>>kw)|((w[i+1]<<(Chunk(ROM.BASEBITS)-kw))&ROM.BMASK)
         }
         w[ROM.NLEN-1]>>=kw;
-        return r
+        return Int(r)
     }
 /* general shift right */
-    func shr(_ k: Int)
+    func shr(_ k: UInt)
     {
-        let n=Int32(k)%ROM.BASEBITS
-        let m=(k/Int(ROM.BASEBITS))
+        let n=k%ROM.BASEBITS
+        let m=Int(k/ROM.BASEBITS)
         for i in 0 ..< ROM.NLEN-m-1
         {
-            w[i]=(w[m+i]>>n)|((w[m+i+1]<<(ROM.BASEBITS-n))&ROM.BMASK)
+            w[i]=(w[m+i]>>Chunk(n))|((w[m+i+1]<<Chunk(ROM.BASEBITS-n))&ROM.BMASK)
         }
-        w[ROM.NLEN - m - 1]=w[ROM.NLEN-1]>>n
+        w[ROM.NLEN - m - 1]=w[ROM.NLEN-1]>>Chunk(n)
         for i in ROM.NLEN - m ..< ROM.NLEN {w[i]=0}
     }
 /* Shift right by less than a word */
-    func fshl(_ k: Int) -> Int32
+    func fshl(_ k: Int) -> Int
     {
-        let kw=Int32(k)
-        w[ROM.NLEN-1]=((w[ROM.NLEN-1]<<kw))|(w[ROM.NLEN-2]>>(ROM.BASEBITS-kw))
+        let kw=Chunk(k)
+        w[ROM.NLEN-1]=((w[ROM.NLEN-1]<<kw))|(w[ROM.NLEN-2]>>(Chunk(ROM.BASEBITS)-kw))
         for i in (1...ROM.NLEN-2).reversed()
         {
-            w[i]=((w[i]<<kw)&ROM.BMASK)|(w[i-1]>>(ROM.BASEBITS-kw))
+            w[i]=((w[i]<<kw)&ROM.BMASK)|(w[i-1]>>(Chunk(ROM.BASEBITS)-kw))
         }
         w[0]=(w[0]<<kw)&ROM.BMASK
-        return (w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS))
+        return Int(w[ROM.NLEN-1]>>Chunk((8*ROM.MODBYTES)%ROM.BASEBITS))
     }
 /* general shift left */
-    func shl(_ k: Int)
+    func shl(_ k: UInt)
     {
-        let n=Int32(k)%ROM.BASEBITS
-        let m=(k/Int(ROM.BASEBITS))
+        let n=k%ROM.BASEBITS
+        let m=Int(k/ROM.BASEBITS)
         
-        w[ROM.NLEN-1]=(w[ROM.NLEN-1-m]<<n)
-        if ROM.NLEN>=m+2 {w[ROM.NLEN-1]|=(w[ROM.NLEN-m-2]>>(ROM.BASEBITS-n))}
+        w[ROM.NLEN-1]=(w[ROM.NLEN-1-m]<<Chunk(n))
+        if ROM.NLEN>=m+2 {w[ROM.NLEN-1]|=(w[ROM.NLEN-m-2]>>Chunk(ROM.BASEBITS-n))}
         for i in (m+1...ROM.NLEN-2).reversed()
         {
-            w[i]=((w[i-m]<<n)&ROM.BMASK)|(w[i-m-1]>>(ROM.BASEBITS-n))
+            w[i]=((w[i-m]<<Chunk(n))&ROM.BMASK)|(w[i-m-1]>>Chunk(ROM.BASEBITS-n))
         }
-        w[m]=(w[0]<<n)&ROM.BMASK
+        w[m]=(w[0]<<Chunk(n))&ROM.BMASK
         for i in 0 ..< m {w[i]=0}
     }
 /* return number of bits */
@@ -227,7 +317,7 @@ final class BIG{
         for i in (0...len-1).reversed()
         {
             let b = BIG(self)
-            b.shr(i*4)
+            b.shr(UInt(i*4))
             let n=String(b.w[0]&15,radix:16,uppercase:false)
             s+=n
         }
@@ -253,9 +343,9 @@ final class BIG{
         }
     }
 /* this+=x, where x is int */
-    func inc(_ x: Int32) {
+    func inc(_ x: Int) {
         norm();
-        w[0]+=x;
+        w[0]+=Chunk(x);
     }
 /* return this.x */
    	func minus(_ x: BIG) -> BIG
@@ -284,14 +374,14 @@ final class BIG{
         }
     }
 /* this-=x where x is int */
-    func dec(_ x: Int32) {
+    func dec(_ x: Int) {
         norm();
-        w[0]-=x;
+        w[0]-=Chunk(x);
     }
 /* this*=x, where x is small int<NEXCESS */
-    func imul(_ c: Int32)
+    func imul(_ c: Int)
     {
-        for i in 0 ..< ROM.NLEN {w[i]*=c}
+        for i in 0 ..< ROM.NLEN {w[i]*=Chunk(c)}
     }
 /* convert this BIG to byte array */
     func tobytearray(_ b: inout [UInt8],_ n: Int)
@@ -312,7 +402,7 @@ final class BIG{
         for i in 0 ..< Int(ROM.MODBYTES)
         {
             m.fshl(8)
-            m.w[0]+=Int32(b[i+n])&0xff    //(int)b[i+n]&0xff;
+            m.w[0]+=Chunk(b[i+n])&0xff    //(int)b[i+n]&0xff;
         }
         return m;
     }
@@ -324,44 +414,49 @@ final class BIG{
     {
         return frombytearray(b,0)
     }
-/* set this[i]+=x*y+c, and return high part */
+/* set this[i]+=x*y+c, and return high part
     func muladd(_ x: Int32,_ y: Int32,_ c: Int32,_ i: Int) -> Int32
     {
-        let prod:Int64 = Int64(x)*Int64(y)+Int64(c)+Int64(w[i])
-        w[i]=Int32(prod&Int64(ROM.BMASK))
-        return Int32(prod>>Int64(ROM.BASEBITS))
-    }
+        let prod:DChunk = DChunk(x)*DChunk(y)+DChunk(c)+DChunk(w[i])
+        w[i]=Int32(prod&DChunk(ROM.BMASK))
+        return Int32(prod>>DChunk(ROM.BASEBITS))
+    } */
+
 /* this*=x, where x is >NEXCESS */
-    func pmul(_ c: Int32) -> Int32
+    func pmul(_ c: Int) -> Chunk
     {
-        var carry:Int32=0;
+        var carry=Chunk(0);
         norm();
         for i in 0 ..< ROM.NLEN
         {
             let ak=w[i]
-            w[i]=0
-            carry=muladd(ak,c,carry,i);
+            let (top,bot)=BIG.muladd(ak,Chunk(c),carry,Chunk(0))
+            carry=top; w[i]=bot;
+            //carry=muladd(ak,Chunk(c),carry,i);
+            
         }
         return carry;
     }
 /* this*=c and catch overflow in DBIG */
-    func pxmul(_ c: Int32) -> DBIG
+    func pxmul(_ c: Int) -> DBIG
     {
         let m=DBIG()
-        var carry:Int32=0
+        var carry=Chunk(0)
         for j in 0 ..< ROM.NLEN
         {
-            carry=m.muladd(w[j],c,carry,j)
+            let (top,bot)=BIG.muladd(w[j],Chunk(c),carry,m.w[j])
+            carry=top; m.w[j]=bot
+  //          carry=m.muladd(w[j],c,carry,j)
         }
         m.w[ROM.NLEN]=carry
         return m;
     }
 /* divide by 3 */
-    func div3() -> Int32
+    func div3() -> Chunk
     {
-        var carry:Int32=0
+        var carry=Chunk(0)
         norm();
-        let base=(1<<ROM.BASEBITS);
+        let base=Chunk(1<<ROM.BASEBITS);
         for i in (0...ROM.NLEN-1).reversed()
         {
             let ak=(carry*base+w[i]);
@@ -376,10 +471,14 @@ final class BIG{
         let c=BIG()
         for i in 0 ..< ROM.NLEN
         {
-            var carry:Int32=0
+            var carry=Chunk(0)
             for j in 0 ..< ROM.NLEN
             {
-                if (i+j<ROM.NLEN) {carry=c.muladd(a.w[i],b.w[j],carry,i+j)}
+                if (i+j<ROM.NLEN) {
+                    let (top,bot)=BIG.muladd(a.w[i],b.w[j],carry,c.w[i+j])
+                    carry=top; c.w[i+j]=bot
+                    //carry=c.muladd(a.w[i],b.w[j],carry,i+j)
+                }
             }
         }
         return c;
@@ -396,18 +495,18 @@ final class BIG{
         return 0;
     }
 /* set x = x mod 2^m */
-    func mod2m(_ m: Int)
+    func mod2m(_ m: UInt)
     {
-        let wd=m/Int(ROM.BASEBITS)
-        let bt=Int32(m)%ROM.BASEBITS
-        let msk=(1<<bt)-1;
+        let wd=Int(m/ROM.BASEBITS)
+        let bt=m%ROM.BASEBITS
+        let msk=Chunk(1<<bt)-1;
         w[wd]&=msk;
         for i in wd+1 ..< ROM.NLEN {w[i]=0}
     }
 /* Arazi and Qi inversion mod 256 */
-    static func invmod256(_ a: Int32) -> Int32
+    static func invmod256(_ a: Int) -> Int
     {
-        var t1:Int32=0
+        var t1:Int=0
         var c=(a>>1)&1
         t1+=c
         t1&=1
@@ -440,24 +539,24 @@ final class BIG{
         return U
     }
 /* return parity */
-    func parity() -> Int32
+    func parity() -> Int
     {
-        return Int32(w[0]%2)
+        return Int(w[0]%2)
     }
     
 /* return n-th bit */
-    func bit(_ n: Int) -> Int32
+    func bit(_ n: UInt) -> Int
     {
-        if ((w[n/Int(ROM.BASEBITS)]&(Int32(1)<<(Int32(n)%ROM.BASEBITS)))>0) {return 1;}
+        if ((w[Int(n/ROM.BASEBITS)]&(1<<Chunk(n%ROM.BASEBITS)))>0) {return 1;}
         else {return 0;}
     }
     
     /* return n last bits */
-    func lastbits(_ n: Int) -> Int32
+    func lastbits(_ n: UInt) -> Int
     {
-        let msk=(1<<Int32(n))-1;
+        let msk=(1<<Chunk(n))-1;
         norm();
-        return Int32((w[0])&msk)
+        return Int((w[0])&msk)
     }
 /* a=1/a mod 2^256. This is very fast! */
     func invmod2m()
@@ -466,9 +565,9 @@ final class BIG{
         var b=BIG()
         let c=BIG()
     
-        U.inc(BIG.invmod256(Int32(lastbits(8))))
+        U.inc(BIG.invmod256(lastbits(8)))
     
-        var i=8
+        var i=UInt(8)
         while (i<ROM.BIGBITS)
         {
             b.copy(self)
@@ -499,7 +598,7 @@ final class BIG{
     func mod(_ m: BIG)
     {
         var k=0
-	let r=BIG(0)
+        let r=BIG(0)
         norm()
         if (BIG.comp(self,m)<0) {return}
         repeat
@@ -515,7 +614,7 @@ final class BIG{
 		r.copy(self)
 		r.sub(m)
 		r.norm()
-		cmove(r,Int32(1-((r.w[ROM.NLEN-1]>>Int32(ROM.CHUNK-1))&1)))
+		cmove(r,Int(1-((r.w[ROM.NLEN-1]>>Chunk(ROM.CHUNK-1))&1)))
 /*
             if (BIG.comp(self,m)>=0)
             {
@@ -532,7 +631,7 @@ final class BIG{
         norm()
         let e=BIG(1)
         let b=BIG(self)
-	let r=BIG(0)
+        let r=BIG(0)
         zero()
     
         while (BIG.comp(b,m)>=0)
@@ -550,7 +649,7 @@ final class BIG{
 		r.copy(b)
 		r.sub(m)
 		r.norm()
-		let d=Int32(1-((r.w[ROM.NLEN-1]>>Int32(ROM.CHUNK-1))&1))
+		let d=Int(1-((r.w[ROM.NLEN-1]>>Chunk(ROM.CHUNK-1))&1))
 		b.cmove(r,d)
 		r.copy(self)
 		r.add(e)
@@ -579,7 +678,7 @@ final class BIG{
             if (j==0) {r=rng.getByte()}
             else {r>>=1}
     
-            let b=Int32(r&1);
+            let b=Chunk(r&1);
             m.shl(1); m.w[0]+=b;// m.inc(b);
             j += 1; j&=7;
         }
@@ -598,7 +697,7 @@ final class BIG{
             if (j==0) {r=rng.getByte()}
             else {r>>=1}
     
-            let b=Int32(r&1);
+            let b=Chunk(r&1);
             d.shl(1); d.w[0]+=b; // m.inc(b);
             j += 1; j&=7;
         }
@@ -607,16 +706,16 @@ final class BIG{
     }
     
     /* return NAF value as +/- 1, 3 or 5. x and x3 should be normed.
-    nbs is number of bits processed, and nzs is number of trailing 0s detected */
-    static func nafbits(_ x: BIG,_ x3:BIG ,i:Int) -> [Int32]
+    nbs is number of bits processed, and nzs is number of trailing 0s detected
+    static func nafbits(_ x: BIG,_ x3:BIG ,i:Int) -> [Chunk]
     {
         var j:Int
-        var n=[Int32](repeating: 0,count: 3)
-        var nb=x3.bit(i)-x.bit(i)
+        var n=[Chunk](repeating: 0,count: 3)
+        var nb=x3.bit(UInt(i))-x.bit(UInt(i))
         n[1]=1;
         n[0]=0;
         if (nb==0) {n[0]=0; return n}
-        if (i==0) {n[0]=nb; return n}
+        if (i==0) {n[0]=Chunk(nb); return n}
         if (nb>0) {n[0]=1}
         else      {n[0]=(-1)}
     
@@ -625,7 +724,7 @@ final class BIG{
         {
             n[1] += 1
             n[0]*=2
-            nb=x3.bit(j)-x.bit(j)
+            nb=x3.bit(UInt(j))-x.bit(UInt(j))
             if (nb>0) {n[0]+=1}
             if (nb<0) {n[0]-=1}
             if (n[0]>5 || n[0] < -5) {break}
@@ -646,11 +745,12 @@ final class BIG{
             n[1] -= 1
         }
         return n;
-    }
+    } */
+    
     /* Jacobi Symbol (this/p). Returns 0, 1 or -1 */
     func jacobi(_ p: BIG) -> Int
     {
-        var n8:Int32
+        var n8:Int
         var k:Int
         var m:Int=0;
         let t=BIG()
@@ -674,9 +774,9 @@ final class BIG{
 				k += 1
 				x.shr(1)
             }
-            if (k%2==1) {m+=Int((n8*n8-1)/8)}
+            if (k%2==1) {m+=((n8*n8-1)/8)}
             let w=Int(x.lastbits(2)-1)
-            m+=Int(n8-1)*w/4
+            m+=(n8-1)*w/4
             t.copy(n)
             t.mod(x)
             n.copy(x)
@@ -751,30 +851,31 @@ final class BIG{
         else {copy(x2)}
     }
     /* return a*b as DBIG */
+#if D32
     static func mul(_ a: BIG,_ b:BIG) -> DBIG
     {
-        var t:Int64
-        var co:Int64
+        var t:DChunk
+        var co:DChunk
         let c=DBIG()
-        let RM:Int64=Int64(ROM.BMASK);
-        let RB:Int64=Int64(ROM.BASEBITS)
+        let RM:DChunk=DChunk(ROM.BMASK);
+        let RB:DChunk=DChunk(ROM.BASEBITS)
    //     a.norm();
    //     b.norm();
         
-        var d=[Int64](repeating: 0,count: ROM.NLEN)
-        var s:Int64
+        var d=[DChunk](repeating: 0,count: ROM.NLEN)
+        var s:DChunk
         for i in 0 ..< ROM.NLEN
         {
-            d[i]=Int64(a.w[i])*Int64(b.w[i]);
+            d[i]=DChunk(a.w[i])*DChunk(b.w[i]);
         }
         s=d[0]
-        t=s; c.w[0]=Int32(t&RM); co=t>>RB
+        t=s; c.w[0]=Chunk(t&RM); co=t>>RB
         for k in 1 ..< ROM.NLEN
         {
             s+=d[k]; t=co+s;
             for i in 1+k/2...k
-                {t+=Int64(a.w[i]-a.w[k-i])*Int64(b.w[k-i]-b.w[i])}
-            c.w[k]=Int32(t&RM); co=t>>RB
+                {t+=DChunk(a.w[i]-a.w[k-i])*DChunk(b.w[k-i]-b.w[i])}
+            c.w[k]=Chunk(t&RM); co=t>>RB
         }
         for k in ROM.NLEN ..< 2*ROM.NLEN-1
         {
@@ -785,59 +886,31 @@ final class BIG{
             while i<ROM.NLEN
             //for i in 1+k/2...ROM.NLEN-1
             {
-                t+=Int64(a.w[i]-a.w[k-i])*Int64(b.w[k-i]-b.w[i])
+                t+=DChunk(a.w[i]-a.w[k-i])*DChunk(b.w[k-i]-b.w[i])
                 i+=1
             }
         
-            c.w[k]=Int32(t&RM); co=t>>RB
+            c.w[k]=Chunk(t&RM); co=t>>RB
         }
-        c.w[2*ROM.NLEN-1]=Int32(co);
+        c.w[2*ROM.NLEN-1]=Chunk(co);
         
-        
-  /*
-        t=Int64(a.w[0])*Int64(b.w[0]); c.w[0]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[1])*Int64(b.w[0])+Int64(a.w[0])*Int64(b.w[1])+co; c.w[1]=Int32(t&RM); co=t>>RB
-        
-        t=Int64(a.w[2])*Int64(b.w[0])+Int64(a.w[1])*Int64(b.w[1])+Int64(a.w[0])*Int64(b.w[2])+co; c.w[2]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[3])*Int64(b.w[0])+Int64(a.w[2])*Int64(b.w[1])+Int64(a.w[1])*Int64(b.w[2])+Int64(a.w[0])*Int64(b.w[3])+co; c.w[3]=Int32(t&RM); co=t>>RB
-        
-        t=Int64(a.w[4])*Int64(b.w[0])+Int64(a.w[3])*Int64(b.w[1])+Int64(a.w[2])*Int64(b.w[2])+Int64(a.w[1])*Int64(b.w[3])+Int64(a.w[0])*Int64(b.w[4])+co; c.w[4]=Int32(t&RM); co=t>>RB;
-        t=Int64(a.w[5])*Int64(b.w[0])+Int64(a.w[4])*Int64(b.w[1])+Int64(a.w[3])*Int64(b.w[2])+Int64(a.w[2])*Int64(b.w[3])+Int64(a.w[1])*Int64(b.w[4])+Int64(a.w[0])*Int64(b.w[5])+co; c.w[5]=Int32(t&RM); co=t>>RB;
-        t=Int64(a.w[6])*Int64(b.w[0])+Int64(a.w[5])*Int64(b.w[1])+Int64(a.w[4])*Int64(b.w[2])+Int64(a.w[3])*Int64(b.w[3])+Int64(a.w[2])*Int64(b.w[4])+Int64(a.w[1])*Int64(b.w[5])+Int64(a.w[0])*Int64(b.w[6])+co; c.w[6]=Int32(t&RM); co=t>>RB;
-        t=Int64(a.w[7])*Int64(b.w[0])+Int64(a.w[6])*Int64(b.w[1])+Int64(a.w[5])*Int64(b.w[2])+Int64(a.w[4])*Int64(b.w[3])+Int64(a.w[3])*Int64(b.w[4])+Int64(a.w[2])*Int64(b.w[5])+Int64(a.w[1])*Int64(b.w[6])+Int64(a.w[0])*Int64(b.w[7])+co; c.w[7]=Int32(t&RM); co=t>>RB;
-        t=Int64(a.w[8])*Int64(b.w[0])+Int64(a.w[7])*Int64(b.w[1])+Int64(a.w[6])*Int64(b.w[2])+Int64(a.w[5])*Int64(b.w[3])+Int64(a.w[4])*Int64(b.w[4])+Int64(a.w[3])*Int64(b.w[5])+Int64(a.w[2])*Int64(b.w[6])+Int64(a.w[1])*Int64(b.w[7])+Int64(a.w[0])*Int64(b.w[8])+co; c.w[8]=Int32(t&RM); co=t>>RB;
-    
-        t=Int64(a.w[8])*Int64(b.w[1])+Int64(a.w[7])*Int64(b.w[2])+Int64(a.w[6])*Int64(b.w[3])+Int64(a.w[5])*Int64(b.w[4])+Int64(a.w[4])*Int64(b.w[5])+Int64(a.w[3])*Int64(b.w[6])+Int64(a.w[2])*Int64(b.w[7])+Int64(a.w[1])*Int64(b.w[8])+co; c.w[9]=Int32(t&RM); co=t>>RB
-        
-        t=Int64(a.w[8])*Int64(b.w[2])+Int64(a.w[7])*Int64(b.w[3])+Int64(a.w[6])*Int64(b.w[4])+Int64(a.w[5])*Int64(b.w[5])+Int64(a.w[4])*Int64(b.w[6])+Int64(a.w[3])*Int64(b.w[7])+Int64(a.w[2])*Int64(b.w[8])+co; c.w[10]=Int32(t&RM); co=t>>RB
-        
-        t=Int64(a.w[8])*Int64(b.w[3])+Int64(a.w[7])*Int64(b.w[4])+Int64(a.w[6])*Int64(b.w[5])+Int64(a.w[5])*Int64(b.w[6])+Int64(a.w[4])*Int64(b.w[7])+Int64(a.w[3])*Int64(b.w[8])+co; c.w[11]=Int32(t&RM); co=t>>RB
-        
-        t=Int64(a.w[8])*Int64(b.w[4])+Int64(a.w[7])*Int64(b.w[5])+Int64(a.w[6])*Int64(b.w[6])+Int64(a.w[5])*Int64(b.w[7])+Int64(a.w[4])*Int64(b.w[8])+co; c.w[12]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(b.w[5])+Int64(a.w[7])*Int64(b.w[6])+Int64(a.w[6])*Int64(b.w[7])+Int64(a.w[5])*Int64(b.w[8])+co; c.w[13]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(b.w[6])+Int64(a.w[7])*Int64(b.w[7])+Int64(a.w[6])*Int64(b.w[8])+co; c.w[14]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(b.w[7])+Int64(a.w[7])*Int64(b.w[8])+co; c.w[15]=Int32(t&RM); co=t>>RB
-    
-        t=Int64(a.w[8])*Int64(b.w[8])+co; c.w[16]=Int32(t&RM); co=t>>RB
-        c.w[17]=Int32(co)
-  */
         return c
     }
     
     /* return a^2 as DBIG */
     static func sqr(_ a: BIG) -> DBIG
     {
-        var t:Int64
-        var co:Int64
+        var t:DChunk
+        var co:DChunk
         let c=DBIG()
-        let RM:Int64=Int64(ROM.BMASK);
-        let RB:Int64=Int64(ROM.BASEBITS)
+        let RM:DChunk=DChunk(ROM.BMASK);
+        let RB:DChunk=DChunk(ROM.BASEBITS)
    //     a.norm();
  
-        t=Int64(a.w[0])*Int64(a.w[0])
-        c.w[0]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[1])*Int64(a.w[0]); t+=t; t+=co
-        c.w[1]=Int32(t&RM); co=t>>RB
+        t=DChunk(a.w[0])*DChunk(a.w[0])
+        c.w[0]=Chunk(t&RM); co=t>>RB
+        t=DChunk(a.w[1])*DChunk(a.w[0]); t+=t; t+=co
+        c.w[1]=Chunk(t&RM); co=t>>RB
         
         var j:Int
         let last=ROM.NLEN-(ROM.NLEN%2)
@@ -845,105 +918,185 @@ final class BIG{
         //for j=2;j<last;j+=2
         while (j<last)
         {
-            t=Int64(a.w[j])*Int64(a.w[0]); for i in 1 ..< (j+1)/2 {t+=Int64(a.w[j-i])*Int64(a.w[i])} ; t+=t; t+=co; t+=Int64(a.w[j/2])*Int64(a.w[j/2])
-            c.w[j]=Int32(t&RM); co=t>>RB
-            t=Int64(a.w[j+1])*Int64(a.w[0]); for i in 1 ..< (j+2)/2 {t+=Int64(a.w[j+1-i])*Int64(a.w[i])} ; t+=t; t+=co
-            c.w[j+1]=Int32(t&RM); co=t>>RB
+            t=DChunk(a.w[j])*DChunk(a.w[0]); for i in 1 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])} ; t+=t; t+=co; t+=DChunk(a.w[j/2])*DChunk(a.w[j/2])
+            c.w[j]=Chunk(t&RM); co=t>>RB
+            t=DChunk(a.w[j+1])*DChunk(a.w[0]); for i in 1 ..< (j+2)/2 {t+=DChunk(a.w[j+1-i])*DChunk(a.w[i])} ; t+=t; t+=co
+            c.w[j+1]=Chunk(t&RM); co=t>>RB
             j+=2
         }
         j=last
         if (ROM.NLEN%2)==1
         {
-            t=Int64(a.w[j])*Int64(a.w[0]); for i in 1 ..< (j+1)/2 {t+=Int64(a.w[j-i])*Int64(a.w[i])} ; t+=t; t+=co; t+=Int64(a.w[j/2])*Int64(a.w[j/2])
-            c.w[j]=Int32(t&RM); co=t>>RB; j += 1
-            t=Int64(a.w[ROM.NLEN-1])*Int64(a.w[j-ROM.NLEN+1]); for i in j-ROM.NLEN+2 ..< (j+1)/2 {t+=Int64(a.w[j-i])*Int64(a.w[i])}; t+=t; t+=co
-            c.w[j]=Int32(t&RM); co=t>>RB; j += 1
+            t=DChunk(a.w[j])*DChunk(a.w[0]); for i in 1 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])} ; t+=t; t+=co; t+=DChunk(a.w[j/2])*DChunk(a.w[j/2])
+            c.w[j]=Chunk(t&RM); co=t>>RB; j += 1
+            t=DChunk(a.w[ROM.NLEN-1])*DChunk(a.w[j-ROM.NLEN+1]); for i in j-ROM.NLEN+2 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t; t+=co
+            c.w[j]=Chunk(t&RM); co=t>>RB; j += 1
         }
         while (j<ROM.DNLEN-2)
         {
-            t=Int64(a.w[ROM.NLEN-1])*Int64(a.w[j-ROM.NLEN+1]); for i in j-ROM.NLEN+2 ..< (j+1)/2 {t+=Int64(a.w[j-i])*Int64(a.w[i])} ; t+=t; t+=co; t+=Int64(a.w[j/2])*Int64(a.w[j/2])
-            c.w[j]=Int32(t&RM); co=t>>RB
-            t=Int64(a.w[ROM.NLEN-1])*Int64(a.w[j-ROM.NLEN+2]); for i in j-ROM.NLEN+3 ..< (j+2)/2 {t+=Int64(a.w[j+1-i])*Int64(a.w[i])} ; t+=t; t+=co
-            c.w[j+1]=Int32(t&RM); co=t>>RB
+            t=DChunk(a.w[ROM.NLEN-1])*DChunk(a.w[j-ROM.NLEN+1]); for i in j-ROM.NLEN+2 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])} ; t+=t; t+=co; t+=DChunk(a.w[j/2])*DChunk(a.w[j/2])
+            c.w[j]=Chunk(t&RM); co=t>>RB
+            t=DChunk(a.w[ROM.NLEN-1])*DChunk(a.w[j-ROM.NLEN+2]); for i in j-ROM.NLEN+3 ..< (j+2)/2 {t+=DChunk(a.w[j+1-i])*DChunk(a.w[i])} ; t+=t; t+=co
+            c.w[j+1]=Chunk(t&RM); co=t>>RB
             j+=2
         }
-        t=Int64(a.w[ROM.NLEN-1])*Int64(a.w[ROM.NLEN-1])+co
-        c.w[ROM.DNLEN-2]=Int32(t&RM); co=t>>RB
-        c.w[ROM.DNLEN-1]=Int32(co)
-        
+        t=DChunk(a.w[ROM.NLEN-1])*DChunk(a.w[ROM.NLEN-1])+co
+        c.w[ROM.DNLEN-2]=Chunk(t&RM); co=t>>RB
+        c.w[ROM.DNLEN-1]=Chunk(co)
     
-        
-/*
-        t=Int64(a.w[0])*Int64(a.w[0]); c.w[0]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[1])*Int64(a.w[0]); t+=t; t+=co; c.w[1]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[2])*Int64(a.w[0]);t+=t; t+=Int64(a.w[1])*Int64(a.w[1]);t+=co;c.w[2]=Int32(t&RM);co=t>>RB
-        t=Int64(a.w[3])*Int64(a.w[0])+Int64(a.w[2])*Int64(a.w[1]); t+=t; t+=co; c.w[3]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[4])*Int64(a.w[0])+Int64(a.w[3])*Int64(a.w[1]); t+=t; t+=Int64(a.w[2])*Int64(a.w[2]); t+=co; c.w[4]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[5])*Int64(a.w[0])+Int64(a.w[4])*Int64(a.w[1])
-            t = t+Int64(a.w[3])*Int64(a.w[2])
-            t+=t; t+=co; c.w[5]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[6])*Int64(a.w[0])+Int64(a.w[5])*Int64(a.w[1])
-            t = t+Int64(a.w[4])*Int64(a.w[2])
-            t+=t; t+=Int64(a.w[3])*Int64(a.w[3]); t+=co; c.w[6]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[7])*Int64(a.w[0])+Int64(a.w[6])*Int64(a.w[1])
-        t = t+Int64(a.w[5])*Int64(a.w[2])+Int64(a.w[4])*Int64(a.w[3])
-            t+=t; t+=co; c.w[7]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(a.w[0])+Int64(a.w[7])*Int64(a.w[1])
-            t = t+Int64(a.w[6])*Int64(a.w[2])+Int64(a.w[5])*Int64(a.w[3])
-            t+=t; t+=Int64(a.w[4])*Int64(a.w[4]); t+=co; c.w[8]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(a.w[1])+Int64(a.w[7])*Int64(a.w[2])
-        t = t+Int64(a.w[6])*Int64(a.w[3])+Int64(a.w[5])*Int64(a.w[4])
-            t+=t; t+=co; c.w[9]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(a.w[2])+Int64(a.w[7])*Int64(a.w[3])
-            t = t+Int64(a.w[6])*Int64(a.w[4])
-            t+=t; t+=Int64(a.w[5])*Int64(a.w[5]); t+=co; c.w[10]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(a.w[3])+Int64(a.w[7])*Int64(a.w[4])
-            t = t+Int64(a.w[6])*Int64(a.w[5])
-            t+=t; t+=co; c.w[11]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(a.w[4])+Int64(a.w[7])*Int64(a.w[5]); t+=t; t+=Int64(a.w[6])*Int64(a.w[6]); t+=co; c.w[12]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(a.w[5])+Int64(a.w[7])*Int64(a.w[6]); t+=t; t+=co; c.w[13]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(a.w[6]); t+=t; t+=Int64(a.w[7])*Int64(a.w[7]); t+=co; c.w[14]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(a.w[7]); t+=t; t+=co; c.w[15]=Int32(t&RM); co=t>>RB
-        t=Int64(a.w[8])*Int64(a.w[8])+co; c.w[16]=Int32(t&RM); co=t>>RB
-        c.w[17]=Int32(co)
-*/
-    return c;
+        return c;
     }
-    
+    static func monty(_ d:DBIG) -> BIG
+    {
+        let md=BIG(ROM.Modulus);
+        let RM:DChunk=DChunk(ROM.BMASK)
+        let RB:DChunk=DChunk(ROM.BASEBITS)
+        
+        
+        var t:DChunk
+        var s:DChunk
+        var c:DChunk
+        var dd=[DChunk](repeating: 0,count: ROM.NLEN)
+        var v=[Chunk](repeating: 0,count: ROM.NLEN)
+        let b=BIG(0)
+        
+        t=DChunk(d.w[0]); v[0]=(Chunk(t&RM)&*ROM.MConst)&ROM.BMASK; t+=DChunk(v[0])*DChunk(md.w[0]); c=DChunk(d.w[1])+(t>>RB); s=0
+        for k in 1 ..< ROM.NLEN
+        {
+            t=c+s+DChunk(v[0])*DChunk(md.w[k])
+            //for i in 1+k/2...k-1
+            //for var i=k-1;i>k/2;i--
+            var i=1+k/2
+            while i<k
+            {
+                t+=DChunk(v[k-i]-v[i])*DChunk(md.w[i]-md.w[k-i])
+                i+=1
+            }
+            v[k]=(Chunk(t&RM)&*ROM.MConst)&ROM.BMASK; t+=DChunk(v[k])*DChunk(md.w[0]); c=DChunk(d.w[k+1])+(t>>RB)
+            dd[k]=DChunk(v[k])*DChunk(md.w[k]); s+=dd[k]
+        }
+        for k in ROM.NLEN ..< 2*ROM.NLEN-1
+        {
+            t=c+s;
+            //for i in 1+k/2...ROM.NLEN-1
+            //for var i=ROM.NLEN-1;i>=1+k/2;i--
+            var i=1+k/2
+            while i<ROM.NLEN
+            {
+                t+=DChunk(v[k-i]-v[i])*DChunk(md.w[i]-md.w[k-i])
+                i+=1
+            }
+            b.w[k-ROM.NLEN]=Chunk(t&RM); c=DChunk(d.w[k+1])+(t>>RB); s-=dd[k-ROM.NLEN+1]
+        }
+        b.w[ROM.NLEN-1]=Chunk(c&RM)
+        b.norm()
+        return b;
+    }
+#endif
+#if D64
+    static func mul(_ a: BIG,_ b:BIG) -> DBIG
+    {
+        let c=DBIG()
+        var carry:Chunk
+        for i in 0 ..< ROM.NLEN {
+            carry=0
+            for j in 0..<ROM.NLEN {
+                let (top,bot)=BIG.muladd(a.w[i],b.w[j],carry,c.w[i+j])
+                carry=top; c.w[i+j]=bot
+            }
+            c.w[ROM.NLEN+i]=carry
+        }
+        return c
+    }
+    static func sqr(_ a: BIG) -> DBIG
+    {
+        let c=DBIG()
+        var carry:Chunk
+        for i in 0 ..< ROM.NLEN {
+            carry=0
+            for j in i+1 ..< ROM.NLEN {
+                let (top,bot)=BIG.muladd(2*a.w[i],a.w[j],carry,c.w[i+j])
+                carry=top; c.w[i+j]=bot
+            }
+            c.w[ROM.NLEN+i]=carry
+        }
+        for i in 0 ..< ROM.NLEN {
+            let (top,bot)=BIG.muladd(a.w[i],a.w[i],Chunk(0),c.w[2*i])
+            c.w[2*i]=bot
+            c.w[2*i+1]+=top
+        }
+        c.norm()
+        return c
+    }
+    static func monty(_ d:DBIG) -> BIG
+    {
+        let b=BIG()
+        let md=BIG(ROM.Modulus);
+        var carry:Chunk
+        var m:Chunk
+        for i in 0 ..< ROM.NLEN {
+            if ROM.MConst == -1 {
+                m=(-d.w[i])&ROM.BMASK
+            } else {
+                if ROM.MConst == 1 {
+                    m=d.w[i]
+                } else {
+                    m=(ROM.MConst&*d.w[i])&ROM.BMASK;
+                }
+            }
+            carry=0
+            for j in 0 ..< ROM.NLEN {
+                let (top,bot)=BIG.muladd(m,md.w[j],carry,d.w[i+j])
+                carry=top; d.w[i+j]=bot
+            }
+            d.w[ROM.NLEN+i]+=carry
+        }
+        for i in 0 ..< ROM.NLEN {
+            b.w[i]=d.w[ROM.NLEN+i]
+        }
+        b.norm();
+        return b
+    }
+#endif
     /* reduce a DBIG to a BIG using the appropriate form of the modulus */
     static func mod(_ d: DBIG) -> BIG
     {
-        var b=BIG()
+ 
         if ROM.MODTYPE==ROM.PSEUDO_MERSENNE
         {
             let t=d.split(ROM.MODBITS)
-            b=BIG(d)
-            let v=t.pmul(ROM.MConst);
-            let tw=t.w[ROM.NLEN-1];
-            t.w[ROM.NLEN-1] &= ROM.TMASK;
-            t.inc(ROM.MConst*((tw>>ROM.TBITS)+(v<<(ROM.BASEBITS-ROM.TBITS))));
+            var b=BIG(d)
+            let v=t.pmul(Int(ROM.MConst))
+            let tw=t.w[ROM.NLEN-1]
+            t.w[ROM.NLEN-1] &= ROM.TMASK
+            t.inc(Int(ROM.MConst*((tw>>Chunk(ROM.TBITS))+(v<<Chunk(ROM.BASEBITS-ROM.TBITS)))))
     
-            b.add(t);
-            b.norm();
+            b.add(t)
+            b.norm()
+            return b
         }
         if ROM.MODTYPE==ROM.MONTGOMERY_FRIENDLY
         {
-            for i in 0 ..< ROM.NLEN
-                {d.w[ROM.NLEN+i]+=d.muladd(d.w[i],ROM.MConst-1,d.w[i],ROM.NLEN+i-1)}
+            for i in 0 ..< ROM.NLEN {
+                let (top,bot)=BIG.muladd(d.w[i],ROM.MConst-1,d.w[i],d.w[ROM.NLEN+i-1])
+                d.w[ROM.NLEN+i]+=top; d.w[ROM.NLEN+i-1]=bot
+ //                   d.w[ROM.NLEN+i]+=d.muladd(d.w[i],ROM.MConst-1,d.w[i],ROM.NLEN+i-1)
+            }
     
-            b=BIG(0);
+            var b=BIG(0);
     
             for i in 0 ..< ROM.NLEN
             {
                 b.w[i]=d.w[ROM.NLEN+i]
             }
             b.norm()
+            return b;
         }
         if ROM.MODTYPE==ROM.GENERALISED_MERSENNE
         { // GoldiLocks Only
             let t=d.split(ROM.MODBITS)
-            let RM2=Int(ROM.MODBITS/2)
-            b=BIG(d)
+            let RM2=ROM.MODBITS/2
+            var b=BIG(d)
             b.add(t)
             let dd=DBIG(t)
             dd.shl(RM2)
@@ -956,92 +1109,19 @@ final class BIG{
             tt.shl(RM2)
             b.add(tt)
             
-            let carry=b.w[ROM.NLEN-1]>>ROM.TBITS
+            let carry=b.w[ROM.NLEN-1]>>Chunk(ROM.TBITS)
             b.w[ROM.NLEN-1]&=ROM.TMASK
             b.w[0]+=carry
             
-            b.w[Int(224/ROM.BASEBITS)]+=carry<<(224%ROM.BASEBITS)
+            b.w[Int(224/ROM.BASEBITS)]+=carry<<Chunk(224%ROM.BASEBITS)
             b.norm()
+            return b;
         }
         if ROM.MODTYPE==ROM.NOT_SPECIAL
         {
-            let md=BIG(ROM.Modulus);
-            let RM:Int64=Int64(ROM.BMASK)
-            let RB:Int64=Int64(ROM.BASEBITS)
-            
-            
-            var t:Int64
-            var s:Int64
-            var c:Int64
-            var dd=[Int64](repeating: 0,count: ROM.NLEN)
-            var v=[Int32](repeating: 0,count: ROM.NLEN)
-            b=BIG(0)
-            
-            t=Int64(d.w[0]); v[0]=(Int32(t&RM)&*ROM.MConst)&ROM.BMASK; t+=Int64(v[0])*Int64(md.w[0]); c=Int64(d.w[1])+(t>>RB); s=0
-            for k in 1 ..< ROM.NLEN
-            {
-                t=c+s+Int64(v[0])*Int64(md.w[k])
-                //for i in 1+k/2...k-1
-                //for var i=k-1;i>k/2;i--
-                var i=1+k/2
-                while i<k
-                {
-                    t+=Int64(v[k-i]-v[i])*Int64(md.w[i]-md.w[k-i])
-                    i+=1
-                }
-                v[k]=(Int32(t&RM)&*ROM.MConst)&ROM.BMASK; t+=Int64(v[k])*Int64(md.w[0]); c=Int64(d.w[k+1])+(t>>RB)
-                dd[k]=Int64(v[k])*Int64(md.w[k]); s+=dd[k]
-            }
-            for k in ROM.NLEN ..< 2*ROM.NLEN-1
-            {
-                t=c+s;
-                //for i in 1+k/2...ROM.NLEN-1
-                //for var i=ROM.NLEN-1;i>=1+k/2;i--
-                var i=1+k/2
-                while i<ROM.NLEN
-                {
-                    t+=Int64(v[k-i]-v[i])*Int64(md.w[i]-md.w[k-i])
-                    i+=1
-                }
-                b.w[k-ROM.NLEN]=Int32(t&RM); c=Int64(d.w[k+1])+(t>>RB); s-=dd[k-ROM.NLEN+1]
-            }
-            b.w[ROM.NLEN-1]=Int32(c&RM)
-            b.norm()
+            return BIG.monty(d)
         }
-            
- /*
-            
-            var sum=Int64(d.w[0])
-            for var j=0;j<ROM.NLEN;j++
-            {
-                for var i=0;i<j;i++ {sum+=Int64(d.w[i])*Int64(md.w[j-i])}
-                let sp=(Int32(sum&Int64(ROM.MASK))&*ROM.MConst)&ROM.MASK
-                d.w[j]=sp; sum+=Int64(sp)*Int64(md.w[0])
-                sum=Int64(d.w[j+1])+(sum>>Int64(ROM.BASEBITS))
-            }
-    
-            for var j=ROM.NLEN;j<ROM.DNLEN-2;j++
-            {
-                for var i=j-ROM.NLEN+1;i<ROM.NLEN;i++ {sum+=Int64(d.w[i])*Int64(md.w[j-i])}
-                    d.w[j]=Int32(sum&Int64(ROM.MASK))
-                sum=Int64(d.w[j+1])+(sum>>Int64(ROM.BASEBITS))
-            }
-    
-            sum+=Int64(d.w[ROM.NLEN-1])*Int64(md.w[ROM.NLEN-1])
-            d.w[ROM.DNLEN-2]=Int32(sum&Int64(ROM.MASK))
-            sum=Int64(d.w[ROM.DNLEN-1])+(sum>>Int64(ROM.BASEBITS))
-            d.w[ROM.DNLEN-1]=Int32(sum&Int64(ROM.MASK))
-    
-            b=BIG(0);
-    
-            for var i=0;i<ROM.NLEN;i++
-            {
-                b.w[i]=d.w[ROM.NLEN+i];
-            }
-            b.norm();
-        }
-   */
-        return b;
+        return BIG(0)
     }
     
     /* return a*b mod m */

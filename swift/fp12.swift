@@ -55,7 +55,7 @@ final class FP12
         c=FP4(0)
     }
     
-    init(_ d:Int32)
+    init(_ d:Int)
     {
         a=FP4(d)
         b=FP4(0)
@@ -551,8 +551,9 @@ final class FP12
         {
             for i in 0 ..< 4
             {
-				a[i]=(t[i].lastbits(2)-2)
-				t[i].dec(a[i]); t[i].norm()
+				a[i]=Int32(t[i].lastbits(2)-2)
+				t[i].dec(Int(a[i]));
+                t[i].norm()
 				t[i].fshr(1)
             }
             w[j]=Int8(8*a[0]+4*a[1]+2*a[2]+a[3])

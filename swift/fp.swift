@@ -34,7 +34,7 @@ final class FP {
         if ROM.MODTYPE != ROM.PSEUDO_MERSENNE && ROM.MODTYPE != ROM.GENERALISED_MERSENNE
         {
             let d=DBIG(x)
-            d.shl(ROM.NLEN*Int(ROM.BASEBITS))
+            d.shl(UInt(ROM.NLEN)*ROM.BASEBITS)
             x.copy(d.mod(FP.p))
         }
     }
@@ -57,7 +57,7 @@ final class FP {
     {
         x=BIG(0)
     }
-    init(_ a: Int32)
+    init(_ a: Int)
     {
         x=BIG(a)
         nres()
@@ -120,31 +120,30 @@ final class FP {
         x.norm();
     }
 /* swap FPs depending on d */
-    func cswap(_ b: FP,_ d: Int32)
+    func cswap(_ b: FP,_ d: Int)
     {
         x.cswap(b.x,d)
     }
     
 /* copy FPs depending on d */
-    func cmove(_ b: FP,_ d:Int32)
+    func cmove(_ b: FP,_ d:Int)
     {
         x.cmove(b.x,d);
     }
 /* this*=b mod Modulus */
     func mul(_ b: FP)
     {
-	norm()
-	b.norm()
+        norm()
+        b.norm()
         let ea=BIG.EXCESS(x)
         let eb=BIG.EXCESS(b.x)
-    
-	if Int64(ea+1)*Int64(eb+1)>Int64(ROM.FEXCESS) {reduce()}
+        
+        if Int64(ea+1)*Int64(eb+1)>Int64(ROM.FEXCESS) {reduce()}
         /*if (ea+1)>=(ROM.FEXCESS-1)/(eb+1) {reduce()}*/
-
+        
         let d=BIG.mul(x,b.x)
         x.copy(BIG.mod(d))
     }
-
     static func logb2(_ w: UInt32) -> Int
     {
         var v = w
@@ -153,23 +152,21 @@ final class FP {
         v |= (v >> 4)
         v |= (v >> 8)
         v |= (v >> 16)
-
-        v = v - ((v >> 1) & 0x55555555)                 
-        v = (v & 0x33333333) + ((v >> 2) & 0x33333333)  
+        
+        v = v - ((v >> 1) & 0x55555555)
+        v = (v & 0x33333333) + ((v >> 2) & 0x33333333)
         let r = Int((   ((v + (v >> 4)) & 0xF0F0F0F)   &* 0x1010101) >> 24)
-        return (r+1)        
+        return (r+1)
     }
-
-/* this = -this mod Modulus */
+    /* this = -this mod Modulus */
     func neg()
     {
         let m=BIG(FP.p);
     
         norm();
-    
         let sb=FP.logb2(UInt32(BIG.EXCESS(x)))
-//       var ov=BIG.EXCESS(x);
-//       var sb=1; while(ov != 0) {sb += 1;ov>>=1}
+ //       var ov=BIG.EXCESS(x);
+ //       var sb=1; while(ov != 0) {sb += 1;ov>>=1}
     
         m.fshl(sb)
         x.rsub(m)
@@ -177,7 +174,7 @@ final class FP {
         if BIG.EXCESS(x)>=ROM.FEXCESS {reduce()}
     }
     /* this*=c mod Modulus, where c is a small int */
-    func imul(_ c: Int32)
+    func imul(_ c: Int)
     {
         var cc=c
         norm();
@@ -208,17 +205,17 @@ final class FP {
 /* this*=this mod Modulus */
     func sqr()
     {
-	norm()
+        norm()
         let ea=BIG.EXCESS(x);
-
-	if Int64(ea+1)*Int64(ea+1)>Int64(ROM.FEXCESS) {reduce()}
+        
+        if Int64(ea+1)*Int64(ea+1)>Int64(ROM.FEXCESS) {reduce()}
         /*if (ea+1)>=(ROM.FEXCESS-1)/(ea+1) {reduce()}*/
-      
+        
         let d=BIG.sqr(x);
         x.copy(BIG.mod(d));
     }
     
-/* this+=b */
+    /* this+=b */
     func add(_ b: FP)
     {
         x.add(b.x);

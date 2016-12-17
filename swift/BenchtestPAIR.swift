@@ -200,5 +200,7 @@ public func BenchtestPAIR()
     if !fail {
         print("All tests pass")
     }
-    
 }
+
+//BenchtestPAIR()
+

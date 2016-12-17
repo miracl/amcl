@@ -118,7 +118,7 @@ final class PAIR {
             lv=line(A,A,Qx,Qy)
             r.smul(lv)
     
-            if (n.bit(i)==1)
+            if (n.bit(UInt(i))==1)
             {
 		lv=line(A,P,Qx,Qy)
 		r.smul(lv)
@@ -188,7 +188,7 @@ final class PAIR {
             r.smul(lv)
             lv=line(B,B,Sx,Sy)
             r.smul(lv)
-            if n.bit(i)==1
+            if n.bit(UInt(i))==1
             {
 		lv=line(A,P,Qx,Qy)
 		r.smul(lv)

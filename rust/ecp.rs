@@ -680,7 +680,7 @@ impl ECP {
 /* constant time multiply by small integer of length bts - use ladder */
 	pub fn pinmul(&mut self,e: i32,bts: i32) -> ECP {	
 		if rom::CURVETYPE==rom::MONTGOMERY {
-			return self.mul(&mut BIG::new_int(e));
+			return self.mul(&mut BIG::new_int(e as isize));
 		} else {
 			let mut P=ECP::new();
 			let mut R0=ECP::new();

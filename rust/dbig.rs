@@ -66,7 +66,7 @@ impl DBIG {
             carry= (self.w[i]<<(rom::BASEBITS-m))&rom::BMASK;
             t.set(i-rom::NLEN+1,nw);
         }
-        self.w[rom::NLEN-1]&=((BIG::cast_to_chunk(1)<<m)-1);
+        self.w[rom::NLEN-1]&=(((1 as Chunk)<<m)-1);
         return t;
     }
 
@@ -103,7 +103,7 @@ impl DBIG {
 	}
 
 	pub fn cmove(&mut self,g:&DBIG,d: isize) {
-		let b=BIG::cast_to_chunk(-d);
+		let b=-d as Chunk;
 		for i in 0 ..rom::DNLEN {
 			self.w[i]^=(self.w[i]^g.w[i])&b;
 		}
@@ -128,7 +128,7 @@ impl DBIG {
 
 /* normalise BIG - force all digits < 2^rom::BASEBITS */
     pub fn norm(&mut self) {
-        let mut carry=BIG::cast_to_chunk(0);
+        let mut carry=0 as Chunk;
         for i in 0 ..rom::DNLEN-1 {
             let d=self.w[i]+carry;
             self.w[i]=d&rom::BMASK;
@@ -142,7 +142,7 @@ impl DBIG {
         let mut k=0;
         self.norm();
         let mut m=DBIG::new_scopy(c);
-	let mut dr=DBIG::new();
+        let mut dr=DBIG::new();
     
         if DBIG::comp(self,&m)<0 {
         	let r=BIG::new_dcopy(self);
