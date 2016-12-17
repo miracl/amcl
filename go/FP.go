@@ -165,7 +165,7 @@ func (F *FP) imul(c int) {
 		c=-c
 		s=true
 	}
-	afx:=(EXCESS(F.x)+1)*(cast_to_chunk(c)+1)+1;
+	afx:=(EXCESS(F.x)+1)*(Chunk(c)+1)+1;
 	if (c<NEXCESS && afx<FEXCESS) {
 		F.x.imul(c);
 	} else {

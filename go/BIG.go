@@ -17,16 +17,46 @@ specific language governing permissions and limitations
 under the License.
 */
 
-/* MiotCL BIG number class */ 
+/* AMCL BIG number class */ 
 
 package main
 
 import "strconv"
 //import "fmt"
 
+
+type BIG struct {
+	w [NLEN]Chunk
+}
+
+type DBIG struct {
+	w [2*NLEN]Chunk
+}
+
+func (r *BIG) get(i int) Chunk {
+	return r.w[i] 
+}
+
+func (r *BIG) set(i int,x Chunk) {
+	r.w[i]=x	
+}
+
+func (r *BIG) xortop(x Chunk) {
+	r.w[NLEN-1]^=x
+}
+
+/* calculate Field Excess */
+func EXCESS(a *BIG) Chunk {
+	return ((a.w[NLEN-1]&OMASK)>>(MODBITS%BASEBITS))
+}
+
+func FF_EXCESS(a* BIG) Chunk {
+	return ((a.w[NLEN-1]&P_OMASK)>>(P_MB))
+}
+
 /* normalise BIG - force all digits < 2^BASEBITS */
 func (r *BIG) norm() int {
-	var carry =cast_to_chunk(0)
+	carry:=Chunk(0)
 	for i:=0;i<NLEN-1;i++ {
 		d:=r.w[i]+carry
 		r.w[i]=d&BMASK
@@ -38,7 +68,7 @@ func (r *BIG) norm() int {
 
 /* Shift right by less than a word */
 func (r *BIG) fshr(k uint) int {
-	w:=r.w[0]&((cast_to_chunk(1)<<k)-1) /* shifted out part */
+	w:=r.w[0]&((Chunk(1)<<k)-1) /* shifted out part */
 	for i:=0;i<NLEN-1;i++ {
 		r.w[i]=(r.w[i]>>k)|((r.w[i+1]<<(BASEBITS-k))&BMASK)
 	}
@@ -64,9 +94,17 @@ func NewBIG() *BIG {
 	return b
 }
 
+func NewBIGints(x [NLEN]Chunk) *BIG {
+	b:=new(BIG)
+	for i:=0;i<NLEN;i++ {
+		b.w[i]=x[i]
+	}
+	return b	
+}
+
 func NewBIGint(x int) *BIG {
 	b:=new(BIG)
-	b.w[0]=cast_to_chunk(x)
+	b.w[0]=Chunk(x)
 	for i:=1;i<NLEN;i++ {
 		b.w[i]=0
 	}
@@ -138,7 +176,7 @@ func (r *BIG) dcopy(x *DBIG) {
 
 /* Conditional swap of two bigs depending on d using XOR - no branches */
 func (r *BIG) cswap(b *BIG,d int) {
-	var c=cast_to_chunk(d)
+	c:=Chunk(d)
 	c=^(c-1)
 
 	for i:=0;i<NLEN;i++ {
@@ -149,7 +187,7 @@ func (r *BIG) cswap(b *BIG,d int) {
 }
 
 func (r *BIG) cmove(g *BIG,d int){
-	var b=cast_to_chunk(-d)
+	b:=Chunk(-d)
 
 	for i:=0;i<NLEN;i++ {
 		r.w[i]^=(r.w[i]^g.w[i])&b
@@ -236,18 +274,15 @@ func (r *BIG) plus(x *BIG) *BIG {
 /* this+=x, where x is int */
 func (r *BIG) inc(x int) {
 	r.norm();
-	r.w[0]+=cast_to_chunk(x);
+	r.w[0]+=Chunk(x);
 }
 
 /* this*=c and catch overflow in DBIG */
 func (r *BIG) pxmul(c int) *DBIG {
 	m:=NewDBIG()	
-	var carry =cast_to_chunk(0)
+	carry:=Chunk(0)
 	for j:=0;j<NLEN;j++ {
-
-		carry,m.w[j]=muladd(r.w[j],cast_to_chunk(c),carry,m.w[j])
-		//carry=m.muladd(r.w[j],cast_to_chunk(c),carry,j)
-
+		carry,m.w[j]=muladd(r.w[j],Chunk(c),carry,m.w[j])
 	}
 	m.w[NLEN]=carry;		
 	return m;
@@ -279,14 +314,26 @@ func (r *BIG) rsub(x *BIG) {
 /* this-=x, where x is int */
 func (r *BIG) dec(x int) {
 	r.norm();
-	r.w[0]-=cast_to_chunk(x)
+	r.w[0]-=Chunk(x)
 } 
 
 /* this*=x, where x is small int<NEXCESS */
 func (r *BIG) imul(c int) {
 	for i:=0;i<NLEN;i++{ 
-		r.w[i]*=cast_to_chunk(c)
+		r.w[i]*=Chunk(c)
 	}
+}
+
+/* this*=x, where x is >NEXCESS */
+func (r *BIG) pmul(c int) Chunk {
+	carry:=Chunk(0)
+	r.norm();
+	for i:=0;i<NLEN;i++ {
+		ak:=r.w[i]
+		r.w[i]=0
+		carry,r.w[i]=muladd(ak,Chunk(c),carry,r.w[i])
+	}
+	return carry
 }
 
 /* convert this BIG to byte array */
@@ -304,7 +351,7 @@ func (r *BIG) tobytearray(b []byte,n int) {
 func frombytearray(b []byte,n int) *BIG {
 	m:=NewBIG();
 	for i:=0;i<int(MODBYTES);i++ {
-		m.fshl(8); m.w[0]+=cast_to_chunk(int(b[i+n]&0xff))
+		m.fshl(8); m.w[0]+=Chunk(int(b[i+n]&0xff))
 	}
 	return m
 }
@@ -319,9 +366,9 @@ func fromBytes(b []byte) *BIG {
 
 /* divide by 3 */
 func (r *BIG) div3() int {	
-	var carry =cast_to_chunk(0)
+	carry:=Chunk(0)
 	r.norm();
-	base:=(cast_to_chunk(1)<<BASEBITS)
+	base:=(Chunk(1)<<BASEBITS)
 	for i:=NLEN-1;i>=0;i-- {
 		ak:=(carry*base+r.w[i])
 		r.w[i]=ak/3;
@@ -332,7 +379,7 @@ func (r *BIG) div3() int {
 
 /* return a*b where result fits in a BIG */
 func smul(a *BIG,b *BIG) *BIG {
-	var carry =cast_to_chunk(0)
+	carry:=Chunk(0)
 	c:=NewBIG()
 	for i:=0;i<NLEN;i++ {
 		carry=0;
@@ -364,7 +411,7 @@ func (r *BIG) parity() int {
 
 /* return n-th bit */
 func (r *BIG) bit(n int) int {
-	if (r.w[n/int(BASEBITS)]&(cast_to_chunk(1)<<(uint(n)%BASEBITS)))>0 {return 1}
+	if (r.w[n/int(BASEBITS)]&(Chunk(1)<<(uint(n)%BASEBITS)))>0 {return 1}
 	return 0;
 }
 
@@ -380,7 +427,7 @@ func (r *BIG) lastbits(n int) int {
 func (r *BIG) mod2m(m uint) {
 	wd:=int(m/BASEBITS)
 	bt:=m%BASEBITS
-	msk:=(cast_to_chunk(1)<<bt)-1
+	msk:=(Chunk(1)<<bt)-1
 	r.w[wd]&=msk
 	for i:=wd+1;i<NLEN;i++ {r.w[i]=0}
 }
@@ -528,7 +575,7 @@ func random(rng *RAND) *BIG {
 			r=rng.GetByte()
 		} else {r>>=1}
 
-		b:=cast_to_chunk(int(r&1))
+		b:=Chunk(int(r&1))
 		m.shl(1); m.w[0]+=b// m.inc(b)
 		j++; j&=7; 
 	}
@@ -545,7 +592,7 @@ func randomnum(q *BIG,rng *RAND) *BIG {
 			r=rng.GetByte();
 		} else {r>>=1}
 
-		b:=cast_to_chunk(int(r&1))
+		b:=Chunk(int(r&1))
 		d.shl(1); d.w[0]+=b// m.inc(b);
 		j++; j&=7 
 	}

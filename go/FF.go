@@ -62,7 +62,7 @@ func (F *FF) getlen() int {
 /* set to integer */
 func (F *FF) set(m int) {
 	F.zero()
-	F.v[0].set(0,cast_to_chunk(m))
+	F.v[0].set(0,Chunk(m))
 }
 
 /* copy from FF b */
@@ -205,12 +205,12 @@ func (F *FF) rnorm(vp int,n int) {
 	}
 	for i:=0;i<n-1;i++ {
 		carry=F.v[vp+i].norm()
-		F.v[vp+i].xortop(cast_to_chunk(carry)<<P_TBITS)
+		F.v[vp+i].xortop(Chunk(carry)<<P_TBITS)
 		F.v[vp+i+1].inc(carry)
 	}
 	carry=F.v[vp+n-1].norm()
 	if trunc {
-		F.v[vp+n-1].xortop(cast_to_chunk(carry)<<P_TBITS)
+		F.v[vp+n-1].xortop(Chunk(carry)<<P_TBITS)
 	}
 }
 
@@ -235,7 +235,7 @@ func (F *FF) shl() {
 	for i:=0;i<F.length-1;i++ {
 		carry:=F.v[i].fshl(1)
 		F.v[i].inc(delay_carry)
-		F.v[i].xortop(cast_to_chunk(carry)<<P_TBITS)
+		F.v[i].xortop(Chunk(carry)<<P_TBITS)
 		delay_carry=int(carry)
 	}
 	F.v[F.length-1].fshl(1)
@@ -247,7 +247,7 @@ func (F *FF) shl() {
 func (F *FF) shr() {
 	for i:=F.length-1;i>0;i-- {
 		carry:=F.v[i].fshr(1)
-		F.v[i-1].xortop(cast_to_chunk(carry)<<P_TBITS)
+		F.v[i-1].xortop(Chunk(carry)<<P_TBITS)
 	}
 	F.v[0].fshr(1)
 }

@@ -55,7 +55,7 @@ func NewDBIGscopy(x *BIG) *DBIG {
 
 /* normalise this */
 func (r *DBIG) norm() {
-	var carry =cast_to_chunk(0)
+	carry:=Chunk(0)
 	for i:=0;i<DNLEN-1;i++ {
 		d:=r.w[i]+carry
 		r.w[i]=d&BMASK
@@ -75,12 +75,12 @@ func (r *DBIG) split(n uint) *BIG {
 		carry=(r.w[i]<<(BASEBITS-m))&BMASK;
 		t.set(i-NLEN+1,nw);
 	}
-	r.w[NLEN-1]&=((cast_to_chunk(1)<<m)-1)
+	r.w[NLEN-1]&=((Chunk(1)<<m)-1)
 	return t;
 }
 
 func (r *DBIG) cmove(g *DBIG,d int){
-	var b=cast_to_chunk(-d)
+	var b=Chunk(-d)
 
 	for i:=0;i<DNLEN;i++ {
 		r.w[i]^=(r.w[i]^g.w[i])&b
