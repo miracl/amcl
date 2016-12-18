@@ -97,85 +97,33 @@ func sqr(a *BIG) *DBIG {
 	return c
 }
 
-/* reduce a DBIG to a BIG using the appropriate form of the modulus */
-func mod(d *DBIG) *BIG {
-	var b *BIG
-	if MODTYPE==PSEUDO_MERSENNE {
-		t:=d.split(MODBITS)
-		b=NewBIGdcopy(d)
-
-		v:=t.pmul(int(MConst))
-		tw:=t.w[NLEN-1]
-		t.w[NLEN-1]&=TMASK
-		t.w[0]+=(MConst*((tw>>TBITS)+(v<<(BASEBITS-TBITS))))
-
-		b.add(t)
-	}
-	if MODTYPE==MONTGOMERY_FRIENDLY {
-		for i:=0;i<NLEN;i++ {
-			top,bot:=muladd(d.w[i],MConst-1,d.w[i],d.w[NLEN+i-1])
-			d.w[NLEN+i-1]=bot
-			d.w[NLEN+i]+=top
-			//d.w[NLEN+i]+=d.muladd(d.w[i],MConst-1,d.w[i],NLEN+i-1)
+func monty(d* DBIG) *BIG {
+	md:=NewBIGints(Modulus)
+	carry:=Chunk(0)
+	m:=Chunk(0)
+	for i:=0;i<NLEN;i++ {
+		if (MConst==-1) { 
+			m=(-d.w[i])&BMASK
+		} else {
+			if (MConst==1) {
+				m=d.w[i]
+			} else {m=(MConst*d.w[i])&BMASK}
 		}
-		b=NewBIG()
 
-		for i:=0;i<NLEN;i++ {
-			b.w[i]=d.w[NLEN+i]
-		}
-	}
-
-	if MODTYPE==GENERALISED_MERSENNE { // GoldiLocks only
-		t:=d.split(MODBITS)
-		b=NewBIGdcopy(d)
-		b.add(t);
-		dd:=NewDBIGscopy(t)
-		dd.shl(MODBITS/2)
-
-		tt:=dd.split(MODBITS)
-		lo:=NewBIGdcopy(dd)
-		b.add(tt)
-		b.add(lo)
-		b.norm()
-		tt.shl(MODBITS/2)
-		b.add(tt)
-
-		carry:=b.w[NLEN-1]>>TBITS
-		b.w[NLEN-1]&=TMASK
-		b.w[0]+=carry
-			
-		b.w[224/BASEBITS]+=carry<<(224%BASEBITS);
-	}
-
-	if MODTYPE==NOT_SPECIAL {
-		md:=NewBIGints(Modulus)
-		carry:=Chunk(0)
-		m:=Chunk(0)
-		for i:=0;i<NLEN;i++ {
-			if (MConst==-1) { 
-				m=(-d.w[i])&BMASK
-			} else {
-				if (MConst==1) {
-					m=d.w[i]
-				} else {m=(MConst*d.w[i])&BMASK}
-			}
-
-			carry=0
-			for j:=0;j<NLEN;j++ {
-				carry,d.w[i+j]=muladd(m,md.w[j],carry,d.w[i+j])
+		carry=0
+		for j:=0;j<NLEN;j++ {
+			carry,d.w[i+j]=muladd(m,md.w[j],carry,d.w[i+j])
 				//carry=d.muladd(m,md.w[j],carry,i+j)
-			}
-			d.w[NLEN+i]+=carry
 		}
+		d.w[NLEN+i]+=carry
+	}
 
-		b=NewBIG()
-		for i:=0;i<NLEN;i++ {
-			b.w[i]=d.w[NLEN+i]
-		}
-		
+	b:=NewBIG()
+	for i:=0;i<NLEN;i++ {
+		b.w[i]=d.w[NLEN+i]
 	}
 	b.norm()
-	return b
+	return b		
 }
 
 /* set this[i]+=x*y+c, and return high part */

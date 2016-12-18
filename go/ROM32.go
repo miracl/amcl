@@ -115,81 +115,31 @@ func sqr(a *BIG) *DBIG {
 	return c
 }
 
-/* reduce a DBIG to a BIG using the appropriate form of the modulus */
-func mod(d *DBIG) *BIG {
-	var b *BIG
-	if MODTYPE==PSEUDO_MERSENNE {
-		t:=d.split(MODBITS)
-		b=NewBIGdcopy(d)
+func monty(d *DBIG) *BIG {
+	var dd [NLEN]DChunk
 
-		v:=t.pmul(int(MConst))
-		tw:=t.w[NLEN-1]
-		t.w[NLEN-1]&=TMASK
-		t.w[0]+=(MConst*((tw>>TBITS)+(v<<(BASEBITS-TBITS))))
+	var v [NLEN]Chunk
+	var m=NewBIGints(Modulus)
+	b:=NewBIG()
 
-		b.add(t)
+	t:=DChunk(d.w[0]); v[0]=(Chunk(t)*MConst)&BMASK; t+=DChunk(v[0])*DChunk(m.w[0]); c:=(t>>BASEBITS)+DChunk(d.w[1]); s:=DChunk(0)
+
+	for k:=1;k<NLEN;k++ {
+		t=c+s+DChunk(v[0])*DChunk(m.w[k])
+		for i:=k-1;i>k/2;i-- {t+=DChunk(v[k-i]-v[i])*DChunk(m.w[i]-m.w[k-i])}
+		v[k]=(Chunk(t)*MConst)&BMASK; t+=DChunk(v[k])*DChunk(m.w[0]); c=(t>>BASEBITS)+DChunk(d.w[k+1])
+		dd[k]=DChunk(v[k])*DChunk(m.w[k]); s+=dd[k]
 	}
-	if MODTYPE==MONTGOMERY_FRIENDLY {
-		for i:=0;i<NLEN;i++ {
-			top,bot:=muladd(d.w[i],MConst-1,d.w[i],d.w[NLEN+i-1])
-			d.w[NLEN+i-1]=bot
-			d.w[NLEN+i]+=top
-			//d.w[NLEN+i]+=d.muladd(d.w[i],MConst-1,d.w[i],NLEN+i-1)
-		}
-		b=NewBIG()
-
-		for i:=0;i<NLEN;i++ {
-			b.w[i]=d.w[NLEN+i]
-		}
+	for k:=NLEN;k<2*NLEN-1;k++ {
+		t=c+s;
+		for i:=NLEN-1;i>=1+k/2;i-- {t+=DChunk(v[k-i]-v[i])*DChunk(m.w[i]-m.w[k-i])}
+		b.w[k-NLEN]=Chunk(t)&BMASK; c=(t>>BASEBITS)+DChunk(d.w[k+1]); s-=dd[k-NLEN+1]
 	}
-
-	if MODTYPE==GENERALISED_MERSENNE { // GoldiLocks only
-		t:=d.split(MODBITS)
-		b=NewBIGdcopy(d)
-		b.add(t);
-		dd:=NewDBIGscopy(t)
-		dd.shl(MODBITS/2)
-
-		tt:=dd.split(MODBITS)
-		lo:=NewBIGdcopy(dd)
-		b.add(tt)
-		b.add(lo)
-		b.norm()
-		tt.shl(MODBITS/2)
-		b.add(tt)
-
-		carry:=b.w[NLEN-1]>>TBITS
-		b.w[NLEN-1]&=TMASK
-		b.w[0]+=carry
-			
-		b.w[224/BASEBITS]+=carry<<(224%BASEBITS);
-	}
-
-	if MODTYPE==NOT_SPECIAL {
-		var dd [NLEN]DChunk
-
-		var v [NLEN]Chunk
-		var m=NewBIGints(Modulus)
-		b=NewBIG()
-
-		t:=DChunk(d.w[0]); v[0]=(Chunk(t)*MConst)&BMASK; t+=DChunk(v[0])*DChunk(m.w[0]); c:=(t>>BASEBITS)+DChunk(d.w[1]); s:=DChunk(0)
-
-		for k:=1;k<NLEN;k++ {
-			t=c+s+DChunk(v[0])*DChunk(m.w[k])
-			for i:=k-1;i>k/2;i-- {t+=DChunk(v[k-i]-v[i])*DChunk(m.w[i]-m.w[k-i])}
-			v[k]=(Chunk(t)*MConst)&BMASK; t+=DChunk(v[k])*DChunk(m.w[0]); c=(t>>BASEBITS)+DChunk(d.w[k+1])
-			dd[k]=DChunk(v[k])*DChunk(m.w[k]); s+=dd[k]
-		}
-		for k:=NLEN;k<2*NLEN-1;k++ {
-			t=c+s;
-			for i:=NLEN-1;i>=1+k/2;i-- {t+=DChunk(v[k-i]-v[i])*DChunk(m.w[i]-m.w[k-i])}
-			b.w[k-NLEN]=Chunk(t)&BMASK; c=(t>>BASEBITS)+DChunk(d.w[k+1]); s-=dd[k-NLEN+1]
-		}
-		b.w[NLEN-1]=Chunk(c)&BMASK;	
-	}
+	b.w[NLEN-1]=Chunk(c)&BMASK;	
 	b.norm()
 	return b
 }
+
 
 /* set this[i]+=x*y+c, and return high part */
 func muladd(a Chunk,b Chunk,c Chunk,r Chunk) (Chunk,Chunk) {

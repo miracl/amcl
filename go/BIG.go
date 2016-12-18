@@ -393,6 +393,67 @@ func smul(a *BIG,b *BIG) *BIG {
 	return c;
 }
 
+/* reduce a DBIG to a BIG using the appropriate form of the modulus */
+func mod(d *DBIG) *BIG {
+	if MODTYPE==PSEUDO_MERSENNE {
+		t:=d.split(MODBITS)
+		b:=NewBIGdcopy(d)
+
+		v:=t.pmul(int(MConst))
+		tw:=t.w[NLEN-1]
+		t.w[NLEN-1]&=TMASK
+		t.w[0]+=(MConst*((tw>>TBITS)+(v<<(BASEBITS-TBITS))))
+
+		b.add(t)
+		b.norm()
+		return b		
+	}
+	if MODTYPE==MONTGOMERY_FRIENDLY {
+		for i:=0;i<NLEN;i++ {
+			top,bot:=muladd(d.w[i],MConst-1,d.w[i],d.w[NLEN+i-1])
+			d.w[NLEN+i-1]=bot
+			d.w[NLEN+i]+=top
+			//d.w[NLEN+i]+=d.muladd(d.w[i],MConst-1,d.w[i],NLEN+i-1)
+		}
+		b:=NewBIG()
+
+		for i:=0;i<NLEN;i++ {
+			b.w[i]=d.w[NLEN+i]
+		}
+		b.norm()
+		return b		
+	}
+
+	if MODTYPE==GENERALISED_MERSENNE { // GoldiLocks only
+		t:=d.split(MODBITS)
+		b:=NewBIGdcopy(d)
+		b.add(t);
+		dd:=NewDBIGscopy(t)
+		dd.shl(MODBITS/2)
+
+		tt:=dd.split(MODBITS)
+		lo:=NewBIGdcopy(dd)
+		b.add(tt)
+		b.add(lo)
+		b.norm()
+		tt.shl(MODBITS/2)
+		b.add(tt)
+
+		carry:=b.w[NLEN-1]>>TBITS
+		b.w[NLEN-1]&=TMASK
+		b.w[0]+=carry
+			
+		b.w[224/BASEBITS]+=carry<<(224%BASEBITS);
+		b.norm()
+		return b		
+	}
+
+	if MODTYPE==NOT_SPECIAL {
+		return monty(d) 
+	}
+	return NewBIG()
+}
+
 /* Compare a and b, return 0 if a==b, -1 if a<b, +1 if a>b. Inputs must be normalised */
 func comp(a *BIG,b *BIG) int {
 	for i:=NLEN-1;i>=0;i-- {
