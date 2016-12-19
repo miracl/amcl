@@ -49,14 +49,6 @@ public class DBIG {
 	}
 */
 
-/* set this[i]+=x*y+c, and return high part */
-	public int muladd(int x,int y,int c,int i)
-	{
-		long prod=(long)x*y+c+w[i];
-		w[i]=(int)prod&ROM.BMASK;
-		return (int)(prod>>ROM.BASEBITS);
-	}
-
 
 /****************************************************************************/
 

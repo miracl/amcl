@@ -272,7 +272,6 @@ public class BIG {
 			carry=cr[0];
 			w[i]=cr[1];
 
-			//carry=muladd(ak,(long)c,carry,i);
 		}
 		return carry;
 	}
@@ -288,7 +287,6 @@ public class BIG {
 			cr=muladd(w[j],(long)c,carry,m.w[j]);
 			carry=cr[0];
 			m.w[j]=cr[1];
-			//carry=m.muladd(w[j],(long)c,carry,j);
 		}
 		m.w[ROM.NLEN]=carry;		
 		return m;
@@ -324,7 +322,6 @@ public class BIG {
 					cr=muladd(a.w[i],b.w[j],carry,c.w[i+j]);
 					carry=cr[0];
 					c.w[i+j]=cr[1];
-					//carry=c.muladd(a.w[i],b.w[j],carry,i+j);
 				}
 		}
 		return c;
@@ -412,11 +409,9 @@ public class BIG {
 				cr=muladd(d.w[i],ROM.MConst-1,d.w[i],d.w[ROM.NLEN+i-1]);
 				d.w[ROM.NLEN+i]+=cr[0];
 				d.w[ROM.NLEN+i-1]=cr[1];
-
-				//d.w[ROM.NLEN+i]+=d.muladd(d.w[i],ROM.MConst-1,d.w[i],ROM.NLEN+i-1);
 			}
+			
 			b=new BIG(0);
-
 			for (int i=0;i<ROM.NLEN;i++ )
 				b.w[i]=d.w[ROM.NLEN+i];
 			b.norm();

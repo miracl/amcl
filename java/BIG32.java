@@ -206,24 +206,29 @@ public class BIG {
 		return s;
 	}
 
-/* set this[i]+=x*y+c, and return high part */
-	public int muladd(int x,int y,int c,int i)
+	public static int[] muladd(int x,int y,int c,int r)
 	{
-		long prod=(long)x*y+c+w[i];
-		w[i]=(int)prod&ROM.BMASK;
-		return (int)(prod>>ROM.BASEBITS);
+		int[] tb=new int[2];
+		long prod=(long)x*y+c+r;	
+		tb[1]=(int)prod&ROM.BMASK;
+		tb[0]=(int)(prod>>ROM.BASEBITS);
+		return tb;
 	}
 
 /* this*=x, where x is >NEXCESS */
 	public int pmul(int c)
 	{
 		int ak,carry=0;
+		int[] cr=new int[2];
+
 		norm();
 		for (int i=0;i<ROM.NLEN;i++)
 		{
 			ak=w[i];
 			w[i]=0;
-			carry=muladd(ak,c,carry,i);
+			cr=muladd(ak,c,carry,w[i]);
+			carry=cr[0];
+			w[i]=cr[1];
 		}
 		return carry;
 	}
@@ -232,9 +237,14 @@ public class BIG {
 	public DBIG pxmul(int c)
 	{
 		DBIG m=new DBIG(0);	
+		int[] cr=new int[2];	
 		int carry=0;
 		for (int j=0;j<ROM.NLEN;j++)
-			carry=m.muladd(w[j],c,carry,j);
+		{
+			cr=muladd(w[j],c,carry,m.w[j]);
+			carry=cr[0];
+			m.w[j]=cr[1];
+		}
 		m.w[ROM.NLEN]=carry;		
 		return m;
 	}
@@ -259,11 +269,19 @@ public class BIG {
 	{
 		int carry;
 		BIG c=new BIG(0);
+		int[] cr=new int[2];			
 		for (int i=0;i<ROM.NLEN;i++)
 		{
 			carry=0;
 			for (int j=0;j<ROM.NLEN;j++)
-				if (i+j<ROM.NLEN) carry=c.muladd(a.w[i],b.w[j],carry,i+j);
+			{
+				if (i+j<ROM.NLEN) 
+				{
+					cr=muladd(a.w[i],b.w[j],carry,c.w[i+j]);
+					carry=cr[0];
+					c.w[i+j]=cr[1];
+				}
+			}
 		}
 		return c;
 	}
@@ -363,11 +381,15 @@ public class BIG {
 		}
 		if (ROM.MODTYPE==ROM.MONTGOMERY_FRIENDLY)
 		{
+			int[] cr=new int[2];				
 			for (int i=0;i<ROM.NLEN;i++)
-				d.w[ROM.NLEN+i]+=d.muladd(d.w[i],ROM.MConst-1,d.w[i],ROM.NLEN+i-1);
+			{
+				cr=muladd(d.w[i],ROM.MConst-1,d.w[i],d.w[ROM.NLEN+i-1]);
+				d.w[ROM.NLEN+i]+=cr[0];
+				d.w[ROM.NLEN+i-1]=cr[1];	
+			}
 			
 			b=new BIG(0);
-
 			for (int i=0;i<ROM.NLEN;i++ )
 				b.w[i]=d.w[ROM.NLEN+i];
 			b.norm();
