@@ -214,7 +214,7 @@ final class BIG{
         }
     }
 /* normalise BIG - force all digits < 2^BASEBITS */
-    func norm() -> Int
+    func norm() -> Chunk
     {
         var carry=Chunk(0);
         for i in 0 ..< ROM.NLEN-1
@@ -224,7 +224,7 @@ final class BIG{
             carry=d>>Chunk(ROM.BASEBITS)
         }
         w[ROM.NLEN-1]+=carry
-        return Int(w[ROM.NLEN-1]>>Chunk((8*ROM.MODBYTES)%ROM.BASEBITS))
+        return (w[ROM.NLEN-1]>>Chunk((8*ROM.MODBYTES)%ROM.BASEBITS))
     }
 /* Shift right by less than a word */
     func fshr(_ k: UInt) -> Int
