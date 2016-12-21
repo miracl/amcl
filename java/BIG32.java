@@ -64,11 +64,6 @@ public class BIG {
 		w[i]=x;
 	} 
 
-	public void xortop(int x,int s)
-	{
-		w[ROM.NLEN-1]^=((int)x<<s);
-	}
-
 /* calculate Field Excess */
 	public static int EXCESS(BIG a)
 	{
@@ -150,7 +145,7 @@ public class BIG {
 	}
 
 /* normalise BIG - force all digits < 2^BASEBITS */
-	public int norm() {
+	public long norm() {
 		int d,carry=0;
 		for (int i=0;i<ROM.NLEN-1;i++)
 		{
@@ -159,7 +154,7 @@ public class BIG {
 			carry=d>>ROM.BASEBITS;
 		}
 		w[ROM.NLEN-1]=(w[ROM.NLEN-1]+carry);
-		return (int)(w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS));  
+		return (long)(w[ROM.NLEN-1]>>((8*ROM.MODBYTES)%ROM.BASEBITS));  
 	}
 
 /* return number of bits */
@@ -452,7 +447,10 @@ public class BIG {
 
 
 /****************************************************************************/
-
+	public void xortop(long x)
+	{
+		w[ROM.NLEN-1]^=x;
+	}
 
 /* set x = x mod 2^m */
 	public void mod2m(int m)
@@ -576,6 +574,12 @@ public class BIG {
 		norm();
 		w[0]+=x;
 	}
+
+/* this+=x, where x is long */
+	public void incl(long x) {
+		norm();
+		w[0]+=x;
+	}	
 
 /* return this.x */
 	public BIG minus(BIG x) {

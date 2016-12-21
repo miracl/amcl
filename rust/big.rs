@@ -231,7 +231,7 @@ impl BIG {
 
 /* 
 alise BIG - force all digits < 2^rom::BASEBITS */
-    pub fn norm(&mut self) -> isize
+    pub fn norm(&mut self) -> Chunk
     {
         let mut carry=0 as Chunk;
         for i in 0 ..rom::NLEN-1 {
@@ -240,7 +240,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
             carry=d>>rom::BASEBITS;
         }
         self.w[rom::NLEN-1]+=carry;
-        return (self.w[rom::NLEN-1]>>((8*rom::MODBYTES)%rom::BASEBITS)) as isize;
+        return (self.w[rom::NLEN-1]>>((8*rom::MODBYTES)%rom::BASEBITS)) as Chunk;
     }
 
 /* Conditional swap of two bigs depending on d using XOR - no branches */
@@ -368,6 +368,11 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     	self.norm();
     	self.w[0]+=x as Chunk; 
     }
+
+//    pub fn incl(&mut self,x:Chunk) {
+//        self.norm();
+//        self.w[0]+=x; 
+//    }
 
 /* return self-x */
 	pub fn minus(&self,x:& BIG) -> BIG {

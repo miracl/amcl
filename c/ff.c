@@ -310,7 +310,7 @@ void FF_dec(BIG x[],int m,int n)
 static void FF_rnorm(BIG z[],int zp,int n)
 {
     int i,trunc=0;
-    int carry;
+    chunk carry;
     if (n<0)
     {
         /* -v n signals to do truncation */
@@ -321,11 +321,11 @@ static void FF_rnorm(BIG z[],int zp,int n)
     {
         carry=BIG_norm(z[zp+i]);
 
-        z[zp+i][NLEN-1]^=(chunk)carry<<P_TBITS; /* remove it */
+        z[zp+i][NLEN-1]^=carry<<P_TBITS; /* remove it */
         z[zp+i+1][0]+=carry;
     }
     carry=BIG_norm(z[zp+n-1]);
-    if (trunc) z[zp+n-1][NLEN-1]^=(chunk)carry<<P_TBITS;
+    if (trunc) z[zp+n-1][NLEN-1]^=carry<<P_TBITS;
 }
 
 void FF_norm(BIG z[],int n)

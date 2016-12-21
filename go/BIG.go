@@ -55,7 +55,7 @@ func FF_EXCESS(a* BIG) Chunk {
 }
 
 /* normalise BIG - force all digits < 2^BASEBITS */
-func (r *BIG) norm() int {
+func (r *BIG) norm() Chunk {
 	carry:=Chunk(0)
 	for i:=0;i<NLEN-1;i++ {
 		d:=r.w[i]+carry
@@ -63,7 +63,7 @@ func (r *BIG) norm() int {
 		carry=d>>BASEBITS
 	}
 	r.w[NLEN-1]=(r.w[NLEN-1]+carry)
-	return int(r.w[NLEN-1]>>((8*MODBYTES)%BASEBITS))  
+	return (r.w[NLEN-1]>>((8*MODBYTES)%BASEBITS))  
 }
 
 /* Shift right by less than a word */

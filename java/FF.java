@@ -231,7 +231,8 @@ public final class FF {
 	private void rnorm(int vp,int n)
 	{
 		boolean trunc=false;
-		int i,carry;
+		int i;
+		long carry;
 		if (n<0)
 		{ /* -v n signals to do truncation */
 			n=-n;
@@ -240,12 +241,12 @@ public final class FF {
 		for (i=0;i<n-1;i++)
 		{
 			carry=v[vp+i].norm();  
-			v[vp+i].xortop(carry,ROM.P_TBITS);
-			v[vp+i+1].inc(carry);
+			v[vp+i].xortop(carry<<ROM.P_TBITS);
+			v[vp+i+1].incl(carry);
 		}
 		carry=v[vp+n-1].norm();
 		if (trunc) 
-			v[vp+n-1].xortop(carry,ROM.P_TBITS);
+			v[vp+n-1].xortop(carry<<ROM.P_TBITS);
 	}
 
 	public void norm()
@@ -261,7 +262,7 @@ public final class FF {
 		{
 			carry=v[i].fshl(1);
 			v[i].inc(delay_carry);
-			v[i].xortop(carry,ROM.P_TBITS);
+			v[i].xortop((long)carry<<ROM.P_TBITS);
 			delay_carry=carry;
 		}
 		v[length-1].fshl(1);
@@ -276,7 +277,7 @@ public final class FF {
 		for (int i=length-1;i>0;i--)
 		{
 			carry=v[i].fshr(1);
-			v[i-1].xortop(carry,ROM.P_TBITS);
+			v[i-1].xortop((long)carry<<ROM.P_TBITS);
 		}
 		v[0].fshr(1);
 	}

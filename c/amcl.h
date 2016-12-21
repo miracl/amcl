@@ -1060,7 +1060,7 @@ extern chunk BIG_split(BIG x,BIG y,DBIG z,int s);
 	All digits of the input BIG are reduced mod 2^BASEBITS
 	@param x BIG number to be normalised
  */
-extern int BIG_norm(BIG x);
+extern chunk BIG_norm(BIG x);
 /**	@brief Normalizes a DBIG number - output normalised
  *
 	All digits of the input DBIG are reduced mod 2^BASEBITS

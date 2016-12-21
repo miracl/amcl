@@ -224,7 +224,7 @@ impl FF {
 /* normalise - but hold any overflow in top part unless n<0 */
 	pub fn rnorm(&mut self,vp: usize,n: isize) {
 		let mut trunc=false;
-		let mut carry:isize;
+		let mut carry:Chunk;
 		let mut nn:usize=n as usize; 
 		if n<0 { /* -v n signals to do truncation */
 			nn=(-n) as usize;
@@ -232,12 +232,12 @@ impl FF {
 		}
 		for i in 0..nn-1 {
 			carry=self.v[vp+i].norm();
-			self.v[vp+i].xortop((carry as Chunk)<<rom::P_TBITS);
-			self.v[vp+i+1].inc(carry);
+			self.v[vp+i].xortop(carry<<rom::P_TBITS);
+			self.v[vp+i+1].w[0]+=carry; //incl(carry);
 		}
 		carry=self.v[vp+nn-1].norm();
 		if trunc {
-			self.v[vp+nn-1].xortop((carry as Chunk)<<rom::P_TBITS);
+			self.v[vp+nn-1].xortop(carry<<rom::P_TBITS);
 		}
 	}
 

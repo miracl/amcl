@@ -198,19 +198,19 @@ func (F *FF) revsub(b *FF) {
 /* normalise - but hold any overflow in top part unless n<0 */
 func (F *FF) rnorm(vp int,n int) {
 	trunc:=false
-	var carry int
+	var carry Chunk
 	if n<0 { /* -v n signals to do truncation */
 		n=-n
 		trunc=true
 	}
 	for i:=0;i<n-1;i++ {
 		carry=F.v[vp+i].norm()
-		F.v[vp+i].xortop(Chunk(carry)<<P_TBITS)
-		F.v[vp+i+1].inc(carry)
+		F.v[vp+i].xortop(carry<<P_TBITS)
+		F.v[vp+i+1].w[0]+=carry; // inc(carry)
 	}
 	carry=F.v[vp+n-1].norm()
 	if trunc {
-		F.v[vp+n-1].xortop(Chunk(carry)<<P_TBITS)
+		F.v[vp+n-1].xortop(carry<<P_TBITS)
 	}
 }
 

@@ -741,74 +741,35 @@ BIG.mul=function(a,b)
 //	a.norm();
 //	b.norm();
 
-/* Doesn't work!
-	var d=[];
-	var s;
+		var d=[];
+		var s,t;
+
+		for (var i=0;i<ROM.NLEN;i++)
+			d[i]=a.w[i]*b.w[i];
+
+		s=d[0];
+		t=s; c.w[0]=t;
+
+		for (var k=1;k<ROM.NLEN;k++)
+		{
+			s+=d[k]; t=s; for (i=k;i>=1+Math.floor(k/2);i--) t+=(a.w[i]-a.w[k-i])*(b.w[k-i]-b.w[i]); c.w[k]=t;
+		}
+		for (var k=ROM.NLEN;k<2*ROM.NLEN-1;k++)
+		{
+			s-=d[k-ROM.NLEN]; t=s; for (i=ROM.NLEN-1;i>=1+Math.floor(k/2);i--) t+=(a.w[i]-a.w[k-i])*(b.w[k-i]-b.w[i]); c.w[k]=t; 
+		}
+
+		var co=0;
+		for (var i=0;i<ROM.DNLEN-1;i++)
+		{
+			n=c.w[i]+co;
+			c.w[i]=n&ROM.BMASK;
+			co=(n-c.w[i])*ROM.MODINV;
+		}
+		c.w[ROM.DNLEN-1]=co;		
 
 
-	d[0]=a.w[0]*b.w[0];
-	d[1]=a.w[1]*b.w[1];
-	d[2]=a.w[2]*b.w[2];
-	d[3]=a.w[3]*b.w[3];
-	d[4]=a.w[4]*b.w[4];
-	d[5]=a.w[5]*b.w[5];
-	d[6]=a.w[6]*b.w[6];
-	d[7]=a.w[7]*b.w[7];
-	d[8]=a.w[8]*b.w[8];
-	d[9]=a.w[9]*b.w[9];
-	d[10]=a.w[10]*b.w[10];
-
-
-	c.w[0]=d[0];
-	s+=d[1]; c.w[1]=s+(a.w[1]-a.w[0])*(b.w[0]-b.w[1]); 
-	s+=d[2]; c.w[2]=s+(a.w[2]-a.w[0])*(b.w[0]-b.w[2]); 
-	s+=d[3]; c.w[3]=s+(a.w[3]-a.w[0])*(b.w[0]-b.w[3])+(a.w[2]-a.w[1])*(b.w[1]-b.w[2]); 
-	s+=d[4]; c.w[4]=s+(a.w[4]-a.w[0])*(b.w[0]-b.w[4])+(a.w[3]-a.w[1])*(b.w[1]-b.w[3]); 
-	s+=d[5]; c.w[5]=s+(a.w[5]-a.w[0])*(b.w[0]-b.w[5])+(a.w[4]-a.w[1])*(b.w[1]-b.w[4])+(a.w[3]-a.w[2])*(b.w[2]-b.w[3]);
-	s+=d[6]; c.w[6]=s+(a.w[6]-a.w[0])*(b.w[0]-b.w[6])+(a.w[5]-a.w[1])*(b.w[1]-b.w[5])+(a.w[4]-a.w[2])*(b.w[2]-b.w[4]); 
-	s+=d[7]; c.w[7]=s+(a.w[7]-a.w[0])*(b.w[0]-b.w[7])+(a.w[6]-a.w[1])*(b.w[1]-b.w[6])+(a.w[5]-a.w[2])*(b.w[2]-b.w[5])+(a.w[4]-a.w[3])*(b.w[3]-b.w[4]); 
-	s+=d[8]; c.w[8]=s+(a.w[8]-a.w[0])*(b.w[0]-b.w[8])+(a.w[7]-a.w[1])*(b.w[1]-b.w[7])+(a.w[6]-a.w[2])*(b.w[2]-b.w[6])+(a.w[5]-a.w[3])*(b.w[3]-b.w[5]); 
-	s+=d[9]; c.w[9]=s+(a.w[9]-a.w[0])*(b.w[0]-b.w[9])+(a.w[8]-a.w[1])*(b.w[1]-b.w[8])+(a.w[7]-a.w[2])*(b.w[2]-b.w[7])+(a.w[6]-a.w[3])*(b.w[3]-b.w[6])+(a.w[5]-a.w[4])*(b.w[4]-b.w[5]);
-	s+=d[10]; c.w[10]=s+(a.w[10]-a.w[0])*(b.w[0]-b.w[10])+(a.w[9]-a.w[1])*(b.w[1]-b.w[9])+(a.w[8]-a.w[2])*(b.w[2]-b.w[8])+(a.w[7]-a.w[3])*(b.w[3]-b.w[7])+(a.w[6]-a.w[4])*(b.w[4]-b.w[6]); 
-
-	s-=d[0]; c.w[11]=s+(a.w[10]-a.w[1])*(b.w[1]-b.w[10])+(a.w[9]-a.w[2])*(b.w[2]-b.w[9])+(a.w[8]-a.w[3])*(b.w[3]-b.w[8])+(a.w[7]-a.w[4])*(b.w[4]-b.w[7])+(a.w[6]-a.w[5])*(b.w[5]-b.w[6]); 
-	s-=d[1]; c.w[12]=s+(a.w[10]-a.w[2])*(b.w[2]-b.w[10])+(a.w[9]-a.w[3])*(b.w[3]-b.w[9])+(a.w[8]-a.w[4])*(b.w[4]-b.w[8])+(a.w[7]-a.w[5])*(b.w[5]-b.w[7]); 
-	s-=d[2]; c.w[13]=s+(a.w[10]-a.w[3])*(b.w[3]-b.w[10])+(a.w[9]-a.w[4])*(b.w[4]-b.w[9])+(a.w[8]-a.w[5])*(b.w[5]-b.w[8])+(a.w[7]-a.w[6])*(b.w[6]-b.w[7]);
-	s-=d[3]; c.w[14]=s+(a.w[10]-a.w[4])*(b.w[4]-b.w[10])+(a.w[9]-a.w[5])*(b.w[5]-b.w[9])+(a.w[8]-a.w[6])*(b.w[6]-b.w[8]); 
-	s-=d[4]; c.w[15]=s+(a.w[10]-a.w[5])*(b.w[5]-b.w[10])+(a.w[9]-a.w[6])*(b.w[6]-b.w[9])+(a.w[8]-a.w[7])*(b.w[7]-b.w[8]); 
-	s-=d[5]; c.w[16]=s+(a.w[10]-a.w[6])*(b.w[6]-b.w[10])+(a.w[9]-a.w[7])*(b.w[7]-b.w[9]); 
-	s-=d[6]; c.w[17]=s+(a.w[10]-a.w[7])*(b.w[7]-b.w[10])+(a.w[9]-a.w[8])*(b.w[8]-b.w[9]); 
-	s-=d[7]; c.w[18]=s+(a.w[10]-a.w[8])*(b.w[8]-b.w[10]); 
-	s-=d[8]; c.w[19]=s+(a.w[10]-a.w[9])*(b.w[9]-b.w[10]); 
-	s-=d[9]; c.w[20]=s; 
-*/
-
-	
 /*
-	c.w[0]=a.w[0]*b.w[0];
-	c.w[1]=a.w[1]*b.w[0]+a.w[0]*b.w[1];
-	c.w[2]=a.w[2]*b.w[0]+a.w[1]*b.w[1]+a.w[0]*b.w[2];
-	c.w[3]=a.w[3]*b.w[0]+a.w[2]*b.w[1]+a.w[1]*b.w[2]+a.w[0]*b.w[3];
-	c.w[4]=a.w[4]*b.w[0]+a.w[3]*b.w[1]+a.w[2]*b.w[2]+a.w[1]*b.w[3]+a.w[0]*b.w[4];
-	c.w[5]=a.w[5]*b.w[0]+a.w[4]*b.w[1]+a.w[3]*b.w[2]+a.w[2]*b.w[3]+a.w[1]*b.w[4]+a.w[0]*b.w[5];
-	c.w[6]=a.w[6]*b.w[0]+a.w[5]*b.w[1]+a.w[4]*b.w[2]+a.w[3]*b.w[3]+a.w[2]*b.w[4]+a.w[1]*b.w[5]+a.w[0]*b.w[6];
-	c.w[7]=a.w[7]*b.w[0]+a.w[6]*b.w[1]+a.w[5]*b.w[2]+a.w[4]*b.w[3]+a.w[3]*b.w[4]+a.w[2]*b.w[5]+a.w[1]*b.w[6]+a.w[0]*b.w[7];
-	c.w[8]=a.w[8]*b.w[0]+a.w[7]*b.w[1]+a.w[6]*b.w[2]+a.w[5]*b.w[3]+a.w[4]*b.w[4]+a.w[3]*b.w[5]+a.w[2]*b.w[6]+a.w[1]*b.w[7]+a.w[0]*b.w[8];
-	c.w[9]=a.w[9]*b.w[0]+a.w[8]*b.w[1]+a.w[7]*b.w[2]+a.w[6]*b.w[3]+a.w[5]*b.w[4]+a.w[4]*b.w[5]+a.w[3]*b.w[6]+a.w[2]*b.w[7]+a.w[1]*b.w[8]+a.w[0]*b.w[9];
-	c.w[10]=a.w[10]*b.w[0]+a.w[9]*b.w[1]+a.w[8]*b.w[2]+a.w[7]*b.w[3]+a.w[6]*b.w[4]+a.w[5]*b.w[5]+a.w[4]*b.w[6]+a.w[3]*b.w[7]+a.w[2]*b.w[8]+a.w[1]*b.w[9]+a.w[0]*b.w[10];
-
-	c.w[11]=a.w[10]*b.w[1]+a.w[9]*b.w[2]+a.w[8]*b.w[3]+a.w[7]*b.w[4]+a.w[6]*b.w[5]+a.w[5]*b.w[6]+a.w[4]*b.w[7]+a.w[3]*b.w[8]+a.w[2]*b.w[9]+a.w[1]*b.w[10];
-	c.w[12]= a.w[10]*b.w[2]+a.w[9]*b.w[3]+a.w[8]*b.w[4]+a.w[7]*b.w[5]+a.w[6]*b.w[6]+a.w[5]*b.w[7]+a.w[4]*b.w[8]+a.w[3]*b.w[9]+a.w[2]*b.w[10];
-	c.w[13]= a.w[10]*b.w[3]+a.w[9]*b.w[4]+a.w[8]*b.w[5]+a.w[7]*b.w[6]+a.w[6]*b.w[7]+a.w[5]*b.w[8]+a.w[4]*b.w[9]+a.w[3]*b.w[10];  
-	c.w[14]= a.w[10]*b.w[4]+a.w[9]*b.w[5]+a.w[8]*b.w[6]+a.w[7]*b.w[7]+a.w[6]*b.w[8]+a.w[5]*b.w[9]+a.w[4]*b.w[10];
-	c.w[15]= a.w[10]*b.w[5]+a.w[9]*b.w[6]+a.w[8]*b.w[7]+a.w[7]*b.w[8]+a.w[6]*b.w[9]+a.w[5]*b.w[10];
-	c.w[16]= a.w[10]*b.w[6]+a.w[9]*b.w[7]+a.w[8]*b.w[8]+a.w[7]*b.w[9]+a.w[6]*b.w[10];
-	c.w[17]= a.w[10]*b.w[7]+a.w[9]*b.w[8]+a.w[8]*b.w[9]+a.w[7]*b.w[10];
-	c.w[18]= a.w[10]*b.w[8]+a.w[9]*b.w[9]+a.w[8]*b.w[10];
-	c.w[19]= a.w[10]*b.w[9]+a.w[9]*b.w[10];
-	c.w[20]= a.w[10]*b.w[10];
-*/
-
 	for (var j=0;j<ROM.NLEN;j++)
 	{
 		t=0; for (var i=0;i<=j;i++) t+=a.w[j-i]*b.w[i];
@@ -829,7 +790,7 @@ BIG.mul=function(a,b)
 		co=(n-c.w[i])*ROM.MODINV;
 	}
 	c.w[ROM.DNLEN-1]=co;
-
+*/
 	return c;
 };
 
@@ -838,30 +799,6 @@ BIG.sqr=function(a)
 {
 	var n,c=new DBIG(0);
 //	a.norm();
-/*
-	c.w[0]=a.w[0]*a.w[0];
-	c.w[1]=2*(a.w[1]*a.w[0]);
-	c.w[2]=2*(a.w[2]*a.w[0])+a.w[1]*a.w[1]; 
-	c.w[3]=2*(a.w[3]*a.w[0]+a.w[2]*a.w[1]);
-	c.w[4]=2*(a.w[4]*a.w[0]+a.w[3]*a.w[1])+a.w[2]*a.w[2];
-	c.w[5]=2*(a.w[5]*a.w[0]+a.w[4]*a.w[1]+a.w[3]*a.w[2]);
-	c.w[6]=2*(a.w[6]*a.w[0]+a.w[5]*a.w[1]+a.w[4]*a.w[2])+a.w[3]*a.w[3];
-	c.w[7]=2*(a.w[7]*a.w[0]+a.w[6]*a.w[1]+a.w[5]*a.w[2]+a.w[4]*a.w[3]);
-	c.w[8]=2*(a.w[8]*a.w[0]+a.w[7]*a.w[1]+a.w[6]*a.w[2]+a.w[5]*a.w[3])+a.w[4]*a.w[4];
-	c.w[9]=2*(a.w[9]*a.w[0]+a.w[8]*a.w[1]+a.w[7]*a.w[2]+a.w[6]*a.w[3]+a.w[5]*a.w[4]);
-	c.w[10]=2*(a.w[10]*a.w[0]+a.w[9]*a.w[1]+a.w[8]*a.w[2]+a.w[7]*a.w[3]+a.w[6]*a.w[4])+a.w[5]*a.w[5];
-
-	c.w[11]=2*(a.w[10]*a.w[1]+a.w[9]*a.w[2]+a.w[8]*a.w[3]+a.w[7]*a.w[4]+a.w[6]*a.w[5]);
-	c.w[12]=2*(a.w[10]*a.w[2]+a.w[9]*a.w[3]+a.w[8]*a.w[4]+a.w[7]*a.w[5])+a.w[6]*a.w[6];
-	c.w[13]=2*(a.w[10]*a.w[3]+a.w[9]*a.w[4]+a.w[8]*a.w[5]+a.w[7]*a.w[6]);
-	c.w[14]=2*(a.w[10]*a.w[4]+a.w[9]*a.w[5]+a.w[8]*a.w[6])+a.w[7]*a.w[7];
-	c.w[15]=2*(a.w[10]*a.w[5]+a.w[9]*a.w[6]+a.w[8]*a.w[7]);
-	c.w[16]=2*(a.w[10]*a.w[6]+a.w[9]*a.w[7])+a.w[8]*a.w[8];
-	c.w[17]=2*(a.w[10]*a.w[7]+a.w[9]*a.w[8]);
-	c.w[18]=2*(a.w[10]*a.w[8])+a.w[9]*a.w[9];
-	c.w[19]=2*(a.w[10]*a.w[9]);
-	c.w[20]= a.w[10]*a.w[10];
-*/
 
 	c.w[0]=a.w[0]*a.w[0];
 	t=a.w[1]*a.w[0]; t+=t; c.w[1]=t;
@@ -963,9 +900,42 @@ BIG.mod=function(d)
 		b.w[Math.floor(224/ROM.BASEBITS)]+=carry<<(224%ROM.BASEBITS);
 	}
 
-
 	if (ROM.MODTYPE==ROM.NOT_SPECIAL)
 	{
+
+		var m=new BIG(0);
+		var v=[];
+		var dd=[];
+		var s,c,t;
+
+		m.rcopy(ROM.Modulus);
+
+
+		t=d.w[0]; v[0]=((t&ROM.BMASK)*ROM.MConst)&ROM.BMASK; t+=v[0]*m.w[0]; 
+		c=d.w[1]+(t*ROM.MODINV); s=0;
+
+		for (var k=1;k<ROM.NLEN;k++)
+		{
+			t=c+s+v[0]*m.w[k];
+			for (i=k-1;i>Math.floor(k/2);i--) t+=(v[k-i]-v[i])*(m.w[i]-m.w[k-i]);
+			v[k]=((t&ROM.BMASK)*ROM.MConst)&ROM.BMASK; t+=v[k]*m.w[0]; 
+			c=(t*ROM.MODINV)+d.w[k+1];
+
+			dd[k]=v[k]*m.w[k]; s+=dd[k];
+		}
+		for (var k=ROM.NLEN;k<2*ROM.NLEN-1;k++)
+		{
+			t=c+s;
+			for (i=ROM.NLEN-1;i>=1+Math.floor(k/2);i--) t+=(v[k-i]-v[i])*(m.w[i]-m.w[k-i]);
+			b.w[k-ROM.NLEN]=t&ROM.BMASK; 
+			c=((t-b.w[k-ROM.NLEN])*ROM.MODINV)+d.w[k+1]; 
+
+			s-=dd[k-ROM.NLEN+1];
+		}
+		b.w[ROM.NLEN-1]=c&ROM.BMASK;	
+
+
+/*	
 		var md=new BIG(0);
 		md.rcopy(ROM.Modulus);
 		var sum;
@@ -992,6 +962,7 @@ BIG.mod=function(d)
 		d.w[ROM.DNLEN-1]=sum&ROM.BMASK;
 		for (i=0;i<ROM.NLEN;i++)
 			b.w[i]=d.w[ROM.NLEN+i];
+*/		
 	}
 	b.norm();
 	return b;
