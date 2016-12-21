@@ -236,12 +236,12 @@ final class FF {
         for i in 0 ..< nn-1
         {
             let carry=v[vp+i].norm();
-            v[vp+i].xortop(Chunk(carry)<<Chunk(ROM.P_TBITS))
-            v[vp+i+1].inc(carry)
+            v[vp+i].xortop(carry<<Chunk(ROM.P_TBITS))
+            v[vp+i+1].w[0]+=carry; //inc(carry)
         }
         let carry=v[vp+nn-1].norm();
         if (trunc)
-            {v[vp+nn-1].xortop(Chunk(carry)<<Chunk(ROM.P_TBITS))}
+            {v[vp+nn-1].xortop(carry<<Chunk(ROM.P_TBITS))}
     }
     
     func norm()
