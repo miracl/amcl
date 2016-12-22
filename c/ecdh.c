@@ -567,12 +567,6 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
         if (RNG!=NULL)
         {
             BIG_randomnum(u,r,RNG);
-            // Output emphemeral key for test vector generation
-            if (K!=NULL)
-            {
-                K->len=EFS;
-                BIG_toBytes(K->val,u);
-            }
             BIG_randomnum(w,r,RNG); /* randomize calculation */
         }
         else
