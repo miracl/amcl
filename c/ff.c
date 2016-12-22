@@ -337,12 +337,12 @@ void FF_norm(BIG z[],int n)
 void FF_shl(BIG x[],int n)
 {
     int i;
-    chunk carry,delay_carry=0;
+    int carry,delay_carry=0;
     for (i=0; i<n-1; i++)
     {
         carry=BIG_fshl(x[i],1);
         x[i][0]|=delay_carry;
-        x[i][NLEN-1]^=carry<<P_TBITS;
+        x[i][NLEN-1]^=(chunk)carry<<P_TBITS;
         delay_carry=carry;
     }
     BIG_fshl(x[n-1],1);
@@ -353,11 +353,11 @@ void FF_shl(BIG x[],int n)
 void FF_shr(BIG x[],int n)
 {
     int i;
-    chunk carry;
+    int carry;
     for (i=n-1; i>0; i--)
     {
         carry=BIG_fshr(x[i],1);
-        x[i-1][NLEN-1]|=carry<<P_TBITS;
+        x[i-1][NLEN-1]|=(chunk)carry<<P_TBITS;
     }
     BIG_fshr(x[0],1);
 }
@@ -797,7 +797,11 @@ static void FF_modmul(BIG z[],BIG x[],BIG y[],BIG p[],BIG ND[],int n)
 #endif
     chunk ex=P_EXCESS(x[n-1]);
     chunk ey=P_EXCESS(y[n-1]);
-    if ((ex+1)>=(P_FEXCESS-1)/(ey+1))
+#ifdef dchunk
+    if ((dchunk)(ex+1)*(ey+1)>(dchunk)P_FEXCESS)
+#else
+    if ((ex+1)>P_FEXCESS/(ey+1))
+#endif
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d %d\n",ex,ey);
@@ -817,7 +821,11 @@ static void FF_modsqr(BIG z[],BIG x[],BIG p[],BIG ND[],int n)
     BIG d[2*n];
 #endif
     chunk ex=P_EXCESS(x[n-1]);
-    if ((ex+1)>=(P_FEXCESS-1)/(ex+1))
+#ifdef dchunk
+    if ((dchunk)(ex+1)*(ex+1)>(dchunk)P_FEXCESS)
+#else
+    if ((ex+1)>P_FEXCESS/(ex+1))
+#endif
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d\n",ex);

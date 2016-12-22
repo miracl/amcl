@@ -774,7 +774,7 @@ void BIG_shl(BIG a,int k)
 /* Fast shift left of a by n bits, where n less than a word, Return excess (but store it as well) */
 /* a MUST be normalised */
 /* SU= 16 */
-chunk BIG_fshl(BIG a,int n)
+int BIG_fshl(BIG a,int n)
 {
     int i;
 
@@ -783,7 +783,7 @@ chunk BIG_fshl(BIG a,int n)
         a[i]=((a[i]<<n)&BMASK)|(a[i-1]>>(BASEBITS-n));
     a[0]=(a[0]<<n)&BMASK;
 
-    return (a[NLEN-1]>>((8*MODBYTES)%BASEBITS)); /* return excess - only used in ff.c */
+    return (int)(a[NLEN-1]>>((8*MODBYTES)%BASEBITS)); /* return excess - only used in ff.c */
 }
 
 /* double length left shift of a by k bits - k can be > BASEBITS , a MUST be normalised */
@@ -821,14 +821,14 @@ void BIG_shr(BIG a,int k)
 /* Faster shift right of a by k bits. Return shifted out part */
 /* a MUST be normalised */
 /* SU= 16 */
-chunk BIG_fshr(BIG a,int k)
+int BIG_fshr(BIG a,int k)
 {
     int i;
     chunk r=a[0]&(((chunk)1<<k)-1); /* shifted out part */
     for (i=0; i<NLEN-1; i++)
         a[i]=(a[i]>>k)|((a[i+1]<<(BASEBITS-k))&BMASK);
     a[NLEN-1]=a[NLEN-1]>>k;
-    return r;
+    return (int)r;
 }
 
 /* double length right shift of a by k bits - can be > BASEBITS */
