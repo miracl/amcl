@@ -210,16 +210,16 @@ void BIG_cmove(BIG f,BIG g,int d)
 /* Move g to f if d=1 */
 void BIG_dcmove(DBIG f,DBIG g,int d)
 {
-	int i;
-	chunk b=(chunk)-d;
+    int i;
+    chunk b=(chunk)-d;
 #ifdef DEBUG_NORM
-	for (i=0;i<=DNLEN;i++)
+    for (i=0; i<=DNLEN; i++)
 #else
-	for (i=0;i<DNLEN;i++)
+    for (i=0; i<DNLEN; i++)
 #endif
-	{
-		f[i]^=(f[i]^g[i])&b;
-	}
+    {
+        f[i]^=(f[i]^g[i])&b;
+    }
 }
 
 /* convert BIG to/from bytes */
@@ -268,6 +268,7 @@ void BIG_fromBytesLen(BIG a,char *b,int s)
     a[NLEN]=0;
 #endif
 }
+
 
 
 /* SU= 88 */
@@ -558,7 +559,7 @@ void BIG_mul(DBIG c,BIG a,BIG b)
     /* faster psuedo-Karatsuba method */
 #ifdef UNWOUND
 
-/* Insert output of faster.c here */
+    /* Insert output of faster.c here */
 
 #else
     for (i=0; i<NLEN; i++)
@@ -652,41 +653,75 @@ void BIG_sqr(DBIG c,BIG a)
 
 #ifdef UNWOUND
 
-/* Insert output of faster.c here */
+    /* Insert output of faster.c here */
 
 #else
 
-	t=(dchunk)a[0]*a[0];
-	c[0]=(chunk)t&BMASK; co=t>>BASEBITS;
-	t=(dchunk)a[1]*a[0]; t+=t; t+=co; 
-	c[1]=(chunk)t&BMASK; co=t>>BASEBITS;
+    t=(dchunk)a[0]*a[0];
+    c[0]=(chunk)t&BMASK;
+    co=t>>BASEBITS;
+    t=(dchunk)a[1]*a[0];
+    t+=t;
+    t+=co;
+    c[1]=(chunk)t&BMASK;
+    co=t>>BASEBITS;
 
-	last=NLEN-NLEN%2;
-	for (j=2;j<last;j+=2)
-	{
-		t=(dchunk)a[j]*a[0]; for (i=1;i<(j+1)/2;i++) t+=(dchunk)a[j-i]*a[i]; t+=t; t+=co;  t+=(dchunk)a[j/2]*a[j/2];
-		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-		t=(dchunk)a[j+1]*a[0]; for (i=1;i<(j+2)/2;i++) t+=(dchunk)a[j+1-i]*a[i]; t+=t; t+=co; 
-		c[j+1]=(chunk)t&BMASK; co=t>>BASEBITS;	
-	}
-	j=last;
+    last=NLEN-NLEN%2;
+    for (j=2; j<last; j+=2)
+    {
+        t=(dchunk)a[j]*a[0];
+        for (i=1; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
+        t+=t;
+        t+=co;
+        t+=(dchunk)a[j/2]*a[j/2];
+        c[j]=(chunk)t&BMASK;
+        co=t>>BASEBITS;
+        t=(dchunk)a[j+1]*a[0];
+        for (i=1; i<(j+2)/2; i++) t+=(dchunk)a[j+1-i]*a[i];
+        t+=t;
+        t+=co;
+        c[j+1]=(chunk)t&BMASK;
+        co=t>>BASEBITS;
+    }
+    j=last;
 #if NLEN%2==1
-	t=(dchunk)a[j]*a[0]; for (i=1;i<(j+1)/2;i++) t+=(dchunk)a[j-i]*a[i]; t+=t; t+=co;  t+=(dchunk)a[j/2]*a[j/2];
-	c[j]=(chunk)t&BMASK; co=t>>BASEBITS; j++;
-	t=(dchunk)a[NLEN-1]*a[j-NLEN+1]; for (i=j-NLEN+2;i<(j+1)/2;i++) t+=(dchunk)a[j-i]*a[i]; t+=t; t+=co; 
-	c[j]=(chunk)t&BMASK; co=t>>BASEBITS; j++;
+    t=(dchunk)a[j]*a[0];
+    for (i=1; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
+    t+=t;
+    t+=co;
+    t+=(dchunk)a[j/2]*a[j/2];
+    c[j]=(chunk)t&BMASK;
+    co=t>>BASEBITS;
+    j++;
+    t=(dchunk)a[NLEN-1]*a[j-NLEN+1];
+    for (i=j-NLEN+2; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
+    t+=t;
+    t+=co;
+    c[j]=(chunk)t&BMASK;
+    co=t>>BASEBITS;
+    j++;
 #endif
-	for (;j<DNLEN-2;j+=2)
-	{
-		t=(dchunk)a[NLEN-1]*a[j-NLEN+1]; for (i=j-NLEN+2;i<(j+1)/2;i++) t+=(dchunk)a[j-i]*a[i]; t+=t; t+=co; t+=(dchunk)a[j/2]*a[j/2];
-		c[j]=(chunk)t&BMASK; co=t>>BASEBITS;
-		t=(dchunk)a[NLEN-1]*a[j-NLEN+2]; for (i=j-NLEN+3;i<(j+2)/2;i++) t+=(dchunk)a[j+1-i]*a[i]; t+=t; t+=co;
-		c[j+1]=(chunk)t&BMASK; co=t>>BASEBITS;
-	}
+    for (; j<DNLEN-2; j+=2)
+    {
+        t=(dchunk)a[NLEN-1]*a[j-NLEN+1];
+        for (i=j-NLEN+2; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
+        t+=t;
+        t+=co;
+        t+=(dchunk)a[j/2]*a[j/2];
+        c[j]=(chunk)t&BMASK;
+        co=t>>BASEBITS;
+        t=(dchunk)a[NLEN-1]*a[j-NLEN+2];
+        for (i=j-NLEN+3; i<(j+2)/2; i++) t+=(dchunk)a[j+1-i]*a[i];
+        t+=t;
+        t+=co;
+        c[j+1]=(chunk)t&BMASK;
+        co=t>>BASEBITS;
+    }
 
-	t=(dchunk)a[NLEN-1]*a[NLEN-1]+co;
-	c[DNLEN-2]=(chunk)t&BMASK; co=t>>BASEBITS;
-	c[DNLEN-1]=(chunk)co;
+    t=(dchunk)a[NLEN-1]*a[NLEN-1]+co;
+    c[DNLEN-2]=(chunk)t&BMASK;
+    co=t>>BASEBITS;
+    c[DNLEN-1]=(chunk)co;
 #endif
 
 #else
@@ -739,7 +774,7 @@ void BIG_shl(BIG a,int k)
 /* Fast shift left of a by n bits, where n less than a word, Return excess (but store it as well) */
 /* a MUST be normalised */
 /* SU= 16 */
-int BIG_fshl(BIG a,int n)
+chunk BIG_fshl(BIG a,int n)
 {
     int i;
 
@@ -748,7 +783,7 @@ int BIG_fshl(BIG a,int n)
         a[i]=((a[i]<<n)&BMASK)|(a[i-1]>>(BASEBITS-n));
     a[0]=(a[0]<<n)&BMASK;
 
-    return (int)(a[NLEN-1]>>((8*MODBYTES)%BASEBITS)); /* return excess - only used in ff.c */
+    return (a[NLEN-1]>>((8*MODBYTES)%BASEBITS)); /* return excess - only used in ff.c */
 }
 
 /* double length left shift of a by k bits - k can be > BASEBITS , a MUST be normalised */
@@ -786,14 +821,14 @@ void BIG_shr(BIG a,int k)
 /* Faster shift right of a by k bits. Return shifted out part */
 /* a MUST be normalised */
 /* SU= 16 */
-int BIG_fshr(BIG a,int k)
+chunk BIG_fshr(BIG a,int k)
 {
     int i;
     chunk r=a[0]&(((chunk)1<<k)-1); /* shifted out part */
     for (i=0; i<NLEN-1; i++)
         a[i]=(a[i]>>k)|((a[i+1]<<(BASEBITS-k))&BMASK);
     a[NLEN-1]=a[NLEN-1]>>k;
-    return (int)r;
+    return r;
 }
 
 /* double length right shift of a by k bits - can be > BASEBITS */
@@ -876,7 +911,7 @@ chunk BIG_norm(BIG a)
 void BIG_dnorm(DBIG a)
 {
     int i;
-    chunk d,carry=0;;
+    chunk d,carry=0;
     for (i=0; i<DNLEN-1; i++)
     {
         d=a[i]+carry;
@@ -934,13 +969,13 @@ int BIG_nbits(BIG a)
     return bts;
 }
 
-/* SU= 8 */
-int BIG_dnbits(BIG a)
+/* SU= 8, Calculate number of bits in a DBIG - output normalised */
+int BIG_dnbits(DBIG a)
 {
     int bts,k=DNLEN-1;
     chunk c;
     BIG_dnorm(a);
-    while (a[k]==0 && k>=0) k--;
+    while (k>=0 && a[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS*k;
     c=a[k];
@@ -958,7 +993,7 @@ int BIG_dnbits(BIG a)
 void BIG_mod(BIG b,BIG c)
 {
     int k=0;
-	BIG r; /**/
+    BIG r; /**/
 
     BIG_norm(b);
     if (BIG_comp(b,c)<0)
@@ -974,17 +1009,17 @@ void BIG_mod(BIG b,BIG c)
     {
         BIG_fshr(c,1);
 
-// constant time...  
-		BIG_sub(r,b,c);
-		BIG_norm(r);
-		BIG_cmove(b,r,1-((r[NLEN-1]>>(CHUNK-1))&1));
-/*
-        if (BIG_comp(b,c)>=0)
-        {
-            BIG_sub(b,b,c);
-            BIG_norm(b);
-        }
-*/
+// constant time...
+        BIG_sub(r,b,c);
+        BIG_norm(r);
+        BIG_cmove(b,r,1-((r[NLEN-1]>>(CHUNK-1))&1));
+        /*
+                if (BIG_comp(b,c)>=0)
+                {
+                    BIG_sub(b,b,c);
+                    BIG_norm(b);
+                }
+        */
         k--;
     }
 }
@@ -1014,17 +1049,17 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
     while (k>0)
     {
         BIG_dshr(m,1);
-// constant time...    
-		BIG_dsub(r,b,m);
-		BIG_dnorm(r);
-		BIG_dcmove(b,r,1-((r[DNLEN-1]>>(CHUNK-1))&1));
-/*
-        if (BIG_dcomp(b,m)>=0)
-        {
-            BIG_dsub(b,b,m);
-            BIG_dnorm(b);
-        }
-*/
+// constant time...
+        BIG_dsub(r,b,m);
+        BIG_dnorm(r);
+        BIG_dcmove(b,r,1-((r[DNLEN-1]>>(CHUNK-1))&1));
+        /*
+                if (BIG_dcomp(b,m)>=0)
+                {
+                    BIG_dsub(b,b,m);
+                    BIG_dnorm(b);
+                }
+        */
         k--;
     }
     BIG_sdcopy(a,b);
@@ -1035,90 +1070,92 @@ void BIG_dmod(BIG a,DBIG b,BIG c)
 
 void BIG_ddiv(BIG a,DBIG b,BIG c)
 {
-	int d,k=0;
-	DBIG m,dr;
-	BIG e,r;
-	BIG_dnorm(b);
-	BIG_dscopy(m,c);
+    int d,k=0;
+    DBIG m,dr;
+    BIG e,r;
+    BIG_dnorm(b);
+    BIG_dscopy(m,c);
 
-	BIG_zero(a);
-	BIG_zero(e); BIG_inc(e,1);
+    BIG_zero(a);
+    BIG_zero(e);
+    BIG_inc(e,1);
 
-	while (BIG_dcomp(b,m)>=0)
-	{
-		BIG_fshl(e,1);
-		BIG_dshl(m,1);
-		k++;
-	}
+    while (BIG_dcomp(b,m)>=0)
+    {
+        BIG_fshl(e,1);
+        BIG_dshl(m,1);
+        k++;
+    }
 
-	while (k>0)
-	{
-		BIG_dshr(m,1);
-		BIG_fshr(e,1);
+    while (k>0)
+    {
+        BIG_dshr(m,1);
+        BIG_fshr(e,1);
 
-		BIG_dsub(dr,b,m);
-		BIG_dnorm(dr);
-		d=1-((dr[DNLEN-1]>>(CHUNK-1))&1);
-		BIG_dcmove(b,dr,d);
+        BIG_dsub(dr,b,m);
+        BIG_dnorm(dr);
+        d=1-((dr[DNLEN-1]>>(CHUNK-1))&1);
+        BIG_dcmove(b,dr,d);
 
-		BIG_add(r,a,e);
-		BIG_norm(r);
-		BIG_cmove(a,r,d);
-/*
-		if (BIG_dcomp(b,m)>=0)
-		{
-			BIG_add(a,a,e);
-			BIG_norm(a);
-			BIG_dsub(b,b,m);
-			BIG_dnorm(b);
-		} */
-		k--;
-	}
+        BIG_add(r,a,e);
+        BIG_norm(r);
+        BIG_cmove(a,r,d);
+        /*
+        		if (BIG_dcomp(b,m)>=0)
+        		{
+        			BIG_add(a,a,e);
+        			BIG_norm(a);
+        			BIG_dsub(b,b,m);
+        			BIG_dnorm(b);
+        		} */
+        k--;
+    }
 }
 
 /* SU= 136 */
 
 void BIG_sdiv(BIG a,BIG c)
 {
-	int d,k=0;
-	BIG m,e,b,r;
-	BIG_norm(a);
-	BIG_copy(b,a);
-	BIG_copy(m,c);
+    int d,k=0;
+    BIG m,e,b,r;
+    BIG_norm(a);
+    BIG_copy(b,a);
+    BIG_copy(m,c);
 
-	BIG_zero(a);
-	BIG_zero(e); BIG_inc(e,1);
+    BIG_zero(a);
+    BIG_zero(e);
+    BIG_inc(e,1);
 
-	while (BIG_comp(b,m)>=0)
-	{
-		BIG_fshl(e,1);
-		BIG_fshl(m,1);
-		k++;
-	}
+    while (BIG_comp(b,m)>=0)
+    {
+        BIG_fshl(e,1);
+        BIG_fshl(m,1);
+        k++;
+    }
 
-	while (k>0)
-	{
-		BIG_fshr(m,1);
-		BIG_fshr(e,1);
+    while (k>0)
+    {
+        BIG_fshr(m,1);
+        BIG_fshr(e,1);
 
-		BIG_sub(r,b,m);
-		BIG_norm(r);
-		d=1-((r[NLEN-1]>>(CHUNK-1))&1);
-		BIG_cmove(b,r,d);
+        BIG_sub(r,b,m);
+        BIG_norm(r);
+        d=1-((r[NLEN-1]>>(CHUNK-1))&1);
+        BIG_cmove(b,r,d);
 
-		BIG_add(r,a,e);
-		BIG_norm(r);
-		BIG_cmove(a,r,d);
-/*
-		if (BIG_comp(b,m)>=0)
-		{
-			BIG_sub(b,b,m);
-			BIG_norm(b);
-			BIG_add(a,a,e);
-			BIG_norm(a);
-		} */
-		k--;
-	}
+        BIG_add(r,a,e);
+        BIG_norm(r);
+        BIG_cmove(a,r,d);
+        /*
+        		if (BIG_comp(b,m)>=0)
+        		{
+        			BIG_sub(b,b,m);
+        			BIG_norm(b);
+        			BIG_add(a,a,e);
+        			BIG_norm(a);
+        		} */
+        k--;
+    }
 }
 
 /* return LSB of a */
@@ -1266,6 +1303,7 @@ void BIG_modneg(BIG r,BIG a,BIG m)
 {
     BIG_mod(a,m);
     BIG_sub(r,m,a);
+    BIG_mod(r,m);
 }
 
 /* Set a=a/b mod m */
@@ -1397,3 +1435,19 @@ void BIG_mod2m(BIG x,int m)
     for (i=wd+1; i<NLEN; i++) x[i]=0;
 }
 
+// new
+/* Convert to DBIG number from byte array of given length */
+void BIG_dfromBytesLen(DBIG a,char *b,int s)
+{
+    int i,len=s;
+    BIG_dzero(a);
+
+    for (i=0; i<len; i++)
+    {
+        BIG_dshl(a,8);
+        a[0]+=(int)(unsigned char)b[i];
+    }
+#ifdef DEBUG_NORM
+    a[NLEN]=0;
+#endif
+}

@@ -22,7 +22,7 @@ under the License.
 // To run test program, define HAS_MAIN
 // gcc x509.c ecdh.c rsa.c amcl.a -o x509.exe
 
-#define HAS_MAIN
+// #define HAS_MAIN
 
 #include <stdio.h>
 #include "ecdh.h"
@@ -114,34 +114,35 @@ static octet RSASHA384= {9,sizeof(rsasha384),rsasha384};
 static char rsasha512[9]= {0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x0d};
 static octet RSASHA512= {9,sizeof(rsasha512),rsasha512};
 
+#ifdef HAS_MAIN
 // countryName
 static char cn[3]= {0x55,0x04,0x06};
 static octet CN= {3,sizeof(cn),cn};
 
 // stateName
-static char sn[3]= {0x55,0x04,0x08};
-static octet SN= {3,sizeof(sn),sn};
+// static char sn[3]= {0x55,0x04,0x08};
+// static octet SN= {3,sizeof(sn),sn};
 
 // localName
-static char ln[3]= {0x55,0x04,0x07};
-static octet LN= {3,sizeof(ln),ln};
+// static char ln[3]= {0x55,0x04,0x07};
+// static octet LN= {3,sizeof(ln),ln};
 
 // orgName
 static char on[3]= {0x55,0x04,0x0A};
 static octet ON= {3,sizeof(on),on};
 
 // unitName
-static char un[3]= {0x55,0x04,0x0B};
-static octet UN= {3,sizeof(un),un};
+// static char un[3]= {0x55,0x04,0x0B};
+// static octet UN= {3,sizeof(un),un};
 
 // myName
-static char mn[3]= {0x55,0x04,0x03};
-static octet MN= {3,sizeof(mn),mn};
+// static char mn[3]= {0x55,0x04,0x03};
+// static octet MN= {3,sizeof(mn),mn};
 
 // emailName
 static char en[9]= {0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x09,0x01};
 static octet EN= {9,sizeof(en),en};
-
+#endif // HAS_MAIN
 
 /* Check expected TAG and return ASN.1 field length. If tag=0 skip check. */
 static int getalen(int tag,char *b,int j)
@@ -193,8 +194,8 @@ static int bround(int len)
 
 pktype X509_extract_cert_sig(octet *sc,octet *sig)
 {
-    int i,j,k,fin,len,rlen,sj,type,ex;
-    char soid[8];
+    int i,j,k,fin,len,rlen,sj,ex;
+    char soid[9];
     octet SOID= {0,sizeof(soid),soid};
     pktype ret;
 
@@ -656,7 +657,7 @@ int X509_find_start_date(octet *c,int start)
 // Find expiry date of certificate validity period
 int X509_find_expiry_date(octet *c,int start)
 {
-    int i,j,len;
+    int j,len;
     j=start;
 
     len=getalen(SEQ,c->val,j);
@@ -787,7 +788,7 @@ octet HH= {0,sizeof(hh),hh};
 
 int main()
 {
-    int i,res,len,sha;
+    int res,len,sha;
     int c,ic;
     rsa_public_key PK;
     pktype st,ca,pt;

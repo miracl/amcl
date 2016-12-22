@@ -282,7 +282,7 @@ static unsign32 InvMixCol(unsign32 x)
 
 /* SU= 8 */
 /* reset cipher */
-void AES_reset(aes *a,int mode,char *iv)
+void AES_reset(amcl_aes *a,int mode,char *iv)
 {
     /* reset mode, or reset iv */
     int i;
@@ -296,7 +296,7 @@ void AES_reset(aes *a,int mode,char *iv)
     }
 }
 
-void AES_getreg(aes *a,char *ir)
+void AES_getreg(amcl_aes *a,char *ir)
 {
     int i;
     for (i=0; i<4*NB; i++) ir[i]=a->f[i];
@@ -304,7 +304,7 @@ void AES_getreg(aes *a,char *ir)
 
 /* SU= 72 */
 /* Initialise cipher */
-int AES_init(aes* a,int mode,int nk,char *key,char *iv)
+int AES_init(amcl_aes* a,int mode,int nk,char *key,char *iv)
 {
     /* Key length Nk=16, 24 or 32 bytes */
     /* Key Scheduler. Create expanded encryption key */
@@ -361,7 +361,7 @@ int AES_init(aes* a,int mode,int nk,char *key,char *iv)
 
 /* SU= 80 */
 /* Encrypt a single block */
-void AES_ecb_encrypt(aes *a,uchar *buff)
+void AES_ecb_encrypt(amcl_aes *a,uchar *buff)
 {
     int i,j,k;
     unsign32 p[4],q[4],*x,*y,*t;
@@ -431,7 +431,7 @@ void AES_ecb_encrypt(aes *a,uchar *buff)
 
 /* SU= 80 */
 /* Decrypt a single block */
-void AES_ecb_decrypt(aes *a,uchar *buff)
+void AES_ecb_decrypt(amcl_aes *a,uchar *buff)
 {
     int i,j,k;
     unsign32 p[4],q[4],*x,*y,*t;
@@ -514,7 +514,7 @@ static void increment(char *f)
 
 /* SU= 40 */
 /* Encrypt using selected mode of operation */
-unsign32 AES_encrypt(aes* a,char *buff)
+unsign32 AES_encrypt(amcl_aes* a,char *buff)
 {
     int j,bytes;
     char st[16];
@@ -579,7 +579,7 @@ unsign32 AES_encrypt(aes* a,char *buff)
 
 /* SU= 40 */
 /* Decrypt using selected mode of operation */
-unsign32 AES_decrypt(aes *a,char *buff)
+unsign32 AES_decrypt(amcl_aes *a,char *buff)
 {
     int j,bytes;
     char st[16];
@@ -647,7 +647,7 @@ unsign32 AES_decrypt(aes *a,char *buff)
 }
 
 /* Clean up and delete left-overs */
-void AES_end(aes *a)
+void AES_end(amcl_aes *a)
 {
     /* clean up */
     int i;
@@ -666,7 +666,7 @@ void AES_end(aes *a)
 int main()
 {
     int i;
-    aes a;
+    amcl_aes a;
 	unsign32 t;
 	uchar x,y;
 

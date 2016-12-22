@@ -337,12 +337,12 @@ void FF_norm(BIG z[],int n)
 void FF_shl(BIG x[],int n)
 {
     int i;
-    int carry,delay_carry=0;
+    chunk carry,delay_carry=0;
     for (i=0; i<n-1; i++)
     {
         carry=BIG_fshl(x[i],1);
         x[i][0]|=delay_carry;
-        x[i][NLEN-1]^=(chunk)carry<<P_TBITS;
+        x[i][NLEN-1]^=carry<<P_TBITS;
         delay_carry=carry;
     }
     BIG_fshl(x[n-1],1);
@@ -353,11 +353,11 @@ void FF_shl(BIG x[],int n)
 void FF_shr(BIG x[],int n)
 {
     int i;
-    int carry;
+    chunk carry;
     for (i=n-1; i>0; i--)
     {
         carry=BIG_fshr(x[i],1);
-        x[i-1][NLEN-1]|=(chunk)carry<<P_TBITS;
+        x[i-1][NLEN-1]|=carry<<P_TBITS;
     }
     BIG_fshr(x[0],1);
 }
@@ -484,8 +484,8 @@ static void FF_karmul_upper(BIG z[],BIG x[],BIG y[],BIG t[],int n)
     nd2=n/2;
     FF_radd(z,n,x,0,x,nd2,nd2);
     FF_radd(z,n+nd2,y,0,y,nd2,nd2);
-	FF_rnorm(z,n,nd2);
-	FF_rnorm(z,n+nd2,nd2);
+    FF_rnorm(z,n,nd2);
+    FF_rnorm(z,n+nd2,nd2);
 
     FF_karmul(t,0,z,n+nd2,z,n,t,n,nd2);  /* t = (a0+a1)(b0+b1) */
     FF_karmul(z,n,x,nd2,y,nd2,t,n,nd2); /* z[n]= a1*b1 */
@@ -797,11 +797,7 @@ static void FF_modmul(BIG z[],BIG x[],BIG y[],BIG p[],BIG ND[],int n)
 #endif
     chunk ex=P_EXCESS(x[n-1]);
     chunk ey=P_EXCESS(y[n-1]);
-#ifdef dchunk
-	if ((dchunk)(ex+1)*(ey+1)>(dchunk)P_FEXCESS)
-#else
-    if ((ex+1)>P_FEXCESS/(ey+1))
-#endif
+    if ((ex+1)>=(P_FEXCESS-1)/(ey+1))
     {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d %d\n",ex,ey);
@@ -821,12 +817,8 @@ static void FF_modsqr(BIG z[],BIG x[],BIG p[],BIG ND[],int n)
     BIG d[2*n];
 #endif
     chunk ex=P_EXCESS(x[n-1]);
-#ifdef dchunk
-	if ((dchunk)(ex+1)*(ex+1)>(dchunk)P_FEXCESS)
-#else
-    if ((ex+1)>P_FEXCESS/(ex+1))
-#endif
-	{
+    if ((ex+1)>=(P_FEXCESS-1)/(ex+1))
+    {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d\n",ex);
 #endif

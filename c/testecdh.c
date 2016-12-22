@@ -18,7 +18,6 @@ under the License.
 */
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
-/* gcc -std=c99 -O3 testecdh.c ecdh.c amcl.a -o testecdh.exe */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,14 +27,14 @@ under the License.
 
 int main()
 {
-    int i,j=0,res;
+    int i,res;
     unsigned long ran;
     char *pp="M0ng00se";
     /* These octets are automatically protected against buffer overflow attacks */
     /* Note salt must be big enough to include an appended word */
     /* Note ECIES ciphertext C must be big enough to include at least 1 appended block */
     /* Recall EFS is field size in bytes. So EFS=32 for 256-bit curve */
-    char s0[EGS],s1[EGS],w0[2*EFS+1],w1[2*EFS+1],z0[EFS],z1[EFS],raw[100],key[EAS],salt[32],pw[20],p1[30],p2[30],v[2*EFS+1],m[32],c[64],t[32],cs[EGS],ds[EGS];
+    char s0[EGS],s1[EGS],w0[2*EFS+1],w1[2*EFS+1],z0[EFS],z1[EFS],raw[100],key[EAS],salt[32],pw[20];
     octet S0= {0,sizeof(s0),s0};
     octet S1= {0,sizeof(s1),s1};
     octet W0= {0,sizeof(w0),w0};
@@ -46,14 +45,6 @@ int main()
     octet KEY= {0,sizeof(key),key};
     octet SALT= {0,sizeof(salt),salt};
     octet PW= {0,sizeof(pw),pw};
-    octet P1= {0,sizeof(p1),p1};
-    octet P2= {0,sizeof(p2),p2};
-    octet V= {0,sizeof(v),v};
-    octet M= {0,sizeof(m),m};
-    octet C= {0,sizeof(c),c};
-    octet T= {0,sizeof(t),t};
-    octet CS= {0,sizeof(cs),cs};
-    octet DS= {0,sizeof(ds),ds};
 
     csprng RNG;                /* Crypto Strong RNG */
 
@@ -68,8 +59,6 @@ int main()
 
     ECC_CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
-//for (j=0;j<100;j++)
-//{
     SALT.len=8;
     for (i=0; i<8; i++) SALT.val[i]=i+1; // set Salt
 
@@ -131,6 +120,16 @@ int main()
 
 #if CURVETYPE != MONTGOMERY
 
+    char ds[EGS],p1[30],p2[30],v[2*EFS+1],m[32],c[64],t[32],cs[EGS];
+    octet DS= {0,sizeof(ds),ds};
+    octet CS= {0,sizeof(cs),cs};
+    octet P1= {0,sizeof(p1),p1};
+    octet P2= {0,sizeof(p2),p2};
+    octet V= {0,sizeof(v),v};
+    octet M= {0,sizeof(m),m};
+    octet C= {0,sizeof(c),c};
+    octet T= {0,sizeof(t),t};
+
     printf("Testing ECIES\n");
 
     P1.len=3;
@@ -169,7 +168,7 @@ int main()
 
     printf("Testing ECDSA\n");
 
-    if (ECPSP_DSA(HASH_TYPE_ECC,&RNG,&S0,&M,&CS,&DS)!=0)
+    if (ECPSP_DSA(HASH_TYPE_ECC,&RNG,NULL,&S0,&M,&CS,&DS)!=0)
     {
         printf("***ECDSA Signature Failed\n");
         return 0;
@@ -185,9 +184,10 @@ int main()
         printf("***ECDSA Verification Failed\n");
         return 0;
     }
-    else printf("ECDSA Signature/Verification succeeded %d\n",j);
-//}
-//printf("Test Completed Successfully\n");
+    else 
+    {
+      printf("ECDSA Signature/Verification succeeded\n");
+    }
 
 #endif
     ECC_KILL_CSPRNG(&RNG);

@@ -159,7 +159,7 @@ int main()
 	iterations=0;
     start=clock();
     do {
-		RSA_KEY_PAIR(&RNG,65537,&priv,&pub);
+      RSA_KEY_PAIR(&RNG,65537,&priv,&pub,NULL,NULL);
 		iterations++;
 		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
     } while (elapsed<MIN_TIME || iterations<MIN_ITERS);

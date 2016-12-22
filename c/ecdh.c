@@ -270,7 +270,7 @@ void AES_CBC_IV0_ENCRYPT(octet *k,octet *m,octet *c)
     /* AES CBC encryption, with Null IV and key k */
     /* Input is from an octet string m, output is to an octet string c */
     /* Input is padded as necessary to make up a full final block */
-    aes a;
+    amcl_aes a;
     int fin;
     int i,j,ipt,opt;
     char buff[16];
@@ -314,7 +314,7 @@ void AES_CBC_IV0_ENCRYPT(octet *k,octet *m,octet *c)
 int AES_CBC_IV0_DECRYPT(octet *k,octet *c,octet *m)
 {
     /* padding is removed */
-    aes a;
+    amcl_aes a;
     int i,ipt,opt,ch;
     char buff[16];
     int fin,bad;
@@ -367,12 +367,13 @@ int AES_CBC_IV0_DECRYPT(octet *k,octet *c,octet *m)
  * otherwise it is generated randomly internally */
 int ECP_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 {
-    BIG r,gx,gy,s;
+    BIG r,gx,s;
     ECP G;
     int res=0;
     BIG_rcopy(gx,CURVE_Gx);
 
 #if CURVETYPE!=MONTGOMERY
+    BIG gy;
     BIG_rcopy(gy,CURVE_Gy);
     ECP_set(&G,gx,gy);
 #else
@@ -462,7 +463,7 @@ int ECP_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 /* validate public key. Set full=true for fuller check */
 int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
 {
-    BIG q,r,wx,wy;
+    BIG q,r,wx;
     ECP WP;
     int valid;
     int res=0;
@@ -473,6 +474,7 @@ int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
     BIG_fromBytes(wx,&(W->val[1]));
     if (BIG_comp(wx,q)>=0) res=ECDH_INVALID_PUBLIC_KEY;
 #if CURVETYPE!=MONTGOMERY
+    BIG wy;
     BIG_fromBytes(wy,&(W->val[EFS+1]));
     if (BIG_comp(wy,q)>=0) res=ECDH_INVALID_PUBLIC_KEY;
 #endif
@@ -499,7 +501,7 @@ int ECP_PUBLIC_KEY_VALIDATE(int full,octet *W)
 /* IEEE-1363 Diffie-Hellman online calculation Z=S.WD */
 int ECPSVDP_DH(octet *S,octet *WD,octet *Z)
 {
-    BIG r,s,wx,wy;
+    BIG r,s,wx;
     int valid;
     ECP W;
     int res=0;
@@ -508,6 +510,7 @@ int ECPSVDP_DH(octet *S,octet *WD,octet *Z)
 
     BIG_fromBytes(wx,&(WD->val[1]));
 #if CURVETYPE!=MONTGOMERY
+    BIG wy;
     BIG_fromBytes(wy,&(WD->val[EFS+1]));
     valid=ECP_set(&W,wx,wy);
 #else
@@ -538,7 +541,7 @@ int ECPSVDP_DH(octet *S,octet *WD,octet *Z)
 #if CURVETYPE!=MONTGOMERY
 
 /* IEEE ECDSA Signature, C and D are signature on F using private key S */
-int ECPSP_DSA(int sha,csprng *RNG,octet *S,octet *F,octet *C,octet *D)
+int ECPSP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet *D)
 {
     char h[128];
     octet H= {0,sizeof(h),h};
@@ -546,21 +549,38 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *S,octet *F,octet *C,octet *D)
     BIG gx,gy,r,s,f,c,d,u,vx,w;
     ECP G,V;
 
-    hashit(sha,F,-1,NULL,&H,MODBYTES);
+    hashit(sha,F,-1,NULL,&H,sha);
     BIG_rcopy(gx,CURVE_Gx);
     BIG_rcopy(gy,CURVE_Gy);
     BIG_rcopy(r,CURVE_Order);
 
     BIG_fromBytes(s,S->val);
-    BIG_fromBytes(f,H.val);
+
+    int hlen=H.len;
+    if (H.len>MODBYTES) hlen=MODBYTES;
+    BIG_fromBytesLen(f,H.val,hlen);
 
     ECP_set(&G,gx,gy);
 
     do
     {
+        if (RNG!=NULL)
+        {
+            BIG_randomnum(u,r,RNG);
+            // Output emphemeral key for test vector generation
+            if (K!=NULL)
+            {
+                K->len=EFS;
+                BIG_toBytes(K->val,u);
+            }
+            BIG_randomnum(w,r,RNG); /* randomize calculation */
+        }
+        else
+        {
+            BIG_fromBytes(u,K->val);
+            BIG_mod(u,r);
+        }
 
-        BIG_randomnum(u,r,RNG);
-		BIG_randomnum(w,r,RNG); /* randomize calculation */
 #ifdef AES_S
         BIG_mod2m(u,2*AES_S);
 #endif
@@ -572,13 +592,19 @@ int ECPSP_DSA(int sha,csprng *RNG,octet *S,octet *F,octet *C,octet *D)
         BIG_copy(c,vx);
         BIG_mod(c,r);
         if (BIG_iszilch(c)) continue;
-		BIG_modmul(u,u,w,r);
+        if (RNG!=NULL)
+        {
+            BIG_modmul(u,u,w,r);
+        }
 
         BIG_invmodp(u,u,r);
         BIG_modmul(d,s,c,r);
 
         BIG_add(d,f,d);
-		BIG_modmul(d,d,w,r);
+        if (RNG!=NULL)
+        {
+            BIG_modmul(d,d,w,r);
+        }
 
         BIG_modmul(d,u,d,r);
 
@@ -604,17 +630,21 @@ int ECPVP_DSA(int sha,octet *W,octet *F, octet *C,octet *D)
     ECP G,WP;
     int valid;
 
-    hashit(sha,F,-1,NULL,&H,MODBYTES);
+    hashit(sha,F,-1,NULL,&H,sha);
     BIG_rcopy(gx,CURVE_Gx);
     BIG_rcopy(gy,CURVE_Gy);
     BIG_rcopy(r,CURVE_Order);
 
-    //OCT_shl(C,C->len-MODBYTES);
-    //OCT_shl(D,D->len-MODBYTES);
+    OCT_shl(C,C->len-MODBYTES);
+    OCT_shl(D,D->len-MODBYTES);
 
     BIG_fromBytes(c,C->val);
     BIG_fromBytes(d,D->val);
-    BIG_fromBytes(f,H.val);
+
+    int hlen=H.len;
+    if (hlen>MODBYTES) hlen=MODBYTES;
+
+    BIG_fromBytesLen(f,H.val,hlen);
 
     //BIG_fromBytes(f,H.val);
 

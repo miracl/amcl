@@ -6,7 +6,7 @@
 	to you under the Apache License, Version 2.0 (the
 	"License"); you may not use this file except in compliance
 	with the License.  You may obtain a copy of the License at
-	
+
 	http://www.apache.org/licenses/LICENSE-2.0
 
 	Unless required by applicable law or agreed to in writing,
@@ -26,7 +26,7 @@
  * @brief Architecture Header File
  *
  * Specify Processor Architecture
- * 
+ *
  */
 
 /* NOTE: There is only one user configurable section in this header - see below */
@@ -37,18 +37,15 @@
 
 
 
-
-
-
 /*** START OF USER CONFIGURABLE SECTION - set architecture ***/
 
+#ifdef CMAKE
+#define CHUNK @AMCL_CHUNK@  /**< size of chunk in bits = wordlength of computer = 16, 32 or 64. Note not all curve options are supported on 16-bit processors - see rom.c */
+#else
 #define CHUNK 32		/**< size of chunk in bits = wordlength of computer = 16, 32 or 64. Note not all curve options are supported on 16-bit processors - see rom.c */
+#endif
 
 /*** END OF USER CONFIGURABLE SECTION ***/
-
-
-
-
 
 
 
@@ -105,10 +102,10 @@
 #if CHUNK == 64
 
 #ifndef C99
-#define chunk __int64		/**< C type corresponding to word length */						
-							/**< Note - no 128-bit type available    */
+#define chunk __int64		/**< C type corresponding to word length */
+/**< Note - no 128-bit type available    */
 #else
-#define chunk int64_t		/**< C type corresponding to word length */		
+#define chunk int64_t		/**< C type corresponding to word length */
 #ifdef __GNUC__
 #define dchunk __int128		/**< Always define double length chunk type if available - GCC supports 128 bit type  ??? */
 #endif

@@ -33,12 +33,16 @@ under the License.
 #ifndef X509_H
 #define X509_H
 
+/**
+ * @brief Public key type
+ */
 typedef struct
 {
-    int type;
-    int hash;
-    int curve;
+    int type;  /**< signature type (ECC or RSA) */
+    int hash;  /**< hash type */
+    int curve; /**< elliptic curve used  */
 } pktype;
+
 
 /* X.509 functions */
 /** @brief Extract certificate signature
