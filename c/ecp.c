@@ -53,6 +53,7 @@ static void ECP_cswap(ECP *P,ECP *Q,int d)
 #endif
 }
 
+#if CURVETYPE!=MONTGOMERY
 /* Conditional move Q to P dependant on d */
 static void ECP_cmove(ECP *P,ECP *Q,int d)
 {
@@ -74,7 +75,9 @@ static int teq(sign32 b,sign32 c)
     x-=1;  // if x=0, x now -1
     return (int)((x>>31)&1);
 }
+#endif // CURVETYPE!=MONTGOMERY
 
+#if CURVETYPE!=MONTGOMERY
 /* Constant time select from pre-computed table */
 static void ECP_select(ECP *P,ECP W[],sign32 b)
 {
@@ -97,6 +100,7 @@ static void ECP_select(ECP *P,ECP W[],sign32 b)
     ECP_neg(&MP);  // minus P
     ECP_cmove(P,&MP,(int)(m&1));
 }
+#endif
 
 /* Test P == Q */
 /* SU=168 */
@@ -439,7 +443,7 @@ void ECP_affine(ECP *P)
 /* SU=120 */
 void ECP_outputxyz(ECP *P)
 {
-    BIG x,y,z;
+    BIG x,z;
     if (ECP_isinf(P))
     {
         printf("Infinity\n");
@@ -453,6 +457,7 @@ void ECP_outputxyz(ECP *P)
     FP_redc(z);
 
 #if CURVETYPE!=MONTGOMERY
+    BIG y;
     BIG_copy(y,P->y);
     FP_reduce(y);
     FP_redc(y);
@@ -638,7 +643,7 @@ void ECP_dbl(ECP *P)
 #endif
 
 #if CURVETYPE==MONTGOMERY
-    BIG t,A,B,AA,BB,C;
+    BIG A,B,AA,BB,C;
     if (ECP_isinf(P)) return;
 
     FP_add(A,P->x,P->z);
@@ -772,7 +777,7 @@ void ECP_add(ECP *P,ECP *Q)
     BIG_norm(P->z);
 
 #else
-    BIG b,A,B,C,D,E,F,G,H,I;
+    BIG b,A,B,C,D,E,F,G;
 
     BIG_rcopy(b,CURVE_B);
     FP_nres(b);
@@ -1110,6 +1115,7 @@ void ECP_mul2(ECP *P,ECP *Q,BIG e,BIG f)
 }
 
 #endif
+
 
 #ifdef HAS_MAIN
 

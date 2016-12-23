@@ -122,39 +122,54 @@ void RSA_KILL_CSPRNG(csprng *RNG)
 }
 
 /* generate an RSA key pair */
-
-void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB)
+void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB,octet *P, octet* Q)
 {
     /* IEEE1363 A16.11/A16.12 more or less */
     BIG t[HFLEN],p1[HFLEN],q1[HFLEN];
 
-    for (;;)
+    if (RNG!=NULL)
     {
 
-        FF_random(PRIV->p,RNG,HFLEN);
-        while (FF_lastbits(PRIV->p,2)!=3) FF_inc(PRIV->p,1,HFLEN);
-        while (!FF_prime(PRIV->p,RNG,HFLEN))
-            FF_inc(PRIV->p,4,HFLEN);
+        for (;;)
+        {
+
+            FF_random(PRIV->p,RNG,HFLEN);
+            while (FF_lastbits(PRIV->p,2)!=3) FF_inc(PRIV->p,1,HFLEN);
+            while (!FF_prime(PRIV->p,RNG,HFLEN))
+                FF_inc(PRIV->p,4,HFLEN);
+
+            FF_copy(p1,PRIV->p,HFLEN);
+            FF_dec(p1,1,HFLEN);
+
+            if (FF_cfactor(p1,e,HFLEN)) continue;
+            break;
+        }
+
+        for (;;)
+        {
+            FF_random(PRIV->q,RNG,HFLEN);
+            while (FF_lastbits(PRIV->q,2)!=3) FF_inc(PRIV->q,1,HFLEN);
+            while (!FF_prime(PRIV->q,RNG,HFLEN))
+                FF_inc(PRIV->q,4,HFLEN);
+
+            FF_copy(q1,PRIV->q,HFLEN);
+            FF_dec(q1,1,HFLEN);
+            if (FF_cfactor(q1,e,HFLEN)) continue;
+
+            break;
+        }
+
+    }
+    else
+    {
+        FF_fromOctet(PRIV->p,P,HFLEN);
+        FF_fromOctet(PRIV->q,Q,HFLEN);
 
         FF_copy(p1,PRIV->p,HFLEN);
         FF_dec(p1,1,HFLEN);
 
-        if (FF_cfactor(p1,e,HFLEN)) continue;
-        break;
-    }
-
-    for (;;)
-    {
-        FF_random(PRIV->q,RNG,HFLEN);
-        while (FF_lastbits(PRIV->q,2)!=3) FF_inc(PRIV->q,1,HFLEN);
-        while (!FF_prime(PRIV->q,RNG,HFLEN))
-            FF_inc(PRIV->q,4,HFLEN);
-
         FF_copy(q1,PRIV->q,HFLEN);
         FF_dec(q1,1,HFLEN);
-        if (FF_cfactor(q1,e,HFLEN)) continue;
-
-        break;
     }
 
     FF_mul(PUB->n,PRIV->p,PRIV->q,HFLEN);

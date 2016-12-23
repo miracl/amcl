@@ -484,8 +484,8 @@ static void FF_karmul_upper(BIG z[],BIG x[],BIG y[],BIG t[],int n)
     nd2=n/2;
     FF_radd(z,n,x,0,x,nd2,nd2);
     FF_radd(z,n+nd2,y,0,y,nd2,nd2);
-	FF_rnorm(z,n,nd2);
-	FF_rnorm(z,n+nd2,nd2);
+    FF_rnorm(z,n,nd2);
+    FF_rnorm(z,n+nd2,nd2);
 
     FF_karmul(t,0,z,n+nd2,z,n,t,n,nd2);  /* t = (a0+a1)(b0+b1) */
     FF_karmul(z,n,x,nd2,y,nd2,t,n,nd2); /* z[n]= a1*b1 */
@@ -798,7 +798,7 @@ static void FF_modmul(BIG z[],BIG x[],BIG y[],BIG p[],BIG ND[],int n)
     chunk ex=P_EXCESS(x[n-1]);
     chunk ey=P_EXCESS(y[n-1]);
 #ifdef dchunk
-	if ((dchunk)(ex+1)*(ey+1)>(dchunk)P_FEXCESS)
+    if ((dchunk)(ex+1)*(ey+1)>(dchunk)P_FEXCESS)
 #else
     if ((ex+1)>P_FEXCESS/(ey+1))
 #endif
@@ -822,11 +822,11 @@ static void FF_modsqr(BIG z[],BIG x[],BIG p[],BIG ND[],int n)
 #endif
     chunk ex=P_EXCESS(x[n-1]);
 #ifdef dchunk
-	if ((dchunk)(ex+1)*(ex+1)>(dchunk)P_FEXCESS)
+    if ((dchunk)(ex+1)*(ex+1)>(dchunk)P_FEXCESS)
 #else
     if ((ex+1)>P_FEXCESS/(ex+1))
 #endif
-	{
+    {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it %d\n",ex);
 #endif

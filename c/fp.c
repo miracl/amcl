@@ -34,14 +34,24 @@ under the License.
 #if MODTYPE == PSEUDO_MERSENNE
 /* r=d mod m */
 
-void FP_nres(BIG a) {}
+/* Converts from BIG integer to n-residue form mod Modulus */
+void FP_nres(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
-void FP_redc(BIG a) {}
+/* Converts from n-residue form back to BIG integer form */
+void FP_redc(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
 void FP_mod(BIG r,DBIG d)
 {
-    BIG t,b,m;
+    BIG t,b;
     chunk v,tw;
     BIG_split(t,b,d,MODBITS);
 
@@ -76,9 +86,19 @@ void FP_mod(BIG r,DBIG d)
 /* This only applies to Curve C448, so specialised (for now) */
 #if MODTYPE == GENERALISED_MERSENNE
 
-void FP_nres(BIG a) {}
+/* Converts from BIG integer to n-residue form mod Modulus */
+void FP_nres(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
-void FP_redc(BIG a) {}
+/* Converts from n-residue form back to BIG integer form */
+void FP_redc(BIG a)
+{
+    BIG tmp;
+    BIG_rcopy(tmp,a);
+}
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
 void FP_mod(BIG r,DBIG d)
@@ -139,7 +159,6 @@ void FP_redc(BIG a)
 void FP_mod(BIG a,DBIG d)
 {
     int i;
-    chunk k;
 
     for (i=0; i<NLEN; i++)
         d[NLEN+i]+=muladd(d[i],MConst-1,d[i],&d[NLEN+i-1]);
@@ -192,9 +211,9 @@ void FP_mod(BIG a,DBIG d)
 
 #ifdef COMBA
 
-#ifdef UNWOUND 
+#ifdef UNWOUND
 
-/* Insert output of faster.c here */
+    /* Insert output of faster.c here */
 
 #else
 
@@ -293,12 +312,12 @@ void FP_mul(BIG r,BIG a,BIG b)
     DBIG d;
     chunk ea,eb;
     BIG_norm(a);
-    BIG_norm(b);	
-	ea=EXCESS(a);
-	eb=EXCESS(b);
+    BIG_norm(b);
+    ea=EXCESS(a);
+    eb=EXCESS(b);
 
 #ifdef dchunk
-	if ((dchunk)(ea+1)*(eb+1)>(dchunk)FEXCESS)
+    if ((dchunk)(ea+1)*(eb+1)>(dchunk)FEXCESS)
 #else
     if ((ea+1)>FEXCESS/(eb+1))
 #endif
@@ -360,10 +379,10 @@ void FP_sqr(BIG r,BIG a)
 {
     DBIG d;
     chunk ea;
-	BIG_norm(a);
-	ea=EXCESS(a);
+    BIG_norm(a);
+    ea=EXCESS(a);
 #ifdef dchunk
-	if ((dchunk)(ea+1)*(ea+1)>(dchunk)FEXCESS)
+    if ((dchunk)(ea+1)*(ea+1)>(dchunk)FEXCESS)
 #else
     if ((ea+1)>FEXCESS/(ea+1))
 #endif
@@ -427,17 +446,17 @@ void FP_reduce(BIG a)
 
 static int logb2(unsign32 v)
 {
-	int r;
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
+    int r;
+    v |= v >> 1;
+    v |= v >> 2;
+    v |= v >> 4;
+    v |= v >> 8;
+    v |= v >> 16;
 
-	v = v - ((v >> 1) & 0x55555555);                  
-	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);  
-	r = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; 
-	return r+1;
+    v = v - ((v >> 1) & 0x55555555);
+    v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
+    r = (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
+    return r+1;
 }
 
 /* Set r=-a mod Modulus */
@@ -451,16 +470,16 @@ void FP_neg(BIG r,BIG a)
     BIG_rcopy(m,Modulus);
     BIG_norm(a);
 
-	sb=logb2((unsign32)EXCESS(a));
-/*
-    ov=EXCESS(a);
-    sb=1;
-    while(ov!=0)
-    {
-        sb++;    // only unpredictable branch 
-        ov>>=1;
-    }
-*/
+    sb=logb2((unsign32)EXCESS(a));
+    /*
+        ov=EXCESS(a);
+        sb=1;
+        while(ov!=0)
+        {
+            sb++;    // only unpredictable branch
+            ov>>=1;
+        }
+    */
     BIG_fshl(m,sb);
     BIG_sub(r,m,a);
 

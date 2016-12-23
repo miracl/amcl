@@ -6,7 +6,7 @@
 	to you under the Apache License, Version 2.0 (the
 	"License"); you may not use this file except in compliance
 	with the License.  You may obtain a copy of the License at
-	
+
 	http://www.apache.org/licenses/LICENSE-2.0
 
 	Unless required by applicable law or agreed to in writing,
@@ -19,10 +19,10 @@
 
 /* AMCL header file */
 /* Designed for AES-128/192/256 security, 254-521 bit elliptic curves and BN curves for pairings */
-/* Each "limb" of a big number occupies at most (n-3) bits of an n-bit computer word. The most significant word must have at least 4 extra unused bits */ 
+/* Each "limb" of a big number occupies at most (n-3) bits of an n-bit computer word. The most significant word must have at least 4 extra unused bits */
 
 /**
- * @file AMCL.h
+ * @file amcl.h
  * @author Mike Scott and Kealan McCusker
  * @date 19th May 2015
  * @brief Main Header File
@@ -30,7 +30,7 @@
  * Allows some user configuration
  * defines structures
  * declares functions
- * 
+ *
  */
 
 /* NOTE: There is only one user configurable section in this header - see below */
@@ -38,51 +38,62 @@
 #ifndef AMCL_H
 #define AMCL_H
 
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include "arch.h"
 
+#ifdef CMAKE
+#define AMCL_VERSION_MAJOR @AMCL_VERSION_MAJOR@ /**< Major version of the library */
+#define AMCL_VERSION_MINOR @AMCL_VERSION_MINOR@ /**< Minor version of the library */
+#define AMCL_VERSION_PATCH @AMCL_VERSION_PATCH@ /**< Patch version of the library */
+#define OS "@OS@"                               /**< Operative system */
+#cmakedefine USE_PATENTS   /**< Use Patents */
+#cmakedefine USE_ANONYMOUS /**< Use Anonymous Configuration in MPin */
+#endif
+
 /* Curve types */
 
-#define WEIERSTRASS 0			/**< Short Weierstrass form curve  */
-#define EDWARDS 1				/**< Edwards or Twisted Edwards curve  */
-#define MONTGOMERY 2			/**< Montgomery form curve  */
+#define WEIERSTRASS 0 /**< Short Weierstrass form curve  */
+#define EDWARDS 1     /**< Edwards or Twisted Edwards curve  */
+#define MONTGOMERY 2  /**< Montgomery form curve  */
 
 /* Elliptic curves are defined over prime fields */
 /* Here are some popular EC prime fields for which we have prepared standard curves. Feel free to specify your own. */
 
-#define NIST256 0 /**< For the NIST 256-bit standard curve									- WEIERSTRASS only */
-#define C25519 1  /**< Bernstein's Modulus 2^255-19											- EDWARDS or MONTGOMERY only */
-#define BRAINPOOL 2 /**< For Brainpool 256-bit curve										- WEIERSTRASS only */
-#define ANSSI 3 /**< For French 256-bit standard curve										- WEIERSTRASS only */
-#define MF254 4 /**< For NUMS curves from Bos et al - 254-bit Montgomery friendly modulus	- WEIERSTRASS or EDWARDS or MONTGOMERY */
-#define MS255 5 /**< For NUMS curve - 255-bit pseudo-mersenne modulus						- WEIERSTRASS or EDWARDS or MONTGOMERY */
-#define MF256 6 /**< For NUMS curve - 256-bit Montgomery friendly modulus					- WEIERSTRASS or EDWARDS or MONTGOMERY */
-#define MS256 7 /**< For NUMS curve - 256-bit pseudo-merseene modulus						- WEIERSTRASS or EDWARDS or MONTGOMERY */
-#define HIFIVE 8 /**< My 336-bit pseudo-mersenne modulus									- EDWARDS only */
-#define GOLDILOCKS  9 /**< Goldilocks generalized-mersenne modulus							- EDWARDS only */
-#define NIST384 10 /**< For the NIST 384-bit standard curve									- WEIERSTRASS only */
-#define C41417 11 /**< Bernstein et al Curve41417 2^414-17									- EDWARDS only */
-#define NIST521 12 /**< For the NIST 521-bit standard curve									- WEIERSTRASS only */
+#define NIST256 0    /**< For the NIST 256-bit standard curve - WEIERSTRASS only */
+#define C25519 1     /**< Bernstein's Modulus 2^255-19 - EDWARDS or MONTGOMERY only */
+#define BRAINPOOL 2  /**< For Brainpool 256-bit curve - WEIERSTRASS only */
+#define ANSSI 3      /**< For French 256-bit standard curve - WEIERSTRASS only */
+#define MF254 4      /**< For NUMS curves from Bos et al - 254-bit Montgomery friendly modulus - WEIERSTRASS or EDWARDS or MONTGOMERY */
+#define MS255 5      /**< For NUMS curve - 255-bit pseudo-mersenne modulus - WEIERSTRASS or EDWARDS or MONTGOMERY */
+#define MF256 6      /**< For NUMS curve - 256-bit Montgomery friendly modulus - WEIERSTRASS or EDWARDS or MONTGOMERY */
+#define MS256 7      /**< For NUMS curve - 256-bit pseudo-merseene modulus - WEIERSTRASS or EDWARDS or MONTGOMERY */
+#define HIFIVE 8     /**< My 336-bit pseudo-mersenne modulus - EDWARDS only */
+#define GOLDILOCKS 9 /**< Goldilocks generalized-mersenne modulus - EDWARDS only */
+#define NIST384 10   /**< For the NIST 384-bit standard curve - WEIERSTRASS only */
+#define C41417 11    /**< Bernstein et al Curve41417 2^414-17 - EDWARDS only */
+#define NIST521 12   /**< For the NIST 521-bit standard curve - WEIERSTRASS only */
 
 /* BN Curves */
-#define BN_CURVES 100
-#define BN454 100  /**< New AES-128 security BN curve - Modulus built from -0x10000010000000000000100000001  - WEIERSTRASS only */
-#define BN646 101  /**< AES-192 security BN curve -  Modulus built from t=-0x10000000000000000000004000000000000001001 - WEIERSTRASS only */
+#define BN_CURVES 100 /**< Barreto-Naehrig curves */
+#define BN454 100     /**< New AES-128 security BN curve - Modulus built from -0x10000010000000000000100000001  - WEIERSTRASS only */
+#define BN646 101     /**< AES-192 security BN curve -  Modulus built from t=-0x10000000000000000000004000000000000001001 - WEIERSTRASS only */
 
 /* A few 254-bit alternative BN curves */
-#define BN254 102    /**< Standard Nogami BN curve - fastest. Modulus built from  t=-0x4080000000000001	- WEIERSTRASS only */
+#define BN254 102 /**< Standard Nogami BN curve - fastest. Modulus built from  t=-0x4080000000000001 - WEIERSTRASS only */
 
 /* GT_STRONG curves */
-#define BN254_CX 103  /**< Our CertiVox BN curve. Modulus built from t=-0x4000000003C012B1				- WEIERSTRASS only */
-#define BN254_T 104   /**< GT_Strong BN curve. Modulus built from t=-0x4000806000004081  				- WEIERSTRASS only */
-#define BN254_T2 105  /**< G2 and GT-Strong BN curve.  Modulus built from t=-0x4000020100608205 		- WEIERSTRASS only */
+#define BN254_CX 103 /**< Our CertiVox BN curve. Modulus built from t=-0x4000000003C012B1 - WEIERSTRASS only */
+#define BN254_T 104  /**< GT_Strong BN curve. Modulus built from t=-0x4000806000004081 - WEIERSTRASS only */
+#define BN254_T2 105 /**< G2 and GT-Strong BN curve.  Modulus built from t=-0x4000020100608205 - WEIERSTRASS only */
 
 /* BLS-12 Curves */
-#define BLS_CURVES 200
-#define BLS455 200   /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
-#define BLS383 201   /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
+#define BLS_CURVES 200 /**< Barreto-Lynn-Scott curves */
+#define BLS455 200     /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
+#define BLS383 201     /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
 
 
 
@@ -91,27 +102,51 @@
 
 /*** START OF USER CONFIGURABLE SECTION - set architecture and choose modulus and curve  ***/
 
-#define CHOICE BN254_CX	/**< Current choice of Field */
+#ifdef CMAKE
+#define CHOICE @AMCL_CHOICE@ /**< Current choice of Field */
+#else
+#define CHOICE BN254_CX	     /**< Current choice of Field */
+#endif
+
 /* For some moduli only one parameterisation of curve may supported. For others there is a choice of WEIERSTRASS, EDWARDS or MONTGOMERY curves. See above. */
-#define CURVETYPE WEIERSTRASS	/**< Note that not all curve types are supported - see above */
+#ifdef CMAKE
+#define CURVETYPE @AMCL_CURVETYPE@ /**< Note that not all curve types are supported - see above */
+#else
+#define CURVETYPE WEIERSTRASS	   /**< Note that not all curve types are supported - see above */
+#endif
+
 
 /* Actual curve parameters associated with these choices can be found in rom.c */
 
 /* These next options only apply for pairings */
-#define USE_GLV		/**< Note this method is patented (GLV), so maybe you want to comment this out */
-#define USE_GS_G2	/**< Well we didn't patent it :) But may be covered by GLV patent :( */
-#define USE_GS_GT   /**< Not patented, so probably safe to always use this */
+#ifdef USE_PATENTS
+#define USE_GLV	  /**< Note this method is patented (GLV), so maybe you want to comment this out */
+#define USE_GS_G2 /**< Well we didn't patent it :) But may be covered by GLV patent :( */
+#endif
+#define USE_GS_GT /**< Not patented, so probably safe to always use this */
 
 /* Finite field support - for RSA, DH etc. */
-#define FFLEN 8  /**< 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256 */
+#ifdef CMAKE
+#define FFLEN @AMCL_FFLEN@ /**< 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256 */
+#else
+#define FFLEN 8 /**< 2^n multiplier of BIGBITS to specify supported Finite Field size, e.g 2048=256*2^3 where BIGBITS=256 */
+#endif
 
-/* For debugging Only.
-#define DEBUG_REDUCE 
-#define DEBUG_NORM
-#define GET_STATS
-*/
 
-// #define UNWOUND 
+
+/* For debugging Only.*/
+#ifdef CMAKE
+#cmakedefine DEBUG_REDUCE /**< Print debug message for field reduction */
+#cmakedefine DEBUG_NORM   /**< Detect digit overflow */
+#cmakedefine GET_STATS    /**< Debug statistics - use with debugger */
+#else
+//#define DEBUG_REDUCE
+//#define DEBUG_NORM
+//#define GET_STATS
+#endif
+
+
+// #define UNWOUND
 
 /*** END OF USER CONFIGURABLE SECTION ***/
 
@@ -122,18 +157,18 @@
 
 
 
-#define NLEN (1+((MBITS-1)/BASEBITS))	/**< Number of words in BIG. */
-#define MODBYTES (1+(MBITS-1)/8)		/**< Number of bytes in Modulus */
-#define BIGBITS (MODBYTES*8)			/**< Number of bits representable in a BIG */
-#define FF_BITS (BIGBITS*FFLEN)			/**< Finite Field Size in bits - must be BIGBITS.2^n */
+#define NLEN (1+((MBITS-1)/BASEBITS)) /**< Number of words in BIG. */
+#define MODBYTES (1+(MBITS-1)/8)      /**< Number of bytes in Modulus */
+#define BIGBITS (MODBYTES*8)	      /**< Number of bits representable in a BIG */
+#define FF_BITS (BIGBITS*FFLEN)	      /**< Finite Field Size in bits - must be BIGBITS.2^n */
 
 
 /* modulus types */
 
-#define NOT_SPECIAL 0			/**< Modulus of no exploitable form */
-#define PSEUDO_MERSENNE 1		/**< Pseudo-mersenne modulus of form $2^n-c$  */
-#define MONTGOMERY_FRIENDLY 3	/**< Montgomery Friendly modulus of form $2^a(2^b-c)-1$  */
-#define GENERALISED_MERSENNE 2	/**< Generalised-mersenne modulus of form $2^n-2^m-1$  */  /** GOLDILOCKS only */
+#define NOT_SPECIAL 0	       /**< Modulus of no exploitable form */
+#define PSEUDO_MERSENNE 1      /**< Pseudo-mersenne modulus of form $2^n-c$  */
+#define MONTGOMERY_FRIENDLY 3  /**< Montgomery Friendly modulus of form $2^a(2^b-c)-1$  */
+#define GENERALISED_MERSENNE 2 /**< Generalised-mersenne modulus of form $2^n-2^m-1$, GOLDILOCKS only */
 
 /* Built-in curves defined here */
 /* MIRACL check.cpp utility used to determine optimal choice for BASEBITS */
@@ -141,240 +176,240 @@
 /* Define AES_S if the desired AES-equivalent security is significantly less than the group order */
 
 
-#if CHOICE==NIST256    
-#define MBITS 256	/**< Number of bits in Modulus */
-#define MOD8 7		/**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
+#if CHOICE==NIST256
+#define MBITS 256	             /**< Number of bits in Modulus */
+#define MOD8 7	                     /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL         /**< Modulus type */
 #if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
-#define BASEBITS 13			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 13                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
 
-#if CHOICE==C25519  
-#define MBITS 255	/**< Number of bits in Modulus */
-#define MOD8 5		/**< Modulus mod 8  */
-#define MODTYPE PSEUDO_MERSENNE /**< Modulus type */
+#if CHOICE==C25519
+#define MBITS 255	             /**< Number of bits in Modulus */
+#define MOD8 5		             /**< Modulus mod 8  */
+#define MODTYPE PSEUDO_MERSENNE      /**< Modulus type */
 #if CURVETYPE==WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
- #if CURVETYPE==MONTGOMERY
-   #error Not supported
- #else
-  #define BASEBITS 13			/**< Numbers represented to base 2*BASEBITS */
- #endif
+#if CURVETYPE==MONTGOMERY
+#error Not supported
+#else
+#define BASEBITS 13		     /**< Numbers represented to base 2*BASEBITS */
+#endif
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
 
-#if CHOICE==BRAINPOOL    
-#define MBITS 256 /**< Number of bits in Modulus */
-#define MOD8 7 /**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
+#if CHOICE==BRAINPOOL
+#define MBITS 256                    /**< Number of bits in Modulus */
+#define MOD8 7                       /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL         /**< Modulus type */
 #if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
-#define BASEBITS 13			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 13                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
 
 #if CHOICE==ANSSI
-#define MBITS 256		/**< Number of bits in Modulus */
-#define MOD8 3			/**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
+#define MBITS 256	             /**< Number of bits in Modulus */
+#define MOD8 3		             /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL         /**< Modulus type */
 #if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
- #if CHUNK==16
-  #define BASEBITS 13			/**< Numbers represented to base 2*BASEBITS */
- #endif
- #if CHUNK == 32
-  #define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
- #endif
- #if CHUNK == 64
-  #define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
- #endif
+#if CHUNK==16
+#define BASEBITS 13                  /**< Numbers represented to base 2*BASEBITS */
+#endif
+#if CHUNK == 32
+#define BASEBITS 29                  /**< Numbers represented to base 2*BASEBITS */
+#endif
+#if CHUNK == 64
+#define BASEBITS 56                  /**< Numbers represented to base 2*BASEBITS */
+#endif
 #endif
 #endif
 
 /**< NUMS curve from Bos et al. paper */
 
-#if CHOICE==MF254   
-#define MBITS 254   /**< Number of bits in Modulus */
-#define MOD8 7      /**< Modulus mod 8  */
+#if CHOICE==MF254
+#define MBITS 254                    /**< Number of bits in Modulus */
+#define MOD8 7                       /**< Modulus mod 8  */
 #define MODTYPE MONTGOMERY_FRIENDLY  /**< Modulus type */
 #if CHUNK==16
 #error Not Supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 
-#if CHOICE==MF256   
-#define MBITS 256   /**< Number of bits in Modulus */
-#define MOD8 7      /**< Modulus mod 8  */
+#if CHOICE==MF256
+#define MBITS 256                    /**< Number of bits in Modulus */
+#define MOD8 7                       /**< Modulus mod 8  */
 #define MODTYPE MONTGOMERY_FRIENDLY  /**< Modulus type */
 #if CHUNK==16
 #error Not Supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 
 #if CHOICE==MS255
-#define MBITS 255	/**< Number of bits in Modulus */
-#define MOD8 3		/**< Modulus mod 8  */
-#define MODTYPE PSEUDO_MERSENNE /**< Modulus type */
+#define MBITS 255	             /**< Number of bits in Modulus */
+#define MOD8 3		             /**< Modulus mod 8  */
+#define MODTYPE PSEUDO_MERSENNE      /**< Modulus type */
 #if CHUNK==16
-#define BASEBITS 13			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 13                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56                  /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 
 #if CHOICE==MS256
-#define MBITS 256	/**< Number of bits in Modulus */
-#define MOD8 3		/**< Modulus mod 8  */
-#define MODTYPE PSEUDO_MERSENNE /**< Modulus type */
+#define MBITS 256	             /**< Number of bits in Modulus */
+#define MOD8 3		             /**< Modulus mod 8  */
+#define MODTYPE PSEUDO_MERSENNE      /**< Modulus type */
 #if CHUNK==16
-#define BASEBITS 13			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 13	             /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 
 #if CHOICE==HIFIVE
-#define MBITS 336	/**< Number of bits in Modulus */
-#define MOD8 5		/**< Modulus mod 8  */
-#define MODTYPE PSEUDO_MERSENNE /**< Modulus type */
-#define AES_S 128   /**< Desired AES equivalent strength */
+#define MBITS 336	             /**< Number of bits in Modulus */
+#define MOD8 5		             /**< Modulus mod 8  */
+#define MODTYPE PSEUDO_MERSENNE      /**< Modulus type */
+#define AES_S 128                    /**< Desired AES equivalent strength */
 #if CURVETYPE!=EDWARDS
- #error Not supported
+#error Not supported
 #else
- #if CHUNK==16
-  #error Not Supported
- #endif
- #if CHUNK == 32
-  #define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
- #endif
- #if CHUNK == 64
-  #define BASEBITS 60			/**< Numbers represented to base 2*BASEBITS */
- #endif
+#if CHUNK==16
+#error Not Supported
+#endif
+#if CHUNK == 32
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
+#endif
+#if CHUNK == 64
+#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
+#endif
 #endif
 #endif
 
 #if CHOICE==GOLDILOCKS
-#define MBITS 448	/**< Number of bits in Modulus */
-#define MOD8 7		/**< Modulus mod 8  */
+#define MBITS 448	             /**< Number of bits in Modulus */
+#define MOD8 7		             /**< Modulus mod 8  */
 #define MODTYPE GENERALISED_MERSENNE /**< Modulus type */
 #if CURVETYPE!=EDWARDS
- #error Not supported
-#else
- #if CHUNK==16
-  #error Not Supported
- #endif
- #if CHUNK == 32
-  #define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
- #endif
- #if CHUNK == 64
-  #define BASEBITS 60			/**< Numbers represented to base 2*BASEBITS */
- #endif
-#endif
-#endif
-
-#if CHOICE==NIST384    
-#define MBITS 384	/**< Number of bits in Modulus */
-#define MOD8 7		/**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
-#if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
- #error Not supported
+#error Not Supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 60			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
 
-#if CHOICE==C41417    
-#define MBITS 414	/**< Number of bits in Modulus */
-#define MOD8 7		/**< Modulus mod 8  */
-#define MODTYPE  PSEUDO_MERSENNE /**< Modulus type */
+#if CHOICE==NIST384
+#define MBITS 384	             /**< Number of bits in Modulus */
+#define MOD8 7		             /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL         /**< Modulus type */
+#if CURVETYPE!=WEIERSTRASS
+#error Not supported
+#else
+#if CHUNK==16
+#error Not supported
+#endif
+#if CHUNK == 32
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
+#endif
+#if CHUNK == 64
+#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
+#endif
+#endif
+#endif
+
+#if CHOICE==C41417
+#define MBITS 414	             /**< Number of bits in Modulus */
+#define MOD8 7		             /**< Modulus mod 8  */
+#define MODTYPE  PSEUDO_MERSENNE     /**< Modulus type */
 #if CURVETYPE!=EDWARDS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
- #error Not supported
+#error Not supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 61			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 61		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
 
-#if CHOICE==NIST521    
-#define MBITS 521	/**< Number of bits in Modulus */
-#define MOD8 7		/**< Modulus mod 8  */
-#define MODTYPE  PSEUDO_MERSENNE /**< Modulus type */
+#if CHOICE==NIST521
+#define MBITS 521	             /**< Number of bits in Modulus */
+#define MOD8 7		             /**< Modulus mod 8  */
+#define MODTYPE  PSEUDO_MERSENNE     /**< Modulus type */
 #if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
- #error Not supported
+#error Not supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 28			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 28		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 60			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
@@ -382,21 +417,21 @@
 /* New BN curve to be used for AES-128 security as response to new DL developments - see Kim & Barbulescu ePrint Archive: Report 2015/1027 */
 
 #if CHOICE==BN454
-#define MBITS 454	/**< Number of bits in Modulus */
-#define MOD8 3		/**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
-#define AES_S 128   /**< Desired AES equivalent strength */
+#define MBITS 454	             /**< Number of bits in Modulus */
+#define MOD8 3		             /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL         /**< Modulus type */
+#define AES_S 128                    /**< Desired AES equivalent strength */
 #if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
- #error Not supported
+#error Not supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 60			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
@@ -404,89 +439,89 @@
 /* New BLS curve to be used for AES-128 security as response to new DL developments - see Kim & Barbulescu ePrint Archive: Report 2015/1027 */
 
 #if CHOICE==BLS455
-#define MBITS 455	/**< Number of bits in Modulus */
-#define MOD8 3		/**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
-#define AES_S 128   /**< Desired AES equivalent strength */
+#define MBITS 455	             /**< Number of bits in Modulus */
+#define MOD8 3		             /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL         /**< Modulus type */
+#define AES_S 128                    /**< Desired AES equivalent strength */
 #if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
- #error Not supported
+#error Not supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 60			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
 
 
 #if CHOICE==BLS383
-#define MBITS 383	/**< Number of bits in Modulus */
-#define MOD8 3		/**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
+#define MBITS 383	             /**< Number of bits in Modulus */
+#define MOD8 3		             /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL         /**< Modulus type */
 #if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
- #error Not supported
+#error Not supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 28			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 28		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
 
 #if CHOICE==BN646
-#define MBITS 646	/**< Number of bits in Modulus */
-#define MOD8 3		/**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
-#define AES_S 192   /**< Desired AES equivalent strength */
+#define MBITS 646	             /**< Number of bits in Modulus */
+#define MOD8 3		             /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL         /**< Modulus type */
+#define AES_S 192                    /**< Desired AES equivalent strength */
 #if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
- #error Not supported
+#error Not supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 60			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
 
 #if CHOICE<BLS_CURVES
 
-#if CHOICE>=BN254     /* Its a BN curve */
-#define MBITS 254	/**< Number of bits in Modulus */
-#define MOD8 3		/**< Modulus mod 8  */
-#define MODTYPE  NOT_SPECIAL /**< Modulus type */
+#if CHOICE>=BN254                    /* Its a BN curve */
+#define MBITS 254	             /**< Number of bits in Modulus */
+#define MOD8 3		             /**< Modulus mod 8  */
+#define MODTYPE  NOT_SPECIAL         /**< Modulus type */
 #if CURVETYPE!=WEIERSTRASS
- #error Not supported
+#error Not supported
 #else
 #if CHUNK==16
-#define BASEBITS 13			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 13		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 32
-#define BASEBITS 29			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 56			/**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
 
 
 #if CHOICE>BN254
-#define GT_STRONG   /**< Using a GT-Strong 254-bit BN curve */
+#define GT_STRONG /**< Using a GT-Strong 254-bit BN curve */
 #endif
 #endif
 
@@ -501,45 +536,45 @@ extern int tdadd,rdadd,tdneg,rdneg;
 
 #define DCHUNK 2*CHUNK	/**< Number of bits in double-length type */
 #define DNLEN 2*NLEN	/**< double length required for products of BIGs */
-#define HFLEN (FFLEN/2)		/**< Useful for half-size RSA private key operations */
+#define HFLEN (FFLEN/2) /**< Useful for half-size RSA private key operations */
 
 #define CHUNK_BITS 8*sizeof(chunk) /**< Number of bits in a chunk */
 
-#ifdef DEBUG_NORM    /* Add an extra location to track chunk extension */
-typedef chunk BIG[NLEN+1]; /**< Define type BIG as array of chunks */
+#ifdef DEBUG_NORM  /* Add an extra location to track chunk extension */
+typedef chunk BIG[NLEN+1];   /**< Define type BIG as array of chunks */
 typedef chunk DBIG[DNLEN+1]; /**< Define type DBIG as array of chunks */
 #else
-typedef chunk BIG[NLEN];  /**< Define type BIG as array of chunks */
-typedef chunk DBIG[DNLEN]; /**< Define type DBIG as array of chunks */
+typedef chunk BIG[NLEN];     /**< Define type BIG as array of chunks */
+typedef chunk DBIG[DNLEN];   /**< Define type DBIG as array of chunks */
 #endif
 
-#define HBITS (BASEBITS/2)  /**< Number of bits in number base divided by 2 */
+#define HBITS (BASEBITS/2)      /**< Number of bits in number base divided by 2 */
 #define HBITS1 ((BASEBITS+1)/2) /**< Number of bits in number base plus 1 divided by 2 */
-#define HDIFF (HBITS1-HBITS)  /**< Will be either 0 or 1, depending if number of bits in number base is even or odd */
+#define HDIFF (HBITS1-HBITS)    /**< Will be either 0 or 1, depending if number of bits in number base is even or odd */
 
 #define BMASK (((chunk)1<<BASEBITS)-1) /**< Mask = 2^BASEBITS-1 */
-#define HMASK (((chunk)1<<HBITS)-1)   /**< Mask = 2^HBITS-1 */
-#define HMASK1 (((chunk)1<<HBITS1)-1) /**< Mask = 2^HBITS1-1 */
+#define HMASK (((chunk)1<<HBITS)-1)    /**< Mask = 2^HBITS-1 */
+#define HMASK1 (((chunk)1<<HBITS1)-1)  /**< Mask = 2^HBITS1-1 */
 
-#define MODBITS MBITS /**< Number of bits in Modulus for selected curve */
-#define TBITS (MBITS%BASEBITS) /**< Number of active bits in top word */
-#define TMASK (((chunk)1<<TBITS)-1)  /**< Mask for active bits in top word */
-#define NEXCESS (1<<(CHUNK-BASEBITS-1)) /**< 2^(CHUNK-BASEBITS-1) - digit cannot be multiplied by more than this before normalisation */
+#define MODBITS MBITS                             /**< Number of bits in Modulus for selected curve */
+#define TBITS (MBITS%BASEBITS)                    /**< Number of active bits in top word */
+#define TMASK (((chunk)1<<TBITS)-1)               /**< Mask for active bits in top word */
+#define NEXCESS (1<<(CHUNK-BASEBITS-1))           /**< 2^(CHUNK-BASEBITS-1) - digit cannot be multiplied by more than this before normalisation */
 #define FEXCESS ((chunk)1<<(BASEBITS*NLEN-MBITS)) /**< 2^(BASEBITS*NLEN-MODBITS) - normalised BIG can be multiplied by more than this before reduction */
-#define OMASK (-((chunk)(1)<<TBITS))     /**<  for masking out overflow bits */
+#define OMASK (-((chunk)(1)<<TBITS))              /**<  for masking out overflow bits */
 
 /* catch field excesses */
-#define EXCESS(a) ((a[NLEN-1]&OMASK)>>(TBITS))   /**< Field Excess */
+#define EXCESS(a) ((a[NLEN-1]&OMASK)>>(TBITS)) /**< Field Excess */
 
 /* Field Params - see rom.c */
 extern const BIG Modulus;  /**< Actual Modulus set in rom.c */
 extern const chunk MConst; /**< Montgomery only - 1/p mod 2^BASEBITS */
 
 /* Curve Params - see rom.c */
-extern const int CURVE_A; /**< Elliptic curve A parameter */
-extern const BIG CURVE_B; /**< Elliptic curve B parameter */
+extern const int CURVE_A;     /**< Elliptic curve A parameter */
+extern const BIG CURVE_B;     /**< Elliptic curve B parameter */
 extern const BIG CURVE_Order; /**< Elliptic curve group order */
-extern const BIG CURVE_Cof; /**< Elliptic curve cofactor */
+extern const BIG CURVE_Cof;   /**< Elliptic curve cofactor */
 
 /* Generator point on G1 */
 extern const BIG CURVE_Gx; /**< x-coordinate of generator point in group G1  */
@@ -561,10 +596,10 @@ extern const BIG CURVE_Fra; /**< real part of BN curve Frobenius Constant */
 extern const BIG CURVE_Frb; /**< imaginary part of BN curve Frobenius Constant */
 
 
-extern const BIG CURVE_W[2];		/**< BN curve constant for GLV decomposition */
-extern const BIG CURVE_SB[2][2];	/**< BN curve constant for GLV decomposition */
-extern const BIG CURVE_WB[4];		/**< BN curve constant for GS decomposition */
-extern const BIG CURVE_BB[4][4];	/**< BN curve constant for GS decomposition */
+extern const BIG CURVE_W[2];	 /**< BN curve constant for GLV decomposition */
+extern const BIG CURVE_SB[2][2]; /**< BN curve constant for GLV decomposition */
+extern const BIG CURVE_WB[4];	 /**< BN curve constant for GS decomposition */
+extern const BIG CURVE_BB[4][4]; /**< BN curve constant for GS decomposition */
 
 /* Structures */
 
@@ -572,75 +607,83 @@ extern const BIG CURVE_BB[4][4];	/**< BN curve constant for GS decomposition */
 	@brief ECP structure - Elliptic Curve Point over base field
 */
 
-typedef struct {
+typedef struct
+{
 #if CURVETYPE!=EDWARDS
-int inf; /**< Infinity Flag - not needed for Edwards representation */
+    int inf; /**< Infinity Flag - not needed for Edwards representation */
 #endif
-BIG x;   /**< x-coordinate of point */
+    BIG x; /**< x-coordinate of point */
 #if CURVETYPE!=MONTGOMERY
-BIG y;  /**< y-coordinate of point. Not needed for Montgomery representation */
+    BIG y; /**< y-coordinate of point. Not needed for Montgomery representation */
 #endif
-BIG z; /**< z-coordinate of point */
+    BIG z;/**< z-coordinate of point */
 } ECP;
 
 /**
 	@brief FP2 Structure - quadratic extension field
 */
 
-typedef struct {
-BIG a; /**< real part of FP2 */
-BIG b; /**< imaginary part of FP2 */
+typedef struct
+{
+    BIG a; /**< real part of FP2 */
+    BIG b; /**< imaginary part of FP2 */
 } FP2;
 
 /**
 	@brief FP4 Structure - towered over two FP2
 */
 
-typedef struct {
-FP2 a; /**< real part of FP4 */
-FP2 b; /**< imaginary part of FP4 */
+typedef struct
+{
+    FP2 a; /**< real part of FP4 */
+    FP2 b; /**< imaginary part of FP4 */
 } FP4;
 
 /**
 	@brief FP12 Structure - towered over three FP4
 */
 
-typedef struct {
-FP4 a; /**< first part of FP12 */
-FP4 b; /**< second part of FP12 */
-FP4 c; /**< third part of FP12 */
+typedef struct
+{
+    FP4 a; /**< first part of FP12 */
+    FP4 b; /**< second part of FP12 */
+    FP4 c; /**< third part of FP12 */
 } FP12;
 
 /**
 	@brief ECP2 Structure - Elliptic Curve Point over quadratic extension field
 */
 
-typedef struct {
-int inf; /**< Infinity Flag */
-FP2 x;  /**< x-coordinate of point */
-FP2 y;  /**< y-coordinate of point */
-FP2 z;  /**< z-coordinate of point */
+typedef struct
+{
+    int inf; /**< Infinity Flag */
+    FP2 x;   /**< x-coordinate of point */
+    FP2 y;   /**< y-coordinate of point */
+    FP2 z;   /**< z-coordinate of point */
 } ECP2;
 
-
 /**
-	@brief SHA256/384-512 hash function instance
-*/
-
-typedef struct {
-unsign32 length[2];  /**< 64-bit input length */
-unsign32 h[8];       /**< Internal state */
-unsign32 w[80];		/**< Internal state */
-int hlen;			/**< Hash length in bytes */
+ * @brief SHA256 hash function instance */
+typedef struct
+{
+    unsign32 length[2]; /**< 64-bit input length */
+    unsign32 h[8];      /**< Internal state */
+    unsign32 w[80];	/**< Internal state */
+    int hlen;		/**< Hash length in bytes */
 } hash256;
 
-typedef struct {
-unsign64 length[2];  /**< 64-bit input length */
-unsign64 h[8];       /**< Internal state */
-unsign64 w[80];		/**< Internal state */
-int hlen;           /**< Hash length in bytes */
+/**
+ * @brief SHA384-512 hash function instance */
+typedef struct
+{
+    unsign64 length[2]; /**< 64-bit input length */
+    unsign64 h[8];      /**< Internal state */
+    unsign64 w[80];	/**< Internal state */
+    int hlen;           /**< Hash length in bytes */
 } hash512;
 
+/**
+ * @brief SHA384 hash function instance */
 typedef hash512 hash384;
 
 #define SHA256 32 /**< SHA-256 hashing */
@@ -672,55 +715,59 @@ typedef hash512 hash384;
 */
 
 
-typedef struct {
-int Nk,Nr;
-int mode;          /**< AES mode of operation */
-unsign32 fkey[60]; /**< subkeys for encrypton */
-unsign32 rkey[60]; /**< subkeys for decrypton */
-char f[16];        /**< buffer for chaining vector */
-} aes;
+typedef struct
+{
+    int Nk;            /**< AES Key Length */
+    int Nr;            /**< AES Number of rounds */
+    int mode;          /**< AES mode of operation */
+    unsign32 fkey[60]; /**< subkeys for encrypton */
+    unsign32 rkey[60]; /**< subkeys for decrypton */
+    char f[16];        /**< buffer for chaining vector */
+} amcl_aes;
 
 /* AES-GCM suppport.  */
 
-#define GCM_ACCEPTING_HEADER 0 /**< GCM status */
-#define GCM_ACCEPTING_CIPHER 1 /**< GCM status */
+#define GCM_ACCEPTING_HEADER 0   /**< GCM status */
+#define GCM_ACCEPTING_CIPHER 1   /**< GCM status */
 #define GCM_NOT_ACCEPTING_MORE 2 /**< GCM status */
-#define GCM_FINISHED 3 /**< GCM status */
-#define GCM_ENCRYPTING 0 /**< GCM mode */
-#define GCM_DECRYPTING 1 /**< GCM mode */
+#define GCM_FINISHED 3           /**< GCM status */
+#define GCM_ENCRYPTING 0         /**< GCM mode */
+#define GCM_DECRYPTING 1         /**< GCM mode */
 
 
 /**
 	@brief GCM mode instance, using AES internally
 */
 
-typedef struct {
-unsign32 table[128][4]; /**< 2k byte table */
-uchar stateX[16];	/**< GCM Internal State */
-uchar Y_0[16];		/**< GCM Internal State */
-unsign32 lenA[2];	/**< GCM 64-bit length of header */
-unsign32 lenC[2];	/**< GCM 64-bit length of ciphertext */
-int status;		/**< GCM Status */
-aes a;			/**< Internal Instance of AES cipher */
+typedef struct
+{
+    unsign32 table[128][4]; /**< 2k byte table */
+    uchar stateX[16];	    /**< GCM Internal State */
+    uchar Y_0[16];	    /**< GCM Internal State */
+    unsign32 lenA[2];	    /**< GCM 64-bit length of header */
+    unsign32 lenC[2];	    /**< GCM 64-bit length of ciphertext */
+    int status;		    /**< GCM Status */
+    amcl_aes a;		    /**< Internal Instance of AMCL_AES cipher */
 } gcm;
 
 /* Marsaglia & Zaman Random number generator constants */
 
 #define NK   21 /**< PRNG constant */
-#define NJ   6 /**< PRNG constant */
-#define NV   8 /**< PRNG constant */
+#define NJ   6  /**< PRNG constant */
+#define NV   8  /**< PRNG constant */
 
 
 /**
 	@brief Cryptographically secure pseudo-random number generator instance
 */
 
-typedef struct {
-unsign32 ira[NK];  /**< random number array   */
-int      rndptr;   /**< pointer into array */
-unsign32 borrow;   /**<  borrow as a result of subtraction */
-int pool_ptr;		/**< pointer into random pool */
-char pool[32];		/**< random pool */
+typedef struct
+{
+    unsign32 ira[NK]; /**< random number array   */
+    int      rndptr;  /**< pointer into array */
+    unsign32 borrow;  /**<  borrow as a result of subtraction */
+    int pool_ptr;     /**< pointer into random pool */
+    char pool[32];    /**< random pool */
 } csprng;
 
 
@@ -730,8 +777,8 @@ char pool[32];		/**< random pool */
 
 typedef struct
 {
-    int len; /**< length in bytes  */
-    int max; /**< max length allowed - enforce truncation  */
+    int len;   /**< length in bytes  */
+    int max;   /**< max length allowed - enforce truncation  */
     char *val; /**< byte array  */
 } octet;
 
@@ -751,8 +798,8 @@ typedef struct
 
 typedef struct
 {
-    BIG p[FFLEN/2]; /**< secret prime p  */
-    BIG q[FFLEN/2]; /**< secret prime q  */
+    BIG p[FFLEN/2];  /**< secret prime p  */
+    BIG q[FFLEN/2];  /**< secret prime q  */
     BIG dp[FFLEN/2]; /**< decrypting exponent mod (p-1)  */
     BIG dq[FFLEN/2]; /**< decrypting exponent mod (q-1)  */
     BIG c[FFLEN/2];  /**< 1/p mod q */
@@ -763,16 +810,16 @@ typedef struct
 Note that a normalised BIG consists of digits mod 2^BASEBITS
 However BIG digits may be "extended" up to 2^(WORDLENGTH-1).
 
-BIGs in extended form may need to be normalised before certain 
+BIGs in extended form may need to be normalised before certain
 operations.
 
-A BIG may be "reduced" to be less that the Modulus, or it 
-may be "unreduced" and allowed to grow greater than the 
+A BIG may be "reduced" to be less that the Modulus, or it
+may be "unreduced" and allowed to grow greater than the
 Modulus.
 
-Normalisation is quite fast. Reduction involves conditional branches, 
-which can be regarded as significant "speed bumps". We try to 
-delay reductions as much as possible. Reductions may also involve 
+Normalisation is quite fast. Reduction involves conditional branches,
+which can be regarded as significant "speed bumps". We try to
+delay reductions as much as possible. Reductions may also involve
 side channel leakage, so delaying and batching them
 hopefully disguises internal operations.
 
@@ -855,6 +902,13 @@ extern void BIG_fromBytes(BIG x,char *a);
 	@param s byte array length
  */
 extern void BIG_fromBytesLen(BIG x,char *a,int s);
+/**@brief Convert to DBIG number from byte array of given length
+ *
+   @param x DBIG number
+   @param a byte array
+   @param s byte array length
+ */
+extern void BIG_dfromBytesLen(DBIG x,char *a,int s);
 /**	@brief Outputs a DBIG number to the console
  *
 	@param x a DBIG number
@@ -1046,7 +1100,7 @@ extern int BIG_fshr(BIG x,int s);
 extern void BIG_dshr(DBIG x,int s);
 /**	@brief Splits a DBIG into two BIGs - input must be normalised, outputs normalised
  *
-	Internal function. The value of s must be approximately in the middle of the DBIG. 
+	Internal function. The value of s must be approximately in the middle of the DBIG.
 	Typically used to extract z mod 2^MODBITS and z/2^MODBITS
 	@param x BIG number, top half of z
 	@param y BIG number, bottom half of z
@@ -1158,17 +1212,18 @@ extern void BIG_random(BIG x,csprng *r);
 	@param r A pointer to a Cryptographically Secure Random Number Generator
  */
 extern void BIG_randomnum(BIG x,BIG n,csprng *r);
-/**	@brief  return NAF (Non-Adjacent-Form) value as +/- 1, 3 or 5, inputs must be normalised
+/**	brief  return NAF (Non-Adjacent-Form) value as +/- 1, 3 or 5, inputs must be normalised
  *
 	Given x and 3*x extracts NAF value from given bit position, and returns number of bits processed, and number of trailing zeros detected if any
-	@param x BIG number
-	@param x3 BIG number, three times x
-	@param i bit position 
-	@param nbs pointer to integer returning number of bits processed
-	@param nzs pointer to integer returning number of trailing 0s
-	@return + or - 1, 3 or 5
- */
+	param x BIG number
+	param x3 BIG number, three times x
+	param i bit position
+	param nbs pointer to integer returning number of bits processed
+	param nzs pointer to integer returning number of trailing 0s
+	return + or - 1, 3 or 5
+*/
 //extern int BIG_nafbits(BIG x,BIG x3,int i,int *nbs,int *nzs);
+
 /**	@brief  Calculate x=y*z mod n
  *
 	Slow method for modular multiplication
@@ -1220,7 +1275,7 @@ extern int BIG_jacobi(BIG x,BIG y);
 extern void BIG_invmodp(BIG x,BIG y,BIG n);
 /** @brief Calculate x=x mod 2^m
  *
-	Truncation 
+	Truncation
 	@param x BIG number, on reduced mod 2^m
 	@param m new truncated size
 */
@@ -1254,10 +1309,10 @@ extern void FP_one(BIG x);
 /**	@brief Reduces DBIG to BIG exploiting special form of the modulus
  *
 	This function comes in different flavours depending on the form of Modulus that is currently in use.
-	@param x BIG number, on exit = y mod Modulus
-	@param y DBIG number to be reduced
+	@param r BIG number, on exit = d mod Modulus
+	@param d DBIG number to be reduced
  */
-extern void FP_mod(BIG x,DBIG y);
+extern void FP_mod(BIG r,DBIG d);
 /**	@brief Fast Modular multiplication of two BIGs in n-residue form, mod Modulus
  *
 	Uses appropriate fast modular reduction method
@@ -1427,7 +1482,7 @@ extern void FP2_zero(FP2 *x);
 extern void FP2_one(FP2 *x);
 /**	@brief Negation of FP2
  *
-	@param x FP2 instance, on exit = -y 
+	@param x FP2 instance, on exit = -y
 	@param y FP2 instance
  */
 extern void FP2_neg(FP2 *x,FP2 *y);
@@ -1440,14 +1495,14 @@ extern void FP2_neg(FP2 *x,FP2 *y);
 extern void FP2_conj(FP2 *x,FP2 *y);
 /**	@brief addition of two FP2s
  *
-	@param x FP2 instance, on exit = y+z 
+	@param x FP2 instance, on exit = y+z
 	@param y FP2 instance
 	@param z FP2 instance
  */
 extern void FP2_add(FP2 *x,FP2 *y,FP2 *z);
 /**	@brief subtraction of two FP2s
  *
-	@param x FP2 instance, on exit = y-z 
+	@param x FP2 instance, on exit = y-z
 	@param y FP2 instance
 	@param z FP2 instance
  */
@@ -1561,7 +1616,7 @@ extern int ECP_equals(ECP *P,ECP *Q);
 extern void ECP_copy(ECP *P,ECP *Q);
 /**	@brief Negation of an ECP point
  *
-	@param P ECP instance, on exit = -P 
+	@param P ECP instance, on exit = -P
  */
 extern void ECP_neg(ECP *P);
 /**	@brief Set ECP to point-at-infinity
@@ -1614,7 +1669,7 @@ extern void ECP_add(ECP *P,ECP *Q,ECP *D);
 #else
 /**	@brief Set ECP to point(x,y) given x and y
  *
-	Point P set to infinity if no such point on the curve. 
+	Point P set to infinity if no such point on the curve.
 	@param P ECP instance to be set (x,y)
 	@param x BIG x coordinate of point
 	@param y BIG y coordinate of point
@@ -1782,14 +1837,14 @@ extern int ECP2_fromOctet(ECP2 *P,octet *S);
 extern void ECP2_rhs(FP2 *r,FP2 *x);
 /**	@brief Set ECP2 to point(x,y) given x and y
  *
-	Point P set to infinity if no such point on the curve. 
+	Point P set to infinity if no such point on the curve.
 	@param P ECP2 instance to be set (x,y)
 	@param x FP2 x coordinate of point
 	@param y FP2 y coordinate of point
 	@return 1 if point exists, else 0
  */
 extern int ECP2_set(ECP2 *P,FP2 *x,FP2 *y);
-/**	@brief Set ECP to point(x,[y]) given x 
+/**	@brief Set ECP to point(x,[y]) given x
  *
 	Point P set to infinity if no such point on the curve. Otherwise y coordinate is calculated from x.
 	@param P ECP instance to be set (x,[y])
@@ -1799,7 +1854,7 @@ extern int ECP2_set(ECP2 *P,FP2 *x,FP2 *y);
 extern int ECP2_setx(ECP2 *P,FP2 *x);
 /**	@brief Negation of an ECP2 point
  *
-	@param P ECP2 instance, on exit = -P 
+	@param P ECP2 instance, on exit = -P
  */
 extern void ECP2_neg(ECP2 *P);
 /**	@brief Doubles an ECP2 instance P
@@ -1878,7 +1933,7 @@ extern int FP4_isreal(FP4 *x);
 	@param b FP2 to form imaginary part of FP4
  */
 extern void FP4_from_FP2s(FP4 *x,FP2 *a,FP2 *b);
-/**	@brief Initialise FP4 from single FP2 
+/**	@brief Initialise FP4 from single FP2
  *
 	Imaginary part is set to zero
 	@param x FP4 instance to be initialised
@@ -1903,7 +1958,7 @@ extern void FP4_zero(FP4 *x);
 extern void FP4_one(FP4 *x);
 /**	@brief Negation of FP4
  *
-	@param x FP4 instance, on exit = -y 
+	@param x FP4 instance, on exit = -y
 	@param y FP4 instance
  */
 extern void FP4_neg(FP4 *x,FP4 *y);
@@ -1923,14 +1978,14 @@ extern void FP4_conj(FP4 *x,FP4 *y);
 extern void FP4_nconj(FP4 *x,FP4 *y);
 /**	@brief addition of two FP4s
  *
-	@param x FP4 instance, on exit = y+z 
+	@param x FP4 instance, on exit = y+z
 	@param y FP4 instance
 	@param z FP4 instance
  */
 extern void FP4_add(FP4 *x,FP4 *y,FP4 *z);
 /**	@brief subtraction of two FP4s
  *
-	@param x FP4 instance, on exit = y-z 
+	@param x FP4 instance, on exit = y-z
 	@param y FP4 instance
 	@param z FP4 instance
  */
@@ -2021,7 +2076,7 @@ extern void FP4_xtr_A(FP4 *r,FP4 *w,FP4 *x,FP4 *y,FP4 *z);
 	@param x FP4 instance
  */
 extern void FP4_xtr_D(FP4 *r,FP4 *x);
-/**	@brief Calculates FP4 trace of an FP12 raised to the power of a BIG number 
+/**	@brief Calculates FP4 trace of an FP12 raised to the power of a BIG number
  *
 	XTR single exponentiation
 	@param r FP4 instance, on exit = trace(w^b)
@@ -2032,12 +2087,12 @@ extern void FP4_xtr_pow(FP4 *r,FP4 *x,BIG b);
 /**	@brief Calculates FP4 trace of c^a.d^b, where c and d are derived from FP4 traces of FP12s
  *
 	XTR double exponentiation
-	Assumes c=tr(x^m), d=tr(x^n), e=tr(x^(m-n)), f=tr(x^(m-2n)) 
+	Assumes c=tr(x^m), d=tr(x^n), e=tr(x^(m-n)), f=tr(x^(m-2n))
 	@param r FP4 instance, on exit = trace(c^a.d^b)
-	@param c FP4 instance, trace of an FP12 
-	@param d FP4 instance, trace of an FP12 
-	@param e FP4 instance, trace of an FP12 
-	@param f FP4 instance, trace of an FP12 
+	@param c FP4 instance, trace of an FP12
+	@param d FP4 instance, trace of an FP12
+	@param e FP4 instance, trace of an FP12
+	@param f FP4 instance, trace of an FP12
 	@param a BIG number
 	@param b BIG number
  */
@@ -2083,7 +2138,7 @@ extern int FP12_equals(FP12 *x,FP12 *y);
 	@param y FP12 instance
  */
 extern void FP12_conj(FP12 *x,FP12 *y);
-/**	@brief Initialise FP12 from single FP4 
+/**	@brief Initialise FP12 from single FP4
  *
 	Sets first FP4 component of an FP12, other components set to zero
 	@param x FP12 instance to be initialised
@@ -2313,7 +2368,7 @@ extern void FF_one(BIG *x,int n);
 extern int FF_comp(BIG *x,BIG *y,int n);
 /**	@brief addition of two FFs
  *
-	@param x FF instance, on exit = y+z 
+	@param x FF instance, on exit = y+z
 	@param y FF instance
 	@param z FF instance
 	@param n size of FF in BIGs
@@ -2321,7 +2376,7 @@ extern int FF_comp(BIG *x,BIG *y,int n);
 extern void FF_add(BIG *x,BIG *y,BIG *z,int n);
 /**	@brief subtraction of two FFs
  *
-	@param x FF instance, on exit = y-z 
+	@param x FF instance, on exit = y-z
 	@param y FF instance
 	@param z FF instance
 	@param n size of FF in BIGs
@@ -2365,6 +2420,12 @@ extern void FF_shr(BIG *x,int n);
 	@param n size of FF in BIGs
  */
 extern void FF_output(BIG *x,int n);
+/**	@brief Formats and outputs an FF to the console, in raw form
+ *
+ 	@param x FF instance to be printed
+ 	@param n size of FF in BIGs
+ */
+extern void FF_rawoutput(BIG *x,int n);
 /**	@brief Formats and outputs an FF instance to an octet string
  *
 	Converts an FF to big-endian base 256 form.
@@ -2389,7 +2450,7 @@ extern void FF_fromOctet(BIG *x,octet *S,int n);
 	@param z FF instance
 	@param n size of FF in BIGs
  */
-extern void FF_mul(BIG *x,BIG *y,BIG *z,int n); 
+extern void FF_mul(BIG *x,BIG *y,BIG *z,int n);
 /**	@brief Reduce FF mod a modulus
  *
 	This is slow
@@ -2607,7 +2668,7 @@ extern void OCT_frombase64(octet *O,char *b);
 extern void OCT_copy(octet *O,octet *P);
 /**	@brief XOR every byte of an octet with input m
  *
- 	@param O Octet 
+ 	@param O Octet
 	@param m byte to be XORed with every byte of O
 
  */
@@ -2615,7 +2676,7 @@ extern void OCT_xorbyte(octet *O,int m);
 /**	@brief Chops Octet into two, leaving first n bytes in O, moving the rest to P
  *
  	@param O Octet to be chopped
-	@param P new Octet to be created 
+	@param P new Octet to be created
 	@param n number of bytes to chop off O
 
  */
@@ -2640,7 +2701,7 @@ extern void OCT_jint(octet *O,int m,int n);
 extern void OCT_rand(octet *O,csprng *R,int n);
 /**	@brief Shifts Octet left by n bytes
  *
-	Leftmost bytes disappear 
+	Leftmost bytes disappear
  	@param O Octet to be shifted
 	@param n number of bytes to shift
 
@@ -2728,58 +2789,58 @@ extern void HASH512_hash(hash512 *H,char *h);
 /* AES functions */
 /**	@brief Reset AES mode or IV
  *
-	@param A an instance of the AES
+	@param A an instance of the AMCL_AES
 	@param m is the new active mode of operation (ECB, CBC, OFB, CFB etc)
 	@param iv the new Initialisation Vector
  */
-extern void AES_reset(aes *A,int m,char *iv);
-/**	@brief Extract chaining vector from AES instance
+extern void AES_reset(amcl_aes *A,int m,char *iv);
+/**	@brief Extract chaining vector from AMCL_AES instance
  *
-	@param A an instance of the AES
+	@param A an instance of the AMCL_AES
 	@param f the extracted chaining vector
  */
-extern void AES_getreg(aes *A,char * f);
-/**	@brief Initialise an instance of AES and its mode of operation
+extern void AES_getreg(amcl_aes *A,char * f);
+/**	@brief Initialise an instance of AMCL_AES and its mode of operation
  *
-	@param A an instance AES
+	@param A an instance AMCL_AES
 	@param m is the active mode of operation (ECB, CBC, OFB, CFB etc)
 	@param n is the key length in bytes, 16, 24 or 32
 	@param k the AES key as an array of 16 bytes
 	@param iv the Initialisation Vector
 	@return 0 for invalid n
  */
-extern int AES_init(aes *A,int m,int n,char *k,char *iv);
+extern int AES_init(amcl_aes *A,int m,int n,char *k,char *iv);
 /**	@brief Encrypt a single 16 byte block in ECB mode
  *
-	@param A an instance of the AES
+	@param A an instance of the AMCL_AES
 	@param b is an array of 16 plaintext bytes, on exit becomes ciphertext
  */
-extern void AES_ecb_encrypt(aes *A,uchar * b);
+extern void AES_ecb_encrypt(amcl_aes *A,uchar * b);
 /**	@brief Decrypt a single 16 byte block in ECB mode
  *
-	@param A an instance of the AES
+	@param A an instance of the AMCL_AES
 	@param b is an array of 16 cipherext bytes, on exit becomes plaintext
  */
-extern void AES_ecb_decrypt(aes *A,uchar * b);
+extern void AES_ecb_decrypt(amcl_aes *A,uchar * b);
 /**	@brief Encrypt a single 16 byte block in active mode
  *
-	@param A an instance of the AES
+	@param A an instance of the AMCL_AES
 	@param b is an array of 16 plaintext bytes, on exit becomes ciphertext
 	@return 0, or overflow bytes from CFB mode
  */
-extern unsign32 AES_encrypt(aes *A,char *b );
+extern unsign32 AES_encrypt(amcl_aes *A,char *b );
 /**	@brief Decrypt a single 16 byte block in active mode
  *
-	@param A an instance of the AES
+	@param A an instance of the AMCL_AES
 	@param b is an array of 16 ciphertext bytes, on exit becomes plaintext
 	@return 0, or overflow bytes from CFB mode
  */
-extern unsign32 AES_decrypt(aes *A,char *b);
+extern unsign32 AES_decrypt(amcl_aes *A,char *b);
 /**	@brief Clean up after application of AES
  *
-	@param A an instance of the AES
+	@param A an instance of the AMCL_AES
  */
-extern void AES_end(aes *A);
+extern void AES_end(amcl_aes *A);
 
 
 /* AES-GCM functions */
@@ -2848,5 +2909,16 @@ extern void RAND_clean(csprng *R);
 	@return a random byte
  */
 extern int RAND_byte(csprng *R);
+
+/**
+ * @brief Convert to DBIG number from byte array of given length
+ *
+ * Convert to DBIG number from byte array of given length.
+ *
+ * @param x DBIG number
+ * @param a byte array
+ * @param s byte array length
+ */
+extern void BIG_dfromBytesLen(DBIG x,char *a,int s);
 
 #endif

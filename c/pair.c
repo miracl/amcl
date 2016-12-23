@@ -93,8 +93,11 @@ void PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
     FP2 X;
     BIG x,n,Qx,Qy;
     int i,nb;
-    ECP2 A,KA;
+    ECP2 A;
     FP12 lv;
+#if CHOICE<BLS_CURVES
+    ECP2 KA;
+#endif
 
     BIG_rcopy(Qx,CURVE_Fra);
     BIG_rcopy(Qy,CURVE_Frb);
@@ -167,9 +170,11 @@ void PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
     FP2 X;
     BIG x,n,Qx,Qy,Sx,Sy;
     int i,nb;
-    ECP2 A,B,K;
+    ECP2 A,B;
     FP12 lv;
-
+#if CHOICE<BLS_CURVES
+    ECP2 K;
+#endif
     BIG_rcopy(Qx,CURVE_Fra);
     BIG_rcopy(Qy,CURVE_Frb);
     FP2_from_BIGs(&X,Qx,Qy);
@@ -452,6 +457,7 @@ void PAIR_fexp(FP12 *r)
 #endif
 }
 
+#ifdef USE_GLV
 /* GLV method */
 static void glv(BIG u[2],BIG e)
 {
@@ -497,12 +503,14 @@ static void glv(BIG u[2],BIG e)
 
     return;
 }
+#endif // USE_GLV
 
 /* Galbraith & Scott Method */
 static void gs(BIG u[4],BIG e)
 {
-    int i,j;
+    int i;
 #if CHOICE<BLS_CURVES
+    int j;
     BIG v[4],t,q;
     DBIG d;
     BIG_rcopy(q,CURVE_Order);

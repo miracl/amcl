@@ -36,7 +36,7 @@ under the License.
 #define EGS MODBYTES  /**< ECC Group Size in bytes */
 #define EFS MODBYTES  /**< ECC Field Size in bytes */
 
-#define HASH_TYPE_ECC SHA512
+#define HASH_TYPE_ECC SHA256  /**< Hash type */
 
 #define ECDH_OK                     0     /**< Function completed without error */
 /*#define ECDH_DOMAIN_ERROR          -1*/
@@ -192,13 +192,14 @@ extern int ECP_ECIES_DECRYPT(int h,octet *P1,octet *P2,octet *V,octet *C,octet *
 	IEEE-1363 ECDSA Signature
 	@param h is the hash type
 	@param R is a pointer to a cryptographically secure random number generator
+        @param k Ephemeral key. This value is used when R=NULL
 	@param s the input private signing key
 	@param M the input message to be signed
 	@param c component of the output signature
 	@param d component of the output signature
 
  */
-extern int ECPSP_DSA(int h,csprng *R,octet *s,octet *M,octet *c,octet *d);
+extern int ECPSP_DSA(int h,csprng *R,octet *k,octet *s,octet *M,octet *c,octet *d);
 /**	@brief ECDSA Signature Verification
  *
 	IEEE-1363 ECDSA Signature Verification

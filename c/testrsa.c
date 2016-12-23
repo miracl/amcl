@@ -18,8 +18,6 @@ under the License.
 */
 
 /* test driver and function exerciser for RSA API Functions */
-/* gcc -std=c99 -O3 testrsa.c rsa.c amcl.a -o testrsa.exe */
-
 
 #include <stdio.h>
 #include <time.h>
@@ -54,7 +52,7 @@ int main()
 //{
 
     printf("Generating public/private key pair\n");
-    RSA_KEY_PAIR(&RNG,65537,&priv,&pub);
+    RSA_KEY_PAIR(&RNG,65537,&priv,&pub,NULL,NULL);
 
     printf("Encrypting test string\n");
     OCT_jstring(&M,(char *)"Hello World\n");
