@@ -50,6 +50,9 @@ int main()
 #if CHOICE==BLS455 
 	printf("BLS455 Curve\n");	
 #endif
+#if CHOICE==BLS383 
+	printf("BLS383 Curve\n");	
+#endif
 
 #if CHUNK==16
 	printf("16-bit Build\n");
