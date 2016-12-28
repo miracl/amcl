@@ -378,12 +378,44 @@ public class BIG {
 		return c;
 	}
 
+	static BIG monty(DBIG d)
+	{
+		BIG b;
+		BIG md=new BIG(ROM.Modulus);
+		long m,carry;
+		long[] cr=new long[2];
+		for (int i=0;i<ROM.NLEN;i++) 
+		{
+			if (ROM.MConst==-1) m=(-d.w[i])&ROM.BMASK;
+			else
+			{
+				if (ROM.MConst==1) m=d.w[i];
+				else m=(ROM.MConst*d.w[i])&ROM.BMASK;
+			}
+
+			carry=0;
+			for (int j=0;j<ROM.NLEN;j++)
+			{
+				cr=muladd(m,md.w[j],carry,d.w[i+j]);
+				carry=cr[0];
+				d.w[i+j]=cr[1];
+			}
+			d.w[ROM.NLEN+i]+=carry;
+		}
+
+		b=new BIG(0);
+		for (int i=0;i<ROM.NLEN;i++ )
+			b.w[i]=d.w[ROM.NLEN+i];
+		b.norm();
+		return b;		
+	}
+
 /* reduce a DBIG to a BIG using the appropriate form of the modulus */
 	public static BIG mod(DBIG d)
 	{
-		BIG b;
 		if (ROM.MODTYPE==ROM.PSEUDO_MERSENNE)
 		{
+			BIG b;		
 			long v,tw;
 			BIG t=d.split(ROM.MODBITS);
 			b=new BIG(d);
@@ -395,9 +427,11 @@ public class BIG {
 
 			b.add(t);
 			b.norm();
+			return b;		
 		}
 		if (ROM.MODTYPE==ROM.MONTGOMERY_FRIENDLY)
 		{
+			BIG b;		
 			long[] cr=new long[2];
 			for (int i=0;i<ROM.NLEN;i++)
 			{
@@ -410,9 +444,11 @@ public class BIG {
 			for (int i=0;i<ROM.NLEN;i++ )
 				b.w[i]=d.w[ROM.NLEN+i];
 			b.norm();
+			return b;		
 		}
 		if (ROM.MODTYPE==ROM.GENERALISED_MERSENNE)
 		{ // GoldiLocks Only
+			BIG b;		
 			BIG t=d.split(ROM.MODBITS);
 			b=new BIG(d);
 			b.add(t);
@@ -433,39 +469,14 @@ public class BIG {
 			
 			b.w[224/ROM.BASEBITS]+=carry<<(224%ROM.BASEBITS);
 			b.norm();
+			return b;		
 		}
 		if (ROM.MODTYPE==ROM.NOT_SPECIAL)
 		{
-			BIG md=new BIG(ROM.Modulus);
-			long m,carry;
-			long[] cr=new long[2];
-			for (int i=0;i<ROM.NLEN;i++) 
-			{
-				if (ROM.MConst==-1) m=(-d.w[i])&ROM.BMASK;
-				else
-				{
-					if (ROM.MConst==1) m=d.w[i];
-					else m=(ROM.MConst*d.w[i])&ROM.BMASK;
-				}
-
-				carry=0;
-				for (int j=0;j<ROM.NLEN;j++)
-				{
-					cr=muladd(m,md.w[j],carry,d.w[i+j]);
-					carry=cr[0];
-					d.w[i+j]=cr[1];
-					//carry=d.muladd(m,md.w[j],carry,i+j);
-				}
-				d.w[ROM.NLEN+i]+=carry;
-			}
-
-			b=new BIG(0);
-			for (int i=0;i<ROM.NLEN;i++ )
-				b.w[i]=d.w[ROM.NLEN+i];
-			b.norm();
+			return monty(d);
 		}
 
-		return b;
+		return new BIG(0);
 	}
 
 

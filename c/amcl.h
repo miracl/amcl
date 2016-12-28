@@ -162,7 +162,6 @@
 #define BIGBITS (MODBYTES*8)	      /**< Number of bits representable in a BIG */
 #define FF_BITS (BIGBITS*FFLEN)	      /**< Finite Field Size in bits - must be BIGBITS.2^n */
 
-
 /* modulus types */
 
 #define NOT_SPECIAL 0	       /**< Modulus of no exploitable form */
@@ -565,6 +564,14 @@ typedef chunk DBIG[DNLEN];   /**< Define type DBIG as array of chunks */
 
 /* catch field excesses */
 #define EXCESS(a) ((a[NLEN-1]&OMASK)>>(TBITS)) /**< Field Excess */
+
+
+#define P_MBITS (MODBYTES*8)
+#define P_TBITS (P_MBITS%BASEBITS)
+#define P_EXCESS(a) ((a[NLEN-1])>>(P_TBITS))
+#define P_FEXCESS ((chunk)1<<(BASEBITS*NLEN-P_MBITS))
+
+
 
 /* Field Params - see rom.c */
 extern const BIG Modulus;  /**< Actual Modulus set in rom.c */

@@ -356,12 +356,42 @@ public class BIG {
 		return c;
 	}
 
+	static BIG monty(DBIG d)
+	{
+		BIG b;
+		long t,c,s;
+		int i,k;
+		long[] dd=new long[ROM.NLEN];
+		int[] v=new int[ROM.NLEN];
+		BIG m=new BIG(ROM.Modulus);
+		b=new BIG(0);
+
+		t=d.w[0]; v[0]=((int)t*ROM.MConst)&ROM.BMASK; t+=(long)v[0]*m.w[0]; c=(t>>ROM.BASEBITS)+d.w[1]; s=0;
+
+		for (k=1;k<ROM.NLEN;k++)
+		{
+			t=c+s+(long)v[0]*m.w[k];
+			for (i=k-1;i>k/2;i--) t+=(long)(v[k-i]-v[i])*(m.w[i]-m.w[k-i]);
+			v[k]=((int)t*ROM.MConst)&ROM.BMASK; t+=(long)v[k]*m.w[0]; c=(t>>ROM.BASEBITS)+d.w[k+1];
+			dd[k]=(long)v[k]*m.w[k]; s+=dd[k];
+		}
+		for (k=ROM.NLEN;k<2*ROM.NLEN-1;k++)
+		{
+			t=c+s;
+			for (i=ROM.NLEN-1;i>=1+k/2;i--) t+=(long)(v[k-i]-v[i])*(m.w[i]-m.w[k-i]);
+			b.w[k-ROM.NLEN]=(int)t&ROM.BMASK; c=(t>>ROM.BASEBITS)+d.w[k+1]; s-=dd[k-ROM.NLEN+1];
+		}
+		b.w[ROM.NLEN-1]=(int)c&ROM.BMASK;	
+		b.norm();
+		return b;		
+	}
+
 /* reduce a DBIG to a BIG using the appropriate form of the modulus */
 	public static BIG mod(DBIG d)
 	{
-		BIG b;
 		if (ROM.MODTYPE==ROM.PSEUDO_MERSENNE)
 		{
+			BIG b;
 			int v,tw;
 			BIG t=d.split(ROM.MODBITS);
 			b=new BIG(d);
@@ -373,9 +403,11 @@ public class BIG {
 
 			b.add(t);
 			b.norm();
+			return b;
 		}
 		if (ROM.MODTYPE==ROM.MONTGOMERY_FRIENDLY)
 		{
+			BIG b;
 			int[] cr=new int[2];				
 			for (int i=0;i<ROM.NLEN;i++)
 			{
@@ -388,9 +420,11 @@ public class BIG {
 			for (int i=0;i<ROM.NLEN;i++ )
 				b.w[i]=d.w[ROM.NLEN+i];
 			b.norm();
+			return b;
 		}
 		if (ROM.MODTYPE==ROM.GENERALISED_MERSENNE)
 		{ // GoldiLocks Only
+			BIG b;
 			BIG t=d.split(ROM.MODBITS);
 			b=new BIG(d);
 			b.add(t);
@@ -411,37 +445,14 @@ public class BIG {
 			
 			b.w[224/ROM.BASEBITS]+=carry<<(224%ROM.BASEBITS);
 			b.norm();
+			return b;
 		}
 		if (ROM.MODTYPE==ROM.NOT_SPECIAL)
 		{
-
-			long t,c,s;
-			int i,k;
-			long[] dd=new long[ROM.NLEN];
-			int[] v=new int[ROM.NLEN];
-			BIG m=new BIG(ROM.Modulus);
-			b=new BIG(0);
-
-			t=d.w[0]; v[0]=((int)t*ROM.MConst)&ROM.BMASK; t+=(long)v[0]*m.w[0]; c=(t>>ROM.BASEBITS)+d.w[1]; s=0;
-
-			for (k=1;k<ROM.NLEN;k++)
-			{
-				t=c+s+(long)v[0]*m.w[k];
-				for (i=k-1;i>k/2;i--) t+=(long)(v[k-i]-v[i])*(m.w[i]-m.w[k-i]);
-				v[k]=((int)t*ROM.MConst)&ROM.BMASK; t+=(long)v[k]*m.w[0]; c=(t>>ROM.BASEBITS)+d.w[k+1];
-				dd[k]=(long)v[k]*m.w[k]; s+=dd[k];
-			}
-			for (k=ROM.NLEN;k<2*ROM.NLEN-1;k++)
-			{
-				t=c+s;
-				for (i=ROM.NLEN-1;i>=1+k/2;i--) t+=(long)(v[k-i]-v[i])*(m.w[i]-m.w[k-i]);
-				b.w[k-ROM.NLEN]=(int)t&ROM.BMASK; c=(t>>ROM.BASEBITS)+d.w[k+1]; s-=dd[k-ROM.NLEN+1];
-			}
-			b.w[ROM.NLEN-1]=(int)c&ROM.BMASK;	
-			b.norm();
+			return monty(d);
 		}
 
-		return b;
+		return new BIG(0);
 	}
 
 

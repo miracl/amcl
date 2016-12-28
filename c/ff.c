@@ -21,12 +21,6 @@ under the License.
 
 #include "amcl.h"
 
-#define P_MBITS (MODBYTES*8)
-#define P_TBITS (P_MBITS%BASEBITS)
-#define P_EXCESS(a) ((a[NLEN-1])>>(P_TBITS))
-#define P_FEXCESS ((chunk)1<<(BASEBITS*NLEN-P_MBITS))
-
-
 /* Arazi and Qi inversion mod 256 */
 static int invmod256(int a)
 {
