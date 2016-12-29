@@ -9,7 +9,7 @@ It is expected that the consumer will themselves take this final step,
 depending on the exact requirements of their project.
 
 Note that AMCL is largely configure at compile time, and so it doesn't
-fit the mold for a general purpose library that can be configured at
+fit the mould for a general purpose library that can be configured at
 runtime.
 
 AMCL is available in 32-bit and 64-bit versions in most languages.
