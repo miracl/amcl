@@ -99,5 +99,26 @@ swift -lamcl -I. TestRSA.swift
 
 Note that classes and methods that need to be exposed to consuming programs, 
 should be made "public" when and if needed. Here we have done this as needed 
-just for these example programs
+just for these example programs.
+
+------------------------------------------------
+
+An alternative method to build applications is to use the swiftc compiler 
+directly. For example:-
+
+Edit main.swift to just include a call to BenchtestPAIR()
+
+Copy rom32.swift to rom.swift
+
+Compile directly using swiftc
+
+swiftc -DD32 -O -Ounchecked -whole-module-optimization main.swift BenchtestPAIR.swift pair.swift fp12.swift fp4.swift fp2.swift fp.swift big.swift dbig.swift ecp.swift ecp2.swift hash256.swift hash384.swift hash512.swift aes.swift rand.swift rom.swift -o main 
+
+Run the BenchtestPAIR() program by
+
+./main
+
+For the files needed to build other applications, see go/readme.txt
+
+Change "32" to "64" for a 64-bit build
 
