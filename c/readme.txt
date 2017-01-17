@@ -27,7 +27,11 @@ select your curve of CHOICE in amcl.h
 
 Example (1), in amcl.h choose
 
-#define CHOICE BN
+#define CHOICE BN254
+
+and
+
+#define CURVETYPE WEIERSTRASS
 
 Under windows run the batch file build_pair.bat to build the amcl.a library
 and the testmpin.exe applications.
@@ -38,6 +42,10 @@ Example (2), in amcl.h choose
 
 #define CHOICE C25519
 
+and
+
+#define CURVETYPE EDWARDS
+
 to select the Edwards curve ed25519.
 
 Under Windows run the batch file build_ec.bat to build the amcl.a library and
@@ -47,8 +55,12 @@ For Linux execute "bash build_ec"
 
 
 To help generate the ROM constants for your own curve some MIRACL helper 
-programs are included. The program bngen.cpp generates ROM data for a 
-BN curve, and the program ecgen.cpp generates ROM data for EC curves. 
+programs are included. The programs bngen.cpp and blsgen.cpp generate ROM 
+data for a BN and BLS pairing friendly curves, and the program ecgen.cpp 
+generates ROM data for regular EC curves.
+
+The MIRACL based program check.cpp helps choose the best number base for
+big number representation, given the word-length and the size of the modulus.
 
 The program bigtobig.cpp converts a big number to the AMCL 
 BIG format.

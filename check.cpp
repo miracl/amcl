@@ -70,10 +70,15 @@ int main(int argc, char *argv[])
 		s=w*b-p;
 
 		lhs=(w+1)*(pow((Big)2,2*b)-pow((Big)2,b+1)+1);
-		rhs=pow((Big)2,2*n)-1;
+		rhs=pow((Big)2,2*n-1);
 
 		if (lhs>=rhs)    {printf("Stability violation for BASEBITS= %d\n",b); continue;}
+
+// Top bits of Modulus must appear in top word of representation. Also at least 4 bits spare needed for field excess. And rounded up number of bytes in modulus must be representable. */ 
+
 		if (s<4 || s>=b) {printf("Not enough spare for    BASEBITS= %d\n",b); continue;}
+		if (8*(1+(p-1)/8) > b*(1+(p-1)/b)) {printf("Not enough extra for    BASEBITS= %d\n",b); continue;}
+
 		printf("Solution found for BASEBITS= %d Words Per Big=%d, spare bits= %d\n",b,w,s);
 		//break;
 	}
