@@ -25,8 +25,12 @@ In the ROM.java file you must provide the curve constants. Several examples
 are provided there, if you are willing to use one of these.
 
 To help generate the ROM constants for your own curve some MIRACL helper 
-programs are included. The program bngen.cpp generates ROM data for a 
-BN curve, and the program ecgen.cpp generates ROM data for EC curves. 
+programs are included. The programs bngen.cpp and blsgen.cpp generate ROM 
+data for a BN and BLS pairing friendly curves, and the program ecgen.cpp 
+generates ROM data for regular EC curves.
+
+The MIRACL based program check.cpp helps choose the best number base for
+big number representation, given the word-length and the size of the modulus.
 
 The program bigtobig.cpp converts a big number to the AMCL 
 BIG format.
