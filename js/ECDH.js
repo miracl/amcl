@@ -165,7 +165,7 @@ var ECDH = {
 	{
 		var i,j,k,d,opt;
 		d=Math.floor(olen/sha); if (olen%sha!==0) d++;
-		var F=new Array(this.EFS);
+		var F=new Array(sha);
 		var U=[];
 		var S=[];
 
@@ -178,13 +178,13 @@ var ECDH = {
 			var N=this.inttobytes(i,4);
 			for (j=0;j<4;j++) S[Salt.length+j]=N[j];
 			this.HMAC(sha,S,Pass,F);
-			for (j=0;j<this.EFS;j++) U[j]=F[j];
+			for (j=0;j<sha;j++) U[j]=F[j];
 			for (j=2;j<=rep;j++)
 			{
 				this.HMAC(sha,U,Pass,U);
-				for (k=0;k<this.EFS;k++) F[k]^=U[k];
+				for (k=0;k<sha;k++) F[k]^=U[k];
 			}
-			for (j=0;j<this.EFS;j++) K[opt++]=F[j];
+			for (j=0;j<sha;j++) K[opt++]=F[j];
 		}
 		var key=[];
 		for (i=0;i<olen;i++) key[i]=K[i];

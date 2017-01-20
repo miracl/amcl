@@ -145,11 +145,11 @@ public final class ECDH {
 	{
 		int i,j,k,len,d,opt;
 		d=olen/sha; if (olen%sha!=0) d++;
-		byte[] F=new byte[EFS];
-		byte[] U=new byte[EFS];
+		byte[] F=new byte[sha];
+		byte[] U=new byte[sha];
 		byte[] S=new byte[Salt.length+4];
 
-		byte[] K=new byte[d*EFS];
+		byte[] K=new byte[d*sha];
 		opt=0;
 
 		for (i=1;i<=d;i++)
@@ -160,13 +160,13 @@ public final class ECDH {
 
 			HMAC(sha,S,Pass,F);
 
-			for (j=0;j<EFS;j++) U[j]=F[j];
+			for (j=0;j<sha;j++) U[j]=F[j];
 			for (j=2;j<=rep;j++)
 			{
 				HMAC(sha,U,Pass,U);
-				for (k=0;k<EFS;k++) F[k]^=U[k];
+				for (k=0;k<sha;k++) F[k]^=U[k];
 			}
-			for (j=0;j<EFS;j++) K[opt++]=F[j];
+			for (j=0;j<sha;j++) K[opt++]=F[j];
 		}
 		byte[] key=new byte[olen];
 		for (i=0;i<olen;i++) key[i]=K[i];

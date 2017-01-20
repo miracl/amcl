@@ -137,16 +137,13 @@ func KDF2(sha int,Z []byte,P []byte,olen int) []byte {
 /* Output key of length olen */
 func PBKDF2(sha int,Pass []byte,Salt []byte,rep int,olen int) []byte {
 	d:=olen/sha; if olen%sha!=0 {d++}
-	var F [ECDH_EFS]byte
-	var U [ECDH_EFS]byte
 
+	var F []byte
+	var U []byte
 	var S []byte
-
-	//byte[] S=new byte[Salt.length+4];
-
 	var K []byte
-	//byte[] K=new byte[d*EFS];
-	//opt:=0
+	
+	for i:=0;i<sha;i++{F=append(F,0); U=append(U,0)}
 
 	for i:=1;i<=d;i++ {
 		for j:=0;j<len(Salt);j++ {S=append(S,Salt[j])} 
@@ -155,12 +152,12 @@ func PBKDF2(sha int,Pass []byte,Salt []byte,rep int,olen int) []byte {
 
 		HMAC(sha,S,Pass,F[:])
 
-		for j:=0;j<ECDH_EFS;j++ {U[j]=F[j]}
+		for j:=0;j<sha;j++ {U[j]=F[j]}
 		for j:=2;j<=rep;j++ {
 			HMAC(sha,U[:],Pass,U[:]);
-			for k:=0;k<ECDH_EFS;k++ {F[k]^=U[k]}
+			for k:=0;k<sha;k++ {F[k]^=U[k]}
 		}
-		for j:=0;j<ECDH_EFS;j++ {K=append(K,F[j])} 
+		for j:=0;j<sha;j++ {K=append(K,F[j])} 
 	}
 	var key []byte
 	for i:=0;i<olen;i++ {key=append(key,K[i])}

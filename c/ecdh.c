@@ -238,7 +238,7 @@ void KDF2(int sha,octet *z,octet *p,int olen,octet *key)
 void PBKDF2(int sha,octet *p,octet *s,int rep,int olen,octet *key)
 {
     int i,j,len,d=ROUNDUP(olen,sha);
-    char f[EFS],u[EFS];
+    char f[64],u[64];   /*****/
     octet F= {0,sizeof(f),f};
     octet U= {0,sizeof(u),u};
     OCT_empty(key);
@@ -248,13 +248,13 @@ void PBKDF2(int sha,octet *p,octet *s,int rep,int olen,octet *key)
         len=s->len;
         OCT_jint(s,i,4);
 
-        HMAC(sha,s,p,EFS,&F);
+        HMAC(sha,s,p,sha,&F);  /* sha not EFS */
 
         s->len=len;
         OCT_copy(&U,&F);
         for (j=2; j<=rep; j++)
         {
-            HMAC(sha,&U,p,EFS,&U);
+            HMAC(sha,&U,p,sha,&U); /* sha not EFS */
             OCT_xor(&F,&U);
         }
 
