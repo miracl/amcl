@@ -143,15 +143,11 @@ pub fn kdf2(sha: usize,z: &[u8],p: Option<&[u8]>,olen: usize,k: &mut [u8])  {
 /* Output key of length olen */
 pub fn pbkdf2(sha: usize,pass: &[u8],salt: &[u8],rep: usize,olen: usize,k: &mut [u8]) {
 	let mut d=olen/sha; if olen%sha!=0 {d+=1}
-	let mut f:[u8;EFS]=[0;EFS];
-	let mut u:[u8;EFS]=[0;EFS];
-	let mut ku:[u8;EFS]=[0;EFS];	
+	let mut f:[u8;64]=[0;64];
+	let mut u:[u8;64]=[0;64];
+	let mut ku:[u8;64]=[0;64];	
 	let mut s:[u8;36]=[0;36];    // Maximum salt of 32 bytes + 4
 	let mut n:[u8;4]=[0;4];
-
-	//byte[] S=new byte[Salt.length+4];
-	//byte[] K=new byte[d*EFS];
-	//opt:=0
 
 	let sl=salt.len();
 	let mut kp=0;
@@ -160,25 +156,25 @@ pub fn pbkdf2(sha: usize,pass: &[u8],salt: &[u8],rep: usize,olen: usize,k: &mut 
 		inttobytes(i+1,&mut n);
 		for j in 0..4 {s[sl+j]=n[j]}   
 
-		hmac(sha,&s[0..sl+4],pass,&mut f);
+		hmac(sha,&s[0..sl+4],pass,sha,&mut f);
 
-		for j in 0..EFS {u[j]=f[j]}
+		for j in 0..sha {u[j]=f[j]}
 		for _ in 1..rep {
-			hmac(sha,&mut u,pass,&mut ku);
-			for k in 0..EFS {u[k]=ku[k]; f[k]^=u[k]}
+			hmac(sha,&mut u,pass,sha,&mut ku);
+			for k in 0..sha {u[k]=ku[k]; f[k]^=u[k]}
 		}
 		for j in 0..EFS {if kp<olen {k[kp]=f[j]} kp+=1} 
 	}
 }
 
 /* Calculate HMAC of m using key k. HMAC is tag of length olen (which is length of tag) */
-pub fn hmac(sha: usize,m: &[u8],k: &[u8],tag: &mut [u8]) -> bool {
+pub fn hmac(sha: usize,m: &[u8],k: &[u8],olen: usize,tag: &mut [u8]) -> bool {
 	/* Input is from an octet m        *
 	* olen is requested output length in bytes. k is the key  *
 	* The output is the calculated tag */
 	let mut b:[u8;64]=[0;64];  /* Not good */
 	let mut k0:[u8;128]=[0;128];
-	let olen=tag.len();    /* length of HMAC */
+//	let olen=tag.len();    /* length of HMAC */
 
 	if olen<4 /*|| olen>sha */ {return false}
 
@@ -529,7 +525,7 @@ pub fn ecies_encrypt(sha: usize,p1: &[u8],p2: &[u8],rng: &mut RAND,w: &[u8],m: &
 		c.push(l2[i]);
 	}
 
-	hmac(sha,&c,&k2,t);
+	hmac(sha,&c,&k2,t.len(),t);
 
 	for _ in 0..p2l+8 {c.pop();}
 	
@@ -547,7 +543,7 @@ pub fn ecies_decrypt(sha: usize,p1: &[u8],p2: &[u8],v: &[u8],c: &mut Vec<u8>,t: 
 
 	let mut tag:[u8;32]=[0;32];  /* 32 is max length of tag */
 
-	for i in 0..12 {tag[i]=t[i]}
+	for i in 0..t.len() {tag[i]=t[i]}
 
 	if ecpsvdp_dh(&u,&v,&mut z)!=0 {return None}
 
@@ -574,7 +570,7 @@ pub fn ecies_decrypt(sha: usize,p1: &[u8],p2: &[u8],v: &[u8],c: &mut Vec<u8>,t: 
 		c.push(l2[i]);
 	}
 
-	hmac(sha,&c,&k2,&mut tag);
+	hmac(sha,&c,&k2,t.len(),&mut tag);
 
 	for _ in 0..p2l+8 {c.pop();}
 

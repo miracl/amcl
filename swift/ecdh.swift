@@ -143,11 +143,11 @@ final public class ECDH
     {
         var d=olen/sha;
         if (olen%sha) != 0 {d+=1}
-        var F=[UInt8](repeating: 0,count: ECDH.EFS)
-        var U=[UInt8](repeating: 0,count: ECDH.EFS)
+        var F=[UInt8](repeating: 0,count: sha)
+        var U=[UInt8](repeating: 0,count: sha)
         var S=[UInt8](repeating: 0,count: Salt.count+4)
     
-        var K=[UInt8](repeating: 0,count: d*ECDH.EFS)
+        var K=[UInt8](repeating: 0,count: d*sha)
         
         var opt=0;
     
@@ -157,21 +157,17 @@ final public class ECDH
             var N=ECDH.inttoBytes(i,4);
             for j in 0 ..< 4 {S[Salt.count+j]=N[j]}
     
- //           printBinary(S);
- //           printBinary(Pass);
+            printBinary(Pass);
             
             ECDH.HMAC(sha,S,Pass,&F);
-    
-//            printBinary(F);
-//            exit(0);
-            
-            for j in 0 ..< EFS {U[j]=F[j]}
+             
+            for j in 0 ..< sha {U[j]=F[j]}
             for _ in 2...rep
             {
-				ECDH.HMAC(sha,U,Pass,&U);
-                for k in 0 ..< ECDH.EFS {F[k]^=U[k]}
+		ECDH.HMAC(sha,U,Pass,&U);
+                for k in 0 ..< sha {F[k]^=U[k]}
             }
-            for j in 0 ..< EFS {K[opt]=F[j]; opt+=1}
+            for j in 0 ..< sha {K[opt]=F[j]; opt+=1}
         }
         var key=[UInt8](repeating: 0,count: olen)
         for i in 0 ..< olen {key[i]=K[i]}

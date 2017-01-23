@@ -34,7 +34,7 @@ Miracl precision=20;
 
 int main(int argc, char *argv[])
 {
-	int p,w,b,n,s,e;
+	int p,w,b,n,s,t,e;
 	Big lhs,rhs;
 
 	argc--; argv++;
@@ -74,12 +74,13 @@ int main(int argc, char *argv[])
 
 		if (lhs>=rhs)    {printf("Stability violation for BASEBITS= %d\n",b); continue;}
 
-// Top bits of Modulus must appear in top word of representation. Also at least 4 bits spare needed for field excess. And rounded up number of bytes in modulus must be representable. */ 
+// Top bits of Modulus must appear in top word of representation. Also at least 4 bits spare needed for field excess.  
+		if (s<4 || s>=b) {printf("Not enough Fp spare for BASEBITS= %d\n",b); continue;}
+// At least 2 spare bits needed for FF excess 
+		t=b*(1+(p-1)/b) - 8*(1+(p-1)/8);
+		if (t<2 || t>=b) {printf("Not enough FF spare for BASEBITS= %d\n",b); continue;}
 
-		if (s<4 || s>=b) {printf("Not enough spare for    BASEBITS= %d\n",b); continue;}
-		if (8*(1+(p-1)/8) > b*(1+(p-1)/b)) {printf("Not enough extra for    BASEBITS= %d\n",b); continue;}
-
-		printf("Solution found for BASEBITS= %d Words Per Big=%d, spare bits= %d\n",b,w,s);
+		printf("Solution for BASEBITS= %d, Words Per Big=%d, Fp spare bits= %d, FF spare bits= %d\n",b,w,s,t);
 		//break;
 	}
 	
