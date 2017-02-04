@@ -241,18 +241,7 @@ int MPIN_DECODING(octet *TP);
 	@return today's date, as number of days elapsed since the epoch
  */
 unsign32 MPIN_today(void);
-/**	@brief Initialise a random number generator
- *
-	@param R is a pointer to a cryptographically secure random number generator
-	@param S is an input truly random seed value
- */
-void MPIN_CREATE_CSPRNG(csprng *R,octet *S);
-/**	@brief Kill a random number generator
- *
-	Deletes all internal state
-	@param R is a pointer to a cryptographically secure random number generator
- */
-void MPIN_KILL_CSPRNG(csprng *R);
+
 /**	@brief Find a random multiple of a point in G1
  *
 	@param R is a pointer to a cryptographically secure random number generator

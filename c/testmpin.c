@@ -31,13 +31,14 @@ under the License.
 #include <string.h>
 #include <time.h>
 #include "mpin.h"
+#include "randapi.h"
 
 #define PERMITS  /* for time permits ON or OFF */
 #define PINERROR /* For PIN ERROR detection ON or OFF */
 #define FULL     /* for M-Pin Full or M-Pin regular */
 //#define SINGLE_PASS /* SINGLE PASS M-Pin */
 
-int main()
+int mpin(csprng *RNG)
 {
     int i,pin,rtn,err;
 #ifdef PERMITS
@@ -46,7 +47,7 @@ int main()
     int date=0;
 #endif
     unsigned long ran;
-    char x[PGS],s[PGS],y[PGS],client_id[100],raw[100],sst[4*PFS],token[2*PFS+1],sec[2*PFS+1],permit[2*PFS+1],xcid[2*PFS+1],xid[2*PFS+1],e[12*PFS],f[12*PFS];
+    char x[PGS],s[PGS],y[PGS],client_id[100],sst[4*PFS],token[2*PFS+1],sec[2*PFS+1],permit[2*PFS+1],xcid[2*PFS+1],xid[2*PFS+1],e[12*PFS],f[12*PFS];
     char hcid[PFS],hsid[PFS],hid[2*PFS+1],htid[2*PFS+1],h[PGS];
 #ifdef FULL
     char r[PGS],z[2*PFS+1],w[PGS],t[2*PFS+1];
@@ -57,7 +58,6 @@ int main()
     octet X= {0,sizeof(x),x};
     octet Y= {0,sizeof(y),y};
     octet H= {0,sizeof(h),h};
-    octet RAW= {0,sizeof(raw),raw};
     octet CLIENT_ID= {0,sizeof(client_id),client_id};
     octet SST= {0,sizeof(sst),sst};
     octet TOKEN= {0,sizeof(token),token};
@@ -83,22 +83,9 @@ int main()
 #endif
     octet *pxID,*pxCID,*pHID,*pHTID,*pE,*pF,*pPERMIT,*prHID;
     char idhex[100];
-    /* Crypto Strong RNG */
-    csprng RNG;
-    /* fake random seed source */
-    time((time_t *)&ran);
-    RAW.len=100;
-    RAW.val[0]=ran;
-    RAW.val[1]=ran>>8;
-    RAW.val[2]=ran>>16;
-    RAW.val[3]=ran>>24;
-    for (i=0; i<100; i++) RAW.val[i]=i+1;
-
-    /* initialise strong RNG */
-    MPIN_CREATE_CSPRNG(&RNG,&RAW);
 
     /* Trusted Authority set-up */
-    MPIN_RANDOM_GENERATE(&RNG,&S);
+    MPIN_RANDOM_GENERATE(RNG,&S);
     printf("Master Secret= ");
     OCT_output(&S);
 
@@ -142,7 +129,7 @@ int main()
     OCT_output(&PERMIT);
 
     /* This encoding makes Time permit look random */
-    if (MPIN_ENCODING(&RNG,&PERMIT)!=0) printf("Encoding error\n");
+    if (MPIN_ENCODING(RNG,&PERMIT)!=0) printf("Encoding error\n");
     /* printf("Encoded Time Permit= "); OCT_output(&PERMIT); */
     if (MPIN_DECODING(&PERMIT)!=0) printf("Decoding error\n");
     /* printf("Decoded Time Permit= "); OCT_output(&PERMIT); */
@@ -210,7 +197,7 @@ int main()
     printf("MPIN Single Pass\n");
     timeValue = MPIN_GET_TIME();
 
-    rtn=MPIN_CLIENT(HASH_TYPE_MPIN,date,&CLIENT_ID,&RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT,NULL,timeValue,&Y);
+    rtn=MPIN_CLIENT(HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT,NULL,timeValue,&Y);
 
     if (rtn != 0)
     {
@@ -219,7 +206,7 @@ int main()
     }
 
 #ifdef FULL
-    MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);  /* Also Send Z=r.ID to Server, remember random r */
+    MPIN_GET_G1_MULTIPLE(RNG,1,&R,&HCID,&Z);  /* Also Send Z=r.ID to Server, remember random r */
 #endif
 
 
@@ -227,12 +214,12 @@ int main()
 
 #ifdef FULL
     MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HSID);  // new
-    MPIN_GET_G1_MULTIPLE(&RNG,0,&W,prHID,&T);  /* Also send T=w.ID to client, remember random w  */
+    MPIN_GET_G1_MULTIPLE(RNG,0,&W,prHID,&T);  /* Also send T=w.ID to client, remember random w  */
 #endif
 
 #else // SINGLE_PASS
     printf("MPIN Multi Pass\n");
-    if (MPIN_CLIENT_1(HASH_TYPE_MPIN,date,&CLIENT_ID,&RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT)!=0)
+    if (MPIN_CLIENT_1(HASH_TYPE_MPIN,date,&CLIENT_ID,RNG,&X,pin,&TOKEN,&SEC,pxID,pxCID,pPERMIT)!=0)
     {
         printf("Error from Client side - First Pass\n");
         return 0;
@@ -242,18 +229,18 @@ int main()
 
 #ifdef FULL
     MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HCID);
-    MPIN_GET_G1_MULTIPLE(&RNG,1,&R,&HCID,&Z);  /* Also Send Z=r.ID to Server, remember random r, DH component */
+    MPIN_GET_G1_MULTIPLE(RNG,1,&R,&HCID,&Z);  /* Also Send Z=r.ID to Server, remember random r, DH component */
 #endif
 
     /* Server calculates H(ID) and H(ID)+H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
     MPIN_SERVER_1(HASH_TYPE_MPIN,date,pID,pHID,pHTID);
 
     /* Server generates Random number Y and sends it to Client */
-    MPIN_RANDOM_GENERATE(&RNG,&Y);
+    MPIN_RANDOM_GENERATE(RNG,&Y);
 
 #ifdef FULL
     MPIN_HASH_ID(HASH_TYPE_MPIN,&CLIENT_ID,&HSID); //new
-    MPIN_GET_G1_MULTIPLE(&RNG,0,&W,prHID,&T);  /* Also send T=w.ID to client, remember random w, DH component  */
+    MPIN_GET_G1_MULTIPLE(RNG,0,&W,prHID,&T);  /* Also send T=w.ID to client, remember random w, DH component  */
 #endif
 
     /* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
@@ -299,3 +286,29 @@ int main()
 #endif
     return 0;
 }
+
+int main()
+{
+    int i,res;
+    unsigned long ran;
+
+	char raw[100];
+    octet RAW= {0,sizeof(raw),raw};
+    csprng RNG;                /* Crypto Strong RNG */
+
+    time((time_t *)&ran);
+
+    RAW.len=100;				/* fake random seed source */
+    RAW.val[0]=ran;
+    RAW.val[1]=ran>>8;
+    RAW.val[2]=ran>>16;
+    RAW.val[3]=ran>>24;
+    for (i=0; i<100; i++) RAW.val[i]=i+1;
+
+    CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
+
+	mpin(&RNG);
+
+	KILL_CSPRNG(&RNG);
+}
+

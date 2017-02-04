@@ -109,18 +109,6 @@ static int hashit(int sha,octet *p,int n,octet *w)
     return hlen;
 }
 
-/* Initialise a Cryptographically Strong Random Number Generator from
-   an octet of raw random data */
-void RSA_CREATE_CSPRNG(csprng *RNG,octet *RAW)
-{
-    RAND_seed(RNG,RAW->len,RAW->val);
-}
-
-void RSA_KILL_CSPRNG(csprng *RNG)
-{
-    RAND_clean(RNG);
-}
-
 /* generate an RSA key pair */
 void RSA_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB,octet *P, octet* Q)
 {
@@ -224,7 +212,7 @@ const char SHA512ID[]= {0x30,0x51,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0
 
 int PKCS15(int sha,octet *m,octet *w)
 {
-    int olen=FF_BITS/8;
+    int olen=w->max;
     int hlen=sha;
     int idlen=19;
     char h[64];
@@ -252,10 +240,10 @@ int PKCS15(int sha,octet *m,octet *w)
 
 int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
 {
-    int slen,olen=RFS-1;
+    int slen,olen=f->max-1;
     int mlen=m->len;
     int hlen,seedlen;
-    char dbmask[RFS],seed[64];
+    char dbmask[MAX_RSA_BYTES],seed[64];
     octet DBMASK= {0,sizeof(dbmask),dbmask};
     octet SEED= {0,sizeof(seed),seed};
 
@@ -282,7 +270,7 @@ int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
 
     OCT_joctet(f,&DBMASK);
 
-    OCT_pad(f,RFS);
+    OCT_pad(f,f->max);
     OCT_clear(&SEED);
     OCT_clear(&DBMASK);
 
@@ -294,9 +282,9 @@ int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
 int OAEP_DECODE(int sha,octet *p,octet *f)
 {
     int comp,x,t;
-    int i,k,olen=RFS-1;
+    int i,k,olen=f->max-1;
     int hlen,seedlen;
-    char dbmask[RFS],seed[64],chash[64];
+    char dbmask[MAX_RSA_BYTES],seed[64],chash[64];
     octet DBMASK= {0,sizeof(dbmask),dbmask};
     octet SEED= {0,sizeof(seed),seed};
     octet CHASH= {0,sizeof(chash),chash};

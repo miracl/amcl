@@ -32,22 +32,12 @@ under the License.
 
 #include "amcl.h"
 
+#define MAX_RSA_BYTES 512 // Maximum of 4096
 #define HASH_TYPE_RSA SHA256 /**< Chosen Hash algorithm */
 #define RFS MODBYTES*FFLEN /**< RSA Public Key Size in bytes */
 
 /* RSA Auxiliary Functions */
-/**	@brief Initialise a random number generator
- *
-	@param R is a pointer to a cryptographically secure random number generator
-	@param S is an input truly random seed value
- */
-extern void RSA_CREATE_CSPRNG(csprng *R,octet *S);
-/**	@brief Kill a random number generator
- *
-	Deletes all internal state
-	@param R is a pointer to a cryptographically secure random number generator
- */
-extern void RSA_KILL_CSPRNG(csprng *R);
+
 /**	@brief RSA Key Pair Generator
  *
 	@param R is a pointer to a cryptographically secure random number generator

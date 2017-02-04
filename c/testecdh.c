@@ -24,8 +24,9 @@ under the License.
 #include <string.h>
 #include <time.h>
 #include "ecdh.h"
+#include "randapi.h"
 
-int main()
+int ecdh(csprng *RNG)
 {
     int i,res;
     unsigned long ran;
@@ -34,30 +35,16 @@ int main()
     /* Note salt must be big enough to include an appended word */
     /* Note ECIES ciphertext C must be big enough to include at least 1 appended block */
     /* Recall EFS is field size in bytes. So EFS=32 for 256-bit curve */
-    char s0[EGS],s1[EGS],w0[2*EFS+1],w1[2*EFS+1],z0[EFS],z1[EFS],raw[100],key[EAS],salt[32],pw[20];
+    char s0[2*EGS],s1[EGS],w0[2*EFS+1],w1[2*EFS+1],z0[EFS],z1[EFS],key[EAS],salt[40],pw[40];
     octet S0= {0,sizeof(s0),s0};
     octet S1= {0,sizeof(s1),s1};
     octet W0= {0,sizeof(w0),w0};
     octet W1= {0,sizeof(w1),w1};
     octet Z0= {0,sizeof(z0),z0};
     octet Z1= {0,sizeof(z1),z1};
-    octet RAW= {0,sizeof(raw),raw};
     octet KEY= {0,sizeof(key),key};
     octet SALT= {0,sizeof(salt),salt};
     octet PW= {0,sizeof(pw),pw};
-
-    csprng RNG;                /* Crypto Strong RNG */
-
-    time((time_t *)&ran);
-
-    RAW.len=100;				/* fake random seed source */
-    RAW.val[0]=ran;
-    RAW.val[1]=ran>>8;
-    RAW.val[2]=ran>>16;
-    RAW.val[3]=ran>>24;
-    for (i=0; i<100; i++) RAW.val[i]=i;
-
-    ECC_CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
 
     SALT.len=8;
     for (i=0; i<8; i++) SALT.val[i]=i+1; // set Salt
@@ -88,7 +75,7 @@ int main()
     }
 
     /* Random private key for other party */
-    ECP_KEY_PAIR_GENERATE(&RNG,&S1,&W1);
+    ECP_KEY_PAIR_GENERATE(RNG,&S1,&W1);
     res=ECP_PUBLIC_KEY_VALIDATE(1,&W1);
     if (res!=0)
     {
@@ -145,7 +132,7 @@ int main()
     M.len=17;
     for (i=0; i<=16; i++) M.val[i]=i;
 
-    ECP_ECIES_ENCRYPT(HASH_TYPE_ECC,&P1,&P2,&RNG,&W1,&M,12,&V,&C,&T);
+    ECP_ECIES_ENCRYPT(HASH_TYPE_ECC,&P1,&P2,RNG,&W1,&M,12,&V,&C,&T);
 
     printf("Ciphertext= \n");
     printf("V= 0x");
@@ -168,7 +155,7 @@ int main()
 
     printf("Testing ECDSA\n");
 
-    if (ECPSP_DSA(HASH_TYPE_ECC,&RNG,NULL,&S0,&M,&CS,&DS)!=0)
+    if (ECPSP_DSA(HASH_TYPE_ECC,RNG,NULL,&S0,&M,&CS,&DS)!=0)
     {
         printf("***ECDSA Signature Failed\n");
         return 0;
@@ -190,8 +177,32 @@ int main()
     }
 
 #endif
-    ECC_KILL_CSPRNG(&RNG);
 
     return 0;
+}
+
+int main()
+{
+    int i,res;
+    unsigned long ran;
+
+	char raw[100];
+    octet RAW= {0,sizeof(raw),raw};
+    csprng RNG;                /* Crypto Strong RNG */
+
+    time((time_t *)&ran);
+
+    RAW.len=100;				/* fake random seed source */
+    RAW.val[0]=ran;
+    RAW.val[1]=ran>>8;
+    RAW.val[2]=ran>>16;
+    RAW.val[3]=ran>>24;
+    for (i=0; i<100; i++) RAW.val[i]=i+1;
+
+    CREATE_CSPRNG(&RNG,&RAW);   /* initialise strong RNG */
+
+	ecdh(&RNG);
+
+	KILL_CSPRNG(&RNG);
 }
 

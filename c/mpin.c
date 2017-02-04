@@ -283,19 +283,6 @@ void MPIN_HASH_ALL(int sha,octet *HID,octet *xID,octet *xCID,octet *SEC,octet *Y
     hashit(sha,0,&T,H);
 }
 
-/* Initialise a Cryptographically Strong Random Number Generator from
-   an octet of raw random data */
-
-void MPIN_CREATE_CSPRNG(csprng *RNG,octet *RAW)
-{
-    RAND_seed(RNG,RAW->len,RAW->val);
-}
-
-void MPIN_KILL_CSPRNG(csprng *RNG)
-{
-    RAND_clean(RNG);
-}
-
 void MPIN_HASH_ID(int sha,octet *ID,octet *HID)
 {
     hashit(sha,0,ID,HID);

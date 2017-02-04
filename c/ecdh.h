@@ -50,18 +50,7 @@ under the License.
 
 /* ECDH Auxiliary Functions */
 
-/**	@brief Initialise a random number generator
- *
-	@param R is a pointer to a cryptographically secure random number generator
-	@param S is an input truly random seed value
- */
-extern void ECC_CREATE_CSPRNG(csprng *R,octet *S);
-/**	@brief Kill a random number generator
- *
-	Deletes all internal state
-	@param R is a pointer to a cryptographically secure random number generator
- */
-extern void ECC_KILL_CSPRNG(csprng *R);
+
 /**	@brief hash an octet into another octet
  *
  	@param h is the hash type

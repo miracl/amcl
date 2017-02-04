@@ -93,7 +93,7 @@
 /* BLS-12 Curves */
 #define BLS_CURVES 200 /**< Barreto-Lynn-Scott curves */
 #define BLS455 200     /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
-#define BLS383 201     /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
+#define BLS383 201     /**< New AES-128 security BLS curve - Modulus built from -0x1101000000040110  - WEIERSTRASS only */
 
 
 
@@ -367,10 +367,10 @@
 #error Not supported
 #endif
 #if CHUNK == 32
-#define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 28		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 56		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif
@@ -389,7 +389,7 @@
 #define BASEBITS 29		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #if CHUNK == 64
-#define BASEBITS 61		     /**< Numbers represented to base 2*BASEBITS */
+#define BASEBITS 60		     /**< Numbers represented to base 2*BASEBITS */
 #endif
 #endif
 #endif

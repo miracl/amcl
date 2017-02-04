@@ -21,7 +21,7 @@ under the License.
 
 (MINGW build)
 
-g++ -O3 ecgen.cpp big.cpp miracl.a -o ecgen.exe
+g++ -O3 ecgen.cpp ecn.cpp big.cpp miracl.a -o ecgen.exe
 
 
 */

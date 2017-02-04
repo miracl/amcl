@@ -21,7 +21,7 @@ ar r amcl.a rand.o aes.o gcm.o oct.o rom.o
 
 ar r amcl.a pair.o fp2.o ecp2.o fp4.o fp12.o
 
-gcc -std=c99 -O3 testmpin.c mpin.c amcl.a -o testmpin.exe
+gcc -std=c99 -O3 testmpin.c mpin.c randapi.c amcl.a -o testmpin.exe
 gcc -std=c99 -O3 benchtest_pair.c amcl.a -o benchtest_pair.exe
 
 del *.o
