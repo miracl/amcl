@@ -1,0 +1,19 @@
+#include "arch.h"
+#include "ecp_MS256M.h"
+
+/* MS256 NUMS Curve - Montgomery */
+
+/* Pseudo-Mersenne NUMS curves http://eprint.iacr.org/2014/130 */
+
+
+#if CHUNK==32
+const int CURVE_A_MS256M=-61370;
+const BIG_256 CURVE_Order_MS256M= {0x1122B4AD,0xDC27378,0x9AF1939,0x154AB5A1,0x1FFFFBE6,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x3FFFFF};
+const BIG_256 CURVE_Gx_MS256M= {0xb};
+#endif
+
+#if CHUNK==64
+const int CURVE_A_MS256M=-61370;
+const BIG_256 CURVE_Order_MS256M= {0xB84E6F1122B4AD,0xA55AD0A6BC64E5,0xFFFFFFFFFFBE6A,0xFFFFFFFFFFFFFF,0x3FFFFFFF};
+const BIG_256 CURVE_Gx_MS256M= {0xb};
+#endif

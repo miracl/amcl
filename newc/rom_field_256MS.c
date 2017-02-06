@@ -1,0 +1,22 @@
+#include "arch.h"
+#include "fp_256MS.h"
+
+/* MS256 NUMS Curve - Edwards */
+
+/* Pseudo-Mersenne NUMS curves http://eprint.iacr.org/2014/130 */
+
+
+#if CHUNK==16
+const BIG_256 Modulus_256MS= {0x1F43,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FF};
+const chunk MConst_256MS=0xBD;
+#endif
+
+#if CHUNK==32
+const BIG_256 Modulus_256MS= {0x1FFFFF43,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0xFFFFFF};
+const chunk MConst_256MS=0xBD;
+#endif
+
+#if CHUNK==64
+const BIG_256 Modulus_256MS= {0xFFFFFFFFFFFF43,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0xFFFFFFFF};
+const chunk MConst_256MS=0xBD;
+#endif

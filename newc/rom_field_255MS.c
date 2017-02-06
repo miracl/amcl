@@ -1,0 +1,22 @@
+#include "arch.h"
+#include "fp_255MS.h"
+
+/* MS255 NUMS Curve - Edwards */
+
+/* Pseudo-Mersenne NUMS curves http://eprint.iacr.org/2014/130 */
+
+#if CHUNK==16
+const BIG_256 Modulus_255MS= {0x1D03,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0x1FFF,0xFF};
+const chunk MConst_255MS=0x2FD;
+#endif
+
+#if CHUNK==32
+const BIG_256 Modulus_255MS= {0x1FFFFD03,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x7FFFFF};
+const chunk MConst_255MS=0x2FD;
+#endif
+
+#if CHUNK==64
+const BIG_256 Modulus_255MS= {0xFFFFFFFFFFFD03,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0x7FFFFFFF};
+const chunk MConst_255MS=0x2FD;
+#endif
+
