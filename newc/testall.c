@@ -109,7 +109,7 @@ int ecdh_ED25519(csprng *RNG)
     printf("Servers DH Key=  0x");
     OCT_output(&KEY);
 
-#if CURVETYPE != MONTGOMERY
+#if CURVETYPE_ED25519 != MONTGOMERY
 
     char ds[EGS_ED25519],p1[30],p2[30],v[2*EFS_ED25519+1],m[32],c[64],t[32],cs[EGS_ED25519];
     octet DS= {0,sizeof(ds),ds};
@@ -264,7 +264,7 @@ int ecdh_NIST256(csprng *RNG)
     printf("Servers DH Key=  0x");
     OCT_output(&KEY);
 
-#if CURVETYPE != MONTGOMERY
+#if CURVETYPE_NIST256 != MONTGOMERY
 
     char ds[EGS_NIST256],p1[30],p2[30],v[2*EFS_NIST256+1],m[32],c[64],t[32],cs[EGS_NIST256];
     octet DS= {0,sizeof(ds),ds};
@@ -419,7 +419,7 @@ int ecdh_GOLDILOCKS(csprng *RNG)
     printf("Servers DH Key=  0x");
     OCT_output(&KEY);
 
-#if CURVETYPE != MONTGOMERY
+#if CURVETYPE_GOLDILOCKS != MONTGOMERY
 
     char ds[EGS_GOLDILOCKS],p1[30],p2[30],v[2*EFS_GOLDILOCKS+1],m[32],c[64],t[32],cs[EGS_GOLDILOCKS];
     octet DS= {0,sizeof(ds),ds};
