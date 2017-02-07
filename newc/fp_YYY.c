@@ -198,77 +198,9 @@ void FP_YYY_redc(BIG_XXX a)
 /* SU= 112 */
 void FP_YYY_mod(BIG_XXX a,DBIG_XXX d)
 {
-    int i,k;
-    BIG_XXX md;
-
-#ifdef dchunk
-    dchunk t,c,s;
-    dchunk dd[NLEN_XXX];
-    chunk v[NLEN_XXX];
-#endif
-
-    BIG_XXX_rcopy(md,Modulus_YYY);
-
-#ifdef COMBA
-
-#ifdef UNWOUND
-
-    /* Insert output of faster.c here */
-
-#else
-
-    t=d[0];
-    v[0]=((chunk)t*MConst_YYY)&BMASK_XXX;
-    t+=(dchunk)v[0]*md[0];
-    c=(t>>BASEBITS_XXX)+d[1];
-    s=0;
-
-    for (k=1; k<NLEN_XXX; k++)
-    {
-        t=c+s+(dchunk)v[0]*md[k];
-        for (i=k-1; i>k/2; i--) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
-        v[k]=((chunk)t*MConst_YYY)&BMASK_XXX;
-        t+=(dchunk)v[k]*md[0];
-        c=(t>>BASEBITS_XXX)+d[k+1];
-        dd[k]=(dchunk)v[k]*md[k];
-        s+=dd[k];
-    }
-    for (k=NLEN_XXX; k<2*NLEN_XXX-1; k++)
-    {
-        t=c+s;
-        for (i=NLEN_XXX-1; i>=1+k/2; i--) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
-        a[k-NLEN_XXX]=(chunk)t&BMASK_XXX;
-        c=(t>>BASEBITS_XXX)+d[k+1];
-        s-=dd[k-NLEN_XXX+1];
-    }
-    a[NLEN_XXX-1]=(chunk)c&BMASK_XXX;
-
-#endif
-
-#ifdef DEBUG_NORM
-    a[NLEN_XXX]=0;
-#endif
-
-#else
-    int j;
-    chunk m,carry;
-    for (i=0; i<NLEN_XXX; i++)
-    {
-        if (MConst_YYY==-1) m=(-d[i])&BMASK_XXX;
-        else
-        {
-            if (MConst_YYY==1) m=d[i];
-            else m=(MConst_YYY*d[i])&BMASK_XXX;
-        }
-        carry=0;
-        for (j=0; j<NLEN_XXX; j++)
-            carry=muladd_XXX(m,md[j],carry,&d[i+j]);
-        d[NLEN_XXX+i]+=carry;
-    }
-    BIG_XXX_sducopy(a,d);
-    BIG_XXX_norm(a);
-
-#endif
+	BIG_XXX mdls;
+	BIG_XXX_rcopy(mdls,Modulus_YYY);
+	BIG_XXX_monty(a,mdls,MConst_YYY,d);
 }
 
 #endif

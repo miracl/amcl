@@ -535,6 +535,30 @@ void BIG_pxmul(DBIG c,BIG a,int b)
 #endif
 }
 
+/* .. if you know the result will fit in a BIG, c must be distinct from a and b */
+/* SU= 40 */
+void BIG_smul(BIG c,BIG a,BIG b)
+{
+    int i,j;
+    chunk carry;
+    BIG_norm(a);
+    BIG_norm(b);
+
+    BIG_zero(c);
+    for (i=0; i<NLEN; i++)
+    {
+        carry=0;
+        for (j=0; j<NLEN; j++)
+        {
+            if (i+j<NLEN)
+                carry=muladd(a[i],b[j],carry,&c[i+j]);
+        }
+    }
+#ifdef DEBUG_NORM
+    c[NLEN]=0;
+#endif
+}
+
 /* Set c=a*b */
 /* SU= 72 */
 void BIG_mul(DBIG c,BIG a,BIG b)
@@ -608,31 +632,6 @@ void BIG_mul(DBIG c,BIG a,BIG b)
 #ifdef DEBUG_NORM
     c[DNLEN]=0;
 #endif
-}
-
-/* .. if you know the result will fit in a BIG, c must be distinct from a and b */
-/* SU= 40 */
-void BIG_smul(BIG c,BIG a,BIG b)
-{
-    int i,j;
-    chunk carry;
-    BIG_norm(a);
-    BIG_norm(b);
-
-    BIG_zero(c);
-    for (i=0; i<NLEN; i++)
-    {
-        carry=0;
-        for (j=0; j<NLEN; j++)
-        {
-            if (i+j<NLEN)
-                carry=muladd(a[i],b[j],carry,&c[i+j]);
-        }
-    }
-#ifdef DEBUG_NORM
-    c[NLEN]=0;
-#endif
-
 }
 
 /* Set c=a*a */
@@ -748,6 +747,79 @@ void BIG_sqr(DBIG c,BIG a)
     c[DNLEN]=0;
 #endif
 
+}
+
+/* Montgomery reduction */
+void BIG_monty(BIG a,BIG md,chunk MC,DBIG d)
+{
+    int i,k;
+
+#ifdef dchunk
+    dchunk t,c,s;
+    dchunk dd[NLEN];
+    chunk v[NLEN];
+#endif
+
+#ifdef COMBA
+
+#ifdef UNWOUND
+
+    /* Insert output of faster.c here */
+
+#else
+
+    t=d[0];
+    v[0]=((chunk)t*MC)&BMASK;
+    t+=(dchunk)v[0]*md[0];
+    c=(t>>BASEBITS)+d[1];
+    s=0;
+
+    for (k=1; k<NLEN; k++)
+    {
+        t=c+s+(dchunk)v[0]*md[k];
+        for (i=k-1; i>k/2; i--) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
+        v[k]=((chunk)t*MC)&BMASK;
+        t+=(dchunk)v[k]*md[0];
+        c=(t>>BASEBITS)+d[k+1];
+        dd[k]=(dchunk)v[k]*md[k];
+        s+=dd[k];
+    }
+    for (k=NLEN; k<2*NLEN-1; k++)
+    {
+        t=c+s;
+        for (i=NLEN-1; i>=1+k/2; i--) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
+        a[k-NLEN]=(chunk)t&BMASK;
+        c=(t>>BASEBITS)+d[k+1];
+        s-=dd[k-NLEN+1];
+    }
+    a[NLEN-1]=(chunk)c&BMASK;
+
+#endif
+
+#ifdef DEBUG_NORM
+    a[NLEN]=0;
+#endif
+
+#else
+    int j;
+    chunk m,carry;
+    for (i=0; i<NLEN; i++)
+    {
+        if (MC==-1) m=(-d[i])&BMASK;
+        else
+        {
+            if (MC==1) m=d[i];
+            else m=(MC*d[i])&BMASK;
+        }
+        carry=0;
+        for (j=0; j<NLEN; j++)
+            carry=muladd(m,md[j],carry,&d[i+j]);
+        d[NLEN+i]+=carry;
+    }
+    BIG_sducopy(a,d);
+    BIG_norm(a);
+
+#endif
 }
 
 /* General shift left of a by n bits */

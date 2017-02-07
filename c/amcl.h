@@ -38,8 +38,6 @@
 #ifndef AMCL_H
 #define AMCL_H
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
@@ -94,10 +92,6 @@
 #define BLS_CURVES 200 /**< Barreto-Lynn-Scott curves */
 #define BLS455 200     /**< New AES-128 security BLS curve - Modulus built from -0x10002000002000010007  - WEIERSTRASS only */
 #define BLS383 201     /**< New AES-128 security BLS curve - Modulus built from -0x1101000000040110  - WEIERSTRASS only */
-
-
-
-
 
 
 /*** START OF USER CONFIGURABLE SECTION - set architecture and choose modulus and curve  ***/
@@ -1065,6 +1059,16 @@ extern void BIG_smul(BIG x,BIG y,BIG z);
 	@param y BIG number to be squared
  */
 extern void BIG_sqr(DBIG x,BIG y);
+
+/**	@brief Montgomery reduction of a DBIG to a BIG  - input normalised and output normalised
+ *
+	@param a BIG number, reduction of a BIG
+	@param md BIG number, the modulus
+	@param MC the Montgomery Constant
+	@param d DBIG number to be reduced
+ */
+extern void BIG_monty(BIG a,BIG md,chunk MC,DBIG d);
+
 /**	@brief Shifts a BIG left by any number of bits - input must be normalised, output normalised
  *
 	@param x BIG number to be shifted

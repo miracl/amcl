@@ -8,6 +8,8 @@
 #include "amcl.h"
 #include "config_big_XXX.h"
 
+//#define UNWOUND
+
 #define BIGBITS_XXX (8*MODBYTES_XXX)
 #define NLEN_XXX (1+((8*MODBYTES_XXX-1)/BASEBITS_XXX))
 #define DNLEN_XXX 2*NLEN_XXX
@@ -249,6 +251,16 @@ extern void BIG_XXX_smul(BIG_XXX x,BIG_XXX y,BIG_XXX z);
 	@param y BIG number to be squared
  */
 extern void BIG_XXX_sqr(DBIG_XXX x,BIG_XXX y);
+
+/**	@brief Montgomery reduction of a DBIG to a BIG  - input normalised and output normalised
+ *
+	@param a BIG number, reduction of a BIG
+	@param md BIG number, the modulus
+	@param MC the Montgomery Constant
+	@param d DBIG number to be reduced
+ */
+extern void BIG_XXX_monty(BIG_XXX a,BIG_XXX md,chunk MC,DBIG_XXX d);
+
 /**	@brief Shifts a BIG left by any number of bits - input must be normalised, output normalised
  *
 	@param x BIG number to be shifted
