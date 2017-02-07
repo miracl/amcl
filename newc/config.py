@@ -43,7 +43,7 @@ def rsaset(tb,tff,nb,b16,b32,b64,ml) :
 
 	replace(fnamec,"XXX",tb)
 	replace(fnameh,"XXX",tb)
-	os.system("gcc -O2 -std=c99 -c "+fnamec)
+	os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 	fnamec="ff_"+tff+".c"
 	fnameh="ff_"+tff+".h"
@@ -55,7 +55,7 @@ def rsaset(tb,tff,nb,b16,b32,b64,ml) :
 	replace(fnamec,"XXX",tb)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",tb)
-	os.system("gcc -O2 -std=c99 -c "+fnamec)
+	os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 	fnamec="rsa_"+tff+".c"
 	fnameh="rsa_"+tff+".h"
@@ -67,7 +67,7 @@ def rsaset(tb,tff,nb,b16,b32,b64,ml) :
 	replace(fnamec,"XXX",tb)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",tb)
-	os.system("gcc -O2 -std=c99 -c "+fnamec)
+	os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 	copytext=""
@@ -111,7 +111,7 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 
 	replace(fnamec,"XXX",tb)
 	replace(fnameh,"XXX",tb)
-	os.system("gcc -O2 -std=c99 -c "+fnamec)
+	os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 	fnamec="fp_"+tf+".c"
 	fnameh="fp_"+tf+".h"
@@ -123,9 +123,9 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 	replace(fnamec,"XXX",tb)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",tb)
-	os.system("gcc -O2 -std=c99 -c "+fnamec)
+	os.system("gcc -O3 -std=c99 -c "+fnamec)
 
-	os.system("gcc -O2 -std=c99 -c rom_field_"+tf+".c");
+	os.system("gcc -O3 -std=c99 -c rom_field_"+tf+".c");
 
 	fnamec="ecp_"+tc+".c"
 	fnameh="ecp_"+tc+".h"
@@ -139,7 +139,7 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",tb)
-	os.system("gcc -O2 -std=c99 -c "+fnamec)
+	os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 	fnamec="ecdh_"+tc+".c"
 	fnameh="ecdh_"+tc+".h"
@@ -153,9 +153,9 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",tb)
-	os.system("gcc -O2 -std=c99 -c "+fnamec)
+	os.system("gcc -O3 -std=c99 -c "+fnamec)
 
-	os.system("gcc -O2 -std=c99 -c rom_curve_"+tc+".c");
+	os.system("gcc -O3 -std=c99 -c rom_curve_"+tc+".c");
 
 	if pf != "NOT" :
 		fnamec="fp2_"+tf+".c"
@@ -167,7 +167,7 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 		replace(fnamec,"XXX",tb)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",tb)
-		os.system("gcc -O2 -std=c99 -c "+fnamec)
+		os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 		fnamec="fp4_"+tf+".c"
 		fnameh="fp4_"+tf+".h"
@@ -178,7 +178,7 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 		replace(fnamec,"XXX",tb)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",tb)
-		os.system("gcc -O2 -std=c99 -c "+fnamec)
+		os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 		fnamec="fp12_"+tf+".c"
 		fnameh="fp12_"+tf+".h"
@@ -189,7 +189,7 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 		replace(fnamec,"XXX",tb)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",tb)
-		os.system("gcc -O2 -std=c99 -c "+fnamec)
+		os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 		fnamec="ecp2_"+tc+".c"
 		fnameh="ecp2_"+tc+".h"
@@ -202,7 +202,7 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 		replace(fnameh,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",tb)
-		os.system("gcc -O2 -std=c99 -c "+fnamec)
+		os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 		fnamec="pair_"+tc+".c"
 		fnameh="pair_"+tc+".h"
@@ -215,7 +215,7 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 		replace(fnameh,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",tb)
-		os.system("gcc -O2 -std=c99 -c "+fnamec)
+		os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 		fnamec="mpin_"+tc+".c"
 		fnameh="mpin_"+tc+".h"
@@ -228,7 +228,7 @@ def curveset(tb,tf,tc,nb,b16,b32,b64,nbt,m8,mt,ct,pf) :
 		replace(fnameh,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",tb)
-		os.system("gcc -O2 -std=c99 -c "+fnamec)
+		os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 print("Elliptic Curves")
 print("1. ED25519")
@@ -424,19 +424,19 @@ os.system(deltext+" pair_ZZZ.*")
 os.system(deltext+" mpin_ZZZ.*")
 
 # create library
-os.system("gcc -O2 -std=c99 -c randapi.c")
+os.system("gcc -O3 -std=c99 -c randapi.c")
 if curve_selected :
-	os.system("gcc -O2 -std=c99 -c ecdh_support.c")
+	os.system("gcc -O3 -std=c99 -c ecdh_support.c")
 if rsa_selected :
-	os.system("gcc -O2 -std=c99 -c rsa_support.c")
+	os.system("gcc -O3 -std=c99 -c rsa_support.c")
 if pfcurve_selected :
-	os.system("gcc -O2 -std=c99 -c mpin_support.c")
+	os.system("gcc -O3 -std=c99 -c mpin_support.c")
 
-os.system("gcc -O2 -std=c99 -c hash.c")
-os.system("gcc -O2 -std=c99 -c rand.c")
-os.system("gcc -O2 -std=c99 -c oct.c")
-os.system("gcc -O2 -std=c99 -c aes.c")
-os.system("gcc -O2 -std=c99 -c gcm.c")
+os.system("gcc -O3 -std=c99 -c hash.c")
+os.system("gcc -O3 -std=c99 -c rand.c")
+os.system("gcc -O3 -std=c99 -c oct.c")
+os.system("gcc -O3 -std=c99 -c aes.c")
+os.system("gcc -O3 -std=c99 -c gcm.c")
 
 os.system("ar rc amcl.a *.o")
 os.system(deltext+" *.o")
