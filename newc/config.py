@@ -388,13 +388,16 @@ while ptr<max:
 # multiplier is 2^m (see above)
 
 	if x==26:
-		rsaset("256","2048","32","13","29","56","8")
+		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
+		rsaset("512","2048","64","","29","60","4")
+		#rsaset("256","2048","32","13","29","56","8")
 		rsa_selected=True
 	if x==27:
 		rsaset("384","3072","48","","28","56","8")
 		rsa_selected=True
 	if x==28:
-		rsaset("256","4096","32","","29","56","16")
+		#rsaset("256","4096","32","","29","56","16")
+		rsaset("512","4096","64","","29","60","8")
 		rsa_selected=True
 
 deltext=""

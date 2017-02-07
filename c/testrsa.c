@@ -26,8 +26,6 @@ under the License.
 
 int rsa(csprng *RNG)
 {
-    int i;
-    unsigned long ran;
     char m[RFS],ml[RFS],c[RFS],e[RFS],s[RFS];
     rsa_public_key pub;
     rsa_private_key priv;
@@ -81,7 +79,7 @@ int rsa(csprng *RNG)
 
 int main()
 {
-    int i,res;
+    int i;
     unsigned long ran;
 
 	char raw[100];

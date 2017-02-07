@@ -28,7 +28,7 @@ under the License.
 #include "rsa_support.h"
 
 /* generate an RSA key pair */
-void RSA_WWW_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key *PUB,octet *P, octet* Q)
+void RSA_WWW_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key_WWW *PRIV,rsa_public_key_WWW *PUB,octet *P, octet* Q)
 {
     /* IEEE1363 A16.11/A16.12 more or less */
     BIG_XXX t[HFLEN_WWW],p1[HFLEN_WWW],q1[HFLEN_WWW];
@@ -101,7 +101,7 @@ void RSA_WWW_KEY_PAIR(csprng *RNG,sign32 e,rsa_private_key *PRIV,rsa_public_key 
 }
 
 /* destroy the Private Key structure */
-void RSA_WWW_PRIVATE_KEY_KILL(rsa_private_key *PRIV)
+void RSA_WWW_PRIVATE_KEY_KILL(rsa_private_key_WWW *PRIV)
 {
     FF_WWW_zero(PRIV->p,HFLEN_WWW);
     FF_WWW_zero(PRIV->q,HFLEN_WWW);
@@ -111,7 +111,7 @@ void RSA_WWW_PRIVATE_KEY_KILL(rsa_private_key *PRIV)
 }
 
 /* RSA encryption with the public key */
-void RSA_WWW_ENCRYPT(rsa_public_key *PUB,octet *F,octet *G)
+void RSA_WWW_ENCRYPT(rsa_public_key_WWW *PUB,octet *F,octet *G)
 {
     BIG_XXX f[FFLEN_WWW];
     FF_WWW_fromOctet(f,F,FFLEN_WWW);
@@ -122,7 +122,7 @@ void RSA_WWW_ENCRYPT(rsa_public_key *PUB,octet *F,octet *G)
 }
 
 /* RSA decryption with the private key */
-void RSA_WWW_DECRYPT(rsa_private_key *PRIV,octet *G,octet *F)
+void RSA_WWW_DECRYPT(rsa_private_key_WWW *PRIV,octet *G,octet *F)
 {
     BIG_XXX g[FFLEN_WWW],t[FFLEN_WWW],jp[HFLEN_WWW],jq[HFLEN_WWW];
 

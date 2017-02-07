@@ -50,7 +50,7 @@ typedef struct
 {
     sign32 e;     /**< RSA exponent (typically 65537) */
     BIG_XXX n[FFLEN_WWW]; /**< An array of BIGs to store public key */
-} rsa_public_key;
+} rsa_public_key_WWW;
 
 /**
 	@brief Integer Factorisation Private Key
@@ -63,11 +63,11 @@ typedef struct
     BIG_XXX dp[FFLEN_WWW/2]; /**< decrypting exponent mod (p-1)  */
     BIG_XXX dq[FFLEN_WWW/2]; /**< decrypting exponent mod (q-1)  */
     BIG_XXX c[FFLEN_WWW/2];  /**< 1/p mod q */
-} rsa_private_key;
+} rsa_private_key_WWW;
 
 /* RSA Auxiliary Functions */
 
-extern void RSA_WWW_KEY_PAIR(csprng *R,sign32 e,rsa_private_key* PRIV,rsa_public_key* PUB,octet *P, octet* Q);
+extern void RSA_WWW_KEY_PAIR(csprng *R,sign32 e,rsa_private_key_WWW* PRIV,rsa_public_key_WWW* PUB,octet *P, octet* Q);
 
 /**	@brief RSA encryption of suitably padded plaintext
  *
@@ -75,7 +75,7 @@ extern void RSA_WWW_KEY_PAIR(csprng *R,sign32 e,rsa_private_key* PRIV,rsa_public
 	@param F is input padded message
 	@param G is the output ciphertext
  */
-extern void RSA_WWW_ENCRYPT(rsa_public_key* PUB,octet *F,octet *G);
+extern void RSA_WWW_ENCRYPT(rsa_public_key_WWW* PUB,octet *F,octet *G);
 /**	@brief RSA decryption of ciphertext
  *
 	@param PRIV the input RSA private key
@@ -83,11 +83,11 @@ extern void RSA_WWW_ENCRYPT(rsa_public_key* PUB,octet *F,octet *G);
 	@param F is output plaintext (requires unpadding)
 
  */
-extern void RSA_WWW_DECRYPT(rsa_private_key* PRIV,octet *G,octet *F);
+extern void RSA_WWW_DECRYPT(rsa_private_key_WWW* PRIV,octet *G,octet *F);
 /**	@brief Destroy an RSA private Key
  *
 	@param PRIV the input RSA private key. Destroyed on output.
  */
-extern void RSA_WWW_PRIVATE_KEY_KILL(rsa_private_key *PRIV);
+extern void RSA_WWW_PRIVATE_KEY_KILL(rsa_private_key_WWW *PRIV);
 
 #endif

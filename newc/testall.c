@@ -753,8 +753,8 @@ int rsa_2048(csprng *RNG)
     int i;
     unsigned long ran;
     char m[RFS_2048],ml[RFS_2048],c[RFS_2048],e[RFS_2048],s[RFS_2048];
-    rsa_public_key pub;
-    rsa_private_key priv;
+    rsa_public_key_2048 pub;
+    rsa_private_key_2048 priv;
     
     octet M= {0,sizeof(m),m};
     octet ML= {0,sizeof(ml),ml};

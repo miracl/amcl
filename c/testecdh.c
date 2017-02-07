@@ -29,7 +29,6 @@ under the License.
 int ecdh(csprng *RNG)
 {
     int i,res;
-    unsigned long ran;
     char *pp="M0ng00se";
     /* These octets are automatically protected against buffer overflow attacks */
     /* Note salt must be big enough to include an appended word */
@@ -183,7 +182,7 @@ int ecdh(csprng *RNG)
 
 int main()
 {
-    int i,res;
+    int i;
     unsigned long ran;
 
 	char raw[100];

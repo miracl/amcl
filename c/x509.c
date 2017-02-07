@@ -22,7 +22,7 @@ under the License.
 // To run test program, define HAS_MAIN
 // gcc x509.c ecdh.c rsa.c amcl.a -o x509.exe
 
-// #define HAS_MAIN
+#define HAS_MAIN
 
 #include <stdio.h>
 #include "ecdh.h"
@@ -786,6 +786,10 @@ octet H= {0,sizeof(h),h};
 char hh[5000];
 octet HH= {0,sizeof(hh),hh};
 
+char hp[RFS];
+octet HP= {0,sizeof(hp),hp};
+
+
 int main()
 {
     int res,len,sha;
@@ -924,11 +928,11 @@ int main()
             printf("Hash Function not supported\n");
             return 0;
         }
-        PKCS15(sha,&H,&H);
+        PKCS15(sha,&H,&HP);
 
         RSA_ENCRYPT(&PK,&SIG,&HH);
 
-        if (OCT_comp(&H,&HH))
+        if (OCT_comp(&HP,&HH))
             printf("RSA Signature/Verification succeeded \n");
         else
         {
@@ -1058,11 +1062,11 @@ int main()
             printf("Hash Function not supported\n");
             return 0;
         }
-        PKCS15(sha,&H,&H);
+        PKCS15(sha,&H,&HP);
 
         RSA_ENCRYPT(&PK,&SIG,&HH);
 
-        if (OCT_comp(&H,&HH))
+        if (OCT_comp(&HP,&HH))
             printf("RSA Signature/Verification succeeded \n");
         else
             printf("***RSA Verification Failed\n");

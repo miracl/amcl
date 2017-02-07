@@ -40,13 +40,12 @@ under the License.
 
 int mpin(csprng *RNG)
 {
-    int i,pin,rtn,err;
+    int pin,rtn,err;
 #ifdef PERMITS
     int date=MPIN_today();
 #else
     int date=0;
 #endif
-    unsigned long ran;
     char x[PGS],s[PGS],y[PGS],client_id[100],sst[4*PFS],token[2*PFS+1],sec[2*PFS+1],permit[2*PFS+1],xcid[2*PFS+1],xid[2*PFS+1],e[12*PFS],f[12*PFS];
     char hcid[PFS],hsid[PFS],hid[2*PFS+1],htid[2*PFS+1],h[PGS];
 #ifdef FULL
@@ -289,7 +288,7 @@ int mpin(csprng *RNG)
 
 int main()
 {
-    int i,res;
+  int i;
     unsigned long ran;
 
 	char raw[100];
