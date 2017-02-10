@@ -387,9 +387,12 @@ while ptr<max:
 # Next give the number base used for 16/32/64 bit architectures, as n where the base is 2^n
 # multiplier is 2^m (see above)
 
+# There are choices here, different ways of getting the same result, but some faster than others
 	if x==26:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
-		rsaset("512","2048","64","","29","60","4")
+		#512 is faster.. but best is 1024
+		rsaset("1024","2048","128","","28","58","2")
+		#rsaset("512","2048","64","","29","60","4")
 		#rsaset("256","2048","32","13","29","56","8")
 		rsa_selected=True
 	if x==27:

@@ -697,8 +697,17 @@ static void FF_nres(BIG a[],BIG m[],int n)
     BIG d[2*n];
 #endif
 
-    FF_dsucopy(d,a,n);
-    FF_dmod(a,d,m,n);
+	if (n==1)
+	{
+		BIG_dscopy(d[0],a[0]);
+		BIG_dshl(d[0],NLEN*BASEBITS);
+		BIG_dmod(a[0],d[0],m[0]);
+	}
+	else
+	{ 
+		FF_dsucopy(d,a,n);
+		FF_dmod(a,d,m,n);
+	}
 }
 
 static void FF_redc(BIG a[],BIG m[],BIG ND[],int n)
@@ -708,10 +717,19 @@ static void FF_redc(BIG a[],BIG m[],BIG ND[],int n)
 #else
     BIG d[2*n];
 #endif
-    FF_mod(a,m,n);
-    FF_dscopy(d,a,n);
-    FF_reduce(a,d,m,ND,n);
-    FF_mod(a,m,n);
+	if (n==1)
+	{
+		BIG_dzero(d[0]);
+		BIG_dscopy(d[0],a[0]);
+		BIG_monty(a[0],m[0],((chunk)1<<BASEBITS)-ND[0][0],d[0]);		
+	}
+	else
+	{
+		FF_mod(a,m,n);
+		FF_dscopy(d,a,n);
+		FF_reduce(a,d,m,ND,n);
+		FF_mod(a,m,n);
+	}
 }
 
 /* U=1/a mod 2^m - Arazi & Qi */
@@ -803,8 +821,16 @@ static void FF_modmul(BIG z[],BIG x[],BIG y[],BIG p[],BIG ND[],int n)
         FF_mod(x,p,n);
     }
 
-    FF_mul(d,x,y,n);
-    FF_reduce(z,d,p,ND,n);
+	if (n==1)
+	{
+		BIG_mul(d[0],x[0],y[0]);
+		BIG_monty(z[0],p[0],((chunk)1<<BASEBITS)-ND[0][0],d[0]);
+	}
+	else
+	{
+		FF_mul(d,x,y,n);
+		FF_reduce(z,d,p,ND,n);
+	}
 }
 
 static void FF_modsqr(BIG z[],BIG x[],BIG p[],BIG ND[],int n)
@@ -826,8 +852,17 @@ static void FF_modsqr(BIG z[],BIG x[],BIG p[],BIG ND[],int n)
 #endif
         FF_mod(x,p,n);
     }
-    FF_sqr(d,x,n);
-    FF_reduce(z,d,p,ND,n);
+
+	if (n==1)
+	{
+		BIG_sqr(d[0],x[0]);
+		BIG_monty(z[0],p[0],((chunk)1<<BASEBITS)-ND[0][0],d[0]);
+	}
+	else
+	{
+		FF_sqr(d,x,n);
+		FF_reduce(z,d,p,ND,n);
+	}
 }
 
 /* r=x^e mod p using side-channel resistant Montgomery Ladder, for large e */

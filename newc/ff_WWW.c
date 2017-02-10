@@ -696,9 +696,17 @@ static void FF_WWW_nres(BIG_XXX a[],BIG_XXX m[],int n)
 #else
     BIG_XXX d[2*n];
 #endif
-
-    FF_WWW_dsucopy(d,a,n);
-    FF_WWW_dmod(a,d,m,n);
+	if (n==1)
+	{
+		BIG_XXX_dscopy(d[0],a[0]);
+		BIG_XXX_dshl(d[0],NLEN_XXX*BASEBITS_XXX);
+		BIG_XXX_dmod(a[0],d[0],m[0]);
+	}
+	else
+	{
+		FF_WWW_dsucopy(d,a,n);
+		FF_WWW_dmod(a,d,m,n);
+	}
 }
 
 static void FF_WWW_redc(BIG_XXX a[],BIG_XXX m[],BIG_XXX ND[],int n)
@@ -708,10 +716,19 @@ static void FF_WWW_redc(BIG_XXX a[],BIG_XXX m[],BIG_XXX ND[],int n)
 #else
     BIG_XXX d[2*n];
 #endif
-    FF_WWW_mod(a,m,n);
-    FF_WWW_dscopy(d,a,n);
-    FF_WWW_reduce(a,d,m,ND,n);
-    FF_WWW_mod(a,m,n);
+	if (n==1)
+	{
+		BIG_XXX_dzero(d[0]);
+		BIG_XXX_dscopy(d[0],a[0]);
+		BIG_XXX_monty(a[0],m[0],((chunk)1<<BASEBITS_XXX)-ND[0][0],d[0]);
+	}
+	else
+	{
+		FF_WWW_mod(a,m,n);
+		FF_WWW_dscopy(d,a,n);
+		FF_WWW_reduce(a,d,m,ND,n);
+		FF_WWW_mod(a,m,n);
+	}
 }
 
 /* U=1/a mod 2^m - Arazi & Qi */
@@ -803,8 +820,16 @@ static void FF_WWW_modmul(BIG_XXX z[],BIG_XXX x[],BIG_XXX y[],BIG_XXX p[],BIG_XX
         FF_WWW_mod(x,p,n);
     }
 
-    FF_WWW_mul(d,x,y,n);
-    FF_WWW_reduce(z,d,p,ND,n);
+	if (n==1)
+	{
+		BIG_XXX_mul(d[0],x[0],y[0]);
+		BIG_XXX_monty(z[0],p[0],((chunk)1<<BASEBITS_XXX)-ND[0][0],d[0]);
+	}
+	else
+	{
+		FF_WWW_mul(d,x,y,n);
+		FF_WWW_reduce(z,d,p,ND,n);
+	}
 }
 
 static void FF_WWW_modsqr(BIG_XXX z[],BIG_XXX x[],BIG_XXX p[],BIG_XXX ND[],int n)
@@ -826,8 +851,16 @@ static void FF_WWW_modsqr(BIG_XXX z[],BIG_XXX x[],BIG_XXX p[],BIG_XXX ND[],int n
 #endif
         FF_WWW_mod(x,p,n);
     }
-    FF_WWW_sqr(d,x,n);
-    FF_WWW_reduce(z,d,p,ND,n);
+	if (n==1)
+	{
+		BIG_XXX_sqr(d[0],x[0]);
+		BIG_XXX_monty(z[0],p[0],((chunk)1<<BASEBITS_XXX)-ND[0][0],d[0]);
+	}
+	else
+	{
+		FF_WWW_sqr(d,x,n);
+		FF_WWW_reduce(z,d,p,ND,n);
+	}
 }
 
 /* r=x^e mod p using side-channel resistant Montgomery Ladder, for large e */
