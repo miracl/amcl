@@ -2,7 +2,7 @@
 #define FF_WWW_H
 
 #include "big_XXX.h"
-#include "config_rsa_WWW.h"
+#include "config_ff_WWW.h"
 
 #define HFLEN_WWW (FFLEN_WWW/2) /**< Useful for half-size RSA private key operations */
 #define P_MBITS_WWW (MODBYTES_XXX*8)

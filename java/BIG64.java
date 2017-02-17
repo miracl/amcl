@@ -107,7 +107,7 @@ public class BIG {
 	public static boolean ff_sexceed(BIG a)
 	{
 		long ea;
-		ea=EXCESS(a);
+		ea=FF_EXCESS(a);
 		if ((ea+1)>ROM.P_FEXCESS/(ea+1)) return true;
 		return false;
 	}

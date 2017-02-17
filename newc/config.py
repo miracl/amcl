@@ -29,8 +29,8 @@ def rsaset(tb,tff,nb,b16,b32,b64,ml) :
 	replace(fnameh,"@B32@",b32)
 	replace(fnameh,"@B64@",b64)
 
-	fnameh="config_rsa_"+tff+".h"
-	os.system(copytext+" config_rsa_WWW.h "+fnameh)
+	fnameh="config_ff_"+tff+".h"
+	os.system(copytext+" config_ff_WWW.h "+fnameh)
 	replace(fnameh,"XXX",tb)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"@ML@",ml);
@@ -333,22 +333,22 @@ while ptr<max:
 		curve_selected=True
 
 	if x==11:
-		curveset("256","254MF","MF254W","32","","29","56","254","7","MONTGOMERY_FRIENDLY","WEIERSTRASS","NOT")
+		curveset("256","254MF","MF254W","32","13","29","56","254","7","MONTGOMERY_FRIENDLY","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==12:
-		curveset("256","254MF","MF254E","32","","29","56","254","7","MONTGOMERY_FRIENDLY","EDWARDS","NOT")
+		curveset("256","254MF","MF254E","32","13","29","56","254","7","MONTGOMERY_FRIENDLY","EDWARDS","NOT")
 		curve_selected=True
 	if x==13:
-		curveset("256","254MF","MF254M","32","","29","56","254","7","MONTGOMERY_FRIENDLY","MONTGOMERY","NOT")
+		curveset("256","254MF","MF254M","32","13","29","56","254","7","MONTGOMERY_FRIENDLY","MONTGOMERY","NOT")
 		curve_selected=True
 	if x==14:
-		curveset("256","256MF","MF256W","32","","29","56","256","7","MONTGOMERY_FRIENDLY","WEIERSTRASS","NOT")
+		curveset("256","256MF","MF256W","32","13","29","56","256","7","MONTGOMERY_FRIENDLY","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==15:
-		curveset("256","256MF","MF256E","32","","29","56","256","7","MONTGOMERY_FRIENDLY","EDWARDS","NOT")
+		curveset("256","256MF","MF256E","32","13","29","56","256","7","MONTGOMERY_FRIENDLY","EDWARDS","NOT")
 		curve_selected=True
 	if x==16:
-		curveset("256","256MF","MF256M","32","","29","56","256","7","MONTGOMERY_FRIENDLY","MONTGOMERY","NOT")
+		curveset("256","256MF","MF256M","32","13","29","56","256","7","MONTGOMERY_FRIENDLY","MONTGOMERY","NOT")
 		curve_selected=True
 	if x==17:
 		curveset("256","255MS","MS255W","32","13","29","56","255","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
@@ -419,6 +419,7 @@ os.system(deltext+" rsa_WWW.*")
 os.system(deltext+" config_big_XXX.h")
 os.system(deltext+" config_field_YYY.h")
 os.system(deltext+" config_curve_ZZZ.h")
+os.system(deltext+" config_ff_WWW.h")
 os.system(deltext+" fp2_YYY.*")
 os.system(deltext+" fp4_YYY.*")
 os.system(deltext+" fp12_YYY.*")
