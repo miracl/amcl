@@ -1,0 +1,464 @@
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
+
+/* Finite Field arithmetic */
+/* AMCL mod p functions */
+package amcl;
+
+public final class FP_YYY {
+
+	public static final int NOT_SPECIAL=0;
+	public static final int PSEUDO_MERSENNE=1;
+	public static final int MONTGOMERY_FRIENDLY=2;
+	public static final int GENERALISED_MERSENNE=3;
+
+	public static final int MODBITS=@NBT@; /* Number of bits in Modulus */
+	public static final int MOD8=@M8@;  /* Modulus mod 8 */
+	public static final int MODTYPE=@MT@;
+
+	public static final long FEXCESS =((long)1<<(BIG_XXX.BASEBITS*BIG_XXX.NLEN-MODBITS)); 
+	public static final long OMASK=(long)(-1)<<(MODBITS%BIG_XXX.BASEBITS);
+	public static final int TBITS=MODBITS%BIG_XXX.BASEBITS; // Number of active bits in top word 
+	public static final long TMASK=((long)1<<TBITS)-1;
+
+
+	private final BIG_XXX x;
+	private static BIG_XXX p=new BIG_XXX(ROM_YYY.Modulus);
+
+/**************** 64-bit specific ************************/
+
+/* calculate Field Excess */
+	public static long EXCESS(BIG_XXX a)
+	{
+		return ((a.w[BIG_XXX.NLEN-1]&OMASK)>>(MODBITS%BIG_XXX.BASEBITS));
+	}
+
+/* Check if product causes excess */
+	public static boolean pexceed(BIG_XXX a,BIG_XXX b)
+	{
+		long ea,eb;
+		ea=EXCESS(a);
+		eb=EXCESS(b);
+		if ((ea+1)>FEXCESS/(eb+1)) return true;
+		return false;
+	}
+
+/* Check if square causes excess */
+	public static boolean sexceed(BIG_XXX a)
+	{
+		long ea;
+		ea=EXCESS(a);
+		if ((ea+1)>FEXCESS/(ea+1)) return true;
+		return false;
+	}
+
+/* reduce a DBIG to a BIG using the appropriate form of the modulus */
+	public static BIG_XXX mod(DBIG_XXX d)
+	{
+		if (MODTYPE==PSEUDO_MERSENNE)
+		{
+			BIG_XXX b;		
+			long v,tw;
+			BIG_XXX t=d.split(MODBITS);
+			b=new BIG_XXX(d);
+
+			v=t.pmul((int)ROM_YYY.MConst);
+			tw=t.w[BIG_XXX.NLEN-1];
+			t.w[BIG_XXX.NLEN-1]&=FP_YYY.TMASK;
+			t.w[0]+=(ROM_YYY.MConst*((tw>>TBITS)+(v<<(BIG_XXX.BASEBITS-TBITS))));
+
+			b.add(t);
+			b.norm();
+			return b;		
+		}
+		if (FP_YYY.MODTYPE==MONTGOMERY_FRIENDLY)
+		{
+			BIG_XXX b;		
+			long[] cr=new long[2];
+			for (int i=0;i<BIG_XXX.NLEN;i++)
+			{
+				cr=BIG_XXX.muladd(d.w[i],ROM_YYY.MConst-1,d.w[i],d.w[BIG_XXX.NLEN+i-1]);
+				d.w[BIG_XXX.NLEN+i]+=cr[0];
+				d.w[BIG_XXX.NLEN+i-1]=cr[1];
+			}
+			
+			b=new BIG_XXX(0);
+			for (int i=0;i<BIG_XXX.NLEN;i++ )
+				b.w[i]=d.w[BIG_XXX.NLEN+i];
+			b.norm();
+			return b;		
+		}
+		if (MODTYPE==GENERALISED_MERSENNE)
+		{ // GoldiLocks Only
+			BIG_XXX b;		
+			BIG_XXX t=d.split(MODBITS);
+			b=new BIG_XXX(d);
+			b.add(t);
+			DBIG_XXX dd=new DBIG_XXX(t);
+			dd.shl(MODBITS/2);
+
+			BIG_XXX tt=dd.split(MODBITS);
+			BIG_XXX lo=new BIG_XXX(dd);
+			b.add(tt);
+			b.add(lo);
+			b.norm();
+			tt.shl(MODBITS/2);
+			b.add(tt);
+
+			long carry=b.w[BIG_XXX.NLEN-1]>>TBITS;
+			b.w[BIG_XXX.NLEN-1]&=FP_YYY.TMASK;
+			b.w[0]+=carry;
+			
+			b.w[224/BIG_XXX.BASEBITS]+=carry<<(224%BIG_XXX.BASEBITS);
+			b.norm();
+			return b;		
+		}
+		if (MODTYPE==NOT_SPECIAL)
+		{
+			BIG_XXX m=new BIG_XXX(ROM_YYY.Modulus);
+			return BIG_XXX.monty(m,ROM_YYY.MConst,d);
+		}
+
+		return new BIG_XXX(0);
+	}
+
+
+
+/*********************************************************/
+
+
+/* Constructors */
+	public FP_YYY(int a)
+	{
+		x=new BIG_XXX(a);
+		nres();
+	}
+
+	public FP_YYY()
+	{
+		x=new BIG_XXX(0);
+	}
+
+	public FP_YYY(BIG_XXX a)
+	{
+		x=new BIG_XXX(a);
+		nres();
+	}
+	
+	public FP_YYY(FP_YYY a)
+	{
+		x=new BIG_XXX(a.x);
+	}
+
+/* convert to string */
+	public String toString() 
+	{
+		String s=redc().toString();
+		return s;
+	}
+
+	public String toRawString() 
+	{
+		String s=x.toRawString();
+		return s;
+	}
+
+/* convert to Montgomery n-residue form */
+	public void nres()
+	{
+		if (MODTYPE!=PSEUDO_MERSENNE && MODTYPE!=GENERALISED_MERSENNE)
+		{
+			DBIG_XXX d=new DBIG_XXX(x);
+			d.shl(BIG_XXX.NLEN*BIG_XXX.BASEBITS);
+			x.copy(d.mod(p));
+		}
+	}
+
+/* convert back to regular form */
+	public BIG_XXX redc()
+	{
+		if (MODTYPE!=PSEUDO_MERSENNE && MODTYPE!=GENERALISED_MERSENNE)
+		{
+			DBIG_XXX d=new DBIG_XXX(x);
+			return mod(d);
+		}
+		else 
+		{
+			BIG_XXX r=new BIG_XXX(x);
+			return r;
+		}
+	}
+
+/* test this=0? */
+	public boolean iszilch() {
+		reduce();
+		return x.iszilch();
+	}
+
+/* copy from FP b */
+	public void copy(FP_YYY b)
+	{
+		x.copy(b.x);
+	}
+
+/* set this=0 */
+	public void zero()
+	{
+		x.zero();
+	}
+	
+/* set this=1 */
+	public void one()
+	{
+		x.one(); nres();
+	}
+
+/* normalise this */
+	public void norm()
+	{
+		x.norm();
+	}
+
+/* swap FPs depending on d */
+	public void cswap(FP_YYY b,int d)
+	{
+		x.cswap(b.x,d);
+	}
+
+/* copy FPs depending on d */
+	public void cmove(FP_YYY b,int d)
+	{
+		x.cmove(b.x,d);
+	}
+
+/* this*=b mod Modulus */
+	public void mul(FP_YYY b)
+	{
+		norm();
+		b.norm();
+
+		if (pexceed(x,b.x)) reduce();
+
+		DBIG_XXX d=BIG_XXX.mul(x,b.x);
+		x.copy(mod(d));
+	}
+
+/* this*=c mod Modulus, where c is a small int */
+	public void imul(int c)
+	{
+		norm();
+		boolean s=false;
+		if (c<0)
+		{
+			c=-c;
+			s=true;
+		}
+		if (c<BIG_XXX.NEXCESS && ((EXCESS(x)+1)*(c+1)+1)<FEXCESS)
+		{
+			x.imul(c);
+		}
+		else
+		{
+			if (((EXCESS(x)+1)*(c+1)+1)<FEXCESS) x.pmul(c);
+			else
+			{
+				DBIG_XXX d=x.pxmul(c);
+				x.copy(d.mod(p));
+			}
+		}
+		if (s) neg();
+		norm();
+	}
+
+/* this*=this mod Modulus */
+	public void sqr()
+	{
+		DBIG_XXX d;
+		norm();
+
+		if (sexceed(x)) reduce();
+
+		d=BIG_XXX.sqr(x);	
+		x.copy(mod(d));
+	}
+
+/* this+=b */
+	public void add(FP_YYY b) {
+		x.add(b.x);
+		if (EXCESS(x)+2>=FEXCESS) reduce();
+	}
+
+// https://graphics.stanford.edu/~seander/bithacks.html
+// constant time log to base 2 (or number of bits in)
+
+	private static int logb2(int v)
+	{
+		int r;
+		v |= v >>> 1;
+		v |= v >>> 2;
+		v |= v >>> 4;
+		v |= v >>> 8;
+		v |= v >>> 16;
+
+		v = v - ((v >>> 1) & 0x55555555);                  
+		v = (v & 0x33333333) + ((v >>> 2) & 0x33333333);  
+		r = ((v + (v >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24; 
+		return r+1;
+	}
+
+/* this = -this mod Modulus */
+	public void neg()
+	{
+		int sb;
+		BIG_XXX m=new BIG_XXX(p);
+
+		norm();
+		sb=logb2((int)EXCESS(x));
+/*
+		ov=EXCESS(x); 
+		sb=1; while(ov!=0) {sb++;ov>>=1;} 
+*/
+		m.fshl(sb);
+		x.rsub(m);		
+
+		if (EXCESS(x)>=FEXCESS) reduce();
+	}
+
+/* this-=b */
+	public void sub(FP_YYY b)
+	{
+		FP_YYY n=new FP_YYY(b);
+		n.neg();
+		this.add(n);
+	}
+
+/* this/=2 mod Modulus */
+	public void div2()
+	{
+		x.norm();
+		if (x.parity()==0)
+			x.fshr(1);
+		else
+		{
+			x.add(p);
+			x.norm();
+			x.fshr(1);
+		}
+	}
+
+/* this=1/this mod Modulus */
+	public void inverse()
+	{
+		BIG_XXX r=redc();
+		r.invmodp(p);
+		x.copy(r);
+		nres();
+	}
+
+/* return TRUE if this==a */
+	public boolean equals(FP_YYY a)
+	{
+		a.reduce();
+		reduce();
+		if (BIG_XXX.comp(a.x,x)==0) return true;
+		return false;
+	}
+
+/* reduce this mod Modulus */
+	public void reduce()
+	{
+		x.mod(p);
+	}
+
+/* return this^e mod Modulus */
+	public FP_YYY pow(BIG_XXX e)
+	{
+		int bt;
+		FP_YYY r=new FP_YYY(1);
+		e.norm();
+		x.norm();
+		FP_YYY m=new FP_YYY(this);
+		while (true)
+		{
+			bt=e.parity();
+			e.fshr(1);
+			if (bt==1) r.mul(m);
+			if (e.iszilch()) break;
+			m.sqr();
+		}
+		r.x.mod(p);
+		return r;
+	}
+
+/* return sqrt(this) mod Modulus */
+	public FP_YYY sqrt()
+	{
+		reduce();
+		BIG_XXX b=new BIG_XXX(p);
+		if (MOD8==5)
+		{
+			b.dec(5); b.norm(); b.shr(3);
+			FP_YYY i=new FP_YYY(this); i.x.shl(1);
+			FP_YYY v=i.pow(b);
+			i.mul(v); i.mul(v);
+			i.x.dec(1);
+			FP_YYY r=new FP_YYY(this);
+			r.mul(v); r.mul(i); 
+			r.reduce();
+			return r;
+		}
+		else
+		{
+			b.inc(1); b.norm(); b.shr(2);
+			return pow(b);
+		}
+	}
+
+/* return jacobi symbol (this/Modulus) */
+	public int jacobi()
+	{
+		BIG_XXX w=redc();
+		return w.jacobi(p);
+	}
+/*
+	public static void main(String[] args) {
+		BIG_XXX m=new BIG_XXX(ROM_YYY.Modulus);
+		BIG_XXX x=new BIG_XXX(3);
+		BIG_XXX e=new BIG_XXX(m);
+		e.dec(1);
+
+		System.out.println("m= "+m.nbits());	
+
+
+		BIG_XXX r=x.powmod(e,m);
+
+		System.out.println("m= "+m.toString());	
+		System.out.println("r= "+r.toString());	
+
+		BIG_XXX.cswap(m,r,0);
+
+		System.out.println("m= "+m.toString());	
+		System.out.println("r= "+r.toString());	
+
+//		FP_YYY y=new FP_YYY(3);
+//		FP_YYY s=y.pow(e);
+//		System.out.println("s= "+s.toString());	
+
+	} */
+}
