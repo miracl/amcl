@@ -50,7 +50,7 @@ func inttoBytes(n int,len int) []byte {
 	return b
 }
 
-func hashit(sha int,A []byte,n int,B []byte,pad int) []byte {
+func ehashit(sha int,A []byte,n int,B []byte,pad int) []byte {
 	var R []byte
 	if sha==ECDH_SHA256 {
 		H:=NewHASH256()
@@ -101,7 +101,7 @@ func KDF1(sha int,Z []byte,olen int) []byte {
 	cthreshold:=olen/hlen; if olen%hlen!=0 {cthreshold++}
 
 	for counter:=0;counter<cthreshold;counter++ {
-		B:=hashit(sha,Z,counter,nil,0)
+		B:=ehashit(sha,Z,counter,nil,0)
 		if k+hlen>olen {
 			for i:=0;i<olen%hlen;i++ {K[k]=B[i]; k++}
 		} else {
@@ -122,7 +122,7 @@ func KDF2(sha int,Z []byte,P []byte,olen int) []byte {
 	cthreshold:=olen/hlen; if olen%hlen!=0 {cthreshold++}
 
 	for counter:=1;counter<=cthreshold;counter++ {
-		B:=hashit(sha,Z,counter,P,0)
+		B:=ehashit(sha,Z,counter,P,0)
 		if k+hlen>olen {
 			for i:=0;i<olen%hlen;i++ {K[k]=B[i]; k++}
 		} else {
@@ -181,17 +181,17 @@ func HMAC(sha int,M []byte,K []byte,tag []byte) int {
 	for i:=0;i<b;i++ {K0[i]=0}
 
 	if len(K) > b {
-		B=hashit(sha,K,0,nil,0) 
+		B=ehashit(sha,K,0,nil,0) 
 		for i:=0;i<sha;i++ {K0[i]=B[i]}
 	} else {
 		for i:=0;i<len(K);i++  {K0[i]=K[i]}
 	}
 		
 	for i:=0;i<b;i++ {K0[i]^=0x36}
-	B=hashit(sha,K0[0:b],0,M,0);
+	B=ehashit(sha,K0[0:b],0,M,0);
 
 	for i:=0;i<b;i++ {K0[i]^=0x6a}
-	B=hashit(sha,K0[0:b],0,B,olen)
+	B=ehashit(sha,K0[0:b],0,B,olen)
 
 	for i:=0;i<olen;i++ {tag[i]=B[i]}
 
@@ -379,7 +379,7 @@ func ECPSVDP_DH(S []byte,WD []byte,Z []byte) int {
 func ECPSP_DSA(sha int,RNG *RAND,S []byte,F []byte,C []byte,D []byte) int {
 	var T [ECDH_EFS]byte
 
-	B:=hashit(sha,F,0,nil,int(MODBYTES));
+	B:=ehashit(sha,F,0,nil,int(MODBYTES));
 
 	gx:=NewBIGints(CURVE_Gx)
 	gy:=NewBIGints(CURVE_Gy)
@@ -425,7 +425,7 @@ func ECPSP_DSA(sha int,RNG *RAND,S []byte,F []byte,C []byte,D []byte) int {
 func ECPVP_DSA(sha int,W []byte,F []byte,C []byte,D []byte) int {
 	res:=0
 
-	B:=hashit(sha,F,0,nil,int(MODBYTES));
+	B:=ehashit(sha,F,0,nil,int(MODBYTES));
 
 	gx:=NewBIGints(CURVE_Gx)
 	gy:=NewBIGints(CURVE_Gy)

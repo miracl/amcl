@@ -89,7 +89,7 @@ func mpin_hash(sha int,c *FP4,U *ECP) []byte {
 
 /* Hash number (optional) and string to coordinate on curve */
 
-func hashit(sha int,n int32,ID []byte) []byte {
+func mhashit(sha int,n int32,ID []byte) []byte {
 	var R []byte
 	if sha==MPIN_SHA256 {
 		H:=NewHASH256()
@@ -211,7 +211,7 @@ func unmap(u* BIG,P *ECP) int {
 }
 
 func MPIN_HASH_ID(sha int,ID []byte) []byte {
-	return hashit(sha,0,ID)
+	return mhashit(sha,0,ID)
 }
 
 /* these next two functions implement elligator squared - http://eprint.iacr.org/2014/043 */
@@ -315,7 +315,7 @@ func MPIN_RANDOM_GENERATE(rng *RAND,S []byte) int {
 func MPIN_EXTRACT_PIN(sha int,CID []byte,pin int,TOKEN []byte) int {
 	P:=ECP_fromBytes(TOKEN)
 	if P.is_infinity() {return MPIN_INVALID_POINT}
-	h:=hashit(sha,0,CID)
+	h:=mhashit(sha,0,CID)
 	R:=mapit(h)
 
 	R=R.pinmul(int32(pin)%MPIN_MAXPIN,MPIN_PBLEN)
@@ -360,7 +360,7 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *RAND,X []byte,pin int,
 		x=fromBytes(X)
 	}
 
-	h:=hashit(sha,0,CLIENT_ID)
+	h:=mhashit(sha,0,CLIENT_ID)
 	P:=mapit(h)
 	
 	T:=ECP_fromBytes(TOKEN)
@@ -372,7 +372,7 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *RAND,X []byte,pin int,
 		W=ECP_fromBytes(PERMIT)
 		if W.is_infinity() {return MPIN_INVALID_POINT}
 		T.add(W)
-		h=hashit(sha,int32(date),h)
+		h=mhashit(sha,int32(date),h)
 		W=mapit(h)
 		if xID!=nil {
 			P=G1mul(P,x)
@@ -442,7 +442,7 @@ func MPIN_GET_CLIENT_SECRET(S []byte,CID []byte,CST []byte) int {
 
 /* Time Permit CTT=S*(date|H(CID)) where S is master secret */
 func MPIN_GET_CLIENT_PERMIT(sha,date int,S []byte,CID []byte,CTT []byte) int {
-	h:=hashit(sha,int32(date),CID)
+	h:=mhashit(sha,int32(date),CID)
 	P:=mapit(h)
 
 	s:=fromBytes(S)
@@ -452,13 +452,13 @@ func MPIN_GET_CLIENT_PERMIT(sha,date int,S []byte,CID []byte,CTT []byte) int {
 
 /* Outputs H(CID) and H(T|H(CID)) for time permits. If no time permits set HID=HTID */
 func MPIN_SERVER_1(sha int,date int,CID []byte,HID []byte,HTID []byte) {
-	h:=hashit(sha,0,CID)
+	h:=mhashit(sha,0,CID)
 	P:=mapit(h)
 	
 	P.toBytes(HID);
 	if date!=0 {
 	//	if HID!=nil {P.toBytes(HID)}
-		h=hashit(sha,int32(date),h)
+		h=mhashit(sha,int32(date),h)
 		R:=mapit(h)
 		P.add(R)
 		P.toBytes(HTID)
@@ -620,7 +620,7 @@ func MPIN_HASH_ALL(sha int,HID []byte,xID []byte,xCID []byte,SEC []byte,Y []byte
 	for i:=0;i<len(W);i++ {T[i+tlen]=W[i]}
 	tlen+=len(W)	
 
-	return hashit(sha,0,T[:])
+	return mhashit(sha,0,T[:])
 }
 
 /* calculate common key on client side */
@@ -719,7 +719,7 @@ func MPIN_GET_TIME() int {
 
 /* Generate Y = H(epoch, xCID/xID) */
 func MPIN_GET_Y(sha int,TimeValue int,xCID []byte,Y []byte) {
-	h:= hashit(sha,int32(TimeValue),xCID)
+	h:= mhashit(sha,int32(TimeValue),xCID)
 	y:= fromBytes(h)
 	q:=NewBIGints(CURVE_Order)
 	y.mod(q)

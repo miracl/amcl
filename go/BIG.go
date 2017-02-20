@@ -449,7 +449,8 @@ func mod(d *DBIG) *BIG {
 	}
 
 	if MODTYPE==NOT_SPECIAL {
-		return monty(d) 
+		md:=NewBIGints(Modulus)
+		return monty(md,MConst,d) 
 	}
 	return NewBIG()
 }

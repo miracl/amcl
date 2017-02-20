@@ -530,18 +530,29 @@ func (F *FF) invmodp(p *FF) {
 /* nresidue mod m */
 func (F *FF) nres(m *FF) {
 	n:=m.length
-	d:=NewFFint(2*n)
-	d.dsucopy(F)
-	F.copy(d.dmod(m))
+	if n==1 {
+		d:=NewDBIGscopy(F.v[0])
+		d.shl(uint(NLEN)*BASEBITS)
+		F.v[0].copy(d.mod(m.v[0]))
+	} else {
+		d:=NewFFint(2*n)
+		d.dsucopy(F)
+		F.copy(d.dmod(m))
+	}
 }
 
 func (F *FF) redc(m *FF,ND *FF) {
 	n:=m.length
-	d:=NewFFint(2*n)
-	F.mod(m)
-	d.dscopy(F)
-	F.copy(d.reduce(m,ND))
-	F.mod(m)
+	if n==1 {
+		d:=NewDBIGscopy(F.v[0])
+		F.v[0].copy(monty(m.v[0],Chunk(1)<<BASEBITS-ND.v[0].w[0],d))
+	} else {
+		d:=NewFFint(2*n)
+		F.mod(m)
+		d.dscopy(F)
+		F.copy(d.reduce(m,ND))
+		F.mod(m)
+	}
 }
 
 func (F *FF) mod2m(m int) {
@@ -604,15 +615,27 @@ func (F *FF) randomnum(p *FF,rng *RAND) {
 /* this*=y mod p */
 func (F *FF) modmul(y *FF,p *FF,nd *FF) {
 	if ff_pexceed(F.v[F.length-1],y.v[y.length-1]) {F.mod(p)}
-	d:=ff_mul(F,y)
-	F.copy(d.reduce(p,nd))
+	n:=p.length
+	if n==1 {
+		d:=mul(F.v[0],y.v[0])
+		F.v[0].copy(monty(p.v[0],Chunk(1)<<BASEBITS-nd.v[0].w[0],d))		
+	} else {
+		d:=ff_mul(F,y)
+		F.copy(d.reduce(p,nd))
+	}
 }
 
 /* this*=y mod p */
 func (F *FF) modsqr(p *FF,nd *FF) {
 	if ff_sexceed(F.v[F.length-1]) {F.mod(p)}
-	d:=ff_sqr(F)
-	F.copy(d.reduce(p,nd))
+	n:=p.length
+	if n==1 {
+		d:=sqr(F.v[0])
+		F.v[0].copy(monty(p.v[0],Chunk(1)<<BASEBITS-nd.v[0].w[0],d))			
+	} else {
+		d:=ff_sqr(F)
+		F.copy(d.reduce(p,nd))
+	}
 }
 
 /* this=this^e mod p using side-channel resistant Montgomery Ladder, for large e */

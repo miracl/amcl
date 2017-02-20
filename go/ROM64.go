@@ -97,17 +97,16 @@ func sqr(a *BIG) *DBIG {
 	return c
 }
 
-func monty(d* DBIG) *BIG {
-	md:=NewBIGints(Modulus)
+func monty(md* BIG, mc Chunk,d* DBIG) *BIG {
 	carry:=Chunk(0)
 	m:=Chunk(0)
 	for i:=0;i<NLEN;i++ {
-		if (MConst==-1) { 
+		if (mc==-1) { 
 			m=(-d.w[i])&BMASK
 		} else {
-			if (MConst==1) {
+			if (mc==1) {
 				m=d.w[i]
-			} else {m=(MConst*d.w[i])&BMASK}
+			} else {m=(mc*d.w[i])&BMASK}
 		}
 
 		carry=0

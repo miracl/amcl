@@ -115,19 +115,18 @@ func sqr(a *BIG) *DBIG {
 	return c
 }
 
-func monty(d *DBIG) *BIG {
+func monty(m* BIG, mc Chunk,d* DBIG) *BIG {
 	var dd [NLEN]DChunk
 
 	var v [NLEN]Chunk
-	var m=NewBIGints(Modulus)
 	b:=NewBIG()
 
-	t:=DChunk(d.w[0]); v[0]=(Chunk(t)*MConst)&BMASK; t+=DChunk(v[0])*DChunk(m.w[0]); c:=(t>>BASEBITS)+DChunk(d.w[1]); s:=DChunk(0)
+	t:=DChunk(d.w[0]); v[0]=(Chunk(t)*mc)&BMASK; t+=DChunk(v[0])*DChunk(m.w[0]); c:=(t>>BASEBITS)+DChunk(d.w[1]); s:=DChunk(0)
 
 	for k:=1;k<NLEN;k++ {
 		t=c+s+DChunk(v[0])*DChunk(m.w[k])
 		for i:=k-1;i>k/2;i-- {t+=DChunk(v[k-i]-v[i])*DChunk(m.w[i]-m.w[k-i])}
-		v[k]=(Chunk(t)*MConst)&BMASK; t+=DChunk(v[k])*DChunk(m.w[0]); c=(t>>BASEBITS)+DChunk(d.w[k+1])
+		v[k]=(Chunk(t)*mc)&BMASK; t+=DChunk(v[k])*DChunk(m.w[0]); c=(t>>BASEBITS)+DChunk(d.w[k+1])
 		dd[k]=DChunk(v[k])*DChunk(m.w[k]); s+=dd[k]
 	}
 	for k:=NLEN;k<2*NLEN-1;k++ {
