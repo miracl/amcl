@@ -20,10 +20,13 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.MF256E;
 
-public class ROM_MF256E
+public class ROM
 {
+// 256MF Modulus
+	public static final int[] Modulus= {0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0xFFA7FF};
+	public static final int MConst=0xFFA800;
 
 // MF256E Curve
 

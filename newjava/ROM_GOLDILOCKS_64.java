@@ -20,10 +20,13 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.GOLDILOCKS;
 
-public class ROM_GOLDILOCKS
+public class ROM
 {
+// GOLDILOCKS Modulus
+	public static final long[] Modulus={0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFEFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFL};
+	public static final long MConst=0x1;
 
 // GOLDILOCKS Curve
 

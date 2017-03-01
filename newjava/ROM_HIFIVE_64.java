@@ -20,10 +20,13 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.HIFIVE;
 
-public class ROM_HIFIVE
+public class ROM
 {
+// 336PM Curve
+	public static final long[] Modulus= {0xFFFFFFFFFFFFFFDL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFL};
+	public static final long MConst=0x3L;
 
 // HIFIVE Curve
 

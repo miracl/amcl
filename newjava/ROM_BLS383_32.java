@@ -20,10 +20,13 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.BLS383;
 
-public class ROM_BLS383
+public class ROM
 {
+// BLS383 Curve Modulus
+	public static final int[] Modulus= {0xAAD556B,0xACAAB52,0x5F75D7A,0x1BB0147,0xD5D7520,0xCF73083,0xF99EB16,0x531820,0xA68EA32,0x2C01355,0x552A785,0x5C6105C,0x80A9F7,0x7AC52};
+	public static final int MConst=0x123D0BD;
 
 // BLS383 Curve
 

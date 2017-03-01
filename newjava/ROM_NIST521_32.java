@@ -20,10 +20,13 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.NIST521;
 
-public class ROM_NIST521
+public class ROM
 {
+// NIST521 Modulus
+	public static final int[] Modulus={0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0xFFFFFFF,0x1FFFF};
+	public static final int MConst=0x1;
 
 // NIST521 Curve
 

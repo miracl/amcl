@@ -20,10 +20,14 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.BN254CX;
 
-public class ROM_BN254CX
+public class ROM
 {
+// 254BNCX Curve
+
+	public static final long[] Modulus= {0x6623EF5C1B55B3L,0xD6EE18093EE1BEL,0x647A6366D3243FL,0x8702A0DB0BDDFL,0x24000000L};
+	public static final long MConst=0x4E205BF9789E85L;
 
 // BN254CX Curve
 

@@ -20,11 +20,14 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.MS256W;
 
-public class ROM_MS256W
+public class ROM
 {
+// 256MS Modulus
 
+	public static final long[] Modulus= {0xFFFFFFFFFFFF43L,0xFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFL,0xFFFFFFFFL};
+	public static final long MConst=0xBDL;
 // MS256W Curve
 
 	public static final int CURVE_A = -3;

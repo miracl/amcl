@@ -20,10 +20,14 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.C41417;
 
-public class ROM_C41417
+public class ROM
 {
+// Curve 41417 Modulus
+
+	public static final long[] Modulus={0xFFFFFFFFFFFFFEFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0x3FFFFFFFFFFFFFL};
+	public static final long MConst=0x11L;
 
 // C41417 Curve
 

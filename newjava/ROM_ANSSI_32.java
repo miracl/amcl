@@ -20,10 +20,14 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.ANSSI;
 
-public class ROM_ANSSI
+public class ROM
 {
+// ANSSI Curve Modulus
+
+  public static final int[] Modulus= {0x186E9C03,0x7E79A9E,0x12329B7A,0x35B7957,0x435B396,0x16F46721,0x163C4049,0x1181675A,0xF1FD17};
+  public static final int MConst=0x164E1155;
 
 // ANSSI Curve
 

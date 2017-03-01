@@ -20,10 +20,13 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.NIST256;
 
-public class ROM_NIST256
+public class ROM
 {
+// NIST256 Curve Modulus
+public static final int[] Modulus={0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FF,0x0,0x0,0x40000,0x1FE00000,0xFFFFFF};
+public static final int MConst=1;
 
 // NIST256 Curve
 

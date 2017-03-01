@@ -20,10 +20,13 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.GOLDILOCKS;
 
-public class ROM_GOLDILOCKS
+public class ROM
 {
+// GOLDILOCKS Modulus
+	public static final int[] Modulus={0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FDFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFF};
+	public static final int MConst=0x1;
 
 // GOLDILOCKS Curve
 

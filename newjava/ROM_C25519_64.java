@@ -20,11 +20,13 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.C25519;
 
-public class ROM_C25519
+public class ROM
 {
-
+// 25519 Modulus
+public static final long[] Modulus= {0xFFFFFFFFFFFFEDL,0xFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFL,0x7FFFFFFFL};
+public static final long MConst=0x13L;
 // C25519 Curve
 
 public static final int CURVE_A =486662;

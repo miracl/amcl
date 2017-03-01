@@ -20,10 +20,14 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.ANSSI;
 
-public class ROM_ANSSI
+public class ROM
 {
+// ANSSI Curve Modulus
+
+  public static final long[] Modulus= {0xFCF353D86E9C03L,0xADBCABC8CA6DE8L,0xE8CE42435B3961L,0xB3AD58F10126DL,0xF1FD178CL};
+  public static final long MConst=0x97483A164E1155L;
 
 // ANSSI Curve
 

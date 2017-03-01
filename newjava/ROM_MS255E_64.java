@@ -20,10 +20,14 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.MS255E;
 
-public class ROM_MS255E
+public class ROM
 {
+// 255MS Modulus
+
+	public static final long[] Modulus= {0xFFFFFFFFFFFD03L,0xFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFL,0x7FFFFFFFL};
+	public static final long MConst=0x2FDL;
 
 // MS255E Curve
 

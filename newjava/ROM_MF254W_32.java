@@ -20,11 +20,13 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.MF254W;
 
-public class ROM_MF254W
+public class ROM
 {
-
+// 254MF Modulus
+	public static final int[] Modulus={0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x3F80FF};
+	public static final int MConst=0x3F8100;
 // MF254W Curve
 
 	public static final int CURVE_A = -3;

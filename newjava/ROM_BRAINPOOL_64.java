@@ -20,10 +20,15 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.BRAINPOOL;
 
-public class ROM_BRAINPOOL
+public class ROM
 {
+// Brainpool Curve
+
+	public static final long[] Modulus= {0x13481D1F6E5377L,0xF623D526202820L,0x909D838D726E3BL,0xA1EEA9BC3E660AL,0xA9FB57DBL};
+	public static final long MConst=0xA75590CEFD89B9L;
+
 
 // Brainpool Curve
 

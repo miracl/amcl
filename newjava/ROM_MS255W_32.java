@@ -20,10 +20,13 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.MS255W;
 
-public class ROM_MS255W
+public class ROM
 {
+// 255MS Modulus
+	public static final int[] Modulus= {0x1FFFFD03,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x7FFFFF};
+	public static final int MConst=0x2FD;
 
 // MS255W Curve
 

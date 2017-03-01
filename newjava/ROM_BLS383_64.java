@@ -20,10 +20,14 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.BLS383;
 
-public class ROM_BLS383
+public class ROM
 {
+// BLS383 Curve
+
+	public static final long[] Modulus= {0xACAAB52AAD556BL,0x1BB01475F75D7AL,0xCF73083D5D7520L,0x531820F99EB16L,0x2C01355A68EA32L,0x5C6105C552A785L,0x7AC52080A9F7L};
+	public static final long MConst=0xA59AB3B123D0BDL;
 
 // BLS383 Curve
 

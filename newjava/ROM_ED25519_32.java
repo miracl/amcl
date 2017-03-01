@@ -20,12 +20,15 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.ED25519;
 
-public class ROM_ED25519
+public class ROM
 {
 
 // ED25519 Curve
+
+public static final int[] Modulus={0x1FFFFFED,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x7FFFFF};
+public static final int MConst=19;
 
 public static final int CURVE_A = -1;
 public static final int[] CURVE_B = {0x135978A3,0xF5A6E50,0x10762ADD,0x149A82,0x1E898007,0x3CBBBC,0x19CE331D,0x1DC56DFF,0x52036C};

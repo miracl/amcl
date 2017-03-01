@@ -20,10 +20,13 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl;
+package amcl.BN254;
 
-public class ROM_BN254
+public class ROM
 {
+// 254-bit BN Curve Modulus
+	public static final long[] Modulus= {0x13L,0x13A7L,0x80000000086121L,0x40000001BA344DL,0x25236482L};
+	public static final long MConst=0x435E50D79435E5L;
 
 // BN254 Curve
 
