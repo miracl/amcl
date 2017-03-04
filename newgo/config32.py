@@ -35,30 +35,27 @@ def rsaset(tb,nb,base,ml) :
 	chosen.append(tb)
 	cptr=cptr+1
 
-	fpath="amcl"+slashtext+tb+slashtext
-	os.system("mkdir amcl"+slashtext+tb)
+	fpath="src"+slashtext+"amcl"+slashtext+tb+slashtext
+	os.system("mkdir src"+slashtext+"amcl"+slashtext+tb)
 
-	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
-	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
-	os.system(copytext+"FF32.java "+fpath+"FF.java")
-	os.system(copytext+"RSA.java "+fpath+"RSA.java")
-	os.system(copytext+"private_key.java "+fpath+"private_key.java")
-	os.system(copytext+"public_key.java "+fpath+"public_key.java")	
+	os.system(copytext+"ARCH32.go "+fpath+"ARCH.go")
+	os.system(copytext+"BIG32.go "+fpath+"BIG.go")
+	os.system(copytext+"DBIG.go "+fpath+"DBIG.go")
+	os.system(copytext+"FF32.go "+fpath+"FF.go")
+	os.system(copytext+"RSA.go "+fpath+"RSA.go")
 
-	replace(fpath+"BIG.java","XXX",tb)
-	replace(fpath+"DBIG.java","XXX",tb)
-	replace(fpath+"FF.java","XXX",tb)
-	replace(fpath+"RSA.java","XXX",tb)
-	replace(fpath+"private_key.java","XXX",tb)
-	replace(fpath+"public_key.java","XXX",tb)
+	replace(fpath+"ARCH.go","XXX",tb)
+	replace(fpath+"BIG.go","XXX",tb)
+	replace(fpath+"DBIG.go","XXX",tb)
+	replace(fpath+"FF.go","XXX",tb)
+	replace(fpath+"RSA.go","XXX",tb)
 
+	replace(fpath+"BIG.go","@NB@",nb)
+	replace(fpath+"BIG.go","@BASE@",base)
 
-	replace(fpath+"BIG.java","@NB@",nb)
-	replace(fpath+"BIG.java","@BASE@",base)
+	replace(fpath+"FF.go","@ML@",ml);
 
-	replace(fpath+"FF.java","@ML@",ml);
-
-	os.system("javac "+fpath+"*.java")
+	os.system("go install amcl"+slashtext+tb)
 
 
 def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
@@ -68,57 +65,63 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	chosen.append(tc)
 	cptr=cptr+1
 
-	fpath="amcl"+slashtext+tc+slashtext
-	os.system("mkdir amcl"+slashtext+tc)
+	fpath="src"+slashtext+"amcl"+slashtext+tc+slashtext
+	os.system("mkdir src"+slashtext+"amcl"+slashtext+tc)
 
-	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
-	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
-	os.system(copytext+"FP32.java "+fpath+"FP.java")
-	os.system(copytext+"ECP.java "+fpath+"ECP.java")
-	os.system(copytext+"ECDH.java "+fpath+"ECDH.java")
-	os.system(copytext+"ROM_"+tc+"_32.java "+fpath+"ROM.java")
+	os.system(copytext+"ARCH32.go "+fpath+"ARCH.go")
+	os.system(copytext+"BIG32.go "+fpath+"BIG.go")
+	os.system(copytext+"DBIG.go "+fpath+"DBIG.go")
+	os.system(copytext+"FP32.go "+fpath+"FP.go")
+	os.system(copytext+"ECP.go "+fpath+"ECP.go")
+	os.system(copytext+"ECDH.go "+fpath+"ECDH.go")
+	os.system(copytext+"ROM_"+tc+"_32.go "+fpath+"ROM.go")
 
-	
-	replace(fpath+"BIG.java","XXX",tc)
-	replace(fpath+"DBIG.java","XXX",tc)
-	replace(fpath+"FP.java","XXX",tc)
-	replace(fpath+"ECP.java","XXX",tc)
-	replace(fpath+"ECDH.java","XXX",tc)
+	replace(fpath+"ARCH.go","XXX",tc)
+	replace(fpath+"BIG.go","XXX",tc)
+	replace(fpath+"DBIG.go","XXX",tc)
+	replace(fpath+"FP.go","XXX",tc)
+	replace(fpath+"ECP.go","XXX",tc)
+	replace(fpath+"ECDH.go","XXX",tc)
 
-	replace(fpath+"BIG.java","@NB@",nb)
-	replace(fpath+"BIG.java","@BASE@",base)
+	replace(fpath+"BIG.go","@NB@",nb)
+	replace(fpath+"BIG.go","@BASE@",base)
 
-	replace(fpath+"FP.java","@NBT@",nbt)
-	replace(fpath+"FP.java","@M8@",m8)
-	replace(fpath+"FP.java","@MT@",mt)
+	replace(fpath+"FP.go","@NBT@",nbt)
+	replace(fpath+"FP.go","@M8@",m8)
+	replace(fpath+"FP.go","@MT@",mt)
 
-	replace(fpath+"ECP.java","@CT@",ct)
-	replace(fpath+"ECP.java","@PF@",pf)
+	replace(fpath+"ECP.go","@CT@",ct)
+	replace(fpath+"ECP.go","@PF@",pf)
 
 
 	if pf != "NOT" :
-		os.system(copytext+"ECP2.java "+fpath+"ECP2.java")
-		os.system(copytext+"FP2.java "+fpath+"FP2.java")
-		os.system(copytext+"FP4.java "+fpath+"FP4.java")
-		os.system(copytext+"FP12.java "+fpath+"FP12.java")
-		os.system(copytext+"PAIR.java "+fpath+"PAIR.java")
-		os.system(copytext+"MPIN.java "+fpath+"MPIN.java")
+		os.system(copytext+"ECP2.go "+fpath+"ECP2.go")
+		os.system(copytext+"FP2.go "+fpath+"FP2.go")
+		os.system(copytext+"FP4.go "+fpath+"FP4.go")
+		os.system(copytext+"FP12.go "+fpath+"FP12.go")
+		os.system(copytext+"PAIR.go "+fpath+"PAIR.go")
+		os.system(copytext+"MPIN.go "+fpath+"MPIN.go")
 
-		replace(fpath+"FP2.java","XXX",tc)
-		replace(fpath+"FP4.java","XXX",tc)
-		replace(fpath+"FP12.java","XXX",tc)
-		replace(fpath+"ECP2.java","XXX",tc)
-		replace(fpath+"PAIR.java","XXX",tc)
-		replace(fpath+"MPIN.java","XXX",tc)
+		replace(fpath+"FP2.go","XXX",tc)
+		replace(fpath+"FP4.go","XXX",tc)
+		replace(fpath+"FP12.go","XXX",tc)
+		replace(fpath+"ECP2.go","XXX",tc)
+		replace(fpath+"PAIR.go","XXX",tc)
+		replace(fpath+"MPIN.go","XXX",tc)
 	
-	os.system("javac "+fpath+"*.java")
+	os.system("go install amcl"+slashtext+tc)
 
+os.system("mkdir src")
+os.system("mkdir bin")
+os.system("mkdir pkg")
 
-os.system("mkdir amcl")
-os.system(copytext+ "HASH*.java amcl"+slashtext+".")
-os.system(copytext+ "RAND.java amcl"+slashtext+".")
-os.system(copytext+ "AES.java amcl"+slashtext+".")
-os.system(copytext+ "GCM.java amcl"+slashtext+".")
+os.system("mkdir src"+slashtext+"amcl")
+os.system(copytext+ "HASH*.go src"+slashtext+"amcl"+slashtext+".")
+os.system(copytext+ "RAND.go src"+slashtext+"amcl"+slashtext+".")
+os.system(copytext+ "AES.go src"+slashtext+"amcl"+slashtext+".")
+os.system(copytext+ "GCM.go src"+slashtext+"amcl"+slashtext+".")
+
+os.system("go install amcl")
 
 print("Elliptic Curves")
 print("1. ED25519")
@@ -290,35 +293,25 @@ while ptr<max:
 		rsa_selected=True
 
 
-os.system(deltext+" HASH*.java")
-os.system(deltext+" AES.java")
-os.system(deltext+" RAND.java")
-os.system(deltext+" GCM.java")
+os.system(deltext+" HASH*.go")
+os.system(deltext+" AES.go")
+os.system(deltext+" RAND.go")
+os.system(deltext+" GCM.go")
 
-os.system(deltext+" BIG*.java")
-os.system(deltext+" DBIG*.java")
-os.system(deltext+" FP*.java")
-os.system(deltext+" ECP.java")
-os.system(deltext+" ECDH.java")
-os.system(deltext+" FF*.java")
-os.system(deltext+" RSA.java")
-os.system(deltext+" public_key.java")
-os.system(deltext+" private_key.java")
-os.system(deltext+" ECP2.java")
-os.system(deltext+" PAIR.java")
-os.system(deltext+" MPIN.java")
-os.system(deltext+" ROM*.java")
+
+os.system(deltext+" ARCH*.go")
+os.system(deltext+" BIG*.go")
+os.system(deltext+" DBIG.go")
+os.system(deltext+" FP*.go")
+os.system(deltext+" ECP.go")
+os.system(deltext+" ECDH.go")
+os.system(deltext+" FF*.go")
+os.system(deltext+" RSA.go")
+os.system(deltext+" ECP2.go")
+os.system(deltext+" PAIR.go")
+os.system(deltext+" MPIN.go")
+os.system(deltext+" ROM*.go")
 
 # create library
 
-os.system("jar cf amcl.jar amcl")
-
-for i in range(0,cptr):
-	os.system(deltext+" amcl"+slashtext+chosen[i]+slashtext+"*.java")
-	os.system(deltext+" amcl"+slashtext+chosen[i]+slashtext+"*.class")
-	os.system("rmdir amcl"+slashtext+chosen[i])
-
-os.system(deltext+" amcl"+slashtext+"*.java")
-os.system(deltext+" amcl"+slashtext+"*.class")
-os.system("rmdir amcl")
 
