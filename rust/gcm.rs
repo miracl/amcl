@@ -25,7 +25,7 @@ const GCM_FINISHED:usize=3;
 const GCM_ENCRYPTING:usize=0;
 const GCM_DECRYPTING:usize=1;
 
-//mod aes;
+use aes;
 use aes::AES;
 
 pub struct GCM {

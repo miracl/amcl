@@ -137,7 +137,7 @@ impl BIG {
 	}
 
     pub fn ff_excess(a:&BIG) -> Chunk {
-        return (a.w[rom::NLEN-1]&rom::OMASK)>>(rom::P_MB)
+        return (a.w[rom::NLEN-1]&rom::P_OMASK)>>(rom::P_MB)
     }
 
 #[cfg(D32)]
