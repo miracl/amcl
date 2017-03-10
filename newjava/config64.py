@@ -125,7 +125,7 @@ print("1. ED25519")
 print("2. C25519")
 print("3. NIST256")
 print("4. BRAINPOOL")
-print("5. ANNSI")
+print("5. ANSSI")
 print("6. HIFIVE")
 print("7. GOLDILOCKS")
 print("8. NIST384")
@@ -202,7 +202,7 @@ while ptr<max:
 		curveset("BRAINPOOL","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==5:
-		curveset("ANNSI","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("ANSSI","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 
 	if x==6:
@@ -284,7 +284,7 @@ while ptr<max:
 		rsaset("RSA3072","48","56","8")
 		rsa_selected=True
 	if x==28:
-		#rsaset("RSA4096","32","29","16")
+		#rsaset("RSA4096","32","56","16")
 		rsaset("RSA4096","64","60","8")
 		rsa_selected=True
 

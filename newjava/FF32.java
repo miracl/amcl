@@ -654,7 +654,8 @@ public final class FF {
 			copy(x2);
 	}
 
-/* nresidue mod m */
+/* 
+idue mod m */
 	public void nres(FF m)
 	{
 		int n=m.length;

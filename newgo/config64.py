@@ -128,7 +128,7 @@ print("1. ED25519")
 print("2. C25519")
 print("3. NIST256")
 print("4. BRAINPOOL")
-print("5. ANNSI")
+print("5. ANSSI")
 print("6. HIFIVE")
 print("7. GOLDILOCKS")
 print("8. NIST384")
@@ -206,7 +206,7 @@ while ptr<max:
 		curveset("BRAINPOOL","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==5:
-		curveset("ANNSI","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("ANSSI","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 
 	if x==6:
@@ -280,16 +280,16 @@ while ptr<max:
 	if x==26:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
-		rsaset("RSA2048","128","28","2")
-		#rsaset("RSA2048","64","29","4")
-		#rsaset("RSA2048","32","29","8")
+		rsaset("RSA2048","128","58","2")
+		#rsaset("RSA2048","64","60","4")
+		#rsaset("RSA2048","32","56","8")
 		rsa_selected=True
 	if x==27:
-		rsaset("RSA3072","48","28","8")
+		rsaset("RSA3072","48","56","8")
 		rsa_selected=True
 	if x==28:
-		#rsaset("RSA4096","32","29","16")
-		rsaset("RSA4096","64","29","8")
+		#rsaset("RSA4096","32","56","16")
+		rsaset("RSA4096","64","60","8")
 		rsa_selected=True
 
 

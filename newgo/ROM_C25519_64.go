@@ -19,4 +19,14 @@ under the License.
 
 /* Fixed Data in ROM - Field and Curve parameters */
 
-package 
+package ED25519
+
+var Modulus = [...]Chunk {0xFFFFFFFFFFFFED,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0x7FFFFFFF}
+const MConst Chunk=0x13
+
+const CURVE_A int = 486662
+var CURVE_B = [...]Chunk {0x0,0x0,0x0,0x0,0x0}
+var CURVE_Order = [...]Chunk {0x12631A5CF5D3ED,0xF9DEA2F79CD658,0x14DE,0x0,0x10000000}
+var CURVE_Gx = [...]Chunk {0x9,0x0,0x0,0x0,0x0}
+var CURVE_Gy = [...]Chunk {0x0,0x0,0x0,0x0,0x0}
+

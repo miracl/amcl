@@ -47,4 +47,4 @@ var CURVE_BB=[4][4][9]Chunk {{{0x132B0CBD,0x108E0531,0x1241B39F,0x1FADDC19,0x166
 const USE_GLV bool=true
 const USE_GS_G2 bool=true
 const USE_GS_GT bool=true	
-const GT_STRONG bool=true
+const GT_STRONG bool=false

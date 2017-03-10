@@ -18,10 +18,10 @@ the number of curves supported. But otherwise the code itself does not
 change.
 
 To this end each supported primitive is implemented inside of its own 
-java package. 
+go namespace. 
 
 So for example to support both ED25519 and the NIST P256 curves, one
-could import into a particular module either "amcl/ED25519" or "amcl/NIST256"
+could import into a particular module both "amcl/ED25519" and "amcl/NIST256"
 
 Separate ROM files provide the constants required for each curve. Some
 files (BIG.go, FP.go, ECP.go) also specify certain constants 
