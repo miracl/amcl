@@ -71,7 +71,7 @@ final class BIG{
     }
     static func FF_EXCESS(_ a: BIG) -> Chunk
     {
-        return ((a.w[ROM.NLEN-1] & ROM.OMASK)>>Chunk(ROM.P_MBITS%ROM.BASEBITS))
+        return ((a.w[ROM.NLEN-1] & ROM.P_OMASK)>>Chunk(ROM.P_MBITS%ROM.BASEBITS))
     }
 #if D32
     static func pexceed(_ a: BIG,_ b : BIG) -> Bool
