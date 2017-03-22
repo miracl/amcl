@@ -756,7 +756,7 @@ public class BIG {
 	{
 		DBIG d=new DBIG(0);
 		int i,b,j=0,r=0;
-		for (i=0;i<16*MODBYTES;i++)
+		for (i=0;i<2*q.nbits();i++)
 		{
 			if (j==0) r=rng.getByte();
 			else r>>=1;

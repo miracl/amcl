@@ -165,15 +165,15 @@ impl BIG {
 #[cfg(D64)]
     pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
         let x0=a&HMASK;
-        let x1=(a>>HBITS);
+        let x1=a>>HBITS;
         let y0=b&HMASK;
-        let y1=(b>>HBITS);
+        let y1=b>>HBITS;
         let mut bot=x0*y0;
         let mut top=x1*y1;
         let mid=x0*y1+x1*y0;
         let u0=mid&HMASK;
-        let u1=(mid>>HBITS);
-        bot+= (u0 <<HBITS);
+        let u1=mid>>HBITS;
+        bot+= u0<<HBITS;
         bot+=c; bot+=r;
         top+=u1;
         let carry=bot>>BASEBITS;
@@ -647,7 +647,8 @@ alise BIG - force all digits < 2^BASEBITS */
         let mut d=DBIG::new();
         let mut j=0;
         let mut r:u8=0;
-        for _ in 0..16*(MODBYTES as usize) {
+        let mut t=BIG::new_copy(q);
+        for _ in 0..2*t.nbits() {
             if j==0 {
                 r=rng.getbyte();
             } else {r>>=1}
@@ -878,8 +879,8 @@ alise BIG - force all digits < 2^BASEBITS */
 #[cfg(D64)]
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
-        let mut carry = 0 as Chunk;
-
+        //let mut carry = 0 as Chunk;
+        let mut carry:Chunk;
         for i in 0 ..NLEN {
             carry=0;
             for j in 0 ..NLEN {
@@ -895,8 +896,8 @@ alise BIG - force all digits < 2^BASEBITS */
 #[cfg(D64)]
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();
-        let mut carry = 0 as Chunk;
-
+        //let mut carry = 0 as Chunk;
+        let mut carry:Chunk;
         for i in 0 ..NLEN {
             carry=0;
             for j in i+1 ..NLEN {
@@ -921,13 +922,15 @@ alise BIG - force all digits < 2^BASEBITS */
 #[cfg(D64)]
     pub fn monty(md: &BIG,mc: Chunk,d: &mut DBIG) -> BIG {
         let mut b=BIG::new();     
-        let mut carry=0 as Chunk; 
-        let mut m=0 as Chunk;
+        //let mut carry=0 as Chunk; 
+        let mut carry:Chunk;
+        //let mut m=0 as Chunk;
+        let mut m:Chunk;
         for i in 0 ..NLEN {
             if mc==-1 { 
                 m=(-d.w[i])&BMASK;
             } else {
-                if (mc==1) {
+                if mc==1 {
                     m=d.w[i];
                 } else {
                     m=(mc*d.w[i])&BMASK;

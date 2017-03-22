@@ -659,7 +659,7 @@ func randomnum(q *BIG,rng *amcl.RAND) *BIG {
 	d:=NewDBIG();
 	var j int=0
 	var r byte=0
-	for i:=0;i<16*int(MODBYTES);i++ {
+	for i:=0;i<2*q.nbits();i++ {
 		if (j==0) {
 			r=rng.GetByte();
 		} else {r>>=1}

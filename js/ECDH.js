@@ -328,7 +328,7 @@ var ECDH = {
 
 		gx=new BIG(0); gx.rcopy(ROM.CURVE_Gx);
 
-		if (ROM.CURVETYPE!=ROM.MOMTGOMERY)
+		if (ROM.CURVETYPE!=ROM.MONTGOMERY)
 		{
 			gy=new BIG(0); gy.rcopy(ROM.CURVE_Gy);
 			G.setxy(gx,gy);

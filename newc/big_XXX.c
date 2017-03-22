@@ -1196,7 +1196,7 @@ void BIG_XXX_randomnum(BIG_XXX m,BIG_XXX q,csprng *rng)
     DBIG_XXX d;
     BIG_XXX_dzero(d);
     /* generate random DBIG */
-    for (i=0; i<16*MODBYTES_XXX; i++)
+    for (i=0; i<2*BIG_XXX_nbits(q); i++)
     {
         if (j==0) r=RAND_byte(rng);
         else r>>=1;

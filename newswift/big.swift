@@ -662,7 +662,7 @@ final class BIG{
         var j:Int=0
         var r:UInt8=0
         
-        for _ in 0 ..< Int(16*BIG.MODBYTES)
+        for _ in 0 ..< 2*q.nbits()
         {
             if (j==0) {r=rng.getByte()}
             else {r>>=1}
