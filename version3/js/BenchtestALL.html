@@ -1,0 +1,383 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>JavaScript AMCL Benchtest</title>
+</head>
+<body>
+<h1>JavaScript Benchmarks </h1>
+
+<script type="text/javascript" src="UInt64.js"></script>
+<script type="text/javascript" src="HASH256.js"></script>
+<script type="text/javascript" src="HASH384.js"></script>
+<script type="text/javascript" src="HASH512.js"></script>
+<script type="text/javascript" src="RAND.js"></script>
+<script type="text/javascript" src="AES.js"></script>
+<script type="text/javascript" src="GCM.js"></script>
+<script type="text/javascript" src="BIG_256.js"></script>
+<script type="text/javascript" src="DBIG_256.js"></script>
+<script type="text/javascript" src="FP_25519.js"></script>
+<script type="text/javascript" src="ECP_ED25519.js"></script>
+<script type="text/javascript" src="ECDH_ED25519.js"></script>
+<script type="text/javascript" src="ROM_FIELD_25519.js"></script>
+<script type="text/javascript" src="ROM_CURVE_ED25519.js"></script>
+
+<script>
+/* test driver and function exerciser ECC functions */
+		var i,j;
+		var result;
+		var MIN_ITERS=5;
+		var MIN_TIME=5;
+		var fail=false;
+		var RAW=[];
+
+		var rng=new RAND();
+
+		rng.clean();
+		for (i=0;i<100;i++) RAW[i]=i;
+
+		rng.seed(100,RAW);
+
+		window.document.write("Curve ED25519"+ "<br>");
+		if (ECP_ED25519.CURVETYPE==ECP_ED25519.WEIERSTRASS)
+		{
+			window.document.write("Weierstrass parameterization "+ "<br>");
+		}		
+		if (ECP_ED25519.CURVETYPE==ECP_ED25519.EDWARDS)
+		{
+			window.document.write("Edwards parameterization"+ "<br>");
+		}
+		if (ECP_ED25519.CURVETYPE==ECP_ED25519.MONTGOMERY)
+		{
+			window.document.write("Montgomery parameterization"+ "<br>");
+		}
+
+		if (FP_25519.MODTYPE==FP_25519.PSEUDO_MERSENNE)
+		{
+			window.document.write("Pseudo-Mersenne Modulus"+ "<br>");
+		}
+		if (FP_25519.MODTYPE==FP_25519.MONTGOMERY_FRIENDLY)
+		{
+			window.document.write("Montgomery friendly Modulus"+ "<br>");
+		}
+		if (FP_25519.MODTYPE==FP_25519.GENERALISED_MERSENNE)
+		{
+			window.document.write("Generalised-Mersenne Modulus"+ "<br>");
+		}
+		if (FP_25519.MODTYPE==FP_25519.NOT_SPECIAL)
+		{
+			window.document.write("Not special Modulus"+ "<br>");
+		}
+
+		window.document.write("Modulus size "+FP_25519.MODBITS+ " bits"+ "<br>"); 
+
+		var r,gx,gy,s;
+		var G,WP;
+		var res=0;
+
+		G=new ECP_ED25519(0);
+
+		gx=new BIG_256(0); gx.rcopy(ROM_CURVE_ED25519.CURVE_Gx);
+
+		if (ECP_ED25519.CURVETYPE!=ECP_ED25519.MOMTGOMERY)
+		{
+			gy=new BIG_256(0); gy.rcopy(ROM_CURVE_ED25519.CURVE_Gy);
+			G.setxy(gx,gy);
+		}
+		else G.setx(gx);
+
+		r=new BIG_256(0); r.rcopy(ROM_CURVE_ED25519.CURVE_Order);
+		s=BIG_256.randomnum(r,rng);
+			
+		WP=G.mul(r);
+		if (!WP.is_infinity())
+		{
+			alert("FAILURE - rG!=O");
+			fail=true;
+		}
+		var elapsed;
+		var start = performance.now();
+		iterations=0;
+		do {
+			WP=G.mul(s);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("EC  mul - " + iterations + " iterations  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+</script>
+<script type="text/javascript" src="BIG_256.js"></script>
+<script type="text/javascript" src="DBIG_256.js"></script>
+<script type="text/javascript" src="FP_BN254.js"></script>
+<script type="text/javascript" src="ECP_BN254.js"></script>
+<script type="text/javascript" src="ROM_FIELD_BN254.js"></script>
+<script type="text/javascript" src="ROM_CURVE_BN254.js"></script>
+<script type="text/javascript" src="FP2_BN254.js"></script>
+<script type="text/javascript" src="FP4_BN254.js"></script>
+<script type="text/javascript" src="FP12_BN254.js"></script>
+<script type="text/javascript" src="ECP2_BN254.js"></script>
+<script type="text/javascript" src="PAIR_BN254.js"></script>
+<script type="text/javascript" src="MPIN_BN254.js"></script>
+
+<script>
+
+/* Note that reloading BIG_256.js and DBIG_256.js seems to be importnat for Google Chrome.. */
+
+		window.document.write("<br> Pairing-friendly Curve BN254"+ "<br>");
+		var i;
+		var result;
+		var MIN_ITERS=5;
+		var MIN_TIME=5;
+		var G=new ECP_BN254(0);
+		var Q=new ECP2_BN254(0);
+
+
+		if (ECP_BN254.CURVE_PAIRING_TYPE==ECP_BN254.BN_CURVE)
+		{
+			window.document.write("BN Pairing-Friendly Curve"+ "<br>");
+		}
+		if (ECP_BN254.CURVE_PAIRING_TYPE==ECP_BN254.BLS_CURVE)
+		{
+			window.document.write("BLS Pairing-Friendly Curve"+ "<br>");
+		}
+
+		window.document.write("Modulus size " + FP_BN254.MODBITS + " bits"+ "<br>"); 
+
+		var gx=new BIG_256(0); gx.rcopy(ROM_CURVE_BN254.CURVE_Gx);	
+		var gy=new BIG_256(0); gy.rcopy(ROM_CURVE_BN254.CURVE_Gy);
+		G.setxy(gx,gy);			
+
+		r=new BIG_256(0); r.rcopy(ROM_CURVE_BN254.CURVE_Order);
+		s=BIG_256.randomnum(r,rng);
+
+		var P=PAIR_BN254.G1mul(G,r);
+
+		if (!P.is_infinity())
+		{
+			alert("FAILURE - rP!=O");
+			fail=true;
+		}	
+
+		var elapsed;
+		var start = performance.now();
+		iterations=0;
+		do {
+			P=PAIR_BN254.G1mul(G,s);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("G1 mul -                " + iterations + " iterations  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+
+		var A=new BIG_256(0);
+		var B=new BIG_256(0);
+		A.rcopy(ROM_CURVE_BN254.CURVE_Pxa); B.rcopy(ROM_CURVE_BN254.CURVE_Pxb);
+		var QX=new FP2_BN254(0); QX.bset(A,B);
+		A.rcopy(ROM_CURVE_BN254.CURVE_Pya); B.rcopy(ROM_CURVE_BN254.CURVE_Pyb);
+		var QY=new FP2_BN254(0); QY.bset(A,B);
+		Q.setxy(QX,QY);
+
+		W=PAIR_BN254.G2mul(Q,r);
+
+		if (!W.is_infinity())
+		{
+			alert("FAILURE - rQ!=O");
+			fail=true;
+		}
+
+		start = performance.now();
+		iterations=0;
+		do {
+			W=PAIR_BN254.G2mul(Q,s);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("G2 mul -                " + iterations + " iteration  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+
+		var w=PAIR_BN254.ate(Q,P);
+		w=PAIR_BN254.fexp(w);
+
+		var g=PAIR_BN254.GTpow(w,r);
+
+		if (!g.isunity())
+		{
+			alert("FAILURE - g^r!=1");
+			fail=true;
+		}
+
+		start = performance.now();
+		iterations=0;
+		do {
+			g=PAIR_BN254.GTpow(w,s);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("GT pow -                " + iterations + " iteration  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+
+//		var fa=new BIG_256(0); fa.rcopy(ROM_FIELD_BN254.Fra);
+//		var fb=new BIG_256(0); fb.rcopy(ROM_FIELD_BN254.Frb);
+//		var f=new FP2_BN254(fa,fb); //f.bset(fa,fb);
+
+//		q=new BIG_256(0); q.rcopy(ROM_FIELD_BN254.Modulus);
+
+/*
+		var m=new BIG_256(q);
+		m.mod(r);
+
+		var a=new BIG_256(s);
+		a.mod(m);
+
+		var b=new BIG_256(s);
+		b.div(m);
+
+		g.copy(w);
+		var c=g.trace();
+
+		g.frob(f);
+		var cp=g.trace();
+
+		w.conj();
+		g.mul(w);
+		var cpm1=g.trace();
+		g.mul(w);
+		var cpm2=g.trace();
+*/
+		var cr;
+		start = performance.now();
+		iterations=0;
+		do {
+			cr=w.compow(s,r); // (cp,cpm1,cpm2,a,b);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("GT pow (compressed) -   " + iterations + " iteration  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+
+		start = performance.now();
+		iterations=0;
+		do {
+			w=PAIR_BN254.ate(Q,P);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("PAIRing ATE   -         " + iterations + " iteration  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+
+		start = performance.now();
+		iterations=0;
+		do {
+			g=PAIR_BN254.fexp(w);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("PAIRing FEXP -          " + iterations + " iteration  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+
+		P.copy(G);
+		Q.copy(W);
+
+		P=PAIR_BN254.G1mul(P,s);
+		g=PAIR_BN254.ate(Q,P);
+		g=PAIR_BN254.fexp(g);
+
+		P.copy(G);
+		Q=PAIR_BN254.G2mul(Q,s);
+		w=PAIR_BN254.ate(Q,P);
+		w=PAIR_BN254.fexp(w);
+
+		if (!g.equals(w))
+		{
+			alert("FAILURE - e(sQ,p)!=e(Q,sP)");
+			fail=true;
+		}
+
+		Q.copy(W);
+		g=PAIR_BN254.ate(Q,P);
+		g=PAIR_BN254.fexp(g);
+		g=PAIR_BN254.GTpow(g,s);
+
+		if (!g.equals(w))
+		{
+			alert("FAILURE - e(sQ,p)!=e(Q,P)^s");
+			fail=true;
+		}
+
+</script>
+<script type="text/javascript" src="BIG_1024.js"></script>
+<script type="text/javascript" src="DBIG_1024.js"></script>
+<script type="text/javascript" src="FF_2048.js"></script>
+<script type="text/javascript" src="RSA_2048.js"></script>
+<script>
+
+		var pub=new rsa_public_key(FF_2048.FFLEN);
+		var priv=new rsa_private_key(FF_2048.HFLEN);
+
+		var M=[];
+		var C=[];
+		var P=[];
+
+		window.document.write("<br> Generating 2048 bit RSA public/private key pair"+ "<br>");
+
+		MIN_ITERS=1;
+		start = performance.now();
+		iterations=0;
+		do {
+			RSA_2048.KEY_PAIR(rng,65537,priv,pub);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("RSA gen - " + iterations + " iteration  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+
+		MIN_ITERS=5;
+
+		for (i=0;i<RSA_2048.RFS;i++) M[i]=(i%128);
+
+		start = performance.now();
+		iterations=0;
+		do {
+			RSA_2048.ENCRYPT(pub,M,C);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("RSA enc - " + iterations + " iterations  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+
+		start = performance.now();
+		iterations=0;
+		do {
+			RSA_2048.DECRYPT(priv,C,P);
+			iterations++;
+			elapsed=(performance.now()-start);
+		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
+		dur=elapsed/iterations;
+		window.document.write("RSA dec - " + iterations + " iterations  ");
+		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
+
+		var cmp=true;
+		for (i=0;i<RSA_2048.RFS;i++)
+		{
+			if (P[i]!=M[i]) cmp=false;
+		}
+
+		if (!cmp)
+		{
+			alert("FAILURE - RSA decryption");
+			fail=true;
+		}
+		if (!fail) window.document.write("All tests pass"+ "<br>");
+
+</script>
+</body>
+</html>
+
