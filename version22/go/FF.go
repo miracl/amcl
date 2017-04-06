@@ -445,6 +445,11 @@ func (F *FF) dmod(b *FF) *FF {
 	x.norm()
 	m.dsucopy(b); k:=BIGBITS*n
 
+	for ff_comp(x,m)>=0 {
+		x.sub(m)
+		x.norm()
+	}
+
 	for k>0 {	
 		m.shr()
 

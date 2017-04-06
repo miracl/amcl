@@ -602,6 +602,12 @@ void FF_WWW_dmod(BIG_XXX r[],BIG_XXX a[],BIG_XXX b[],int n)
     FF_WWW_dsucopy(m,b,n);
     k=BIGBITS_XXX*n;
 
+    while (FF_WWW_comp(x,m,2*n)>=0)
+    {
+        FF_WWW_sub(x,x,m,2*n);
+        FF_WWW_norm(x,2*n);
+    }
+
     while (k>0)
     {
         FF_WWW_shr(m,2*n);

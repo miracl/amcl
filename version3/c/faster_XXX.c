@@ -66,7 +66,7 @@ int main()
 	printf("\tc[%d]=(chunk)co;\n",2*N-1);
 
 
-#if MODTYPE == NOT_SPECIAL
+
 
 	printf("\nInsert this code in BIG_XXX_monty() in file big_XXX.c between #define UNWOUND and #else \n\n");
 
@@ -89,7 +89,6 @@ int main()
 	printf("\ta[%d]=d[%d]+(chunk)c&BMASK_XXX;\n",N-1,2*N-1);	
 
 
-#endif
 
 }
 

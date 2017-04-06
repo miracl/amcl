@@ -447,6 +447,12 @@ FF.prototype={
 		x.norm();
 		m.dsucopy(b); k=ROM.BIGBITS*n;
 
+		while (FF.comp(x,m)>=0)
+		{
+			x.sub(m);
+			x.norm();
+		}
+
 		while (k>0)
 		{	
 			m.shr();

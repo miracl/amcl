@@ -455,6 +455,12 @@ FF_WWW.prototype={
 		x.norm();
 		m.dsucopy(b); k=BIG_XXX.BIGBITS*n;
 
+		while (FF_WWW.comp(x,m)>=0)
+		{
+			x.sub(m);
+			x.norm();
+		}
+
 		while (k>0)
 		{	
 			m.shr();

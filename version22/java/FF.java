@@ -513,6 +513,12 @@ public final class FF {
 		x.norm();
 		m.dsucopy(b); k=ROM.BIGBITS*n;
 
+		while (comp(x,m)>=0)
+		{
+			x.sub(m);
+			x.norm();
+		}
+
 		while (k>0)
 		{	
 			m.shr();

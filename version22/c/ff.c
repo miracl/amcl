@@ -602,6 +602,12 @@ void FF_dmod(BIG r[],BIG a[],BIG b[],int n)
     FF_dsucopy(m,b,n);
     k=BIGBITS*n;
 
+    while (FF_comp(x,m,2*n)>=0)
+    {
+        FF_sub(x,x,m,2*n);
+        FF_norm(x,2*n);
+    }
+
     while (k>0)
     {
         FF_shr(m,2*n);

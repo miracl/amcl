@@ -559,6 +559,11 @@ impl FF {
 		x.norm();
 		m.dsucopy(&b); let mut k=big::BIGBITS*n;
 
+		while FF::comp(&x,&m)>=0 {
+			x.sub(&m);
+			x.norm();
+		}
+
 		while k>0 {	
 			m.shr();
 
