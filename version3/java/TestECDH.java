@@ -81,7 +81,7 @@ public class TestECDH
 		System.out.print("Alice's public key= 0x");
 		printBinary(W0);
 
-		res=ECDH.PUBLIC_KEY_VALIDATE(true,W0);
+		res=ECDH.PUBLIC_KEY_VALIDATE(W0);
 		if (res!=0)
 		{
 			System.out.println("ECP Public Key is invalid!\n");
@@ -97,7 +97,7 @@ public class TestECDH
 		printBinary(W1);
 
 
-		res=ECDH.PUBLIC_KEY_VALIDATE(true,W1);
+		res=ECDH.PUBLIC_KEY_VALIDATE(W1);
 		if (res!=0)
 		{
 			System.out.print("ECP Public Key is invalid!\n");

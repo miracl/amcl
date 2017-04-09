@@ -33,7 +33,7 @@ python3 config.py
 Then select options 1, 23 and 26 (these are fixed for the example 
 programs provided). Select 0 to exit.
 
-Then load TestALL.html of BenchtestALL.html into your favourite browser.
+Then load TestALL.html or BenchtestALL.html into your favourite browser.
 You might have to wait a minute or two for the scripts to complete.
 For TestALL.html the PIN number is 1234.
 

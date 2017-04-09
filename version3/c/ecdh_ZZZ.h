@@ -65,11 +65,10 @@ under the License.
 extern int  ECP_ZZZ_KEY_PAIR_GENERATE(csprng *R,octet *s,octet *W);
 /**	@brief Validate an ECC public key
  *
-	@param f if = 0 just does some simple checks, else tests that W is of the correct order
 	@param W the input public key to be validated
 	@return 0 if public key is OK, or an error code
  */
-extern int  ECP_ZZZ_PUBLIC_KEY_VALIDATE(int f,octet *W);
+extern int  ECP_ZZZ_PUBLIC_KEY_VALIDATE(octet *W);
 
 /* ECDH primitives */
 

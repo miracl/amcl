@@ -345,16 +345,29 @@ pub fn key_pair_generate(rng: Option<&mut RAND>,s: &mut [u8],w: &mut [u8]) -> is
 
 /* validate public key. Set full=true for fuller check */
 #[allow(non_snake_case)]
-pub fn public_key_validate(full: bool,w: &[u8]) -> isize {
+pub fn public_key_validate(w: &[u8]) -> isize {
 	let mut WP=ECP::frombytes(w);
 	let mut res=0;
 
-	let mut r=BIG::new_ints(&rom::CURVE_ORDER);
+	let r=BIG::new_ints(&rom::CURVE_ORDER);
 
 	if WP.is_infinity() {res=INVALID_PUBLIC_KEY}
-	if res==0 && full {
-		WP=WP.mul(&mut r);
-		if !WP.is_infinity() {res=INVALID_PUBLIC_KEY} 
+	if res==0  {
+
+		let mut q=BIG::new_ints(&rom::MODULUS);
+		let nb=q.nbits();
+		let mut k=BIG::new(); k.one(); k.shl((nb+4)/2);
+		k.add(&q);
+		k.div(&r);
+
+		while k.parity()==0 {
+				k.shr(1);
+				WP.dbl();
+		}
+
+		if !k.isunity() {WP=WP.mul(&mut k)}
+		if WP.is_infinity() {res=INVALID_PUBLIC_KEY} 		
+
 	}
 	return res;
 }

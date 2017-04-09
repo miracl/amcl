@@ -360,21 +360,34 @@ public final class ECDH {
 		return res;
 	}
 
-/* validate public key. Set full=true for fuller check */
-	public static int PUBLIC_KEY_VALIDATE(boolean full,byte[] W)
+/* validate public key. */
+	public static int PUBLIC_KEY_VALIDATE(byte[] W)
 	{
-		BIG r;
+		BIG r,q,k;
 		ECP WP=ECP.fromBytes(W);
-		int res=0;
+		int nb,res=0;
 
 		r=new BIG(ROM.CURVE_Order);
 
 		if (WP.is_infinity()) res=INVALID_PUBLIC_KEY;
 
-		if (res==0 && full)
+		if (res==0)
 		{
-			WP=WP.mul(r);
-			if (!WP.is_infinity()) res=INVALID_PUBLIC_KEY; 
+
+			q=new BIG(ROM.Modulus);
+			nb=q.nbits();
+			k=new BIG(1); k.shl((nb+4)/2);
+			k.add(q);
+			k.div(r);
+
+			while (k.parity()==0)
+			{
+				k.shr(1);
+				WP.dbl();
+			}
+
+			if (!k.isunity()) WP=WP.mul(k);
+			if (WP.is_infinity()) res=INVALID_PUBLIC_KEY; 
 		}
 		return res;
 	}

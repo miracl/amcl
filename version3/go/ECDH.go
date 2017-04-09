@@ -336,16 +336,31 @@ func ECDH_KEY_PAIR_GENERATE(RNG *amcl.RAND,S []byte,W []byte) int {
 }
 
 /* validate public key. Set full=true for fuller check */
-func ECDH_PUBLIC_KEY_VALIDATE(full bool,W []byte) int {
+func ECDH_PUBLIC_KEY_VALIDATE(W []byte) int {
 	WP:=ECP_fromBytes(W)
 	res:=0
 
 	r:=NewBIGints(CURVE_Order)
 
 	if WP.Is_infinity() {res=INVALID_PUBLIC_KEY}
-	if res==0 && full {
-		WP=WP.mul(r)
-		if !WP.Is_infinity() {res=INVALID_PUBLIC_KEY} 
+	if res==0 {
+
+		q:=NewBIGints(Modulus)
+		nb:=q.nbits()
+		k:=NewBIGint(1); k.shl(uint((nb+4)/2))
+		k.add(q)
+		k.div(r)
+
+		for (k.parity()==0) {
+			k.shr(1)
+			WP.dbl()
+		}
+
+		if !k.isunity() {
+			WP=WP.mul(k)
+		}
+		if WP.Is_infinity() {res=INVALID_PUBLIC_KEY}
+
 	}
 	return res
 }

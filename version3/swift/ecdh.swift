@@ -362,7 +362,7 @@ final public class ECDH
     }
    
     /* validate public key. Set full=true for fuller check */
-    static public func PUBLIC_KEY_VALIDATE(_ full:Bool,_ W:[UInt8]) -> Int
+    static public func PUBLIC_KEY_VALIDATE(_ W:[UInt8]) -> Int
     {
         var WP=ECP.fromBytes(W);
         var res=0;
@@ -371,10 +371,24 @@ final public class ECDH
     
         if WP.is_infinity() {res=INVALID_PUBLIC_KEY}
     
-        if res==0 && full
+        if res==0
         {
-            WP=WP.mul(r)
-            if !WP.is_infinity() {res=INVALID_PUBLIC_KEY}
+
+
+            let q=BIG(ROM.Modulus)
+            let nb=UInt(q.nbits())
+            let k=BIG(1); k.shl((nb+4)/2)
+            k.add(q)
+            k.div(r)
+
+            while k.parity()==0 {
+                k.shr(1)
+                WP.dbl()
+            }
+
+            if !k.isunity() {WP=WP.mul(k)}
+            if WP.is_infinity() {res=INVALID_PUBLIC_KEY} 
+
         }
         return res;
     }
@@ -398,7 +412,7 @@ final public class ECDH
             if W.is_infinity() {res=ERROR}
             else
             {
-		W.getX().toBytes(&T);
+                W.getX().toBytes(&T);
                 for i in 0 ..< ECDH.EFS {Z[i]=T[i]}
             }
         }

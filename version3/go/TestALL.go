@@ -77,7 +77,7 @@ func ecdh_ED25519(rng *amcl.RAND) {
 	fmt.Printf("Alice's public key= 0x")
 	printBinary(W0[:]);
 
-	res=ED25519.ECDH_PUBLIC_KEY_VALIDATE(true,W0[:])
+	res=ED25519.ECDH_PUBLIC_KEY_VALIDATE(W0[:])
 	if res!=0 {
 		fmt.Printf("ECP Public Key is invalid!\n")
 		return
@@ -93,7 +93,7 @@ func ecdh_ED25519(rng *amcl.RAND) {
 	printBinary(W1[:])
 
 
-	res=ED25519.ECDH_PUBLIC_KEY_VALIDATE(true,W1[:])
+	res=ED25519.ECDH_PUBLIC_KEY_VALIDATE(W1[:])
 	if res!=0 {
 		fmt.Printf("ECP Public Key is invalid!\n")
 		return

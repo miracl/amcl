@@ -71,7 +71,7 @@ int ecdh_ED25519(csprng *RNG)
     printf("Alices public key= 0x");
     OCT_output(&W0);
 
-    res=ECP_ED25519_PUBLIC_KEY_VALIDATE(1,&W0);
+    res=ECP_ED25519_PUBLIC_KEY_VALIDATE(&W0);
     if (res!=0)
     {
         printf("ECP Public Key is invalid!\n");
@@ -80,7 +80,7 @@ int ecdh_ED25519(csprng *RNG)
 
     /* Random private key for other party */
     ECP_ED25519_KEY_PAIR_GENERATE(RNG,&S1,&W1);
-    res=ECP_ED25519_PUBLIC_KEY_VALIDATE(1,&W1);
+    res=ECP_ED25519_PUBLIC_KEY_VALIDATE(&W1);
     if (res!=0)
     {
         printf("ECP Public Key is invalid!\n");
@@ -226,7 +226,7 @@ int ecdh_NIST256(csprng *RNG)
     printf("Alices public key= 0x");
     OCT_output(&W0);
 
-    res=ECP_NIST256_PUBLIC_KEY_VALIDATE(1,&W0);
+    res=ECP_NIST256_PUBLIC_KEY_VALIDATE(&W0);
     if (res!=0)
     {
         printf("ECP Public Key is invalid!\n");
@@ -235,7 +235,7 @@ int ecdh_NIST256(csprng *RNG)
 
     /* Random private key for other party */
     ECP_NIST256_KEY_PAIR_GENERATE(RNG,&S1,&W1);
-    res=ECP_NIST256_PUBLIC_KEY_VALIDATE(1,&W1);
+    res=ECP_NIST256_PUBLIC_KEY_VALIDATE(&W1);
     if (res!=0)
     {
         printf("ECP Public Key is invalid!\n");
@@ -381,7 +381,7 @@ int ecdh_GOLDILOCKS(csprng *RNG)
     printf("Alices public key= 0x");
     OCT_output(&W0);
 
-    res=ECP_GOLDILOCKS_PUBLIC_KEY_VALIDATE(1,&W0);
+    res=ECP_GOLDILOCKS_PUBLIC_KEY_VALIDATE(&W0);
     if (res!=0)
     {
         printf("ECP Public Key is invalid!\n");
@@ -390,7 +390,7 @@ int ecdh_GOLDILOCKS(csprng *RNG)
 
     /* Random private key for other party */
     ECP_GOLDILOCKS_KEY_PAIR_GENERATE(RNG,&S1,&W1);
-    res=ECP_GOLDILOCKS_PUBLIC_KEY_VALIDATE(1,&W1);
+    res=ECP_GOLDILOCKS_PUBLIC_KEY_VALIDATE(&W1);
     if (res!=0)
     {
         printf("ECP Public Key is invalid!\n");

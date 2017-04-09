@@ -36,6 +36,12 @@ typedef chunk DBIG_XXX[DNLEN_XXX];   /**< Define type DBIG as array of chunks */
 	@return 1 if zero, else returns 0
  */
 extern int BIG_XXX_iszilch(BIG_XXX x);
+/**	@brief Tests for BIG equal to one
+ *
+	@param x a BIG number
+	@return 1 if one, else returns 0
+ */
+extern int BIG_XXX_isunity(BIG_XXX x);
 /**	@brief Tests for DBIG equal to zero
  *
 	@param x a DBIG number

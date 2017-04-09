@@ -77,7 +77,7 @@ fn ecdh_ed25519(mut rng: &mut RAND)
 	print!("Alice's public key= 0x");
 	printbinary(&w0);
 
-	let mut res=ed25519::ecdh::public_key_validate(true,&w0);
+	let mut res=ed25519::ecdh::public_key_validate(&w0);
 	if res!=0 {
 		println!("ECP Public Key is invalid!");
 		return;
@@ -93,7 +93,7 @@ fn ecdh_ed25519(mut rng: &mut RAND)
 	printbinary(&w1);
 
 
-	res=ed25519::ecdh::public_key_validate(true,&w1);
+	res=ed25519::ecdh::public_key_validate(&w1);
 	if res!=0 {
 		println!("ECP Public Key is invalid!");
 		return;

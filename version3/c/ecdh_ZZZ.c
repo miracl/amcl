@@ -89,11 +89,11 @@ int ECP_ZZZ_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 }
 
 /* validate public key. Set full=true for fuller check */
-int ECP_ZZZ_PUBLIC_KEY_VALIDATE(int full,octet *W)
+int ECP_ZZZ_PUBLIC_KEY_VALIDATE(octet *W)
 {
-    BIG_XXX q,r,wx;
+    BIG_XXX q,r,wx,k;
     ECP_ZZZ WP;
-    int valid;
+    int valid,nb;
     int res=0;
 
     BIG_XXX_rcopy(q,Modulus_YYY);
@@ -115,10 +115,22 @@ int ECP_ZZZ_PUBLIC_KEY_VALIDATE(int full,octet *W)
         valid=ECP_ZZZ_set(&WP,wx);
 #endif
         if (!valid || ECP_ZZZ_isinf(&WP)) res=ECDH_INVALID_PUBLIC_KEY;
-        if (res==0 && full)
-        {
-            ECP_ZZZ_mul(&WP,r);
-            if (!ECP_ZZZ_isinf(&WP)) res=ECDH_INVALID_PUBLIC_KEY;
+        if (res==0 )
+        {/* Check point is not in wrong group */
+			nb=BIG_XXX_nbits(q);
+			BIG_XXX_one(k);
+			BIG_XXX_shl(k,(nb+4)/2);
+			BIG_XXX_add(k,q,k);
+			BIG_XXX_sdiv(k,r); /* get co-factor */
+
+			while (BIG_XXX_parity(k)==0)
+			{
+				ECP_ZZZ_dbl(&WP);
+				BIG_XXX_fshr(k,1);
+			}
+
+			if (!BIG_XXX_isunity(k)) ECP_ZZZ_mul(&WP,k);
+			if (ECP_ZZZ_isinf(&WP)) res=ECDH_INVALID_PUBLIC_KEY;
         }
     }
 

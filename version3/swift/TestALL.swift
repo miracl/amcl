@@ -145,7 +145,7 @@ public func TestECDH(_ rng: RAND)
     
     print("Alice's public key= 0x",terminator: ""); printBinary(W0)
     
-    var res=ECDH.PUBLIC_KEY_VALIDATE(true,W0);
+    var res=ECDH.PUBLIC_KEY_VALIDATE(W0);
 
     if res != 0
     {
@@ -160,7 +160,7 @@ public func TestECDH(_ rng: RAND)
     
     print("Servers public key= 0x",terminator: ""); printBinary(W1);
     
-    res=ECDH.PUBLIC_KEY_VALIDATE(true,W1)
+    res=ECDH.PUBLIC_KEY_VALIDATE(W1)
     if res != 0
     {
         print("ECP Public Key is invalid!")

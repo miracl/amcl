@@ -31,6 +31,16 @@ int BIG_XXX_iszilch(BIG_XXX a)
     return 1;
 }
 
+/* test a=1? */
+int BIG_XXX_isunity(BIG_XXX a)
+{
+    int i;
+    for (i=1; i<NLEN_XXX; i++)
+        if (a[i]!=0) return 0;
+	if (a[0]!=1) return 0;
+    return 1;
+}
+
 /* test a=0? */
 int BIG_XXX_diszilch(DBIG_XXX a)
 {

@@ -361,7 +361,7 @@ var ECDH_ZZZ = {
 		return res;
 	},
 
-	PUBLIC_KEY_VALIDATE: function(full,W)
+	PUBLIC_KEY_VALIDATE: function(W)
 	{
 		var r;
 		var WP=ECP_ZZZ.fromBytes(W);
@@ -371,10 +371,24 @@ var ECDH_ZZZ = {
 
 		if (WP.is_infinity()) res=this.INVALID_PUBLIC_KEY;
 
-		if (res===0 && full)
+		if (res===0)
 		{
-			WP=WP.mul(r);
-			if (!WP.is_infinity()) res=this.INVALID_PUBLIC_KEY; 
+
+			var q=new BIG_XXX(0); q.rcopy(ROM_FIELD_YYY.Modulus);
+			var nb=q.nbits();
+			var k=new BIG_XXX(1); k.shl(Math.floor((nb+4)/2));
+			k.add(q);
+			k.div(r);
+
+			while (k.parity()==0)
+			{
+				k.shr(1);
+				WP.dbl();
+			}
+
+			if (!k.isunity()) WP=WP.mul(k);
+			if (WP.is_infinity()) res=this.INVALID_PUBLIC_KEY; 
+
 		}
 		return res;
 	},

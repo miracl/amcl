@@ -85,7 +85,7 @@
 
 	window.document.write("Alice's public key= 0x"+ECDH_ED25519.bytestostring(W0)+ "<br>");
 
-	res=ECDH_ED25519.PUBLIC_KEY_VALIDATE(true,W0);
+	res=ECDH_ED25519.PUBLIC_KEY_VALIDATE(W0);
 	if (res!=0)
 		alert("ECP_ED25519 Public Key is invalid!");
 /* Random private key for other party */
@@ -94,7 +94,7 @@
 	window.document.write("Servers private key= 0x"+ECDH_ED25519.bytestostring(S1)+ "<br>");
 	window.document.write("Servers public key= 0x"+ECDH_ED25519.bytestostring(W1)+ "<br>");
 
-	res=ECDH_ED25519.PUBLIC_KEY_VALIDATE(true,W1);
+	res=ECDH_ED25519.PUBLIC_KEY_VALIDATE(W1);
 	if (res!=0)
 		alert("ECP_ED25519 Public Key is invalid!");
 			
