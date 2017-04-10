@@ -563,71 +563,56 @@ void BIG_XXX_sqr(DBIG_XXX c,BIG_XXX a)
 
 #else
 
-    t=(dchunk)a[0]*a[0];
+
+    t=(dchunk)a[0]*a[0]; 
     c[0]=(chunk)t&BMASK_XXX;
     co=t>>BASEBITS_XXX;
-    t=(dchunk)a[1]*a[0];
-    t+=t;
-    t+=co;
-    c[1]=(chunk)t&BMASK_XXX;
-    co=t>>BASEBITS_XXX;
 
-    last=NLEN_XXX-NLEN_XXX%2;
-    for (j=2; j<last; j+=2)
-    {
-        t=(dchunk)a[j]*a[0];
-        for (i=1; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
-        t+=t;
-        t+=co;
-        t+=(dchunk)a[j/2]*a[j/2];
+	for (j=1;j<NLEN_XXX-1; )
+	{
+        t=(dchunk)a[j]*a[0]; 
+        for (i=1; i<(j+1)/2; i++) {t+=(dchunk)a[j-i]*a[i]; }
+        t+=t; t+=co; 
         c[j]=(chunk)t&BMASK_XXX;
         co=t>>BASEBITS_XXX;
-        t=(dchunk)a[j+1]*a[0];
-        for (i=1; i<(j+2)/2; i++) t+=(dchunk)a[j+1-i]*a[i];
-        t+=t;
-        t+=co;
-        c[j+1]=(chunk)t&BMASK_XXX;
-        co=t>>BASEBITS_XXX;
-    }
-    j=last;
-#if NLEN_XXX%2==1
-    t=(dchunk)a[j]*a[0];
-    for (i=1; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
-    t+=t;
-    t+=co;
-    t+=(dchunk)a[j/2]*a[j/2];
-    c[j]=(chunk)t&BMASK_XXX;
-    co=t>>BASEBITS_XXX;
-    j++;
-    t=(dchunk)a[NLEN_XXX-1]*a[j-NLEN_XXX+1];
-    for (i=j-NLEN_XXX+2; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
-    t+=t;
-    t+=co;
-    c[j]=(chunk)t&BMASK_XXX;
-    co=t>>BASEBITS_XXX;
-    j++;
-#endif
-    for (; j<DNLEN_XXX-2; j+=2)
-    {
-        t=(dchunk)a[NLEN_XXX-1]*a[j-NLEN_XXX+1];
-        for (i=j-NLEN_XXX+2; i<(j+1)/2; i++) t+=(dchunk)a[j-i]*a[i];
-        t+=t;
-        t+=co;
-        t+=(dchunk)a[j/2]*a[j/2];
+		j++;
+        t=(dchunk)a[j]*a[0]; 
+        for (i=1; i<(j+1)/2; i++) {t+=(dchunk)a[j-i]*a[i]; }
+        t+=t; t+=co; 
+        t+=(dchunk)a[j/2]*a[j/2]; 
         c[j]=(chunk)t&BMASK_XXX;
         co=t>>BASEBITS_XXX;
-        t=(dchunk)a[NLEN_XXX-1]*a[j-NLEN_XXX+2];
-        for (i=j-NLEN_XXX+3; i<(j+2)/2; i++) t+=(dchunk)a[j+1-i]*a[i];
-        t+=t;
-        t+=co;
-        c[j+1]=(chunk)t&BMASK_XXX;
-        co=t>>BASEBITS_XXX;
-    }
+		j++;
+	}
 
-    t=(dchunk)a[NLEN_XXX-1]*a[NLEN_XXX-1]+co;
+	for (j=NLEN_XXX-1+NLEN_XXX%2;j<DNLEN_XXX-3; )
+	{
+        t=(dchunk)a[NLEN_XXX-1]*a[j-NLEN_XXX+1]; 
+        for (i=j-NLEN_XXX+2; i<(j+1)/2; i++) {t+=(dchunk)a[j-i]*a[i];  }
+        t+=t; t+=co; 
+        c[j]=(chunk)t&BMASK_XXX;
+        co=t>>BASEBITS_XXX;
+		j++;
+        t=(dchunk)a[NLEN_XXX-1]*a[j-NLEN_XXX+1]; 
+        for (i=j-NLEN_XXX+2; i<(j+1)/2; i++) {t+=(dchunk)a[j-i]*a[i];  }
+        t+=t; t+=co; 
+        t+=(dchunk)a[j/2]*a[j/2]; 
+        c[j]=(chunk)t&BMASK_XXX;
+        co=t>>BASEBITS_XXX;
+		j++;
+	}
+
+	t=(dchunk)a[NLEN_XXX-2]*a[NLEN_XXX-1];
+	t+=t; t+=co;
+	c[DNLEN_XXX-3]=(chunk)t&BMASK_XXX;
+    co=t>>BASEBITS_XXX;
+	
+    t=(dchunk)a[NLEN_XXX-1]*a[NLEN_XXX-1]+co; 
     c[DNLEN_XXX-2]=(chunk)t&BMASK_XXX;
     co=t>>BASEBITS_XXX;
     c[DNLEN_XXX-1]=(chunk)co;
+
+
 #endif
 
 #else

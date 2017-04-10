@@ -799,38 +799,40 @@ impl BIG {
         let rb=BASEBITS;
     //    a.norm();
  
-        let mut t=(a.w[0] as DChunk)*(a.w[0] as DChunk);
+
+        let mut t=(a.w[0] as DChunk)*(a.w[0] as DChunk); 
         c.w[0]=(t&rm) as Chunk; let mut co=t>>rb;
-        t=(a.w[1] as DChunk)*(a.w[0] as DChunk); t+=t; t+=co;
-        c.w[1]=(t&rm) as Chunk; co=t>>rb;
-        
-        let last=NLEN-(NLEN%2);
-        let mut j=2;
-        while j<last {
-            t=(a.w[j] as DChunk)*(a.w[0] as DChunk); for i in 1 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk);
+
+        let mut j=1;
+        while j<NLEN-1
+        {
+            t=(a.w[j] as DChunk)*(a.w[0] as DChunk); for  i in 1..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk);} t+=t;  t+=co; 
             c.w[j]=(t&rm) as Chunk; co=t>>rb;
-            t=(a.w[j+1] as DChunk)*(a.w[0] as DChunk); for i in 1 ..(j+2)/2 {t+=(a.w[j+1-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co;
-            c.w[j+1]=(t&rm) as Chunk; co=t>>rb;
-            j+=2;
-        }
-        j=last;
-        if NLEN%2==1 {
-            t=(a.w[j] as DChunk)*(a.w[0] as DChunk); for i in 1 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk);
-            c.w[j]=(t&rm) as Chunk; co=t>>rb; j += 1;
-            t=(a.w[NLEN-1] as DChunk)*(a.w[j-NLEN+1] as DChunk); for i in j-NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk)}; t+=t; t+=co;
-            c.w[j]=(t&rm) as Chunk; co=t>>rb; j += 1;
-        }
-        while j<DNLEN-2 {
-            t=(a.w[NLEN-1] as DChunk)*(a.w[j-NLEN+1] as DChunk); for i in j-NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk);
+            j+=1;
+            t=(a.w[j] as DChunk)*(a.w[0] as DChunk); for  i in 1..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk);} t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk); 
             c.w[j]=(t&rm) as Chunk; co=t>>rb;
-            t=(a.w[NLEN-1] as DChunk)*(a.w[j-NLEN+2] as DChunk); for i in j-NLEN+3 ..(j+2)/2 {t+=(a.w[j+1-i] as DChunk)*(a.w[i] as DChunk)} ; t+=t; t+=co;
-            c.w[j+1]=(t&rm) as Chunk; co=t>>rb;
-            j+=2;
+            j+=1;
         }
-        t=(a.w[NLEN-1] as DChunk)*(a.w[NLEN-1] as DChunk)+co;
+
+        j=NLEN-1+(NLEN%2);
+        while j<DNLEN-3
+        {
+            t=(a.w[NLEN-1] as DChunk)*(a.w[j-NLEN+1] as DChunk); for i in j-NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk);} t+=t; t+=co; 
+            c.w[j]=(t&rm) as Chunk; co=t>>rb;
+            j+=1;
+            t=(a.w[NLEN-1] as DChunk)*(a.w[j-NLEN+1] as DChunk); for i in j-NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk);} t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk); 
+            c.w[j]=(t&rm) as Chunk; co=t>>rb;
+            j+=1;
+        }
+
+        t=(a.w[NLEN-2] as DChunk)*(a.w[NLEN-1] as DChunk);
+        t+=t; t+=co;
+        c.w[DNLEN-3]=(t&rm) as Chunk; co=t>>rb;
+    
+        t=(a.w[NLEN-1] as DChunk)*(a.w[NLEN-1] as DChunk)+co; 
         c.w[DNLEN-2]=(t&rm) as Chunk; co=t>>rb;
         c.w[DNLEN-1]=co as Chunk;
-        
+
         return c;
     }
 

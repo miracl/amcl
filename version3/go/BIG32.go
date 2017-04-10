@@ -78,38 +78,49 @@ func mul(a *BIG,b *BIG) *DBIG {
 
 /* return a^2 as DBIG */
 func sqr(a *BIG) *DBIG {
-	var j int
 	c:=NewDBIG()
 
 	t:=DChunk(a.w[0])*DChunk(a.w[0])
-	c.w[0]=Chunk(t)&BMASK; co:=t>>BASEBITS;
+	c.w[0]=Chunk(t)&BMASK; co:=t>>BASEBITS
 
-	t=DChunk(a.w[1])*DChunk(a.w[0]); t+=t; t+=co 
-	c.w[1]=Chunk(t)&BMASK; co=t>>BASEBITS
 
-	last:=NLEN-(NLEN%2)
-	for j=2;j<last;j+=2 {
-		t=DChunk(a.w[j])*DChunk(a.w[0]); for i:=1;i<(j+1)/2;i++ {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t; t+=co;  t+=DChunk(a.w[j/2])*DChunk(a.w[j/2])
-		c.w[j]=Chunk(t)&BMASK; co=t>>BASEBITS
-		t=DChunk(a.w[j+1])*DChunk(a.w[0]); for i:=1;i<(j+2)/2;i++ {t+=DChunk(a.w[j+1-i])*DChunk(a.w[i])}; t+=t; t+=co 
-		c.w[j+1]=Chunk(t)&BMASK; co=t>>BASEBITS	
-	}
-	j=last;
-	if (NLEN%2)==1 {
-		t=DChunk(a.w[j])*DChunk(a.w[0]); for i:=1;i<(j+1)/2;i++ {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t; t+=co;  t+=DChunk(a.w[j/2])*DChunk(a.w[j/2])
-		c.w[j]=Chunk(t)&BMASK; co=t>>BASEBITS; j+=1
-		t=DChunk(a.w[NLEN-1])*DChunk(a.w[j-NLEN+1]); for i:=j-NLEN+2;i<(j+1)/2;i++ {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t; t+=co 
-		c.w[j]=Chunk(t)&BMASK; co=t>>BASEBITS; j+=1
-	}
-	for ;j<DNLEN-2;j+=2 {
-		t=DChunk(a.w[NLEN-1])*DChunk(a.w[j-NLEN+1]); for i:=j-NLEN+2;i<(j+1)/2;i++ {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t; t+=co; t+=DChunk(a.w[j/2])*DChunk(a.w[j/2])
-		c.w[j]=Chunk(t)&BMASK; co=t>>BASEBITS
-		t=DChunk(a.w[NLEN-1])*DChunk(a.w[j-NLEN+2]); for i:=j-NLEN+3;i<(j+2)/2;i++ {t+=DChunk(a.w[j+1-i])*DChunk(a.w[i])}; t+=t; t+=co
-		c.w[j+1]=Chunk(t)&BMASK; co=t>>BASEBITS
+	for j:=1;j<NLEN-1; {
+		t=DChunk(a.w[j])*DChunk(a.w[0])
+		for i:=1; i<(j+1)/2; i++ {t+=DChunk(a.w[j-i])*DChunk(a.w[i]) }
+		t+=t; t+=co
+		c.w[j]=Chunk(t)&BMASK
+		co=t>>BASEBITS
+		j++
+		t=DChunk(a.w[j])*DChunk(a.w[0]); 
+		for i:=1; i<(j+1)/2; i++ {t+=DChunk(a.w[j-i])*DChunk(a.w[i]) }
+		t+=t; t+=co 
+		t+=DChunk(a.w[j/2])*DChunk(a.w[j/2]); 
+		c.w[j]=Chunk(t)&BMASK;
+		co=t>>BASEBITS; j++
 	}
 
+	for j:=NLEN-1+(NLEN%2);j<DNLEN-3; {
+		t=DChunk(a.w[NLEN-1])*DChunk(a.w[j-NLEN+1]); 
+		for i:=j-NLEN+2; i<(j+1)/2; i++ {t+=DChunk(a.w[j-i])*DChunk(a.w[i]);  }
+		t+=t; t+=co 
+		c.w[j]=Chunk(t)&BMASK;
+		co=t>>BASEBITS; j++
+		t=DChunk(a.w[NLEN-1])*DChunk(a.w[j-NLEN+1]); 
+		for i:=j-NLEN+2; i<(j+1)/2; i++ {t+=DChunk(a.w[j-i])*DChunk(a.w[i]);  }
+		t+=t;  t+=co 
+		t+=DChunk(a.w[j/2])*DChunk(a.w[j/2]); 
+		c.w[j]=Chunk(t)&BMASK;
+		co=t>>BASEBITS; j++
+	}
+
+	t=DChunk(a.w[NLEN-2])*DChunk(a.w[NLEN-1]);
+	t+=t; t+=co
+	c.w[DNLEN-3]=Chunk(t)&BMASK
+	co=t>>BASEBITS
+	
 	t=DChunk(a.w[NLEN-1])*DChunk(a.w[NLEN-1])+co
-	c.w[DNLEN-2]=Chunk(t)&BMASK; co=t>>BASEBITS
+	c.w[DNLEN-2]=Chunk(t)&BMASK;
+	co=t>>BASEBITS
 	c.w[DNLEN-1]=Chunk(co)
 
 	return c

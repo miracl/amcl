@@ -290,36 +290,35 @@ public class BIG {
 		DBIG c=new DBIG(0);
 	//	a.norm();
 
-		t=(long)a.w[0]*a.w[0];
+
+		t=(long)a.w[0]*a.w[0]; 
 		c.w[0]=(int)t&BMASK; co=t>>BASEBITS;
-		t=(long)a.w[1]*a.w[0]; t+=t; t+=co; 
-		c.w[1]=(int)t&BMASK; co=t>>BASEBITS;
 
-		last=NLEN-NLEN%2;
-		for (j=2;j<last;j+=2)
+		for (j=1;j<NLEN-1; )
 		{
-			t=(long)a.w[j]*a.w[0]; for (i=1;i<(j+1)/2;i++) t+=(long)a.w[j-i]*a.w[i]; t+=t; t+=co;  t+=(long)a.w[j/2]*a.w[j/2];
+			t=(long)a.w[j]*a.w[0]; for (i=1; i<(j+1)/2; i++) {t+=(long)a.w[j-i]*a.w[i];} t+=t;  t+=co; 
 			c.w[j]=(int)t&BMASK; co=t>>BASEBITS;
-			t=(long)a.w[j+1]*a.w[0]; for (i=1;i<(j+2)/2;i++) t+=(long)a.w[j+1-i]*a.w[i]; t+=t; t+=co; 
-			c.w[j+1]=(int)t&BMASK; co=t>>BASEBITS;	
-		}
-		j=last;
-		if (NLEN%2==1)
-		{
-			t=(long)a.w[j]*a.w[0]; for (i=1;i<(j+1)/2;i++) t+=(long)a.w[j-i]*a.w[i]; t+=t; t+=co;  t+=(long)a.w[j/2]*a.w[j/2];
-			c.w[j]=(int)t&BMASK; co=t>>BASEBITS; j++;
-			t=(long)a.w[NLEN-1]*a.w[j-NLEN+1]; for (i=j-NLEN+2;i<(j+1)/2;i++) t+=(long)a.w[j-i]*a.w[i]; t+=t; t+=co; 
-			c.w[j]=(int)t&BMASK; co=t>>BASEBITS; j++;
-		}
-		for (;j<DNLEN-2;j+=2)
-		{
-			t=(long)a.w[NLEN-1]*a.w[j-NLEN+1]; for (i=j-NLEN+2;i<(j+1)/2;i++) t+=(long)a.w[j-i]*a.w[i]; t+=t; t+=co; t+=(long)a.w[j/2]*a.w[j/2];
+			j++;
+			t=(long)a.w[j]*a.w[0]; for (i=1; i<(j+1)/2; i++) {t+=(long)a.w[j-i]*a.w[i];} t+=t; t+=co; t+=(long)a.w[j/2]*a.w[j/2]; 
 			c.w[j]=(int)t&BMASK; co=t>>BASEBITS;
-			t=(long)a.w[NLEN-1]*a.w[j-NLEN+2]; for (i=j-NLEN+3;i<(j+2)/2;i++) t+=(long)a.w[j+1-i]*a.w[i]; t+=t; t+=co;
-			c.w[j+1]=(int)t&BMASK; co=t>>BASEBITS;
+			j++;
 		}
 
-		t=(long)a.w[NLEN-1]*a.w[NLEN-1]+co;
+		for (j=NLEN-1+NLEN%2;j<DNLEN-3; )
+		{
+			t=(long)a.w[NLEN-1]*a.w[j-NLEN+1]; for (i=j-NLEN+2; i<(j+1)/2; i++) {t+=(long)a.w[j-i]*a.w[i];} t+=t; t+=co; 
+			c.w[j]=(int)t&BMASK; co=t>>BASEBITS;
+			j++;
+			t=(long)a.w[NLEN-1]*a.w[j-NLEN+1]; for (i=j-NLEN+2; i<(j+1)/2; i++) {t+=(long)a.w[j-i]*a.w[i];} t+=t; t+=co; t+=(long)a.w[j/2]*a.w[j/2]; 
+			c.w[j]=(int)t&BMASK; co=t>>BASEBITS;
+			j++;
+		}
+
+		t=(long)a.w[NLEN-2]*a.w[NLEN-1];
+		t+=t; t+=co;
+		c.w[DNLEN-3]=(int)t&BMASK; co=t>>BASEBITS;
+	
+		t=(long)a.w[NLEN-1]*a.w[NLEN-1]+co; 
 		c.w[DNLEN-2]=(int)t&BMASK; co=t>>BASEBITS;
 		c.w[DNLEN-1]=(int)co;
 

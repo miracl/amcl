@@ -811,39 +811,28 @@ BIG_XXX.sqr=function(a)
 //	a.norm();
 
 	c.w[0]=a.w[0]*a.w[0];
-	t=a.w[1]*a.w[0]; t+=t; c.w[1]=t;
 
-	var last=BIG_XXX.NLEN-BIG_XXX.NLEN%2;
-	for (j=2;j<last;j+=2)
+	for (var j=1;j<BIG_XXX.NLEN-1; )
 	{
-		t=a.w[j]*a.w[0]; for (var i=1;i<(j+1)>>1;i++) t+=a.w[j-i]*a.w[i]; t+=t; t+=a.w[j>>1]*a.w[j>>1];
-		c.w[j]=t;
-		t=a.w[j+1]*a.w[0]; for (var i=1;i<(j+2)>>1;i++) t+=a.w[j+1-i]*a.w[i]; t+=t;
-		c.w[j+1]=t;
-	}	
-	j=last;
-	if (BIG_XXX.NLEN%2==1)
-	{
-		t=a.w[j]*a.w[0]; for (var i=1;i<(j+1)>>1;i++) t+=a.w[j-i]*a.w[i]; t+=t; t+=a.w[j>>1]*a.w[j>>1];
+		t=a.w[j]*a.w[0]; for (var i=1; i<(j+1)>>1; i++) {t+=a.w[j-i]*a.w[i];} t+=t;   
 		c.w[j]=t; j++;
-		t=a.w[BIG_XXX.NLEN-1]*a.w[j-BIG_XXX.NLEN+1]; for (var i=j-BIG_XXX.NLEN+2;i<(j+1)>>1;i++) t+=a.w[j-i]*a.w[i]; t+=t;
+		t=a.w[j]*a.w[0]; for (i=1; i<(j+1)>>1; i++) {t+=a.w[j-i]*a.w[i];} t+=t; t+=a.w[j>>1]*a.w[j>>1]; 
 		c.w[j]=t; j++;
 	}
 
-//	j=BIG_XXX.NLEN;
-//	t=a.w[BIG_XXX.NLEN-1]*a.w[j-BIG_XXX.NLEN+1]; for (var i=j-BIG_XXX.NLEN+2;i<(j+1)>>1;i++) t+=a.w[j-i]*a.w[i]; t+=t; 
-//	c.w[j]=t;
-
-
-	for (;j<BIG_XXX.DNLEN-2;j+=2)
+	for (var j=BIG_XXX.NLEN-1+BIG_XXX.NLEN%2;j<BIG_XXX.DNLEN-3; )
 	{
-		t=a.w[BIG_XXX.NLEN-1]*a.w[j-BIG_XXX.NLEN+1]; for (var i=j-BIG_XXX.NLEN+2;i<(j+1)>>1;i++) t+=a.w[j-i]*a.w[i]; t+=t; t+=a.w[j>>1]*a.w[j>>1];
-		c.w[j]=t;
-		t=a.w[BIG_XXX.NLEN-1]*a.w[j-BIG_XXX.NLEN+2]; for (var i=j-BIG_XXX.NLEN+3;i<(j+2)>>1;i++) t+=a.w[j+1-i]*a.w[i]; t+=t; 
-		c.w[j+1]=t;
+		t=a.w[BIG_XXX.NLEN-1]*a.w[j-BIG_XXX.NLEN+1]; for (var i=j-BIG_XXX.NLEN+2; i<(j+1)>>1; i++) {t+=a.w[j-i]*a.w[i];} t+=t;  
+		c.w[j]=t; j++;
+		t=a.w[BIG_XXX.NLEN-1]*a.w[j-BIG_XXX.NLEN+1]; for (var i=j-BIG_XXX.NLEN+2; i<(j+1)>>1; i++) {t+=a.w[j-i]*a.w[i];} t+=t; t+=a.w[j>>1]*a.w[j>>1]; 
+		c.w[j]=t; j++;
 	}
 
-	t=a.w[BIG_XXX.NLEN-1]*a.w[BIG_XXX.NLEN-1];
+	t=a.w[BIG_XXX.NLEN-2]*a.w[BIG_XXX.NLEN-1];
+	t+=t; 
+	c.w[BIG_XXX.DNLEN-3]=t;
+	
+	t=a.w[BIG_XXX.NLEN-1]*a.w[BIG_XXX.NLEN-1]; 
 	c.w[BIG_XXX.DNLEN-2]=t;
 
 	var co=0;
@@ -854,6 +843,7 @@ BIG_XXX.sqr=function(a)
 		co=(n-c.w[i])*BIG_XXX.MODINV;
 	}
 	c.w[BIG_XXX.DNLEN-1]=co;
+
 	return c;
 };
 

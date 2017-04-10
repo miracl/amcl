@@ -877,6 +877,45 @@ final public class BIG{
         let RB:DChunk=DChunk(BIG.BASEBITS)
    //     a.norm();
  
+
+
+
+        t=DChunk(a.w[0])*DChunk(a.w[0])
+        c.w[0]=Chunk(t&RM); co=t>>RB
+        var j:Int
+        j=1
+        while j<BIG.NLEN-1
+        {
+            t=DChunk(a.w[j])*DChunk(a.w[0]); for  i in 1 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t;  t+=co 
+            c.w[j]=Chunk(t&RM); co=t>>RB
+            j+=1
+            t=DChunk(a.w[j])*DChunk(a.w[0]); for  i in 1 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t; t+=co; t+=DChunk(a.w[j/2])*DChunk(a.w[j/2]) 
+            c.w[j]=Chunk(t&RM); co=t>>RB
+            j+=1
+        }
+
+        j=BIG.NLEN-1+(BIG.NLEN%2)
+        while j<BIG.DNLEN-3
+        {
+            t=DChunk(a.w[BIG.NLEN-1])*DChunk(a.w[j-BIG.NLEN+1]); for i in j-BIG.NLEN+2 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t; t+=co 
+            c.w[j]=Chunk(t&RM); co=t>>RB
+            j+=1;
+            t=DChunk(a.w[BIG.NLEN-1])*DChunk(a.w[j-BIG.NLEN+1]); for i in j-BIG.NLEN+2 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t; t+=co; t+=DChunk(a.w[j/2])*DChunk(a.w[j/2]) 
+            c.w[j]=Chunk(t&RM); co=t>>RB
+            j+=1;
+        }
+
+        t=DChunk(a.w[BIG.NLEN-2])*DChunk(a.w[BIG.NLEN-1])
+        t+=t; t+=co;
+        c.w[BIG.DNLEN-3]=Chunk(t&RM); co=t>>RB
+    
+        t=DChunk(a.w[BIG.NLEN-1])*DChunk(a.w[BIG.NLEN-1])+co
+        c.w[BIG.DNLEN-2]=Chunk(t&RM); co=t>>RB
+        c.w[BIG.DNLEN-1]=Chunk(co)
+
+
+/*
+
         t=DChunk(a.w[0])*DChunk(a.w[0])
         c.w[0]=Chunk(t&RM); co=t>>RB
         t=DChunk(a.w[1])*DChunk(a.w[0]); t+=t; t+=co
@@ -913,7 +952,7 @@ final public class BIG{
         t=DChunk(a.w[BIG.NLEN-1])*DChunk(a.w[BIG.NLEN-1])+co
         c.w[BIG.DNLEN-2]=Chunk(t&RM); co=t>>RB
         c.w[BIG.DNLEN-1]=Chunk(co)
-    
+*/    
         return c;
     }
     static func monty(_ md:BIG,_ mc:Chunk,_ d:DBIG) -> BIG
