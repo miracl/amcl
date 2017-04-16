@@ -1,0 +1,31 @@
+In Pairing-Based Cryptography the time critical function is the modular
+multiplication (in fact modular squarings are rare).
+
+Therefore it makes sense to use a highly optimized modular multiplication
+function. Some advantage comes from "fusing" the multiplication with
+the modular reduction and unrolling the loops.
+
+For example if using 256-bit BIGs with a BN254 curve, replace XXX with 256 
+and YYY with BN254 in this file and in fastest_YYY.c
+
+Then compile and execute the program fastest_YYY.c like this (using MinGW
+port of GCC as an example), in the same directory as arch.h and fp_BN254.h
+
+gcc -O2 -std=c99 fastest_YYY.c -o fastest_YYY.exe
+fastest_YYY > t.txt
+
+Now extract the code fragment from t.txt and insert it where indicated
+into fp_BN254.c (look for FUSED_MODMUL)
+
+Finally make sure that
+
+#define FUSED_MODMUL
+
+appears somewhere in fp_YYY.h
+
+Finally compile and replace the fp_BN254 module in the library, and maybe 
+get a 50% speed-up! If there is no significant improvement, don't use this 
+method!
+
+NOTE: This method is experimental. It might impact on numerical stability
+(although we have checked it with all supported pairing-friendly curves).

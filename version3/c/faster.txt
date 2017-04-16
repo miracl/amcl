@@ -14,7 +14,7 @@ gcc -O2 -std=c99 faster_XXX.c -o faster_XXX.exe
 faster_XXX > t.txt
 
 Now extract the code fragments from t.txt and insert them where indicated
-into big_XXX.c
+into big_XXX.c (look for UNWOUND)
 
 Finally make sure that
 

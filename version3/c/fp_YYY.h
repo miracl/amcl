@@ -18,7 +18,7 @@ extern const chunk MConst_YYY; /**< Montgomery only - 1/p mod 2^BASEBITS */
 /* catch field excesses */
 #define EXCESS_YYY(a) ((a[NLEN_XXX-1]&OMASK_YYY)>>(TBITS_YYY)) /**< Field Excess */
 
-
+//#define FUSED_MODMUL
 
 /* FP prototypes */
 

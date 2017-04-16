@@ -37,15 +37,11 @@ under the License.
 /* Converts from BIG integer to n-residue form mod Modulus */
 void FP_YYY_nres(BIG_XXX a)
 {
-    BIG_XXX tmp;
-    BIG_XXX_rcopy(tmp,a);
 }
 
 /* Converts from n-residue form back to BIG integer form */
 void FP_YYY_redc(BIG_XXX a)
 {
-    BIG_XXX tmp;
-    BIG_XXX_rcopy(tmp,a);
 }
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
@@ -89,15 +85,11 @@ void FP_YYY_mod(BIG_XXX r,DBIG_XXX d)
 /* Converts from BIG integer to n-residue form mod Modulus */
 void FP_YYY_nres(BIG_XXX a)
 {
-    BIG_XXX tmp;
-    BIG_XXX_rcopy(tmp,a);
 }
 
 /* Converts from n-residue form back to BIG integer form */
 void FP_YYY_redc(BIG_XXX a)
 {
-    BIG_XXX tmp;
-    BIG_XXX_rcopy(tmp,a);
 }
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
@@ -128,7 +120,6 @@ void FP_YYY_mod(BIG_XXX r,DBIG_XXX d)
 
     r[224/BASEBITS_XXX]+=carry<<(224%BASEBITS_XXX); /* need to check that this falls mid-word */
     BIG_XXX_norm(r);
-
 }
 
 #endif
@@ -236,6 +227,12 @@ int tadd=0,radd=0,tneg=0,rneg=0;
 int tdadd=0,rdadd=0,tdneg=0,rdneg=0;
 #endif
 
+#ifdef FUSED_MODMUL
+
+/* Insert fastest code here */
+
+#endif
+
 /* r=a*b mod Modulus */
 /* product must be less that p.R - and we need to know this in advance! */
 /* SU= 88 */
@@ -267,9 +264,14 @@ void FP_YYY_mul(BIG_XXX r,BIG_XXX a,BIG_XXX b)
     }
 #endif
 
+#ifdef FUSED_MODMUL
+	FP_YYY_modmul(r,a,b);
+#else
     BIG_XXX_mul(d,a,b);
     FP_YYY_mod(r,d);
+#endif
 }
+
 
 /* multiplication by an integer, r=a*c */
 /* SU= 136 */
