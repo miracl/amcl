@@ -300,12 +300,12 @@ while ptr<max:
 		curveset("384","BLS383","BLS383","48","23","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
 		pfcurve_selected=True
 
-# rsaset(big,ring,big_length_bytes,16_bit_bits_in_base,32_bit_bits_in_base,64_bit_bits_in_base,multiplier)
+# rsaset(big,ring,big_length_bytes,bits_in_base,multiplier)
 # for each choice give distinct names for "big" and "ring".
 # Typically "big" is the length in bits of the underlying big number type
 # "ring" is the RSA modulus size = "big" times 2^m
 # big_length_bytes is "big" divided by 8
-# Next give the number base used for 16/32/64 bit architectures, as n where the base is 2^n
+# Next give the number base as n where the base is 2^n (run check.cpp)
 # multiplier is 2^m (see above)
 
 # There are choices here, different ways of getting the same result, but some faster than others

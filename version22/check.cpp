@@ -34,7 +34,7 @@ Miracl precision=20;
 
 int main(int argc, char *argv[])
 {
-	int p,w,b,n,s,t,e;
+	int p,w,b,n,s,t,e,ex;
 	Big lhs,rhs;
 
 	argc--; argv++;
@@ -61,26 +61,38 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	rhs=pow((Big)2,2*n-1);
 	e=3;            // need at least 3 bits to allow adds and subtracts without normalisation
-	if (n==26) e=1; // not an issue for Javascript
+	if (n==26)
+	{
+		rhs*=2;	// no sign bit to worry about in Javascript
+		e=1;	// not an issue for Javascript
+	}
+
 	for (b=n-e;b>=n-8;b--)
 	{
 		if (n==64 && b%2!=0) continue; // insist on even values for 64-bit builds 
 		w=p/b; if (p%b!=0) w++;
 		s=w*b-p;
 
-		lhs=(w+1)*(pow((Big)2,2*b)-pow((Big)2,b+1)+1);
-		rhs=pow((Big)2,2*n-1);
+		lhs=(w+2)*pow((Big)2,2*b);  // sum of products plus carry plus one for redc
 
 		if (lhs>=rhs)    {printf("Stability violation for BASEBITS= %d\n",b); continue;}
+		ex=1;		
+		while (lhs<rhs)
+		{
+			ex*=2; lhs*=2;
+		}
+		ex/=2;
+
 
 // Top bits of Modulus must appear in top word of representation. Also at least 4 bits spare needed for field excess.  
 		if (s<4 || s>=b) {printf("Not enough Fp spare for BASEBITS= %d\n",b); continue;}
 // At least 2 spare bits needed for FF excess 
 		t=b*(1+(p-1)/b) - 8*(1+(p-1)/8);
-		if (t<2 || t>=b) {printf("Not enough FF spare for BASEBITS= %d\n",b); continue;}
+		if (t<2 || t>=b) {printf("Not enough FF spare for BASEBITS= %d\n",b);}
 
-		printf("Solution for BASEBITS= %d, Words Per Big=%d, Fp spare bits= %d, FF spare bits= %d\n",b,w,s,t);
+		printf("Solution for BASEBITS= %d, Words Per Big=%d, Fp spare bits= %d, FF spare bits= %d (%d)\n",b,w,s,t,ex);
 		//break;
 	}
 	
