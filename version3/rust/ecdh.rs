@@ -311,7 +311,7 @@ pub fn cbc_iv0_decrypt(k: &[u8],c: &[u8]) -> Option<Vec<u8>> { /* padding is rem
 pub fn key_pair_generate(rng: Option<&mut RAND>,s: &mut [u8],w: &mut [u8]) -> isize {
 	let res=0;
 	let mut sc:BIG;
-	let mut G:ECP;
+	let G:ECP;
 
 	let gx=BIG::new_ints(&rom::CURVE_GX);
 	
@@ -354,7 +354,7 @@ pub fn public_key_validate(w: &[u8]) -> isize {
 	if WP.is_infinity() {res=INVALID_PUBLIC_KEY}
 	if res==0  {
 
-		let mut q=BIG::new_ints(&rom::MODULUS);
+		let q=BIG::new_ints(&rom::MODULUS);
 		let nb=q.nbits();
 		let mut k=BIG::new(); k.one(); k.shl((nb+4)/2);
 		k.add(&q);
@@ -483,7 +483,7 @@ pub fn ecpvp_dsa(sha: usize,w: &[u8],f: &[u8],c: &[u8],d: &[u8]) -> isize {
 		fb.copy(&tb);
 		let h2=BIG::modmul(&mut cb,&mut db,&r);
 
-		let mut WP=ECP::frombytes(&w);
+		let WP=ECP::frombytes(&w);
 		if WP.is_infinity() {
 			res=ERROR;
 		} else {

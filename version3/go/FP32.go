@@ -218,8 +218,8 @@ func (F *FP) cmove(b *FP,d int) {
 /* this*=b mod Modulus */
 func (F *FP) mul(b *FP) {
 
-	F.norm()
-	b.norm()
+//	F.norm()
+//	b.norm()
 	if pexceed(F.x,b.x) {F.reduce()}
 	d:=mul(F.x,b.x)
 	F.x.copy(mod(d))
@@ -229,8 +229,8 @@ func (F *FP) mul(b *FP) {
 func (F *FP) neg() {
 	p:=NewBIGints(Modulus)
 	m:=NewBIGcopy(p)
-	F.norm()
-	sb:=logb2(uint32(EXCESS(F.x)))
+//	F.norm()
+	sb:=logb2(uint32(EXCESS(F.x)+1))
 
 //	ov:=EXCESS(F.x); 
 //	sb:=uint(1); for ov!=0 {sb++;ov>>=1} 
@@ -244,15 +244,16 @@ func (F *FP) neg() {
 
 /* this*=c mod Modulus, where c is a small int */
 func (F *FP) imul(c int) {
-	F.norm()
+//	F.norm()
 	s:=false
 	if (c<0) {
 		c=-c
 		s=true
 	}
 	afx:=(EXCESS(F.x)+1)*(Chunk(c)+1)+1;
-	if (c<NEXCESS && afx<FEXCESS) {
-		F.x.imul(c);
+	if (c<=NEXCESS && afx<FEXCESS) {
+		F.x.imul(c)
+		F.x.norm()
 	} else {
 		if (afx<FEXCESS) {
 			F.x.pmul(c)
@@ -262,13 +263,12 @@ func (F *FP) imul(c int) {
 			F.x.copy(d.mod(p))
 		}
 	}
-	if s {F.neg()}
-	F.norm()
+	if s {F.neg(); F.norm()}
 }
 
 /* this*=this mod Modulus */
 func (F *FP) sqr() {
-	F.norm();
+//	F.norm();
 	if sexceed(F.x) {F.reduce()}
 	d:=sqr(F.x)	
 	F.x.copy(mod(d))
@@ -289,7 +289,7 @@ func (F *FP) sub(b *FP) {
 
 /* this/=2 mod Modulus */
 func (F *FP) div2() {
-	F.x.norm()
+//	F.x.norm()
 	if (F.x.parity()==0) {
 		F.x.fshr(1)
 	} else {

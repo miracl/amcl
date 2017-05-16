@@ -35,7 +35,7 @@ public class BIG {
 
 	public static final int HBITS=BASEBITS/2;
 	public static final long HMASK=(((long)1<<HBITS)-1);
-	public static final int NEXCESS =((int)1<<(CHUNK-BASEBITS-1));
+	public static final int NEXCESS = ((int)1<<(CHUNK-BASEBITS-1));
 	public static final int BIGBITS=(MODBYTES*8);
 
 
@@ -229,7 +229,7 @@ public class BIG {
 	{
 		long ak,carry=0;
 		long[] cr=new long[2];
-		norm();
+//		norm();
 		for (int i=0;i<NLEN;i++)
 		{
 			ak=w[i];
@@ -294,6 +294,17 @@ public class BIG {
 		return c;
 	}
 
+/*
+	public boolean isok()
+	{
+		boolean ok=true;
+		for (int i=0;i<NLEN;i++)
+		{
+			if ((w[i]>>BASEBITS)!=0) ok=false;
+		}
+		return ok;
+	}
+*/
 /* return a*b as DBIG */
 	public static DBIG mul(BIG a,BIG b)
 	{
@@ -302,6 +313,8 @@ public class BIG {
 		long[] cr=new long[2];
 //		a.norm();
 //		b.norm();
+
+//	if (!a.isok() || !b.isok()) System.out.println("Problem in mul");
 
 		for (int i=0;i<NLEN;i++)
 		{
@@ -326,6 +339,10 @@ public class BIG {
 		long carry;
 		long[] cr=new long[2];
 	//	a.norm();
+
+//	if (!a.isok()) System.out.println("Problem in sqr");
+
+
 		for (int i=0;i<NLEN;i++)
 		{
 			carry=0;
@@ -497,7 +514,7 @@ public class BIG {
 	public BIG plus(BIG x) {
 		BIG s=new BIG(0);
 		for (int i=0;i<NLEN;i++)
-			s.w[i]=w[i]+x.w[i];	
+			s.w[i]=w[i]+x.w[i];
 		return s;
 	}
 
@@ -648,13 +665,16 @@ public class BIG {
 
 		for (i=8;i<BIGBITS;i<<=1)
 		{
+	U.norm();
 			b.copy(this); b.mod2m(i);
 			BIG t1=BIG.smul(U,b); 
 			t1.shr(i);
 
 			c.copy(this); c.shr(i); c.mod2m(i);
 			BIG t2=BIG.smul(U,c); t2.mod2m(i);
+
 			t1.add(t2);
+	t1.norm();
 			b=BIG.smul(t1,U); t1.copy(b);
 			t1.mod2m(i);
 

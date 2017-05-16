@@ -124,21 +124,22 @@ FP4_YYY.prototype={
 		var t=new FP2_YYY(0);
 		m.add(this.b);
 		m.neg();
-		m.norm();
+	//	m.norm();
 		t.copy(m); t.add(this.b);
 		this.b.copy(m);
 		this.b.add(this.a);
 		this.a.copy(t);
+		this.norm();
 	},
 /* this=conjugate(this) */
 	conj: function()
 	{
-		this.b.neg(); this.b.norm();
+		this.b.neg(); this.norm();
 	},
 /* this=-conjugate(this) */
 	nconj: function()
 	{
-		this.a.neg(); this.a.norm();
+		this.a.neg(); this.norm();
 	},
 /* this+=x */
 	add: function(x)
@@ -168,17 +169,17 @@ FP4_YYY.prototype={
 /* this*=this */
 	sqr: function()
 	{
-		this.norm();
+//		this.norm();
 
 		var t1=new FP2_YYY(this.a); //t1.copy(this.a);
 		var t2=new FP2_YYY(this.b); //t2.copy(this.b);
 		var t3=new FP2_YYY(this.a); //t3.copy(this.a);
 
 		t3.mul(this.b);
-		t1.add(this.b);
+		t1.add(this.b); t1.norm();
 		t2.mul_ip();
 
-		t2.add(this.a);
+		t2.add(this.a); t2.norm();
 		this.a.copy(t1);
 
 		this.a.mul(t2);
@@ -186,6 +187,7 @@ FP4_YYY.prototype={
 		t2.copy(t3);
 		t2.mul_ip();
 		t2.add(t3);
+//		t2.norm();  // ??
 
 		t2.neg();
 
@@ -199,7 +201,7 @@ FP4_YYY.prototype={
 /* this*=y */
 	mul: function(y)
 	{
-		this.norm();
+//		this.norm();
 
 		var t1=new FP2_YYY(this.a); //t1.copy(this.a);
 		var t2=new FP2_YYY(this.b); //t2.copy(this.b);
@@ -212,11 +214,23 @@ FP4_YYY.prototype={
 		t3.add(y.a);
 		t4.add(this.a);
 
-		t4.mul(t3);
-		t4.sub(t1);
+		t3.norm();
+		t4.norm();
 
+		t4.mul(t3);
+
+		t3.copy(t1);
+		t3.neg();
+		t4.add(t3);
+//		t4.norm(); // ??
+
+		// t4.sub(t1);
+
+		t3.copy(t2);
+		t3.neg();
 		this.b.copy(t4);
-		this.b.sub(t2);
+		this.b.add(t3);
+
 		t2.mul_ip();
 		this.a.copy(t2);
 		this.a.add(t1);
@@ -238,11 +252,11 @@ FP4_YYY.prototype={
 
 		t1.sqr();
 		t2.sqr();
-		t2.mul_ip();
+		t2.mul_ip(); t2.norm() // ??
 		t1.sub(t2);
 		t1.inverse();
 		this.a.mul(t1);
-		t1.neg();
+		t1.neg(); t1.norm();
 		this.b.mul(t1);
 	},
 
@@ -255,6 +269,7 @@ FP4_YYY.prototype={
 		t.add(s);
 		this.b.copy(this.a);
 		this.a.copy(t);
+		this.norm();
 	},
 
 /* this=this^q using Frobenius, where q is Modulus */
@@ -290,9 +305,10 @@ FP4_YYY.prototype={
 	{
 		var r=new FP4_YYY(w); //r.copy(w);
 		var t=new FP4_YYY(w); //t.copy(w);
-		r.sub(y);
+		//y.norm(); // ??
+		r.sub(y); r.norm();
 		r.pmul(this.a);
-		t.add(y);
+		t.add(y); t.norm();
 		t.pmul(this.b);
 		t.times_i();
 
@@ -300,14 +316,14 @@ FP4_YYY.prototype={
 		this.add(t);
 		this.add(z);
 
-		this.norm();
+		this.reduce();
 	},
 /* XTR xtr_d function */
 	xtr_D: function() 
 	{
 		var w=new FP4_YYY(this); //w.copy(this);
 		this.sqr(); w.conj();
-		w.add(w);
+		w.add(w); //w.norm(); // ??
 		this.sub(w);
 		this.reduce();
 	},

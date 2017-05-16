@@ -378,6 +378,7 @@ final public class FF {
     {
         if (n==1)
         {
+            x.v[xp].norm(); y.v[yp].norm()
             let d=BIG.mul(x.v[xp],y.v[yp])
             v[vp+1]=d.split(8*BIG.MODBYTES)
             v[vp].copy(d)
@@ -402,6 +403,7 @@ final public class FF {
     {
         if (n==1)
         {
+            x.v[xp].norm()
             let d=BIG.sqr(x.v[xp])
             v[vp+1].copy(d.split(8*BIG.MODBYTES))
             v[vp].copy(d);

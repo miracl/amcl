@@ -125,7 +125,7 @@ final public class ECP2 {
     func neg()
     {
         if is_infinity() {return}
-        y.neg(); y.norm()
+        y.norm(); y.neg(); y.norm()
         return
     }
     /* set to Affine - (x,y,z) to (x,y) */
@@ -293,12 +293,12 @@ final public class ECP2 {
         z.mul(y)
         z.add(z)
     
-        w2.add(w2)
+        w2.add(w2); w2.norm()
         w2.sqr()
         w2.add(w2)
-        w3.sub(x)
+        w3.sub(x); w2.norm(); w3.norm()
         y.copy(w8); y.mul(w3)
-        w2.norm()
+    
         y.sub(w2)
         y.norm()
         z.norm()
@@ -368,14 +368,14 @@ final public class ECP2 {
         A.mul(e)
     
         e.copy(A)
-        e.add(A); e.add(B)
-        x.copy(D); x.sqr(); x.sub(e)
+        e.add(A); e.add(B); e.norm(); D.norm()
+        x.copy(D); x.sqr(); x.sub(e); x.norm()
     
-        A.sub(x)
+        A.sub(x); A.norm()
         y.copy(A); y.mul(D)
         C.mul(B); y.sub(C)
     
-        x.norm()
+    //    x.norm()
         y.norm()
         z.norm()
     

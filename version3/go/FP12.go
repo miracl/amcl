@@ -169,13 +169,13 @@ func (F *FP12)  sqr() {
 
 	A.sqr()
 	B.mul(F.c)
-	B.add(B)
+	B.add(B); B.norm()
 	C.sqr()
 	D.mul(F.b)
 	D.add(D)
 
 	F.c.add(F.a)
-	F.c.add(F.b)
+	F.c.add(F.b); F.c.norm()
 	F.c.sqr()
 
 	F.a.copy(A)
@@ -209,42 +209,38 @@ func (F *FP12) mul(y *FP12) {
 	z0.mul(y.a)
 	z2.mul(y.b)
 
-	t0.add(F.b)
-	t1.add(y.b)
+	t0.add(F.b); t0.norm()
+	t1.add(y.b); t1.norm() 
 
 	z1.copy(t0); z1.mul(t1)
-	t0.copy(F.b); t0.add(F.c)
+	t0.copy(F.b); t0.add(F.c); t0.norm()
 
-	t1.copy(y.b); t1.add(y.c)
+	t1.copy(y.b); t1.add(y.c); t1.norm()
 	z3.copy(t0); z3.mul(t1)
 
 	t0.copy(z0); t0.neg()
 	t1.copy(z2); t1.neg()
 
 	z1.add(t0)
-	z1.norm();
+	//z1.norm();
 	F.b.copy(z1); F.b.add(t1)
 
 	z3.add(t1)
 	z2.add(t0)
 
-	t0.copy(F.a); t0.add(F.c)
-	t1.copy(y.a); t1.add(y.c)
+	t0.copy(F.a); t0.add(F.c); t0.norm()
+	t1.copy(y.a); t1.add(y.c); t1.norm()
 	t0.mul(t1)
 	z2.add(t0)
 
 	t0.copy(F.c); t0.mul(y.c)
 	t1.copy(t0); t1.neg()
 
-	z2.norm();
-	z3.norm();
-	F.b.norm();
-
 	F.c.copy(z2); F.c.add(t1)
 	z3.add(t1)
 	t0.times_i()
 	F.b.add(t0)
-
+	z3.norm()
 	z3.times_i()
 	F.a.copy(z0); F.a.add(z3)
 	F.norm()
@@ -263,21 +259,22 @@ func (F *FP12) smul(y *FP12) {
 	F.b.add(F.a)
 	t1.real().add(y.b.real())
 
+	t1.norm(); F.b.norm()
 	F.b.mul(t1)
-	z3.add(F.c);
+	z3.add(F.c); z3.norm()
 	z3.pmul(y.b.real())
 
 	t0.copy(z0); t0.neg()
 	t1.copy(z2); t1.neg()
 
 	F.b.add(t0)
-	F.b.norm();
+	//F.b.norm();
 
 	F.b.add(t1)
-	z3.add(t1)
+	z3.add(t1); z3.norm()
 	z2.add(t0)
 
-	t0.copy(F.a); t0.add(F.c)
+	t0.copy(F.a); t0.add(F.c); t0.norm()
 	t0.mul(y.a)
 	F.c.copy(z2); F.c.add(t0)
 
@@ -298,16 +295,16 @@ func (F *FP12) inverse() {
 	f0.sqr()
 	f1.mul(F.c)
 	f1.times_i()
-	f0.sub(f1)
+	f0.sub(f1); f0.norm()
 
 	f1.copy(F.c); f1.sqr()
 	f1.times_i()
 	f2.mul(F.b)
-	f1.sub(f2)
+	f1.sub(f2); f1.norm()
 
 	f2.copy(F.b); f2.sqr()
 	f3.copy(F.a); f3.mul(F.c)
-	f2.sub(f3)
+	f2.sub(f3); f2.norm()
 
 	f3.copy(F.b); f3.mul(f2)
 	f3.times_i()
@@ -316,7 +313,7 @@ func (F *FP12) inverse() {
 	F.c.mul(f1)
 	F.c.times_i()
 
-	f3.add(F.c)
+	f3.add(F.c); f3.norm()
 	f3.inverse()
 	F.a.copy(f0); F.a.mul(f3)
 	F.b.copy(f1); F.b.mul(f3)

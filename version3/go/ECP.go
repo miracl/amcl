@@ -246,7 +246,7 @@ func RHS(x *FP) *FP {
 		b.mul(r)
 		b.sub(one)
 		if CURVE_A==-1 {r.neg()}
-		r.sub(one)
+		r.sub(one); r.norm()
 		b.inverse()
 		r.mul(b)
 	}
@@ -381,7 +381,7 @@ func (E *ECP) dbl() {
 			w3.add(w1)
 
 			w8.add(w6)
-
+			w3.norm(); w8.norm()
 			w3.mul(w8)
 			w8.copy(w3)
 			w8.imul(3)
@@ -393,9 +393,9 @@ func (E *ECP) dbl() {
 
 		w2.copy(E.y); w2.sqr()
 		w3.copy(E.x); w3.mul(w2)
-		w3.imul(4)
+		w3.imul(4); //w3.norm()
 		w1.copy(w3); w1.neg()
-	//		w1.norm();
+		w1.norm(); //w8.norm()
 
 
 		E.x.copy(w8); E.x.sqr()
@@ -407,10 +407,10 @@ func (E *ECP) dbl() {
 		E.z.mul(E.y)
 		E.z.add(E.z)
 
-		w2.add(w2)
+		w2.add(w2); w2.norm()
 		w2.sqr()
 		w2.add(w2)
-		w3.sub(E.x)
+		w3.sub(E.x); w3.norm()
 		E.y.copy(w8); E.y.mul(w3);
 	//		w2.norm();
 		E.y.sub(w2)
@@ -426,23 +426,23 @@ func (E *ECP) dbl() {
 		H:=NewFPcopy(E.z)
 		J:=NewFPint(0)
 	
-		E.x.mul(E.y); E.x.add(E.x)
+		E.x.mul(E.y); E.x.add(E.x); E.x.norm()
 		C.sqr()
 		D.sqr()
 		if CURVE_A==-1 {C.neg()}	
-		E.y.copy(C); E.y.add(D)
+		E.y.copy(C); E.y.add(D); E.y.norm()
 	//		y.norm();
 		H.sqr(); H.add(H)
 		E.z.copy(E.y)
-		J.copy(E.y); J.sub(H)
+		J.copy(E.y); J.sub(H); J.norm()
 		E.x.mul(J)
-		C.sub(D)
+		C.sub(D); C.norm()
 		E.y.mul(C)
 		E.z.mul(J)
 
-		E.x.norm()
-		E.y.norm()
-		E.z.norm()
+	//	E.x.norm()
+	//	E.y.norm()
+	//	E.z.norm()
 	}
 	if CURVETYPE==MONTGOMERY {
 		A:=NewFPcopy(E.x)
@@ -453,23 +453,23 @@ func (E *ECP) dbl() {
 	
 		if E.INF {return}
 
-		A.add(E.z)
+		A.add(E.z); A.norm()
 		AA.copy(A); AA.sqr()
-		B.sub(E.z)
+		B.sub(E.z); B.norm()
 		BB.copy(B); BB.sqr()
 		C.copy(AA); C.sub(BB)
-	//		C.norm();
+		C.norm()
 
 		E.x.copy(AA); E.x.mul(BB)
 
 		A.copy(C); A.imul((CURVE_A+2)/4)
 
-		BB.add(A)
+		BB.add(A); BB.norm()
 		E.z.copy(BB); E.z.mul(C)
 	//		x.reduce();
 	//		z.reduce();
-		E.x.norm()
-		E.z.norm()
+	//	E.x.norm()
+	//	E.z.norm()
 	}
 	return;
 }
@@ -530,9 +530,10 @@ func (E *ECP) add(Q *ECP) {
 
 		e.copy(A)
 		e.add(A); e.add(B)
+		D.norm(); e.norm()
 		E.x.copy(D); E.x.sqr(); E.x.sub(e);
 
-		A.sub(E.x);
+		A.sub(E.x); A.norm()
 		E.y.copy(A); E.y.mul(D)
 		C.mul(B); E.y.sub(C)
 
@@ -541,7 +542,7 @@ func (E *ECP) add(Q *ECP) {
 		//	z.reduce();
 		E.x.norm()
 		E.y.norm()
-		E.z.norm()
+	//	E.z.norm()
 	}
 	if CURVETYPE==EDWARDS {
 		b:=NewFPbig(NewBIGints(CURVE_B))
@@ -571,21 +572,23 @@ func (E *ECP) add(Q *ECP) {
 
 		B.copy(E.x); B.add(E.y)
 		D.copy(Q.x); D.add(Q.y)
+		B.norm(); D.norm()
 		B.mul(D)
 		B.sub(C)
+		B.norm(); F.norm()
 		B.mul(F)
 		E.x.copy(A); E.x.mul(B)
-
+		G.norm()
 		if CURVE_A==1 {
-			C.copy(EE); C.mul(G)
+			EE.norm(); C.copy(EE); C.mul(G)
 		}
 		if CURVE_A==-1 {
-			C.mul(G)
+			C.norm(); C.mul(G)
 		}
 		E.y.copy(A); E.y.mul(C)
 		E.z.copy(F); E.z.mul(G)
 		//	x.reduce(); y.reduce(); z.reduce();
-		E.x.norm(); E.y.norm(); E.z.norm()
+	//	E.x.norm(); E.y.norm(); E.z.norm()
 	}
 	return
 }
@@ -604,12 +607,15 @@ func (E *ECP) dadd(Q *ECP,W *ECP) {
 
 	C.add(Q.z)
 	D.sub(Q.z)
+	A.norm(); D.norm()
 
 	DA.copy(D); DA.mul(A)
+	C.norm(); B.norm()
+
 	CB.copy(C); CB.mul(B)
 
-	A.copy(DA); A.add(CB); A.sqr()
-	B.copy(DA); B.sub(CB); B.sqr()
+	A.copy(DA); A.add(CB); A.norm(); A.sqr()
+	B.copy(DA); B.sub(CB); B.norm(); B.sqr()
 
 	E.x.copy(A)
 	E.z.copy(W.x); E.z.mul(B)
@@ -619,7 +625,7 @@ func (E *ECP) dadd(Q *ECP,W *ECP) {
 	} else {E.INF=false;}
 
 	//	x.reduce();
-	E.x.norm();
+//	E.x.norm();
 }
 
 /* this-=Q */

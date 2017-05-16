@@ -141,13 +141,13 @@ impl FP2 {
 
 /* negate self mod Modulus */
 	pub fn neg(&mut self) {
-		self.norm();
+	//	self.norm();
 		let mut m=FP::new_copy(&self.a);
 		let mut t=FP::new();
 
 		m.add(&self.b);
 		m.neg();
-		m.norm();
+	//	m.norm();
 		t.copy(&m); t.add(&self.b);
 		self.b.copy(&m);
 		self.b.add(&self.a);
@@ -157,6 +157,7 @@ impl FP2 {
 /* set to a-ib */
 	pub fn conj(&mut self) {
 		self.b.neg();
+		self.b.norm();
 	}
 
 /* self+=a */
@@ -178,7 +179,7 @@ impl FP2 {
 	}
 
 /* self*=s, where s is an FP */
-	pub fn pmul(&mut self,s:&mut FP) {
+	pub fn pmul(&mut self,s:&FP) {
 		self.a.mul(s);
 		self.b.mul(s);
 	}
@@ -191,36 +192,43 @@ impl FP2 {
 
 /* self*=self */
 	pub fn sqr(&mut self) {
-		self.norm();
+	//	self.norm();
 		let mut w1=FP::new_copy(&self.a);
 		let mut w3=FP::new_copy(&self.a);
 		let mut mb=FP::new_copy(&self.b);
 
-		w3.mul(&mut self.b);
+		w3.mul(&self.b);
 		w1.add(&self.b);
 		mb.neg();
 		self.a.add(&mb);
-		self.a.mul(&mut w1);
+
+		w1.norm();
+		self.a.norm();
+
+		self.a.mul(&w1);
 		self.b.copy(&w3); self.b.add(&w3);
 
-		self.norm();
+		self.b.norm();
 	}	
 
 /* this*=y */
-	pub fn mul(&mut self,y :&mut FP2) {
-		self.norm();  /* This is needed here as {a,b} is not normed before additions */
+	pub fn mul(&mut self,y :&FP2) {
+	//	self.norm();  
 
 		let mut w1=FP::new_copy(&self.a);
 		let mut w2=FP::new_copy(&self.b);
 		let mut w5=FP::new_copy(&self.a);
 		let mut mw=FP::new();
 
-		w1.mul(&mut y.a);  // w1=a*y.a  - this norms w1 and y.a, NOT a
-		w2.mul(&mut y.b);  // w2=b*y.b  - this norms w2 and y.b, NOT b
+		w1.mul(&y.a);  // w1=a*y.a  - this norms w1 and y.a, NOT a
+		w2.mul(&y.b);  // w2=b*y.b  - this norms w2 and y.b, NOT b
 		w5.add(&self.b);    // w5=a+b
 		self.b.copy(&y.a); self.b.add(&y.b); // b=y.a+y.b
 
-		self.b.mul(&mut w5);
+		self.b.norm();
+		w5.norm();
+
+		self.b.mul(&w5);
 		mw.copy(&w1); mw.add(&w2); mw.neg();
 
 		self.b.add(&mw); mw.add(&w1);
@@ -238,16 +246,16 @@ impl FP2 {
 		w1.sqr(); w2.sqr(); w1.add(&w2);
 		if w1.jacobi()!=1 { self.zero(); return false }
 		w2.copy(&w1.sqrt()); w1.copy(&w2);
-		w2.copy(&self.a); w2.add(&w1); w2.div2();
+		w2.copy(&self.a); w2.add(&w1); w2.norm(); w2.div2();
 		if w2.jacobi()!=1 {
-			w2.copy(&self.a); w2.sub(&w1); w2.div2();
+			w2.copy(&self.a); w2.sub(&w1); w2.norm(); w2.div2();
 			if w2.jacobi()!=1 { self.zero(); return false }
 		}
 		w1.copy(&w2.sqrt());
 		self.a.copy(&w1);
 		w1.dbl();
 		w1.inverse();
-		self.b.mul(&mut w1);
+		self.b.mul(&w1);
 		return true;
 	}
 
@@ -266,9 +274,9 @@ impl FP2 {
 		w2.sqr();
 		w1.add(&w2);
 		w1.inverse();
-		self.a.mul(&mut w1);
-		w1.neg();
-		self.b.mul(&mut w1);
+		self.a.mul(&w1);
+		w1.neg(); w1.norm();
+		self.b.mul(&w1);
 	}
 
 /* self/=2 */
@@ -288,14 +296,14 @@ impl FP2 {
 /* w*=(1+sqrt(-1)) */
 /* where X*2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
 	pub fn mul_ip(&mut self) {
-		self.norm();
+	//	self.norm();
 		let t=FP2::new_copy(self);
 		let z=FP::new_copy(&self.a);
 		self.a.copy(&self.b);
 		self.a.neg();
 		self.b.copy(&z);
 		self.add(&t);
-		self.norm();
+	//	self.norm();
 	}
 
 /* w/=(1+sqrt(-1)) */
@@ -304,7 +312,7 @@ impl FP2 {
 		self.norm();
 		t.a.copy(&self.a); t.a.add(&self.b);
 		t.b.copy(&self.b); t.b.sub(&self.a);
-		self.copy(&t);
+		t.norm(); self.copy(&t); 
 		self.div2();
 	}
 

@@ -168,13 +168,13 @@ FP12_YYY.prototype={
 
 		A.sqr();
 		B.mul(this.c);
-		B.add(B);
+		B.add(B);  //B.norm();
 		C.sqr();
 		D.mul(this.b);
 		D.add(D);
 
 		this.c.add(this.a);
-		this.c.add(this.b);
+		this.c.add(this.b); this.c.norm();
 		this.c.sqr();
 
 		this.a.copy(A);
@@ -209,10 +209,14 @@ FP12_YYY.prototype={
 		t0.add(this.b);
 		t1.add(y.b);
 
+		t0.norm(); t1.norm();
+
 		z1.copy(t0); z1.mul(t1);
 		t0.copy(this.b); t0.add(this.c);
 
 		t1.copy(y.b); t1.add(y.c);
+
+		t0.norm(); t1.norm();
 		z3.copy(t0); z3.mul(t1);
 
 		t0.copy(z0); t0.neg();
@@ -226,6 +230,9 @@ FP12_YYY.prototype={
 
 		t0.copy(this.a); t0.add(this.c);
 		t1.copy(y.a); t1.add(y.c);
+
+		t0.norm(); t1.norm();
+
 		t0.mul(t1);
 		z2.add(t0);
 
@@ -236,7 +243,7 @@ FP12_YYY.prototype={
 		z3.add(t1);
 		t0.times_i();
 		this.b.add(t0);
-
+	// z3.norm();
 		z3.times_i();
 		this.a.copy(z0); this.a.add(z3);
 
@@ -257,8 +264,12 @@ FP12_YYY.prototype={
 		this.b.add(this.a);
 		t1.real().add(y.b.real());
 
+		this.b.norm();
+		t1.norm();
+
 		this.b.mul(t1);
 		z3.add(this.c);
+		z3.norm();
 		z3.pmul(y.b.real());
 
 		t0.copy(z0); t0.neg();
@@ -271,9 +282,10 @@ FP12_YYY.prototype={
 		z2.add(t0);
 
 		t0.copy(this.a); t0.add(this.c);
+		t0.norm();
 		t0.mul(y.a);
 		this.c.copy(z2); this.c.add(t0);
-
+		//z3.norm();
 		z3.times_i();
 		this.a.copy(z0); this.a.add(z3);
 
@@ -291,16 +303,16 @@ FP12_YYY.prototype={
 		f0.sqr();
 		f1.mul(this.c);
 		f1.times_i();
-		f0.sub(f1);
+		f0.sub(f1); f0.norm();
 
 		f1.copy(this.c); f1.sqr();
 		f1.times_i();
 		f2.mul(this.b);
-		f1.sub(f2);
+		f1.sub(f2); f1.norm();
 
 		f2.copy(this.b); f2.sqr();
 		f3.copy(this.a); f3.mul(this.c);
-		f2.sub(f3);
+		f2.sub(f3); f2.norm();
 
 		f3.copy(this.b); f3.mul(f2);
 		f3.times_i();
@@ -309,7 +321,7 @@ FP12_YYY.prototype={
 		this.c.mul(f1);
 		this.c.times_i();
 
-		f3.add(this.c);
+		f3.add(this.c); f3.norm();
 		f3.inverse();
 		this.a.copy(f0); this.a.mul(f3);
 		this.b.copy(f1); this.b.mul(f3);

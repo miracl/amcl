@@ -132,8 +132,8 @@ void FP12_YYY_usqr(FP12_YYY *w,FP12_YYY *x)
     FP4_YYY_add(&(w->c),&(w->c),&(w->c));
     FP4_YYY_add(&(w->b),&B,&(w->b));
     FP4_YYY_add(&(w->c),&C,&(w->c));
-    FP12_YYY_reduce(w);	    /* reduce here as in pow function repeated squarings would trigger multiple reductions */
 
+    FP12_YYY_reduce(w);	    /* reduce here as in pow function repeated squarings would trigger multiple reductions */
 }
 
 /* FP12 squaring w=x^2 */
@@ -147,16 +147,18 @@ void FP12_YYY_sqr(FP12_YYY *w,FP12_YYY *x)
     FP4_YYY_sqr(&A,&(x->a));
     FP4_YYY_mul(&B,&(x->b),&(x->c));
     FP4_YYY_add(&B,&B,&B);
+FP4_YYY_norm(&B);
     FP4_YYY_sqr(&C,&(x->c));
+
     FP4_YYY_mul(&D,&(x->a),&(x->b));
     FP4_YYY_add(&D,&D,&D);
     FP4_YYY_add(&(w->c),&(x->a),&(x->c));
     FP4_YYY_add(&(w->c),&(x->b),&(w->c));
+FP4_YYY_norm(&(w->c));	
 
     FP4_YYY_sqr(&(w->c),&(w->c));
 
     FP4_YYY_copy(&(w->a),&A);
-
     FP4_YYY_add(&A,&A,&B);
 
     FP4_YYY_norm(&A);
@@ -165,7 +167,6 @@ void FP12_YYY_sqr(FP12_YYY *w,FP12_YYY *x)
     FP4_YYY_add(&A,&A,&D);
 
     FP4_YYY_norm(&A);
-
     FP4_YYY_neg(&A,&A);
     FP4_YYY_times_i(&B);
     FP4_YYY_times_i(&C);
@@ -191,42 +192,46 @@ void FP12_YYY_mul(FP12_YYY *w,FP12_YYY *y)
 
     FP4_YYY_add(&t0,&(w->a),&(w->b));
     FP4_YYY_add(&t1,&(y->a),&(y->b));  //
+
+FP4_YYY_norm(&t0);
+FP4_YYY_norm(&t1);
+
     FP4_YYY_mul(&z1,&t0,&t1);
     FP4_YYY_add(&t0,&(w->b),&(w->c));
-
     FP4_YYY_add(&t1,&(y->b),&(y->c));  //
+
+FP4_YYY_norm(&t0);
+FP4_YYY_norm(&t1);
+
     FP4_YYY_mul(&z3,&t0,&t1);
 
     FP4_YYY_neg(&t0,&z0);
     FP4_YYY_neg(&t1,&z2);
 
     FP4_YYY_add(&z1,&z1,&t0);   // z1=z1-z0
-
-    FP4_YYY_norm(&z1);
-
+//    FP4_YYY_norm(&z1);
     FP4_YYY_add(&(w->b),&z1,&t1);
 // z1=z1-z2
     FP4_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
     FP4_YYY_add(&z2,&z2,&t0);        // z2=z2-z0
 
     FP4_YYY_add(&t0,&(w->a),&(w->c));
-
     FP4_YYY_add(&t1,&(y->a),&(y->c));
+
+FP4_YYY_norm(&t0);
+FP4_YYY_norm(&t1);
+
     FP4_YYY_mul(&t0,&t1,&t0);
     FP4_YYY_add(&z2,&z2,&t0);
 
     FP4_YYY_mul(&t0,&(w->c),&(y->c));
     FP4_YYY_neg(&t1,&t0);
 
-    FP4_YYY_norm(&z2);
-    FP4_YYY_norm(&z3);
-    FP4_YYY_norm(&(w->b));
-
     FP4_YYY_add(&(w->c),&z2,&t1);
     FP4_YYY_add(&z3,&z3,&t1);
     FP4_YYY_times_i(&t0);
     FP4_YYY_add(&(w->b),&(w->b),&t0);
-
+FP4_YYY_norm(&z3);
     FP4_YYY_times_i(&z3);
     FP4_YYY_add(&(w->a),&z0,&z3);
 
@@ -242,27 +247,33 @@ void FP12_YYY_smul(FP12_YYY *w,FP12_YYY *y)
 
     FP4_YYY_copy(&z3,&(w->b));
     FP4_YYY_mul(&z0,&(w->a),&(y->a));
+
     FP4_YYY_pmul(&z2,&(w->b),&(y->b).a);
     FP4_YYY_add(&(w->b),&(w->a),&(w->b));
     FP4_YYY_copy(&t1,&(y->a));
     FP2_YYY_add(&t1.a,&t1.a,&(y->b).a);
 
+FP4_YYY_norm(&t1);
+FP4_YYY_norm(&(w->b));
+
     FP4_YYY_mul(&(w->b),&(w->b),&t1);
     FP4_YYY_add(&z3,&z3,&(w->c));
+FP4_YYY_norm(&z3);
     FP4_YYY_pmul(&z3,&z3,&(y->b).a);
     FP4_YYY_neg(&t0,&z0);
     FP4_YYY_neg(&t1,&z2);
 
     FP4_YYY_add(&(w->b),&(w->b),&t0);   // z1=z1-z0
-
-    FP4_YYY_norm(&(w->b));
-
+//    FP4_YYY_norm(&(w->b));
     FP4_YYY_add(&(w->b),&(w->b),&t1);   // z1=z1-z2
 
     FP4_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
     FP4_YYY_add(&z2,&z2,&t0);        // z2=z2-z0
 
     FP4_YYY_add(&t0,&(w->a),&(w->c));
+
+FP4_YYY_norm(&t0);
+FP4_YYY_norm(&z3);
 
     FP4_YYY_mul(&t0,&(y->a),&t0);
     FP4_YYY_add(&(w->c),&z2,&t0);
@@ -278,21 +289,24 @@ void FP12_YYY_smul(FP12_YYY *w,FP12_YYY *y)
 void FP12_YYY_inv(FP12_YYY *w,FP12_YYY *x)
 {
     FP4_YYY f0,f1,f2,f3;
-    FP12_YYY_norm(x);
+//    FP12_YYY_norm(x);
 
     FP4_YYY_sqr(&f0,&(x->a));
     FP4_YYY_mul(&f1,&(x->b),&(x->c));
     FP4_YYY_times_i(&f1);
     FP4_YYY_sub(&f0,&f0,&f1);  /* y.a */
+	FP4_YYY_norm(&f0); 		
 
     FP4_YYY_sqr(&f1,&(x->c));
     FP4_YYY_times_i(&f1);
     FP4_YYY_mul(&f2,&(x->a),&(x->b));
     FP4_YYY_sub(&f1,&f1,&f2);  /* y.b */
+	FP4_YYY_norm(&f1); 
 
     FP4_YYY_sqr(&f2,&(x->b));
     FP4_YYY_mul(&f3,&(x->a),&(x->c));
     FP4_YYY_sub(&f2,&f2,&f3);  /* y.c */
+	FP4_YYY_norm(&f2); 
 
     FP4_YYY_mul(&f3,&(x->b),&f2);
     FP4_YYY_times_i(&f3);
@@ -302,6 +316,8 @@ void FP12_YYY_inv(FP12_YYY *w,FP12_YYY *x)
     FP4_YYY_times_i(&(w->c));
 
     FP4_YYY_add(&f3,&(w->c),&f3);
+	FP4_YYY_norm(&f3);
+	
     FP4_YYY_inv(&f3,&f3);
 
     FP4_YYY_mul(&(w->a),&f0,&f3);

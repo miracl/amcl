@@ -31,7 +31,7 @@ use xxx::rom;
 
 #[allow(non_snake_case)]
 
-fn linedbl(A: &mut ECP2,qx: &mut FP,qy: &mut  FP) -> FP12 {
+fn linedbl(A: &mut ECP2,qx: &FP,qy: &FP) -> FP12 {
 	let mut P=ECP2::new();
 
 	P.copy(A);
@@ -57,10 +57,10 @@ fn linedbl(A: &mut ECP2,qx: &mut FP,qy: &mut  FP) -> FP12 {
 	z3.mul(&mut zz);
 	z3.pmul(qy);
 
-	x.mul(&mut t);
-	x.sub(&y);
+	x.mul(&mut t); 
+	x.sub(&y); x.norm();
 	a.copy(&FP4::new_fp2s(&z3,&x));
-	t.neg();
+	t.neg(); t.norm();
 	zz.mul(&mut t);
 	zz.pmul(qx);
 	b.copy(&FP4::new_fp2(&zz));
@@ -69,7 +69,7 @@ fn linedbl(A: &mut ECP2,qx: &mut FP,qy: &mut  FP) -> FP12 {
 }
 
 #[allow(non_snake_case)]
-fn lineadd(A: &mut ECP2,B: &mut ECP2,qx: &mut FP,qy: &mut  FP) -> FP12 {
+fn lineadd(A: &mut ECP2,B: &ECP2,qx: &FP,qy: &FP) -> FP12 {
 
 	let mut P=ECP2::new();
 
@@ -87,19 +87,19 @@ fn lineadd(A: &mut ECP2,B: &mut ECP2,qx: &mut FP,qy: &mut  FP) -> FP12 {
 
 	if d==0 { /* Addition */
 		let mut x=FP2::new_copy(&B.getpx());
-		let mut y=FP2::new_copy(&B.getpy());
+		let y=FP2::new_copy(&B.getpy());
 		let mut t=FP2::new_copy(&P.getpz()); 
-		t.mul(&mut y);
-		zz.mul(&mut t);
+		t.mul(&y);
+		zz.mul(&t);
 
-		let mut ny=FP2::new_copy(&P.getpy()); ny.neg();
-		zz.add(&ny); 
+		let mut ny=FP2::new_copy(&P.getpy()); ny.neg(); ny.norm();
+		zz.add(&ny); zz.norm();
 		z3.pmul(qy);
-		t.mul(&mut P.getpx());
-		x.mul(&mut ny);
-		t.add(&x);
+		t.mul(&P.getpx());
+		x.mul(&ny);
+		t.add(&x); t.norm();
 		a.copy(&FP4::new_fp2s(&z3,&t));
-		zz.neg();
+		zz.neg(); zz.norm();
 		zz.pmul(qx);
 		b.copy(&FP4::new_fp2(&zz));
 	} else { /* Doubling */
@@ -111,24 +111,25 @@ fn lineadd(A: &mut ECP2,B: &mut ECP2,qx: &mut FP,qy: &mut  FP) -> FP12 {
 
 		y.sqr();
 		y.dbl();
-		z3.mul(&mut zz);
+		z3.mul(&zz);
 		z3.pmul(qy);
 
-		x.mul(&mut t);
-		x.sub(&y);
+		x.mul(&t); 
+		x.sub(&y); x.norm();
 		a.copy(&FP4::new_fp2s(&z3,&x));
-		t.neg();
-		zz.mul(&mut t);
+		t.neg(); t.norm();
+		zz.mul(&t);
 		zz.pmul(qx);
 		b.copy(&FP4::new_fp2(&zz));
 	}
+
 	return FP12::new_fp4s(&a,&b,&c);
 }
 
 #[allow(non_snake_case)]
 /* Optimal R-ate pairing */
-pub fn ate(P: & mut ECP2,Q: &mut ECP) -> FP12 {
-	let mut f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
+pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
+	let f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
 	let x = BIG::new_ints(&rom::CURVE_BNX);
 	let mut n = BIG::new_copy(&x);
 	let mut K = ECP2::new();
@@ -139,10 +140,10 @@ pub fn ate(P: & mut ECP2,Q: &mut ECP) -> FP12 {
 	} else {n.copy(&x)}
 	
 	n.norm();
-	P.affine();
-	Q.affine();
-	let mut qx=FP::new_copy(&Q.getpx());
-	let mut qy=FP::new_copy(&Q.getpy());
+//	P.affine();
+//	Q.affine();
+	let qx=FP::new_copy(&Q.getpx());
+	let qy=FP::new_copy(&Q.getpy());
 
 	let mut A=ECP2::new();
 	let mut r=FP12::new_int(1);
@@ -151,23 +152,23 @@ pub fn ate(P: & mut ECP2,Q: &mut ECP) -> FP12 {
 	let nb=n.nbits();
 
 	for i in (1..nb-1).rev() {
-		let mut lv=linedbl(&mut A,&mut qx,&mut qy);
-		r.smul(&mut lv);
+		let mut lv=linedbl(&mut A,&qx,&qy);
+		r.smul(&lv);
 		if n.bit(i)==1 {
 		
-			lv=lineadd(&mut A,P,&mut qx,&mut qy);
+			lv=lineadd(&mut A,P,&qx,&qy);
 		
-			r.smul(&mut lv);
+			r.smul(&lv);
 		}		
 		r.sqr();	
 	}
 
-	let mut lv=linedbl(&mut A,&mut qx,&mut qy);
-	r.smul(&mut lv);
+	let mut lv=linedbl(&mut A,&qx,&qy);
+	r.smul(&lv);
 
 	if n.parity()==1 {
-		lv=lineadd(&mut A,P,&mut qx,&mut qy);
-		r.smul(&mut lv);
+		lv=lineadd(&mut A,P,&qx,&qy);
+		r.smul(&lv);
 	}
 
 /* R-ate fixup required for BN curves */
@@ -175,14 +176,14 @@ pub fn ate(P: & mut ECP2,Q: &mut ECP) -> FP12 {
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
 		r.conj();
 		K.copy(&P);
-		K.frob(&mut f);
+		K.frob(&f);
 		A.neg();
-		lv=lineadd(&mut A,&mut K,&mut qx,&mut qy);
-		r.smul(&mut lv);
-		K.frob(&mut f);
+		lv=lineadd(&mut A,&K,&qx,&qy);
+		r.smul(&lv);
+		K.frob(&f);
 		K.neg();
-		lv=lineadd(&mut A,&mut K,&mut qx,&mut qy);
-		r.smul(&mut lv);
+		lv=lineadd(&mut A,&K,&qx,&qy);
+		r.smul(&lv);
 	}
 
 	return r;
@@ -190,8 +191,8 @@ pub fn ate(P: & mut ECP2,Q: &mut ECP) -> FP12 {
 
 #[allow(non_snake_case)]
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-pub fn ate2(P: &mut ECP2,Q: &mut ECP,R: &mut ECP2,S: &mut ECP) -> FP12 {
-	let mut f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
+pub fn ate2(P: &ECP2,Q: &ECP,R: &ECP2,S: &ECP) -> FP12 {
+	let f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
 	let x = BIG::new_ints(&rom::CURVE_BNX);
 	let mut n = BIG::new_copy(&x);
 	let mut K = ECP2::new();
@@ -202,16 +203,16 @@ pub fn ate2(P: &mut ECP2,Q: &mut ECP,R: &mut ECP2,S: &mut ECP) -> FP12 {
 	} else {n.copy(&x)}
 	
 	n.norm();
-	P.affine();
-	Q.affine();
-	R.affine();
-	S.affine();
+//	P.affine();
+//	Q.affine();
+//	R.affine();
+//	S.affine();
 
-	let mut qx=FP::new_copy(&Q.getpx());
-	let mut qy=FP::new_copy(&Q.getpy());
+	let qx=FP::new_copy(&Q.getpx());
+	let qy=FP::new_copy(&Q.getpy());
 
-	let mut sx=FP::new_copy(&S.getpx());
-	let mut sy=FP::new_copy(&S.getpy());
+	let sx=FP::new_copy(&S.getpx());
+	let sy=FP::new_copy(&S.getpy());
 
 	let mut A=ECP2::new();
 	let mut B=ECP2::new();
@@ -222,53 +223,53 @@ pub fn ate2(P: &mut ECP2,Q: &mut ECP,R: &mut ECP2,S: &mut ECP) -> FP12 {
 	let nb=n.nbits();
 
 	for i in (1..nb-1).rev() {
-		let mut lv=linedbl(&mut A,&mut qx,&mut qy);
-		r.smul(&mut lv);
-		lv=linedbl(&mut B,&mut sx,&mut sy);
-		r.smul(&mut lv);
+		let mut lv=linedbl(&mut A,&qx,&qy);
+		r.smul(&lv);
+		lv=linedbl(&mut B,&sx,&sy);
+		r.smul(&lv);
 
 		if n.bit(i)==1 {
-			lv=lineadd(&mut A,P,&mut qx,&mut qy);
-			r.smul(&mut lv);
-			lv=lineadd(&mut B,R,&mut sx,&mut sy);
-			r.smul(&mut lv);
+			lv=lineadd(&mut A,P,&qx,&qy);
+			r.smul(&lv);
+			lv=lineadd(&mut B,R,&sx,&sy);
+			r.smul(&lv);
 		}
 		r.sqr();
 	}
 
-	let mut lv=linedbl(&mut A,&mut qx,&mut qy);
-	r.smul(&mut lv);
-	lv=linedbl(&mut B,&mut sx,&mut sy);
-	r.smul(&mut lv);
+	let mut lv=linedbl(&mut A,&qx,&qy);
+	r.smul(&lv);
+	lv=linedbl(&mut B,&sx,&sy);
+	r.smul(&lv);
 	if n.parity()==1 {
-		lv=lineadd(&mut A,P,&mut qx,&mut qy);
-		r.smul(&mut lv);
-		lv=lineadd(&mut B,R,&mut sx,&mut sy);
-		r.smul(&mut lv);
+		lv=lineadd(&mut A,P,&qx,&qy);
+		r.smul(&lv);
+		lv=lineadd(&mut B,R,&sx,&sy);
+		r.smul(&lv);
 	}
 
 /* R-ate fixup */
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
 		r.conj();
 		K.copy(&P);
-		K.frob(&mut f);
+		K.frob(&f);
 		A.neg();
-		lv=lineadd(&mut A,&mut K,&mut qx,&mut qy);
-		r.smul(&mut lv);
-		K.frob(&mut f);
+		lv=lineadd(&mut A,&K,&qx,&qy);
+		r.smul(&lv);
+		K.frob(&f);
 		K.neg();
-		lv=lineadd(&mut A,&mut K,&mut qx,&mut qy);
-		r.smul(&mut lv);
+		lv=lineadd(&mut A,&K,&qx,&qy);
+		r.smul(&lv);
 
 		K.copy(&R);
-		K.frob(&mut f);
+		K.frob(&f);
 		B.neg();
-		lv=lineadd(&mut B,&mut K,&mut sx,&mut sy);
-		r.smul(&mut lv);
-		K.frob(&mut f);
+		lv=lineadd(&mut B,&K,&sx,&sy);
+		r.smul(&lv);
+		K.frob(&f);
 		K.neg();
-		lv=lineadd(&mut B,&mut K,&mut sx,&mut sy);
-		r.smul(&mut lv);
+		lv=lineadd(&mut B,&K,&sx,&sy);
+		r.smul(&lv);
 	}
 
 	return r;
@@ -276,7 +277,7 @@ pub fn ate2(P: &mut ECP2,Q: &mut ECP,R: &mut ECP2,S: &mut ECP) -> FP12 {
 
 /* final exponentiation - keep separate for multi-pairings and to avoid thrashing stack */
 pub fn fexp(m: &FP12) -> FP12 {
-	let mut f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
+	let f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
 	let mut x = BIG::new_ints(&rom::CURVE_BNX);
 	let mut r=FP12::new_copy(m);
 		
@@ -285,57 +286,57 @@ pub fn fexp(m: &FP12) -> FP12 {
 	lv.inverse();
 	r.conj();
 
-	r.mul(&mut lv);
+	r.mul(&lv);
 	lv.copy(&r);
-	r.frob(&mut f);
-	r.frob(&mut f);
-	r.mul(&mut lv);
+	r.frob(&f);
+	r.frob(&f);
+	r.mul(&lv);
 /* Hard part of final exp */
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
 		lv.copy(&r);
-		lv.frob(&mut f);
+		lv.frob(&f);
 		let mut x0=FP12::new_copy(&lv);
-		x0.frob(&mut f);
-		lv.mul(&mut r);
-		x0.mul(&mut lv);
-		x0.frob(&mut f);
+		x0.frob(&f);
+		lv.mul(&r);
+		x0.mul(&lv);
+		x0.frob(&f);
 		let mut x1=FP12::new_copy(&r);
 		x1.conj();
 		let mut x4=r.pow(&mut x);
 
 		let mut x3=FP12::new_copy(&x4);
-		x3.frob(&mut f);
+		x3.frob(&f);
 
 		let mut x2=x4.pow(&mut x);
 
 		let mut x5=FP12::new_copy(&x2); x5.conj();
 		lv=x2.pow(&mut x);
 
-		x2.frob(&mut f);
+		x2.frob(&f);
 		r.copy(&x2); r.conj();
 
-		x4.mul(&mut r);
-		x2.frob(&mut f);
+		x4.mul(&r);
+		x2.frob(&f);
 
 		r.copy(&lv);
-		r.frob(&mut f);
-		lv.mul(&mut r);
+		r.frob(&f);
+		lv.mul(&r);
 
 		lv.usqr();
-		lv.mul(&mut x4);
-		lv.mul(&mut x5);
+		lv.mul(&x4);
+		lv.mul(&x5);
 		r.copy(&x3);
-		r.mul(&mut x5);
-		r.mul(&mut lv);
-		lv.mul(&mut x2);
+		r.mul(&x5);
+		r.mul(&lv);
+		lv.mul(&x2);
 		r.usqr();
-		r.mul(&mut lv);
+		r.mul(&lv);
 		r.usqr();
 		lv.copy(&r);
-		lv.mul(&mut x1);
-		r.mul(&mut x0);
+		lv.mul(&x1);
+		r.mul(&x0);
 		lv.usqr();
-		r.mul(&mut lv);
+		r.mul(&lv);
 		r.reduce();
 	} else {
 
@@ -345,29 +346,29 @@ pub fn fexp(m: &FP12) -> FP12 {
 		let mut y1=y0.pow(&mut x);
 		x.fshr(1); let mut y2=y1.pow(&mut x); x.fshl(1);
 		let mut y3=FP12::new_copy(&r); y3.conj();
-		y1.mul(&mut y3);
+		y1.mul(&y3);
 
 		y1.conj();
-		y1.mul(&mut y2);
+		y1.mul(&y2);
 
 		y2=y1.pow(&mut x);
 
 		y3=y2.pow(&mut x);
 		y1.conj();
-		y3.mul(&mut y1);
+		y3.mul(&y1);
 
 		y1.conj();
-		y1.frob(&mut f); y1.frob(&mut f); y1.frob(&mut f);
-		y2.frob(&mut f); y2.frob(&mut f);
-		y1.mul(&mut y2);
+		y1.frob(&f); y1.frob(&f); y1.frob(&f);
+		y2.frob(&f); y2.frob(&f);
+		y1.mul(&y2);
 
 		y2=y3.pow(&mut x);
-		y2.mul(&mut y0);
-		y2.mul(&mut r);
+		y2.mul(&y0);
+		y2.mul(&r);
 
-		y1.mul(&mut y2);
-		y2.copy(&y3); y2.frob(&mut f);
-		y1.mul(&mut y2);
+		y1.mul(&y2);
+		y2.copy(&y3); y2.frob(&f);
+		y1.mul(&y2);
 		r.copy(&y1);
 		r.reduce();
 
@@ -420,7 +421,7 @@ pub fn fexp(m: &FP12) -> FP12 {
 
 #[allow(non_snake_case)]
 /* GLV method */
-fn glv(e: &mut BIG) -> [BIG;2] {
+fn glv(e: &BIG) -> [BIG;2] {
 	let mut u:[BIG;2]=[BIG::new(),BIG::new()];
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
 		let mut t=BIG::new();
@@ -429,7 +430,7 @@ fn glv(e: &mut BIG) -> [BIG;2] {
 
 		for i in 0..2 {
 			t.copy(&BIG::new_ints(&rom::CURVE_W[i]));  // why not just t=new BIG(ROM.CURVE_W[i]); 
-			let mut d:DBIG = BIG::mul(&mut t,e);
+			let mut d:DBIG = BIG::mul(&t,e);
 			v[i].copy(&d.div(&q));
 		}
 		u[0].copy(&e);
@@ -457,7 +458,7 @@ fn glv(e: &mut BIG) -> [BIG;2] {
 
 #[allow(non_snake_case)]
 /* Galbraith & Scott Method */
-pub fn gs(e: &mut BIG) -> [BIG;4] {
+pub fn gs(e: &BIG) -> [BIG;4] {
 	let mut u:[BIG;4]=[BIG::new(),BIG::new(),BIG::new(),BIG::new()];
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
 		let mut t=BIG::new();
@@ -466,7 +467,7 @@ pub fn gs(e: &mut BIG) -> [BIG;4] {
 		let mut v:[BIG;4]=[BIG::new(),BIG::new(),BIG::new(),BIG::new()];
 		for i in 0..4 {
 			t.copy(&BIG::new_ints(&rom::CURVE_WB[i]));
-			let mut d:DBIG=BIG::mul(&mut t,e);
+			let mut d:DBIG=BIG::mul(&t,e);
 			v[i].copy(&d.div(&q));
 		}
 		u[0].copy(&e);
@@ -493,10 +494,10 @@ pub fn gs(e: &mut BIG) -> [BIG;4] {
 
 #[allow(non_snake_case)]
 /* Multiply P by e in group G1 */
-pub fn g1mul(P: &mut ECP,e: &mut BIG) -> ECP {
+pub fn g1mul(P: &ECP,e: &mut BIG) -> ECP {
 	let mut R=ECP::new();
 	if rom::USE_GLV {
-		P.affine();
+	//	P.affine();
 		R.copy(P);
 		let mut Q=ECP::new();
 		Q.copy(P);
@@ -531,22 +532,22 @@ pub fn g1mul(P: &mut ECP,e: &mut BIG) -> ECP {
 
 #[allow(non_snake_case)]
 /* Multiply P by e in group G2 */
-pub fn g2mul(P: &mut ECP2,e: &mut BIG) -> ECP2 {
+pub fn g2mul(P: &ECP2,e: &BIG) -> ECP2 {
 	let mut R=ECP2::new();
 	if rom::USE_GS_G2 {
 		let mut Q:[ECP2;4]=[ECP2::new(),ECP2::new(),ECP2::new(),ECP2::new()];
-		let mut f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
+		let f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
 		let q=BIG::new_ints(&rom::CURVE_ORDER);
 		let mut u=gs(e);
 		let mut T=ECP2::new();
 
 		let mut t=BIG::new();
-		P.affine();
+	//	P.affine();
 		Q[0].copy(&P);
 		for i in 1..4 {
 			T.copy(&Q[i-1]);
 			Q[i].copy(&T);
-			Q[i].frob(&mut f);
+			Q[i].frob(&f);
 		}
 		for i in 0..4 {
 			let np=u[i].nbits();
@@ -568,11 +569,11 @@ pub fn g2mul(P: &mut ECP2,e: &mut BIG) -> ECP2 {
 
 /* f=f^e */
 /* Note that this method requires a lot of RAM! Better to use compressed XTR method, see FP4.java */
-pub fn gtpow(d: &mut FP12,e: &mut BIG) -> FP12 {
+pub fn gtpow(d: &FP12,e: &BIG) -> FP12 {
 	let mut r=FP12::new();
 	if rom::USE_GS_GT {
 		let mut g:[FP12;4]=[FP12::new(),FP12::new(),FP12::new(),FP12::new()];
-		let mut f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
+		let f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
 		let q=BIG::new_ints(&rom::CURVE_ORDER);
 		let mut t=BIG::new();
 		let mut u=gs(e);
@@ -582,7 +583,7 @@ pub fn gtpow(d: &mut FP12,e: &mut BIG) -> FP12 {
 		for i in 1..4 {
 			w.copy(&g[i-1]);
 			g[i].copy(&w);
-			g[i].frob(&mut f);
+			g[i].frob(&f);
 		}
 		for i in 0..4 {
 			let np=u[i].nbits();

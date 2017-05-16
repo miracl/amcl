@@ -54,13 +54,18 @@ static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,BIG_XXX Qx,BIG_XXX
         FP2_YYY_mul(&ZZ,&ZZ,&T);
 
         FP2_YYY_neg(&NY,&(P.y));
+		FP2_YYY_norm(&NY);
         FP2_YYY_add(&ZZ,&ZZ,&NY); /* ZZ=Z^3*Y2-Y (slope numerator) */
+		FP2_YYY_norm(&ZZ);
         FP2_YYY_pmul(&Z3,&Z3,Qy);    /* Z3*Qy */
         FP2_YYY_mul(&T,&T,&(P.x));
         FP2_YYY_mul(&X,&X,&NY);
         FP2_YYY_add(&T,&T,&X);       /* Z*Y2*X-X2*Y */
+		FP2_YYY_norm(&T);
         FP4_YYY_from_FP2s(&a,&Z3,&T); /* a=[Z3*Qy,Z*Y2*X-X2*Y] */
+
         FP2_YYY_neg(&ZZ,&ZZ);
+		FP2_YYY_norm(&ZZ);
         FP2_YYY_pmul(&ZZ,&ZZ,Qx);
         FP4_YYY_from_FP2(&b,&ZZ);    /* b=-slope*Qx */
     }
@@ -76,15 +81,19 @@ static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,BIG_XXX Qx,BIG_XXX
         FP2_YYY_pmul(&Z3,&Z3,Qy);   /* Z3=Z3*ZZ*Qy */
 
         FP2_YYY_mul(&X,&(P.x),&T);
+		//FP2_YYY_norm(&Y);
         FP2_YYY_sub(&X,&X,&Y);      /* X=X*slope-2Y^2 */
+		FP2_YYY_norm(&X);
         FP4_YYY_from_FP2s(&a,&Z3,&X); /* a=[Z3*ZZ*Qy , X*slope-2Y^2] */
         FP2_YYY_neg(&T,&T);
+		FP2_YYY_norm(&T);
         FP2_YYY_mul(&ZZ,&ZZ,&T);
         FP2_YYY_pmul(&ZZ,&ZZ,Qx);
         FP4_YYY_from_FP2(&b,&ZZ);    /* b=-slope*ZZ*Qx */
     }
 
     FP12_YYY_from_FP4s(v,&a,&b,&c);
+//	FP12_YYY_norm(v);
 }
 
 /* Optimal R-ate pairing r=e(P,Q) */
@@ -114,8 +123,8 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 
     BIG_XXX_norm(n);
 
-    ECP2_ZZZ_affine(P);
-    ECP_ZZZ_affine(Q);
+//    ECP2_ZZZ_affine(P);
+//    ECP_ZZZ_affine(Q);
 
     BIG_XXX_copy(Qx,Q->x);
     BIG_XXX_copy(Qy,Q->y);
@@ -190,11 +199,11 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 
     BIG_XXX_norm(n);
 
-    ECP2_ZZZ_affine(P);
-    ECP_ZZZ_affine(Q);
+//    ECP2_ZZZ_affine(P);
+//    ECP_ZZZ_affine(Q);
 
-    ECP2_ZZZ_affine(R);
-    ECP_ZZZ_affine(S);
+//    ECP2_ZZZ_affine(R);
+//    ECP_ZZZ_affine(S);
 
     BIG_XXX_copy(Qx,Q->x);
     BIG_XXX_copy(Qy,Q->y);
@@ -656,8 +665,7 @@ void PAIR_ZZZ_GTpow(FP12_YYY *f,BIG_XXX e)
     BIG_XXX_rcopy(y,Frb_YYY);
     FP2_YYY_from_BIGs(&X,x,y);
 
-    BIG_XXX_rcopy(q,CURVE_Order_ZZZ
-		);
+    BIG_XXX_rcopy(q,CURVE_Order_ZZZ);
     gs(u,e);
 
     FP12_YYY_copy(&g[0],f);

@@ -333,6 +333,7 @@ ECP_ZZZ.prototype={
 				w1.neg();
 				w3.add(w1);
 				w8.add(w6);
+				w3.norm(); w8.norm();
 				w3.mul(w8);
 				w8.copy(w3);
 				w8.imul(3);
@@ -346,9 +347,10 @@ ECP_ZZZ.prototype={
 
 			w2.copy(this.y); w2.sqr();
 			w3.copy(this.x); w3.mul(w2);
-			w3.imul(4);
+			w3.imul(4); //w3.norm();
 			w1.copy(w3); w1.neg();
 
+			//w8.norm();
 			this.x.copy(w8); this.x.sqr();
 			this.x.add(w1);
 			this.x.add(w1);
@@ -358,9 +360,9 @@ ECP_ZZZ.prototype={
 			this.z.add(this.z);
 
 			w2.add(w2);
-			w2.sqr();
+			w2.norm(); w2.sqr();
 			w2.add(w2);
-			w3.sub(this.x);
+			w3.sub(this.x); w3.norm();
 			this.y.copy(w8); this.y.mul(w3);
 			this.y.sub(w2);
 			this.y.norm();
@@ -373,22 +375,22 @@ ECP_ZZZ.prototype={
 			var H=new FP_YYY(0); H.copy(this.z);
 			var J=new FP_YYY(0);
 
-			this.x.mul(this.y); this.x.add(this.x);
+			this.x.mul(this.y); this.x.add(this.x); this.x.norm();
 			C.sqr();
 			D.sqr();
 			if (ROM_CURVE_ZZZ.CURVE_A==-1) C.neg();	
-			this.y.copy(C); this.y.add(D);
+			this.y.copy(C); this.y.add(D); this.y.norm();
 			H.sqr(); H.add(H);
 			this.z.copy(this.y);
-			J.copy(this.y); J.sub(H);
+			J.copy(this.y); J.sub(H); J.norm();
 			this.x.mul(J);
-			C.sub(D);
-			this.y.mul(C);
+			C.sub(D); C.norm();
+			this.y.mul(C);  
 			this.z.mul(J);
 
-			this.x.norm();
-			this.y.norm();
-			this.z.norm();
+		//	this.x.norm();
+		//	this.y.norm();
+		//	this.z.norm();
 		}
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.MONTGOMERY)
 		{
@@ -400,20 +402,20 @@ ECP_ZZZ.prototype={
 	
 			if (this.INF) return;
 
-			A.add(this.z);
+			A.add(this.z); A.norm();
 			AA.copy(A); AA.sqr();
-			B.sub(this.z);
+			B.sub(this.z); B.norm();
 			BB.copy(B); BB.sqr();
-			C.copy(AA); C.sub(BB);
+			C.copy(AA); C.sub(BB); C.norm();
 
 			this.x.copy(AA); this.x.mul(BB);
 
 			A.copy(C); A.imul((ROM_CURVE_ZZZ.CURVE_A+2)>>2);
 
-			BB.add(A);
+			BB.add(A); BB.norm();
 			this.z.copy(BB); this.z.mul(C);
-			this.x.norm();
-			this.z.norm();
+		//	this.x.norm();
+		//	this.z.norm();
 		}
 		return;
 	},
@@ -482,16 +484,16 @@ ECP_ZZZ.prototype={
 			A.mul(e);
 
 			e.copy(A);
-			e.add(A); e.add(B);
+			e.add(A); e.add(B); e.norm(); D.norm();
 			this.x.copy(D); this.x.sqr(); this.x.sub(e);
 
-			A.sub(this.x);
+			A.sub(this.x); A.norm();
 			this.y.copy(A); this.y.mul(D); 
 			C.mul(B); this.y.sub(C);
 
 			this.x.norm();
 			this.y.norm();
-			this.z.norm();
+		//	this.z.norm();
 
 		}
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.EDWARDS)
@@ -522,22 +524,25 @@ ECP_ZZZ.prototype={
 
 			B.copy(this.x); B.add(this.y);
 			D.copy(Q.x); D.add(Q.y); 
+			B.norm(); D.norm();
 			B.mul(D);
 			B.sub(C);
+			B.norm(); F.norm();
 			B.mul(F);
 			this.x.copy(A); this.x.mul(B);
 
+			G.norm();
 			if (ROM_CURVE_ZZZ.CURVE_A==1)
 			{
-				C.copy(E); C.mul(G);
+				E.norm(); C.copy(E); C.mul(G);
 			}
 			if (ROM_CURVE_ZZZ.CURVE_A==-1)
 			{
-				C.mul(G);
+				C.norm(); C.mul(G);
 			}
 			this.y.copy(A); this.y.mul(C);
 			this.z.copy(F); this.z.mul(G);
-			this.x.norm(); this.y.norm(); this.z.norm();
+		//	this.x.norm(); this.y.norm(); this.z.norm();
 		}
 		return;
 	},
@@ -558,11 +563,13 @@ ECP_ZZZ.prototype={
 		C.add(Q.z);
 		D.sub(Q.z);
 
+		D.norm(); A.norm();
 		DA.copy(D); DA.mul(A);
+		C.norm(); B.norm();
 		CB.copy(C); CB.mul(B);
 
-		A.copy(DA); A.add(CB); A.sqr();
-		B.copy(DA); B.sub(CB); B.sqr();
+		A.copy(DA); A.add(CB); A.norm(); A.sqr();
+		B.copy(DA); B.sub(CB); B.norm(); B.sqr();
 
 		this.x.copy(A);
 		this.z.copy(W.x); this.z.mul(B);
@@ -570,7 +577,7 @@ ECP_ZZZ.prototype={
 		if (this.z.iszilch()) this.inf();
 		else this.INF=false;
 
-		this.x.norm();
+	//	this.x.norm();
 	},
 
 /* this-=Q */
@@ -894,7 +901,7 @@ ECP_ZZZ.RHS= function(x)
 		b.sub(one);
 		if (ROM_CURVE_ZZZ.CURVE_A==-1) r.neg();
 		r.sub(one);
-
+		r.norm();
 		b.inverse();
 
 		r.mul(b);

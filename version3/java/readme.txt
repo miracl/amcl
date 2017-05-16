@@ -28,6 +28,7 @@ Or on Linux
 javac -cp amcl.jar: TestALL.java
 java -cp amcl.jar: TestALL
 
+The correct PIN is 1234
 
 Next compile and run the Benchmarking program by executing on windows
 

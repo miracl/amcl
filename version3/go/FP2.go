@@ -137,13 +137,13 @@ func (F *FP2) one() {
 
 /* negate this mod Modulus */
 func (F *FP2) neg() {
-	F.norm()
+//	F.norm()
 	m:=NewFPcopy(F.a)
 	t:= NewFPint(0)
 
 	m.add(F.b)
 	m.neg()
-	m.norm()
+//	m.norm()
 	t.copy(m); t.add(F.b)
 	F.b.copy(m)
 	F.b.add(F.a)
@@ -152,7 +152,7 @@ func (F *FP2) neg() {
 
 /* set to a-ib */
 func (F *FP2) conj() {
-	F.b.neg()
+	F.b.neg(); F.b.norm()
 }
 
 /* this+=a */
@@ -182,7 +182,7 @@ func (F *FP2) imul(c int) {
 
 /* this*=this */
 func (F *FP2) sqr() {
-	F.norm()
+//	F.norm()
 	w1:=NewFPcopy(F.a)
 	w3:=NewFPcopy(F.a)
 	mb:=NewFPcopy(F.b)
@@ -191,10 +191,14 @@ func (F *FP2) sqr() {
 	w1.add(F.b)
 	mb.neg()
 	F.a.add(mb)
+
+	w1.norm()
+	F.a.norm()
+
 	F.a.mul(w1)
 	F.b.copy(w3); F.b.add(w3)
 
-	F.norm()
+	F.b.norm()
 }
 
 /* this*=y */
@@ -210,6 +214,9 @@ func (F *FP2) mul(y *FP2) {
 	w2.mul(y.b)  // w2=b*y.b  - this norms w2 and y.b, NOT b
 	w5.add(F.b)    // w5=a+b
 	F.b.copy(y.a); F.b.add(y.b) // b=y.a+y.b
+
+	w5.norm();
+	F.b.norm();
 
 	F.b.mul(w5);
 	mw.copy(w1); mw.add(w2); mw.neg()
@@ -229,9 +236,9 @@ func (F *FP2) sqrt() bool {
 	w1.sqr(); w2.sqr(); w1.add(w2)
 	if w1.jacobi()!=1 { F.zero(); return false }
 	w1=w1.sqrt()
-	w2.copy(F.a); w2.add(w1); w2.div2()
+	w2.copy(F.a); w2.add(w1); w2.norm(); w2.div2()
 	if w2.jacobi()!=1 {
-		w2.copy(F.a); w2.sub(w1); w2.div2()
+		w2.copy(F.a); w2.sub(w1); w2.norm(); w2.div2()
 		if w2.jacobi()!=1 { F.zero(); return false }
 	}
 	w2=w2.sqrt()
@@ -258,7 +265,7 @@ func (F *FP2) inverse() {
 	w1.add(w2)
 	w1.inverse()
 	F.a.mul(w1)
-	w1.neg()
+	w1.neg(); w1.norm();
 	F.b.mul(w1)
 }
 
@@ -279,14 +286,14 @@ func (F *FP2) times_i() {
 /* w*=(1+sqrt(-1)) */
 /* where X*2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
 func (F *FP2) mul_ip() {
-	F.norm()
+//	F.norm()
 	t:=NewFP2copy(F)
 	z:=NewFPcopy(F.a)
 	F.a.copy(F.b)
 	F.a.neg()
 	F.b.copy(z)
 	F.add(t)
-	F.norm()
+//	F.norm()
 }
 
 /* w/=(1+sqrt(-1)) */
@@ -295,6 +302,6 @@ func (F *FP2) div_ip() {
 	F.norm()
 	t.a.copy(F.a); t.a.add(F.b)
 	t.b.copy(F.b); t.b.sub(F.a);
-	F.copy(t)
+	F.copy(t); F.norm()
 	F.div2()
 }

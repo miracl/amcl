@@ -130,13 +130,13 @@ FP2_YYY.prototype={
 /* negate this */
 	neg: function()
 	{
-		this.norm();
+//		this.norm();
 		var m=new FP_YYY(this.a); 
 		var t=new FP_YYY(0);
 
 		m.add(this.b);
 		m.neg();
-		m.norm();
+//		m.norm();
 		t.copy(m); t.add(this.b);
 		this.b.copy(m);
 		this.b.add(this.a);
@@ -147,6 +147,7 @@ FP2_YYY.prototype={
 	conj: function()
 	{
 		this.b.neg();
+		this.b.norm();
 	},
 /* this+=a */
 	add: function(x)
@@ -176,7 +177,7 @@ FP2_YYY.prototype={
 /* this*=this */
 	sqr: function()
 	{
-		this.norm();
+//		this.norm();
 
 		var w1=new FP_YYY(this.a); 
 		var w3=new FP_YYY(this.a); 
@@ -186,14 +187,18 @@ FP2_YYY.prototype={
 		w1.add(this.b);
 		mb.neg();
 		this.a.add(mb);
+
+		this.a.norm();
+		w1.norm();
+
 		this.a.mul(w1);
 		this.b.copy(w3); this.b.add(w3);
-		this.norm();
+		this.b.norm();
 	},
 /* this*=y */
 	mul: function(y)
 	{
-		this.norm();  // This is needed here as {a,b} is not normed before additions
+//		this.norm();  // This is needed here as {a,b} is not normed before additions
 
 		var w1=new FP_YYY(this.a); 
 		var w2=new FP_YYY(this.b); 
@@ -204,6 +209,9 @@ FP2_YYY.prototype={
 		w2.mul(y.b);  // w2=b*y.b  - this norms w2 and y.b, NOT b
 		w5.add(this.b);    // w5=a+b
 		this.b.copy(y.a); this.b.add(y.b); // b=y.a+y.b
+
+		this.b.norm();
+		w5.norm();
 
 		this.b.mul(w5);
 		mw.copy(w1); mw.add(w2); mw.neg();
@@ -225,10 +233,10 @@ FP2_YYY.prototype={
 		w1.sqr(); w2.sqr(); w1.add(w2);
 		if (w1.jacobi()!=1) { this.zero(); return false; }
 		w1=w1.sqrt();
-		w2.copy(this.a); w2.add(w1); w2.div2();
+		w2.copy(this.a); w2.add(w1); w2.norm(); w2.div2();
 		if (w2.jacobi()!=1)
 		{
-			w2.copy(this.a); w2.sub(w1); w2.div2();
+			w2.copy(this.a); w2.sub(w1); w2.norm(); w2.div2();
 			if (w2.jacobi()!=1) { this.zero(); return false; }
 		}
 		w2=w2.sqrt();
@@ -255,7 +263,7 @@ FP2_YYY.prototype={
 		w1.add(w2);
 		w1.inverse();
 		this.a.mul(w1);
-		w1.neg();
+		w1.neg(); w1.norm();
 		this.b.mul(w1);
 	},
 /* this/=2 */
@@ -276,14 +284,14 @@ FP2_YYY.prototype={
 /* where X*2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
 	mul_ip: function()
 	{
-		this.norm();
+//		this.norm();
 		var t=new FP2_YYY(this);// t.copy(this);
 		var z=new FP_YYY(this.a); //z.copy(this.a);
 		this.a.copy(this.b);
 		this.a.neg();
 		this.b.copy(z);
 		this.add(t);
-		this.norm();
+//		this.norm();
 	},
 
 /* w/=(1+sqrt(-1)) */
@@ -293,7 +301,7 @@ FP2_YYY.prototype={
 		this.norm();
 		t.a.copy(this.a); t.a.add(this.b);
 		t.b.copy(this.b); t.b.sub(this.a);
-		this.copy(t);
+		this.copy(t); this.norm();
 		this.div2();
 	},
 /* this=this^e */

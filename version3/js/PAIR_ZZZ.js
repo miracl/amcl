@@ -44,14 +44,14 @@ var PAIR_ZZZ = {
 			T.mul(Y);
 			ZZ.mul(T);
 
-			var NY=new FP2_YYY(P.gety()); /*NY.copy(P.gety());*/ NY.neg();
-			ZZ.add(NY);
+			var NY=new FP2_YYY(P.gety()); /*NY.copy(P.gety());*/ NY.neg(); NY.norm();
+			ZZ.add(NY); // ZZ.norm();
 			Z3.pmul(Qy);
 			T.mul(P.getx());
 			X.mul(NY);
-			T.add(X);
+			T.add(X); T.norm();
 			a=new FP4_YYY(Z3,T); //a.set(Z3,T);
-			ZZ.neg();
+			ZZ.neg(); ZZ.norm();
 			ZZ.pmul(Qx);
 			b=new FP4_YYY(ZZ); //b.seta(ZZ);
 		}
@@ -69,9 +69,9 @@ var PAIR_ZZZ = {
 			Z3.pmul(Qy);
 
 			X.mul(T);
-			X.sub(Y);
+			X.sub(Y); X.norm();
 			a=new FP4_YYY(Z3,X); //a.set(Z3,X);
-			T.neg();
+			T.neg(); T.norm();
 			ZZ.mul(T);
 
 			ZZ.pmul(Qx);
@@ -102,8 +102,8 @@ var PAIR_ZZZ = {
 			n.copy(x);
 		n.norm();
 
-		P.affine();
-		Q.affine();
+	//	P.affine();
+	//	Q.affine();
 		var Qx=new FP_YYY(Q.getx()); //Qx.copy(Q.getx());
 		var Qy=new FP_YYY(Q.gety()); //Qy.copy(Q.gety());
 
@@ -171,10 +171,10 @@ var PAIR_ZZZ = {
 			n.copy(x);
 		n.norm();
 
-		P.affine();
-		Q.affine();
-		R.affine();
-		S.affine();
+	//	P.affine();
+	//	Q.affine();
+	//	R.affine();
+	//	S.affine();
 
 		var Qx=new FP_YYY(Q.getx()); //Qx.copy(Q.getx());
 		var Qy=new FP_YYY(Q.gety()); //Qy.copy(Q.gety());

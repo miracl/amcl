@@ -320,6 +320,8 @@ func ff_cswap(a *FF,b *FF,d int) {
 /* z=x*y, t is workspace */
 func (F *FF) karmul(vp int,x *FF,xp int,y *FF,yp int,t *FF,tp int,n int) {
 	if n==1 {
+		x.v[xp].norm()
+		y.v[yp].norm()
 		d:=mul(x.v[xp],y.v[yp])
 		F.v[vp+1]=d.split(8*MODBYTES)
 		F.v[vp].dcopy(d)
@@ -341,6 +343,7 @@ func (F *FF) karmul(vp int,x *FF,xp int,y *FF,yp int,t *FF,tp int,n int) {
 
 func (F *FF) karsqr(vp int,x *FF,xp int,t *FF,tp int,n int) {
 	if n==1 {
+		x.v[xp].norm()
 		d:=sqr(x.v[xp])
 		F.v[vp+1].copy(d.split(8*MODBYTES))
 		F.v[vp].dcopy(d)

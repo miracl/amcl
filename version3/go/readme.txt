@@ -36,6 +36,8 @@ go install TestALL
 Run the test program by executing the program TestALL.exe in
 the bin/ subdirectory
 
+The correct PIN is 1234
+
 Next copy the program BenchtestALL.go to a src/BenchtestALL subdirectory
 
 and install the program by running from your root directory

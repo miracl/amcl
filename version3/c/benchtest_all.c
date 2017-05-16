@@ -8,8 +8,8 @@
 #include <time.h>
 
 #include "rsa_2048.h"
-#include "ecp_ed25519.h"
-#include "pair_bn254.h"
+#include "ecp_ED25519.h"
+#include "pair_BN254.h"
 
 #define MIN_TIME 10.0
 #define MIN_ITERS 10 

@@ -164,8 +164,8 @@ FP_YYY.prototype={
 /* this*=b mod Modulus */
 	mul: function(b)
 	{
-		this.norm();
-		b.norm();
+//		this.norm();
+//		b.norm();
 		var ea=FP_YYY.EXCESS(this.f);
 		var eb=FP_YYY.EXCESS(b.f);
 
@@ -189,9 +189,10 @@ FP_YYY.prototype={
 		}
 
 		var afx=(FP_YYY.EXCESS(this.f)+1)*(c+1)+1;
-		if (c<BIG_XXX.NEXCESS && afx<FP_YYY.FEXCESS)
+		if (c<=BIG_XXX.NEXCESS && afx<FP_YYY.FEXCESS)
 		{
 			this.f.imul(c);
+			this.norm();
 		}
 		else
 		{
@@ -204,15 +205,15 @@ FP_YYY.prototype={
 				this.f.copy(d.mod(p));
 			}
 		}
-		if (s) this.neg();
-		return this.norm();
+		if (s) {this.neg(); this.norm();}
+		return this;
 	},
 
 /* this*=this mod Modulus */
 	sqr: function()
 	{
 		var d;
-		this.norm();
+//		this.norm();
 		var ea=FP_YYY.EXCESS(this.f);
 
 		if ((ea+1)*(ea+1)>FP_YYY.FEXCESS) this.reduce();
@@ -238,8 +239,8 @@ FP_YYY.prototype={
 		var m=new BIG_XXX(0);
 		m.rcopy(ROM_FIELD_YYY.Modulus);
 
-		this.norm();
-		sb=FP_YYY.logb2(FP_YYY.EXCESS(this.f));
+//		this.norm();
+		sb=FP_YYY.logb2(FP_YYY.EXCESS(this.f)+1);
 
 //		ov=FP_YYY.EXCESS(this.f); 
 //		sb=1; while(ov!==0) {sb++;ov>>=1;} 
@@ -263,7 +264,7 @@ FP_YYY.prototype={
 /* this/=2 mod Modulus */
 	div2: function()
 	{
-		this.norm();
+//		this.norm();
 		if (this.f.parity()===0)
 			this.f.fshr(1);
 		else

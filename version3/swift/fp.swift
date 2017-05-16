@@ -256,12 +256,15 @@ final public class FP {
 /* this*=b mod Modulus */
     func mul(_ b: FP)
     {
-        norm()
-        b.norm()
-        let ea=FP.EXCESS(x)
-        let eb=FP.EXCESS(b.x)
+    //    norm()
+    //    b.norm()
+
+        if FP.pexceed(x,b.x) {reduce()}
+
+        //let ea=FP.EXCESS(x)
+        //let eb=FP.EXCESS(b.x)
         
-        if Int64(ea+1)*Int64(eb+1)>Int64(FP.FEXCESS) {reduce()}
+       // if Int64(ea+1)*Int64(eb+1)>Int64(FP.FEXCESS) {reduce()}
         /*if (ea+1)>=(FP.FEXCESS-1)/(eb+1) {reduce()}*/
         
         let d=BIG.mul(x,b.x)
@@ -286,8 +289,8 @@ final public class FP {
     {
         let m=BIG(FP.p);
     
-        norm();
-        let sb=FP.logb2(UInt32(FP.EXCESS(x)))
+    //    norm();
+        let sb=FP.logb2(UInt32(FP.EXCESS(x))+1)
  //       var ov=BIG.EXCESS(x);
  //       var sb=1; while(ov != 0) {sb += 1;ov>>=1}
     
@@ -300,7 +303,7 @@ final public class FP {
     func imul(_ c: Int)
     {
         var cc=c
-        norm();
+    //    norm();
         var s=false
         if (cc<0)
         {
@@ -308,9 +311,10 @@ final public class FP {
             s=true
         }
         let afx=(FP.EXCESS(x)+1)*(cc+1)+1;
-        if cc<BIG.NEXCESS && afx<FP.FEXCESS
+        if cc<=BIG.NEXCESS && afx<FP.FEXCESS
         {
-            x.imul(cc);
+            x.imul(cc)
+            x.norm()
         }
         else
         {
@@ -321,17 +325,21 @@ final public class FP {
 				x.copy(d.mod(FP.p));
             }
         }
-        if s {neg()}
-        norm();
+        if s {neg();  norm()}
+       
     }
     
 /* this*=this mod Modulus */
     func sqr()
     {
-        norm()
-        let ea=FP.EXCESS(x);
+    //    norm()
+
+        if FP.sexceed(x) {reduce()}
+
+
+     //   let ea=FP.EXCESS(x);
         
-        if Int64(ea+1)*Int64(ea+1)>Int64(FP.FEXCESS) {reduce()}
+    //    if Int64(ea+1)*Int64(ea+1)>Int64(FP.FEXCESS) {reduce()}
         /*if (ea+1)>=(FP.FEXCESS-1)/(ea+1) {reduce()}*/
         
         let d=BIG.sqr(x);
@@ -354,7 +362,7 @@ final public class FP {
 /* this/=2 mod Modulus */
     func div2()
     {
-        x.norm()
+    //    x.norm()
         if (x.parity()==0)
             {x.fshr(1)}
         else

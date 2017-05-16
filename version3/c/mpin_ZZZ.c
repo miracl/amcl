@@ -627,6 +627,7 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     {
         PAIR_ZZZ_G1mul(&P,y);  // y(A+AT)
         ECP_ZZZ_add(&P,&R); // x(A+AT)+y(A+T)
+		ECP_ZZZ_affine(&P);
         if (!ECP_ZZZ_fromOctet(&R,mSEC))  res=MPIN_INVALID_POINT; // V
     }
     if (res==0)
@@ -652,6 +653,7 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
                     {
                         PAIR_ZZZ_G1mul(&P,y);  // yA
                         ECP_ZZZ_add(&P,&R); // yA+xA
+						ECP_ZZZ_affine(&P);
                     }
                 }
                 if (res==0)
@@ -906,6 +908,7 @@ int MPIN_ZZZ_SERVER_KEY(int sha,octet *Z,octet *SST,octet *W,octet *H,octet *HID
     {
         PAIR_ZZZ_G1mul(&A,h);
         ECP_ZZZ_add(&R,&A);  // new
+		ECP_ZZZ_affine(&R);
         PAIR_ZZZ_ate(&g,&sQ,&R);
         PAIR_ZZZ_fexp(&g);
         PAIR_ZZZ_G1mul(&U,w);

@@ -601,7 +601,7 @@ public class MPIN
 		if (P.is_infinity()) return INVALID_POINT;
 
 		P=PAIR.G1mul(P,y);
-		P.add(R);
+		P.add(R); P.affine();
 		R=ECP.fromBytes(mSEC);
 		if (R.is_infinity()) return INVALID_POINT;
 
@@ -623,7 +623,7 @@ public class MPIN
 					if (R.is_infinity()) return INVALID_POINT;
 
 					P=PAIR.G1mul(P,y);
-					P.add(R);
+					P.add(R); P.affine();
 				}
 				g=PAIR.ate(Q,P);
 				g=PAIR.fexp(g);
@@ -796,7 +796,7 @@ public class MPIN
 		BIG w=BIG.fromBytes(W);
 		BIG h=BIG.fromBytes(H);
 		A=PAIR.G1mul(A,h);	// new
-		R.add(A);
+		R.add(A); R.affine();
 
 		U=PAIR.G1mul(U,w);
 		FP12 g=PAIR.ate(sQ,R);

@@ -50,14 +50,14 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 		T.mul(Y)
 		ZZ.mul(T)
 
-		NY:=NewFP2copy(P.gety()); NY.neg()
-		ZZ.add(NY)
+		NY:=NewFP2copy(P.gety()); NY.neg(); NY.norm()
+		ZZ.add(NY); ZZ.norm()
 		Z3.pmul(Qy)
 		T.mul(P.getx());
 		X.mul(NY);
-		T.add(X);
+		T.add(X); T.norm()
 		a=NewFP4fp2s(Z3,T)
-		ZZ.neg();
+		ZZ.neg(); ZZ.norm()
 		ZZ.pmul(Qx)
 		b=NewFP4fp2(ZZ)
 	} else { /* Doubling */
@@ -73,9 +73,9 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 		Z3.pmul(Qy)
 
 		X.mul(T)
-		X.sub(Y)
+		X.sub(Y); X.norm()
 		a=NewFP4fp2s(Z3,X)
-		T.neg()
+		T.neg(); T.norm()
 		ZZ.mul(T)
 		ZZ.pmul(Qx)
 		b=NewFP4fp2(ZZ)
@@ -96,8 +96,8 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 	} else {n.copy(x)}
 	
 	n.norm()
-	P.affine()
-	Q.affine()
+	//P.affine()
+	//Q.affine()
 	Qx:=NewFPcopy(Q.getx())
 	Qy:=NewFPcopy(Q.gety())
 
@@ -158,10 +158,10 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 	} else {n.copy(x)}
 	
 	n.norm()
-	P.affine()
-	Q.affine()
-	R.affine()
-	S.affine()
+	//P.affine()
+	//Q.affine()
+	//R.affine()
+	//S.affine()
 
 	Qx:=NewFPcopy(Q.getx())
 	Qy:=NewFPcopy(Q.gety())

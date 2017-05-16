@@ -380,18 +380,18 @@ pub fn extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isize {
 /* Functions to support M-Pin Full */
 #[allow(non_snake_case)]
 pub fn precompute(token: &[u8],cid: &[u8],g1: &mut [u8],g2: &mut [u8]) -> isize {
-	let mut T=ECP::frombytes(&token);
+	let T=ECP::frombytes(&token);
 	if T.is_infinity() {return INVALID_POINT} 
 
-	let mut P=mapit(&cid);
+	let P=mapit(&cid);
 
-	let mut Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
+	let Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
 
-	let mut g=pair::ate(&mut Q,&mut T);
+	let mut g=pair::ate(&Q,&T);
 	g=pair::fexp(&g);
 	g.tobytes(g1);
 
-	g=pair::ate(&mut Q,&mut P);
+	g=pair::ate(&Q,&P);
 	g=pair::fexp(&g);
 	g.tobytes(g2);
 
@@ -533,9 +533,9 @@ pub fn get_y(sha: usize,timevalue: usize,xcid: &[u8],y: &mut [u8]) {
 #[allow(non_snake_case)]
 pub fn server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],xid: Option<&[u8]>,xcid: Option<&[u8]>,msec: &[u8],e: Option<&mut [u8]>,f: Option<&mut [u8]>) -> isize {
 //	q:=NewBIGints(Modulus)
-	let mut Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
+	let Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
 
-	let mut sQ=ECP2::frombytes(&sst);
+	let sQ=ECP2::frombytes(&sst);
 	if sQ.is_infinity() {return INVALID_POINT}	
 
 	let mut R:ECP;
@@ -560,14 +560,14 @@ pub fn server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],x
 	if P.is_infinity() {return INVALID_POINT}
 
 	P=pair::g1mul(&mut P,&mut sy);
-	P.add(&mut R);
+	P.add(&mut R); P.affine();
 	R=ECP::frombytes(&msec);
 	if R.is_infinity() {return INVALID_POINT}
 
 	let mut g:FP12;
 //		FP12 g1=new FP12(0);
 
-	g=pair::ate2(&mut Q,&mut R,&mut sQ,&mut P);
+	g=pair::ate2(&Q,&R,&sQ,&P);
 	g=pair::fexp(&g);
 
 	if !g.isunity() {
@@ -583,9 +583,9 @@ pub fn server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],x
 						R=ECP::frombytes(&rxid);
 						if R.is_infinity() {return INVALID_POINT}			
 						P=pair::g1mul(&mut P,&mut sy);
-						P.add(&mut R);									
+						P.add(&mut R);	P.affine();								
 					}
-					g=pair::ate(&mut Q,&mut P);
+					g=pair::ate(&Q,&P);
 					g=pair::fexp(&g);
 					g.tobytes(rf);
 
@@ -737,7 +737,7 @@ pub fn client_key(sha: usize,g1: &[u8],g2: &[u8],pin: usize,r: &[u8],x: &[u8],h:
 /* Z=r.A - no time permits involved */
 #[allow(non_snake_case)]
 pub fn server_key(sha: usize,z: &[u8],sst: &[u8],w: &[u8],h: &[u8],hid: &[u8],xid: &[u8],xcid: Option<&[u8]>,sk: &mut [u8]) -> isize {
-	let mut sQ=ECP2::frombytes(&sst);
+	let sQ=ECP2::frombytes(&sst);
 	if sQ.is_infinity() {return INVALID_POINT} 
 	let mut R=ECP::frombytes(&z);
 	if R.is_infinity() {return INVALID_POINT} 
@@ -756,10 +756,10 @@ pub fn server_key(sha: usize,z: &[u8],sst: &[u8],w: &[u8],h: &[u8],hid: &[u8],xi
 	let mut w=BIG::frombytes(&w);
 	let mut h=BIG::frombytes(&h);
 	A=pair::g1mul(&mut A,&mut h);	// new
-	R.add(&mut A);
+	R.add(&mut A); R.affine();
 
 	U=pair::g1mul(&mut U,&mut w);
-	let mut g=pair::ate(&mut sQ,&mut R);
+	let mut g=pair::ate(&sQ,&R);
 	g=pair::fexp(&g);
 
 	let mut c=g.trace();

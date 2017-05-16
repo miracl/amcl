@@ -263,13 +263,14 @@ impl BIG {
 	}
 
 /* return number of bits */
-	pub fn nbits(&mut self) -> usize {
+	pub fn nbits(&self) -> usize {
 		let mut k=NLEN-1;
-		self.norm();
-		while (k as isize)>=0 && self.w[k]==0 {k=k-1}
+        let mut s=BIG::new_copy(&self);        
+		s.norm();
+		while (k as isize)>=0 && s.w[k]==0 {k=k-1}
 		if (k as isize) <0 {return 0}
 		let mut bts=BASEBITS*k;
-		let mut c=self.w[k];
+		let mut c=s.w[k];
 		while c!=0 {c/=2; bts+=1;}
 		return bts;
 	}
@@ -395,7 +396,7 @@ impl BIG {
 /* self*=x, where x is >NEXCESS */
     pub fn pmul(&mut self,c: isize) -> Chunk {
         let mut carry=0 as Chunk;
-        self.norm();
+        //self.norm();
         for i in 0 ..NLEN {
             let ak=self.w[i];
             let tuple=BIG::muladd(ak,c as Chunk,carry,0 as Chunk);
@@ -530,6 +531,7 @@ impl BIG {
     
         let mut i=8;
         while i<BIGBITS {
+            u.norm();
             b.copy(self);
             b.mod2m(i);
             let mut t1=BIG::smul(&u,&b);
@@ -540,7 +542,7 @@ impl BIG {
     
             let mut t2=BIG::smul(&u,&c);
             t2.mod2m(i);
-            t1.add(&t2);
+            t1.add(&t2); t1.norm();
             b=BIG::smul(&t1,&u);
             t1.copy(&b);
             t1.mod2m(i);
@@ -647,7 +649,7 @@ impl BIG {
         let mut d=DBIG::new();
         let mut j=0;
         let mut r:u8=0;
-        let mut t=BIG::new_copy(q);
+        let t=BIG::new_copy(q);
         for _ in 0..2*t.nbits() {
             if j==0 {
                 r=rng.getbyte();
@@ -754,15 +756,23 @@ impl BIG {
         if BIG::comp(&u,&one)==0 {self.copy(&x1)}
         else {self.copy(&x2)}
     }
-
+/*
+    pub fn isok(&self) ->bool {
+        let mut ok=true;
+        for i in 0 ..NLEN {
+            if (self.w[i]>>BASEBITS)!=0 {ok=false;}
+        }
+        return ok;
+    }
+*/
    /* return a*b as DBIG */
 //#[cfg(D32)]
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let rm=BMASK as DChunk;
         let rb=BASEBITS;
-     //   a.norm();
-     //   b.norm();
+     //if !a.isok() {println!("a not normalised in mul");}
+     //if !b.isok() {println!("b not normalised in mul");}
 
         let mut d: [DChunk; DNLEN] = [0; DNLEN];
         for i in 0 ..NLEN {
@@ -797,8 +807,8 @@ impl BIG {
         let mut c=DBIG::new();
         let rm=BMASK as DChunk;
         let rb=BASEBITS;
-    //    a.norm();
  
+        //if !a.isok() {println!("a not normalised in sqr");}
 
         let mut t=(a.w[0] as DChunk)*(a.w[0] as DChunk); 
         c.w[0]=(t&rm) as Chunk; let mut co=t>>rb;

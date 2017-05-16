@@ -47,8 +47,6 @@
 
 /*** END OF USER CONFIGURABLE SECTION ***/
 
-
-
 /* Create Integer types */
 /* Support for C99?  Note for GCC need to explicitly include -std=c99 in command line */
 
@@ -113,7 +111,7 @@
 #endif
 
 #ifdef dchunk
-#define COMBA      /**< Use COMBA method for faster BN muls, sqrs and reductions */
+#define COMBA      /**< Use COMBA method for faster muls, sqrs and reductions */
 #endif
 
 

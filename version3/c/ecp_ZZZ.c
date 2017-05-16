@@ -235,6 +235,7 @@ void ECP_ZZZ_rhs(BIG_XXX v,BIG_XXX x)
     if (CURVE_A_ZZZ==-1)
     {
         FP_YYY_add(v,v,one);
+		BIG_XXX_norm(v);
         FP_YYY_neg(v,v);
     }
     FP_YYY_redc(v);
@@ -569,6 +570,7 @@ void ECP_ZZZ_dbl(ECP_ZZZ *P)
         FP_YYY_neg(w1,w6);
         FP_YYY_add(w3,P->x,w1);
         FP_YYY_add(w8,P->x,w6);
+BIG_XXX_norm(w3); BIG_XXX_norm(w8);
         FP_YYY_mul(w3,w3,w8);
         BIG_XXX_imul(w8,w3,3);
     }
@@ -583,10 +585,11 @@ void ECP_ZZZ_dbl(ECP_ZZZ *P)
     FP_YYY_mul(w3,P->x,w2);
 
     BIG_XXX_imul(w3,w3,4);
+BIG_XXX_norm(w3);
     FP_YYY_neg(w1,w3);
 
-    BIG_XXX_norm(w1);
-
+BIG_XXX_norm(w1);
+BIG_XXX_norm(w8);
     FP_YYY_sqr(P->x,w8);
     FP_YYY_add(P->x,P->x,w1);
     FP_YYY_add(P->x,P->x,w1);
@@ -599,10 +602,13 @@ void ECP_ZZZ_dbl(ECP_ZZZ *P)
 
 
     FP_YYY_add(w7,w2,w2);
+BIG_XXX_norm(w7);
     FP_YYY_sqr(w2,w7);
 
     FP_YYY_add(w2,w2,w2);
     FP_YYY_sub(w3,w3,P->x);
+//BIG_XXX_norm(w2);
+BIG_XXX_norm(w3);
     FP_YYY_mul(P->y,w8,w3);
 
     FP_YYY_sub(P->y,P->y,w2);
@@ -624,19 +630,24 @@ void ECP_ZZZ_dbl(ECP_ZZZ *P)
     if (CURVE_A_ZZZ==-1) FP_YYY_neg(E,C);
     FP_YYY_add(F,E,D);
 
-    BIG_XXX_norm(F);
+BIG_XXX_norm(F);
 
     FP_YYY_sqr(H,P->z);
     FP_YYY_add(H,H,H);
+//BIG_XXX_norm(H);
     FP_YYY_sub(J,F,H);
+BIG_XXX_norm(B);
+BIG_XXX_norm(J);
     FP_YYY_mul(P->x,B,J);
     FP_YYY_sub(E,E,D);
+
+BIG_XXX_norm(E);
     FP_YYY_mul(P->y,F,E);
     FP_YYY_mul(P->z,F,J);
 
-    BIG_XXX_norm(P->x);
-    BIG_XXX_norm(P->y);
-    BIG_XXX_norm(P->z);
+//    BIG_XXX_norm(P->x);
+//    BIG_XXX_norm(P->y);
+//    BIG_XXX_norm(P->z);
 
 #endif
 
@@ -645,18 +656,21 @@ void ECP_ZZZ_dbl(ECP_ZZZ *P)
     if (ECP_ZZZ_isinf(P)) return;
 
     FP_YYY_add(A,P->x,P->z);
+BIG_XXX_norm(A);
     FP_YYY_sqr(AA,A);
     FP_YYY_sub(B,P->x,P->z);
+BIG_XXX_norm(B);
     FP_YYY_sqr(BB,B);
     FP_YYY_sub(C,AA,BB);
-
+BIG_XXX_norm(C);
     FP_YYY_mul(P->x,AA,BB);
     FP_YYY_imul(A,C,(CURVE_A_ZZZ+2)/4);
     FP_YYY_add(BB,BB,A);
+BIG_XXX_norm(BB);
     FP_YYY_mul(P->z,BB,C);
 
-    BIG_XXX_norm(P->x);
-    BIG_XXX_norm(P->z);
+//    BIG_XXX_norm(P->x);
+//    BIG_XXX_norm(P->z);
 #endif
 }
 
@@ -673,12 +687,18 @@ void ECP_ZZZ_add(ECP_ZZZ *P,ECP_ZZZ *Q,ECP_ZZZ *W)
     FP_YYY_add(C,Q->x,Q->z);
     FP_YYY_sub(D,Q->x,Q->z);
 
+BIG_XXX_norm(D);
+BIG_XXX_norm(A);
     FP_YYY_mul(DA,D,A);
+BIG_XXX_norm(C);
+BIG_XXX_norm(B);
     FP_YYY_mul(CB,C,B);
 
     FP_YYY_add(A,DA,CB);
+BIG_XXX_norm(A);
     FP_YYY_sqr(A,A);
     FP_YYY_sub(B,DA,CB);
+BIG_XXX_norm(B);
     FP_YYY_sqr(B,B);
 
     BIG_XXX_copy(P->x,A);
@@ -690,7 +710,6 @@ void ECP_ZZZ_add(ECP_ZZZ *P,ECP_ZZZ *Q,ECP_ZZZ *W)
 
     BIG_XXX_norm(P->x);
 }
-
 
 #else
 
@@ -761,18 +780,20 @@ void ECP_ZZZ_add(ECP_ZZZ *P,ECP_ZZZ *Q)
 
     FP_YYY_add(E,A,A);
     FP_YYY_add(E,E,B);
-
+BIG_XXX_norm(D);
+BIG_XXX_norm(E);
     FP_YYY_sqr(P->x,D);
     FP_YYY_sub(P->x,P->x,E);
-
+//BIG_XXX_norm(P->x);
     FP_YYY_sub(A,A,P->x);
+BIG_XXX_norm(A);
     FP_YYY_mul(P->y,A,D);
     FP_YYY_mul(C,C,B);
     FP_YYY_sub(P->y,P->y,C);
 
     BIG_XXX_norm(P->x);
     BIG_XXX_norm(P->y);
-    BIG_XXX_norm(P->z);
+ //   BIG_XXX_norm(P->z);
 
 #else
     BIG_XXX b,A,B,C,D,E,F,G;
@@ -795,21 +816,26 @@ void ECP_ZZZ_add(ECP_ZZZ *P,ECP_ZZZ *Q)
 
     FP_YYY_add(B,P->x,P->y);
     FP_YYY_add(D,Q->x,Q->y);
+BIG_XXX_norm(B);
+//BIG_XXX_norm(C);
+BIG_XXX_norm(D);
     FP_YYY_mul(B,B,D);
     FP_YYY_sub(B,B,C);
+BIG_XXX_norm(B);
+BIG_XXX_norm(F);
     FP_YYY_mul(B,B,F);
     FP_YYY_mul(P->x,A,B);
 
-
-    if (CURVE_A_ZZZ==1) FP_YYY_mul(C,E,G);
-    if (CURVE_A_ZZZ==-1)FP_YYY_mul(C,C,G);
+BIG_XXX_norm(G);
+    if (CURVE_A_ZZZ==1) {BIG_XXX_norm(E); FP_YYY_mul(C,E,G);}
+    if (CURVE_A_ZZZ==-1) {BIG_XXX_norm(C); FP_YYY_mul(C,C,G);}
 
     FP_YYY_mul(P->y,A,C);
     FP_YYY_mul(P->z,F,G);
 
-    BIG_XXX_norm(P->x);
-    BIG_XXX_norm(P->y);
-    BIG_XXX_norm(P->z);
+  //  BIG_XXX_norm(P->x);
+  //  BIG_XXX_norm(P->y);
+  //  BIG_XXX_norm(P->z);
 
 #endif
 }

@@ -218,7 +218,7 @@ final public class ECP {
             b.mul(r);
             b.sub(one);
             if ROM.CURVE_A == -1 {r.neg()}
-            r.sub(one)
+            r.sub(one); r.norm()
             b.inverse()
             r.mul(b);
         }
@@ -424,6 +424,7 @@ final public class ECP {
 				w1.neg()
 				w3.add(w1)
 				w8.add(w6)
+                w3.norm(); w8.norm();
 				w3.mul(w8)
 				w8.copy(w3)
 				w8.imul(3)
@@ -449,10 +450,10 @@ final public class ECP {
             z.mul(y)
             z.add(z)
     
-            w2.add(w2)
+            w2.add(w2); w2.norm()
             w2.sqr()
             w2.add(w2)
-            w3.sub(x)
+            w3.sub(x); w3.norm()
             y.copy(w8); y.mul(w3)
             //w2.norm();
             y.sub(w2)
@@ -466,23 +467,22 @@ final public class ECP {
             let H=FP(z)
             let J=FP(0)
     
-            x.mul(y); x.add(x)
+            x.mul(y); x.add(x); x.norm()
             C.sqr()
             D.sqr()
             if ROM.CURVE_A == -1 {C.neg()}
-            y.copy(C); y.add(D)
-            y.norm()
+            y.copy(C); y.add(D); y.norm()
             H.sqr(); H.add(H)
             z.copy(y)
-            J.copy(y); J.sub(H)
+            J.copy(y); J.sub(H); J.norm()
             x.mul(J)
-            C.sub(D)
+            C.sub(D); C.norm()
             y.mul(C)
             z.mul(J)
     
-            x.norm();
-            y.norm();
-            z.norm();
+         //   x.norm();
+         //   y.norm();
+         //   z.norm();
         }
         if ECP.CURVETYPE==ECP.MONTGOMERY
         {
@@ -494,21 +494,20 @@ final public class ECP {
     
             if INF {return}
     
-            A.add(z)
+            A.add(z); A.norm()
             AA.copy(A); AA.sqr()
-            B.sub(z)
+            B.sub(z); B.norm()
             BB.copy(B); BB.sqr()
-            C.copy(AA); C.sub(BB)
-    //C.norm();
+            C.copy(AA); C.sub(BB); C.norm()
     
             x.copy(AA); x.mul(BB)
     
             A.copy(C); A.imul((ROM.CURVE_A+2)/4)
     
-            BB.add(A)
+            BB.add(A); BB.norm()
             z.copy(BB); z.mul(C)
-            x.norm()
-            z.norm()
+        //    x.norm()
+        //    z.norm()
         }
         return
     }
@@ -579,16 +578,16 @@ final public class ECP {
             A.mul(e)
     
             e.copy(A)
-            e.add(A); e.add(B)
+            e.add(A); e.add(B); e.norm(); D.norm()
             x.copy(D); x.sqr(); x.sub(e)
     
-            A.sub(x)
+            A.sub(x); A.norm()
             y.copy(A); y.mul(D)
             C.mul(B); y.sub(C)
     
             x.norm()
             y.norm()
-            z.norm()
+        //    z.norm()
         }
         if ECP.CURVETYPE==ECP.EDWARDS
         {
@@ -618,22 +617,23 @@ final public class ECP {
     
             B.copy(x); B.add(y)
             D.copy(Q.x); D.add(Q.y)
+            B.norm(); D.norm()
             B.mul(D)
-            B.sub(C)
+            B.sub(C); B.norm(); F.norm()
             B.mul(F)
             x.copy(A); x.mul(B)
-
+            G.norm()
             if ROM.CURVE_A==1
             {
-				C.copy(E); C.mul(G)
+				E.norm(); C.copy(E); C.mul(G)
             }
             if ROM.CURVE_A == -1
             {
-				C.mul(G)
+				C.norm(); C.mul(G)
             }
             y.copy(A); y.mul(C)
             z.copy(F); z.mul(G)
-            x.norm(); y.norm(); z.norm()
+            //x.norm(); //y.norm(); //z.norm()
         }
         return;
     }

@@ -240,8 +240,8 @@ void FP_YYY_mul(BIG_XXX r,BIG_XXX a,BIG_XXX b)
 {
     DBIG_XXX d;
     chunk ea,eb;
-    BIG_XXX_norm(a);
-    BIG_XXX_norm(b);
+//    BIG_XXX_norm(a);
+//    BIG_XXX_norm(b);
     ea=EXCESS_YYY(a);
     eb=EXCESS_YYY(b);
 
@@ -281,15 +281,18 @@ void FP_YYY_imul(BIG_XXX r,BIG_XXX a,int c)
     BIG_XXX m;
     int s=0;
     chunk afx;
-    BIG_XXX_norm(a);
+//    BIG_XXX_norm(a);
     if (c<0)
     {
         c=-c;
         s=1;
     }
     afx=(EXCESS_YYY(a)+1)*(c+1)+1;
-    if (c<NEXCESS_XXX && afx<FEXCESS_YYY)
+    if (c<=NEXCESS_XXX && afx<FEXCESS_YYY)
+	{
         BIG_XXX_imul(r,a,c);
+		BIG_XXX_norm(r);
+	}
     else
     {
         if (afx<FEXCESS_YYY)
@@ -303,8 +306,11 @@ void FP_YYY_imul(BIG_XXX r,BIG_XXX a,int c)
             BIG_XXX_dmod(r,d,m);
         }
     }
-    if (s) FP_YYY_neg(r,r);
-    BIG_XXX_norm(r);
+    if (s) 
+	{
+		FP_YYY_neg(r,r);
+		BIG_XXX_norm(r);
+	}
 }
 
 /* Set r=a^2 mod m */
@@ -313,7 +319,7 @@ void FP_YYY_sqr(BIG_XXX r,BIG_XXX a)
 {
     DBIG_XXX d;
     chunk ea;
-    BIG_XXX_norm(a);
+//    BIG_XXX_norm(a);
     ea=EXCESS_YYY(a);
 #ifdef dchunk
     if ((dchunk)(ea+1)*(ea+1)>(dchunk)FEXCESS_YYY)
@@ -362,7 +368,9 @@ void FP_YYY_add(BIG_XXX r,BIG_XXX a,BIG_XXX b)
 void FP_YYY_sub(BIG_XXX r,BIG_XXX a,BIG_XXX b)
 {
     BIG_XXX n;
+//	BIG_XXX_norm(b);
     FP_YYY_neg(n,b);
+//	BIG_XXX_norm(n);
     FP_YYY_add(r,a,n);
 }
 
@@ -398,22 +406,12 @@ static int logb2(unsign32 v)
 void FP_YYY_neg(BIG_XXX r,BIG_XXX a)
 {
     int sb;
-//    chunk ov;
     BIG_XXX m;
 
     BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_norm(a);
+//    BIG_XXX_norm(a);
 
-    sb=logb2((unsign32)EXCESS_YYY(a));
-    /*
-        ov=EXCESS_YYY(a);
-        sb=1;
-        while(ov!=0)
-        {
-            sb++;    // only unpredictable branch
-            ov>>=1;
-        }
-    */
+    sb=logb2((unsign32)EXCESS_YYY(a)+1);
     BIG_XXX_fshl(m,sb);
     BIG_XXX_sub(r,m,a);
 
@@ -439,7 +437,7 @@ void FP_YYY_div2(BIG_XXX r,BIG_XXX a)
 {
     BIG_XXX m;
     BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_norm(a);
+//    BIG_XXX_norm(a);
     if (BIG_XXX_parity(a)==0)
     {
         BIG_XXX_copy(r,a);

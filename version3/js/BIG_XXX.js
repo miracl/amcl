@@ -322,7 +322,7 @@ BIG_XXX.prototype={
 	pmul: function(c)
 	{
 		var ak,carry=0;
-		this.norm();
+	//	this.norm();
 		for (var i=0;i<BIG_XXX.NLEN;i++)
 		{
 			ak=this.w[i];
@@ -379,12 +379,14 @@ BIG_XXX.prototype={
 
 		for (var i=8;i<BIG_XXX.BIGBITS;i<<=1)
 		{
+			U.norm();
 			b.copy(this); b.mod2m(i);
 			var t1=BIG_XXX.smul(U,b); t1.shr(i);
 			c.copy(this); c.shr(i); c.mod2m(i);
 
 			var t2=BIG_XXX.smul(U,c); t2.mod2m(i);
 			t1.add(t2);
+			t1.norm();
 			b=BIG_XXX.smul(t1,U); t1.copy(b);
 			t1.mod2m(i);
 
@@ -494,6 +496,18 @@ BIG_XXX.prototype={
 		this.norm();
 		return (this.w[0])&msk;
 	},
+
+	isok: function()
+	{
+		var ok=true;
+		for (var i=0;i<BIG_XXX.NLEN;i++)
+		{
+			if ((this.w[i]>>BIG_XXX.BASEBITS)!=0) ok=false;
+		}
+		return ok;
+	},
+
+
 /* Jacobi Symbol (this/p). Returns 0, 1 or -1 */
 	jacobi: function(p)
 	{
@@ -754,6 +768,9 @@ BIG_XXX.mul=function(a,b)
 		var d=[];
 		var s,t;
 
+//if (!a.isok()) alert("Problem in mul a");
+//if (!b.isok()) alert("Problem in mul b");
+
 		for (var i=0;i<BIG_XXX.NLEN;i++)
 			d[i]=a.w[i]*b.w[i];
 
@@ -809,6 +826,8 @@ BIG_XXX.sqr=function(a)
 {
 	var n,c=new DBIG_XXX(0);
 //	a.norm();
+
+//if (!a.isok()) alert("Problem in sqr");
 
 	c.w[0]=a.w[0]*a.w[0];
 

@@ -304,6 +304,8 @@ FF_WWW.prototype={
 		var nd2;
 		if (n==1)
 		{
+			x.v[xp].norm();
+			y.v[yp].norm();
 			var d=BIG_XXX.mul(x.v[xp],y.v[yp]);
 			this.v[vp+1]=d.split(8*BIG_XXX.MODBYTES);
 			this.v[vp].copy(d);
@@ -328,6 +330,7 @@ FF_WWW.prototype={
 		var nd2;
 		if (n==1)
 		{
+			x.v[xp].norm();
 			var d=BIG_XXX.sqr(x.v[xp]);
 			this.v[vp+1].copy(d.split(8*BIG_XXX.MODBYTES));
 			this.v[vp].copy(d);

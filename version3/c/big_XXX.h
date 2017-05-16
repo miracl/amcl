@@ -14,15 +14,20 @@
 #define NLEN_XXX (1+((8*MODBYTES_XXX-1)/BASEBITS_XXX))
 #define DNLEN_XXX 2*NLEN_XXX
 #define BMASK_XXX (((chunk)1<<BASEBITS_XXX)-1) /**< Mask = 2^BASEBITS-1 */
+#define NEXCESS_XXX (1<<(CHUNK-BASEBITS_XXX-1))           /**< 2^(CHUNK-BASEBITS-1) - digit cannot be multiplied by more than this before normalisation */
 
 #define HBITS_XXX (BASEBITS_XXX/2)      /**< Number of bits in number base divided by 2 */
 #define HMASK_XXX (((chunk)1<<HBITS_XXX)-1)    /**< Mask = 2^HBITS-1 */
 
-#define NEXCESS_XXX (1<<(CHUNK-BASEBITS_XXX-1)) 
+//#define DEBUG_NORM
 
 #ifdef DEBUG_NORM  /* Add an extra location to track chunk extension */
-typedef chunk BIG_XXX[NLEN_XXX+1];   /**< Define type BIG as array of chunks */
-typedef chunk DBIG_XXX[DNLEN_XXX+1]; /**< Define type DBIG as array of chunks */
+#define MPV_XXX NLEN_XXX
+#define MNV_XXX (NLEN_XXX+1)
+typedef chunk BIG_XXX[NLEN_XXX+2];   /**< Define type BIG as array of chunks */
+#define DMPV_XXX DNLEN_XXX
+#define DMNV_XXX (DNLEN_XXX+1)
+typedef chunk DBIG_XXX[DNLEN_XXX+2]; /**< Define type DBIG as array of chunks */
 #else
 typedef chunk BIG_XXX[NLEN_XXX];     /**< Define type BIG as array of chunks */
 typedef chunk DBIG_XXX[DNLEN_XXX];   /**< Define type DBIG as array of chunks */

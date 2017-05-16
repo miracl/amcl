@@ -71,6 +71,7 @@ void BIG_XXX_invmod2m(BIG_XXX a)
     BIG_XXX_inc(U,invmod256(BIG_XXX_lastbits(a,8)));
     for (i=8; i<BIGBITS_XXX; i<<=1)
     {
+		BIG_XXX_norm(U);
         BIG_XXX_copy(b,a);
         BIG_XXX_mod2m(b,i);   // bottom i bits of a
 
@@ -85,6 +86,7 @@ void BIG_XXX_invmod2m(BIG_XXX a)
         BIG_XXX_mod2m(b,i);  // bottom i bits of U*c
 
         BIG_XXX_add(t1,t1,b);
+		BIG_XXX_norm(t1);
         BIG_XXX_smul(b,t1,U);
         BIG_XXX_copy(t1,b);  // (t1+b)*U
         BIG_XXX_mod2m(t1,i);				// bottom i bits of (t1+b)*U
@@ -412,6 +414,8 @@ static void FF_WWW_karmul(BIG_XXX z[],int zp,BIG_XXX x[],int xp,BIG_XXX y[],int 
     int nd2;
     if (n==1)
     {
+		BIG_XXX_norm(x[xp]);
+		BIG_XXX_norm(y[yp]);
         BIG_XXX_mul(t[tp],x[xp],y[yp]);
         BIG_XXX_split(z[zp+1],z[zp],t[tp],BIGBITS_XXX);
         return;
@@ -437,6 +441,7 @@ static void FF_WWW_karsqr(BIG_XXX z[],int zp,BIG_XXX x[],int xp,BIG_XXX t[],int 
     int nd2;
     if (n==1)
     {
+		BIG_XXX_norm(x[xp]);
         BIG_XXX_sqr(t[tp],x[xp]);
         BIG_XXX_split(z[zp+1],z[zp],t[tp],BIGBITS_XXX);
         return;
@@ -458,6 +463,8 @@ static void FF_WWW_karmul_lower(BIG_XXX z[],int zp,BIG_XXX x[],int xp,BIG_XXX y[
     if (n==1)
     {
         /* only calculate bottom half of product */
+		BIG_XXX_norm(x[xp]);
+		BIG_XXX_norm(y[yp]);
         BIG_XXX_smul(z[zp],x[xp],y[yp]);
         return;
     }

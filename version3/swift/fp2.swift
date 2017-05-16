@@ -148,13 +148,13 @@ final public class FP2
     /* negate self mod Modulus */
     func neg()
     {
-        norm();
+    //    norm();
         let m=FP(a)
         let t=FP(0)
     
         m.add(b)
         m.neg()
-        m.norm()
+    //    m.norm()
         t.copy(m); t.add(b)
         b.copy(m)
         b.add(a)
@@ -164,7 +164,7 @@ final public class FP2
     /* set to a-ib */
     func conj()
     {
-        b.neg()
+        b.neg(); b.norm()
     }
 
     /* self+=a */
@@ -199,7 +199,7 @@ final public class FP2
     /* self*=self */
     func sqr()
     {
-        norm();
+    //    norm();
     
         let w1=FP(a)
         let w3=FP(a)
@@ -208,14 +208,18 @@ final public class FP2
         w1.add(b)
         mb.neg()
         a.add(mb)
+
+        a.norm()
+        w1.norm()
+
         a.mul(w1)
         b.copy(w3); b.add(w3)
-        norm()
+        b.norm()
     }
     /* self*=y */
     func mul(_ y:FP2)
     {
-        norm();  /* This is needed here as {a,b} is not normed before additions */
+    //    norm();  
     
         let w1=FP(a)
         let w2=FP(b)
@@ -226,6 +230,9 @@ final public class FP2
         w2.mul(y.b)  // w2=b*y.b  - this norms w2 and y.b, NOT b
         w5.add(b)    // w5=a+b
         b.copy(y.a); b.add(y.b) // b=y.a+y.b
+
+        b.norm()
+        w5.norm()
     
         b.mul(w5)
         mw.copy(w1); mw.add(w2); mw.neg()
@@ -247,10 +254,10 @@ final public class FP2
         w1.sqr(); w2.sqr(); w1.add(w2)
         if w1.jacobi() != 1 { zero(); return false; }
         w1=w1.sqrt()
-        w2.copy(a); w2.add(w1); w2.div2()
+        w2.copy(a); w2.add(w1); w2.norm(); w2.div2()
         if w2.jacobi() != 1
         {
-            w2.copy(a); w2.sub(w1); w2.div2()
+            w2.copy(a); w2.sub(w1); w2.norm(); w2.div2()
             if w2.jacobi() != 1 { zero(); return false }
         }
         w2=w2.sqrt()
@@ -283,7 +290,7 @@ final public class FP2
         w1.add(w2)
         w1.inverse()
         a.mul(w1)
-        w1.neg()
+        w1.neg(); w1.norm()
         b.mul(w1)
     }
 
@@ -306,14 +313,14 @@ final public class FP2
     /* where X*2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
     func mul_ip()
     {
-        norm();
+    //    norm();
         let t=FP2(self)
         let z=FP(a)
         a.copy(b)
         a.neg()
         b.copy(z)
         add(t)
-        norm()
+    //    norm()
     }
     /* w/=(1+sqrt(-1)) */
     func div_ip()
@@ -322,7 +329,7 @@ final public class FP2
         norm()
         t.a.copy(a); t.a.add(b)
         t.b.copy(b); t.b.sub(a)
-        copy(t)
+        copy(t); norm()
         div2()
     }
     

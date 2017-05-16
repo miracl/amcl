@@ -186,14 +186,14 @@ impl FP12 {
 		let mut d=FP4::new_copy(&self.a);
 
 		a.sqr();
-		b.mul(&mut self.c);
-		b.dbl();
+		b.mul(&self.c);
+		b.dbl(); b.norm();
 		c.sqr();
-		d.mul(&mut self.b);
+		d.mul(&self.b);
 		d.dbl();
 
 		self.c.add(&self.a);
-		self.c.add(&self.b);
+		self.c.add(&self.b); self.c.norm();
 		self.c.sqr();
 
 		self.a.copy(&a);
@@ -216,7 +216,7 @@ impl FP12 {
 
 
 /* FP12 full multiplication self=self*y */
-	pub fn mul(&mut self,y: &mut FP12) {
+	pub fn mul(&mut self,y: &FP12) {
 		let mut z0=FP4::new_copy(&self.a);
 		let mut z1=FP4::new();
 		let mut z2=FP4::new_copy(&mut self.b);
@@ -224,44 +224,46 @@ impl FP12 {
 		let mut t0=FP4::new_copy(&self.a);
 		let mut t1=FP4::new_copy(&y.a);
 
-		z0.mul(&mut y.a);
-		z2.mul(&mut y.b);
+		z0.mul(&y.a);
+		z2.mul(&y.b);
 
 		t0.add(&self.b);
 		t1.add(&y.b);
 
-		z1.copy(&t0); z1.mul(&mut t1);
-		t0.copy(&self.b); t0.add(&self.c);
+		t0.norm(); t1.norm();
 
+		z1.copy(&t0); z1.mul(&t1);
+		t0.copy(&self.b); t0.add(&self.c);
 		t1.copy(&y.b); t1.add(&y.c);
-		z3.copy(&t0); z3.mul(&mut t1);
+
+		t0.norm(); t1.norm();	
+
+		z3.copy(&t0); z3.mul(&t1);
 
 		t0.copy(&z0); t0.neg();
 		t1.copy(&z2); t1.neg();
 
 		z1.add(&t0);
-		z1.norm();
+		//z1.norm();
 		self.b.copy(&z1); self.b.add(&t1);
 
 		z3.add(&t1);
 		z2.add(&t0);
 
-		t0.copy(&self.a); t0.add(&self.c);
-		t1.copy(&y.a); t1.add(&y.c);
-		t0.mul(&mut t1);
+		t0.copy(&self.a); t0.add(&self.c); t0.norm();
+		t1.copy(&y.a); t1.add(&y.c); t1.norm();
+		t0.mul(&t1);
 		z2.add(&t0);
 
-		t0.copy(&self.c); t0.mul(&mut y.c);
+		t0.copy(&self.c); t0.mul(&y.c);
 		t1.copy(&t0); t1.neg();
 
-		z2.norm();
-		z3.norm();
-		self.b.norm();
 
 		self.c.copy(&z2); self.c.add(&t1);
 		z3.add(&t1);
 		t0.times_i();
 		self.b.add(&t0);
+		z3.norm();
 
 		z3.times_i();
 		self.a.copy(&z0); self.a.add(&z3);
@@ -269,40 +271,44 @@ impl FP12 {
 	}
 
 /* Special case of multiplication arises from special form of ATE pairing line function */
-	pub fn smul(&mut self,y: &mut FP12) {
+	pub fn smul(&mut self,y: &FP12) {
 		let mut z0=FP4::new_copy(&self.a);
 		let mut z2=FP4::new_copy(&self.b);
 		let mut z3=FP4::new_copy(&self.b);
 		let mut t0=FP4::new();
 		let mut t1=FP4::new_copy(&y.a);
 		
-		z0.mul(&mut y.a);
-		z2.pmul(&mut y.b.real());
+		z0.mul(&y.a);
+		z2.pmul(&y.b.real());
 		self.b.add(&self.a);
 		t1.padd(&y.b.real());
 
-		self.b.mul(&mut t1);
-		z3.add(&self.c);
-		z3.pmul(&mut y.b.real());
+		self.b.norm(); t1.norm();
+
+		self.b.mul(&t1);
+		z3.add(&self.c); z3.norm();
+		z3.pmul(&y.b.real());
 
 		t0.copy(&z0); t0.neg();
 		t1.copy(&z2); t1.neg();
-
+	
 		self.b.add(&t0);
-		self.b.norm();
+		//self.b.norm();
 
 		self.b.add(&t1);
 		z3.add(&t1);
 		z2.add(&t0);
 
 		t0.copy(&self.a); t0.add(&self.c);
-		t0.mul(&mut y.a);
+		t0.norm(); z3.norm();
+			
+		t0.mul(&y.a);
 		self.c.copy(&z2); self.c.add(&t0);
 
 		z3.times_i();
 		self.a.copy(&z0); self.a.add(&z3);
 
-		self.norm();
+		self.norm();		
 	}
 
 /* self=1/self */
@@ -314,47 +320,47 @@ impl FP12 {
 
 		self.norm();
 		f0.sqr();
-		f1.mul(&mut self.c);
+		f1.mul(&self.c);
 		f1.times_i();
-		f0.sub(&f1);
+		f0.sub(&f1); f0.norm();
 
 		f1.copy(&self.c); f1.sqr();
 		f1.times_i();
-		f2.mul(&mut self.b);
-		f1.sub(&f2);
+		f2.mul(&self.b);
+		f1.sub(&f2); f1.norm();
 
 		f2.copy(&self.b); f2.sqr();
-		f3.copy(&self.a); f3.mul(&mut self.c);
-		f2.sub(&f3);
+		f3.copy(&self.a); f3.mul(&self.c);
+		f2.sub(&f3); f2.norm();
 
-		f3.copy(&self.b); f3.mul(&mut f2);
+		f3.copy(&self.b); f3.mul(&f2);
 		f3.times_i();
-		self.a.mul(&mut f0);
+		self.a.mul(&f0);
 		f3.add(&self.a);
-		self.c.mul(&mut f1);
+		self.c.mul(&f1);
 		self.c.times_i();
 
-		f3.add(&self.c);
+		f3.add(&self.c); f3.norm();
 		f3.inverse();
-		self.a.copy(&f0); self.a.mul(&mut f3);
-		self.b.copy(&f1); self.b.mul(&mut f3);
-		self.c.copy(&f2); self.c.mul(&mut f3);
+		self.a.copy(&f0); self.a.mul(&f3);
+		self.b.copy(&f1); self.b.mul(&f3);
+		self.c.copy(&f2); self.c.mul(&f3);
 	}
 
 /* self=self^p using Frobenius */
-	pub fn frob(&mut self,f: &mut FP2) {
+	pub fn frob(&mut self,f: &FP2) {
 		let mut f2=FP2::new_copy(f);
 		let mut f3=FP2::new_copy(f);
 
 		f2.sqr();
-		f3.mul(&mut f2);
+		f3.mul(&f2);
 
-		self.a.frob(&mut f3);
-		self.b.frob(&mut f3);
-		self.c.frob(&mut f3);
+		self.a.frob(&f3);
+		self.b.frob(&f3);
+		self.c.frob(&f3);
 
 		self.b.pmul(f);
-		self.c.pmul(&mut f2);
+		self.c.pmul(&f2);
 	}
 
 /* trace function */
@@ -458,16 +464,16 @@ impl FP12 {
 	}
 
 /* self=self^e */
-	pub fn pow(&mut self,e: &mut BIG) -> FP12 {
-		self.norm();
-		e.norm();
+	pub fn pow(&self,e: &BIG) -> FP12 {
+		//self.norm();
+		//e.norm();
 		let mut w=FP12::new_copy(self);
 		let mut z=BIG::new_copy(&e);
 		let mut r=FP12::new_int(1);
 		loop {
 			let bt=z.parity();
 			z.fshr(1);
-			if bt==1 {r.mul(&mut w)};
+			if bt==1 {r.mul(&w)};
 			if z.iszilch() {break}
 			w.usqr();
 		}
@@ -483,14 +489,14 @@ impl FP12 {
 		for i in (0..bts).rev() {
 			let b:usize=((e>>i)&1) as usize;
 			t.copy(&r[b]);
-			r[1-b].mul(&mut t);
+			r[1-b].mul(&t);
 			r[b].usqr();
 		}
 		self.copy(&r[0]);
 	}
 
-	pub fn compow(&mut self,e: &BIG, r: &mut BIG) -> FP4 {
-		let mut f=FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
+	pub fn compow(&mut self,e: &BIG, r: &BIG) -> FP4 {
+		let f=FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
 		let q=BIG::new_ints(&rom::MODULUS);
 
 		let mut g1=FP12::new_copy(self);
@@ -508,12 +514,12 @@ impl FP12 {
 
 		let mut c=g1.trace();
 
-		g2.frob(&mut f);
+		g2.frob(&f);
 		let cp=g2.trace();
 		g1.conj();
-		g2.mul(&mut g1);
+		g2.mul(&g1);
 		let cpm1=g2.trace();
-		g2.mul(&mut g1);
+		g2.mul(&g1);
 		let cpm2=g2.trace();
 
 		c=c.xtr_pow2(&cp,&cpm1,&cpm2,&mut a,&mut b);
@@ -524,7 +530,7 @@ impl FP12 {
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
 /* Timing attack secure, but not cache attack secure */
 
- 	pub fn pow4(q:&mut [FP12],u:&[BIG]) -> FP12 {
+ 	pub fn pow4(q:&[FP12],u:&[BIG]) -> FP12 {
 		let mut a:[i8;4]=[0;4];
 		let mut s:[FP12;2]=[FP12::new(),FP12::new()];
 		let mut g:[FP12;8]=[FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new()];
@@ -537,35 +543,35 @@ impl FP12 {
 		let mut mt=BIG::new();
 		let mut t:[BIG;4]=[BIG::new_copy(&u[0]),BIG::new_copy(&u[1]),BIG::new_copy(&u[2]),BIG::new_copy(&u[3])];
 
-		g[0].copy(&q[0]); s[0].copy(&q[1]); s[0].conj(); g[0].mul(&mut s[0]);
+		g[0].copy(&q[0]); s[0].copy(&q[1]); s[0].conj(); g[0].mul(&s[0]);
 		p.copy(&g[0]);
 		g[1].copy(&p);
 		g[2].copy(&p);
 		g[3].copy(&p);
-		g[4].copy(&q[0]); g[4].mul(&mut q[1]);
+		g[4].copy(&q[0]); g[4].mul(&q[1]);
 		p.copy(&g[4]);
 		g[5].copy(&p);
 		g[6].copy(&p);
 		g[7].copy(&p);
 
 
-		s[1].copy(&q[2]); s[0].copy(&q[3]); s[0].conj(); p.copy(&s[0]); s[1].mul(&mut p);
-		p.copy(&s[1]); s[0].copy(&p); s[0].conj(); g[1].mul(&mut s[0]);
-		g[2].mul(&mut s[1]);
-		g[5].mul(&mut s[0]);
-		g[6].mul(&mut s[1]);
-		s[1].copy(&q[2]); s[1].mul(&mut q[3]);
-		p.copy(&s[1]); s[0].copy(&p); s[0].conj(); g[0].mul(&mut s[0]);
-		g[3].mul(&mut s[1]);
-		g[4].mul(&mut s[0]);
-		g[7].mul(&mut s[1]);
+		s[1].copy(&q[2]); s[0].copy(&q[3]); s[0].conj(); p.copy(&s[0]); s[1].mul(&p);
+		p.copy(&s[1]); s[0].copy(&p); s[0].conj(); g[1].mul(&s[0]);
+		g[2].mul(&s[1]);
+		g[5].mul(&s[0]);
+		g[6].mul(&s[1]);
+		s[1].copy(&q[2]); s[1].mul(&q[3]);
+		p.copy(&s[1]); s[0].copy(&p); s[0].conj(); g[0].mul(&s[0]);
+		g[3].mul(&s[1]);
+		g[4].mul(&s[0]);
+		g[7].mul(&s[1]);
 
 /* if power is even add 1 to power, and add q to correction */
 
 		for i in 0..4 {
 			if t[i].parity()==0 {
 				t[i].inc(1); t[i].norm();
-				c.mul(&mut q[i]);
+				c.mul(&q[i]);
 			}
 			mt.add(&t[i]); mt.norm();
 		}
@@ -590,9 +596,9 @@ impl FP12 {
 			j=(j-1)/2;
 			s[0].copy(&g[j]); s[1].copy(&g[j]); s[1].conj();
 			p.usqr();
-			p.mul(&mut s[(m&1) as usize]);
+			p.mul(&s[(m&1) as usize]);
 		}
-		p.mul(&mut c);  /* apply correction */
+		p.mul(&c);  /* apply correction */
 		p.reduce();
 		return p;
 	}

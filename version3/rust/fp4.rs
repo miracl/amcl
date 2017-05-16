@@ -92,17 +92,17 @@ impl FP4 {
 		return self.b.iszilch();
 	}
 /* extract real part a */
-	pub fn real(&mut self) -> FP2 {
+	pub fn real(&self) -> FP2 {
 		let f=FP2::new_copy(&self.a);
 		return f;
 	}
 
-	pub fn geta(&mut self) -> FP2 {
+	pub fn geta(&self) -> FP2 {
 		let f=FP2::new_copy(&self.a);
 		return f;
 	}
 /* extract imaginary part b */
-	pub fn getb(&mut self) -> FP2 {
+	pub fn getb(&self) -> FP2 {
 		let f=FP2::new_copy(&self.b);
 		return f;
 	}
@@ -131,28 +131,29 @@ impl FP4 {
 
 /* negate self mod Modulus */
 	pub fn neg(&mut self) {
-		self.norm();
+	//	self.norm();
 		let mut m=FP2::new_copy(&self.a);
 		let mut t=FP2::new();
 
 		m.add(&self.b);
 		m.neg();
-		m.norm();
+	//	m.norm();
 		t.copy(&m); t.add(&self.b);
 		self.b.copy(&m);
 		self.b.add(&self.a);
 		self.a.copy(&t);
+		self.norm();
 	}	
 
 /* set to a-ib */
 	pub fn conj(&mut self) {
 		self.b.neg();
-		self.b.norm();
+		self.norm();
 	}
 
 /* self=-conjugate(self) */
 	pub fn nconj(&mut self) {
-		self.a.neg(); self.a.norm();
+		self.a.neg(); self.norm();
 	}
 
 /* self+=a */
@@ -178,7 +179,7 @@ impl FP4 {
 	}
 
 /* self*=s, where s is an FP */
-	pub fn pmul(&mut self,s:&mut FP2) {
+	pub fn pmul(&mut self,s:&FP2) {
 		self.a.mul(s);
 		self.b.mul(s);
 	}
@@ -191,25 +192,29 @@ impl FP4 {
 
 /* self*=self */	
 	pub fn sqr(&mut self) {
-		self.norm();
+	//	self.norm();
 
 		let mut t1=FP2::new_copy(&self.a);
 		let mut t2=FP2::new_copy(&self.b);
 		let mut t3=FP2::new_copy(&self.a);
 
 
-		t3.mul(&mut self.b);
+		t3.mul(&self.b);
 		t1.add(&self.b);
 		t2.mul_ip();
 
-		t2.add(&mut self.a);
+		t2.add(&self.a);
+
+		t1.norm();
+		t2.norm();
+
 		self.a.copy(&t1);
 
-		self.a.mul(&mut t2);
+		self.a.mul(&t2);
 
 		t2.copy(&t3);
 		t2.mul_ip();
-		t2.add(&mut t3);
+		t2.add(&t3); t2.norm();
 		t2.neg();
 		self.a.add(&t2);
 
@@ -220,7 +225,7 @@ impl FP4 {
 	}
 
 /* self*=y */
-	pub fn mul(&mut self,y :&mut FP4) {
+	pub fn mul(&mut self,y :&FP4) {
 		self.norm();
 
 		let mut t1=FP2::new_copy(&self.a);
@@ -228,18 +233,26 @@ impl FP4 {
 		let mut t3=FP2::new();
 		let mut t4=FP2::new_copy(&self.b);
 
-		t1.mul(&mut y.a);
-		t2.mul(&mut y.b);
+		t1.mul(&y.a);
+		t2.mul(&y.b);
 		t3.copy(&y.b);
 		t3.add(&y.a);
 		t4.add(&self.a);
 
-		t4.mul(&mut t3);
-		t4.sub(&t1);
+		t3.norm(); t4.norm();
+
+		t4.mul(&t3);
+
+		t3.copy(&t1);
+		t3.neg();
+		t4.add(&t3);
 		t4.norm();
 
+		t3.copy(&t2);
+		t3.neg();
 		self.b.copy(&t4);
-		self.b.sub(&t2);
+		self.b.add(&t3);	
+
 		t2.mul_ip();
 		self.a.copy(&t2);
 		self.a.add(&t1);
@@ -261,28 +274,29 @@ impl FP4 {
 
 		t1.sqr();
 		t2.sqr();
-		t2.mul_ip();
+		t2.mul_ip(); t2.norm();
 		t1.sub(&t2);
 		t1.inverse();
-		self.a.mul(&mut t1);
-		t1.neg();
-		self.b.mul(&mut t1);
+		self.a.mul(&t1);
+		t1.neg(); t1.norm();
+		self.b.mul(&t1);
 	}	
 
 /* self*=i where i = sqrt(-1+sqrt(-1)) */
 	pub fn times_i(&mut self) {
-		self.norm();
+	//	self.norm();
 		let mut s=FP2::new_copy(&self.b);
 		let mut t=FP2::new_copy(&self.b);
 		s.times_i();
 		t.add(&s);
-		t.norm();
+	//	t.norm();
 		self.b.copy(&self.a);
 		self.a.copy(&t);
+		self.norm();
 	}	
 
 /* self=self^p using Frobenius */
-	pub fn frob(&mut self,f: &mut FP2) {
+	pub fn frob(&mut self,f: &FP2) {
 		self.a.conj();
 		self.b.conj();
 		self.b.mul(f);
@@ -310,10 +324,11 @@ impl FP4 {
 	pub fn xtr_a(&mut self,w:&FP4,y:&FP4,z:&FP4) {
 		let mut r=FP4::new_copy(w);
 		let mut t=FP4::new_copy(w);
-		r.sub(y);
-		r.pmul(&mut self.a);
-		t.add(y);
-		t.pmul(&mut self.b);
+	//	y.norm();
+		r.sub(y); r.norm();
+		r.pmul(&self.a);
+		t.add(y); t.norm();
+		t.pmul(&self.b);
 		t.times_i();
 
 		self.copy(&r);
@@ -327,7 +342,7 @@ impl FP4 {
 	pub fn xtr_d(&mut self) {
 		let mut w=FP4::new_copy(self);
 		self.sqr(); w.conj();
-		w.dbl();
+		w.dbl(); w.norm();
 		self.sub(&w);
 		self.reduce();
 	}

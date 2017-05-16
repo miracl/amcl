@@ -52,14 +52,14 @@ final public class PAIR {
             T.mul(Y)
             ZZ.mul(T)
     
-            let NY=FP2(P.gety()); NY.neg()
-            ZZ.add(NY)
+            let NY=FP2(P.gety()); NY.neg(); NY.norm()
+            ZZ.add(NY); ZZ.norm()
             Z3.pmul(Qy)
             T.mul(P.getx())
             X.mul(NY)
-            T.add(X)
+            T.add(X); T.norm()
             a=FP4(Z3,T)
-            ZZ.neg()
+            ZZ.neg(); ZZ.norm()
             ZZ.pmul(Qx)
             b=FP4(ZZ)
         }
@@ -77,9 +77,9 @@ final public class PAIR {
             Z3.pmul(Qy)
     
             X.mul(T)
-            X.sub(Y)
+            X.sub(Y); X.norm()
             a=FP4(Z3,X)
-            T.neg()
+            T.neg(); T.norm()
             ZZ.mul(T)
             ZZ.pmul(Qx)
             b=FP4(ZZ)
@@ -101,8 +101,8 @@ final public class PAIR {
 	} else {n.copy(x)}
 	
 	n.norm()
-        P.affine()
-        Q.affine()
+    //    P.affine()
+    //    Q.affine()
         let Qx=FP(Q.getx())
         let Qy=FP(Q.gety())
     
@@ -163,10 +163,10 @@ final public class PAIR {
         } else {n.copy(x)}
 	
         n.norm()
-        P.affine()
-        Q.affine()
-        R.affine()
-        S.affine()
+    //    P.affine()
+    //    Q.affine()
+    //    R.affine()
+    //    S.affine()
     
         let Qx=FP(Q.getx())
         let Qy=FP(Q.gety())

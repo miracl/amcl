@@ -396,7 +396,7 @@ final public class BIG{
     @discardableResult func pmul(_ c: Int) -> Chunk
     {
         var carry=Chunk(0);
-        norm();
+        //norm();
         for i in 0 ..< BIG.NLEN
         {
             let ak=w[i]
@@ -540,6 +540,7 @@ final public class BIG{
         var i=UInt(8)
         while (i<BIG.BIGBITS)
         {
+            U.norm();
             b.copy(self)
             b.mod2m(i)
             let t1=BIG.smul(U,b)
@@ -550,7 +551,7 @@ final public class BIG{
     
             let t2=BIG.smul(U,c)
             t2.mod2m(i)
-            t1.add(t2)
+            t1.add(t2); t1.norm()
             b=BIG.smul(t1,U)
             t1.copy(b)
             t1.mod2m(i)
@@ -876,9 +877,6 @@ final public class BIG{
         let RM:DChunk=DChunk(BIG.BMASK);
         let RB:DChunk=DChunk(BIG.BASEBITS)
    //     a.norm();
- 
-
-
 
         t=DChunk(a.w[0])*DChunk(a.w[0])
         c.w[0]=Chunk(t&RM); co=t>>RB

@@ -210,7 +210,7 @@ public final class ECP {
 			b.sub(one);
 			if (ROM.CURVE_A==-1) r.neg();
 			r.sub(one);
-
+	r.norm();
 			b.inverse();
 
 			r.mul(b);
@@ -404,6 +404,7 @@ public final class ECP {
 				w1.neg();
 				w3.add(w1);
 				w8.add(w6);
+			w3.norm(); w8.norm();
 				w3.mul(w8);
 				w8.copy(w3);
 				w8.imul(3);
@@ -418,9 +419,10 @@ public final class ECP {
 			w2.copy(y); w2.sqr();
 			w3.copy(x); w3.mul(w2);
 			w3.imul(4);
+		//w3.norm();
 			w1.copy(w3); w1.neg();
 			w1.norm();
-
+		//w8.norm();
 			x.copy(w8); x.sqr();
 			x.add(w1);
 			x.add(w1);
@@ -430,9 +432,12 @@ public final class ECP {
 			z.add(z);
 
 			w2.add(w2);
+		w2.norm();
 			w2.sqr();
 			w2.add(w2);
 			w3.sub(x);
+		//w2.norm(); 
+		w3.norm();
 			y.copy(w8); y.mul(w3);
 			y.sub(w2);
 			y.norm();
@@ -446,22 +451,26 @@ public final class ECP {
 			FP J=new FP(0);
 	
 			x.mul(y); x.add(x);
+		x.norm();
 			C.sqr();
 			D.sqr();
 			if (ROM.CURVE_A==-1) C.neg();	
 			y.copy(C); y.add(D);
-			y.norm();
+		y.norm();
 			H.sqr(); H.add(H);
+		//H.norm();
 			z.copy(y);
 			J.copy(y); J.sub(H);
+		J.norm();
 			x.mul(J);
 			C.sub(D);
+		C.norm();
 			y.mul(C);
 			z.mul(J);
 
-			x.norm();
-			y.norm();
-			z.norm();
+		//	x.norm();
+		//	y.norm();
+		//	z.norm();
 		}
 		if (CURVETYPE==MONTGOMERY)
 		{
@@ -474,19 +483,22 @@ public final class ECP {
 			if (INF) return;
 
 			A.add(z);
+		A.norm();
 			AA.copy(A); AA.sqr();
 			B.sub(z);
+		B.norm();
 			BB.copy(B); BB.sqr();
 			C.copy(AA); C.sub(BB);
-
+		C.norm();
 			x.copy(AA); x.mul(BB);
 
 			A.copy(C); A.imul((ROM.CURVE_A+2)/4);
 
 			BB.add(A);
+		BB.norm();
 			z.copy(BB); z.mul(C);
-			x.norm();
-			z.norm();
+		//	x.norm();
+		//	z.norm();
 		}
 		return;
 	}
@@ -556,15 +568,19 @@ public final class ECP {
 
 			e.copy(A);
 			e.add(A); e.add(B);
+		D.norm();
+		e.norm();
 			x.copy(D); x.sqr(); x.sub(e);
+		//x.norm();
 
 			A.sub(x);
+		A.norm();
 			y.copy(A); y.mul(D); 
 			C.mul(B); y.sub(C);
 
 			x.norm();
 			y.norm();
-			z.norm();
+		//	z.norm();
 		}
 		if (CURVETYPE==EDWARDS)
 		{
@@ -596,22 +612,28 @@ public final class ECP {
 
 			B.copy(x); B.add(y);
 			D.copy(Q.x); D.add(Q.y); 
+		B.norm();
+		//C.norm();
+		D.norm();
 			B.mul(D);
 			B.sub(C);
+		B.norm();
+		F.norm();
 			B.mul(F);
 			x.copy(A); x.mul(B);
-
+		G.norm();
 			if (ROM.CURVE_A==1)
 			{
+		E.norm();
 				C.copy(E); C.mul(G);
 			}
 			if (ROM.CURVE_A==-1)
 			{
-				C.mul(G);
+				C.norm(); C.mul(G);
 			}
 			y.copy(A); y.mul(C);
 			z.copy(F); z.mul(G);
-			x.norm(); y.norm(); z.norm();
+			//x.norm(); //y.norm(); //z.norm();
 		}
 		return;
 	}
@@ -630,12 +652,19 @@ public final class ECP {
 
 			C.add(Q.z);
 			D.sub(Q.z);
+		A.norm();
+		D.norm();
 
 			DA.copy(D); DA.mul(A);
+
+		C.norm();
+		B.norm();
 			CB.copy(C); CB.mul(B);
 
-			A.copy(DA); A.add(CB); A.sqr();
-			B.copy(DA); B.sub(CB); B.sqr();
+			A.copy(DA); A.add(CB); 
+		A.norm(); A.sqr();
+			B.copy(DA); B.sub(CB); 
+		B.norm(); B.sqr();
 
 			x.copy(A);
 			z.copy(W.x); z.mul(B);
@@ -643,7 +672,7 @@ public final class ECP {
 			if (z.iszilch()) inf();
 			else INF=false;
 
-			x.norm();
+		//	x.norm();
 	}
 /* this-=Q */
 	public void sub(ECP Q) {

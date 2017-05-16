@@ -251,8 +251,8 @@ public final class FP {
 /* this*=b mod Modulus */
 	public void mul(FP b)
 	{
-		norm();
-		b.norm();
+//		norm();
+//		b.norm();
 
 		if (pexceed(x,b.x)) reduce();
 
@@ -263,16 +263,17 @@ public final class FP {
 /* this*=c mod Modulus, where c is a small int */
 	public void imul(int c)
 	{
-		norm();
+//		norm();
 		boolean s=false;
 		if (c<0)
 		{
 			c=-c;
 			s=true;
 		}
-		if (c<BIG.NEXCESS && ((EXCESS(x)+1)*(c+1)+1)<FEXCESS)
+		if (c<=BIG.NEXCESS && ((EXCESS(x)+1)*(c+1)+1)<FEXCESS)
 		{
 			x.imul(c);
+			x.norm();
 		}
 		else
 		{
@@ -283,15 +284,14 @@ public final class FP {
 				x.copy(d.mod(p));
 			}
 		}
-		if (s) neg();
-		norm();
+		if (s) {neg(); norm();}
 	}
 
 /* this*=this mod Modulus */
 	public void sqr()
 	{
 		DBIG d;
-		norm();
+//		norm();
 
 		if (sexceed(x)) reduce();
 
@@ -329,8 +329,9 @@ public final class FP {
 		int sb;
 		BIG m=new BIG(p);
 
-		norm();
-		sb=logb2((int)EXCESS(x));
+//	if (!x.isok()) System.out.println("Problem in neg");
+//		norm();
+		sb=logb2((int)EXCESS(x)+1);
 /*
 		ov=EXCESS(x); 
 		sb=1; while(ov!=0) {sb++;ov>>=1;} 
@@ -346,13 +347,14 @@ public final class FP {
 	{
 		FP n=new FP(b);
 		n.neg();
+//	n.norm();
 		this.add(n);
 	}
 
 /* this/=2 mod Modulus */
 	public void div2()
 	{
-		x.norm();
+//		x.norm();
 		if (x.parity()==0)
 			x.fshr(1);
 		else

@@ -256,10 +256,10 @@ impl FP {
     }
 
 /* this*=b mod Modulus */
-    pub fn mul(&mut self,b: &mut FP)
+    pub fn mul(&mut self,b: &FP)
     {
-        self.norm();
-        b.norm();
+    //    self.norm();
+    //    b.norm();
         if FP::pexceed(&(self.x),&(b.x)) {self.reduce()}
 
         let mut d=BIG::mul(&(self.x),&(b.x));
@@ -284,9 +284,9 @@ impl FP {
     pub fn neg(&mut self) {
   		let mut p = BIG::new_ints(&rom::MODULUS);   
     
-        self.norm();
+    //    self.norm();
 
-        let sb=FP::logb2(FP::excess(&(self.x)) as u32);
+        let sb=FP::logb2((FP::excess(&(self.x))+1) as u32);
 
     //    let mut ov=BIG::excess(&(self.x));
     //    let mut sb=1; while ov != 0 {sb += 1;ov>>=1}
@@ -300,15 +300,16 @@ impl FP {
     /* this*=c mod Modulus, where c is a small int */
     pub fn imul(&mut self,c: isize) {
         let mut cc=c;
-        self.norm();
+    //    self.norm();
         let mut s=false;
         if cc<0 {
             cc = -cc;
             s=true;
         }
         let afx=(FP::excess(&(self.x))+1)*((cc as Chunk)+1)+1;
-        if cc<big::NEXCESS && afx<FEXCESS {
+        if cc<=big::NEXCESS && afx<FEXCESS {
             self.x.imul(cc);
+            self.norm();
         } else {
             if afx<FEXCESS {
             	self.x.pmul(cc);
@@ -318,13 +319,12 @@ impl FP {
 				self.x.copy(&d.dmod(&p));
             }
         }
-        if s {self.neg()}
-        self.norm();
+        if s {self.neg(); self.norm();}
     }
 
 /* self*=self mod Modulus */
     pub fn sqr(&mut self) {
-        self.norm();
+    //    self.norm();
         if FP::sexceed(&(self.x)) {self.reduce()}
 
         let mut d=BIG::sqr(&(self.x));
@@ -353,7 +353,7 @@ impl FP {
 
 /* self/=2 mod Modulus */
     pub fn div2(&mut self) {
-        self.x.norm();
+    //    self.x.norm();
         if self.x.parity()==0 {
         	self.x.fshr(1);
         } else {
@@ -390,7 +390,7 @@ impl FP {
         loop {
             let bt=e.parity();
             e.fshr(1);
-            if bt==1 {r.mul(&mut m)}
+            if bt==1 {r.mul(&m)}
             if e.iszilch() {break}
             m.sqr();
         }
@@ -405,11 +405,11 @@ impl FP {
         if MOD8==5 {
             p.dec(5); p.norm(); p.shr(3);
             let mut i=FP::new_copy(self); i.x.shl(1);
-            let mut v=i.pow(&mut p);
-            i.mul(&mut v); i.mul(&mut v);
+            let v=i.pow(&mut p);
+            i.mul(&v); i.mul(&v);
             i.x.dec(1);
             let mut r=FP::new_copy(self);
-            r.mul(&mut v); r.mul(&mut i);
+            r.mul(&v); r.mul(&i);
             r.reduce();
             return r;
         }

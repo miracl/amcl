@@ -1,4 +1,4 @@
-NOTE: This version of the library requires Version 1.17 of Rust for 64-bit 
+NOTE: This version of the library requires Version 1.17+ of Rust for 64-bit 
 support. 
 
 Namespaces are used to separate different curves.

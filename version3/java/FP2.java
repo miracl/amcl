@@ -142,13 +142,14 @@ public final class FP2 {
 /* negate this mod Modulus */
 	public void neg()
 	{
-		norm();
+//		norm();
 		FP m=new FP(a);
 		FP t=new FP(0);
 
 		m.add(b);
+//	m.norm();
 		m.neg();
-		m.norm();
+		//m.norm();
 		t.copy(m); t.add(b);
 		b.copy(m);
 		b.add(a);
@@ -158,7 +159,9 @@ public final class FP2 {
 /* set to a-ib */
 	public void conj()
 	{
+//	b.norm();
 		b.neg();
+	b.norm();
 	}
 
 /* this+=a */
@@ -173,6 +176,7 @@ public final class FP2 {
 	{
 		FP2 m=new FP2(x);
 		m.neg();
+//	m.norm();
 		add(m);
 	}
 
@@ -193,7 +197,7 @@ public final class FP2 {
 /* this*=this */
 	public void sqr()
 	{
-		norm();
+//		norm();
 		FP w1=new FP(a);
 		FP w3=new FP(a);
 		FP mb=new FP(b);
@@ -202,15 +206,19 @@ public final class FP2 {
 		w1.add(b);
 		mb.neg();
 		a.add(mb);
+
+	w1.norm();
+	a.norm();
+
 		a.mul(w1);
 		b.copy(w3); b.add(w3);
-		norm();
+	b.norm();
 	}
 
 /* this*=y */
 	public void mul(FP2 y)
 	{
-		norm();  /* This is needed here as {a,b} is not normed before additions */
+//		norm();  
 
 		FP w1=new FP(a);
 		FP w2=new FP(b);
@@ -222,8 +230,13 @@ public final class FP2 {
 		w5.add(b);    // w5=a+b
 		b.copy(y.a); b.add(y.b); // b=y.a+y.b
 
+	w5.norm();
+	b.norm();
+
 		b.mul(w5);
-		mw.copy(w1); mw.add(w2); mw.neg();
+		mw.copy(w1); mw.add(w2); 
+	//mw.norm(); 
+		mw.neg();
 
 		b.add(mw); mw.add(w1);
 		a.copy(w1);	a.add(mw);
@@ -241,10 +254,12 @@ public final class FP2 {
 		w1.sqr(); w2.sqr(); w1.add(w2);
 		if (w1.jacobi()!=1) { zero(); return false; }
 		w1=w1.sqrt();
-		w2.copy(a); w2.add(w1); w2.div2();
+		w2.copy(a); w2.add(w1); 
+		w2.norm(); w2.div2();
 		if (w2.jacobi()!=1)
 		{
-			w2.copy(a); w2.sub(w1); w2.div2();
+			w2.copy(a); w2.sub(w1); 
+			w2.norm(); w2.div2();
 			if (w2.jacobi()!=1) { zero(); return false; }
 		}
 		w2=w2.sqrt();
@@ -279,6 +294,7 @@ public final class FP2 {
 		w1.inverse();
 		a.mul(w1);
 		w1.neg();
+	w1.norm();
 		b.mul(w1);
 	}
 
@@ -302,14 +318,14 @@ public final class FP2 {
 /* where X*2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
 	public void mul_ip()
 	{
-		norm();
+//		norm();
 		FP2 t=new FP2(this);
 		FP z=new FP(a);
 		a.copy(b);
 		a.neg();
 		b.copy(z);
 		add(t);
-		norm();
+//		norm();
 	}
 
 /* w/=(1+sqrt(-1)) */
@@ -320,6 +336,7 @@ public final class FP2 {
 		t.a.copy(a); t.a.add(b);
 		t.b.copy(b); t.b.sub(a);
 		copy(t);
+	norm();
 		div2();
 	}
 /*

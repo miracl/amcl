@@ -137,13 +137,15 @@ void FP2_YYY_neg(FP2_YYY *w,FP2_YYY *x)
 {
     /* Just one neg! */
     BIG_XXX m,t;
-    FP2_YYY_norm(x);
+//    FP2_YYY_norm(x);
     FP_YYY_add(m,x->a,x->b);
+//BIG_XXX_norm(m);
     FP_YYY_neg(m,m);
-    BIG_XXX_norm(m);
+//    BIG_XXX_norm(m);
     FP_YYY_add(t,m,x->b);
     FP_YYY_add(w->b,m,x->a);
     BIG_XXX_copy(w->a,t);
+
 }
 
 /* Set w=conj(x) */
@@ -151,7 +153,9 @@ void FP2_YYY_neg(FP2_YYY *w,FP2_YYY *x)
 void FP2_YYY_conj(FP2_YYY *w,FP2_YYY *x)
 {
     BIG_XXX_copy(w->a,x->a);
+//	BIG_XXX_norm(x->b);
     FP_YYY_neg(w->b,x->b);
+	BIG_XXX_norm(w->b);
 }
 
 /* Set w=x+y */
@@ -163,11 +167,13 @@ void FP2_YYY_add(FP2_YYY *w,FP2_YYY *x,FP2_YYY *y)
 }
 
 /* Set w=x-y */
-/* SU= 16 */
+/* Input y MUST be normed */ 
 void FP2_YYY_sub(FP2_YYY *w,FP2_YYY *x,FP2_YYY *y)
 {
     FP2_YYY m;
+
     FP2_YYY_neg(&m,y);
+//	FP2_YYY_norm(&m);
     FP2_YYY_add(w,x,&m);
 }
 
@@ -197,17 +203,20 @@ void FP2_YYY_sqr(FP2_YYY *w,FP2_YYY *x)
     FP_YYY_add(w1,x->a,x->b); /* w1#2 w1=2 */
     FP_YYY_neg(mb,x->b);      /* mb#2 mb=1 */
     FP_YYY_add(w->a,x->a,mb);   /* w2#3 w2=3 */
+
+	BIG_XXX_norm(w->a);
+	BIG_XXX_norm(w1);
+
     FP_YYY_mul(w->a,w1,w->a);     /* w->a#2 w->a=1 w1&w2=6 w1*w2=2 */
 
     FP_YYY_add(w->b,w3,w3); /* w->b#4 w->b=2 */
 
-    FP2_YYY_norm(w);
-
+    BIG_XXX_norm(w->b);
 }
 
 
 /* Set w=x*y */
-/* SU= 168 */
+/* Inputs MUST be normed  */
 void FP2_YYY_mul(FP2_YYY *w,FP2_YYY *x,FP2_YYY *y)
 {
     BIG_XXX w1,w2,w5,mw;
@@ -216,11 +225,15 @@ void FP2_YYY_mul(FP2_YYY *w,FP2_YYY *x,FP2_YYY *y)
     FP_YYY_mul(w2,x->b,y->b);  /* and y */
 
     FP_YYY_add(w5,x->a,x->b);
-
     FP_YYY_add(w->b,y->a,y->b);
+
+	BIG_XXX_norm(w->b);
+	BIG_XXX_norm(w5);
 
     FP_YYY_mul(w->b,w->b,w5);
     FP_YYY_add(mw,w1,w2);
+//	BIG_XXX_norm(mw);
+
     FP_YYY_neg(mw,mw);
 
     FP_YYY_add(w->b,w->b,mw);
@@ -228,7 +241,6 @@ void FP2_YYY_mul(FP2_YYY *w,FP2_YYY *x,FP2_YYY *y)
     FP_YYY_add(w->a,w1,mw);
 
     FP2_YYY_norm(w);
-
 }
 
 /* output FP2 in hex format [a,b] */
@@ -274,6 +286,7 @@ void FP2_YYY_inv(FP2_YYY *w,FP2_YYY *x)
     FP_YYY_nres(w1);
     FP_YYY_mul(w->a,x->a,w1);
     FP_YYY_neg(w1,w1);
+	BIG_XXX_norm(w1);
     FP_YYY_mul(w->b,x->b,w1);
 //	FP2_YYY_norm(w);
 }
@@ -290,13 +303,13 @@ void FP2_YYY_div2(FP2_YYY *w,FP2_YYY *x)
 /* Set w*=(1+sqrt(-1)) */
 /* where X^2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
 
-/* SU= 128 */
+/* Input MUST be normed */
 void FP2_YYY_mul_ip(FP2_YYY *w)
 {
     FP2_YYY t;
     BIG_XXX z;
 
-    FP2_YYY_norm(w);
+ //   FP2_YYY_norm(w);
     FP2_YYY_copy(&t,w);
 
     BIG_XXX_copy(z,w->a);
@@ -304,7 +317,7 @@ void FP2_YYY_mul_ip(FP2_YYY *w)
     BIG_XXX_copy(w->b,z);
 
     FP2_YYY_add(w,&t,w);
-    FP2_YYY_norm(w);
+//    Output NOT normed, so use with care
 }
 
 /* Set w/=(1+sqrt(-1)) */
@@ -315,6 +328,7 @@ void FP2_YYY_div_ip(FP2_YYY *w)
     FP2_YYY_norm(w);
     FP_YYY_add(t.a,w->a,w->b);
     FP_YYY_sub(t.b,w->b,w->a);
+	FP2_YYY_norm(&t);
     FP2_YYY_div2(w,&t);
 }
 
@@ -371,10 +385,12 @@ int FP2_YYY_sqrt(FP2_YYY *w,FP2_YYY *u)
     }
     FP_YYY_sqrt(w1,w1);
     FP_YYY_add(w2,w->a,w1);
+	BIG_XXX_norm(w2);
     FP_YYY_div2(w2,w2);
     if (!FP_YYY_qr(w2))
     {
         FP_YYY_sub(w2,w->a,w1);
+		BIG_XXX_norm(w2);
         FP_YYY_div2(w2,w2);
         if (!FP_YYY_qr(w2))
         {

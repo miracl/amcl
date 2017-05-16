@@ -131,21 +131,22 @@ final public class FP4 {
         let t=FP2(0)
         m.add(b)
         m.neg()
-        m.norm()
+    //    m.norm()
         t.copy(m); t.add(b)
         b.copy(m)
         b.add(a)
         a.copy(t)
+        norm()
     }
     /* self=conjugate(self) */
     func conj()
     {
-        b.neg(); b.norm()
+        b.neg(); norm()
     }
     /* this=-conjugate(this) */
     func nconj()
     {
-        a.neg(); a.norm()
+        a.neg(); norm()
     }
     /* self+=x */
     func add(_ x:FP4)
@@ -176,7 +177,7 @@ final public class FP4 {
     /* self*=self */
     func sqr()
     {
-        norm();
+//        norm();
     
         let t1=FP2(a)
         let t2=FP2(b)
@@ -187,13 +188,16 @@ final public class FP4 {
         t2.mul_ip()
     
         t2.add(a)
+
+        t1.norm(); t2.norm()
         a.copy(t1)
     
         a.mul(t2)
     
         t2.copy(t3)
         t2.mul_ip()
-        t2.add(t3)
+        t2.add(t3); t2.norm()
+
         t2.neg()
         a.add(t2)
     
@@ -205,7 +209,7 @@ final public class FP4 {
     /* self*=y */
     func mul(_ y:FP4)
     {
-        norm();
+    //    norm();
     
         let t1=FP2(a)
         let t2=FP2(b)
@@ -217,18 +221,26 @@ final public class FP4 {
         t3.copy(y.b)
         t3.add(y.a)
         t4.add(a)
+
+        t3.norm(); t4.norm()
     
         t4.mul(t3)
-        t4.sub(t1)
+
+        t3.copy(t1)
+        t3.neg()
+        t4.add(t3)
         t4.norm()
-    
+
+        t3.copy(t2)
+        t3.neg()
         b.copy(t4)
-        b.sub(t2)
+        b.add(t3)
+
         t2.mul_ip()
         a.copy(t2)
         a.add(t1)
-    
-        norm()
+
+        norm();
     }
     /* convert this to hex string */
     func toString() -> String
@@ -250,25 +262,26 @@ final public class FP4 {
     
         t1.sqr()
         t2.sqr()
-        t2.mul_ip()
+        t2.mul_ip(); t2.norm()
         t1.sub(t2)
         t1.inverse()
         a.mul(t1)
-        t1.neg()
+        t1.neg(); t1.norm()
         b.mul(t1)
     }
     
     /* self*=i where i = sqrt(-1+sqrt(-1)) */
     func times_i()
     {
-        norm();
+    //    norm();
         let s=FP2(b)
         let t=FP2(b)
         s.times_i()
         t.add(s)
-        t.norm()
+    //    t.norm()
         b.copy(a)
         a.copy(t)
+        norm()
     }
     
     /* self=self^p using Frobenius */
@@ -302,9 +315,9 @@ final public class FP4 {
     {
         let r=FP4(w)
         let t=FP4(w)
-        r.sub(y)
+        r.sub(y); r.norm()
         r.pmul(a)
-        t.add(y)
+        t.add(y); t.norm()
         t.pmul(b)
         t.times_i()
     
@@ -319,7 +332,7 @@ final public class FP4 {
     {
         let w=FP4(self)
         sqr(); w.conj()
-        w.add(w)
+        w.add(w); w.norm();
         sub(w)
         reduce()
     }

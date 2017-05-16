@@ -615,7 +615,7 @@ var MPIN_ZZZ = {
 		if (P.is_infinity()) return this.INVALID_POINT;
 
 		P=PAIR_ZZZ.G1mul(P,y);
-		P.add(R);
+		P.add(R); P.affine();
 		R=ECP_ZZZ.fromBytes(mSEC);
 		if (R.is_infinity()) return this.INVALID_POINT;
 
@@ -635,7 +635,7 @@ var MPIN_ZZZ = {
 					if (R.is_infinity()) return this.INVALID_POINT;
 
 					P=PAIR_ZZZ.G1mul(P,y);
-					P.add(R);
+					P.add(R); P.affine();
 				}
 				g=PAIR_ZZZ.ate(Q,P);
 				g=PAIR_ZZZ.fexp(g);
@@ -919,7 +919,7 @@ var MPIN_ZZZ = {
 		var w=BIG_XXX.fromBytes(W);
 		var h=BIG_XXX.fromBytes(H);
 		A=PAIR_ZZZ.G1mul(A,h);
-		R.add(A);
+		R.add(A); R.affine()
 
 		U=PAIR_ZZZ.G1mul(U,w);
 		var g=PAIR_ZZZ.ate(sQ,R);

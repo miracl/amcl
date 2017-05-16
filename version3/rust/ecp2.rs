@@ -73,7 +73,7 @@ impl ECP2 {
 	}
 
 /* Test this=O? */
-	pub fn is_infinity(&mut self) -> bool {
+	pub fn is_infinity(&self) -> bool {
 		return self.inf;
 	}
 
@@ -96,7 +96,7 @@ impl ECP2 {
 /* set self=-self */
 	pub fn neg(&mut self) {
 		if self.is_infinity() {return}
-		self.y.neg(); self.y.reduce();
+		self.y.norm(); self.y.neg(); self.y.norm();
 	}	
 
 /* Conditional move of Q to self dependant on d */
@@ -148,13 +148,13 @@ impl ECP2 {
 
 		let mut zs2=FP2::new_copy(&self.z); zs2.sqr();
 		let mut zo2=FP2::new_copy(&Q.z); zo2.sqr();
-		let mut zs3=FP2::new_copy(&zs2); zs3.mul(&mut self.z);
-		let mut zo3=FP2::new_copy(&zo2); zo3.mul(&mut Q.z);
-		zs2.mul(&mut Q.x);
-		zo2.mul(&mut self.x);
+		let mut zs3=FP2::new_copy(&zs2); zs3.mul(&self.z);
+		let mut zo3=FP2::new_copy(&zo2); zo3.mul(&Q.z);
+		zs2.mul(&Q.x);
+		zo2.mul(&self.x);
 		if !zs2.equals(&mut zo2) {return false}
-		zs3.mul(&mut Q.y);
-		zo3.mul(&mut self.y);
+		zs3.mul(&Q.y);
+		zo3.mul(&self.y);
 		if !zs3.equals(&mut zo3) {return false}
 
 		return true;
@@ -169,9 +169,9 @@ impl ECP2 {
 
 		let mut z2=FP2::new_copy(&self.z);
 		z2.sqr();
-		self.x.mul(&mut z2); self.x.reduce();
-		self.y.mul(&mut z2); 
-		self.y.mul(&mut self.z); self.y.reduce();
+		self.x.mul(&z2); self.x.reduce();
+		self.y.mul(&z2); 
+		self.y.mul(&self.z); self.y.reduce();
 		self.z.copy(&one);
 	}
 
@@ -188,15 +188,15 @@ impl ECP2 {
 	}
 
 /* extract projective x */
-	pub fn getpx(&mut self) -> FP2 {
+	pub fn getpx(&self) -> FP2 {
 		return FP2::new_copy(&self.x);
 	}
 /* extract projective y */
-	pub fn getpy(&mut self) -> FP2 {
+	pub fn getpy(&self) -> FP2 {
 		return FP2::new_copy(&self.y);
 	}
 /* extract projective z */
-	pub fn getpz(&mut self) -> FP2 {
+	pub fn getpz(&self) -> FP2 {
 		return FP2::new_copy(&self.z);
 	}
 
@@ -276,7 +276,7 @@ impl ECP2 {
 		w8.imul(3);
 
 		w2.copy(&self.y); w2.sqr();
-		w3.copy(&self.x); w3.mul(&mut w2);
+		w3.copy(&self.x); w3.mul(&w2);
 		w3.imul(4);
 		w1.copy(&w3); w1.neg();
 		w1.norm();
@@ -286,14 +286,15 @@ impl ECP2 {
 		self.x.add(&w1);
 		self.x.norm();
 
-		self.z.mul(&mut self.y);
+		self.z.mul(&self.y);
 		self.z.dbl();
 
-		w2.dbl();
+		w2.dbl(); w2.norm();
 		w2.sqr();
 		w2.dbl();
 		w3.sub(&self.x);
-		self.y.copy(&w8); self.y.mul(&mut w3);
+		w2.norm(); w3.norm();
+		self.y.copy(&w8); self.y.mul(&w3);
 		w2.norm();
 		self.y.sub(&w2);
 
@@ -304,7 +305,7 @@ impl ECP2 {
 	}
 
 /* self+=Q - return 0 for add, 1 for double, -1 for O */
-	pub fn add(&mut self,Q:&mut ECP2) -> isize {
+	pub fn add(&mut self,Q:&ECP2) -> isize {
 		if self.inf {
 			self.copy(Q);
 			return -1;
@@ -313,32 +314,33 @@ impl ECP2 {
 
 		let mut aff=false;
 
-		if Q.z.isunity() {aff=true}
-
 		let mut a=FP2::new();
 		let mut c=FP2::new();
 		let mut b=FP2::new_copy(&self.z);
 		let mut d=FP2::new_copy(&self.z);
 
+		a.copy(&Q.z);
+		if a.isunity() {aff=true}		
+
 		if !aff {
-			a.copy(&Q.z);
+			//a.copy(&Q.z);
 			c.copy(&Q.z);
 
 			a.sqr(); b.sqr();
-			c.mul(&mut a); d.mul(&mut b);
+			c.mul(&a); d.mul(&b);
 
-			a.mul(&mut self.x);
-			c.mul(&mut self.y);
+			a.mul(&self.x);
+			c.mul(&self.y);
 		} else {
 			a.copy(&self.x);
 			c.copy(&self.y);
 	
 			b.sqr();
-			d.mul(&mut b);
+			d.mul(&b);
 		}
 
-		b.mul(&mut Q.x); b.sub(&a);
-		d.mul(&mut Q.y); d.sub(&c);
+		b.mul(&Q.x); b.sub(&a);
+		d.mul(&Q.y); d.sub(&c);
 
 		if b.iszilch() {
 			if d.iszilch() {
@@ -350,22 +352,23 @@ impl ECP2 {
 			}
 		}
 
-		if !aff {self.z.mul(&mut Q.z)}
-		self.z.mul(&mut b);
+		if !aff {self.z.mul(&Q.z)}
+		self.z.mul(&b);
 
 		let mut e=FP2::new_copy(&b); e.sqr();
-		b.mul(&mut e);
-		a.mul(&mut e);
+		b.mul(&e);
+		a.mul(&e);
 
 		e.copy(&a);
-		e.add(&a); e.add(&b);
-		self.x.copy(&d); self.x.sqr(); self.x.sub(&e);
+		e.add(&a); e.add(&b); 
+		e.norm(); d.norm();
+		self.x.copy(&d); self.x.sqr(); self.x.sub(&e); self.x.norm();
 
-		a.sub(&self.x);
-		self.y.copy(&a); self.y.mul(&mut d);
-		c.mul(&mut b); self.y.sub(&c);
+		a.sub(&self.x); a.norm();
+		self.y.copy(&a); self.y.mul(&d);
+		c.mul(&b); self.y.sub(&c);
 
-		self.x.norm();
+		//self.x.norm();
 		self.y.norm();
 		self.z.norm();
 
@@ -373,15 +376,15 @@ impl ECP2 {
 	}
 
 /* set this-=Q */
-	pub fn sub(&mut self,Q :&mut ECP2) -> isize {
-		Q.neg();
-		let d=self.add(Q);
-		Q.neg();
+	pub fn sub(&mut self,Q :&ECP2) -> isize {
+		let mut NQ=ECP2::new(); NQ.copy(Q);
+		NQ.neg();
+		let d=self.add(&NQ);
 		return d;
 	}
 
 /* set this*=q, where q is Modulus, using Frobenius */
-	pub fn frob(&mut self,x:&mut FP2) {
+	pub fn frob(&mut self,x:&FP2) {
 	 	if self.inf {return}
 		let mut x2=FP2::new_copy(x);
 		x2.sqr();
@@ -389,8 +392,8 @@ impl ECP2 {
 		self.y.conj();
 		self.z.conj();
 		self.z.reduce();
-		self.x.mul(&mut x2);
-		self.y.mul(&mut x2);
+		self.x.mul(&x2);
+		self.y.mul(&x2);
 		self.y.mul(x);
 	}
 
@@ -409,26 +412,26 @@ impl ECP2 {
 		for i in 2..m {
 			t1.copy(&work[i-1]);
 			work[i].copy(&t1);
-			work[i].mul(&mut P[i-1].z)
+			work[i].mul(&P[i-1].z)
 		}
 
 		t1.copy(&work[m-1]); 
-		t1.mul(&mut P[m-1].z);
+		t1.mul(&P[m-1].z);
 		t1.inverse();
 		t2.copy(&P[m-1].z);
-		work[m-1].mul(&mut t1);
+		work[m-1].mul(&t1);
 
 		let mut i=m-2;
 
 		loop {
 			if i==0 {
 				work[0].copy(&t1);
-				work[0].mul(&mut t2);
+				work[0].mul(&t2);
 				break;
 			}
-			work[i].mul(&mut t2);
-			work[i].mul(&mut t1);
-			t2.mul(&mut P[i].z);
+			work[i].mul(&t2);
+			work[i].mul(&t1);
+			t2.mul(&P[i].z);
 			i-=1;
 		}
 /* now work[] contains inverses of all Z coordinates */
@@ -436,14 +439,14 @@ impl ECP2 {
 		for i in 0..m {
 			P[i].z.one();
 			t1.copy(&work[i]); t1.sqr();
-			P[i].x.mul(&mut t1);
-			t1.mul(&mut work[i]);
-			P[i].y.mul(&mut t1);
+			P[i].x.mul(&t1);
+			t1.mul(&work[i]);
+			P[i].y.mul(&t1);
 		}    
 	}
 
 /* self*=e */
-	pub fn mul(&mut self,e: &BIG) -> ECP2 {
+	pub fn mul(&self,e: &BIG) -> ECP2 {
 /* fixed size windows */
 		let mut mt=BIG::new();
 		let mut t=BIG::new();
@@ -458,7 +461,7 @@ impl ECP2 {
 		const CT:usize=1+(big::NLEN*(big::BASEBITS as usize)+3)/4;
 		let mut w:[i8;CT]=[0;CT]; 
 
-		self.affine();
+	//	self.affine();
 
 /* precompute table */
 		Q.copy(&self);

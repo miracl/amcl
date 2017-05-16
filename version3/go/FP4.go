@@ -126,21 +126,22 @@ func (F *FP4) neg() {
 	t:=NewFP2int(0)
 	m.add(F.b)
 	m.neg()
-	m.norm()
+	//m.norm()
 	t.copy(m); t.add(F.b)
 	F.b.copy(m)
 	F.b.add(F.a)
 	F.a.copy(t)
+	F.norm()
 }
 
 /* this=conjugate(this) */
 func (F *FP4) conj() {
-	F.b.neg(); F.b.norm()
+	F.b.neg(); F.norm()
 }
 
 /* this=-conjugate(this) */
 func (F *FP4) nconj() {
-	F.a.neg(); F.a.norm()
+	F.a.neg(); F.norm()
 }
 
 /* this+=x */
@@ -168,7 +169,7 @@ func (F *FP4) imul(c int) {
 
 /* this*=this */	
 func (F *FP4) sqr() {
-	F.norm()
+//	F.norm()
 
 	t1:=NewFP2copy(F.a)
 	t2:=NewFP2copy(F.b)
@@ -179,13 +180,16 @@ func (F *FP4) sqr() {
 	t2.mul_ip()
 
 	t2.add(F.a)
+
+	t1.norm(); t2.norm()
+
 	F.a.copy(t1)
 
 	F.a.mul(t2)
 
 	t2.copy(t3)
 	t2.mul_ip()
-	t2.add(t3)
+	t2.add(t3); t2.norm()
 	t2.neg()
 	F.a.add(t2)
 
@@ -197,7 +201,7 @@ func (F *FP4) sqr() {
 
 /* this*=y */
 func (F *FP4) mul(y *FP4) {
-	F.norm()
+//	F.norm()
 
 	t1:=NewFP2copy(F.a)
 	t2:=NewFP2copy(F.b)
@@ -210,12 +214,20 @@ func (F *FP4) mul(y *FP4) {
 	t3.add(y.a)
 	t4.add(F.a)
 
-	t4.mul(t3)
-	t4.sub(t1)
-	t4.norm();
+	t3.norm(); t4.norm();
 
+	t4.mul(t3)
+
+	t3.copy(t1)
+	t3.neg()
+	t4.add(t3)
+	t4.norm()
+
+	t3.copy(t2);
+	t3.neg()
 	F.b.copy(t4)
-	F.b.sub(t2)
+	F.b.add(t3)
+
 	t2.mul_ip()
 	F.a.copy(t2)
 	F.a.add(t1)
@@ -230,31 +242,32 @@ func (F *FP4) toString() string {
 
 /* this=1/this */
 func (F *FP4) inverse() {
-	F.norm()
+//	F.norm()
 
 	t1:=NewFP2copy(F.a)
 	t2:=NewFP2copy(F.b)
 
 	t1.sqr()
 	t2.sqr()
-	t2.mul_ip()
+	t2.mul_ip(); t2.norm()
 	t1.sub(t2)
 	t1.inverse()
 	F.a.mul(t1)
-	t1.neg()
+	t1.neg(); t1.norm()
 	F.b.mul(t1)
 }
 
 /* this*=i where i = sqrt(-1+sqrt(-1)) */
 func (F *FP4) times_i() {
-	F.norm()
+//	F.norm()
 	s:=NewFP2copy(F.b)
 	t:=NewFP2copy(F.b)
 	s.times_i()
 	t.add(s)
-	t.norm();
+//	t.norm();
 	F.b.copy(F.a)
 	F.a.copy(t)
+	F.norm()
 }
 
 /* this=this^p using Frobenius */
@@ -286,9 +299,10 @@ func (F *FP4) pow(e *BIG) *FP4 {
 func (F *FP4) xtr_A(w *FP4,y *FP4,z *FP4) {
 	r:=NewFP4copy(w)
 	t:=NewFP4copy(w)
-	r.sub(y);
+	//y.norm()
+	r.sub(y); r.norm()
 	r.pmul(F.a)
-	t.add(y)
+	t.add(y); t.norm()
 	t.pmul(F.b)
 	t.times_i()
 
@@ -303,7 +317,7 @@ func (F *FP4) xtr_A(w *FP4,y *FP4,z *FP4) {
 func (F *FP4) xtr_D() {
 	w:=NewFP4copy(F)
 	F.sqr(); w.conj()
-	w.add(w)
+	w.add(w); w.norm()
 	F.sub(w)
 	F.reduce()
 }

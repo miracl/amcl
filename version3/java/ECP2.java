@@ -120,6 +120,7 @@ public final class ECP2 {
 /* set this=-this */
 	public void neg() {
 		if (is_infinity()) return;
+	y.norm();
 		y.neg(); y.norm();
 		return;
 	}
@@ -284,9 +285,12 @@ public final class ECP2 {
 		z.add(z);
 
 		w2.add(w2);
+	w2.norm();
 		w2.sqr();
 		w2.add(w2);
 		w3.sub(x);
+	w2.norm();
+	w3.norm();
 		y.copy(w8); y.mul(w3);
 	//	w2.norm();
 		y.sub(w2);
@@ -359,13 +363,16 @@ public final class ECP2 {
 
 		e.copy(A);
 		e.add(A); e.add(B);
+	e.norm();
+	D.norm();
 		x.copy(D); x.sqr(); x.sub(e);
-
+	x.norm();
 		A.sub(x);
+	A.norm();
 		y.copy(A); y.mul(D); 
 		C.mul(B); y.sub(C);
 
-		x.norm();
+		//x.norm();
 		y.norm();
 		z.norm();
 

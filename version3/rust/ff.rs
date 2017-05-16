@@ -383,7 +383,9 @@ impl FF {
 /* z=x*y, t is workspace */
 	fn karmul(&mut self,vp: usize,x: &FF,xp: usize,y: &FF,yp: usize,t: *mut FF,tp: usize,n: usize) {
 		if n==1 {
-			let mut d=BIG::mul(&x.v[xp],&y.v[yp]);
+			let xx= BIG::new_copy(&x.v[xp]);
+			let yy= BIG::new_copy(&y.v[yp]);
+			let mut d=BIG::mul(&xx,&yy);
 			self.v[vp+1]=d.split(8*big::MODBYTES);
 			self.v[vp].dcopy(&d);
 			return;
@@ -408,7 +410,8 @@ impl FF {
 
 	fn karsqr(&mut self,vp: usize,x: &FF,xp: usize,t: *mut FF,tp: usize,n: usize) {
 		if n==1 {
-			let mut d=BIG::sqr(&x.v[xp]);
+			let xx= BIG::new_copy(&x.v[xp]);	
+			let mut d=BIG::sqr(&xx);
 			self.v[vp+1].copy(&d.split(8*big::MODBYTES));
 			self.v[vp].dcopy(&d);
 			return;

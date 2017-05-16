@@ -61,7 +61,7 @@ func (E *ECP2) inf() {
 /* set this=-this */
 func (E *ECP2) neg() {
 	if E.Is_infinity() {return}
-	E.y.neg(); E.y.reduce()
+	E.y.norm(); E.y.neg(); E.y.reduce()
 }
 
 /* Conditional move of Q to P dependant on d */
@@ -274,10 +274,10 @@ func (E *ECP2) dbl() int {
 	E.z.mul(E.y)
 	E.z.add(E.z)
 
-	w2.add(w2)
+	w2.add(w2); w2.norm()
 	w2.sqr()
-	w2.add(w2)
-	w3.sub(E.x);
+	w2.add(w2); w2.norm();
+	w3.sub(E.x); w3.norm();
 	E.y.copy(w8); E.y.mul(w3)
 	//	w2.norm();
 	E.y.sub(w2)
@@ -341,14 +341,14 @@ func (E *ECP2) add(Q *ECP2) int {
 	A.mul(e)
 
 	e.copy(A)
-	e.add(A); e.add(B)
-	E.x.copy(D); E.x.sqr(); E.x.sub(e)
+	e.add(A); e.add(B); e.norm(); D.norm()
+	E.x.copy(D); E.x.sqr(); E.x.sub(e); E.x.norm()
 
-	A.sub(E.x);
+	A.sub(E.x); A.norm();
 	E.y.copy(A); E.y.mul(D)
 	C.mul(B); E.y.sub(C)
 
-	E.x.norm()
+	//E.x.norm()
 	E.y.norm()
 	E.z.norm()
 

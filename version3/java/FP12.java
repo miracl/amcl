@@ -171,12 +171,14 @@ public final class FP12 {
 		A.sqr();
 		B.mul(c);
 		B.add(B);
+	B.norm();
 		C.sqr();
 		D.mul(b);
 		D.add(D);
 
 		c.add(a);
 		c.add(b);
+	c.norm();
 		c.sqr();
 
 		a.copy(A);
@@ -195,6 +197,7 @@ public final class FP12 {
 
 		b.copy(C); b.add(D);
 		c.add(A);
+
 		norm();
 	}
 
@@ -214,17 +217,24 @@ public final class FP12 {
 		t0.add(b);
 		t1.add(y.b);
 
+	t0.norm();
+	t1.norm();
+
 		z1.copy(t0); z1.mul(t1);
 		t0.copy(b); t0.add(c);
 
 		t1.copy(y.b); t1.add(y.c);
+
+	t0.norm();
+	t1.norm();
+
 		z3.copy(t0); z3.mul(t1);
 
 		t0.copy(z0); t0.neg();
 		t1.copy(z2); t1.neg();
 
 		z1.add(t0);
-		z1.norm();
+		//z1.norm();
 		b.copy(z1); b.add(t1);
 
 		z3.add(t1);
@@ -232,21 +242,25 @@ public final class FP12 {
 
 		t0.copy(a); t0.add(c);
 		t1.copy(y.a); t1.add(y.c);
+
+t0.norm();
+t1.norm();
+	
 		t0.mul(t1);
 		z2.add(t0);
 
 		t0.copy(c); t0.mul(y.c);
 		t1.copy(t0); t1.neg();
 
-		z2.norm();
-		z3.norm();
-		b.norm();
+//		z2.norm();
+//		z3.norm();
+//		b.norm();
 
 		c.copy(z2); c.add(t1);
 		z3.add(t1);
 		t0.times_i();
 		b.add(t0);
-
+	z3.norm();
 		z3.times_i();
 		a.copy(z0); a.add(z3);
 		norm();
@@ -260,27 +274,32 @@ public final class FP12 {
 		FP4 z3=new FP4(b);
 		FP4 t0=new FP4(0);
 		FP4 t1=new FP4(y.a);
-		
+
 		z0.mul(y.a);
 		z2.pmul(y.b.real());
 		b.add(a);
 		t1.real().add(y.b.real());
 
+t1.norm();
+b.norm();
 		b.mul(t1);
 		z3.add(c);
+z3.norm();
 		z3.pmul(y.b.real());
 
 		t0.copy(z0); t0.neg();
 		t1.copy(z2); t1.neg();
 
 		b.add(t0);
-		b.norm();
+	//	b.norm();
 
 		b.add(t1);
 		z3.add(t1);
 		z2.add(t0);
 
 		t0.copy(a); t0.add(c);
+t0.norm();
+z3.norm();
 		t0.mul(y.a);
 		c.copy(z2); c.add(t0);
 
@@ -303,15 +322,18 @@ public final class FP12 {
 		f1.mul(c);
 		f1.times_i();
 		f0.sub(f1);
+	f0.norm();
 
 		f1.copy(c); f1.sqr();
 		f1.times_i();
 		f2.mul(b);
 		f1.sub(f2);
+	f1.norm();
 
 		f2.copy(b); f2.sqr();
 		f3.copy(a); f3.mul(c);
 		f2.sub(f3);
+	f2.norm();
 
 		f3.copy(b); f3.mul(f2);
 		f3.times_i();
@@ -321,6 +343,7 @@ public final class FP12 {
 		c.times_i();
 
 		f3.add(c);
+	f3.norm();
 		f3.inverse();
 		a.copy(f0); a.mul(f3);
 		b.copy(f1); b.mul(f3);

@@ -257,7 +257,6 @@ int ECP2_ZZZ_set(ECP2_ZZZ *P,FP2_YYY *x,FP2_YYY *y)
 
     if (!FP2_YYY_equals(&y2,&rhs))
     {
-
         P->inf=1;
         return 0;
     }
@@ -295,6 +294,7 @@ int ECP2_ZZZ_setx(ECP2_ZZZ *P,FP2_YYY *x)
 /* SU= 8 */
 void ECP2_ZZZ_neg(ECP2_ZZZ *P)
 {
+	FP2_YYY_norm(&(P->y));
     FP2_YYY_neg(&(P->y),&(P->y));
     FP2_YYY_norm(&(P->y));
 }
@@ -322,7 +322,6 @@ int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
     FP2_YYY_imul(&w3,&w3,4);
 
     FP2_YYY_neg(&w1,&w3);
-
     FP2_YYY_norm(&w1);
 
     FP2_YYY_sqr(&(P->x),&w8);
@@ -336,13 +335,15 @@ int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
     FP2_YYY_add(&(P->z),&(P->z),&(P->z));
 
     FP2_YYY_add(&w7,&w2,&w2);
+FP2_YYY_norm(&w7);
     FP2_YYY_sqr(&w2,&w7);
 
     FP2_YYY_add(&w2,&w2,&w2);
     FP2_YYY_sub(&w3,&w3,&(P->x));
+FP2_YYY_norm(&w2);
+FP2_YYY_norm(&w3);
     FP2_YYY_mul(&(P->y),&w8,&w3);
     FP2_YYY_sub(&(P->y),&(P->y),&w2);
-
 
     FP2_YYY_norm(&(P->y));
     FP2_YYY_norm(&(P->z));
@@ -414,10 +415,14 @@ int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
     FP2_YYY_add(&E,&A,&A);
     FP2_YYY_add(&E,&E,&B);
 
+FP2_YYY_norm(&D);
+FP2_YYY_norm(&E);
+
     FP2_YYY_sqr(&(P->x),&D);
     FP2_YYY_sub(&(P->x),&(P->x),&E);
-
+FP2_YYY_norm(&(P->x));
     FP2_YYY_sub(&A,&A,&(P->x));
+FP2_YYY_norm(&A);
     FP2_YYY_mul(&(P->y),&A,&D);
     FP2_YYY_mul(&C,&C,&B);
     FP2_YYY_sub(&(P->y),&(P->y),&C);

@@ -34,6 +34,7 @@ const DNLEN int=2*NLEN
 const BMASK Chunk= ((Chunk(1)<<BASEBITS)-1)
 const HBITS uint=(BASEBITS/2)
 const HMASK Chunk= ((Chunk(1)<<HBITS)-1)
+//const NEXCESS int=4
 const NEXCESS int=(1<<(uint(CHUNK)-BASEBITS-1));
 
 const BIGBITS int=int(MODBYTES*8)
@@ -47,6 +48,17 @@ type DBIG struct {
 	w [2*NLEN]Chunk
 }
 
+/*
+func (r *BIG) isok() bool {
+	ok:=true
+	for i:=0;i<NLEN;i++ {
+		if (r.w[i]>>BASEBITS)!=0 {
+			ok=false
+		}
+	}
+	return ok;
+}
+*/
 /***************** 64-bit specific code ****************/
 
 /* First the 32/64-bit dependent BIG code */
@@ -58,6 +70,9 @@ func mul(a *BIG,b *BIG) *DBIG {
 	carry:= Chunk(0)
 //	a.norm()
 //	b.norm()
+
+//	if !a.isok() || !b.isok() {fmt.Printf("Problem in mul\n")}
+
 
 	for i:=0;i<NLEN;i++ {
 		carry=0
@@ -76,6 +91,9 @@ func sqr(a *BIG) *DBIG {
 	c:=NewDBIG()
 	carry:= Chunk(0)
 //	a.norm()
+
+//if !a.isok() {fmt.Printf("Problem in sqr")}
+
 	for i:=0;i<NLEN;i++ {
 		carry=0;
 		for j:=i+1;j<NLEN;j++ {
@@ -430,7 +448,7 @@ func (r *BIG) imul(c int) {
 /* this*=x, where x is >NEXCESS */
 func (r *BIG) pmul(c int) Chunk {
 	carry:=Chunk(0)
-	r.norm();
+//	r.norm();
 	for i:=0;i<NLEN;i++ {
 		ak:=r.w[i]
 		r.w[i]=0
@@ -548,19 +566,21 @@ func (r *BIG) invmod2m() {
 	U.inc(invmod256(r.lastbits(8)))
 
 	for i:=8;i<BIGBITS;i<<=1 {
-		ui:=uint(i);
+		U.norm()
+		ui:=uint(i)
 		b.copy(r); b.mod2m(ui)
 		t1:=smul(U,b); t1.shr(ui)
 		c.copy(r); c.shr(ui); c.mod2m(ui)
 
 		t2:=smul(U,c); t2.mod2m(ui)
 		t1.add(t2)
+		t1.norm()
 		b=smul(t1,U); t1.copy(b)
-		t1.mod2m(ui);
+		t1.mod2m(ui)
 
 		t2.one(); t2.shl(ui); t1.rsub(t2); t1.norm()
-		t1.shl(ui);
-		U.add(t1);
+		t1.shl(ui)
+		U.add(t1)
 	}
 	U.mod2m(8*MODBYTES)
 	r.copy(U)

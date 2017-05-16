@@ -54,13 +54,17 @@ public final class PAIR {
 			ZZ.mul(T);
 
 			FP2 NY=new FP2(P.gety()); NY.neg();
+		NY.norm();
 			ZZ.add(NY);
+		ZZ.norm();
 			Z3.pmul(Qy);
 			T.mul(P.getx());
 			X.mul(NY);
 			T.add(X);
+		T.norm();
 			a=new FP4(Z3,T);
 			ZZ.neg();
+		ZZ.norm();
 			ZZ.pmul(Qx);
 			b=new FP4(ZZ);
 		}
@@ -78,9 +82,12 @@ public final class PAIR {
 			Z3.pmul(Qy);
 
 			X.mul(T);
+		//Y.norm();
 			X.sub(Y);
+		X.norm();
 			a=new FP4(Z3,X);
 			T.neg();
+		T.norm();
 			ZZ.mul(T);
 			ZZ.pmul(Qx);
 			b=new FP4(ZZ);
@@ -105,8 +112,8 @@ public final class PAIR {
 			n.copy(x);
 		n.norm();
 		
-		P.affine();
-		Q.affine();
+	//	P.affine();
+	//	Q.affine();
 		FP Qx=new FP(Q.getx());
 		FP Qy=new FP(Q.gety());
 
@@ -171,10 +178,10 @@ public final class PAIR {
 			n.copy(x);
 		n.norm();
 
-		P.affine();
-		Q.affine();
-		R.affine();
-		S.affine();
+	//	P.affine();
+	//	Q.affine();
+	//	R.affine();
+	//	S.affine();
 
 		FP Qx=new FP(Q.getx());
 		FP Qy=new FP(Q.gety());

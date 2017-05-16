@@ -108,6 +108,7 @@ ECP2_ZZZ.prototype={
 	neg: function() 
 	{
 		if (this.is_infinity()) return;
+		this.y.norm();
 		this.y.neg(); this.y.norm();
 		return;
 	},
@@ -258,9 +259,12 @@ ECP2_ZZZ.prototype={
 		this.z.add(this.z);
 
 		w2.add(w2);
+		w2.norm();
 		w2.sqr();
 		w2.add(w2);
 		w3.sub(this.x);
+		w2.norm(); // ??
+		w3.norm();
 		this.y.copy(w8); this.y.mul(w3);
 		this.y.sub(w2);
 		this.y.norm();
@@ -331,14 +335,14 @@ ECP2_ZZZ.prototype={
 		A.mul(e);
 
 		e.copy(A);
-		e.add(A); e.add(B);
-		this.x.copy(D); this.x.sqr(); this.x.sub(e);
+		e.add(A); e.add(B); e.norm(); D.norm();
+		this.x.copy(D); this.x.sqr(); this.x.sub(e); this.x.norm(); // ??
 
-		A.sub(this.x);
+		A.sub(this.x); A.norm();
 		this.y.copy(A); this.y.mul(D); 
 		C.mul(B); this.y.sub(C);
 
-		this.x.norm();
+		//this.x.norm();
 		this.y.norm();
 		this.z.norm();
 		return 0;

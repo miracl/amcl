@@ -46,6 +46,9 @@ gcc -O2 -std=c99 testall.c amcl.a -o testall
 The test program exercises 3 different ordinary elliptic curves, a 
 pairing friendly curve and RSA, all in the one binary.
 
+The correct PIN is 1234
+
+
 Next compile 
 
 

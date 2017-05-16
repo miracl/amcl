@@ -122,22 +122,24 @@ public final class FP4 {
 		FP2 m=new FP2(a);
 		FP2 t=new FP2(0);
 		m.add(b);
+//	m.norm();
 		m.neg();
-		m.norm();
+	//	m.norm();
 		t.copy(m); t.add(b);
 		b.copy(m);
 		b.add(a);
 		a.copy(t);
+	norm();
 	}
 /* this=conjugate(this) */
 	public void conj()
 	{
-		b.neg(); b.norm();
+		b.neg(); norm();
 	}
 /* this=-conjugate(this) */
 	public void nconj()
 	{
-		a.neg(); a.norm();
+		a.neg(); norm();
 	}
 /* this+=x */
 	public void add(FP4 x)
@@ -168,7 +170,7 @@ public final class FP4 {
 /* this*=this */	
 	public void sqr()
 	{
-		norm();
+//		norm();
 
 		FP2 t1=new FP2(a);
 		FP2 t2=new FP2(b);
@@ -179,6 +181,10 @@ public final class FP4 {
 		t2.mul_ip();
 
 		t2.add(a);
+
+	t1.norm();
+	t2.norm();
+
 		a.copy(t1);
 
 		a.mul(t2);
@@ -186,6 +192,7 @@ public final class FP4 {
 		t2.copy(t3);
 		t2.mul_ip();
 		t2.add(t3);
+	t2.norm();
 		t2.neg();
 		a.add(t2);
 
@@ -197,7 +204,7 @@ public final class FP4 {
 /* this*=y */
 	public void mul(FP4 y)
 	{
-		norm();
+//		norm();
 
 		FP2 t1=new FP2(a);
 		FP2 t2=new FP2(b);
@@ -210,12 +217,27 @@ public final class FP4 {
 		t3.add(y.a);
 		t4.add(a);
 
-		t4.mul(t3);
-		t4.sub(t1);
-		t4.norm();
+	t3.norm();
+	t4.norm();
 
-		b.copy(t4);
-		b.sub(t2);
+		t4.mul(t3);
+
+	t3.copy(t1);
+	t3.neg();
+	t4.add(t3);
+	t4.norm();
+
+	//	t4.sub(t1);
+	//	t4.norm();
+
+	t3.copy(t2);
+	t3.neg();
+	b.copy(t4);
+	b.add(t3);
+
+	//	b.copy(t4);
+	//	b.sub(t2);
+
 		t2.mul_ip();
 		a.copy(t2);
 		a.add(t1);
@@ -236,7 +258,7 @@ public final class FP4 {
 /* this=1/this */
 	public void inverse()
 	{
-		norm();
+//		norm();
 
 		FP2 t1=new FP2(a);
 		FP2 t2=new FP2(b);
@@ -244,10 +266,12 @@ public final class FP4 {
 		t1.sqr();
 		t2.sqr();
 		t2.mul_ip();
+	t2.norm();
 		t1.sub(t2);
 		t1.inverse();
 		a.mul(t1);
 		t1.neg();
+	t1.norm();
 		b.mul(t1);
 	}
 
@@ -255,14 +279,15 @@ public final class FP4 {
 /* this*=i where i = sqrt(-1+sqrt(-1)) */
 	public void times_i()
 	{
-		norm();
+//		norm();
 		FP2 s=new FP2(b);
 		FP2 t=new FP2(b);
 		s.times_i();
 		t.add(s);
-		t.norm();
+	//	t.norm();
 		b.copy(a);
 		a.copy(t);
+		norm();
 	}
 
 /* this=this^p using Frobenius */
@@ -297,9 +322,12 @@ public final class FP4 {
 	{
 		FP4 r=new FP4(w);
 		FP4 t=new FP4(w);
+	//y.norm();
 		r.sub(y);
+	r.norm();
 		r.pmul(a);
 		t.add(y);
+	t.norm();
 		t.pmul(b);
 		t.times_i();
 
@@ -315,6 +343,7 @@ public final class FP4 {
 		FP4 w=new FP4(this);
 		sqr(); w.conj();
 		w.add(w);
+	w.norm();
 		sub(w);
 		reduce();
 	}
