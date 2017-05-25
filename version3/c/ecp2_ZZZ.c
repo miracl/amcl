@@ -318,8 +318,12 @@ int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
     FP2_YYY_imul(&w8,&w1,3);
 
     FP2_YYY_sqr(&w2,&(P->y));
-    FP2_YYY_mul(&w3,&(P->x),&w2);
-    FP2_YYY_imul(&w3,&w3,4);
+
+	FP2_YYY_imul(&w3,&(P->x),4);
+	FP2_YYY_mul(&w3,&w3,&w2);
+	
+//    FP2_YYY_mul(&w3,&(P->x),&w2);
+//    FP2_YYY_imul(&w3,&w3,4);
 
     FP2_YYY_neg(&w1,&w3);
     FP2_YYY_norm(&w1);
@@ -330,9 +334,19 @@ int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
 
     FP2_YYY_norm(&(P->x));
 
-    if (FP2_YYY_isunity(&(P->z))) FP2_YYY_copy(&(P->z),&(P->y));
-    else FP2_YYY_mul(&(P->z),&(P->z),&(P->y));
-    FP2_YYY_add(&(P->z),&(P->z),&(P->z));
+	if (FP2_YYY_isunity(&(P->z)))
+	{
+		FP2_YYY_add(&(P->z),&(P->y),&(P->y));
+	}
+	else
+	{
+		FP2_YYY_add(&(P->z),&(P->z),&(P->z)); FP2_YYY_norm(&(P->z)); 
+		FP2_YYY_mul(&(P->z),&(P->z),&(P->y));
+	}
+
+//    if (FP2_YYY_isunity(&(P->z))) FP2_YYY_copy(&(P->z),&(P->y));
+//    else FP2_YYY_mul(&(P->z),&(P->z),&(P->y));
+//    FP2_YYY_add(&(P->z),&(P->z),&(P->z));
 
     FP2_YYY_add(&w7,&w2,&w2);
 FP2_YYY_norm(&w7);

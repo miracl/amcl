@@ -95,15 +95,11 @@ FP_YYY.prototype={
 			var p=new BIG_XXX();
 			p.rcopy(ROM_FIELD_YYY.Modulus);
 			var d=new DBIG_XXX(0);
-//alert("f= "+this.f.toString());
+
 			d.hcopy(this.f);
 			d.norm();
-//alert("1. d= "+d.toString());
 			d.shl(BIG_XXX.NLEN*BIG_XXX.BASEBITS);
-//alert("2. d= "+d.toString());
 			this.f.copy(d.mod(p));
-//alert("3. f= "+this.f.toString());
-
 		}
 		return this;
 	},
@@ -117,9 +113,7 @@ FP_YYY.prototype={
 		{
 			var d=new DBIG_XXX(0);
 			d.hcopy(this.f);
-//alert("rd= "+d.toString());
 			var w=FP_YYY.mod(d);
-//alert("w= "+w.toString());
 			r.copy(w);
 		}
 
@@ -394,10 +388,15 @@ FP_YYY.mod=function(d)
 		if (ROM_FIELD_YYY.MConst!=1)
 			v=t.pmul(ROM_FIELD_YYY.MConst);
 		else v=0;
+
+		t.add(b); t.norm();
+
 		tw=t.w[BIG_XXX.NLEN-1];
 		t.w[BIG_XXX.NLEN-1]&=FP_YYY.TMASK;
 		t.inc(ROM_FIELD_YYY.MConst*((tw>>FP_YYY.TBITS)+(v<<(BIG_XXX.BASEBITS-FP_YYY.TBITS))));
-		b.add(t);
+//		b.add(t);
+		t.norm();
+		return t;
 	}
 	
 	if (FP_YYY.MODTYPE==FP_YYY.MONTGOMERY_FRIENDLY)

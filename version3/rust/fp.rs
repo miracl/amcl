@@ -140,13 +140,19 @@ impl FP {
             let mut t=d.split(MODBITS);
             b.dcopy(&d);
             let v=t.pmul(rom::MCONST as isize);
+
+    t.add(&b);
+    t.norm();
+
+
             let tw=t.w[big::NLEN-1];
             t.w[big::NLEN-1] &= TMASK;
             t.w[0]+=rom::MCONST*((tw>>TBITS)+(v<<(big::BASEBITS-TBITS)));
-    
-            b.add(&t);
-            b.norm();
-            return b;
+    t.norm();
+    return t;
+        //    b.add(&t);
+        //   b.norm();
+        //    return b;
         }
     
         if MODTYPE==MONTGOMERY_FRIENDLY

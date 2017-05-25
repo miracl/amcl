@@ -116,13 +116,21 @@ final public class FP {
             let t=d.split(FP.MODBITS)
             var b=BIG(d)
             let v=t.pmul(Int(ROM.MConst))
+
+    t.add(b)
+    t.norm()
+
+
             let tw=t.w[BIG.NLEN-1]
             t.w[BIG.NLEN-1] &= TMASK
             t.inc(Int(ROM.MConst*((tw>>Chunk(FP.TBITS))+(v<<Chunk(BIG.BASEBITS-FP.TBITS)))))
     
-            b.add(t)
-            b.norm()
-            return b
+    t.norm()
+    return t
+
+    //        b.add(t)
+    //        b.norm()
+    //        return b
         }
         if FP.MODTYPE==FP.MONTGOMERY_FRIENDLY
         {

@@ -80,13 +80,20 @@ public final class FP {
 			b=new BIG(d);
 
 			v=t.pmul((int)ROM.MConst);
+
+	t.add(b);
+	t.norm();
+
 			tw=t.w[BIG.NLEN-1];
 			t.w[BIG.NLEN-1]&=TMASK;
 			t.w[0]+=(ROM.MConst*((tw>>TBITS)+(v<<(BIG.BASEBITS-TBITS))));
 
-			b.add(t);
-			b.norm();
-			return b;
+//			b.add(t);    // out
+//			b.norm();    // out
+//			return b;    // out
+	t.norm();
+	return t;
+
 		}
 		if (MODTYPE==MONTGOMERY_FRIENDLY)
 		{

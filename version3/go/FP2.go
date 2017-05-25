@@ -187,8 +187,13 @@ func (F *FP2) sqr() {
 	w3:=NewFPcopy(F.a)
 	mb:=NewFPcopy(F.b)
 
-	w3.mul(F.b)
+//	w3.mul(F.b)
 	w1.add(F.b)
+
+w3.add(F.a);
+w3.norm();
+F.b.mul(w3);
+
 	mb.neg()
 	F.a.add(mb)
 
@@ -196,9 +201,9 @@ func (F *FP2) sqr() {
 	F.a.norm()
 
 	F.a.mul(w1)
-	F.b.copy(w3); F.b.add(w3)
+//	F.b.copy(w3); F.b.add(w3)
 
-	F.b.norm()
+//	F.b.norm()
 }
 
 /* this*=y */

@@ -199,19 +199,21 @@ void FP2_YYY_sqr(FP2_YYY *w,FP2_YYY *x)
 {
     BIG_XXX w1,w3,mb;
 
-    FP_YYY_mul(w3,x->a,x->b); /* norms x */
-    FP_YYY_add(w1,x->a,x->b); /* w1#2 w1=2 */
-    FP_YYY_neg(mb,x->b);      /* mb#2 mb=1 */
-    FP_YYY_add(w->a,x->a,mb);   /* w2#3 w2=3 */
+    FP_YYY_add(w1,x->a,x->b); 
+    FP_YYY_neg(mb,x->b);  
+	
+	FP_YYY_add(w3,x->a,x->a);
+	BIG_XXX_norm(w3);
+    FP_YYY_mul(w->b,w3,x->b); 
+
+    FP_YYY_add(w->a,x->a,mb);   
 
 	BIG_XXX_norm(w->a);
 	BIG_XXX_norm(w1);
 
     FP_YYY_mul(w->a,w1,w->a);     /* w->a#2 w->a=1 w1&w2=6 w1*w2=2 */
 
-    FP_YYY_add(w->b,w3,w3); /* w->b#4 w->b=2 */
-
-    BIG_XXX_norm(w->b);
+//    BIG_XXX_norm(w->b);
 }
 
 

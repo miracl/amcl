@@ -197,8 +197,13 @@ impl FP2 {
 		let mut w3=FP::new_copy(&self.a);
 		let mut mb=FP::new_copy(&self.b);
 
-		w3.mul(&self.b);
+	//	w3.mul(&self.b);
 		w1.add(&self.b);
+
+w3.add(&self.a);
+w3.norm();
+self.b.mul(&w3);
+
 		mb.neg();
 		self.a.add(&mb);
 
@@ -206,9 +211,9 @@ impl FP2 {
 		self.a.norm();
 
 		self.a.mul(&w1);
-		self.b.copy(&w3); self.b.add(&w3);
+	//	self.b.copy(&w3); self.b.add(&w3);
 
-		self.b.norm();
+	//	self.b.norm();
 	}	
 
 /* this*=y */

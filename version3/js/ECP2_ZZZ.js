@@ -245,8 +245,8 @@ ECP2_ZZZ.prototype={
 		w8.imul(3);
 
 		w2.copy(this.y); w2.sqr();
-		w3.copy(this.x); w3.mul(w2);
-		w3.imul(4);
+		w3.copy(this.x); w3.imul(4); w3.mul(w2);
+		
 		w1.copy(w3); w1.neg();
 
 
@@ -255,8 +255,9 @@ ECP2_ZZZ.prototype={
 		this.x.add(w1);
 		this.x.norm();
 
+		this.z.add(this.z); this.z.norm();
 		this.z.mul(this.y);
-		this.z.add(this.z);
+
 
 		w2.add(w2);
 		w2.norm();

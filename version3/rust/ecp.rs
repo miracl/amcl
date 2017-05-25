@@ -407,8 +407,8 @@ impl ECP {
 			}
 
 			w2.copy(&self.y); w2.sqr();
-			w3.copy(&self.x); w3.mul(&w2);
-			w3.imul(4);
+			w3.copy(&self.x); w3.imul(4); w3.mul(&w2);
+			
 			w1.copy(&w3); w1.neg();
 			w1.norm();
 
@@ -417,8 +417,9 @@ impl ECP {
             self.x.add(&w1);
             self.x.norm();
     
+    		self.z.dbl(); self.z.norm();
             self.z.mul(&self.y);
-            self.z.dbl();
+            
     
             w2.dbl();  w2.norm();
             w2.sqr();

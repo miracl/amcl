@@ -183,8 +183,14 @@ FP2_YYY.prototype={
 		var w3=new FP_YYY(this.a); 
 		var mb=new FP_YYY(this.b); 
 
-		w3.mul(this.b);
+//		w3.mul(this.b);
 		w1.add(this.b);
+
+
+w3.add(this.a);
+w3.norm();
+this.b.mul(w3);
+
 		mb.neg();
 		this.a.add(mb);
 
@@ -192,8 +198,8 @@ FP2_YYY.prototype={
 		w1.norm();
 
 		this.a.mul(w1);
-		this.b.copy(w3); this.b.add(w3);
-		this.b.norm();
+//		this.b.copy(w3); this.b.add(w3);
+//		this.b.norm();
 	},
 /* this*=y */
 	mul: function(y)

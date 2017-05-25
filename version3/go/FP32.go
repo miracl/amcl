@@ -118,13 +118,19 @@ func mod(d *DBIG) *BIG {
 		b:=NewBIGdcopy(d)
 
 		v:=t.pmul(int(MConst))
+
+		t.add(b)
+		t.norm()
+
 		tw:=t.w[NLEN-1]
 		t.w[NLEN-1]&=TMASK
 		t.w[0]+=(MConst*((tw>>TBITS)+(v<<(BASEBITS-TBITS))))
 
-		b.add(t)
-		b.norm()
-		return b		
+		t.norm()
+		return t
+	//	b.add(t)
+	//	b.norm()
+	//	return b		
 	}
 	if MODTYPE==MONTGOMERY_FRIENDLY {
 		for i:=0;i<NLEN;i++ {

@@ -57,24 +57,26 @@ void FP_YYY_mod(BIG_XXX r,DBIG_XXX d)
     if (MConst_YYY < NEXCESS_XXX)
     {
         BIG_XXX_imul(t,t,MConst_YYY);
-
         BIG_XXX_norm(t);
-        tw=t[NLEN_XXX-1];
-        t[NLEN_XXX-1]&=TMASK_YYY;
-        t[0]+=MConst_YYY*((tw>>TBITS_YYY));
+		BIG_XXX_add(r,t,b);
+		BIG_XXX_norm(r);
+        tw=r[NLEN_XXX-1];
+        r[NLEN_XXX-1]&=TMASK_YYY;
+        r[0]+=MConst_YYY*((tw>>TBITS_YYY));
     }
     else
     {
         v=BIG_XXX_pmul(t,t,MConst_YYY);
-        tw=t[NLEN_XXX-1];
-        t[NLEN_XXX-1]&=TMASK_YYY;
+		BIG_XXX_add(r,t,b);
+		BIG_XXX_norm(r);
+        tw=r[NLEN_XXX-1];
+        r[NLEN_XXX-1]&=TMASK_YYY;
 #if CHUNK == 16
-        t[1]+=muladd_XXX(MConst_YYY,((tw>>TBITS_YYY)+(v<<(BASEBITS_XXX-TBITS_YYY))),0,&t[0]);
+        r[1]+=muladd_XXX(MConst_YYY,((tw>>TBITS_YYY)+(v<<(BASEBITS_XXX-TBITS_YYY))),0,&r[0]);
 #else
-        t[0]+=MConst_YYY*((tw>>TBITS_YYY)+(v<<(BASEBITS_XXX-TBITS_YYY)));
+        r[0]+=MConst_YYY*((tw>>TBITS_YYY)+(v<<(BASEBITS_XXX-TBITS_YYY)));
 #endif
     }
-    BIG_XXX_add(r,t,b);
     BIG_XXX_norm(r);
 }
 #endif

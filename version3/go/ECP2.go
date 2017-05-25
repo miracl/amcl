@@ -261,8 +261,8 @@ func (E *ECP2) dbl() int {
 	w8.imul(3)
 
 	w2.copy(E.y); w2.sqr()
-	w3.copy(E.x); w3.mul(w2)
-	w3.imul(4)
+	w3.copy(E.x); w3.imul(4); w3.mul(w2)
+	
 	w1.copy(w3); w1.neg()
 	w1.norm();
 
@@ -271,8 +271,9 @@ func (E *ECP2) dbl() int {
 	E.x.add(w1)
 	E.x.norm()
 
+	E.z.add(E.z); E.z.norm()
 	E.z.mul(E.y)
-	E.z.add(E.z)
+	
 
 	w2.add(w2); w2.norm()
 	w2.sqr()

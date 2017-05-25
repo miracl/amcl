@@ -437,8 +437,8 @@ final public class ECP {
             }
     
             w2.copy(y); w2.sqr()
-            w3.copy(x); w3.mul(w2)
-            w3.imul(4)
+            w3.copy(x); w3.imul(4); w3.mul(w2)
+            
             w1.copy(w3); w1.neg()
             w1.norm()
     
@@ -447,8 +447,9 @@ final public class ECP {
             x.add(w1)
             x.norm()
     
+            z.add(z); z.norm()
             z.mul(y)
-            z.add(z)
+            
     
             w2.add(w2); w2.norm()
             w2.sqr()

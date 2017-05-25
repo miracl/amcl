@@ -197,13 +197,19 @@ public final class FP2 {
 /* this*=this */
 	public void sqr()
 	{
-//		norm();
 		FP w1=new FP(a);
 		FP w3=new FP(a);
 		FP mb=new FP(b);
 
-		w3.mul(b);
+
+//		w3.mul(b);  // out
 		w1.add(b);
+
+w3.add(a);
+w3.norm();
+b.mul(w3);
+
+
 		mb.neg();
 		a.add(mb);
 
@@ -211,8 +217,8 @@ public final class FP2 {
 	a.norm();
 
 		a.mul(w1);
-		b.copy(w3); b.add(w3);
-	b.norm();
+//		b.copy(w3); b.add(w3);  // out
+//	b.norm();					// out
 	}
 
 /* this*=y */

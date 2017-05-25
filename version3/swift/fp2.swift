@@ -204,8 +204,15 @@ final public class FP2
         let w1=FP(a)
         let w3=FP(a)
         let mb=FP(b)
-        w3.mul(b)
+
+        //w3.mul(b)
+
         w1.add(b)
+
+        w3.add(a)
+        w3.norm()
+        b.mul(w3)
+
         mb.neg()
         a.add(mb)
 
@@ -213,8 +220,8 @@ final public class FP2
         w1.norm()
 
         a.mul(w1)
-        b.copy(w3); b.add(w3)
-        b.norm()
+    //    b.copy(w3); b.add(w3)
+    //    b.norm()
     }
     /* self*=y */
     func mul(_ y:FP2)
@@ -226,8 +233,8 @@ final public class FP2
         let w5=FP(a)
         let mw=FP(0)
     
-        w1.mul(y.a)  // w1=a*y.a  - this norms w1 and y.a, NOT a
-        w2.mul(y.b)  // w2=b*y.b  - this norms w2 and y.b, NOT b
+        w1.mul(y.a)  // w1=a*y.a  
+        w2.mul(y.b)  // w2=b*y.b 
         w5.add(b)    // w5=a+b
         b.copy(y.a); b.add(y.b) // b=y.a+y.b
 

@@ -392,8 +392,12 @@ func (E *ECP) dbl() {
 		}
 
 		w2.copy(E.y); w2.sqr()
-		w3.copy(E.x); w3.mul(w2)
-		w3.imul(4); //w3.norm()
+
+	w3.copy(E.x); w3.imul(4);
+
+	//	w3.copy(E.x); 
+		w3.mul(w2)
+	//	w3.imul(4); //w3.norm()
 		w1.copy(w3); w1.neg()
 		w1.norm(); //w8.norm()
 
@@ -401,11 +405,12 @@ func (E *ECP) dbl() {
 		E.x.copy(w8); E.x.sqr()
 		E.x.add(w1)
 		E.x.add(w1)
-	//		x.reduce();
+	
 		E.x.norm()
 
+		E.z.add(E.z); E.z.norm()
 		E.z.mul(E.y)
-		E.z.add(E.z)
+		
 
 		w2.add(w2); w2.norm()
 		w2.sqr()
@@ -414,8 +419,7 @@ func (E *ECP) dbl() {
 		E.y.copy(w8); E.y.mul(w3);
 	//		w2.norm();
 		E.y.sub(w2)
-	//		y.reduce();
-	//		z.reduce();
+
 		E.y.norm()
 		E.z.norm()
 

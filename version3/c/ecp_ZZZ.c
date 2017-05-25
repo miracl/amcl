@@ -572,34 +572,37 @@ void ECP_ZZZ_dbl(ECP_ZZZ *P)
         FP_YYY_add(w8,P->x,w6);
 BIG_XXX_norm(w3); BIG_XXX_norm(w8);
         FP_YYY_mul(w3,w3,w8);
-        BIG_XXX_imul(w8,w3,3);
+        FP_YYY_imul(w8,w3,3);
     }
     else
     {
         /* assuming A=0 */
         FP_YYY_sqr(w1,P->x);
-        BIG_XXX_imul(w8,w1,3);
+        FP_YYY_imul(w8,w1,3);
     }
 
     FP_YYY_sqr(w2,P->y);
-    FP_YYY_mul(w3,P->x,w2);
+	FP_YYY_imul(w3,P->x,4);	 
+    FP_YYY_mul(w3,w3,w2);
 
-    BIG_XXX_imul(w3,w3,4);
-BIG_XXX_norm(w3);
     FP_YYY_neg(w1,w3);
 
 BIG_XXX_norm(w1);
-BIG_XXX_norm(w8);
     FP_YYY_sqr(P->x,w8);
     FP_YYY_add(P->x,P->x,w1);
     FP_YYY_add(P->x,P->x,w1);
 
     BIG_XXX_norm(P->x);
 
-    if (BIG_XXX_comp(P->z,one)==0) BIG_XXX_copy(P->z,P->y);
-    else FP_YYY_mul(P->z,P->z,P->y);
-    FP_YYY_add(P->z,P->z,P->z);
-
+    if (BIG_XXX_comp(P->z,one)==0) 
+	{
+		FP_YYY_add(P->z,P->y,P->y);
+	}
+    else 
+	{
+		FP_YYY_add(P->z,P->z,P->z); BIG_XXX_norm(P->z);
+		FP_YYY_mul(P->z,P->z,P->y);
+	}
 
     FP_YYY_add(w7,w2,w2);
 BIG_XXX_norm(w7);
