@@ -1,0 +1,10 @@
+[package]
+name = "rust"
+version = "0.1.0"
+authors = ["Vyacheslav Gudkov <vyacheslav.gudkov@dsr-company.com>"]
+
+[lib]
+name = "amcl"
+path = "src/lib.rs"
+
+[dependencies]

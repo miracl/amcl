@@ -88,7 +88,7 @@ impl HASH256 {
 			d=c;
 			c=b;
 			b=a;
-			a=t1+t2 ; 
+			a=t1+t2 ;
 		}
 		self.h[0]+=a; self.h[1]+=b; self.h[2]+=c; self.h[3]+=d;
 		self.h[4]+=e; self.h[5]+=f; self.h[6]+=g; self.h[7]+=hh; 

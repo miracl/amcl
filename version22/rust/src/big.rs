@@ -20,7 +20,7 @@ under the License.
 use rom;
 use rom::Chunk;
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
 use rom::DChunk;
 
 #[derive(Copy, Clone)]
@@ -140,7 +140,7 @@ impl BIG {
         return (a.w[rom::NLEN-1]&rom::P_OMASK)>>(rom::P_MB)
     }
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn pexceed(a: &BIG,b: &BIG) -> bool {
         let ea=BIG::excess(a);
         let eb=BIG::excess(b);        
@@ -148,14 +148,14 @@ impl BIG {
         return false
     }
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn sexceed(a: &BIG) -> bool {
         let ea=BIG::excess(a);
         if ((ea+1) as DChunk)*((ea+1) as DChunk) > rom::FEXCESS as DChunk {return true}
         return false
     }
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn ff_pexceed(a: &BIG,b: &BIG) -> bool {
         let ea=BIG::ff_excess(a);
         let eb=BIG::ff_excess(b);
@@ -163,7 +163,7 @@ impl BIG {
         return false;
     }
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn ff_sexceed(a: &BIG) -> bool {
         let ea=BIG::ff_excess(a);
         if ((ea+1) as DChunk)*((ea+1) as DChunk) > rom::P_FEXCESS as DChunk {return true}
@@ -171,7 +171,7 @@ impl BIG {
     }
 
 /* Get top and bottom half of =x*y+c+r */
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
         let prod:DChunk = (a as DChunk)*(b as DChunk)+(c as DChunk)+(r as DChunk);
         let bot=(prod&(rom::BMASK as DChunk)) as Chunk;
@@ -179,7 +179,7 @@ impl BIG {
         return (top,bot);     
     }
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn pexceed(a: &BIG,b: &BIG) -> bool {
         let ea=BIG::excess(a);
         let eb=BIG::excess(b);        
@@ -187,14 +187,14 @@ impl BIG {
         return false
     }
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn sexceed(a: &BIG) -> bool {
         let ea=BIG::excess(a);
         if (ea+1) > rom::FEXCESS/(ea+1) {return true}
         return false
     }
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn ff_pexceed(a: &BIG,b: &BIG) -> bool {
         let ea=BIG::ff_excess(a);
         let eb=BIG::ff_excess(b);
@@ -202,14 +202,14 @@ impl BIG {
         return false;
     }
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn ff_sexceed(a: &BIG) -> bool {
         let ea=BIG::ff_excess(a);
         if (ea+1) > rom::P_FEXCESS/(ea+1) {return true}
         return false;
     }    
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
         let x0=a&rom::HMASK;
         let x1=(a>>rom::HBITS);
@@ -802,7 +802,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     }
 
    /* return a*b as DBIG */
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let rm=rom::BMASK as DChunk;
@@ -838,7 +838,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     }
 
 /* return a^2 as DBIG */
-#[cfg(D32)]  
+#[cfg(target_pointer_width = "32")]
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let rm=rom::BMASK as DChunk;
@@ -881,7 +881,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     }
 
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     fn monty(d: &mut DBIG) -> BIG {
         let mut b=BIG::new();           
         let md=BIG::new_ints(&rom::MODULUS);
@@ -923,7 +923,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
 
 
 /* return a*b as DBIG */
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let mut carry = 0 as Chunk;
@@ -940,7 +940,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     } 
 
 /* return a^2 as DBIG */
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let mut carry = 0 as Chunk;
@@ -966,7 +966,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
         return c;
     } 
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     fn monty(d: &mut DBIG) -> BIG {
         let mut b=BIG::new();     
         let md=BIG::new_ints(&rom::MODULUS);
