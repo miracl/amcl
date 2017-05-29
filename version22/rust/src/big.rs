@@ -18,6 +18,7 @@ under the License.
 */
 
 use std::fmt;
+use std::cmp::Ordering;
 
 use rom;
 use rom::Chunk;
@@ -52,6 +53,27 @@ impl fmt::Debug for BIG {
 impl PartialEq for BIG {
     fn eq(&self, other: &BIG) -> bool {
         return self.w == other.w;
+    }
+}
+
+impl Ord for BIG {
+    fn cmp(&self, other: &BIG) -> Ordering {
+        let r = BIG::comp(self, other);
+        if r > 0 {
+            return Ordering::Greater;
+        }
+        if r < 0 {
+            return Ordering::Less;
+        }
+        return Ordering::Equal;
+    }
+}
+
+impl Eq for BIG { }
+
+impl PartialOrd for BIG {
+    fn partial_cmp(&self, other: &BIG) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
