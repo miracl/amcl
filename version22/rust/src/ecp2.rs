@@ -17,6 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
+#[derive(Copy, Clone)]
 pub struct ECP2 {
 	x:FP2,
 	y:FP2,
