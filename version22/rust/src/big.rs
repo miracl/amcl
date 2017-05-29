@@ -17,6 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use std::fmt;
+
 use rom;
 use rom::Chunk;
 
@@ -32,6 +34,26 @@ pub struct BIG {
 
 use dbig::DBIG;
 use rand::RAND;
+
+impl fmt::Display for BIG {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut big = self.clone();
+        write!(f, "BIG: [ {} ]", big.tostring())
+    }
+}
+
+impl fmt::Debug for BIG {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut big = self.clone();
+        write!(f, "BIG: [ {} ]", big.tostring())
+    }
+}
+
+impl PartialEq for BIG {
+    fn eq(&self, other: &BIG) -> bool {
+        return self.w == other.w;
+    }
+}
 
 impl BIG {
 

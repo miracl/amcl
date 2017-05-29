@@ -17,6 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use std::fmt;
+
 #[derive(Copy, Clone)]
 pub struct ECP {
 	x:FP,
@@ -37,6 +39,27 @@ use big::BIG;
 //mod hash256;
 //mod rom;
 use rom;
+
+impl fmt::Display for ECP {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP: [ {}, {}, {}, {} ]", self.inf, self.x, self.y, self.z)
+	}
+}
+
+impl fmt::Debug for ECP {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP: [ {}, {}, {}, {} ]", self.inf, self.x, self.y, self.z)
+	}
+}
+
+impl PartialEq for ECP {
+	fn eq(&self, other: &ECP) -> bool {
+		return (self.inf == other.inf) &&
+			(self.x == other.x) &&
+			(self.y == other.y) &&
+			(self.z == other.z);
+	}
+}
 
 #[allow(non_snake_case)]
 impl ECP {

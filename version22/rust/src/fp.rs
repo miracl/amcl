@@ -17,6 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use std::fmt;
+
 #[derive(Copy, Clone)]
 pub struct FP {
  	x:BIG
@@ -26,6 +28,24 @@ use big::BIG;
 use dbig::DBIG;
 use rom;
 use rom::Chunk;
+
+impl fmt::Display for FP {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "FP: [ {} ]", self.x)
+    }
+}
+
+impl fmt::Debug for FP {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "FP: [ {} ]", self.x)
+    }
+}
+
+impl PartialEq for FP {
+    fn eq(&self, other: &FP) -> bool {
+        return self.x == other.x;
+    }
+}
 
 impl FP {
 
