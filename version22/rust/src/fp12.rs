@@ -17,6 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use std::fmt;
+
 #[derive(Copy, Clone)]
 pub struct FP12 {
 	a:FP4,
@@ -40,6 +42,26 @@ use big::BIG;
 //mod hash256;
 //mod rom;
 use rom;
+
+impl PartialEq for FP12 {
+	fn eq(&self, other: &FP12) -> bool {
+		return (self.a == other.a) &&
+			(self.b == other.b) &&
+			(self.c == other.c);
+	}
+}
+
+impl fmt::Display for FP12 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "FP12: [ {}, {}, {} ]", self.a, self.b, self.c)
+	}
+}
+
+impl fmt::Debug for FP12 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "FP12: [ {}, {}, {} ]", self.a, self.b, self.c)
+	}
+}
 
 impl FP12 {
 
