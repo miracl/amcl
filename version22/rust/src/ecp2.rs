@@ -18,6 +18,7 @@ under the License.
 */
 
 use std::fmt;
+use std::str::SplitWhitespace;
 
 #[derive(Copy, Clone)]
 pub struct ECP2 {
@@ -29,6 +30,7 @@ pub struct ECP2 {
 
 
 use rom;
+use rom::BIG_HEX_STRING_LEN;
 //mod fp2;
 use fp2::FP2;
 //mod fp;
@@ -275,7 +277,29 @@ impl ECP2 {
 		if self.is_infinity() {return String::from("infinity")}
 		self.affine();
 		return format!("({},{})",self.x.tostring(),self.y.tostring());
-}	
+}
+
+	pub fn to_hex(&self) -> String {
+		let mut ret: String = String::with_capacity(7 * BIG_HEX_STRING_LEN);
+		ret.push_str(&format!("{} {} {} {}", self.inf, self.x.to_hex(), self.y.to_hex(), self.z.to_hex()));
+		return ret;
+	}
+
+	pub fn from_hex_iter(iter: &mut SplitWhitespace) -> ECP2 {
+		let mut ret:ECP2 = ECP2::new();
+		if let Some(x) = iter.next() {
+			ret.inf = x == "true";
+			ret.x = FP2::from_hex_iter(iter);
+			ret.y = FP2::from_hex_iter(iter);
+			ret.z = FP2::from_hex_iter(iter);
+		}
+		return ret;
+	}
+
+	pub fn from_hex(val: String) -> ECP2 {
+		let mut iter = val.split_whitespace();
+		return ECP2::from_hex_iter(&mut iter);
+	}
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 	pub fn rhs(x:&mut FP2) -> FP2 {
