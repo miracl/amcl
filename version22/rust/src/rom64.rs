@@ -69,6 +69,7 @@ pub const AES_S: usize= 0;
 pub const FFLEN:usize=8;
 
 pub const NLEN: usize = (1+((MODBITS-1)/BASEBITS));
+pub const BIG_HEX_STRING_LEN:usize = NLEN * 16 + NLEN - 1;
 pub const DNLEN: usize = 2*NLEN;
 pub const BMASK: Chunk= ((1<<BASEBITS)-1);
 pub const MODBYTES: usize = 1+(MODBITS-1)/8;

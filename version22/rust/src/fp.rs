@@ -18,6 +18,7 @@ under the License.
 */
 
 use std::fmt;
+use std::str::SplitWhitespace;
 
 #[derive(Copy, Clone)]
 pub struct FP {
@@ -100,6 +101,22 @@ impl FP {
 	pub fn tostring(&mut self) -> String {
         let s=self.redc().tostring();
         return s;
+    }
+
+    pub fn to_hex(&self) -> String {
+        self.x.to_hex()
+    }
+
+    pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP {
+        FP {
+            x: BIG::from_hex_iter(iter)
+        }
+    }
+
+    pub fn from_hex(val: String) -> FP {
+        FP {
+            x: BIG::from_hex(val)
+        }
     }
 
 /* reduce this mod Modulus */
