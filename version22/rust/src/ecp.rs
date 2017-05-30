@@ -394,7 +394,7 @@ impl ECP {
 	pub fn from_hex_iter(iter: &mut SplitWhitespace) -> ECP {
 		let mut ret:ECP = ECP::new();
 		if let Some(x) = iter.next() {
-			ret.inf = i32::from_str_radix(x, 16).unwrap().is_positive();
+			ret.inf = x == "true";
 			ret.x = FP::from_hex_iter(iter);
 			ret.y = FP::from_hex_iter(iter);
 			ret.z = FP::from_hex_iter(iter);
