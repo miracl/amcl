@@ -18,6 +18,7 @@ under the License.
 */
 
 use std::fmt;
+use std::str::SplitWhitespace;
 
 #[derive(Copy, Clone)]
 pub struct FP12 {
@@ -26,7 +27,7 @@ pub struct FP12 {
 	c:FP4
 }
 
-//use rom;
+use rom::BIG_HEX_STRING_LEN;
 
 //mod fp;
 //use fp::FP;
@@ -488,6 +489,25 @@ impl FP12 {
 /* output to hex string */
 	pub fn tostring(&mut self) -> String {
 		return format!("[{},{},{}]",self.a.tostring(),self.b.tostring(),self.c.tostring());		
+	}
+
+	pub fn to_hex(&self) -> String {
+		let mut ret: String = String::with_capacity(12 * BIG_HEX_STRING_LEN);
+		ret.push_str(&format!("{} {} {}", self.a.to_hex(), self.b.to_hex(), self.c.to_hex()));
+		return ret;
+	}
+
+	pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP12 {
+		let mut ret:FP12 = FP12::new();
+		ret.a = FP4::from_hex_iter(iter);
+		ret.b = FP4::from_hex_iter(iter);
+		ret.c = FP4::from_hex_iter(iter);
+		return ret;
+	}
+
+	pub fn from_hex(val: String) -> FP12 {
+		let mut iter = val.split_whitespace();
+		return FP12::from_hex_iter(&mut iter);
 	}
 
 /* self=self^e */

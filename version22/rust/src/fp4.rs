@@ -18,6 +18,7 @@ under the License.
 */
 
 use std::fmt;
+use std::str::SplitWhitespace;
 
 #[derive(Copy, Clone)]
 pub struct FP4 {
@@ -25,7 +26,7 @@ pub struct FP4 {
 	b:FP2,
 }
 
-//use rom;
+use rom::BIG_HEX_STRING_LEN;
 //mod fp;
 //use fp::FP;
 //mod fp2;
@@ -282,7 +283,25 @@ impl FP4 {
 /* output to hex string */
 	pub fn tostring(&mut self) -> String {
 		return format!("[{},{}]",self.a.tostring(),self.b.tostring());		
-	}	
+	}
+
+	pub fn to_hex(&self) -> String {
+		let mut ret: String = String::with_capacity(4 * BIG_HEX_STRING_LEN);
+		ret.push_str(&format!("{} {}", self.a.to_hex(), self.b.to_hex()));
+		return ret;
+	}
+
+	pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP4 {
+		let mut ret:FP4 = FP4::new();
+		ret.a = FP2::from_hex_iter(iter);
+		ret.b = FP2::from_hex_iter(iter);
+		return ret;
+	}
+
+	pub fn from_hex(val: String) -> FP4 {
+		let mut iter = val.split_whitespace();
+		return FP4::from_hex_iter(&mut iter);
+	}
 
 /* self=1/self */
 	pub fn inverse(&mut self) {
