@@ -206,6 +206,13 @@ extern void BIG_XXX_sub(BIG_XXX x,BIG_XXX y,BIG_XXX z);
 	@param i integer
  */
 extern void BIG_XXX_dec(BIG_XXX x,int i);
+/**	@brief Set DBIG to sum of two DBIGs
+ *
+	@param x DBIG number, sum of other two - output not normalised
+	@param y DBIG number
+	@param z DBIG number
+ */
+extern void BIG_XXX_dadd(DBIG_XXX x,DBIG_XXX y,DBIG_XXX z);
 /**	@brief Set DBIG to difference of two DBIGs
  *
 	@param x DBIG number, difference of other two - output not normalised

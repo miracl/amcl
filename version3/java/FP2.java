@@ -222,17 +222,47 @@ b.mul(w3);
 	}
 
 /* this*=y */
+/* Now uses Lazy reduction */
 	public void mul(FP2 y)
 	{
-//		norm();  
 
+		if (FP.pexceed(FP.EXCESS(a.x)+FP.EXCESS(b.x)+1,FP.EXCESS(y.a.x)+FP.EXCESS(y.b.x)+1))
+		{
+			if (FP.EXCESS(a.x)>0) a.reduce();
+			if (FP.EXCESS(b.x)>0) b.reduce();			
+		}
+
+		DBIG pR=new DBIG(0);
+		BIG C=new BIG(a.x);
+		BIG D=new BIG(y.a.x);
+	//	BIG p=new BIG(ROM.Modulus);
+
+		pR.ucopy(FP.p);
+
+		DBIG A=BIG.mul(a.x,y.a.x);
+		DBIG B=BIG.mul(b.x,y.b.x);
+
+		C.add(b.x); C.norm();
+		D.add(y.b.x); D.norm();
+
+		DBIG E=BIG.mul(C,D);
+		DBIG F=new DBIG(A); F.add(B);
+		B.rsub(pR);
+
+		A.add(B); A.norm();
+		E.sub(F); E.norm();
+
+		a.x.copy(FP.mod(A));
+		b.x.copy(FP.mod(E));
+
+/*		
 		FP w1=new FP(a);
 		FP w2=new FP(b);
 		FP w5=new FP(a);
 		FP mw=new FP(0);
 
-		w1.mul(y.a);  // w1=a*y.a  - this norms w1 and y.a, NOT a
-		w2.mul(y.b);  // w2=b*y.b  - this norms w2 and y.b, NOT b
+		w1.mul(y.a);  // w1=a*y.a 
+		w2.mul(y.b);  // w2=b*y.b 
 		w5.add(b);    // w5=a+b
 		b.copy(y.a); b.add(y.b); // b=y.a+y.b
 
@@ -247,7 +277,7 @@ b.mul(w3);
 		b.add(mw); mw.add(w1);
 		a.copy(w1);	a.add(mw);
 
-		norm();
+		norm(); */
 	}
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */

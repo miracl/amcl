@@ -19,6 +19,8 @@ under the License.
 
 use xxx::fp::FP;
 use xxx::big::BIG;
+use xxx::dbig::DBIG;
+use xxx::rom;
 
 #[derive(Copy, Clone)]
 pub struct FP2 {
@@ -192,7 +194,6 @@ impl FP2 {
 
 /* self*=self */
 	pub fn sqr(&mut self) {
-	//	self.norm();
 		let mut w1=FP::new_copy(&self.a);
 		let mut w3=FP::new_copy(&self.a);
 		let mut mb=FP::new_copy(&self.b);
@@ -218,17 +219,66 @@ self.b.mul(&w3);
 
 /* this*=y */
 	pub fn mul(&mut self,y :&FP2) {
-	//	self.norm();  
 
+		let exa=FP::excess(&self.a.x);
+		let exb=FP::excess(&self.b.x);
+		let eya=FP::excess(&y.a.x);
+		let eyb=FP::excess(&y.b.x);
+		let ec=exa+exb+1;
+		let ed=eya+eyb+1;
+
+		if FP::pexceed(ec,ed) {
+			if exa>0 {self.a.reduce()}
+			if exb>0 {self.b.reduce()}
+		}
+
+
+//		if FP::pexceed(FP::excess(&(self.a.x))+FP::excess(&(self.b.x))+1,FP::excess(&(y.a.x))+FP::excess(&(y.b.x))+1) {
+//			self.reduce();
+//		}
+
+		//if FP::pexceed(FP::excess(&self.a.x),FP::excess(&y.a.x)) {
+		//	self.a.reduce()
+		//}
+		//if FP::pexceed(FP::excess(&self.b.x),FP::excess(&y.b.x)) {
+		//	self.b.reduce()
+		//}
+
+
+  		let p = BIG::new_ints(&rom::MODULUS);    
+  		let mut pr=DBIG::new();
+
+  		pr.ucopy(&p);
+
+		let mut c=BIG::new_copy(&(self.a.x));
+		let mut d=BIG::new_copy(&(y.a.x));
+
+		let mut a=BIG::mul(&self.a.x,&y.a.x);
+		let mut b=BIG::mul(&self.b.x,&y.b.x);
+
+		c.add(&self.b.x); c.norm();
+		d.add(&y.b.x); d.norm();
+
+		let mut e=BIG::mul(&c,&d);
+		let mut f=DBIG::new_copy(&a); f.add(&b);
+		b.rsub(&pr);
+
+		a.add(&b); a.norm();
+		e.sub(&f); e.norm();
+
+		self.a.x.copy(&FP::modulo(&mut a));
+		self.b.x.copy(&FP::modulo(&mut e));
+
+/*
 		let mut w1=FP::new_copy(&self.a);
 		let mut w2=FP::new_copy(&self.b);
 		let mut w5=FP::new_copy(&self.a);
 		let mut mw=FP::new();
 
-		w1.mul(&y.a);  // w1=a*y.a  - this norms w1 and y.a, NOT a
-		w2.mul(&y.b);  // w2=b*y.b  - this norms w2 and y.b, NOT b
+		w1.mul(&my.a);  // w1=a*y.a  
+		w2.mul(&my.b);  // w2=b*y.b 
 		w5.add(&self.b);    // w5=a+b
-		self.b.copy(&y.a); self.b.add(&y.b); // b=y.a+y.b
+		self.b.copy(&my.a); self.b.add(&my.b); // b=y.a+y.b
 
 		self.b.norm();
 		w5.norm();
@@ -239,7 +289,7 @@ self.b.mul(&w3);
 		self.b.add(&mw); mw.add(&w1);
 		self.a.copy(&w1); self.a.add(&mw);
 
-		self.norm();
+		self.norm(); */
 	}
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */

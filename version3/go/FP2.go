@@ -182,7 +182,6 @@ func (F *FP2) imul(c int) {
 
 /* this*=this */
 func (F *FP2) sqr() {
-//	F.norm()
 	w1:=NewFPcopy(F.a)
 	w3:=NewFPcopy(F.a)
 	mb:=NewFPcopy(F.b)
@@ -207,9 +206,46 @@ F.b.mul(w3);
 }
 
 /* this*=y */
+/* Now using Lazy reduction */
 func (F *FP2) mul(y *FP2) {
-	F.norm();  /* This is needed here as {a,b} is not normed before additions */
 
+	exa:=EXCESS(F.a.x)
+	exb:=EXCESS(F.b.x)
+	eya:=EXCESS(y.a.x)
+	eyb:=EXCESS(y.b.x)
+
+	ec:=exa+exb+1
+	ed:=eya+eyb+1
+
+	if pexceed(ec,ed) {
+		if ec>0 {F.a.reduce()}
+		if ed>0 {F.b.reduce()}
+	}
+
+	pR:=NewDBIG()
+	C:=NewBIGcopy(F.a.x)
+	D:=NewBIGcopy(y.a.x)
+	p:=NewBIGints(Modulus)
+
+	pR.ucopy(p)
+
+	A:=mul(F.a.x,y.a.x)
+	B:=mul(F.b.x,y.b.x)
+
+	C.add(F.b.x); C.norm()
+	D.add(y.b.x); D.norm()
+
+	E:=mul(C,D)
+	FF:=NewDBIGcopy(A); FF.add(B)
+	B.rsub(pR)
+
+	A.add(B); A.norm()
+	E.sub(FF); E.norm()
+
+	F.a.x.copy(mod(A))
+	F.b.x.copy(mod(E))
+
+/*
 	w1:=NewFPcopy(F.a)
 	w2:=NewFPcopy(F.b)
 	w5:=NewFPcopy(F.a)
@@ -229,7 +265,7 @@ func (F *FP2) mul(y *FP2) {
 	F.b.add(mw); mw.add(w1)
 	F.a.copy(w1);	F.a.add(mw)
 
-	F.norm()
+	F.norm() */
 }
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */

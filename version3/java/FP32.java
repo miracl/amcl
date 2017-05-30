@@ -39,8 +39,8 @@ public final class FP {
 	public static final int TMASK=((int)1<<TBITS)-1;
 
 
-	private final BIG x;
-	private static BIG p=new BIG(ROM.Modulus);
+	public final BIG x;
+	public static BIG p=new BIG(ROM.Modulus);
 
 /**************** 32-bit specific ************************/
 
@@ -51,20 +51,20 @@ public final class FP {
 	}
 
 /* Check if product causes excess */
-	public static boolean pexceed(BIG a,BIG b)
+	public static boolean pexceed(int ea,int eb)
 	{
-		int ea,eb;
-		ea=EXCESS(a);
-		eb=EXCESS(b);
+	//	int ea,eb;
+	//	ea=EXCESS(a);
+	//	eb=EXCESS(b);
 		if ((long)(ea+1)*(eb+1)>FEXCESS) return true;
 		return false;
 	}
 
 /* Check if square causes excess */
-	public static boolean sexceed(BIG a)
+	public static boolean sexceed(int ea)
 	{
-		int ea,eb;
-		ea=EXCESS(a);
+	//	int ea,eb;
+	//	ea=EXCESS(a);
 		if ((long)(ea+1)*(ea+1)>FEXCESS) return true;
 		return false;
 	}
@@ -259,7 +259,7 @@ public final class FP {
 //		norm();
 //		b.norm();
 
-		if (pexceed(x,b.x)) reduce();
+		if (pexceed(EXCESS(x),EXCESS(b.x))) reduce();
 
 		DBIG d=BIG.mul(x,b.x);
 		x.copy(mod(d));
@@ -298,7 +298,7 @@ public final class FP {
 		DBIG d;
 //		norm();
 
-		if (sexceed(x)) reduce();
+		if (sexceed(EXCESS(x))) reduce();
 
 		d=BIG.sqr(x);	
 		x.copy(mod(d));

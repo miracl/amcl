@@ -28,7 +28,7 @@ use arch::DChunk;
 
 #[derive(Copy, Clone)]
 pub struct FP {
- 	x:BIG
+ 	pub x:BIG
 }
 
 pub const NOT_SPECIAL:usize =0;
@@ -54,16 +54,16 @@ impl FP {
     }
 
 //#[cfg(D32)]
-    pub fn pexceed(a: &BIG,b: &BIG) -> bool {
-        let ea=FP::excess(a);
-        let eb=FP::excess(b);        
+    pub fn pexceed(ea: Chunk,eb: Chunk) -> bool {
+        //let ea=FP::excess(a);
+        //let eb=FP::excess(b);        
         if ((ea+1) as DChunk)*((eb+1) as DChunk) > FEXCESS as DChunk {return true}
         return false
     }
 
 //#[cfg(D32)]
-    pub fn sexceed(a: &BIG) -> bool {
-        let ea=FP::excess(a);
+    pub fn sexceed(ea: Chunk) -> bool {
+        //let ea=FP::excess(a);
         if ((ea+1) as DChunk)*((ea+1) as DChunk) > FEXCESS as DChunk {return true}
         return false
     }
@@ -264,9 +264,7 @@ impl FP {
 /* this*=b mod Modulus */
     pub fn mul(&mut self,b: &FP)
     {
-    //    self.norm();
-    //    b.norm();
-        if FP::pexceed(&(self.x),&(b.x)) {self.reduce()}
+        if FP::pexceed(FP::excess(&(self.x)),FP::excess(&(b.x))) {self.reduce()}
 
         let mut d=BIG::mul(&(self.x),&(b.x));
         self.x.copy(&FP::modulo(&mut d))
@@ -331,7 +329,7 @@ impl FP {
 /* self*=self mod Modulus */
     pub fn sqr(&mut self) {
     //    self.norm();
-        if FP::sexceed(&(self.x)) {self.reduce()}
+        if FP::sexceed(FP::excess(&(self.x))) {self.reduce()}
 
         let mut d=BIG::sqr(&(self.x));
         self.x.copy(&FP::modulo(&mut d))

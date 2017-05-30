@@ -144,6 +144,15 @@ public class DBIG {
 			w[i]=x.w[i];
 	}
 
+/* Copy into upper part */
+	public void ucopy(BIG x)
+	{
+		for (int i=0;i<BIG.NLEN;i++)
+			w[i]=0;
+		for (int i=BIG.NLEN;i<BIG.DNLEN;i++)
+			w[i]=x.w[i-BIG.NLEN];
+	}
+
 /* Copy from a BIG 
 	public void copy(BIG x)
 	{
@@ -195,6 +204,11 @@ public class DBIG {
 	public void sub(DBIG x) {
 		for (int i=0;i<BIG.DNLEN;i++)
 			w[i]-=x.w[i];
+	}
+
+	public void rsub(DBIG x) {
+		for (int i=0;i<BIG.DNLEN;i++)
+			w[i]=x.w[i]-w[i];
 	}
 
 /* Compare a and b, return 0 if a==b, -1 if a<b, +1 if a>b. Inputs must be normalised */

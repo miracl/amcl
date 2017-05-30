@@ -66,6 +66,21 @@ final class DBIG{
         for i in 0 ..< BIG.DNLEN {w[i] = x.w[i]}
     }
 
+    func ucopy(_ x: BIG)
+    {
+        for i in 0 ..< BIG.NLEN {w[i] = 0}
+        for i in BIG.NLEN ..< BIG.DNLEN {w[i] = x.w[i-BIG.NLEN]}        
+    }
+
+    /* this+=x */
+    func add(_ x: DBIG)
+    {
+        for i in 0 ..< BIG.DNLEN
+        {
+            w[i]+=x.w[i]
+        }
+    }
+
     /* this-=x */
     func sub(_ x: DBIG)
     {
@@ -74,6 +89,15 @@ final class DBIG{
             w[i]-=x.w[i]
         }
     }
+
+    /* this-=x */
+    func rsub(_ x: DBIG)
+    {
+        for i in 0 ..< BIG.DNLEN
+        {
+            w[i]=x.w[i]-w[i]
+        }
+    }    
 /*    func muladd(_ x: Int32,_ y: Int32,_ c: Int32,_ i: Int) -> Int32
     {
         let prod:Int64 = Int64(x)*Int64(y)+Int64(c)+Int64(w[i])

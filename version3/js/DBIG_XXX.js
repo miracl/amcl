@@ -52,6 +52,14 @@ DBIG_XXX.prototype={
 		return this;
 	},
 
+	ucopy: function(b)
+	{
+		var i;
+		for (i=0;i<BIG_XXX.NLEN;i++) this.w[i]=0;
+		for (i=BIG_XXX.NLEN;i<BIG_XXX.DNLEN;i++) this.w[i]=b.w[i-BIG_XXX.NLEN];
+		return this;
+	},
+
 /* normalise this */
 	norm: function()
 	{
@@ -126,6 +134,12 @@ DBIG_XXX.prototype={
 	{
 		for (var i=0;i<BIG_XXX.DNLEN;i++)
 			this.w[i]-=x.w[i];
+	},
+
+	rsub: function(x) 
+	{
+		for (var i=0;i<BIG_XXX.DNLEN;i++)
+			this.w[i]=x.w[i]-this.w[i];
 	},
 
 /* return number of bits in this */

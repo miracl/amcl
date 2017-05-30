@@ -219,12 +219,64 @@ void FP2_YYY_sqr(FP2_YYY *w,FP2_YYY *x)
 
 /* Set w=x*y */
 /* Inputs MUST be normed  */
+/* Now uses Lazy reduction */
 void FP2_YYY_mul(FP2_YYY *w,FP2_YYY *x,FP2_YYY *y)
 {
+	DBIG_XXX A,B,E,F,pR;
+	BIG_XXX C,D,p;
+	chunk exa,exb,eya,eyb,eC,eD;
+
+    BIG_XXX_rcopy(p,Modulus_YYY);
+	BIG_XXX_dsucopy(pR,p);
+
+// reduce excesses of a and b as required (so product < pR)
+
+	exa=EXCESS_YYY(x->a); exb=EXCESS_YYY(x->b); eya=EXCESS_YYY(y->a); eyb=EXCESS_YYY(y->b);
+
+	eC=exa+exb+1;
+	eD=eya+eyb+1;
+
+#ifdef dchunk
+	if ((dchunk)(eC+1)*(eD+1)>(dchunk)FEXCESS_YYY)
+#else
+    if ((eC+1)>FEXCESS_YYY/(eD+1))
+#endif
+	{
+#ifdef DEBUG_REDUCE
+		printf("FP2 Product too large - reducing it %d %d %d\n",eC,eD,FEXCESS_YYY);
+#endif
+		if (eC>0) FP_YYY_reduce(x->a);
+        if (eD>0) FP_YYY_reduce(x->b);        
+#ifdef GET_STATS
+        rmul+=2;
+    }
+
+    tmul+=3;
+#else
+    }
+#endif
+
+	BIG_XXX_mul(A,x->a,y->a);
+	BIG_XXX_mul(B,x->b,y->b);
+
+	BIG_XXX_add(C,x->a,x->b); BIG_XXX_norm(C);
+	BIG_XXX_add(D,y->a,y->b); BIG_XXX_norm(D);
+
+	BIG_XXX_mul(E,C,D);
+	BIG_XXX_dadd(F,A,B);
+	BIG_XXX_dsub(B,pR,B); // 
+
+	BIG_XXX_dadd(A,A,B);    // A<pR? Not necessarily, but <2pR
+	BIG_XXX_dsub(E,E,F);    // E<pR ? Yes
+
+	BIG_XXX_dnorm(A); FP_YYY_mod(w->a,A);  // may drift above 2p...
+	BIG_XXX_dnorm(E); FP_YYY_mod(w->b,E);
+
+/*
     BIG_XXX w1,w2,w5,mw;
 
-    FP_YYY_mul(w1,x->a,y->a);  /* norms x  */
-    FP_YYY_mul(w2,x->b,y->b);  /* and y */
+    FP_YYY_mul(w1,x->a,y->a); 
+    FP_YYY_mul(w2,x->b,y->b); 
 
     FP_YYY_add(w5,x->a,x->b);
     FP_YYY_add(w->b,y->a,y->b);
@@ -242,7 +294,7 @@ void FP2_YYY_mul(FP2_YYY *w,FP2_YYY *x,FP2_YYY *y)
     FP_YYY_add(mw,w1,mw);
     FP_YYY_add(w->a,w1,mw);
 
-    FP2_YYY_norm(w);
+    FP2_YYY_norm(w); */
 }
 
 /* output FP2 in hex format [a,b] */

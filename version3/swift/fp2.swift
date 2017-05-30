@@ -199,13 +199,9 @@ final public class FP2
     /* self*=self */
     func sqr()
     {
-    //    norm();
-    
         let w1=FP(a)
         let w3=FP(a)
         let mb=FP(b)
-
-        //w3.mul(b)
 
         w1.add(b)
 
@@ -220,14 +216,46 @@ final public class FP2
         w1.norm()
 
         a.mul(w1)
-    //    b.copy(w3); b.add(w3)
-    //    b.norm()
+
     }
     /* self*=y */
     func mul(_ y:FP2)
-    {
-    //    norm();  
-    
+    { 
+        let exa=FP.EXCESS(a.x)
+        let exb=FP.EXCESS(b.x)
+        let eya=FP.EXCESS(y.a.x)
+        let eyb=FP.EXCESS(y.b.x)
+        let ec=exa+exb+1
+        let ed=eya+eyb+1
+
+        if FP.pexceed(ec,ed) {
+            if exa>0 {a.reduce()}
+            if exb>0 {b.reduce()}
+        }
+
+        let pR=DBIG(0)
+        pR.ucopy(FP.p)
+
+        let C=BIG(a.x)
+        let D=BIG(y.a.x)
+
+        let A=BIG.mul(a.x,y.a.x)
+        let B=BIG.mul(b.x,y.b.x)
+
+        C.add(b.x); C.norm()
+        D.add(y.b.x); D.norm()
+
+        let E=BIG.mul(C,D)
+        let F=DBIG(A); F.add(B);
+        B.rsub(pR);
+
+        A.add(B); A.norm()
+        E.sub(F); E.norm()
+
+        a.x.copy(FP.mod(A))
+        b.x.copy(FP.mod(E))
+
+/*
         let w1=FP(a)
         let w2=FP(b)
         let w5=FP(a)
@@ -247,7 +275,7 @@ final public class FP2
         b.add(mw); mw.add(w1)
         a.copy(w1);	a.add(mw)
     
-        norm()
+        norm() */
     
     }
  

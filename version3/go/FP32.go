@@ -45,15 +45,15 @@ func EXCESS(a *BIG) Chunk {
 
 /***************** Start 32-bit specific code ****************/
 
-func pexceed(a *BIG,b *BIG) bool {
-	ea:=EXCESS(a)
-	eb:=EXCESS(b)
+func pexceed(ea Chunk,eb Chunk) bool {
+	//ea:=EXCESS(a)
+	//eb:=EXCESS(b)
 	if DChunk(ea+1)*DChunk(eb+1)>DChunk(FEXCESS) {return true}
 	return false
 }
 
-func sexceed(a *BIG) bool {
-	ea:=EXCESS(a)
+func sexceed(ea Chunk) bool {
+	//ea:=EXCESS(a)
 	if DChunk(ea+1)*DChunk(ea+1)>DChunk(FEXCESS) {return true}
 	return false
 }
@@ -226,7 +226,7 @@ func (F *FP) mul(b *FP) {
 
 //	F.norm()
 //	b.norm()
-	if pexceed(F.x,b.x) {F.reduce()}
+	if pexceed(EXCESS(F.x),EXCESS(b.x)) {F.reduce()}
 	d:=mul(F.x,b.x)
 	F.x.copy(mod(d))
 }
@@ -275,7 +275,7 @@ func (F *FP) imul(c int) {
 /* this*=this mod Modulus */
 func (F *FP) sqr() {
 //	F.norm();
-	if sexceed(F.x) {F.reduce()}
+	if sexceed(EXCESS(F.x)) {F.reduce()}
 	d:=sqr(F.x)	
 	F.x.copy(mod(d))
 }

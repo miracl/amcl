@@ -36,7 +36,7 @@ impl DBIG {
 
     pub fn new_copy(y:&DBIG) -> DBIG {
     	let mut s= DBIG::new();   
-    	for i in 0..big::NLEN {s.w[i]=y.w[i]}
+    	for i in 0..big::DNLEN {s.w[i]=y.w[i]}
     	return s;	
     }
 
@@ -96,9 +96,18 @@ impl DBIG {
 /* Copy from another DBIG */
 	pub fn copy(&mut self,x: &DBIG) {
 		for i in 0 ..big::DNLEN {
-			self.w[i]=x.w[i]
+			self.w[i]=x.w[i];
 		}
 	}
+
+    pub fn ucopy(&mut self,x: &BIG) {
+        for i in 0 ..big::NLEN {
+            self.w[i]=0;
+        }
+        for i in big::NLEN ..big::DNLEN {
+            self.w[i]=x.w[i-big::NLEN];
+        }        
+    }    
 
 	pub fn cmove(&mut self,g:&DBIG,d: isize) {
 		let b=-d as Chunk;
@@ -107,12 +116,27 @@ impl DBIG {
 		}
 	}
 
+/* self+=x */
+    pub fn add(&mut self,x:&DBIG) {
+        for i in 0 ..big::DNLEN {
+            self.w[i]+=x.w[i]; 
+        }
+    } 
+
 /* self-=x */
 	pub fn sub(&mut self,x:&DBIG) {
 		for i in 0 ..big::DNLEN {
 			self.w[i]-=x.w[i]; 
 		}
 	} 
+
+/* self=x-self */
+    pub fn rsub(&mut self,x:&DBIG) {
+        for i in 0 ..big::DNLEN {
+            self.w[i]=x.w[i]-self.w[i]; 
+        }
+    } 
+
 
 /* Compare a and b, return 0 if a==b, -1 if a<b, +1 if a>b. Inputs must be normalised */
     pub fn comp(a: &DBIG,b: &DBIG) -> isize {

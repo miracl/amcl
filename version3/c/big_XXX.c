@@ -391,6 +391,18 @@ void BIG_XXX_dsub(DBIG_XXX c,DBIG_XXX a,DBIG_XXX b)
 #endif
 }
 
+void BIG_XXX_dadd(DBIG_XXX c,DBIG_XXX a,DBIG_XXX b)
+{
+    int i;
+    for (i=0; i<DNLEN_XXX; i++)
+        c[i]=a[i]+b[i];
+#ifdef DEBUG_NORM
+	c[DMPV_XXX]=a[DMPV_XXX]+b[DMNV_XXX];
+	c[DMNV_XXX]=a[DMNV_XXX]+b[DMPV_XXX];
+	if (c[DMPV_XXX]>NEXCESS_XXX)  printf("double add problem - positive digit overflow %d\n",c[DMPV_XXX]);
+	if (c[DMNV_XXX]>NEXCESS_XXX)  printf("double add problem - negative digit overflow %d\n",c[DMNV_XXX]);
+#endif
+}
 
 /* Set c=c-1 */
 void BIG_XXX_dec(BIG_XXX c,int d)

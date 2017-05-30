@@ -51,32 +51,32 @@ final public class FP {
     }
 
 #if D32
-    static func pexceed(_ a: BIG,_ b : BIG) -> Bool
+    static func pexceed(_ ea: Chunk,_ eb : Chunk) -> Bool
     {
-        let ea=EXCESS(a)
-        let eb=EXCESS(b)
+    //    let ea=EXCESS(a)
+    //    let eb=EXCESS(b)
         if (DChunk(ea)+1)*(DChunk(eb)+1) > DChunk(FEXCESS) {return true}
         return false;
     }
-    static func sexceed(_ a: BIG) -> Bool
+    static func sexceed(_ ea: Chunk) -> Bool
     {
-        let ea=EXCESS(a)
+    //    let ea=EXCESS(a)
         if (DChunk(ea)+1)*(DChunk(ea)+1) > DChunk(FEXCESS) {return true}
         return false;
     }
 #endif
 
 #if D64
-    static func pexceed(_ a: BIG,_ b : BIG) -> Bool
+    static func pexceed(_ ea: Chunk,_ eb : Chunk) -> Bool
     {
-        let ea=EXCESS(a)
-        let eb=EXCESS(b)
+    //    let ea=EXCESS(a)
+    //    let eb=EXCESS(b)
         if (ea+1) > FEXCESS/(eb+1) {return true}
         return false;
     }
-    static func sexceed(_ a: BIG) -> Bool
+    static func sexceed(_ ea: Chunk) -> Bool
     {
-        let ea=EXCESS(a)
+    //    let ea=EXCESS(a)
         if (ea+1) > FEXCESS/(ea+1) {return true}
         return false;
     }
@@ -267,7 +267,7 @@ final public class FP {
     //    norm()
     //    b.norm()
 
-        if FP.pexceed(x,b.x) {reduce()}
+        if FP.pexceed(FP.EXCESS(x),FP.EXCESS(b.x)) {reduce()}
 
         //let ea=FP.EXCESS(x)
         //let eb=FP.EXCESS(b.x)
@@ -342,7 +342,7 @@ final public class FP {
     {
     //    norm()
 
-        if FP.sexceed(x) {reduce()}
+        if FP.sexceed(FP.EXCESS(x)) {reduce()}
 
 
      //   let ea=FP.EXCESS(x);

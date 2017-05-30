@@ -202,9 +202,50 @@ this.b.mul(w3);
 //		this.b.norm();
 	},
 /* this*=y */
+/* Now using Lazy reduction - inputs must be normed */
 	mul: function(y)
 	{
-//		this.norm();  // This is needed here as {a,b} is not normed before additions
+		var p=new BIG_XXX(0);
+		p.rcopy(ROM_FIELD_YYY.Modulus);
+		var pR=new DBIG_XXX(0);
+		pR.ucopy(p);
+
+		var exa=FP_YYY.EXCESS(this.a.f);
+		var exb=FP_YYY.EXCESS(this.b.f);
+		var eya=FP_YYY.EXCESS(y.a.f);
+		var eyb=FP_YYY.EXCESS(y.b.f);
+
+		var eC=exa+exb+1;
+		var eD=eya+eyb+1;
+	
+		if ((eC+1)*(eD+1)>FP_YYY.FEXCESS)
+		{
+			if (eC>0) this.a.reduce();
+			if (eD>0) this.b.reduce();
+		//	if (eD>1) y.reduce();
+		}
+		
+		var A=BIG_XXX.mul(this.a.f,y.a.f);
+		var B=BIG_XXX.mul(this.b.f,y.b.f);
+
+		var C=new BIG_XXX(this.a.f);
+		var D=new BIG_XXX(y.a.f);
+
+		C.add(this.b.f); C.norm();
+		D.add(y.b.f); D.norm();
+
+		var E=BIG_XXX.mul(C,D);
+		var F=new DBIG_XXX(0); F.copy(A); F.add(B);
+		B.rsub(pR);
+
+		A.add(B); A.norm();
+		E.sub(F); E.norm();
+
+		this.a.f.copy(FP_YYY.mod(A));
+		this.b.f.copy(FP_YYY.mod(E));
+
+
+/*
 
 		var w1=new FP_YYY(this.a); 
 		var w2=new FP_YYY(this.b); 
@@ -225,7 +266,7 @@ this.b.mul(w3);
 		this.b.add(mw); mw.add(w1);
 		this.a.copy(w1); this.a.add(mw);
 
-		this.norm();
+		this.norm(); */
 	},
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */

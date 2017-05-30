@@ -158,13 +158,10 @@ FP_YYY.prototype={
 /* this*=b mod Modulus */
 	mul: function(b)
 	{
-//		this.norm();
-//		b.norm();
 		var ea=FP_YYY.EXCESS(this.f);
 		var eb=FP_YYY.EXCESS(b.f);
 
 		if ((ea+1)*(eb+1)>FP_YYY.FEXCESS) this.reduce();
-		//if ((ea+1) >= Math.floor((FP_YYY.FEXCESS-1)/(eb+1))) this.reduce();
 
 		var d=BIG_XXX.mul(this.f,b.f);
 		this.f.copy(FP_YYY.mod(d));

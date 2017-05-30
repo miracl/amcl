@@ -98,10 +98,20 @@ func dcomp(a *DBIG,b *DBIG) int {
 	return 0
 }
 
-/* Copy from another BIG */
+/* Copy from another DBIG */
 func (r *DBIG) copy(x *DBIG) {
 	for i:=0;i<DNLEN;i++ {
 		r.w[i]=x.w[i]
+	}
+}
+
+/* Copy from another BIG to upper half */
+func (r *DBIG) ucopy(x *BIG) {
+	for i:=0;i<NLEN;i++ {
+		r.w[i]=0
+	}
+	for i:=NLEN;i<DNLEN;i++ {
+		r.w[i]=x.w[i-NLEN]
 	}
 }
 
@@ -115,6 +125,13 @@ func (r *DBIG) add(x *DBIG) {
 func (r *DBIG) sub(x *DBIG) {
 	for i:=0;i<DNLEN;i++ {
 		r.w[i]=r.w[i]-x.w[i] 
+	}
+} 
+
+/* this-=x */
+func (r *DBIG) rsub(x *DBIG) {
+	for i:=0;i<DNLEN;i++ {
+		r.w[i]=x.w[i]-r.w[i] 
 	}
 } 
 
