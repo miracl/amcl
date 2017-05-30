@@ -19,9 +19,10 @@ under the License.
 
 use std::fmt;
 use std::cmp::Ordering;
+use std::str::SplitWhitespace;
 
 use rom;
-use rom::Chunk;
+use rom::{Chunk, NLEN};
 
 #[cfg(target_pointer_width = "32")]
 use rom::DChunk;
@@ -482,6 +483,39 @@ alise BIG - force all digits < 2^rom::BASEBITS */
 		return BIG::frombytearray(b,0)
 	}
 
+    pub fn to_hex(&self) -> String {
+        let mut ret: String = String::with_capacity(NLEN * 16 + NLEN - 1);
+
+        for i in 0..NLEN {
+            if i == NLEN-1 {
+                ret.push_str(&format!("{:X}", self.w[i]));
+            } else {
+                ret.push_str(&format!("{:X} ", self.w[i]));
+            }
+        }
+        return ret;
+    }
+
+    pub fn from_hex_iter(iter: &mut SplitWhitespace) -> BIG {
+        let mut ret:BIG = BIG::new();
+        for i in 0..NLEN {
+            let v = iter.next();
+            match v {
+                Some(x) => {
+                    ret.w[i] = u64::from_str_radix(x, 16).unwrap() as Chunk;
+                },
+                None => {
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
+
+    pub fn from_hex(val: String) -> BIG {
+        let mut iter = val.split_whitespace();
+        return BIG::from_hex_iter(&mut iter);
+    }
 
 /* self*=x, where x is >NEXCESS */
     pub fn pmul(&mut self,c: isize) -> Chunk {
