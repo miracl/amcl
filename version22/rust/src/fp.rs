@@ -28,7 +28,7 @@ pub struct FP {
 use big::BIG;
 use dbig::DBIG;
 use rom;
-use rom::Chunk;
+use rom::{Chunk, BIG_HEX_STRING_LEN};
 
 impl fmt::Display for FP {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -104,7 +104,9 @@ impl FP {
     }
 
     pub fn to_hex(&self) -> String {
-        self.x.to_hex()
+        let mut ret: String = String::with_capacity(2 * BIG_HEX_STRING_LEN);
+        ret.push_str(&format!("{}", self.x.to_hex()));
+        return ret;
     }
 
     pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP {
@@ -114,9 +116,8 @@ impl FP {
     }
 
     pub fn from_hex(val: String) -> FP {
-        FP {
-            x: BIG::from_hex(val)
-        }
+        let mut iter = val.split_whitespace();
+        return FP::from_hex_iter(&mut iter);
     }
 
 /* reduce this mod Modulus */
