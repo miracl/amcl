@@ -346,7 +346,7 @@ impl AES {
             for j in 0..4 {self.rkey[k+j]=AES::invmixcol(self.fkey[i+j])}
             i+=4;
         }
-        for j in n-4..n {self.rkey[j-n+4]=self.fkey[j]}
+        for j in n-4..n {self.rkey[j+4-n]=self.fkey[j]}
 		return true;
 	}
 

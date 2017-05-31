@@ -267,7 +267,7 @@ impl BIG {
 		let mut k=NLEN-1;
         let mut s=BIG::new_copy(&self);        
 		s.norm();
-		while (k as isize)>=0 && s.w[k]==0 {k=k-1}
+		while (k as isize)>=0 && s.w[k]==0 {k=k.wrapping_sub(1)}
 		if (k as isize) <0 {return 0}
 		let mut bts=BASEBITS*k;
 		let mut c=s.w[k];
@@ -824,13 +824,13 @@ impl BIG {
             j+=1;
         }
 
-        j=NLEN-1+(NLEN%2);
+        j=NLEN+(NLEN%2)-1;
         while j<DNLEN-3
         {
-            t=(a.w[NLEN-1] as DChunk)*(a.w[j-NLEN+1] as DChunk); for i in j-NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk);} t+=t; t+=co; 
+            t=(a.w[NLEN-1] as DChunk)*(a.w[j+1-NLEN] as DChunk); for i in j+2-NLEN ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk);} t+=t; t+=co; 
             c.w[j]=(t&rm) as Chunk; co=t>>rb;
             j+=1;
-            t=(a.w[NLEN-1] as DChunk)*(a.w[j-NLEN+1] as DChunk); for i in j-NLEN+2 ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk);} t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk); 
+            t=(a.w[NLEN-1] as DChunk)*(a.w[j+1-NLEN] as DChunk); for i in j+2-NLEN ..(j+1)/2 {t+=(a.w[j-i] as DChunk)*(a.w[i] as DChunk);} t+=t; t+=co; t+=(a.w[j/2] as DChunk)*(a.w[j/2] as DChunk); 
             c.w[j]=(t&rm) as Chunk; co=t>>rb;
             j+=1;
         }
@@ -858,7 +858,8 @@ impl BIG {
             
         b.zero();
             
-        let mut t=d.w[0] as DChunk; v[0]=(((t&rm) as Chunk)*mc)&BMASK; t+=(v[0] as DChunk)*(md.w[0] as DChunk); let mut c=(d.w[1] as DChunk)+(t>>rb); let mut s:DChunk=0;
+        let mut t=d.w[0] as DChunk; v[0]=(((t&rm) as Chunk).wrapping_mul(mc))&BMASK; 
+        t+=(v[0] as DChunk)*(md.w[0] as DChunk); let mut c=(d.w[1] as DChunk)+(t>>rb); let mut s:DChunk=0;
         for k in 1 ..NLEN {
             t=c+s+(v[0] as DChunk)*(md.w[k] as DChunk);
             let mut i=1+k/2;
@@ -866,7 +867,8 @@ impl BIG {
                 t+=((v[k-i]-v[i]) as DChunk)*((md.w[i]-md.w[k-i]) as DChunk);
                 i+=1;
             }
-            v[k]=(((t&rm) as Chunk)*mc)&BMASK; t+=(v[k] as DChunk)*(md.w[0] as DChunk); c=(d.w[k+1] as DChunk)+(t>>rb);
+            v[k]=(((t&rm) as Chunk).wrapping_mul(mc))&BMASK; 
+            t+=(v[k] as DChunk)*(md.w[0] as DChunk); c=(d.w[k+1] as DChunk)+(t>>rb);
             dd[k]=(v[k] as DChunk)*(md.w[k] as DChunk); s+=dd[k];
         }
             
@@ -878,7 +880,7 @@ impl BIG {
                 t+=((v[k-i]-v[i]) as DChunk)*((md.w[i]-md.w[k-i]) as DChunk);
                 i+=1;
             }
-            b.w[k-NLEN]=(t&rm) as Chunk; c=(d.w[k+1] as DChunk)+(t>>rb); s-=dd[k-NLEN+1];
+            b.w[k-NLEN]=(t&rm) as Chunk; c=(d.w[k+1] as DChunk)+(t>>rb); s-=dd[k+1-NLEN];
         }
         b.w[NLEN-1]=(c&rm) as Chunk;  
         b.norm();

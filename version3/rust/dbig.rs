@@ -62,7 +62,7 @@ impl DBIG {
         for i in (big::NLEN-1..big::DNLEN-1).rev() {
             let nw=(self.w[i]>>m)|carry;
             carry= (self.w[i]<<(big::BASEBITS-m))&big::BMASK;
-            t.set(i-big::NLEN+1,nw);
+            t.set(i+1-big::NLEN,nw);
         }
         self.w[big::NLEN-1]&=((1 as Chunk)<<m)-1;
         return t;
@@ -240,7 +240,7 @@ impl DBIG {
 	pub fn nbits(&mut self) -> usize {
 		let mut k=big::DNLEN-1;
 		self.norm();
-		while (k as isize)>=0 && self.w[k]==0 {k=k-1}
+		while (k as isize)>=0 && self.w[k]==0 {k=k.wrapping_sub(1)}
 		if (k as isize) <0 {return 0}
 		let mut bts=(big::BASEBITS as usize)*k;
 		let mut c=self.w[k];

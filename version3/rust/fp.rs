@@ -280,7 +280,7 @@ impl FP {
 
         v = v - ((v >> 1) & 0x55555555);                 
         v = (v & 0x33333333) + ((v >> 2) & 0x33333333);  
-        let r= ((   ((v + (v >> 4)) & 0xF0F0F0F)   * 0x1010101) >> 24) as usize;
+        let r= ((   ((v + (v >> 4)) & 0xF0F0F0F).wrapping_mul(0x1010101)) >> 24) as usize;
         return r+1;    
     }
 

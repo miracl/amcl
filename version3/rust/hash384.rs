@@ -94,17 +94,18 @@ impl HASH384 {
 		let mut a=self.h[0]; let mut b=self.h[1]; let mut c=self.h[2]; let mut d=self.h[3]; 
 		let mut e=self.h[4]; let mut f=self.h[5]; let mut g=self.h[6]; let mut hh=self.h[7];
 		for j in 0..80 { /* 64 times - mush it up */
-			let t1=hh+HASH384::sig1(e)+HASH384::ch(e,f,g)+HASH384_K[j]+self.w[j];
-			let t2=HASH384::sig0(a)+HASH384::maj(a,b,c);
+			let t1=hh.wrapping_add(HASH384::sig1(e)).wrapping_add(HASH384::ch(e,f,g)).wrapping_add(HASH384_K[j]).wrapping_add(self.w[j]);
+			let t2=HASH384::sig0(a).wrapping_add(HASH384::maj(a,b,c));
 			hh=g; g=f; f=e;
-			e=d+t1;
+			e=d.wrapping_add(t1);
 			d=c;
 			c=b;
 			b=a;
-			a=t1+t2 ; 
+			a=t1.wrapping_add(t2) ; 
 		}
-		self.h[0]+=a; self.h[1]+=b; self.h[2]+=c; self.h[3]+=d;
-		self.h[4]+=e; self.h[5]+=f; self.h[6]+=g; self.h[7]+=hh; 
+		self.h[0]=self.h[0].wrapping_add(a); self.h[1]=self.h[1].wrapping_add(b); self.h[2]=self.h[2].wrapping_add(c); self.h[3]=self.h[3].wrapping_add(d);
+		self.h[4]=self.h[4].wrapping_add(e); self.h[5]=self.h[5].wrapping_add(f); self.h[6]=self.h[6].wrapping_add(g); self.h[7]=self.h[7].wrapping_add(hh);
+
 	} 	
 
 /* Initialise Hash function */

@@ -120,7 +120,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	#os.system("go install amcl"+slashtext+tc)
 
 os.system("cargo new amcl")
-os.system("mkdir amcl"+slashtext+"src")
+#os.system("mkdir amcl"+slashtext+"src")
 os.system(copytext+ "hash*.rs amcl"+slashtext+"src"+slashtext+".")
 os.system(copytext+ "rand.rs amcl"+slashtext+"src"+slashtext+".")
 os.system(copytext+ "aes.rs amcl"+slashtext+"src"+slashtext+".")
