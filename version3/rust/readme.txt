@@ -32,3 +32,15 @@ rustc BenchtestALL.rs --extern amcl=libamcl.rlib
 Run this test program by executing the program BenchtestALL.exe
 
 
+
+If you wish to test/benchtest other curves:-
+
+(a) Edit TestALL.rs and BenchtestALL.rs, and change all occurences of 
+ed25519 to nist256
+
+(b) Go throught the process above again from scratch, but this time
+select options 3, 11 and 14
+
+And thats it!
+
+
