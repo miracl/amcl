@@ -147,7 +147,7 @@ func monty(m* BIG, mc Chunk,d* DBIG) *BIG {
 		b.w[k-NLEN]=Chunk(t)&BMASK; c=(t>>BASEBITS)+DChunk(d.w[k+1]); s-=dd[k-NLEN+1]
 	}
 	b.w[NLEN-1]=Chunk(c)&BMASK;	
-	b.norm()
+//	b.norm()
 	return b
 }
 

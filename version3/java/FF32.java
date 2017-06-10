@@ -43,11 +43,11 @@ public final class FF {
 /**************** 32-bit specific ************************/
 
 	public static final int P_OMASK=((int)(-1)<<(P_MBITS%BIG.BASEBITS));
-	public static final int P_FEXCESS=((int)1<<(BIG.BASEBITS*BIG.NLEN-P_MBITS));
+	public static final int P_FEXCESS=((int)1<<(BIG.BASEBITS*BIG.NLEN-P_MBITS-1));
 
 	public static int EXCESS(BIG a)
 	{
-		return ((a.get(BIG.NLEN-1)&P_OMASK)>>(P_TBITS));
+		return ((a.get(BIG.NLEN-1)&P_OMASK)>>(P_TBITS))+1;
 	}
 
 /* Check if product causes excess */

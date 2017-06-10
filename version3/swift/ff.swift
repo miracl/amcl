@@ -38,7 +38,7 @@ final public class FF {
 
     static let P_MBITS:UInt=BIG.MODBYTES*8
     static let P_OMASK:Chunk=Chunk(-1)<<Chunk(FF.P_MBITS%BIG.BASEBITS)
-    static let P_FEXCESS:Chunk=(1<<Chunk(BIG.BASEBITS*UInt(BIG.NLEN)-FF.P_MBITS))
+    static let P_FEXCESS:Chunk=(1<<Chunk(BIG.BASEBITS*UInt(BIG.NLEN)-FF.P_MBITS-1))
     static let P_TBITS=(FF.P_MBITS%BIG.BASEBITS)
  
 
@@ -49,7 +49,7 @@ final public class FF {
 /* calculate Field Excess */
     static func EXCESS(_ a: BIG) -> Chunk
     {
-        return ((a.w[BIG.NLEN-1] & FF.P_OMASK)>>Chunk(FF.P_MBITS%BIG.BASEBITS))
+        return ((a.w[BIG.NLEN-1] & FF.P_OMASK)>>Chunk(FF.P_MBITS%BIG.BASEBITS))+1
     }
 
 #if D32

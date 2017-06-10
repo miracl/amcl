@@ -30,7 +30,7 @@ var FF_WWW = function(n) {
 FF_WWW.FFLEN=@ML@;
 FF_WWW.P_MBITS=BIG_XXX.MODBYTES*8;
 FF_WWW.P_OMASK=((-1)<<(FF_WWW.P_MBITS%BIG_XXX.BASEBITS));
-FF_WWW.P_FEXCESS=(1<<(BIG_XXX.BASEBITS*BIG_XXX.NLEN-FF_WWW.P_MBITS));
+FF_WWW.P_FEXCESS=(1<<(BIG_XXX.BASEBITS*BIG_XXX.NLEN-FF_WWW.P_MBITS-1));
 FF_WWW.P_TBITS=(FF_WWW.P_MBITS%BIG_XXX.BASEBITS);
 FF_WWW.FF_BITS=(BIG_XXX.BIGBITS*FF_WWW.FFLEN);
 FF_WWW.HFLEN=(FF_WWW.FFLEN/2);  /* Useful for half-size RSA private key operations */
@@ -40,7 +40,7 @@ FF_WWW.prototype={
 
 	P_EXCESS: function() 
 	{
-		return ((this.v[this.length-1].get(BIG_XXX.NLEN-1)&FF_WWW.P_OMASK)>>(FF_WWW.P_TBITS));
+		return ((this.v[this.length-1].get(BIG_XXX.NLEN-1)&FF_WWW.P_OMASK)>>(FF_WWW.P_TBITS))+1;
 	},
 
 	zero: function()

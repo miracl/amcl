@@ -33,7 +33,7 @@ public final class FP {
 	public static final int MOD8=@M8@;  /* Modulus mod 8 */
 	public static final int MODTYPE=@MT@;
 
-	public static final long FEXCESS =((long)1<<(BIG.BASEBITS*BIG.NLEN-MODBITS)); 
+	public static final long FEXCESS =((long)1<<(BIG.BASEBITS*BIG.NLEN-MODBITS-1)); 
 	public static final long OMASK=(long)(-1)<<(MODBITS%BIG.BASEBITS);
 	public static final int TBITS=MODBITS%BIG.BASEBITS; // Number of active bits in top word 
 	public static final long TMASK=((long)1<<TBITS)-1;
@@ -47,7 +47,7 @@ public final class FP {
 /* calculate Field Excess */
 	public static long EXCESS(BIG a)
 	{
-		return ((a.w[BIG.NLEN-1]&OMASK)>>(MODBITS%BIG.BASEBITS));
+		return ((a.w[BIG.NLEN-1]&OMASK)>>(MODBITS%BIG.BASEBITS))+1;
 	}
 
 /* Check if product causes excess */
@@ -335,13 +335,7 @@ public final class FP {
 		int sb;
 		BIG m=new BIG(p);
 
-//	if (!x.isok()) System.out.println("Problem in neg");
-//		norm();
 		sb=logb2((int)EXCESS(x)+1);
-/*
-		ov=EXCESS(x); 
-		sb=1; while(ov!=0) {sb++;ov>>=1;} 
-*/
 		m.fshl(sb);
 		x.rsub(m);		
 

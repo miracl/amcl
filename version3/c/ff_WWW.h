@@ -7,8 +7,8 @@
 #define HFLEN_WWW (FFLEN_WWW/2) /**< Useful for half-size RSA private key operations */
 #define P_MBITS_WWW (MODBYTES_XXX*8)
 #define P_TBITS_WWW (P_MBITS_WWW%BASEBITS_XXX)
-#define P_EXCESS_WWW(a) ((a[NLEN_XXX-1])>>(P_TBITS_WWW))
-#define P_FEXCESS_WWW ((chunk)1<<(BASEBITS_XXX*NLEN_XXX-P_MBITS_WWW))
+#define P_EXCESS_WWW(a) (((a[NLEN_XXX-1])>>(P_TBITS_WWW))+1)
+#define P_FEXCESS_WWW ((chunk)1<<(BASEBITS_XXX*NLEN_XXX-P_MBITS_WWW-1))
 
 
 /* Finite Field Prototypes */

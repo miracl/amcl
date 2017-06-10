@@ -12,11 +12,11 @@ extern const chunk MConst_YYY; /**< Montgomery only - 1/p mod 2^BASEBITS */
 #define MODBITS_YYY MBITS_YYY
 #define TBITS_YYY (MBITS_YYY%BASEBITS_XXX)                    /**< Number of active bits in top word */
 #define TMASK_YYY (((chunk)1<<TBITS_YYY)-1)               /**< Mask for active bits in top word */
-#define FEXCESS_YYY ((chunk)1<<(BASEBITS_XXX*NLEN_XXX-MBITS_YYY)) /**< 2^(BASEBITS*NLEN-MODBITS) - normalised BIG can be multiplied by more than this before reduction */
+#define FEXCESS_YYY ((chunk)1<<(BASEBITS_XXX*NLEN_XXX-MBITS_YYY-1)) /**< 2^(BASEBITS*NLEN-MODBITS) - normalised BIG can be multiplied by more than this before reduction */
 #define OMASK_YYY (-((chunk)(1)<<TBITS_YYY))              /**<  for masking out overflow bits */
 
 /* catch field excesses */
-#define EXCESS_YYY(a) ((a[NLEN_XXX-1]&OMASK_YYY)>>(TBITS_YYY)) /**< Field Excess */
+#define EXCESS_YYY(a) (((a[NLEN_XXX-1]&OMASK_YYY)>>(TBITS_YYY))+1) /**< Field Excess */
 
 //#define FUSED_MODMUL
 

@@ -37,7 +37,7 @@ pub const HFLEN:usize=(FFLEN/2);  /* Useful for half-size RSA private key operat
 
 pub const P_MBITS:usize=(big::MODBYTES as usize)*8;
 pub const P_OMASK:Chunk=((-1)<<(P_MBITS%big::BASEBITS));
-pub const P_FEXCESS: Chunk=(1<<(big::BASEBITS*big::NLEN-P_MBITS));
+pub const P_FEXCESS: Chunk=(1<<(big::BASEBITS*big::NLEN-P_MBITS-1));
 pub const P_TBITS: usize=(P_MBITS%big::BASEBITS);
 
 
@@ -53,7 +53,7 @@ impl FF {
 
 
     pub fn excess(a:&BIG) -> Chunk {
-        return (a.w[big::NLEN-1]&P_OMASK)>>(P_TBITS)
+        return ((a.w[big::NLEN-1]&P_OMASK)>>(P_TBITS))+1;
     }
 
 

@@ -40,7 +40,7 @@ pub const MODBITS:usize = @NBT@; /* Number of bits in Modulus */
 pub const MOD8: usize = @M8@;  /* Modulus mod 8 */
 pub const MODTYPE:usize=@MT@;
 
-pub const FEXCESS:Chunk = ((1 as Chunk)<<(big::BASEBITS*(big::NLEN)-MODBITS));
+pub const FEXCESS:Chunk = ((1 as Chunk)<<(big::BASEBITS*(big::NLEN)-MODBITS-1));
 pub const OMASK:Chunk = (-1)<<(MODBITS%big::BASEBITS);
 pub const TBITS:usize=MODBITS%big::BASEBITS; // Number of active bits in top word
 pub const TMASK:Chunk=(1<<TBITS)-1;
@@ -50,7 +50,7 @@ impl FP {
 
 /* calculate Field Excess */
     pub fn excess(a:&BIG) -> Chunk {
-        return (a.w[big::NLEN-1]&OMASK)>>(MODBITS%big::BASEBITS)
+        return ((a.w[big::NLEN-1]&OMASK)>>(MODBITS%big::BASEBITS))+1;
     }
 
 //#[cfg(D32)]

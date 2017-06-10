@@ -32,11 +32,11 @@ const HFLEN int=(FFLEN/2)  /* Useful for half-size RSA private key operations */
 
 const P_MBITS uint=MODBYTES*8
 const P_OMASK Chunk=(Chunk(-1)<<(P_MBITS%BASEBITS))
-const P_FEXCESS Chunk=(Chunk(1)<<(BASEBITS*uint(NLEN)-P_MBITS))
+const P_FEXCESS Chunk=(Chunk(1)<<(BASEBITS*uint(NLEN)-P_MBITS-1))
 const P_TBITS uint=(P_MBITS%BASEBITS)
 
 func FF_EXCESS(a* BIG) Chunk {
-	return ((a.w[NLEN-1]&P_OMASK)>>(P_TBITS))
+	return ((a.w[NLEN-1]&P_OMASK)>>(P_TBITS))+1
 }
 
 /***************** Start 64-bit specific code ****************/

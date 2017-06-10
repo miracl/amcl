@@ -350,7 +350,7 @@ public class BIG {
 			b.w[k-NLEN]=(int)t&BMASK; c=(t>>BASEBITS)+d.w[k+1]; s-=dd[k-NLEN+1];
 		}
 		b.w[NLEN-1]=(int)c&BMASK;	
-		b.norm();
+	//	b.norm();
 		return b;		
 	}
 

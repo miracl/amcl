@@ -37,7 +37,7 @@ final public class FP {
     static let MOD8:UInt = @M8@
     static public let MODTYPE =  @MT@   
 
-    static let FEXCESS:Chunk = (1<<Chunk(BIG.BASEBITS*UInt(BIG.NLEN)-FP.MODBITS));
+    static let FEXCESS:Chunk = (1<<Chunk(BIG.BASEBITS*UInt(BIG.NLEN)-FP.MODBITS-1));
     static let OMASK:Chunk=Chunk(-1)<<Chunk(FP.MODBITS%BIG.BASEBITS)
     static let TBITS:UInt=FP.MODBITS%BIG.BASEBITS; // Number of active bits in top word
     static let TMASK:Chunk=(1<<Chunk(FP.TBITS))-1
@@ -47,7 +47,7 @@ final public class FP {
 
     static func EXCESS(_ a: BIG) -> Chunk
     {
-        return ((a.w[BIG.NLEN-1] & FP.OMASK)>>Chunk(FP.MODBITS%BIG.BASEBITS))
+        return ((a.w[BIG.NLEN-1] & FP.OMASK)>>Chunk(FP.MODBITS%BIG.BASEBITS))+1
     }
 
 #if D32

@@ -996,7 +996,7 @@ final public class BIG{
             b.w[k-BIG.NLEN]=Chunk(t&RM); c=DChunk(d.w[k+1])+(t>>RB); s-=dd[k-BIG.NLEN+1]
         }
         b.w[BIG.NLEN-1]=Chunk(c&RM)
-        b.norm()
+     //   b.norm()
         return b;
     }
 #endif

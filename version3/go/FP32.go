@@ -33,14 +33,14 @@ const MODBITS uint=@NBT@ /* Number of bits in Modulus */
 const MOD8 uint=@M8@  /* Modulus mod 8 */
 const MODTYPE int=@MT@ //NOT_SPECIAL
 
-const FEXCESS Chunk=(Chunk(1)<<(BASEBITS*uint(NLEN)-MODBITS))
+const FEXCESS Chunk=(Chunk(1)<<(BASEBITS*uint(NLEN)-MODBITS-1))
 const OMASK Chunk= ((Chunk(-1))<<(MODBITS%BASEBITS))
 const TBITS uint=MODBITS%BASEBITS // Number of active bits in top word 
 const TMASK Chunk=(Chunk(1)<<TBITS)-1
 
 /* calculate Field Excess */
 func EXCESS(a *BIG) Chunk {
-	return ((a.w[NLEN-1]&OMASK)>>(MODBITS%BASEBITS))
+	return ((a.w[NLEN-1]&OMASK)>>(MODBITS%BASEBITS))+1
 }
 
 /***************** Start 32-bit specific code ****************/

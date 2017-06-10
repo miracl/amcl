@@ -50,6 +50,23 @@ public class DBIG {
 		return s;
 	}
 */
+/* split DBIG at position n, return higher half, keep lower half */
+	public BIG split(int n)
+	{
+		BIG t=new BIG(0);
+		int nw,m=n%BIG.BASEBITS;
+		int carry=w[BIG.DNLEN-1]<<(BIG.BASEBITS-m);
+
+		for (int i=BIG.DNLEN-2;i>=BIG.NLEN-1;i--)
+		{
+			nw=(w[i]>>m)|carry;
+			carry=(w[i]<<(BIG.BASEBITS-m))&BIG.BMASK;
+			t.w[i-BIG.NLEN+1]=nw;
+		//	t.set(i-BIG.NLEN+1,nw);
+		}
+		w[BIG.NLEN-1]&=(((int)1<<m)-1);
+		return t;
+	}
 
 
 /****************************************************************************/
@@ -121,23 +138,6 @@ public class DBIG {
 		for (int i=BIG.NLEN+1;i<BIG.DNLEN;i++) w[i]=0;
 	}
 
-/* split DBIG at position n, return higher half, keep lower half */
-	public BIG split(int n)
-	{
-		BIG t=new BIG(0);
-		int nw,m=n%BIG.BASEBITS;
-		int carry=w[BIG.DNLEN-1]<<(BIG.BASEBITS-m);
-
-		for (int i=BIG.DNLEN-2;i>=BIG.NLEN-1;i--)
-		{
-			nw=(w[i]>>m)|carry;
-			carry=(w[i]<<(BIG.BASEBITS-m))&BIG.BMASK;
-			t.w[i-BIG.NLEN+1]=nw;
-		//	t.set(i-BIG.NLEN+1,nw);
-		}
-		w[BIG.NLEN-1]&=(((int)1<<m)-1);
-		return t;
-	}
 
 /* Copy from another DBIG */
 	public void copy(DBIG x)

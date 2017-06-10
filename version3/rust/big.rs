@@ -883,7 +883,7 @@ impl BIG {
             b.w[k-NLEN]=(t&rm) as Chunk; c=(d.w[k+1] as DChunk)+(t>>rb); s-=dd[k+1-NLEN];
         }
         b.w[NLEN-1]=(c&rm) as Chunk;  
-        b.norm();
+   //     b.norm();
         return b;
     }
     

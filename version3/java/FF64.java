@@ -36,8 +36,6 @@ public final class FF {
 	public static final int HFLEN=(FFLEN/2);  /* Useful for half-size RSA private key operations */
 
 	public static final int P_MBITS=BIG.MODBYTES*8;
-	public static final long P_OMASK=((long)(-1)<<(P_MBITS%BIG.BASEBITS));
-	public static final long P_FEXCESS=((long)1<<(BIG.BASEBITS*BIG.NLEN-P_MBITS));
 	public static final int P_TBITS=(P_MBITS%BIG.BASEBITS);
 
 	private final BIG[] v;
@@ -45,9 +43,12 @@ public final class FF {
 
 /**************** 64-bit specific ************************/
 
+	public static final long P_OMASK=((long)(-1)<<(P_MBITS%BIG.BASEBITS));
+	public static final long P_FEXCESS=((long)1<<(BIG.BASEBITS*BIG.NLEN-P_MBITS-1));
+
 	public static long EXCESS(BIG a)
 	{
-		return ((a.get(BIG.NLEN-1)&P_OMASK)>>(P_TBITS));
+		return ((a.get(BIG.NLEN-1)&P_OMASK)>>(P_TBITS))+1;
 	}
 
 /* Check if product causes excess */
