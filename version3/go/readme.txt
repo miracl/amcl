@@ -25,7 +25,7 @@ or
 
 python3 config64.py
 
-Then select options 1, 23 and 26 (these are fixed for the example 
+Then select options 1, 17 and 20 (these are fixed for the example 
 program provided). Select 0 to exit.
 
 Then copy the test program TestALL.go to a src/TestALL subdirectory 

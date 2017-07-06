@@ -42,7 +42,7 @@
 #ifdef CMAKE
 #define CHUNK @AMCL_CHUNK@  /**< size of chunk in bits = wordlength of computer = 16, 32 or 64. Note not all curve options are supported on 16-bit processors - see rom.c */
 #else
-#define CHUNK 32		/**< size of chunk in bits = wordlength of computer = 16, 32 or 64. Note not all curve options are supported on 16-bit processors - see rom.c */
+#define CHUNK @WL@		/**< size of chunk in bits = wordlength of computer = 16, 32 or 64. Note not all curve options are supported on 16-bit processors - see rom.c */
 #endif
 
 /*** END OF USER CONFIGURABLE SECTION ***/
@@ -60,12 +60,14 @@
 #ifndef C99  /* You are on your own! These are for Microsoft C */
 #define sign32 __int32			/**< 32-bit signed integer */
 #define sign8 signed char		/**< 8-bit signed integer */
+#define sign64 long long		/**< 64-bit signed integer */
 #define unsign32 unsigned __int32 /**< 32-bit unsigned integer */
 #define unsign64 unsigned long long  /**< 64-bit unsigned integer */
 #else
 #include <stdint.h>
 #define sign8 int8_t			/**< 8-bit signed integer */
 #define sign32 int32_t			/**< 32-bit signed integer */
+#define sign64 int64_t			/**< 64-bit signed integer */
 #define unsign32 uint32_t		/**< 32-bit unsigned integer */
 #define unsign64 uint64_t		/**< 64-bit unsigned integer */
 #endif

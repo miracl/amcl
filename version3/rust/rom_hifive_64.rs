@@ -20,12 +20,15 @@ under the License.
 use hifive::big::NLEN;
 use arch::Chunk;
 
+// Base Bits= 60
 // hifive Modulus 
 pub const MODULUS:[Chunk;NLEN]=[0xFFFFFFFFFFFFFFD,0xFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFFF,0xFFFFFFFFF];
+pub const R2MODP:[Chunk;NLEN]=[0x9000000000000,0x0,0x0,0x0,0x0,0x0];
 pub const MCONST:Chunk=0x3;
 
-// hifive Curve 
+// hifive Curve
 pub const CURVE_A:isize = 1;
+pub const CURVE_B_I:isize = 11111;
 pub const CURVE_B:[Chunk;NLEN]=[0x2B67,0x0,0x0,0x0,0x0,0x0];
 pub const CURVE_ORDER:[Chunk;NLEN]=[0xB2F95973E9FA805,0xC0BD6B87F93BAA7,0x71415FA9850,0x0,0x0,0x200000000];
 pub const CURVE_GX:[Chunk;NLEN]=[0xC,0x0,0x0,0x0,0x0,0x0];

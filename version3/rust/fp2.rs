@@ -17,6 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use xxx::fp;
 use xxx::fp::FP;
 use xxx::big::BIG;
 use xxx::dbig::DBIG;
@@ -180,6 +181,12 @@ impl FP2 {
 		self.add(&m);
 	}
 
+/* self=a-self */
+	pub fn rsub(&mut self,x:&FP2) {
+		self.neg();
+		self.add(x);
+	}
+
 /* self*=s, where s is an FP */
 	pub fn pmul(&mut self,s:&FP) {
 		self.a.mul(s);
@@ -201,9 +208,9 @@ impl FP2 {
 	//	w3.mul(&self.b);
 		w1.add(&self.b);
 
-w3.add(&self.a);
-w3.norm();
-self.b.mul(&w3);
+		w3.add(&self.a);
+		w3.norm();
+		self.b.mul(&w3);
 
 		mb.neg();
 		self.a.add(&mb);
@@ -212,37 +219,16 @@ self.b.mul(&w3);
 		self.a.norm();
 
 		self.a.mul(&w1);
-	//	self.b.copy(&w3); self.b.add(&w3);
-
-	//	self.b.norm();
 	}	
 
 /* this*=y */
 	pub fn mul(&mut self,y :&FP2) {
 
-		let exa=FP::excess(&self.a.x);
-		let exb=FP::excess(&self.b.x);
-		let eya=FP::excess(&y.a.x);
-		let eyb=FP::excess(&y.b.x);
-		let ec=exa+exb+1;
-		let ed=eya+eyb+1;
 
-		if FP::pexceed(ec,ed) {
-			if exa>0 {self.a.reduce()}
-			if exb>0 {self.b.reduce()}
+		if ((self.a.xes+self.b.xes) as i64)*((y.a.xes+y.b.xes) as i64) > fp::FEXCESS as i64 {
+			if self.a.xes>1 {self.a.reduce()}
+			if self.b.xes>1 {self.b.reduce()}
 		}
-
-
-//		if FP::pexceed(FP::excess(&(self.a.x))+FP::excess(&(self.b.x))+1,FP::excess(&(y.a.x))+FP::excess(&(y.b.x))+1) {
-//			self.reduce();
-//		}
-
-		//if FP::pexceed(FP::excess(&self.a.x),FP::excess(&y.a.x)) {
-		//	self.a.reduce()
-		//}
-		//if FP::pexceed(FP::excess(&self.b.x),FP::excess(&y.b.x)) {
-		//	self.b.reduce()
-		//}
 
 
   		let p = BIG::new_ints(&rom::MODULUS);    
@@ -266,30 +252,9 @@ self.b.mul(&w3);
 		a.add(&b); a.norm();
 		e.sub(&f); e.norm();
 
-		self.a.x.copy(&FP::modulo(&mut a));
-		self.b.x.copy(&FP::modulo(&mut e));
+		self.a.x.copy(&FP::modulo(&mut a)); self.a.xes=3;
+		self.b.x.copy(&FP::modulo(&mut e)); self.b.xes=2;
 
-/*
-		let mut w1=FP::new_copy(&self.a);
-		let mut w2=FP::new_copy(&self.b);
-		let mut w5=FP::new_copy(&self.a);
-		let mut mw=FP::new();
-
-		w1.mul(&my.a);  // w1=a*y.a  
-		w2.mul(&my.b);  // w2=b*y.b 
-		w5.add(&self.b);    // w5=a+b
-		self.b.copy(&my.a); self.b.add(&my.b); // b=y.a+y.b
-
-		self.b.norm();
-		w5.norm();
-
-		self.b.mul(&w5);
-		mw.copy(&w1); mw.add(&w2); mw.neg();
-
-		self.b.add(&mw); mw.add(&w1);
-		self.a.copy(&w1); self.a.add(&mw);
-
-		self.norm(); */
 	}
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */
@@ -359,6 +324,13 @@ self.b.mul(&w3);
 		self.b.copy(&z);
 		self.add(&t);
 	//	self.norm();
+	}
+
+	pub fn div_ip2(&mut self) {
+		let mut t=FP2::new();
+		t.a.copy(&self.a); t.a.add(&self.b);
+		t.b.copy(&self.b); t.b.sub(&self.a);
+		self.copy(&t); 
 	}
 
 /* w/=(1+sqrt(-1)) */

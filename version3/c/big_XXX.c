@@ -207,6 +207,21 @@ void BIG_XXX_doutput(DBIG_XXX a)
     }
 }
 
+
+void BIG_XXX_drawoutput(DBIG_XXX a)
+{
+    int i;
+    printf("(");
+    for (i=0; i<DNLEN_XXX-1; i++)
+#if CHUNK==64
+        printf("%"PRIxMAX",",(uint64_t) a[i]);
+    printf("%"PRIxMAX")",(uint64_t) a[DNLEN_XXX-1]);
+#else
+        printf("%x,",(unsigned int) a[i]);
+    printf("%x)",(unsigned int) a[DNLEN_XXX-1]);
+#endif
+}
+
 /* Copy b=a */
 void BIG_XXX_copy(BIG_XXX b,BIG_XXX a)
 {

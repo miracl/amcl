@@ -168,6 +168,12 @@ func (F *FP2) sub(x *FP2) {
 	F.add(m)
 }
 
+/* this-=a */
+func (F *FP2) rsub(x *FP2) {
+	F.neg()
+	F.add(x)
+}
+
 /* this*=s, where s is an FP */
 func (F *FP2) pmul(s *FP) {
 	F.a.mul(s)
@@ -209,17 +215,9 @@ F.b.mul(w3);
 /* Now using Lazy reduction */
 func (F *FP2) mul(y *FP2) {
 
-	exa:=EXCESS(F.a.x)
-	exb:=EXCESS(F.b.x)
-	eya:=EXCESS(y.a.x)
-	eyb:=EXCESS(y.b.x)
-
-	ec:=exa+exb+1
-	ed:=eya+eyb+1
-
-	if pexceed(ec,ed) {
-		if ec>0 {F.a.reduce()}
-		if ed>0 {F.b.reduce()}
+	if int64(F.a.XES+F.b.XES)*int64(y.a.XES+y.b.XES)>int64(FEXCESS) {
+		if F.a.XES>1 {F.a.reduce()}
+		if F.b.XES>1 {F.b.reduce()}		
 	}
 
 	pR:=NewDBIG()
@@ -242,30 +240,9 @@ func (F *FP2) mul(y *FP2) {
 	A.add(B); A.norm()
 	E.sub(FF); E.norm()
 
-	F.a.x.copy(mod(A))
-	F.b.x.copy(mod(E))
+	F.a.x.copy(mod(A)); F.a.XES=3
+	F.b.x.copy(mod(E)); F.b.XES=2
 
-/*
-	w1:=NewFPcopy(F.a)
-	w2:=NewFPcopy(F.b)
-	w5:=NewFPcopy(F.a)
-	mw:=NewFPint(0)
-
-	w1.mul(y.a)  // w1=a*y.a  - this norms w1 and y.a, NOT a
-	w2.mul(y.b)  // w2=b*y.b  - this norms w2 and y.b, NOT b
-	w5.add(F.b)    // w5=a+b
-	F.b.copy(y.a); F.b.add(y.b) // b=y.a+y.b
-
-	w5.norm();
-	F.b.norm();
-
-	F.b.mul(w5);
-	mw.copy(w1); mw.add(w2); mw.neg()
-
-	F.b.add(mw); mw.add(w1)
-	F.a.copy(w1);	F.a.add(mw)
-
-	F.norm() */
 }
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */
@@ -335,6 +312,13 @@ func (F *FP2) mul_ip() {
 	F.b.copy(z)
 	F.add(t)
 //	F.norm()
+}
+
+func (F *FP2) div_ip2() {
+	t:=NewFP2int(0)
+	t.a.copy(F.a); t.a.add(F.b)
+	t.b.copy(F.b); t.b.sub(F.a);
+	F.copy(t);
 }
 
 /* w/=(1+sqrt(-1)) */

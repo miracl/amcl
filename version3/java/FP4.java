@@ -182,8 +182,8 @@ public final class FP4 {
 
 		t2.add(a);
 
-	t1.norm();
-	t2.norm();
+		t1.norm();
+		t2.norm();
 
 		a.copy(t1);
 
@@ -192,7 +192,7 @@ public final class FP4 {
 		t2.copy(t3);
 		t2.mul_ip();
 		t2.add(t3);
-	t2.norm();
+		t2.norm();
 		t2.neg();
 		a.add(t2);
 

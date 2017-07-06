@@ -3,9 +3,10 @@ We assume than optimizing compilers will unwind loops at every opportunity.
 But sometimes they don't. So time-critical code will run faster if we step
 in and unwind complex loops for the compiler.
 
-Once the architecture (arch.h) and ECC/RSA support is decided upon choose 
-which BIG numbers need to be optimized. So for example if using 256 bit 
-BIGs, replace XXX with 256 in this file and in faster_XXX.c
+Once the architecture and ECC/RSA support is decided upon choose 
+which BIG numbers need to be optimized. So for example for a 32-bit build and
+if using 256 bit BIGs and a base of 2^29, replace XXX with 256_29 in this 
+file and in faster_XXX.c
 
 Then compile and execute the program faster_XXX.c like this (using MinGW 
 port of GCC as an example), in the same directory as arch.h and big_XXX.h
@@ -23,6 +24,6 @@ Finally make sure that
 appears somewhere in big_XXX.h
 
 Finally compile and replace the big_XXX module in the library, and maybe 
-get a 50% speed-up! If there is no significant improvement, don't use this 
+get a 30% speed-up! If there is no significant improvement, don't use this 
 method!
 

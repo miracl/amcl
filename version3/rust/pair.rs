@@ -30,99 +30,73 @@ use xxx::ecp;
 use xxx::rom;
 
 #[allow(non_snake_case)]
-
 fn linedbl(A: &mut ECP2,qx: &FP,qy: &FP) -> FP12 {
-	let mut P=ECP2::new();
-
-	P.copy(A);
-	let mut zz=FP2::new_copy(&P.getpz());
-	zz.sqr();
-	let d=A.dbl();	
-
-	if d<0 {return FP12::new_int(1)}
-
-	let mut z3=FP2::new_copy(&A.getpz());
 	let mut a=FP4::new();
 	let mut b=FP4::new();
 	let c=FP4::new();	
 
-	let mut x=FP2::new_copy(&P.getpx());
-	let mut y=FP2::new_copy(&P.getpy());
-	let mut t=FP2::new_copy(&P.getpx());
-	t.sqr();
-	t.imul(3);
+	let mut xx=FP2::new_copy(&A.getpx());  //X
+	let mut yy=FP2::new_copy(&A.getpy());  //Y
+	let mut zz=FP2::new_copy(&A.getpz());  //Z
+	let mut yz=FP2::new_copy(&yy);        //Y 
+	yz.mul(&zz);                //YZ
+	xx.sqr();	               //X^2
+	yy.sqr();	               //Y^2
+	zz.sqr();			       //Z^2
+			
+	yz.imul(4);
+	yz.neg(); yz.norm();       //-2YZ
+	yz.pmul(qy);               //-2YZ.Ys
 
-	y.sqr();
-	y.dbl();
-	z3.mul(&mut zz);
-	z3.pmul(qy);
+	xx.imul(6);                //3X^2
+	xx.pmul(qx);               //3X^2.Xs
 
-	x.mul(&mut t); 
-	x.sub(&y); x.norm();
-	a.copy(&FP4::new_fp2s(&z3,&x));
-	t.neg(); t.norm();
-	zz.mul(&mut t);
-	zz.pmul(qx);
-	b.copy(&FP4::new_fp2(&zz));
+	let sb=3*rom::CURVE_B_I;
+	zz.imul(sb); 	
+			
+	zz.div_ip2();  zz.norm(); // 3b.Z^2 
 
-	return FP12::new_fp4s(&a,&b,&c);
+	yy.dbl();
+	zz.sub(&yy); zz.norm();     // 3b.Z^2-Y^2
+
+	a.copy(&FP4::new_fp2s(&yz,&zz)); // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
+	b.copy(&FP4::new_fp2(&xx));       // L(0,1) | L(0,0) | L(1,0)
+
+	A.dbl();
+	return FP12::new_fp4s(&a,&b,&c);	
 }
 
 #[allow(non_snake_case)]
 fn lineadd(A: &mut ECP2,B: &ECP2,qx: &FP,qy: &FP) -> FP12 {
 
-	let mut P=ECP2::new();
-
-	P.copy(A);
-	let mut zz=FP2::new_copy(&P.getpz());
-	zz.sqr();
-
-	let d=A.add(B);
-	if d<0 {return FP12::new_int(1)}	
-
-	let mut z3=FP2::new_copy(&A.getpz());
 	let mut a=FP4::new();
 	let mut b=FP4::new();
 	let c=FP4::new();	
 
-	if d==0 { /* Addition */
-		let mut x=FP2::new_copy(&B.getpx());
-		let y=FP2::new_copy(&B.getpy());
-		let mut t=FP2::new_copy(&P.getpz()); 
-		t.mul(&y);
-		zz.mul(&t);
+	let mut x1=FP2::new_copy(&A.getpx());    // X1
+	let mut y1=FP2::new_copy(&A.getpy());    // Y1
+	let mut t1=FP2::new_copy(&A.getpz());    // Z1
+	let mut t2=FP2::new_copy(&A.getpz());    // Z1
+			
+	t1.mul(&B.getpy());    // T1=Z1.Y2 
+	t2.mul(&B.getpx());    // T2=Z1.X2
 
-		let mut ny=FP2::new_copy(&P.getpy()); ny.neg(); ny.norm();
-		zz.add(&ny); zz.norm();
-		z3.pmul(qy);
-		t.mul(&P.getpx());
-		x.mul(&ny);
-		t.add(&x); t.norm();
-		a.copy(&FP4::new_fp2s(&z3,&t));
-		zz.neg(); zz.norm();
-		zz.pmul(qx);
-		b.copy(&FP4::new_fp2(&zz));
-	} else { /* Doubling */
-		let mut x=FP2::new_copy(&P.getpx());
-		let mut y=FP2::new_copy(&P.getpy());
-		let mut t=FP2::new_copy(&P.getpx());
-		t.sqr();
-		t.imul(3);
+	x1.sub(&t2); x1.norm();  // X1=X1-Z1.X2
+	y1.sub(&t1); y1.norm();  // Y1=Y1-Z1.Y2
 
-		y.sqr();
-		y.dbl();
-		z3.mul(&zz);
-		z3.pmul(qy);
+	t1.copy(&x1);            // T1=X1-Z1.X2
+	x1.pmul(qy);            // X1=(X1-Z1.X2).Ys
+	t1.mul(&B.getpy());       // T1=(X1-Z1.X2).Y2
 
-		x.mul(&t); 
-		x.sub(&y); x.norm();
-		a.copy(&FP4::new_fp2s(&z3,&x));
-		t.neg(); t.norm();
-		zz.mul(&t);
-		zz.pmul(qx);
-		b.copy(&FP4::new_fp2(&zz));
-	}
+	t2.copy(&y1);            // T2=Y1-Z1.Y2
+	t2.mul(&B.getpx());       // T2=(Y1-Z1.Y2).X2
+	t2.sub(&t1); t2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+	y1.pmul(qx); y1.neg(); y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
 
+	a.copy(&FP4::new_fp2s(&x1,&t2)); // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+	b.copy(&FP4::new_fp2(&y1));
+
+	A.add(B);
 	return FP12::new_fp4s(&a,&b,&c);
 }
 

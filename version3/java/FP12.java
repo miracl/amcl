@@ -123,6 +123,7 @@ public final class FP12 {
 /* Granger-Scott Unitary Squaring */
 	public void usqr()
 	{
+//System.out.println("Into usqr");
 		FP4 A=new FP4(a);
 		FP4 B=new FP4(c);
 		FP4 C=new FP4(b);
@@ -156,13 +157,15 @@ public final class FP12 {
 		c.add(c);
 		b.add(B);
 		c.add(C);
+//System.out.println("Out of usqr 1");
 		reduce();
-
+//System.out.println("Out of usqr 2");
 	}
 
 /* Chung-Hasan SQR2 method from http://cacr.uwaterloo.ca/techreports/2006/cacr2006-24.pdf */
 	public void sqr()
 	{
+//System.out.println("Into sqr");
 		FP4 A=new FP4(a);
 		FP4 B=new FP4(b);
 		FP4 C=new FP4(c);
@@ -197,13 +200,14 @@ public final class FP12 {
 
 		b.copy(C); b.add(D);
 		c.add(A);
-
+//System.out.println("Out of sqr");
 		norm();
 	}
 
 /* FP12 full multiplication this=this*y */
 	public void mul(FP12 y)
 	{
+//System.out.println("Into mul");
 		FP4 z0=new FP4(a);
 		FP4 z1=new FP4(0);
 		FP4 z2=new FP4(b);
@@ -264,11 +268,13 @@ t1.norm();
 		z3.times_i();
 		a.copy(z0); a.add(z3);
 		norm();
+//System.out.println("Out of mul");
 	}
 
 /* Special case of multiplication arises from special form of ATE pairing line function */
 	public void smul(FP12 y)
 	{
+//System.out.println("Into smul");
 		FP4 z0=new FP4(a);
 		FP4 z2=new FP4(b);
 		FP4 z3=new FP4(b);
@@ -280,26 +286,25 @@ t1.norm();
 		b.add(a);
 		t1.real().add(y.b.real());
 
-t1.norm();
-b.norm();
+		t1.norm();
+		b.norm();
 		b.mul(t1);
 		z3.add(c);
-z3.norm();
+		z3.norm();
 		z3.pmul(y.b.real());
 
 		t0.copy(z0); t0.neg();
 		t1.copy(z2); t1.neg();
 
 		b.add(t0);
-	//	b.norm();
 
 		b.add(t1);
 		z3.add(t1);
 		z2.add(t0);
 
 		t0.copy(a); t0.add(c);
-t0.norm();
-z3.norm();
+		t0.norm();
+		z3.norm();
 		t0.mul(y.a);
 		c.copy(z2); c.add(t0);
 
@@ -307,6 +312,7 @@ z3.norm();
 		a.copy(z0); a.add(z3);
 
 		norm();
+//System.out.println("Out of smul");
 	}
 
 /* this=1/this */

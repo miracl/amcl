@@ -32,66 +32,69 @@ public final class PAIR {
 /* Line function */
 	public static FP12 line(ECP2 A,ECP2 B,FP Qx,FP Qy)
 	{
-		ECP2 P=new ECP2();
-
-		FP4 a,b,c;
-		P.copy(A);
-		FP2 ZZ=new FP2(P.getz());
-		ZZ.sqr();
-		int D;
-		if (A==B) D=A.dbl(); /* Check this return value in ecp2.c */
-		else D=A.add(B);
-		if (D<0) 
-			return new FP12(1);
-		FP2 Z3=new FP2(A.getz());
+//System.out.println("Into line");
+		FP4 a,b,c;                            // Edits here
 		c=new FP4(0);
-		if (D==0)
-		{ /* Addition */
-			FP2 X=new FP2(B.getx());
-			FP2 Y=new FP2(B.gety());
-			FP2 T=new FP2(P.getz()); 
-			T.mul(Y);
-			ZZ.mul(T);
+		if (A==B)
+		{ // Doubling
+			FP2 XX=new FP2(A.getx());  //X
+			FP2 YY=new FP2(A.gety());  //Y
+			FP2 ZZ=new FP2(A.getz());  //Z
+			FP2 YZ=new FP2(YY);        //Y 
+			YZ.mul(ZZ);                //YZ
+			XX.sqr();	               //X^2
+			YY.sqr();	               //Y^2
+			ZZ.sqr();			       //Z^2
+			
+			YZ.imul(4);
+			YZ.neg(); YZ.norm();       //-2YZ
+			YZ.pmul(Qy);               //-2YZ.Ys
 
-			FP2 NY=new FP2(P.gety()); NY.neg();
-		NY.norm();
-			ZZ.add(NY);
-		ZZ.norm();
-			Z3.pmul(Qy);
-			T.mul(P.getx());
-			X.mul(NY);
-			T.add(X);
-		T.norm();
-			a=new FP4(Z3,T);
-			ZZ.neg();
-		ZZ.norm();
-			ZZ.pmul(Qx);
-			b=new FP4(ZZ);
+			XX.imul(6);                //3X^2
+			XX.pmul(Qx);               //3X^2.Xs
+
+			int sb=3*ROM.CURVE_B_I;
+			ZZ.imul(sb); 	
+			
+			ZZ.div_ip2();  ZZ.norm(); // 3b.Z^2 
+
+			YY.add(YY);
+			ZZ.sub(YY); ZZ.norm();     // 3b.Z^2-Y^2
+
+			a=new FP4(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
+			b=new FP4(XX);             // L(0,1) | L(0,0) | L(1,0)
+
+			A.dbl();
 		}
 		else
-		{ /* Doubling */
-			FP2 X=new FP2(P.getx());
-			FP2 Y=new FP2(P.gety());
-			FP2 T=new FP2(P.getx());
-			T.sqr();
-			T.imul(3);
+		{ // Addition - assume B is affine
 
-			Y.sqr();
-			Y.add(Y);
-			Z3.mul(ZZ);
-			Z3.pmul(Qy);
+			FP2 X1=new FP2(A.getx());    // X1
+			FP2 Y1=new FP2(A.gety());    // Y1
+			FP2 T1=new FP2(A.getz());    // Z1
+			FP2 T2=new FP2(A.getz());    // Z1
+			
+			T1.mul(B.gety());    // T1=Z1.Y2 
+			T2.mul(B.getx());    // T2=Z1.X2
 
-			X.mul(T);
-		//Y.norm();
-			X.sub(Y);
-		X.norm();
-			a=new FP4(Z3,X);
-			T.neg();
-		T.norm();
-			ZZ.mul(T);
-			ZZ.pmul(Qx);
-			b=new FP4(ZZ);
+			X1.sub(T2); X1.norm();  // X1=X1-Z1.X2
+			Y1.sub(T1); Y1.norm();  // Y1=Y1-Z1.Y2
+
+			T1.copy(X1);            // T1=X1-Z1.X2
+			X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
+			T1.mul(B.gety());       // T1=(X1-Z1.X2).Y2
+
+			T2.copy(Y1);            // T2=Y1-Z1.Y2
+			T2.mul(B.getx());       // T2=(Y1-Z1.Y2).X2
+			T2.sub(T1); T2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+			Y1.pmul(Qx);  Y1.neg(); Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
+
+			a=new FP4(X1,T2);       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+			b=new FP4(Y1);
+
+			A.add(B);
 		}
+//System.out.println("Out of line");
 		return new FP12(a,b,c);
 	}
 
@@ -112,8 +115,6 @@ public final class PAIR {
 			n.copy(x);
 		n.norm();
 		
-	//	P.affine();
-	//	Q.affine();
 		FP Qx=new FP(Q.getx());
 		FP Qy=new FP(Q.gety());
 
@@ -178,11 +179,6 @@ public final class PAIR {
 			n.copy(x);
 		n.norm();
 
-	//	P.affine();
-	//	Q.affine();
-	//	R.affine();
-	//	S.affine();
-
 		FP Qx=new FP(Q.getx());
 		FP Qy=new FP(Q.gety());
 		FP Sx=new FP(S.getx());
@@ -200,6 +196,7 @@ public final class PAIR {
 		{
 			lv=line(A,A,Qx,Qy);
 			r.smul(lv);
+
 			lv=line(B,B,Sx,Sy);
 			r.smul(lv);
 
@@ -211,6 +208,7 @@ public final class PAIR {
 				r.smul(lv);
 			}
 			r.sqr();
+
 		}
 
 		lv=line(A,A,Qx,Qy);
@@ -353,49 +351,6 @@ public final class PAIR {
 			y1.mul(y2);
 			r.copy(y1);
 			r.reduce();
-
-/*
-			x0=new FP12(r);
-			x1=new FP12(r);
-			lv.copy(r); lv.frob(f);
-			x3=new FP12(lv); x3.conj(); x1.mul(x3);
-			lv.frob(f); lv.frob(f);
-			x1.mul(lv);
-
-			r.copy(r.pow(x));  //r=r.pow(x);
-			x3.copy(r); x3.conj(); x1.mul(x3);
-			lv.copy(r); lv.frob(f);
-			x0.mul(lv);
-			lv.frob(f);
-			x1.mul(lv);
-			lv.frob(f);
-			x3.copy(lv); x3.conj(); x0.mul(x3);
-
-			r.copy(r.pow(x));
-			x0.mul(r);
-			lv.copy(r); lv.frob(f); lv.frob(f);
-			x3.copy(lv); x3.conj(); x0.mul(x3);
-			lv.frob(f);
-			x1.mul(lv);
-
-			r.copy(r.pow(x));
-			lv.copy(r); lv.frob(f);
-			x3.copy(lv); x3.conj(); x0.mul(x3);
-			lv.frob(f);
-			x1.mul(lv);
-
-			r.copy(r.pow(x));
-			x3.copy(r); x3.conj(); x0.mul(x3);
-			lv.copy(r); lv.frob(f);
-			x1.mul(lv);
-
-			r.copy(r.pow(x));
-			x1.mul(r);
-
-			x0.usqr();
-			x0.mul(x1);
-			r.copy(x0);
-			r.reduce(); */
 		}
 		
 		return r;
@@ -543,11 +498,10 @@ public final class PAIR {
 			BIG q=new BIG(ROM.CURVE_Order);
 			BIG[] u=gs(e);
 
-
-
 			BIG t=new BIG(0);
 			int i,np,nn;
 			P.affine();
+
 			Q[0]=new ECP2(); Q[0].copy(P);
 			for (i=1;i<4;i++)
 			{

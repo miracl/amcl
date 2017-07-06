@@ -24,7 +24,7 @@ var ECP2_ZZZ=function()
 {
 	this.x=new FP2_YYY(0);
 	this.y=new FP2_YYY(1);
-	this.z=new FP2_YYY(1);
+	this.z=new FP2_YYY(0);
 	this.INF=true;
 };
 
@@ -32,6 +32,9 @@ ECP2_ZZZ.prototype={
 /* Test this=O? */
 	is_infinity: function() 
 	{
+		if (this.INF) return true;                    //******
+		this.x.reduce(); this.y.reduce(); this.z.reduce();
+		this.INF=(this.x.iszilch() && this.z.iszilch());
 		return this.INF;
 	},
 /* copy this=P */
@@ -47,7 +50,7 @@ ECP2_ZZZ.prototype={
 	{
 		this.INF=true;
 		this.x.zero();
-		this.y.zero();
+		this.y.one();
 		this.z.zero();
 	},
 
@@ -91,23 +94,23 @@ ECP2_ZZZ.prototype={
 		if (this.is_infinity() && Q.is_infinity()) return true;
 		if (this.is_infinity() || Q.is_infinity()) return false;
 
-		var zs2=new FP2_YYY(this.z); /*zs2.copy(this.z);*/ zs2.sqr();
-		var zo2=new FP2_YYY(Q.z); /*zo2.copy(Q.z);*/  zo2.sqr();
-		var zs3=new FP2_YYY(zs2); /*zs3.copy(zs2);*/ zs3.mul(this.z);
-		var zo3=new FP2_YYY(zo2); /*zo3.copy(zo2);*/  zo3.mul(Q.z);
-		zs2.mul(Q.x);
-		zo2.mul(this.x);
-		if (!zs2.equals(zo2)) return false;
-		zs3.mul(Q.y);
-		zo3.mul(this.y);
-		if (!zs3.equals(zo3)) return false;
+		var a=new FP_YYY(0); a.copy(this.x);
+		var b=new FP_YYY(0); b.copy(Q.x);
+
+		a.copy(this.x); a.mul(Q.z); a.reduce();
+		b.copy(Q.x); b.mul(this.z); b.reduce();
+		if (!a.equals(b)) return false;
+
+		a.copy(this.y); a.mul(Q.z); a.reduce();
+		b.copy(Q.y); b.mul(this.z); b.reduce();
+		if (!a.equals(b)) return false;
 
 		return true;
 	},
 /* set this=-this */
 	neg: function() 
 	{
-		if (this.is_infinity()) return;
+//		if (this.is_infinity()) return;
 		this.y.norm();
 		this.y.neg(); this.y.norm();
 		return;
@@ -117,15 +120,17 @@ ECP2_ZZZ.prototype={
 	{
 		if (this.is_infinity()) return;
 		var one=new FP2_YYY(1);
-		if (this.z.equals(one)) return;
+		if (this.z.equals(one)) 
+		{
+			this.x.reduce();
+			this.y.reduce();
+			return;
+		}
 		this.z.inverse();
 
-		var z2=new FP2_YYY(this.z); //z2.copy(this.z);
-		z2.sqr();
-		this.x.mul(z2); this.x.reduce();
-		this.y.mul(z2); 
-		this.y.mul(this.z);  this.y.reduce();
-		this.z=one;
+		this.x.mul(this.z); this.x.reduce();               // *****
+		this.y.mul(this.z); this.y.reduce();
+		this.z.copy(one);
 	},
 /* extract affine x as FP2_YYY */
 	getX: function()
@@ -229,47 +234,40 @@ ECP2_ZZZ.prototype={
 	dbl: function() 
 	{
 		if (this.INF) return -1;
-		if (this.y.iszilch())
-		{
-			this.inf();
-			return -1;
-		}
-
-		var w1=new FP2_YYY(this.x); //w1.copy(this.x);
-		var w2=new FP2_YYY(0); 
-		var w3=new FP2_YYY(this.x); //w3.copy(this.x);
-		var w8=new FP2_YYY(this.x); //w8.copy(this.x);
-
-		w1.sqr();
-		w8.copy(w1);
-		w8.imul(3);
-
-		w2.copy(this.y); w2.sqr();
-		w3.copy(this.x); w3.imul(4); w3.mul(w2);
 		
-		w1.copy(w3); w1.neg();
+		var iy=new FP2_YYY(0); iy.copy(this.y); //FP2 iy=new FP2(y);
+		iy.mul_ip(); iy.norm();
 
+		var t0=new FP2_YYY(0); t0.copy(this.y);//FP2 t0=new FP2(y);                  //***** Change 
+		t0.sqr();            t0.mul_ip();   
+		var t1=new FP2_YYY(0); t1.copy(iy);//FP2 t1=new FP2(iy);  
+		t1.mul(this.z);
+		var t2=new FP2_YYY(0); t2.copy(this.z);//FP2 t2=new FP2(z);
+		t2.sqr();
 
-		this.x.copy(w8); this.x.sqr();
-		this.x.add(w1);
-		this.x.add(w1);
-		this.x.norm();
+		this.z.copy(t0);
+		this.z.add(t0); this.z.norm(); 
+		this.z.add(this.z); 
+		this.z.add(this.z); 
+		this.z.norm();  
 
-		this.z.add(this.z); this.z.norm();
-		this.z.mul(this.y);
+		t2.imul(3*ROM_CURVE_ZZZ.CURVE_B_I); 
 
+		var x3=new FP2_YYY(0); x3.copy(t2);//FP2 x3=new FP2(t2);
+		x3.mul(this.z); 
 
-		w2.add(w2);
-		w2.norm();
-		w2.sqr();
-		w2.add(w2);
-		w3.sub(this.x);
-		w2.norm(); // ??
-		w3.norm();
-		this.y.copy(w8); this.y.mul(w3);
-		this.y.sub(w2);
-		this.y.norm();
-		this.z.norm();
+		var y3=new FP2_YYY(0); y3.copy(t0); //FP2 y3=new FP2(t0);   
+
+		y3.add(t2); y3.norm();
+		this.z.mul(t1);
+		t1.copy(t2); t1.add(t2); t2.add(t1); t2.norm();  
+		t0.sub(t2); t0.norm();                           //y^2-9bz^2
+		y3.mul(t0); y3.add(x3);                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+		t1.copy(this.x); t1.mul(iy);						//
+		this.x.copy(t0); this.x.norm(); this.x.mul(t1); this.x.add(this.x);       //(y^2-9bz^2)xy2
+
+		this.x.norm(); 
+		this.y.copy(y3); this.y.norm();
 
 		return 1;
 	},
@@ -284,68 +282,62 @@ ECP2_ZZZ.prototype={
 		}
 		if (Q.INF) return -1;
 
-		var aff=false;
+		var b=3*ROM_CURVE_ZZZ.CURVE_B_I;
+		var t0=new FP2_YYY(0); t0.copy(this.x); //FP2 t0=new FP2(x);
+		t0.mul(Q.x);         // x.Q.x
+		var t1=new FP2_YYY(0); t1.copy(this.y); //FP2 t1=new FP2(y);
+		t1.mul(Q.y);		 // y.Q.y
 
-		if (Q.z.isunity()) aff=true;
+		var t2=new FP2_YYY(0); t2.copy(this.z);//FP2 t2=new FP2(z);
+		t2.mul(Q.z);
+		var t3=new FP2_YYY(0); t3.copy(this.x);//FP2 t3=new FP2(x);
+		t3.add(this.y); t3.norm();          //t3=X1+Y1
+		var t4=new FP2_YYY(0); t4.copy(Q.x);//FP2 t4=new FP2(Q.x);            
+		t4.add(Q.y); t4.norm();			//t4=X2+Y2
+		t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
+		t4.copy(t0); t4.add(t1);		//t4=X1.X2+Y1.Y2
 
-		var A,C;
-		var B=new FP2_YYY(this.z);
-		var D=new FP2_YYY(this.z);
-		if (!aff)
-		{
-			A=new FP2_YYY(Q.z);
-			C=new FP2_YYY(Q.z);
+		t3.sub(t4); t3.norm(); t3.mul_ip();  t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 
-			A.sqr(); B.sqr();
-			C.mul(A); D.mul(B);
+		t4.copy(this.y);                    
+		t4.add(this.z); t4.norm();			//t4=Y1+Z1
+		var x3=new FP2_YYY(0); x3.copy(Q.y);//FP2 x3=new FP2(Q.y);
+		x3.add(Q.z); x3.norm();			//x3=Y2+Z2
 
-			A.mul(this.x);
-			C.mul(this.y);
-		}
-		else
-		{
-			A=new FP2_YYY(this.x);
-			C=new FP2_YYY(this.y);
+		t4.mul(x3);						//t4=(Y1+Z1)(Y2+Z2)
+		x3.copy(t1);					//
+		x3.add(t2);						//X3=Y1.Y2+Z1.Z2
 	
-			B.sqr();
-			D.mul(B);
-		}
+		t4.sub(x3); t4.norm(); t4.mul_ip(); t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 
-		B.mul(Q.x); B.sub(A);
-		D.mul(Q.y); D.sub(C);
-			
-		if (B.iszilch())
-		{
-			if (D.iszilch())
-			{
-				this.dbl();
-				return 1;
-			}
-			else
-			{
-				this.INF=true;
-				return -1;
-			}
-		}
+		x3.copy(this.x); x3.add(this.z); x3.norm();	// x3=X1+Z1
+		var y3=new FP2_YYY(0); y3.copy(Q.x);//FP2 y3=new FP2(Q.x);				
+		y3.add(Q.z); y3.norm();				// y3=X2+Z2
+		x3.mul(y3);							// x3=(X1+Z1)(X2+Z2)
+		y3.copy(t0);
+		y3.add(t2);							// y3=X1.X2+Z1+Z2
+		y3.rsub(x3); y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-		if (!aff) this.z.mul(Q.z);
-		this.z.mul(B);
+		t0.mul_ip(); t0.norm(); // x.Q.x
+		t1.mul_ip(); t1.norm(); // y.Q.y
 
-		var e=new FP2_YYY(B); e.sqr();
-		B.mul(e);
-		A.mul(e);
+		x3.copy(t0); x3.add(t0); 
+		t0.add(x3); t0.norm();
+		t2.imul(b); 	
 
-		e.copy(A);
-		e.add(A); e.add(B); e.norm(); D.norm();
-		this.x.copy(D); this.x.sqr(); this.x.sub(e); this.x.norm(); // ??
+		var z3=new FP2_YYY(0); z3.copy(t1);//FP2 z3=new FP2(t1); 
+		z3.add(t2); z3.norm();
+		t1.sub(t2); t1.norm(); 
+		y3.imul(b); 
 
-		A.sub(this.x); A.norm();
-		this.y.copy(A); this.y.mul(D); 
-		C.mul(B); this.y.sub(C);
+		x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2);
+		y3.mul(t0); t1.mul(z3); y3.add(t1);
+		t0.mul(t3); z3.mul(t4); z3.add(t0);
 
-		//this.x.norm();
-		this.y.norm();
-		this.z.norm();
+		this.x.copy(x3); this.x.norm(); 
+		this.y.copy(y3); this.y.norm();
+		this.z.copy(z3); this.z.norm();
+
 		return 0;
 	},
 /* this-=Q */
@@ -386,10 +378,6 @@ ECP2_ZZZ.prototype={
 			W[i].copy(W[i-1]);
 			W[i].add(Q);
 		}
-
-// convert the table to affine 
-
-		ECP2_ZZZ.multiaffine(8,W);
 
 // make exponent odd - add 2P if even, P if odd 
 		t.copy(e);
@@ -468,54 +456,6 @@ ECP2_ZZZ.RHS=function(x)
 	return r;
 };
 
-/* normalises m-array of ECP2_ZZZ points. Requires work vector of m FP2_YYYs */
-
-ECP2_ZZZ.multiaffine=function(m,P)
-{
-	var i;
-	var t1=new FP2_YYY(0);
-	var t2=new FP2_YYY(0);
-	var work=[];
-
-	work[0]=new FP2_YYY(1);
-	work[1]=new FP2_YYY(P[0].z);
-	for (i=2;i<m;i++)
-	{
-		work[i]=new FP2_YYY(work[i-1]);
-		work[i].mul(P[i-1].z);
-	}
-
-	t1.copy(work[m-1]); t1.mul(P[m-1].z);
-
-	t1.inverse();
-
-	t2.copy(P[m-1].z);
-	work[m-1].mul(t1);
-
-	for (i=m-2;;i--)
-	{
-		if (i==0)
-		{
-			work[0].copy(t1);
-			work[0].mul(t2);
-			break;
-		}
-		work[i].mul(t2);
-		work[i].mul(t1);
-		t2.mul(P[i].z);
-	}
-/* now work[] contains inverses of all Z coordinates */
-
-	for (i=0;i<m;i++)
-	{
-		P[i].z.one();
-		t1.copy(work[i]); t1.sqr();
-		P[i].x.mul(t1);
-		t1.mul(work[i]);
-		P[i].y.mul(t1);
-	}    
-};
-
 /* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
 ECP2_ZZZ.mul4=function(Q,u)
 {
@@ -555,8 +495,6 @@ ECP2_ZZZ.mul4=function(Q,u)
 	W[3].add(T);
 	W[4].sub(T);
 	W[7].add(T);
-
-	ECP2_ZZZ.multiaffine(8,W);
 
 /* if multiplier is even add 1 to multiplier, and add P to correction */
 	mt.zero(); C.inf();

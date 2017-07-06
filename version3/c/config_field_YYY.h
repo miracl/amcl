@@ -9,6 +9,7 @@
 #define MBITS_YYY @NBT@	        
 #define MOD8_YYY @M8@	 
 #define MODTYPE_YYY @MT@
+#define MAXXES_YYY @SH@
 
 
 #endif

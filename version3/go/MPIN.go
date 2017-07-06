@@ -151,7 +151,7 @@ func mapit2(h []byte) *ECP2 {
 	x=NewBIGints(CURVE_Bnx)
 
 	T=NewECP2(); T.Copy(Q)
-	T.mul(x); T.neg()
+	T=T.mul(x); T.neg()
 	K=NewECP2(); K.Copy(T)
 	K.dbl(); K.add(T); K.affine()
 

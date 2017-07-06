@@ -31,58 +31,69 @@ final public class PAIR {
     // Line function
     static func line(_ A:ECP2,_ B:ECP2,_ Qx:FP,_ Qy:FP) -> FP12
     {
-        let P=ECP2()
         var a:FP4
         var b:FP4
         var c:FP4
-        P.copy(A);
-        let ZZ=FP2(P.getz())
-        ZZ.sqr();
-        var D:Int
-        if A===B {D=A.dbl()} // Check this return value in ecp2.c
-        else {D=A.add(B)}
-        if (D<0) {return FP12(1)}
-        let Z3=FP2(A.getz())
+
         c=FP4(0)
-        if D==0
-        { /* Addition */
-            let X=FP2(B.getx())
-            let Y=FP2(B.gety())
-            let T=FP2(P.getz())
-            T.mul(Y)
-            ZZ.mul(T)
-    
-            let NY=FP2(P.gety()); NY.neg(); NY.norm()
-            ZZ.add(NY); ZZ.norm()
-            Z3.pmul(Qy)
-            T.mul(P.getx())
-            X.mul(NY)
-            T.add(X); T.norm()
-            a=FP4(Z3,T)
-            ZZ.neg(); ZZ.norm()
-            ZZ.pmul(Qx)
-            b=FP4(ZZ)
+        if A===B
+        { /* Doubling */
+
+            let XX=FP2(A.getx())  //X
+            let YY=FP2(A.gety())  //Y
+            let ZZ=FP2(A.getz())  //Z
+            let YZ=FP2(YY)        //Y 
+            YZ.mul(ZZ)                //YZ
+            XX.sqr()                  //X^2
+            YY.sqr()                  //Y^2
+            ZZ.sqr()                  //Z^2
+            
+            YZ.imul(4)
+            YZ.neg(); YZ.norm()       //-2YZ
+            YZ.pmul(Qy)               //-2YZ.Ys
+
+            XX.imul(6)               //3X^2
+            XX.pmul(Qx)              //3X^2.Xs
+
+            let sb=3*ROM.CURVE_B_I
+            ZZ.imul(sb)  
+            
+            ZZ.div_ip2();  ZZ.norm() // 3b.Z^2 
+
+            YY.add(YY)
+            ZZ.sub(YY); ZZ.norm()     // 3b.Z^2-Y^2
+
+            a=FP4(YZ,ZZ)          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
+            b=FP4(XX)            // L(0,1) | L(0,0) | L(1,0)
+
+            A.dbl()
         }
         else
-        { // Doubling
-            let X=FP2(P.getx())
-            let Y=FP2(P.gety())
-            let T=FP2(P.getx())
-            T.sqr()
-            T.imul(3)
-    
-            Y.sqr()
-            Y.add(Y)
-            Z3.mul(ZZ)
-            Z3.pmul(Qy)
-    
-            X.mul(T)
-            X.sub(Y); X.norm()
-            a=FP4(Z3,X)
-            T.neg(); T.norm()
-            ZZ.mul(T)
-            ZZ.pmul(Qx)
-            b=FP4(ZZ)
+        { // Addition
+            let X1=FP2(A.getx())    // X1
+            let Y1=FP2(A.gety())    // Y1
+            let T1=FP2(A.getz())    // Z1
+            let T2=FP2(A.getz())    // Z1
+            
+            T1.mul(B.gety())    // T1=Z1.Y2 
+            T2.mul(B.getx())    // T2=Z1.X2
+
+            X1.sub(T2); X1.norm()  // X1=X1-Z1.X2
+            Y1.sub(T1); Y1.norm()  // Y1=Y1-Z1.Y2
+
+            T1.copy(X1)            // T1=X1-Z1.X2
+            X1.pmul(Qy)            // X1=(X1-Z1.X2).Ys
+            T1.mul(B.gety())       // T1=(X1-Z1.X2).Y2
+
+            T2.copy(Y1)            // T2=Y1-Z1.Y2
+            T2.mul(B.getx())       // T2=(Y1-Z1.Y2).X2
+            T2.sub(T1); T2.norm()          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+            Y1.pmul(Qx);  Y1.neg(); Y1.norm() // Y1=-(Y1-Z1.Y2).Xs
+
+            a=FP4(X1,T2)       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+            b=FP4(Y1)
+
+            A.add(B)
         }
         return FP12(a,b,c)
     }
@@ -427,7 +438,7 @@ final public class PAIR {
 		}
 	} else {
 		let x=BIG(ROM.CURVE_Bnx)
-		var w=BIG(e)
+		let w=BIG(e)
 		for i in 0 ..< 4
 		{
 			u.append(BIG(w))

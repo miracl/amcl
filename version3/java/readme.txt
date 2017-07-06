@@ -15,8 +15,8 @@ or
 
 python3 config64.py
 
-Then select options 1, 23 and 26 (these are fixed for the example 
-programs provided). Select 0 to exit.
+Then select options 1, 17 and 20 (these are fixed for the example 
+programs provided, but easily changed). Select 0 to exit.
 
 Then compile and run the test program by executing on windows
 

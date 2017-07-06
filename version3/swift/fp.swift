@@ -37,60 +37,25 @@ final public class FP {
     static let MOD8:UInt = @M8@
     static public let MODTYPE =  @MT@   
 
-    static let FEXCESS:Chunk = (1<<Chunk(BIG.BASEBITS*UInt(BIG.NLEN)-FP.MODBITS-1));
+    static let FEXCESS:Int32 = (Int32(1)<<@SH@);
     static let OMASK:Chunk=Chunk(-1)<<Chunk(FP.MODBITS%BIG.BASEBITS)
     static let TBITS:UInt=FP.MODBITS%BIG.BASEBITS; // Number of active bits in top word
     static let TMASK:Chunk=(1<<Chunk(FP.TBITS))-1
 
     var x:BIG
+    var xes:Int32
     static let p=BIG(ROM.Modulus)
-
-    static func EXCESS(_ a: BIG) -> Chunk
-    {
-        return ((a.w[BIG.NLEN-1] & FP.OMASK)>>Chunk(FP.MODBITS%BIG.BASEBITS))+1
-    }
-
-#if D32
-    static func pexceed(_ ea: Chunk,_ eb : Chunk) -> Bool
-    {
-    //    let ea=EXCESS(a)
-    //    let eb=EXCESS(b)
-        if (DChunk(ea)+1)*(DChunk(eb)+1) > DChunk(FEXCESS) {return true}
-        return false;
-    }
-    static func sexceed(_ ea: Chunk) -> Bool
-    {
-    //    let ea=EXCESS(a)
-        if (DChunk(ea)+1)*(DChunk(ea)+1) > DChunk(FEXCESS) {return true}
-        return false;
-    }
-#endif
-
-#if D64
-    static func pexceed(_ ea: Chunk,_ eb : Chunk) -> Bool
-    {
-    //    let ea=EXCESS(a)
-    //    let eb=EXCESS(b)
-        if (ea+1) > FEXCESS/(eb+1) {return true}
-        return false;
-    }
-    static func sexceed(_ ea: Chunk) -> Bool
-    {
-    //    let ea=EXCESS(a)
-        if (ea+1) > FEXCESS/(ea+1) {return true}
-        return false;
-    }
-#endif
+    static let r2modp=BIG(ROM.R2modp)
 
 /* convert to Montgomery n-residue form */
     func nres()
     {
         if FP.MODTYPE != FP.PSEUDO_MERSENNE && FP.MODTYPE != FP.GENERALISED_MERSENNE
         {
-            let d=DBIG(x)
-            d.shl(UInt(BIG.NLEN)*BIG.BASEBITS)
-            x.copy(d.mod(FP.p))
-        }
+            let d=BIG.mul(x,FP.r2modp);
+            x.copy(FP.mod(d))
+            xes=2
+        } else {xes=1}
     }
 /* convert back to regular form */
     func redc() -> BIG
@@ -114,23 +79,20 @@ final public class FP {
         if FP.MODTYPE==FP.PSEUDO_MERSENNE
         {
             let t=d.split(FP.MODBITS)
-            var b=BIG(d)
+            let b=BIG(d)
             let v=t.pmul(Int(ROM.MConst))
 
-    t.add(b)
-    t.norm()
+            t.add(b)
+            t.norm()
 
 
             let tw=t.w[BIG.NLEN-1]
             t.w[BIG.NLEN-1] &= TMASK
             t.inc(Int(ROM.MConst*((tw>>Chunk(FP.TBITS))+(v<<Chunk(BIG.BASEBITS-FP.TBITS)))))
     
-    t.norm()
-    return t
+            t.norm()
+            return t
 
-    //        b.add(t)
-    //        b.norm()
-    //        return b
         }
         if FP.MODTYPE==FP.MONTGOMERY_FRIENDLY
         {
@@ -140,7 +102,7 @@ final public class FP {
  //                   d.w[BIG.NLEN+i]+=d.muladd(d.w[i],ROM.MConst-1,d.w[i],BIG.NLEN+i-1)
             }
     
-            var b=BIG(0);
+            let b=BIG(0);
     
             for i in 0 ..< BIG.NLEN
             {
@@ -153,7 +115,7 @@ final public class FP {
         { // GoldiLocks Only
             let t=d.split(FP.MODBITS)
             let RM2=FP.MODBITS/2
-            var b=BIG(d)
+            let b=BIG(d)
             b.add(t)
             let dd=DBIG(t)
             dd.shl(RM2)
@@ -187,20 +149,24 @@ final public class FP {
     init()
     {
         x=BIG(0)
+        xes=1
     }
     init(_ a: Int)
     {
         x=BIG(a)
+        xes=1
         nres()
     }
     init(_ a: BIG)
     {
         x=BIG(a)
+        xes=1
         nres()
     }
     init(_ a: FP)
     {
         x=BIG(a.x)
+        xes=a.xes
     }
     /* convert to string */
     func toString() -> String
@@ -218,6 +184,7 @@ final public class FP {
     func reduce()
     {
         x.mod(FP.p)
+        xes=1
     }
     
 /* test this=0? */
@@ -230,13 +197,15 @@ final public class FP {
 /* copy from FP b */
     func copy(_ b: FP)
     {
-        x.copy(b.x);
+        x.copy(b.x)
+        xes=b.xes
     }
     
 /* set this=0 */
     func zero()
     {
         x.zero();
+        xes=1;
     }
     
 /* set this=1 */
@@ -253,30 +222,30 @@ final public class FP {
 /* swap FPs depending on d */
     func cswap(_ b: FP,_ d: Int)
     {
+        var c=Int32(d)
         x.cswap(b.x,d)
+        c = ~(c-1)
+        let t=c&(xes^b.xes)
+        xes^=t
+        b.xes^=t        
     }
     
 /* copy FPs depending on d */
     func cmove(_ b: FP,_ d:Int)
     {
-        x.cmove(b.x,d);
+        let c=Int32(-d)
+        x.cmove(b.x,d)
+        xes^=(xes^b.xes)&c        
     }
 /* this*=b mod Modulus */
     func mul(_ b: FP)
     {
-    //    norm()
-    //    b.norm()
 
-        if FP.pexceed(FP.EXCESS(x),FP.EXCESS(b.x)) {reduce()}
-
-        //let ea=FP.EXCESS(x)
-        //let eb=FP.EXCESS(b.x)
-        
-       // if Int64(ea+1)*Int64(eb+1)>Int64(FP.FEXCESS) {reduce()}
-        /*if (ea+1)>=(FP.FEXCESS-1)/(eb+1) {reduce()}*/
+        if Int64(xes)*Int64(b.xes) > Int64(FP.FEXCESS) {reduce()}
         
         let d=BIG.mul(x,b.x)
         x.copy(FP.mod(d))
+        xes=2
     }
     static func logb2(_ w: UInt32) -> Int
     {
@@ -290,22 +259,17 @@ final public class FP {
         v = v - ((v >> 1) & 0x55555555)
         v = (v & 0x33333333) + ((v >> 2) & 0x33333333)
         let r = Int((   ((v + (v >> 4)) & 0xF0F0F0F)   &* 0x1010101) >> 24)
-        return (r+1)
+        return (r)
     }
     /* this = -this mod Modulus */
     func neg()
     {
-        let m=BIG(FP.p);
-    
-    //    norm();
-        let sb=FP.logb2(UInt32(FP.EXCESS(x))+1)
- //       var ov=BIG.EXCESS(x);
- //       var sb=1; while(ov != 0) {sb += 1;ov>>=1}
-    
+        let m=BIG(FP.p)
+        let sb=FP.logb2(UInt32(xes-Int32(1)))
         m.fshl(sb)
         x.rsub(m)
-    
-        if FP.EXCESS(x)>=FP.FEXCESS {reduce()}
+        xes=(1<<Int32(sb))
+        if xes>FP.FEXCESS {reduce()}
     }
     /* this*=c mod Modulus, where c is a small int */
     func imul(_ c: Int)
@@ -318,21 +282,25 @@ final public class FP {
             cc = -cc
             s=true
         }
-        let afx=(FP.EXCESS(x)+1)*(cc+1)+1;
-        if cc<=BIG.NEXCESS && afx<FP.FEXCESS
+
+        if FP.MODTYPE==FP.PSEUDO_MERSENNE || FP.MODTYPE==FP.GENERALISED_MERSENNE
         {
-            x.imul(cc)
-            x.norm()
+            let d=x.pxmul(cc)
+            x.copy(FP.mod(d))
+            xes=2
         }
-        else
-        {
-            if afx<FP.FEXCESS {x.pmul(cc)}
-            else
+        else {
+            if xes*Int32(cc)<FP.FEXCESS
             {
-				let d=x.pxmul(cc);
-				x.copy(d.mod(FP.p));
+                x.pmul(cc)
+                xes*=Int32(cc);
+            }
+            else {
+                let n=FP(cc)
+                self.mul(n)
             }
         }
+
         if s {neg();  norm()}
        
     }
@@ -340,25 +308,18 @@ final public class FP {
 /* this*=this mod Modulus */
     func sqr()
     {
-    //    norm()
-
-        if FP.sexceed(FP.EXCESS(x)) {reduce()}
-
-
-     //   let ea=FP.EXCESS(x);
-        
-    //    if Int64(ea+1)*Int64(ea+1)>Int64(FP.FEXCESS) {reduce()}
-        /*if (ea+1)>=(FP.FEXCESS-1)/(ea+1) {reduce()}*/
-        
+        if Int64(xes)*Int64(xes) > Int64(FP.FEXCESS) {reduce()}   
         let d=BIG.sqr(x);
         x.copy(FP.mod(d));
+        xes=2
     }
     
     /* this+=b */
     func add(_ b: FP)
     {
         x.add(b.x);
-        if FP.EXCESS(x)+2>=FP.FEXCESS {reduce()}
+        xes+=b.xes
+        if xes>FP.FEXCESS {reduce()}
     }
 /* this-=b */
     func sub(_ b: FP)
@@ -366,6 +327,12 @@ final public class FP {
         let n=FP(b)
         n.neg()
         self.add(n)
+    }
+/* this=b-this */
+    func rsub(_ b: FP)
+    {
+        self.neg();
+        self.add(b)
     }
 /* this/=2 mod Modulus */
     func div2()
@@ -403,7 +370,7 @@ final public class FP {
         let r=FP(1)
         e.norm()
         x.norm()
-	let m=FP(self)
+	   let m=FP(self)
         while (true)
         {
             let bt=e.parity()

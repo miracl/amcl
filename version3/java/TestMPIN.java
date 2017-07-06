@@ -94,12 +94,14 @@ public class TestMPIN
 		System.out.print("Client ID= "); printBinary(CLIENT_ID);
 
 /* Client and Server are issued secrets by DTA */
-		MPIN.GET_SERVER_SECRET(S,SST);
-		System.out.print("Server Secret SS: 0x");  printBinary(SST); 
 
 		MPIN.GET_CLIENT_SECRET(S,HCID,TOKEN);
 		System.out.print("Client Secret CS: 0x");        
 		printBinary(TOKEN); 
+
+		MPIN.GET_SERVER_SECRET(S,SST);
+		System.out.print("Server Secret SS: 0x");  printBinary(SST); 
+
 
 /* Client extracts PIN from secret to create Token */
 		int pin=1234;

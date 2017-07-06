@@ -13,8 +13,8 @@
 <script type="text/javascript" src="RAND.js"></script>
 <script type="text/javascript" src="AES.js"></script>
 <script type="text/javascript" src="GCM.js"></script>
-<script type="text/javascript" src="BIG_256.js"></script>
-<script type="text/javascript" src="DBIG_256.js"></script>
+<script type="text/javascript" src="BIG_256_24.js"></script>
+<script type="text/javascript" src="DBIG_256_24.js"></script>
 <script type="text/javascript" src="FP_25519.js"></script>
 <script type="text/javascript" src="ECP_ED25519.js"></script>
 <script type="text/javascript" src="ECDH_ED25519.js"></script>
@@ -76,17 +76,17 @@
 
 		G=new ECP_ED25519(0);
 
-		gx=new BIG_256(0); gx.rcopy(ROM_CURVE_ED25519.CURVE_Gx);
+		gx=new BIG_256_24(0); gx.rcopy(ROM_CURVE_ED25519.CURVE_Gx);
 
 		if (ECP_ED25519.CURVETYPE!=ECP_ED25519.MOMTGOMERY)
 		{
-			gy=new BIG_256(0); gy.rcopy(ROM_CURVE_ED25519.CURVE_Gy);
+			gy=new BIG_256_24(0); gy.rcopy(ROM_CURVE_ED25519.CURVE_Gy);
 			G.setxy(gx,gy);
 		}
 		else G.setx(gx);
 
-		r=new BIG_256(0); r.rcopy(ROM_CURVE_ED25519.CURVE_Order);
-		s=BIG_256.randomnum(r,rng);
+		r=new BIG_256_24(0); r.rcopy(ROM_CURVE_ED25519.CURVE_Order);
+		s=BIG_256_24.randomnum(r,rng);
 			
 		WP=G.mul(r);
 		if (!WP.is_infinity())
@@ -106,8 +106,8 @@
 		window.document.write("EC  mul - " + iterations + " iterations  ");
 		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
 </script>
-<script type="text/javascript" src="BIG_256.js"></script>
-<script type="text/javascript" src="DBIG_256.js"></script>
+<script type="text/javascript" src="BIG_256_24.js"></script>
+<script type="text/javascript" src="DBIG_256_24.js"></script>
 <script type="text/javascript" src="FP_BN254.js"></script>
 <script type="text/javascript" src="ECP_BN254.js"></script>
 <script type="text/javascript" src="ROM_FIELD_BN254.js"></script>
@@ -121,7 +121,7 @@
 
 <script>
 
-/* Note that reloading BIG_256.js and DBIG_256.js seems to be importnat for Google Chrome.. */
+/* Note that reloading BIG_256_24.js and DBIG_256_24.js seems to be important for Google Chrome.. */
 
 		window.document.write("<br> Pairing-friendly Curve BN254"+ "<br>");
 		var i;
@@ -143,12 +143,12 @@
 
 		window.document.write("Modulus size " + FP_BN254.MODBITS + " bits"+ "<br>"); 
 
-		var gx=new BIG_256(0); gx.rcopy(ROM_CURVE_BN254.CURVE_Gx);	
-		var gy=new BIG_256(0); gy.rcopy(ROM_CURVE_BN254.CURVE_Gy);
+		var gx=new BIG_256_24(0); gx.rcopy(ROM_CURVE_BN254.CURVE_Gx);	
+		var gy=new BIG_256_24(0); gy.rcopy(ROM_CURVE_BN254.CURVE_Gy);
 		G.setxy(gx,gy);			
 
-		r=new BIG_256(0); r.rcopy(ROM_CURVE_BN254.CURVE_Order);
-		s=BIG_256.randomnum(r,rng);
+		r=new BIG_256_24(0); r.rcopy(ROM_CURVE_BN254.CURVE_Order);
+		s=BIG_256_24.randomnum(r,rng);
 
 		var P=PAIR_BN254.G1mul(G,r);
 
@@ -170,8 +170,8 @@
 		window.document.write("G1 mul -                " + iterations + " iterations  ");
 		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
 
-		var A=new BIG_256(0);
-		var B=new BIG_256(0);
+		var A=new BIG_256_24(0);
+		var B=new BIG_256_24(0);
 		A.rcopy(ROM_CURVE_BN254.CURVE_Pxa); B.rcopy(ROM_CURVE_BN254.CURVE_Pxb);
 		var QX=new FP2_BN254(0); QX.bset(A,B);
 		A.rcopy(ROM_CURVE_BN254.CURVE_Pya); B.rcopy(ROM_CURVE_BN254.CURVE_Pyb);
@@ -219,20 +219,20 @@
 		window.document.write("GT pow -                " + iterations + " iteration  ");
 		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
 
-//		var fa=new BIG_256(0); fa.rcopy(ROM_FIELD_BN254.Fra);
-//		var fb=new BIG_256(0); fb.rcopy(ROM_FIELD_BN254.Frb);
+//		var fa=new BIG_256_24(0); fa.rcopy(ROM_FIELD_BN254.Fra);
+//		var fb=new BIG_256_24(0); fb.rcopy(ROM_FIELD_BN254.Frb);
 //		var f=new FP2_BN254(fa,fb); //f.bset(fa,fb);
 
-//		q=new BIG_256(0); q.rcopy(ROM_FIELD_BN254.Modulus);
+//		q=new BIG_256_24(0); q.rcopy(ROM_FIELD_BN254.Modulus);
 
 /*
-		var m=new BIG_256(q);
+		var m=new BIG_256_24(q);
 		m.mod(r);
 
-		var a=new BIG_256(s);
+		var a=new BIG_256_24(s);
 		a.mod(m);
 
-		var b=new BIG_256(s);
+		var b=new BIG_256_24(s);
 		b.div(m);
 
 		g.copy(w);
@@ -311,8 +311,8 @@
 		}
 
 </script>
-<script type="text/javascript" src="BIG_1024.js"></script>
-<script type="text/javascript" src="DBIG_1024.js"></script>
+<script type="text/javascript" src="BIG_1024_22.js"></script>
+<script type="text/javascript" src="DBIG_1024_22.js"></script>
 <script type="text/javascript" src="FF_2048.js"></script>
 <script type="text/javascript" src="RSA_2048.js"></script>
 <script>

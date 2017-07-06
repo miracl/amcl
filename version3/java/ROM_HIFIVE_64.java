@@ -24,17 +24,18 @@ package amcl.HIFIVE;
 
 public class ROM
 {
-// 336PM Curve
+
+// Base Bits= 60
 	public static final long[] Modulus= {0xFFFFFFFFFFFFFFDL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFFL,0xFFFFFFFFFL};
-	public static final long MConst=0x3L;
+	public static final long[] R2modp= {0x9000000000000L,0x0L,0x0L,0x0L,0x0L,0x0L};
+	public static final long MConst= 0x3L;
 
-// HIFIVE Curve
-
-  public static final int CURVE_A = 1;
-  public static final long[] CURVE_B = {0x2B67L,0x0L,0x0L,0x0L,0x0L,0x0L};
-  public static final long[] CURVE_Order={0xB2F95973E9FA805L,0xC0BD6B87F93BAA7L,0x71415FA9850L,0x0L,0x0L,0x200000000L};
-  public static final long[] CURVE_Gx ={0xCL,0x0L,0x0L,0x0L,0x0L,0x0L};
-  public static final long[] CURVE_Gy ={0x2BEC68505FE8632L,0x5D5650CA0365DB1L,0x3811C7EF435B6DBL,0x7853D1B14B46CL,0x56502E18E1C161DL,0xC0DC616BL};
+	public static final int CURVE_A= 1;
+	public static final int CURVE_B_I= 11111;
+	public static final long[] CURVE_B= {0x2B67L,0x0L,0x0L,0x0L,0x0L,0x0L};
+	public static final long[] CURVE_Order= {0xB2F95973E9FA805L,0xC0BD6B87F93BAA7L,0x71415FA9850L,0x0L,0x0L,0x200000000L};
+	public static final long[] CURVE_Gx= {0xCL,0x0L,0x0L,0x0L,0x0L,0x0L};
+	public static final long[] CURVE_Gy= {0x2BEC68505FE8632L,0x5D5650CA0365DB1L,0x3811C7EF435B6DBL,0x7853D1B14B46CL,0x56502E18E1C161DL,0xC0DC616BL};
 
 }
 

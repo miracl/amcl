@@ -200,7 +200,7 @@ var MPIN_ZZZ = {
 		x=new BIG_XXX(0); x.rcopy(ROM_CURVE_ZZZ.CURVE_Bnx);
 
 		T=new ECP2_ZZZ(); T.copy(Q);
-		T.mul(x); T.neg();
+		T=T.mul(x); T.neg();
 		K=new ECP2_ZZZ(); K.copy(T);
 		K.dbl(); K.add(T); K.affine();
 

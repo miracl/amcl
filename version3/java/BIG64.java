@@ -173,30 +173,6 @@ public class BIG {
 	}
 
 /* set this[i]+=x*y+c, and return high part */
-/*
-	public long muladd(long a,long b,long c,int i)
-	{
-		long x0,x1,y0,y1;
-		x0=a&ROM.HMASK;
-		x1=(a>>ROM.HBITS);
-		y0=b&ROM.HMASK;
-		y1=(b>>ROM.HBITS);
-		long bot=x0*y0;
-		long top=x1*y1;
-		long mid=x0*y1+x1*y0;
-
-		x0=mid&ROM.HMASK;
-		x1=(mid>>ROM.HBITS);
-		bot+=x0<<ROM.HBITS; bot+=c; bot+=w[i]; 
-
-		top+=x1;
-		long carry=bot>>ROM.BASEBITS;
-		bot&=ROM.BMASK;
-		top+=carry;
-		w[i]=bot;
-		return top;
-	}
-*/
 
 	public static long[] muladd(long a,long b,long c,long r)
 	{
@@ -221,15 +197,12 @@ public class BIG {
 		return tb;
 	}
 
-
-
-
 /* this*=x, where x is >NEXCESS */
 	public long pmul(int c)
 	{
 		long ak,carry=0;
 		long[] cr=new long[2];
-//		norm();
+
 		for (int i=0;i<NLEN;i++)
 		{
 			ak=w[i];
@@ -294,27 +267,13 @@ public class BIG {
 		return c;
 	}
 
-/*
-	public boolean isok()
-	{
-		boolean ok=true;
-		for (int i=0;i<NLEN;i++)
-		{
-			if ((w[i]>>BASEBITS)!=0) ok=false;
-		}
-		return ok;
-	}
-*/
 /* return a*b as DBIG */
+/* Inputs must be normed */
 	public static DBIG mul(BIG a,BIG b)
 	{
 		DBIG c=new DBIG(0);
 		long carry;
 		long[] cr=new long[2];
-//		a.norm();
-//		b.norm();
-
-//	if (!a.isok() || !b.isok()) System.out.println("Problem in mul");
 
 		for (int i=0;i<NLEN;i++)
 		{
@@ -324,7 +283,6 @@ public class BIG {
 				cr=muladd(a.w[i],b.w[j],carry,c.w[i+j]);
 				carry=cr[0];
 				c.w[i+j]=cr[1];
-				//carry=c.muladd(a.w[i],b.w[j],carry,i+j);
 			}
 			c.w[NLEN+i]=carry;
 		}
@@ -333,15 +291,12 @@ public class BIG {
 	}
 
 /* return a^2 as DBIG */
+/* Input must be normed */
 	public static DBIG sqr(BIG a)
 	{
 		DBIG c=new DBIG(0);
 		long carry;
 		long[] cr=new long[2];
-	//	a.norm();
-
-//	if (!a.isok()) System.out.println("Problem in sqr");
-
 
 		for (int i=0;i<NLEN;i++)
 		{
@@ -351,7 +306,6 @@ public class BIG {
 				cr=muladd(2*a.w[i],a.w[j],carry,c.w[i+j]);
 				carry=cr[0];
 				c.w[i+j]=cr[1];
-				//carry=c.muladd(2*a.w[i],a.w[j],carry,i+j);
 			}
 			c.w[NLEN+i]=carry;
 		}
@@ -361,7 +315,6 @@ public class BIG {
 			cr=muladd(a.w[i],a.w[i],0,c.w[2*i]);
 			c.w[2*i+1]+=cr[0];
 			c.w[2*i]=cr[1];
-			//c.w[2*i+1]+=c.muladd(a.w[i],a.w[i],0,2*i);
 		}
 		c.norm(); 
 		return c;
@@ -665,7 +618,7 @@ public class BIG {
 
 		for (i=8;i<BIGBITS;i<<=1)
 		{
-	U.norm();
+			U.norm();
 			b.copy(this); b.mod2m(i);
 			BIG t1=BIG.smul(U,b); 
 			t1.shr(i);
@@ -674,7 +627,7 @@ public class BIG {
 			BIG t2=BIG.smul(U,c); t2.mod2m(i);
 
 			t1.add(t2);
-	t1.norm();
+			t1.norm();
 			b=BIG.smul(t1,U); t1.copy(b);
 			t1.mod2m(i);
 
@@ -710,12 +663,6 @@ public class BIG {
 			r.sub(m);
 			r.norm();
 			cmove(r,(int)(1-((r.w[NLEN-1]>>(CHUNK-1))&1)));
-/*
-			if (comp(this,m)>=0)
-			{
-				sub(m);
-				norm();
-			} */
 			k--;
 		}
 	}
@@ -751,15 +698,6 @@ public class BIG {
 			r.add(e);
 			r.norm();
 			cmove(r,d);
-
-/*
-			if (comp(b,m)>=0)
-			{
-				add(e);
-				norm();
-				b.sub(m);
-				b.norm();
-			} */
 			k--;
 		}
 	}

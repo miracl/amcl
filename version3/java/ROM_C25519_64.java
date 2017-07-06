@@ -24,17 +24,17 @@ package amcl.C25519;
 
 public class ROM
 {
-// 25519 Modulus
+
+// Base Bits= 56
 public static final long[] Modulus= {0xFFFFFFFFFFFFEDL,0xFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFL,0xFFFFFFFFFFFFFFL,0x7FFFFFFFL};
-public static final long MConst=0x13L;
-// C25519 Curve
+public static final long[] R2modp= {0xA4000000000000L,0x5L,0x0L,0x0L,0x0L};
+public static final long MConst= 0x13L;
 
-public static final int CURVE_A =486662;
-public static final long[] CURVE_B = {0x0L,0x0L,0x0L,0x0L,0x0L}; // not used
-public static final long[] CURVE_Order={0x12631A5CF5D3EDL,0xF9DEA2F79CD658L,0x14DEL,0x0L,0x10000000L};
-public static final long[] CURVE_Gx ={0x9L,0x0L,0x0L,0x0L,0x0L};
-public static final long[] CURVE_Gy ={0x0L,0x0L,0x0L,0x0L,0x0L}; // not used
-
-
+public static final int CURVE_A= 486662;
+public static final int CURVE_B_I= 0;
+public static final long[] CURVE_B= {0x0L,0x0L,0x0L,0x0L,0x0L};
+public static final long[] CURVE_Order= {0x12631A5CF5D3EDL,0xF9DEA2F79CD658L,0x14DEL,0x0L,0x10000000L};
+public static final long[] CURVE_Gx= {0x9L,0x0L,0x0L,0x0L,0x0L};
+public static final long[] CURVE_Gy= {0x0L,0x0L,0x0L,0x0L,0x0L};
 }
 

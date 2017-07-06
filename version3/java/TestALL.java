@@ -31,9 +31,10 @@ public class TestALL
 
 		rng.seed(100,RAW);
 
+		TestMPIN.mpin(rng);
 		TestRSA.rsa(rng);
 		TestECDH.ecdh(rng);
-		TestMPIN.mpin(rng);
+
 
 	}
 }

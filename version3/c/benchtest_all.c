@@ -14,28 +14,46 @@
 #define MIN_TIME 10.0
 #define MIN_ITERS 10 
 
-int main()
+#if CHUNK==16
+
+#define BIG_ED BIG_256_13
+#define BIG_BN BIG_256_13
+#define BIG_ED_rcopy BIG_256_13_rcopy
+#define BIG_ED_randomnum BIG_256_13_randomnum 
+#define BIG_BN_rcopy BIG_256_13_rcopy
+#define BIG_BN_randomnum BIG_256_13_randomnum 
+
+#endif
+
+#if CHUNK==32
+
+#define BIG_ED BIG_256_29
+#define BIG_BN BIG_256_28
+#define BIG_ED_rcopy BIG_256_29_rcopy
+#define BIG_ED_randomnum BIG_256_29_randomnum 
+#define BIG_BN_rcopy BIG_256_28_rcopy
+#define BIG_BN_randomnum BIG_256_28_randomnum 
+
+#endif
+
+#if CHUNK==64
+
+#define BIG_ED BIG_256_56
+#define BIG_BN BIG_256_56
+#define BIG_ED_rcopy BIG_256_56_rcopy
+#define BIG_ED_randomnum BIG_256_56_randomnum 
+#define BIG_BN_rcopy BIG_256_56_rcopy
+#define BIG_BN_randomnum BIG_256_56_randomnum 
+
+#endif
+
+int ED_25519(csprng *RNG)
 {
-    csprng RNG;
-	BIG_256 s,r,x,y;
-	ECP_ED25519 EP,EG;
-	ECP_BN254 P,G;
-	ECP2_BN254 Q,W;
-	FP12_BN254 g,w;
-	FP4_BN254 cm;
-	FP2_BN254 wx,wy;
     int i,iterations;
     clock_t start;
     double elapsed;
-	char pr[10];
-	unsigned long ran;
-    rsa_public_key_2048 pub;
-    rsa_private_key_2048 priv;
-    char m[RFS_2048],d[RFS_2048],c[RFS_2048];
-    octet M= {0,sizeof(m),m};
-    octet D= {0,sizeof(d),d};
-    octet C= {0,sizeof(c),c};
-
+	ECP_ED25519 EP,EG;
+	BIG_ED s,r,x,y;
 	printf("Testing/Timing ED25519 ECC\n");
 
 #if CURVETYPE_ED25519==WEIERSTRASS
@@ -58,24 +76,17 @@ int main()
 	printf("64-bit Build\n");
 #endif
 
-	time((time_t *)&ran);
-	pr[0]=ran;
-	pr[1]=ran>>8;
-	pr[2]=ran>>16;
-	pr[3]=ran>>24;
-	for (i=4;i<10;i++) pr[i]=i;
-    RAND_seed(&RNG,10,pr);
 
-	BIG_256_rcopy(x,CURVE_Gx_ED25519);
+	BIG_ED_rcopy(x,CURVE_Gx_ED25519);
 #if CURVETYPE_ED25519!=MONTGOMERY
-	BIG_256_rcopy(y,CURVE_Gy_ED25519);
+	BIG_ED_rcopy(y,CURVE_Gy_ED25519);
     ECP_ED25519_set(&EG,x,y);
 #else
     ECP_ED25519_set(&EG,x);
 #endif
 	
-	BIG_256_rcopy(r,CURVE_Order_ED25519);
-	BIG_256_randomnum(s,r,&RNG);
+	BIG_ED_rcopy(r,CURVE_Order_ED25519);
+	BIG_ED_randomnum(s,r,RNG);
 	ECP_ED25519_copy(&EP,&EG);
     ECP_ED25519_mul(&EP,r);
 
@@ -97,19 +108,33 @@ int main()
     elapsed=1000.0*elapsed/iterations;
     printf("EC  mul - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
-	
 
+	return 0;
+}
 
+int BN_254(csprng *RNG)
+{
+    int i,iterations;
+    clock_t start;
+    double elapsed;
+
+	ECP_BN254 P,G;
+	ECP2_BN254 Q,W;
+	FP12_BN254 g,w;
+	FP4_BN254 cm;
+	FP2_BN254 wx,wy;
+
+	BIG_BN s,r,x,y;
 	printf("\nTesting/Timing BN254 Pairings\n");
 
-	BIG_256_rcopy(x,CURVE_Gx_BN254);
+	BIG_BN_rcopy(x,CURVE_Gx_BN254);
 
-	BIG_256_rcopy(y,CURVE_Gy_BN254);
+	BIG_BN_rcopy(y,CURVE_Gy_BN254);
     ECP_BN254_set(&G,x,y);
 
 	
-	BIG_256_rcopy(r,CURVE_Order_BN254);
-	BIG_256_randomnum(s,r,&RNG);
+	BIG_BN_rcopy(r,CURVE_Order_BN254);
+	BIG_BN_randomnum(s,r,RNG);
 	ECP_BN254_copy(&P,&G);
     PAIR_BN254_G1mul(&P,r);
 
@@ -133,10 +158,10 @@ int main()
     printf(" %8.2lf ms per iteration\n",elapsed);
 
     
-    BIG_256_rcopy(wx.a,CURVE_Pxa_BN254); FP_BN254_nres(wx.a);
-    BIG_256_rcopy(wx.b,CURVE_Pxb_BN254); FP_BN254_nres(wx.b);
-    BIG_256_rcopy(wy.a,CURVE_Pya_BN254); FP_BN254_nres(wy.a);
-    BIG_256_rcopy(wy.b,CURVE_Pyb_BN254); FP_BN254_nres(wy.b);    
+    FP_BN254_rcopy(&(wx.a),CURVE_Pxa_BN254); 
+    FP_BN254_rcopy(&(wx.b),CURVE_Pxb_BN254); 
+    FP_BN254_rcopy(&(wy.a),CURVE_Pya_BN254); 
+    FP_BN254_rcopy(&(wy.b),CURVE_Pyb_BN254);     
 	ECP2_BN254_set(&W,&wx,&wy);
 
 	ECP2_BN254_copy(&Q,&W);
@@ -253,8 +278,22 @@ int main()
 		printf("FAILURE - e(sQ,p)!=e(Q,P)^s \n");
 		return 0;
 	}
+	return 0;
+}
 
+int RSA_2048(csprng *RNG)
+{
+    rsa_public_key_2048 pub;
+    rsa_private_key_2048 priv;
 
+    int i,iterations;
+    clock_t start;
+    double elapsed;
+
+    char m[RFS_2048],d[RFS_2048],c[RFS_2048];
+    octet M= {0,sizeof(m),m};
+    octet D= {0,sizeof(d),d};
+    octet C= {0,sizeof(c),c};
 
 	printf("\nTesting/Timing 2048-bit RSA\n");
 
@@ -263,7 +302,7 @@ int main()
 	iterations=0;
     start=clock();
     do {
-		RSA_2048_KEY_PAIR(&RNG,65537,&priv,&pub,NULL,NULL);
+		RSA_2048_KEY_PAIR(RNG,65537,&priv,&pub,NULL,NULL);
 		iterations++;
 		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
     } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
@@ -308,4 +347,26 @@ int main()
 	printf("All tests pass\n");
 
 	return 0;
+}
+
+int main()
+{
+    csprng RNG;
+	int i;
+	char pr[10];
+	unsigned long ran;
+
+
+	time((time_t *)&ran);
+	pr[0]=ran;
+	pr[1]=ran>>8;
+	pr[2]=ran>>16;
+	pr[3]=ran>>24;
+	for (i=4;i<10;i++) pr[i]=i;
+    RAND_seed(&RNG,10,pr);
+
+	ED_25519(&RNG);
+	BN_254(&RNG);
+	RSA_2048(&RNG);
+	
 }

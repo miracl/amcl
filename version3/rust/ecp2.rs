@@ -35,7 +35,7 @@ impl ECP2 {
 	pub fn new() -> ECP2 {
 		ECP2 {
 				x: FP2::new(),
-				y: FP2::new(),
+				y: FP2::new_int(1),
 				z: FP2::new(),
 				inf: true
 		}
@@ -74,7 +74,10 @@ impl ECP2 {
 
 /* Test this=O? */
 	pub fn is_infinity(&self) -> bool {
-		return self.inf;
+		if self.inf {return true}
+		let mut xx=FP2::new_copy(&self.x);
+		let mut zz=FP2::new_copy(&self.z);
+		return xx.iszilch() && zz.iszilch();
 	}
 
 /* copy self=P */
@@ -89,13 +92,13 @@ impl ECP2 {
 	pub fn inf(&mut self) {
 		self.inf=true;
 		self.x.zero();
-		self.y.zero();
+		self.y.one();
 		self.z.zero();
 	}
 
 /* set self=-self */
 	pub fn neg(&mut self) {
-		if self.is_infinity() {return}
+	//	if self.is_infinity() {return}
 		self.y.norm(); self.y.neg(); self.y.norm();
 	}	
 
@@ -146,16 +149,15 @@ impl ECP2 {
 		if self.is_infinity() && Q.is_infinity() {return true}
 		if self.is_infinity() || Q.is_infinity() {return false}
 
-		let mut zs2=FP2::new_copy(&self.z); zs2.sqr();
-		let mut zo2=FP2::new_copy(&Q.z); zo2.sqr();
-		let mut zs3=FP2::new_copy(&zs2); zs3.mul(&self.z);
-		let mut zo3=FP2::new_copy(&zo2); zo3.mul(&Q.z);
-		zs2.mul(&Q.x);
-		zo2.mul(&self.x);
-		if !zs2.equals(&mut zo2) {return false}
-		zs3.mul(&Q.y);
-		zo3.mul(&self.y);
-		if !zs3.equals(&mut zo3) {return false}
+		let mut a=FP2::new_copy(&self.x);
+		let mut b=FP2::new_copy(&Q.x); 
+
+		a.mul(&Q.z);
+		b.mul(&self.z);
+		if !a.equals(&mut b) {return false}
+		a.copy(&self.y); a.mul(&Q.z);
+		b.copy(&Q.y); b.mul(&self.z);
+		if !a.equals(&mut b) {return false}
 
 		return true;
 	}
@@ -167,10 +169,7 @@ impl ECP2 {
 		if self.z.equals(&mut one) {return}
 		self.z.inverse();
 
-		let mut z2=FP2::new_copy(&self.z);
-		z2.sqr();
-		self.x.mul(&z2); self.x.reduce();
-		self.y.mul(&z2); 
+		self.x.mul(&self.z); self.x.reduce(); 
 		self.y.mul(&self.z); self.y.reduce();
 		self.z.copy(&one);
 	}
@@ -261,48 +260,43 @@ impl ECP2 {
 /* self+=self */
 	pub fn dbl(&mut self) -> isize {
 		if self.inf {return -1}
-		if self.y.iszilch() {
-			self.inf();
-			return -1
-		}
 
-		let mut w1=FP2::new_copy(&self.x);
-		let mut w2=FP2::new();
-		let mut w3=FP2::new_copy(&self.x);
-		let mut w8=FP2::new_copy(&self.x);
+		let mut iy=FP2::new_copy(&self.y);
+		iy.mul_ip(); iy.norm();
 
-		w1.sqr();
-		w8.copy(&w1);
-		w8.imul(3);
+		let mut t0=FP2::new_copy(&self.y);                  //***** Change 
+		t0.sqr();  t0.mul_ip();   
+		let mut t1=FP2::new_copy(&iy);  
+		t1.mul(&self.z);
+		let mut t2=FP2::new_copy(&self.z);
+		t2.sqr();
 
-		w2.copy(&self.y); w2.sqr();
-		w3.copy(&self.x); w3.imul(4); w3.mul(&w2);
-		
-		w1.copy(&w3); w1.neg();
-		w1.norm();
+		self.z.copy(&t0);
+		self.z.add(&t0); self.z.norm(); 
+		self.z.dbl(); 
+		self.z.dbl(); 
+		self.z.norm();  
 
-		self.x.copy(&w8); self.x.sqr();
-		self.x.add(&w1);
-		self.x.add(&w1);
-		self.x.norm();
+		t2.imul(3*rom::CURVE_B_I); 
 
-		self.z.dbl(); self.z.norm();
-		self.z.mul(&self.y);
-		
+		let mut x3=FP2::new_copy(&t2);
+		x3.mul(&self.z); 
 
-		w2.dbl(); w2.norm();
-		w2.sqr();
-		w2.dbl();
-		w3.sub(&self.x);
-		w2.norm(); w3.norm();
-		self.y.copy(&w8); self.y.mul(&w3);
-		w2.norm();
-		self.y.sub(&w2);
+		let mut y3=FP2::new_copy(&t0);   
 
-		self.y.norm();
-		self.z.norm();
+		y3.add(&t2); y3.norm();
+		self.z.mul(&t1);
+		t1.copy(&t2); t1.add(&t2); t2.add(&t1); t2.norm();  
+		t0.sub(&t2); t0.norm();                           //y^2-9bz^2
+		y3.mul(&t0); y3.add(&x3);                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+		t1.copy(&self.x); t1.mul(&iy);						//
+		self.x.copy(&t0); self.x.norm(); self.x.mul(&t1); self.x.dbl();       //(y^2-9bz^2)xy2
+
+		self.x.norm(); 
+		self.y.copy(&y3); self.y.norm();
 
 		return 1;
+
 	}
 
 /* self+=Q - return 0 for add, 1 for double, -1 for O */
@@ -313,65 +307,61 @@ impl ECP2 {
 		}
 		if Q.inf {return -1}
 
-		let mut aff=false;
 
-		let mut a=FP2::new();
-		let mut c=FP2::new();
-		let mut b=FP2::new_copy(&self.z);
-		let mut d=FP2::new_copy(&self.z);
+		let b=3*rom::CURVE_B_I;
+		let mut t0=FP2::new_copy(&self.x);
+		t0.mul(&Q.x);         // x.Q.x
+		let mut t1=FP2::new_copy(&self.y);
+		t1.mul(&Q.y);		 // y.Q.y
 
-		a.copy(&Q.z);
-		if a.isunity() {aff=true}		
+		let mut t2=FP2::new_copy(&self.z);
+		t2.mul(&Q.z);
+		let mut t3=FP2::new_copy(&self.x);
+		t3.add(&self.y); t3.norm();          //t3=X1+Y1
+		let mut t4=FP2::new_copy(&Q.x);            
+		t4.add(&Q.y); t4.norm();			//t4=X2+Y2
+		t3.mul(&t4);						//t3=(X1+Y1)(X2+Y2)
+		t4.copy(&t0); t4.add(&t1);		//t4=X1.X2+Y1.Y2
 
-		if !aff {
-			//a.copy(&Q.z);
-			c.copy(&Q.z);
+		t3.sub(&t4); t3.norm(); t3.mul_ip();  t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 
-			a.sqr(); b.sqr();
-			c.mul(&a); d.mul(&b);
+		t4.copy(&self.y);                    
+		t4.add(&self.z); t4.norm();			//t4=Y1+Z1
+		let mut x3=FP2::new_copy(&Q.y);
+		x3.add(&Q.z); x3.norm();			//x3=Y2+Z2
 
-			a.mul(&self.x);
-			c.mul(&self.y);
-		} else {
-			a.copy(&self.x);
-			c.copy(&self.y);
+		t4.mul(&x3);						//t4=(Y1+Z1)(Y2+Z2)
+		x3.copy(&t1);					//
+		x3.add(&t2);						//X3=Y1.Y2+Z1.Z2
 	
-			b.sqr();
-			d.mul(&b);
-		}
+		t4.sub(&x3); t4.norm(); t4.mul_ip(); t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 
-		b.mul(&Q.x); b.sub(&a);
-		d.mul(&Q.y); d.sub(&c);
+		x3.copy(&self.x); x3.add(&self.z); x3.norm();	// x3=X1+Z1
+		let mut y3=FP2::new_copy(&Q.x);				
+		y3.add(&Q.z); y3.norm();				// y3=X2+Z2
+		x3.mul(&y3);							// x3=(X1+Z1)(X2+Z2)
+		y3.copy(&t0);
+		y3.add(&t2);							// y3=X1.X2+Z1+Z2
+		y3.rsub(&x3); y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-		if b.iszilch() {
-			if d.iszilch() {
-				self.dbl();
-				return 1;
-			} else	{
-				self.inf=true;
-				return -1;
-			}
-		}
+		t0.mul_ip(); t0.norm(); // x.Q.x
+		t1.mul_ip(); t1.norm(); // y.Q.y
 
-		if !aff {self.z.mul(&Q.z)}
-		self.z.mul(&b);
+		x3.copy(&t0); x3.add(&t0); 
+		t0.add(&x3); t0.norm();
+		t2.imul(b); 	
 
-		let mut e=FP2::new_copy(&b); e.sqr();
-		b.mul(&e);
-		a.mul(&e);
+		let mut z3=FP2::new_copy(&t1); z3.add(&t2); z3.norm();
+		t1.sub(&t2); t1.norm(); 
+		y3.imul(b); 
 
-		e.copy(&a);
-		e.add(&a); e.add(&b); 
-		e.norm(); d.norm();
-		self.x.copy(&d); self.x.sqr(); self.x.sub(&e); self.x.norm();
+		x3.copy(&y3); x3.mul(&t4); t2.copy(&t3); t2.mul(&t1); x3.rsub(&t2);
+		y3.mul(&t0); t1.mul(&z3); y3.add(&t1);
+		t0.mul(&t3); z3.mul(&t4); z3.add(&t0);
 
-		a.sub(&self.x); a.norm();
-		self.y.copy(&a); self.y.mul(&d);
-		c.mul(&b); self.y.sub(&c);
-
-		//self.x.norm();
-		self.y.norm();
-		self.z.norm();
+		self.x.copy(&x3); self.x.norm(); 
+		self.y.copy(&y3); self.y.norm();
+		self.z.copy(&z3); self.z.norm();
 
 		return 0;
 	}
@@ -396,54 +386,6 @@ impl ECP2 {
 		self.x.mul(&x2);
 		self.y.mul(&x2);
 		self.y.mul(x);
-	}
-
-/* normalises m-array of ECP2 points. Requires work vector of m FP2s */
-
-	pub fn multiaffine(P: &mut [ECP2]) {
-		let mut t1=FP2::new();
-		let mut t2=FP2::new();
-
-		let mut work:[FP2;8]=[FP2::new(),FP2::new(),FP2::new(),FP2::new(),FP2::new(),FP2::new(),FP2::new(),FP2::new()];
-		let m=8;
-
-		work[0].one();
-		work[1].copy(&P[0].z);
-
-		for i in 2..m {
-			t1.copy(&work[i-1]);
-			work[i].copy(&t1);
-			work[i].mul(&P[i-1].z)
-		}
-
-		t1.copy(&work[m-1]); 
-		t1.mul(&P[m-1].z);
-		t1.inverse();
-		t2.copy(&P[m-1].z);
-		work[m-1].mul(&t1);
-
-		let mut i=m-2;
-
-		loop {
-			if i==0 {
-				work[0].copy(&t1);
-				work[0].mul(&t2);
-				break;
-			}
-			work[i].mul(&t2);
-			work[i].mul(&t1);
-			t2.mul(&P[i].z);
-			i-=1;
-		}
-/* now work[] contains inverses of all Z coordinates */
-
-		for i in 0..m {
-			P[i].z.one();
-			t1.copy(&work[i]); t1.sqr();
-			P[i].x.mul(&t1);
-			t1.mul(&work[i]);
-			P[i].y.mul(&t1);
-		}    
 	}
 
 /* self*=e */
@@ -475,10 +417,6 @@ impl ECP2 {
 			W[i].copy(&C);
 			W[i].add(&mut Q);
 		}
-
-/* convert the table to affine */
-
-		ECP2::multiaffine(&mut W);
 
 /* make exponent odd - add 2P if even, P if odd */
 		t.copy(&e);
@@ -553,8 +491,6 @@ impl ECP2 {
 		W[3].add(&mut T);
 		W[4].sub(&mut T);
 		W[7].add(&mut T);
-
-		ECP2::multiaffine(&mut W);
 
 /* if multiplier is even add 1 to multiplier, and add P to correction */
 		mt.zero(); C.inf();

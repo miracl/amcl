@@ -34,14 +34,17 @@ func NewECP2() *ECP2 {
 	E:=new(ECP2)
 	E.x=NewFP2int(0)
 	E.y=NewFP2int(1)
-	E.z=NewFP2int(1)
+	E.z=NewFP2int(0)
 	E.INF=true
 	return E
 }
 
 /* Test this=O? */
 func (E *ECP2) Is_infinity() bool {
-		return E.INF
+	if E.INF {return true}
+	E.x.reduce(); E.y.reduce(); E.z.reduce()
+	E.INF=E.x.iszilch() && E.z.iszilch()
+	return E.INF
 }
 /* copy this=P */
 func (E *ECP2) Copy(P *ECP2) {
@@ -54,14 +57,14 @@ func (E *ECP2) Copy(P *ECP2) {
 func (E *ECP2) inf() {
 	E.INF=true
 	E.x.zero()
-	E.y.zero()
+	E.y.one()
 	E.z.zero()
 }
 
 /* set this=-this */
 func (E *ECP2) neg() {
-	if E.Is_infinity() {return}
-	E.y.norm(); E.y.neg(); E.y.reduce()
+//	if E.Is_infinity() {return}
+	E.y.norm(); E.y.neg(); E.y.norm()
 }
 
 /* Conditional move of Q to P dependant on d */
@@ -104,16 +107,14 @@ func (E *ECP2) equals(Q *ECP2) bool {
 	if E.Is_infinity() && Q.Is_infinity() {return true}
 	if E.Is_infinity() || Q.Is_infinity() {return false}
 
-	zs2:=NewFP2copy(E.z); zs2.sqr()
-	zo2:=NewFP2copy(Q.z); zo2.sqr()
-	zs3:=NewFP2copy(zs2); zs3.mul(E.z)
-	zo3:=NewFP2copy(zo2); zo3.mul(Q.z)
-	zs2.mul(Q.x)
-	zo2.mul(E.x)
-	if !zs2.equals(zo2) {return false}
-	zs3.mul(Q.y)
-	zo3.mul(E.y)
-	if !zs3.equals(zo3) {return false}
+	a:=NewFP2copy(E.x)
+	b:=NewFP2copy(Q.x)
+	a.mul(Q.z); b.mul(E.z)
+
+	if !a.equals(b) {return false}
+	a.copy(E.y); b.copy(Q.y)
+	a.mul(Q.z); b.mul(E.z);
+	if !a.equals(b) {return false}
 
 	return true
 }
@@ -122,14 +123,11 @@ func (E *ECP2) equals(Q *ECP2) bool {
 func (E *ECP2) affine() {
 	if E.Is_infinity() {return}
 	one:=NewFP2int(1)
-	if E.z.equals(one) {return}
+	if E.z.equals(one) {E.x.reduce(); E.y.reduce(); return}
 	E.z.inverse()
 
-	z2:=NewFP2copy(E.z);
-	z2.sqr()
-	E.x.mul(z2); E.x.reduce()
-	E.y.mul(z2) 
-	E.y.mul(E.z);  E.y.reduce()
+	E.x.mul(E.z); E.x.reduce()
+	E.y.mul(E.z); E.y.reduce()
 	E.z.copy(one)
 }
 
@@ -246,45 +244,40 @@ func NewECP2fp2(ix *FP2) *ECP2 {
 /* this+=this */
 func (E *ECP2) dbl() int {
 	if E.INF {return -1}
-	if E.y.iszilch() {
-		E.inf()
-		return -1
-	}
 
-	w1:=NewFP2copy(E.x)
-	w2:=NewFP2int(0)
-	w3:=NewFP2copy(E.x)
-	w8:=NewFP2copy(E.x)
+	iy:=NewFP2copy(E.y)
+	iy.mul_ip(); iy.norm()
 
-	w1.sqr()
-	w8.copy(w1)
-	w8.imul(3)
+	t0:=NewFP2copy(E.y)                  //***** Change 
+	t0.sqr();  t0.mul_ip()   
+	t1:=NewFP2copy(iy)  
+	t1.mul(E.z)
+	t2:=NewFP2copy(E.z)
+	t2.sqr()
 
-	w2.copy(E.y); w2.sqr()
-	w3.copy(E.x); w3.imul(4); w3.mul(w2)
-	
-	w1.copy(w3); w1.neg()
-	w1.norm();
+	E.z.copy(t0)
+	E.z.add(t0); E.z.norm() 
+	E.z.add(E.z)
+	E.z.add(E.z) 
+	E.z.norm()  
 
-	E.x.copy(w8); E.x.sqr()
-	E.x.add(w1)
-	E.x.add(w1)
+	t2.imul(3*CURVE_B_I) 
+
+	x3:=NewFP2copy(t2)
+	x3.mul(E.z) 
+
+	y3:=NewFP2copy(t0)   
+
+	y3.add(t2); y3.norm()
+	E.z.mul(t1)
+	t1.copy(t2); t1.add(t2); t2.add(t1); t2.norm()  
+	t0.sub(t2); t0.norm()                           //y^2-9bz^2
+	y3.mul(t0); y3.add(x3)                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+	t1.copy(E.x); t1.mul(iy)						//
+	E.x.copy(t0); E.x.norm(); E.x.mul(t1); E.x.add(E.x)       //(y^2-9bz^2)xy2
+
 	E.x.norm()
-
-	E.z.add(E.z); E.z.norm()
-	E.z.mul(E.y)
-	
-
-	w2.add(w2); w2.norm()
-	w2.sqr()
-	w2.add(w2); w2.norm();
-	w3.sub(E.x); w3.norm();
-	E.y.copy(w8); E.y.mul(w3)
-	//	w2.norm();
-	E.y.sub(w2)
-
-	E.y.norm()
-	E.z.norm()
+	E.y.copy(y3); E.y.norm()
 
 	return 1
 }
@@ -297,61 +290,60 @@ func (E *ECP2) add(Q *ECP2) int {
 	}
 	if Q.INF {return -1}
 
-	aff:=false
+	b:=3*CURVE_B_I
+	t0:=NewFP2copy(E.x)
+	t0.mul(Q.x)         // x.Q.x
+	t1:=NewFP2copy(E.y)
+	t1.mul(Q.y)		 // y.Q.y
 
-	if Q.z.isunity() {aff=true}
+	t2:=NewFP2copy(E.z)
+	t2.mul(Q.z)
+	t3:=NewFP2copy(E.x)
+	t3.add(E.y); t3.norm()          //t3=X1+Y1
+	t4:=NewFP2copy(Q.x)            
+	t4.add(Q.y); t4.norm()			//t4=X2+Y2
+	t3.mul(t4)						//t3=(X1+Y1)(X2+Y2)
+	t4.copy(t0); t4.add(t1)		//t4=X1.X2+Y1.Y2
 
-	var A,C *FP2
-	B:=NewFP2copy(E.z)
-	D:=NewFP2copy(E.z)
-	if !aff{
-		A=NewFP2copy(Q.z)
-		C=NewFP2copy(Q.z)
+	t3.sub(t4); t3.norm(); t3.mul_ip();  t3.norm()         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 
-		A.sqr(); B.sqr()
-		C.mul(A); D.mul(B)
+	t4.copy(E.y);                    
+	t4.add(E.z); t4.norm()			//t4=Y1+Z1
+	x3:=NewFP2copy(Q.y)
+	x3.add(Q.z); x3.norm()			//x3=Y2+Z2
 
-		A.mul(E.x)
-		C.mul(E.y)
-	} else {
-		A=NewFP2copy(E.x)
-		C=NewFP2copy(E.y)
+	t4.mul(x3)						//t4=(Y1+Z1)(Y2+Z2)
+	x3.copy(t1)					//
+	x3.add(t2)						//X3=Y1.Y2+Z1.Z2
 	
-		B.sqr()
-		D.mul(B)
-	}
+	t4.sub(x3); t4.norm(); t4.mul_ip(); t4.norm()          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 
-	B.mul(Q.x); B.sub(A)
-	D.mul(Q.y); D.sub(C)
+	x3.copy(E.x); x3.add(E.z); x3.norm()	// x3=X1+Z1
+	y3:=NewFP2copy(Q.x)				
+	y3.add(Q.z); y3.norm()				// y3=X2+Z2
+	x3.mul(y3)							// x3=(X1+Z1)(X2+Z2)
+	y3.copy(t0)
+	y3.add(t2)							// y3=X1.X2+Z1+Z2
+	y3.rsub(x3); y3.norm()				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-	if B.iszilch() {
-		if D.iszilch() {
-			E.dbl()
-			return 1
-		} else	{
-			E.INF=true
-			return -1
-		}
-	}
+	t0.mul_ip(); t0.norm() // x.Q.x
+	t1.mul_ip(); t1.norm() // y.Q.y
 
-	if !aff {E.z.mul(Q.z)}
-	E.z.mul(B)
+	x3.copy(t0); x3.add(t0) 
+	t0.add(x3); t0.norm()
+	t2.imul(b) 	
 
-	e:=NewFP2copy(B); e.sqr()
-	B.mul(e)
-	A.mul(e)
+	z3:=NewFP2copy(t1); z3.add(t2); z3.norm()
+	t1.sub(t2); t1.norm()
+	y3.imul(b) 
 
-	e.copy(A)
-	e.add(A); e.add(B); e.norm(); D.norm()
-	E.x.copy(D); E.x.sqr(); E.x.sub(e); E.x.norm()
+	x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2)
+	y3.mul(t0); t1.mul(z3); y3.add(t1)
+	t0.mul(t3); z3.mul(t4); z3.add(t0)
 
-	A.sub(E.x); A.norm();
-	E.y.copy(A); E.y.mul(D)
-	C.mul(B); E.y.sub(C)
-
-	//E.x.norm()
-	E.y.norm()
-	E.z.norm()
+	E.x.copy(x3); E.x.norm() 
+	E.y.copy(y3); E.y.norm()
+	E.z.copy(z3); E.z.norm()
 
 	return 0
 }
@@ -375,54 +367,6 @@ func (E *ECP2) frob(X *FP2) {
 	E.x.mul(X2)
 	E.y.mul(X2)
 	E.y.mul(X)
-}
-
-/* normalises m-array of ECP2 points. Requires work vector of m FP2s */
-
-func multiaffine2(m int,P []*ECP2) {
-	t1:=NewFP2int(0)
-	t2:=NewFP2int(0)
-
-	var work []*FP2
-
-	for i:=0;i<m;i++ {
-		work=append(work,NewFP2int(0))
-	}
-
-	work[0].one()
-	work[1].copy(P[0].z)
-
-	for i:=2;i<m;i++ {
-		work[i].copy(work[i-1])
-		work[i].mul(P[i-1].z)
-	}
-
-	t1.copy(work[m-1]); t1.mul(P[m-1].z)
-
-	t1.inverse()
-
-	t2.copy(P[m-1].z)
-	work[m-1].mul(t1)
-
-	for i:=m-2;;i-- {
-		if i==0 {
-			work[0].copy(t1)
-			work[0].mul(t2)
-			break
-		}
-		work[i].mul(t2);
-		work[i].mul(t1);
-		t2.mul(P[i].z);
-	}
-/* now work[] contains inverses of all Z coordinates */
-
-	for i:=0;i<m;i++ {
-		P[i].z.one();
-		t1.copy(work[i]); t1.sqr()
-		P[i].x.mul(t1)
-		t1.mul(work[i])
-		P[i].y.mul(t1)
-	}    
 }
 
 /* P*=e */
@@ -453,10 +397,6 @@ func (E *ECP2) mul(e *BIG) *ECP2 {
 		W[i].Copy(W[i-1])
 		W[i].add(Q)
 	}
-
-/* convert the table to affine */
-
-	multiaffine2(8,W[:])
 
 /* make exponent odd - add 2P if even, P if odd */
 	t.copy(e)
@@ -529,8 +469,6 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 	W[3].add(T)
 	W[4].sub(T)
 	W[7].add(T)
-
-	multiaffine2(8,W[:])
 
 /* if multiplier is even add 1 to multiplier, and add P to correction */
 	mt.zero(); C.inf()

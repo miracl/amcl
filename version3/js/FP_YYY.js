@@ -25,6 +25,7 @@ var FP_YYY = function(x) {
 	if (x instanceof FP_YYY)
 	{
 		this.f=new BIG_XXX(x.f);
+		this.XES=x.XES;
 	}
 	else
 	{
@@ -42,7 +43,7 @@ FP_YYY.MODBITS=@NBT@;
 FP_YYY.MOD8=@M8@;
 FP_YYY.MODTYPE=FP_YYY.@MT@;
 
-FP_YYY.FEXCESS=(1<<(BIG_XXX.BASEBITS*BIG_XXX.NLEN-FP_YYY.MODBITS-1)); // 2^(BASEBITS*NLEN-MODBITS)
+FP_YYY.FEXCESS=(1<<@SH@); // 2^(BASEBITS*NLEN-MODBITS)
 FP_YYY.OMASK=(-1)<<FP_YYY.TBITS;
 FP_YYY.TBITS=FP_YYY.MODBITS%BIG_XXX.BASEBITS;
 FP_YYY.TMASK=(1<<FP_YYY.TBITS)-1;
@@ -51,7 +52,8 @@ FP_YYY.prototype={
 /* set this=0 */
 	zero: function()
 	{
-		return this.f.zero();
+		this.XES=1;
+		this.f.zero();
 	},
 
 /* copy from a BIG_XXX in ROM */
@@ -72,19 +74,29 @@ FP_YYY.prototype={
 /* copy from another FP_YYY */
 	copy: function(y)
 	{
-		return this.f.copy(y.f);
+		this.XES=y.XES;
+		this.f.copy(y.f);
 	},
 
 /* conditional swap of a and b depending on d */
 	cswap: function(b,d)
 	{
 		this.f.cswap(b.f,d);
+		var t,c=d;
+		c=~(c-1);
+		t=c&(this.XES^b.XES);
+		this.XES^=t;
+		b.XES^=t;
 	},
 
 /* conditional copy of b to a depending on d */
 	cmove: function(b,d)
 	{
+		var c=d;
+		c=~(c-1);
+
 		this.f.cmove(b.f,d);
+		this.XES^=(this.XES^b.XES)&c;
 	},
 
 /* convert to Montgomery n-residue form */
@@ -92,15 +104,14 @@ FP_YYY.prototype={
 	{
 		if (FP_YYY.MODTYPE!=FP_YYY.PSEUDO_MERSENNE && FP_YYY.MODTYPE!=FP_YYY.GENERALISED_MERSENNE)
 		{
-			var p=new BIG_XXX();
-			p.rcopy(ROM_FIELD_YYY.Modulus);
-			var d=new DBIG_XXX(0);
+			var r=new BIG_XXX();
+			r.rcopy(ROM_FIELD_YYY.R2modp);
 
-			d.hcopy(this.f);
-			d.norm();
-			d.shl(BIG_XXX.NLEN*BIG_XXX.BASEBITS);
-			this.f.copy(d.mod(p));
+			var d=BIG_XXX.mul(this.f,r);
+			this.f.copy(FP_YYY.mod(d));
+			this.XES=2;
 		}
+		else this.XES=1;
 		return this;
 	},
 	
@@ -139,7 +150,8 @@ FP_YYY.prototype={
 	{
 		var p=new BIG_XXX(0);
 		p.rcopy(ROM_FIELD_YYY.Modulus);
-		return this.f.mod(p);
+		this.f.mod(p);
+		this.XES=1;
 	},
 
 /* set this=1 */
@@ -158,13 +170,11 @@ FP_YYY.prototype={
 /* this*=b mod Modulus */
 	mul: function(b)
 	{
-		var ea=FP_YYY.EXCESS(this.f);
-		var eb=FP_YYY.EXCESS(b.f);
-
-		if ((ea+1)*(eb+1)>FP_YYY.FEXCESS) this.reduce();
+		if (this.XES*b.XES>FP_YYY.FEXCESS) this.reduce();
 
 		var d=BIG_XXX.mul(this.f,b.f);
 		this.f.copy(FP_YYY.mod(d));
+		this.XES=2;
 		return this;
 	},
 
@@ -172,30 +182,48 @@ FP_YYY.prototype={
 	imul: function(c)
 	{
 		var s=false;
-		this.norm();
+		//this.norm();
 		if (c<0)
 		{
 			c=-c;
 			s=true;
 		}
 
-		var afx=(FP_YYY.EXCESS(this.f)+1)*(c+1)+1;
-		if (c<=BIG_XXX.NEXCESS && afx<FP_YYY.FEXCESS)
+		if (FP_YYY.MODTYPE==FP_YYY.PSEUDO_MERSENNE || FP_YYY.MODTYPE==FP_YYY.GENERALISED_MERSENNE)
+		{
+			var d=this.f.pxmul(c);
+			this.f.copy(FP_YYY.mod(d));
+			this.XES=2;
+		}
+		else
+		{
+			if (this.XES*c<=FP_YYY.FEXCESS)
+			{
+				this.f.pmul(c);
+				this.XES*=c;
+			}
+			else
+			{
+				var n=new FP_YYY(c);
+				this.mul(n);
+			}
+		}
+
+/*
+		if (c<=BIG_XXX.NEXCESS && this.XES*c<=FP_YYY.FEXCESS)
 		{
 			this.f.imul(c);
+			this.XES*=c;
 			this.norm();
 		}
 		else
 		{
-			if (afx<FP_YYY.FEXCESS) this.f.pmul(c);
-			else
-			{
-				var p=new BIG_XXX(0);
-				p.rcopy(ROM_FIELD_YYY.Modulus);
-				var d=this.f.pxmul(c);
-				this.f.copy(d.mod(p));
-			}
+//			var p=new BIG_XXX(0);
+//			p.rcopy(ROM_FIELD_YYY.Modulus);
+			var d=this.f.pxmul(c);
+			this.f.copy(FP_YYY.mod(d));
 		}
+*/
 		if (s) {this.neg(); this.norm();}
 		return this;
 	},
@@ -204,15 +232,13 @@ FP_YYY.prototype={
 	sqr: function()
 	{
 		var d;
-//		this.norm();
-		var ea=FP_YYY.EXCESS(this.f);
-
-		if ((ea+1)*(ea+1)>FP_YYY.FEXCESS) this.reduce();
+		if (this.XES*this.XES>FP_YYY.FEXCESS) this.reduce();
 		//if ((ea+1)>= Math.floor((FP_YYY.FEXCESS-1)/(ea+1))) this.reduce();
 
 		d=BIG_XXX.sqr(this.f);
 		var t=FP_YYY.mod(d); 
 		this.f.copy(t);
+		this.XES=2;
 		return this;
 	},
 
@@ -220,7 +246,8 @@ FP_YYY.prototype={
 	add: function(b) 
 	{
 		this.f.add(b.f);
-		if (FP_YYY.EXCESS(this.f)+2>=FP_YYY.FEXCESS) this.reduce();
+		this.XES+=b.XES;
+		if (this.XES>FP_YYY.FEXCESS) this.reduce();
 		return this;
 	},
 /* this=-this mod Modulus */
@@ -230,15 +257,12 @@ FP_YYY.prototype={
 		var m=new BIG_XXX(0);
 		m.rcopy(ROM_FIELD_YYY.Modulus);
 
-//		this.norm();
-		sb=FP_YYY.logb2(FP_YYY.EXCESS(this.f)+1);
-
-//		ov=FP_YYY.EXCESS(this.f); 
-//		sb=1; while(ov!==0) {sb++;ov>>=1;} 
+		sb=FP_YYY.logb2(this.XES-1);
 
 		m.fshl(sb);
+		this.XES=(1<<sb);
 		this.f.rsub(m);	
-		if (FP_YYY.EXCESS(this.f)>=FP_YYY.FEXCESS) this.reduce();
+		if (this.XES>FP_YYY.FEXCESS) this.reduce();
 		return this;
 	},
 
@@ -250,6 +274,15 @@ FP_YYY.prototype={
 		n.neg();
 		this.add(n);
 		return this;
+	},
+
+	rsub: function(b)
+	{
+		var n=new FP_YYY(0);
+		n.copy(this);
+		n.neg();
+		this.copy(b);
+		this.add(n);
 	},
 
 /* this/=2 mod Modulus */
@@ -362,15 +395,15 @@ FP_YYY.logb2=function(v)
 		v = v - ((v >>> 1) & 0x55555555);                  
 		v = (v & 0x33333333) + ((v >>> 2) & 0x33333333);  
 		var r = ((v + (v >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24; 
-		return r+1;
+		return r;
 };
 
-/* calculate Field Excess */
+/* calculate Field Excess 
 FP_YYY.EXCESS=function(a)
 {
 	return ((a.w[BIG_XXX.NLEN-1]&FP_YYY.OMASK)>>(FP_YYY.MODBITS%BIG_XXX.BASEBITS))+1;
 };
-
+*/
 
 /* reduce a DBIG_XXX to a BIG_XXX using a "special" modulus */
 FP_YYY.mod=function(d)
@@ -402,6 +435,7 @@ FP_YYY.mod=function(d)
 			d.w[BIG_XXX.NLEN+i]+=d.muladd(d.w[i],ROM_FIELD_YYY.MConst-1,d.w[i],BIG_XXX.NLEN+i-1);
 		for (i=0;i<BIG_XXX.NLEN;i++)
 			b.w[i]=d.w[BIG_XXX.NLEN+i];
+		b.norm();
 	}
 
 	if (FP_YYY.MODTYPE==FP_YYY.GENERALISED_MERSENNE)
@@ -428,6 +462,7 @@ FP_YYY.mod=function(d)
 		b.w[0]+=carry;
 			
 		b.w[Math.floor(224/BIG_XXX.BASEBITS)]+=carry<<(224%BIG_XXX.BASEBITS);
+		b.norm();
 	}
 
 	if (FP_YYY.MODTYPE==FP_YYY.NOT_SPECIAL)
@@ -439,6 +474,5 @@ FP_YYY.mod=function(d)
 		b.copy(BIG_XXX.monty(m,ROM_FIELD_YYY.MConst,d));
 
 	}
-	b.norm();
 	return b;
 };

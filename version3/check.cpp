@@ -48,7 +48,10 @@ int main(int argc, char *argv[])
        printf("check 32 256\n");
 	   printf("Outputs choices for BASEBITS, number of words per Big, and number of spare bits\n");
 	   printf("Normally choose for minimum words per Big, and maximum spare bits\n");
-	   printf("(But >= 12 spare bits is enough, and tidier if BASEBITS =0 mod 4) \n");
+	   printf(">=5 spare bits for Edwards curves\n");
+	   printf(">=10 spare bits for Weierstrass curves\n");
+	   printf(">=23 spare bits for pairings\n");
+	   printf("But should be less than 32 bits\n");
        exit(0);
     }
 
@@ -57,7 +60,7 @@ int main(int argc, char *argv[])
 
 	if (n!=16 && n!=26 && n!=32 && n!=64)
 	{
-		printf("wordlength must be 16, 32 or 64\n");
+		printf("wordlength must be 16, 32 or 64 (or 26 for Javascript)\n");
 		return 0;
 	}
 
@@ -78,13 +81,14 @@ int main(int argc, char *argv[])
 		lhs=(w+2)*pow((Big)2,2*b);  // sum of products plus carry plus one for redc
 
 		if (lhs>=rhs)    {printf("Stability violation for BASEBITS= %d\n",b); continue;}
+/*
 		ex=1;		
 		while (lhs<rhs)
 		{
 			ex*=2; lhs*=2;
 		}
 		ex/=2;
-
+*/
 
 // Top bits of Modulus must appear in top word of representation. Also at least 4 bits spare needed for field excess.  
 		if (s<4 || s>=b) {printf("Not enough Fp spare for BASEBITS= %d\n",b); continue;}
@@ -92,7 +96,7 @@ int main(int argc, char *argv[])
 		t=b*(1+(p-1)/b) - 8*(1+(p-1)/8);
 		if (t<2 || t>=b) {printf("Not enough FF spare for BASEBITS= %d\n",b);}
 
-		printf("Solution for BASEBITS= %d, Words Per Big=%d, Fp spare bits= %d, FF spare bits= %d (%d)\n",b,w,s,t,ex);
+		printf("Solution for BASEBITS= %d, Words Per Big=%d, Fp spare bits= %d, FF spare bits= %d\n",b,w,s,t);
 		//break;
 	}
 	

@@ -118,6 +118,13 @@ extern void BIG_XXX_dfromBytesLen(DBIG_XXX x,char *a,int s);
 	@param x a DBIG number
  */
 extern void BIG_XXX_doutput(DBIG_XXX x);
+
+/**	@brief Outputs a DBIG number to the console
+ *
+	@param x a DBIG number
+ */
+extern void BIG_XXX_drawoutput(DBIG_XXX x);
+
 /**	@brief Copy BIG from Read-Only Memory to a BIG
  *
 	@param x BIG number

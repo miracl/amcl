@@ -7,8 +7,12 @@
 // ECP stuff
 
 #define CURVETYPE_ZZZ @CT@  
-
 #define PAIRING_FRIENDLY_ZZZ @PF@
+
+/*
+#define CURVETYPE_ZZZ EDWARDS 
+#define PAIRING_FRIENDLY_ZZZ NOT
+*/
 
 #if PAIRING_FRIENDLY_ZZZ != NOT
 #define USE_GLV_ZZZ	  /**< Note this method is patented (GLV), so maybe you want to comment this out */

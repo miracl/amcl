@@ -182,6 +182,13 @@ final public class FP2
         add(m)
     }
 
+    /* self=a-self */
+    func rsub(_ x:FP2)
+    {
+        self.neg()
+        self.add(x)
+    }
+
     /* self*=s, where s is an FP */
     func pmul(_ s:FP)
     {
@@ -221,16 +228,10 @@ final public class FP2
     /* self*=y */
     func mul(_ y:FP2)
     { 
-        let exa=FP.EXCESS(a.x)
-        let exb=FP.EXCESS(b.x)
-        let eya=FP.EXCESS(y.a.x)
-        let eyb=FP.EXCESS(y.b.x)
-        let ec=exa+exb+1
-        let ed=eya+eyb+1
-
-        if FP.pexceed(ec,ed) {
-            if exa>0 {a.reduce()}
-            if exb>0 {b.reduce()}
+        if Int64(a.xes+b.xes)*Int64(y.a.xes+y.b.xes) > Int64(FP.FEXCESS)
+        {
+            if a.xes>1 {a.reduce()}
+            if b.xes>1 {b.reduce()}       
         }
 
         let pR=DBIG(0)
@@ -252,30 +253,8 @@ final public class FP2
         A.add(B); A.norm()
         E.sub(F); E.norm()
 
-        a.x.copy(FP.mod(A))
-        b.x.copy(FP.mod(E))
-
-/*
-        let w1=FP(a)
-        let w2=FP(b)
-        let w5=FP(a)
-        let mw=FP(0)
-    
-        w1.mul(y.a)  // w1=a*y.a  
-        w2.mul(y.b)  // w2=b*y.b 
-        w5.add(b)    // w5=a+b
-        b.copy(y.a); b.add(y.b) // b=y.a+y.b
-
-        b.norm()
-        w5.norm()
-    
-        b.mul(w5)
-        mw.copy(w1); mw.add(w2); mw.neg()
-    
-        b.add(mw); mw.add(w1)
-        a.copy(w1);	a.add(mw)
-    
-        norm() */
+        a.x.copy(FP.mod(A)); a.xes=3
+        b.x.copy(FP.mod(E)); b.xes=2
     
     }
  
@@ -368,4 +347,12 @@ final public class FP2
         div2()
     }
     
+    func div_ip2()
+    {
+        let t=FP2(0)
+        t.a.copy(a); t.a.add(b)
+        t.b.copy(b); t.b.sub(a)
+        copy(t); 
+    }
+
 }

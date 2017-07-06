@@ -24,7 +24,7 @@ var ECP_ZZZ = function()
 {
 	this.x=new FP_YYY(0);
 	this.y=new FP_YYY(1);
-	this.z=new FP_YYY(1);
+	this.z=new FP_YYY(0);
 	this.INF=true;
 };
 
@@ -42,12 +42,23 @@ ECP_ZZZ.prototype={
 /* test this=O point-at-infinity */
 	is_infinity: function() 
 	{
+		if (this.INF) return true;
+		this.x.reduce(); this.z.reduce();
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.EDWARDS)
 		{
-			this.x.reduce(); this.y.reduce(); this.z.reduce();
-			return (this.x.iszilch() && this.y.equals(this.z));
+			this.y.reduce();
+			this.INF= (this.x.iszilch() && this.y.equals(this.z));
 		}
-		else return this.INF;
+		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.WEIERSTRASS)
+		{
+			this.y.reduce();
+			this.INF= (this.x.iszilch() && this.z.iszilch());
+		}
+		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.MONTGOMERY)
+		{
+			this.INF= (z.iszilch());
+		}		
+		return this.INF;
 	},
 
 
@@ -57,13 +68,12 @@ ECP_ZZZ.prototype={
 		this.x.cswap(Q.x,d);
 		if (ECP_ZZZ.CURVETYPE!=ECP_ZZZ.MONTGOMERY) this.y.cswap(Q.y,d);
 		this.z.cswap(Q.z,d);
-		if (ECP_ZZZ.CURVETYPE!=ECP_ZZZ.EDWARDS)
-		{
-			var bd=(d!==0)?true:false;
-			bd=bd&(this.INF^Q.INF);
-			this.INF^=bd;
-			Q.INF^=bd;
-		}
+
+		var bd=(d!==0)?true:false;
+		bd=bd&(this.INF^Q.INF);
+		this.INF^=bd;
+		Q.INF^=bd;
+
 	},
 
 /* conditional move of Q to P dependant on d */
@@ -72,11 +82,9 @@ ECP_ZZZ.prototype={
 		this.x.cmove(Q.x,d);
 		if (ECP_ZZZ.CURVETYPE!=ECP_ZZZ.MONTGOMERY) this.y.cmove(Q.y,d);
 		this.z.cmove(Q.z,d);
-		if (ECP_ZZZ.CURVETYPE!=ECP_ZZZ.EDWARDS)
-		{
-			var bd=(d!==0)?true:false;
-			this.INF^=(this.INF^Q.INF)&bd;
-		}
+	
+		var bd=(d!==0)?true:false;
+		this.INF^=(this.INF^Q.INF)&bd;
 	},
 
 /* Constant time select from pre-computed table */
@@ -108,32 +116,17 @@ ECP_ZZZ.prototype={
 	{
 		if (this.is_infinity() && Q.is_infinity()) return true;
 		if (this.is_infinity() || Q.is_infinity()) return false;
-		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.WEIERSTRASS)
+
+		var a=new FP_YYY(0);
+		var b=new FP_YYY(0);
+		a.copy(this.x); a.mul(Q.z); a.reduce();
+		b.copy(Q.x); b.mul(this.z); b.reduce();
+		if (!a.equals(b)) return false;
+		if (ECP_ZZZ.CURVETYPE!=ECP_ZZZ.MONTGOMERY)
 		{
-			var zs2=new FP_YYY(0); zs2.copy(this.z); zs2.sqr();
-			var zo2=new FP_YYY(0); zo2.copy(Q.z); zo2.sqr();
-			var zs3=new FP_YYY(0); zs3.copy(zs2); zs3.mul(this.z);
-			var zo3=new FP_YYY(0); zo3.copy(zo2); zo3.mul(Q.z);
-			zs2.mul(Q.x);
-			zo2.mul(this.x);
-			if (!zs2.equals(zo2)) return false;
-			zs3.mul(Q.y);
-			zo3.mul(this.y);
-			if (!zs3.equals(zo3)) return false;
-		}
-		else
-		{
-			var a=new FP_YYY(0);
-			var b=new FP_YYY(0);
-			a.copy(this.x); a.mul(Q.z); a.reduce();
-			b.copy(Q.x); b.mul(this.z); b.reduce();
+			a.copy(this.y); a.mul(Q.z); a.reduce();
+			b.copy(Q.y); b.mul(this.z); b.reduce();
 			if (!a.equals(b)) return false;
-			if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.EDWARDS)
-			{
-				a.copy(this.y); a.mul(Q.z); a.reduce();
-				b.copy(Q.y); b.mul(this.z); b.reduce();
-				if (!a.equals(b)) return false;
-			}
 		}
 		return true;
 	},
@@ -148,7 +141,7 @@ ECP_ZZZ.prototype={
 /* this=-this */
 	neg: function() 
 	{
-		if (this.is_infinity()) return;
+//		if (this.is_infinity()) return;
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.WEIERSTRASS)
 		{
 			this.y.neg(); this.y.norm();
@@ -164,8 +157,9 @@ ECP_ZZZ.prototype={
 	{
 		this.INF=true;
 		this.x.zero();
-		this.y=new FP_YYY(1);
-		this.z=new FP_YYY(1);
+		if (ECP_ZZZ.CURVETYPE!=ECP_ZZZ. MONTGOMERY) this.y.one();
+		if (ECP_ZZZ.CURVETYPE!=ECP_ZZZ.EDWARDS) this.z.zero();
+		else this.z.one();
 	},
 /* set this=(x,y) where x and y are BIG_XXXs */
 	setxy: function(ix,iy) 
@@ -227,16 +221,8 @@ ECP_ZZZ.prototype={
 		var one=new FP_YYY(1);
 		if (this.z.equals(one)) return;
 		this.z.inverse();
-		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.WEIERSTRASS)
-		{
-			var z2=new FP_YYY(0); z2.copy(this.z);
-			z2.sqr();
-			this.x.mul(z2); this.x.reduce();
-			this.y.mul(z2); 
-			this.y.mul(this.z); this.y.reduce();
-			this.z=one;
-		}
-		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.EDWARDS)
+
+		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.EDWARDS || ECP_ZZZ.CURVETYPE==ECP_ZZZ.WEIERSTRASS)
 		{
 			this.x.mul(this.z); this.x.reduce();
 			this.y.mul(this.z); this.y.reduce();
@@ -314,115 +300,149 @@ ECP_ZZZ.prototype={
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.WEIERSTRASS)
 		{
 			if (this.INF) return;
-			if (this.y.iszilch())
+	
+			if (ROM_CURVE_ZZZ.CURVE_A==0)
 			{
-				this.inf();
-				return;
-			}
+				var t0=new FP_YYY(0); t0.copy(this.y); //FP t0=new FP(y);                      /*** Change ***/    // Edits made
+				t0.sqr();
+				var t1=new FP_YYY(0); t1.copy(this.y); //FP t1=new FP(y);
+				t1.mul(this.z);
+				var t2=new FP_YYY(0); t2.copy(this.z); //FP t2=new FP(z);
+				t2.sqr();
 
-			var w1=new FP_YYY(0); w1.copy(this.x);
-			var w6=new FP_YYY(0); w6.copy(this.z);
-			var w2=new FP_YYY(0);
-			var w3=new FP_YYY(0); w3.copy(this.x);
-			var w8=new FP_YYY(0); w8.copy(this.x);
+				this.z.copy(t0);
+				this.z.add(t0); this.z.norm(); 
+				this.z.add(this.z); this.z.add(this.z); this.z.norm();
 
-			if (ROM_CURVE_ZZZ.CURVE_A==-3)
-			{
-				w6.sqr();
-				w1.copy(w6);
-				w1.neg();
-				w3.add(w1);
-				w8.add(w6);
-				w3.norm(); w8.norm();
-				w3.mul(w8);
-				w8.copy(w3);
-				w8.imul(3);
+				t2.imul(3*ROM_CURVE_ZZZ.CURVE_B_I);
+
+				var x3=new FP_YYY(0); x3.copy(t2); //FP x3=new FP(t2);
+				x3.mul(this.z);
+				var y3=new FP_YYY(0); y3.copy(t0); //FP y3=new FP(t0);
+				y3.add(t2); y3.norm();
+				this.z.mul(t1); 
+				t1.copy(t2); t1.add(t2); t2.add(t1);
+				t0.sub(t2); t0.norm(); y3.mul(t0); y3.add(x3);
+				t1.copy(this.x); t1.mul(this.y); 
+				this.x.copy(t0); this.x.norm(); this.x.mul(t1); this.x.add(this.x);
+//System.out.println("Out of dbl");
+				this.x.norm(); 
+				this.y.copy(y3); this.y.norm();
 			}
 			else
 			{
-				w1.sqr();
-				w8.copy(w1);
-				w8.imul(3);
+				var t0=new FP_YYY(0); t0.copy(this.x); //FP t0=new FP(x);
+				var t1=new FP_YYY(0); t1.copy(this.y);//FP t1=new FP(y);
+				var t2=new FP_YYY(0); t2.copy(this.z);//FP t2=new FP(z);
+				var t3=new FP_YYY(0); t3.copy(this.x);//FP t3=new FP(x);
+				var z3=new FP_YYY(0); z3.copy(this.z);//FP z3=new FP(z);
+				var y3=new FP_YYY(0); //FP y3=new FP(0);
+				var x3=new FP_YYY(0);//FP x3=new FP(0);
+				var b=new FP_YYY(0); //FP b=new FP(0);
+//System.out.println("Into dbl");
+				if (ROM_CURVE_ZZZ.CURVE_B_I==0)
+					b.copy(new FP(new BIG(ROM_CURVE_ZZZ.CURVE_B)));
+//System.out.println("b= "+b.toString());
+				t0.sqr();  //1    x^2
+				t1.sqr();  //2    y^2
+				t2.sqr();  //3
+
+				t3.mul(this.y); //4
+				t3.add(t3); t3.norm();//5
+				z3.mul(this.x);   //6
+				z3.add(z3);  z3.norm();//7
+				y3.copy(t2); 
+				
+				if (ROM_CURVE_ZZZ.CURVE_B_I==0)
+					y3.mul(b); //8
+				else
+					y3.imul(ROM_CURVE_ZZZ.CURVE_B_I);
+				
+				y3.sub(z3); //y3.norm(); //9  ***
+				x3.copy(y3); x3.add(y3); x3.norm();//10
+
+				y3.add(x3); //y3.norm();//11
+				x3.copy(t1); x3.sub(y3); x3.norm();//12
+				y3.add(t1); y3.norm();//13
+				y3.mul(x3); //14
+				x3.mul(t3); //15
+				t3.copy(t2); t3.add(t2); //t3.norm(); //16
+				t2.add(t3); //t2.norm(); //17
+
+				if (ROM_CURVE_ZZZ.CURVE_B_I==0)
+					z3.mul(b); //18
+				else
+					z3.imul(ROM_CURVE_ZZZ.CURVE_B_I);
+
+				z3.sub(t2); //z3.norm();//19
+				z3.sub(t0); z3.norm();//20  ***
+				t3.copy(z3); t3.add(z3); //t3.norm();//21
+
+				z3.add(t3); z3.norm(); //22
+				t3.copy(t0); t3.add(t0); //t3.norm(); //23
+				t0.add(t3); //t0.norm();//24
+				t0.sub(t2); t0.norm();//25
+
+				t0.mul(z3);//26
+				y3.add(t0); //y3.norm();//27
+				t0.copy(this.y); t0.mul(this.z);//28
+				t0.add(t0); t0.norm(); //29
+				z3.mul(t0);//30
+				x3.sub(z3); //x3.norm();//31
+				t0.add(t0); t0.norm();//32
+				t1.add(t1); t1.norm();//33
+				z3.copy(t0); z3.mul(t1);//34
+//System.out.println("Out of dbl");
+				this.x.copy(x3); this.x.norm(); 
+				this.y.copy(y3); this.y.norm();
+				this.z.copy(z3); this.z.norm();
 			}
-
-			w2.copy(this.y); w2.sqr();
-
-w3.copy(this.x); w3.imul(4);
-
-//			w3.copy(this.x); 
-			w3.mul(w2);
-//			w3.imul(4); //w3.norm();
-			w1.copy(w3); w1.neg();
-
-			//w8.norm();
-			this.x.copy(w8); this.x.sqr();
-			this.x.add(w1);
-			this.x.add(w1);
-			this.x.norm();
-
-			this.z.add(this.z); this.z.norm();
-			this.z.mul(this.y);
-
-//			this.z.mul(this.y);
-//			this.z.add(this.z);
-
-			w2.add(w2);
-			w2.norm(); w2.sqr();
-			w2.add(w2);
-			w3.sub(this.x); w3.norm();
-			this.y.copy(w8); this.y.mul(w3);
-			this.y.sub(w2);
-			this.y.norm();
-			this.z.norm();
 		}
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.EDWARDS)
 		{
-			var C=new FP_YYY(0); C.copy(this.x);
-			var D=new FP_YYY(0); D.copy(this.y);
-			var H=new FP_YYY(0); H.copy(this.z);
-			var J=new FP_YYY(0);
-
+			var C=new FP_YYY(0); C.copy(this.x); //FP C=new FP(x);
+			var D=new FP_YYY(0); D.copy(this.y);//FP D=new FP(y);
+			var H=new FP_YYY(0); H.copy(this.z);//FP H=new FP(z);
+			var J=new FP_YYY(0); //FP J=new FP(0);
+//System.out.println("Into dbl");	
 			this.x.mul(this.y); this.x.add(this.x); this.x.norm();
 			C.sqr();
 			D.sqr();
 			if (ROM_CURVE_ZZZ.CURVE_A==-1) C.neg();	
+
 			this.y.copy(C); this.y.add(D); this.y.norm();
 			H.sqr(); H.add(H);
+
 			this.z.copy(this.y);
-			J.copy(this.y); J.sub(H); J.norm();
+			J.copy(this.y); 
+
+			J.sub(H); J.norm();
+
 			this.x.mul(J);
 			C.sub(D); C.norm();
-			this.y.mul(C);  
+			this.y.mul(C);
 			this.z.mul(J);
-
-		//	this.x.norm();
-		//	this.y.norm();
-		//	this.z.norm();
+//System.out.println("Out of dbl");
 		}
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.MONTGOMERY)
 		{
-			var A=new FP_YYY(0); A.copy(this.x);
-			var B=new FP_YYY(0); B.copy(this.x);		
-			var AA=new FP_YYY(0);
-			var BB=new FP_YYY(0);
-			var C=new FP_YYY(0);
-	
-			if (this.INF) return;
+			var A=new FP_YYY(0); A.copy(this.x);  //FP A=new FP(x);
+			var B=new FP_YYY(0); B.copy(this.x);//FP B=new FP(x);		
+			var AA=new FP_YYY(0); //FP AA=new FP(0);
+			var BB=new FP_YYY(0); //FP BB=new FP(0);
+			var C=new FP_YYY(0); //FP C=new FP(0);
 
 			A.add(this.z); A.norm();
 			AA.copy(A); AA.sqr();
 			B.sub(this.z); B.norm();
 			BB.copy(B); BB.sqr();
 			C.copy(AA); C.sub(BB); C.norm();
-
 			this.x.copy(AA); this.x.mul(BB);
 
 			A.copy(C); A.imul((ROM_CURVE_ZZZ.CURVE_A+2)>>2);
 
 			BB.add(A); BB.norm();
 			this.z.copy(BB); this.z.mul(C);
-		//	this.x.norm();
-		//	this.z.norm();
 		}
 		return;
 	},
@@ -430,127 +450,209 @@ w3.copy(this.x); w3.imul(4);
 /* this+=Q */
 	add: function(Q) 
 	{
+		if (this.INF)
+		{
+			this.copy(Q);
+			return;
+		}
+		if (Q.INF) return;
+
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.WEIERSTRASS)
 		{
-			if (this.INF)
+
+//System.out.println("Into add");
+			if (ROM_CURVE_ZZZ.CURVE_A==0)
 			{
-				this.copy(Q);
-				return;
-			}
-			if (Q.INF) return;
+//	System.out.println("Into add");                      // Edits made
 
-			var aff=false;
-			var one=new FP_YYY(1);
-			if (Q.z.equals(one)) aff=true;
+				var b=3*ROM_CURVE_ZZZ.CURVE_B_I;
+				var t0=new FP_YYY(0); t0.copy(this.x);//FP t0=new FP(x);
+				t0.mul(Q.x);
+				var t1=new FP_YYY(0); t1.copy(this.y);//FP t1=new FP(y);
+				t1.mul(Q.y);
+				var t2=new FP_YYY(0); t2.copy(this.z);//FP t2=new FP(z);
+				t2.mul(Q.z);
+				var t3=new FP_YYY(0); t3.copy(this.x);//FP t3=new FP(x);
+				t3.add(this.y); t3.norm();
+				var t4=new FP_YYY(0); t4.copy(Q.x);//FP t4=new FP(Q.x);
+				t4.add(Q.y); t4.norm();
+				t3.mul(t4);
+				t4.copy(t0); t4.add(t1);
 
-			var A,C;
-			var B=new FP_YYY(this.z);
-			var D=new FP_YYY(this.z);
-			if (!aff)
-			{
-				A=new FP_YYY(Q.z);
-				C=new FP_YYY(Q.z);
+				t3.sub(t4); t3.norm();
+				t4.copy(this.y);
+				t4.add(this.z); t4.norm();
+				var x3=new FP_YYY(0); x3.copy(Q.y);//FP x3=new FP(Q.y);
+				x3.add(Q.z); x3.norm();
 
-				A.sqr(); B.sqr();
-				C.mul(A); D.mul(B);
+				t4.mul(x3);
+				x3.copy(t1);
+				x3.add(t2);
+	
+				t4.sub(x3); t4.norm();
+				x3.copy(this.x); x3.add(this.z); x3.norm();
+				var y3=new FP_YYY(0); y3.copy(Q.x);//FP y3=new FP(Q.x);
+				y3.add(Q.z); y3.norm();
+				x3.mul(y3);
+				y3.copy(t0);
+				y3.add(t2);
+				y3.rsub(x3); y3.norm();
+				x3.copy(t0); x3.add(t0); 
+				t0.add(x3); t0.norm();
+				t2.imul(b);
 
-				A.mul(this.x);
-				C.mul(this.y);
+				var z3=new FP_YYY(0); z3.copy(t1);//FP z3=new FP(t1); 
+				z3.add(t2); z3.norm();
+				t1.sub(t2); t1.norm(); 
+				y3.imul(b);
+	
+				x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2);
+				y3.mul(t0); t1.mul(z3); y3.add(t1);
+				t0.mul(t3); z3.mul(t4); z3.add(t0);
+
+//System.out.println("Out of add");
+
+				this.x.copy(x3); this.x.norm(); 
+				this.y.copy(y3); this.y.norm();
+				this.z.copy(z3); this.z.norm();
 			}
 			else
 			{
-				A=new FP_YYY(this.x);
-				C=new FP_YYY(this.y);
-	
-				B.sqr();
-				D.mul(B);
-			}
+				var t0=new FP_YYY(0); t0.copy(this.x);//FP t0=new FP(x);
+				var t1=new FP_YYY(0); t1.copy(this.y);//FP t1=new FP(y);
+				var t2=new FP_YYY(0); t2.copy(this.z);//FP t2=new FP(z);
+				var t3=new FP_YYY(0); t3.copy(this.x);//FP t3=new FP(x);
+				var t4=new FP_YYY(0); t4.copy(Q.x);//FP t4=new FP(Q.x);
+				var z3=new FP_YYY(0); //FP z3=new FP(0);
+				var y3=new FP_YYY(0); y3.copy(Q.x); //FP y3=new FP(Q.x);
+				var x3=new FP_YYY(0); x3.copy(Q.y);//FP x3=new FP(Q.y);
+				var b=new FP_YYY(0); //FP b=new FP(0);
 
-			B.mul(Q.x); B.sub(A);
-			D.mul(Q.y); D.sub(C);
-			
-			if (B.iszilch())
-			{
-				if (D.iszilch())
-				{
-					this.dbl();
-					return;
-				}
+				if (ROM_CURVE_ZZZ.CURVE_B_I==0)
+					b.rcopy(ROM_CURVE_ZZZ.CURVE_B);
+				t0.mul(Q.x); //1
+				t1.mul(Q.y); //2
+				t2.mul(Q.z); //3
+
+				t3.add(this.y); t3.norm(); //4
+				t4.add(Q.y); t4.norm();//5
+				t3.mul(t4);//6
+				t4.copy(t0); t4.add(t1); //t4.norm(); //7
+				t3.sub(t4); t3.norm(); //8
+				t4.copy(this.y); t4.add(this.z); t4.norm();//9
+				x3.add(Q.z); x3.norm();//10
+				t4.mul(x3); //11
+				x3.copy(t1); x3.add(t2); //x3.norm();//12
+
+				t4.sub(x3); t4.norm();//13
+				x3.copy(this.x); x3.add(this.z); x3.norm(); //14
+				y3.add(Q.z); y3.norm();//15
+
+				x3.mul(y3); //16
+				y3.copy(t0); y3.add(t2); //y3.norm();//17
+
+				y3.rsub(x3); y3.norm(); //18
+				z3.copy(t2); 
+				
+
+				if (ROM_CURVE_ZZZ.CURVE_B_I==0)
+					z3.mul(b); //18
 				else
-				{
-					this.INF=true;
-					return;
-				}
+					z3.imul(ROM_CURVE_ZZZ.CURVE_B_I);
+				
+				x3.copy(y3); x3.sub(z3); x3.norm(); //20
+				z3.copy(x3); z3.add(x3); //z3.norm(); //21
+
+				x3.add(z3); //x3.norm(); //22
+				z3.copy(t1); z3.sub(x3); z3.norm(); //23
+				x3.add(t1); x3.norm(); //24
+
+				if (ROM_CURVE_ZZZ.CURVE_B_I==0)
+					y3.mul(b); //18
+				else
+					y3.imul(ROM_CURVE_ZZZ.CURVE_B_I);
+
+				t1.copy(t2); t1.add(t2); //t1.norm();//26
+				t2.add(t1); //t2.norm();//27
+
+				y3.sub(t2); //y3.norm(); //28
+
+				y3.sub(t0); y3.norm(); //29
+				t1.copy(y3); t1.add(y3); //t1.norm();//30
+				y3.add(t1); y3.norm(); //31
+
+				t1.copy(t0); t1.add(t0); //t1.norm(); //32
+				t0.add(t1); //t0.norm();//33
+				t0.sub(t2); t0.norm();//34
+				t1.copy(t4); t1.mul(y3);//35
+				t2.copy(t0); t2.mul(y3);//36
+				y3.copy(x3); y3.mul(z3);//37
+				y3.add(t2); //y3.norm();//38
+				x3.mul(t3);//39
+				x3.sub(t1);//40
+				z3.mul(t4);//41
+				t1.copy(t3); t1.mul(t0);//42
+				z3.add(t1); //z3.norm();
+//System.out.println("Out of add");
+				this.x.copy(x3); this.x.norm(); 
+				this.y.copy(y3); this.y.norm();
+				this.z.copy(z3); this.z.norm();
 			}
-
-			if (!aff) this.z.mul(Q.z);
-			this.z.mul(B);
-
-			var e=new FP_YYY(B); e.sqr();
-			B.mul(e);
-			A.mul(e);
-
-			e.copy(A);
-			e.add(A); e.add(B); e.norm(); D.norm();
-			this.x.copy(D); this.x.sqr(); this.x.sub(e);
-
-			A.sub(this.x); A.norm();
-			this.y.copy(A); this.y.mul(D); 
-			C.mul(B); this.y.sub(C);
-
-			this.x.norm();
-			this.y.norm();
-		//	this.z.norm();
-
 		}
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.EDWARDS)
 		{
-			var b=new FP_YYY(0); b.rcopy(ROM_CURVE_ZZZ.CURVE_B);
-			var A=new FP_YYY(0); A.copy(this.z);
-			var B=new FP_YYY(0);
-			var C=new FP_YYY(0); C.copy(this.x);
-			var D=new FP_YYY(0); D.copy(this.y);
-			var E=new FP_YYY(0);
-			var F=new FP_YYY(0);
-			var G=new FP_YYY(0);
 
-			A.mul(Q.z);
-			B.copy(A); B.sqr();
-			C.mul(Q.x);
-			D.mul(Q.y);
+			var A=new FP_YYY(0); A.copy(this.z);  //FP A=new FP(z);
+			var B=new FP_YYY(0); //FP B=new FP(0);
+			var C=new FP_YYY(0); C.copy(this.x);//FP C=new FP(x);
+			var D=new FP_YYY(0); D.copy(this.y);//FP D=new FP(y);
+			var E=new FP_YYY(0); //FP E=new FP(0);
+			var F=new FP_YYY(0); //FP F=new FP(0);
+			var G=new FP_YYY(0); //FP G=new FP(0);
 
-			E.copy(C); E.mul(D); E.mul(b);
-			F.copy(B); F.sub(E); 
-			G.copy(B); G.add(E); 
+			A.mul(Q.z);             //A=2
+			B.copy(A); B.sqr();     //B=2
+			C.mul(Q.x);             //C=2
+			D.mul(Q.y);             //D=2
 
-			if (ROM_CURVE_ZZZ.CURVE_A==1)
+			E.copy(C); E.mul(D);    //E=2
+		
+			if (ROM_CURVE_ZZZ.CURVE_B_I==0)
 			{
-				E.copy(D); E.sub(C);
+				var b=new FP_YYY(0); b.rcopy(ROM_CURVE_ZZZ.CURVE_B);
+				E.mul(b);
 			}
-			C.add(D);
+			else
+				E.imul(ROM_CURVE_ZZZ.CURVE_B_I);  //E=22222	
 
-			B.copy(this.x); B.add(this.y);
-			D.copy(Q.x); D.add(Q.y); 
-			B.norm(); D.norm();
-			B.mul(D);
-			B.sub(C);
-			B.norm(); F.norm();
-			B.mul(F);
-			this.x.copy(A); this.x.mul(B);
+			F.copy(B); F.sub(E);        //F=22224 
+			G.copy(B); G.add(E);        //G=22224
 
-			G.norm();
 			if (ROM_CURVE_ZZZ.CURVE_A==1)
 			{
-				E.norm(); C.copy(E); C.mul(G);
+				E.copy(D); E.sub(C);    //E=4
+			}
+			C.add(D);                   //C=4
+
+			B.copy(this.x); B.add(this.y);        //B=4
+			D.copy(Q.x); D.add(Q.y); B.norm(); D.norm(); //D=4
+			B.mul(D);                   //B=2  
+			B.sub(C); B.norm(); F.norm(); // B=6
+			B.mul(F);                     //B=2  
+			this.x.copy(A); this.x.mul(B); G.norm();  // x=2
+			if (ROM_CURVE_ZZZ.CURVE_A==1)
+			{
+				E.norm(); C.copy(E); C.mul(G);  //C=2
 			}
 			if (ROM_CURVE_ZZZ.CURVE_A==-1)
 			{
 				C.norm(); C.mul(G);
 			}
-			this.y.copy(A); this.y.mul(C);
-			this.z.copy(F); this.z.mul(G);
-		//	this.x.norm(); this.y.norm(); this.z.norm();
+			this.y.copy(A); this.y.mul(C);     //y=2
+			this.z.copy(F);   
+			this.z.mul(G);  
 		}
+
 		return;
 	},
 
@@ -580,9 +682,6 @@ w3.copy(this.x); w3.imul(4);
 
 		this.x.copy(A);
 		this.z.copy(W.x); this.z.mul(B);
-
-		if (this.z.iszilch()) this.inf();
-		else this.INF=false;
 
 	//	this.x.norm();
 	},
@@ -675,10 +774,6 @@ w3.copy(this.x); w3.imul(4);
 				W[i].add(Q);
 			}
 
-// convert the table to affine 
-			if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.WEIERSTRASS) 
-				ECP_ZZZ.multiaffine(8,W);
-
 // make exponent odd - add 2P if even, P if odd 
 			t.copy(e);
 			s=t.parity();
@@ -746,10 +841,6 @@ w3.copy(this.x); w3.imul(4);
 		W[4]=new ECP_ZZZ(); W[4].copy(W[5]); W[4].sub(S);
 		W[7]=new ECP_ZZZ(); W[7].copy(W[6]); W[7].add(S);
 
-// convert the table to affine 
-		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.WEIERSTRASS) 
-			ECP_ZZZ.multiaffine(8,W);
-
 // if multiplier is odd, add 2, else add 1 to multiplier, and add 2P or P to correction 
 
 		s=te.parity();
@@ -793,56 +884,6 @@ w3.copy(this.x); w3.imul(4);
 		return S;
 	}
 
-};
-
-ECP_ZZZ.multiaffine=function(m,P)
-{
-	var i;
-	var t1=new FP_YYY(0);
-	var t2=new FP_YYY(0);
-	var work=[];
-
-	for (i=0;i<m;i++)
-		work[i]=new FP_YYY(0);
-	
-	work[0].one();
-	work[1].copy(P[0].z);
-
-	for (i=2;i<m;i++)
-	{
-		work[i].copy(work[i-1]);
-		work[i].mul(P[i-1].z);
-	}
-
-	t1.copy(work[m-1]);
-	t1.mul(P[m-1].z);
-	t1.inverse();
-	t2.copy(P[m-1].z);
-	work[m-1].mul(t1);
-
-	for (i=m-2;;i--)
-	{
-		if (i==0)
-		{
-			work[0].copy(t1);
-			work[0].mul(t2);
-			break;
-		}
-		work[i].mul(t2);
-		work[i].mul(t1);
-		t2.mul(P[i].z);
-	}
-/* now work[] contains inverses of all Z coordinates */
-
-	for (i=0;i<m;i++)
-	{
-		P[i].z.one();
-		t1.copy(work[i]);
-		t1.sqr();
-		P[i].x.mul(t1);
-		t1.mul(work[i]);
-		P[i].y.mul(t1);
-	}    
 };
 
 /* return 1 if b==c, no branching */

@@ -45,20 +45,28 @@ final public class ECP {
     init()
     {
         x=FP(0)
-        y=FP(0)
-        z=FP(1)
+        y=FP(1)
+        z=FP(0)
         INF=true
     }
     
     /* test for O point-at-infinity */
     public func is_infinity() -> Bool
     {
+        if INF {return true}        
         if (ECP.CURVETYPE==ECP.EDWARDS)
         {
-            x.reduce(); y.reduce(); z.reduce()
             return x.iszilch() && y.equals(z)
         }
-        else {return INF}
+        if (ECP.CURVETYPE==ECP.WEIERSTRASS)
+        {
+            return x.iszilch() && z.iszilch()
+        }        
+        if (ECP.CURVETYPE==ECP.MONTGOMERY)     
+        {
+            return z.iszilch()
+        }   
+        return true
     }
  
     /* Conditional swap of P and Q dependant on d */
@@ -67,15 +75,13 @@ final public class ECP {
         x.cswap(Q.x,d);
         if ECP.CURVETYPE != ECP.MONTGOMERY {y.cswap(Q.y,d)}
         z.cswap(Q.z,d);
-        if (ECP.CURVETYPE != ECP.EDWARDS)
-        {
-            var bd:Bool
-            if d==0 {bd=false}
-            else {bd=true}
-            bd=bd && (INF != Q.INF)
-            INF = (INF != bd)
-            Q.INF = (Q.INF != bd)
-        }
+
+        var bd:Bool
+        if d==0 {bd=false}
+        else {bd=true}
+        bd=bd && (INF != Q.INF)
+        INF = (INF != bd)
+        Q.INF = (Q.INF != bd)
     }
     
     /* Conditional move of Q to P dependant on d */
@@ -84,13 +90,10 @@ final public class ECP {
         x.cmove(Q.x,d);
         if ECP.CURVETYPE != ECP.MONTGOMERY {y.cmove(Q.y,d)}
         z.cmove(Q.z,d);
-        if (ECP.CURVETYPE != ECP.EDWARDS)
-        {
-            var bd:Bool
-            if d==0 {bd=false}
-            else {bd=true}
-            INF = (INF != Q.INF) && bd;
-        }
+        var bd:Bool
+        if d==0 {bd=false}
+        else {bd=true}
+        INF = (INF != Q.INF) && bd;
     }
     
     /* return 1 if b==c, no branching */
@@ -111,12 +114,12 @@ final public class ECP {
     }
     /* self=-self */
     func neg() {
-        if is_infinity() {return}
-        if (ECP.CURVETYPE==ECP.WEIERSTRASS)
+    //    if is_infinity() {return}
+        if (ECP.CURVETYPE == ECP.WEIERSTRASS)
         {
             y.neg(); y.norm();
         }
-        if (ECP.CURVETYPE==ECP.EDWARDS)
+        if (ECP.CURVETYPE == ECP.EDWARDS)
         {
             x.neg(); x.norm();
         }
@@ -151,32 +154,17 @@ final public class ECP {
     {
         if (is_infinity() && Q.is_infinity()) {return true}
         if (is_infinity() || Q.is_infinity()) {return false}
-        if (ECP.CURVETYPE==ECP.WEIERSTRASS)
+ 
+        let a=FP(0)
+        let b=FP(0)
+        a.copy(x); a.mul(Q.z)
+        b.copy(Q.x); b.mul(z)
+        if !a.equals(b) {return false}
+        if ECP.CURVETYPE != ECP.MONTGOMERY
         {
-            let zs2=FP(z); zs2.sqr()
-            let zo2=FP(Q.z); zo2.sqr()
-            let zs3=FP(zs2); zs3.mul(z)
-            let zo3=FP(zo2); zo3.mul(Q.z)
-            zs2.mul(Q.x)
-            zo2.mul(x)
-            if !zs2.equals(zo2) {return false}
-            zs3.mul(Q.y)
-            zo3.mul(y)
-            if !zs3.equals(zo3) {return false}
-        }
-        else
-        {
-            let a=FP(0)
-            let b=FP(0)
-            a.copy(x); a.mul(Q.z); a.reduce()
-            b.copy(Q.x); b.mul(z); b.reduce()
-            if !a.equals(b) {return false}
-            if ECP.CURVETYPE==ECP.EDWARDS
-            {
-				a.copy(y); a.mul(Q.z); a.reduce()
-				b.copy(Q.y); b.mul(z); b.reduce()
-				if !a.equals(b) {return false}
-            }
+			a.copy(y); a.mul(Q.z); 
+			b.copy(Q.y); b.mul(z); 
+			if !a.equals(b) {return false}
         }
         return true
     }
@@ -186,8 +174,9 @@ final public class ECP {
     {
         INF=true;
         x.zero()
-        y.one()
-        z.one()
+        if ECP.CURVETYPE != ECP.MONTGOMERY {y.one()}
+        if ECP.CURVETYPE != ECP.EDWARDS {z.zero()}
+        else {z.one()}
     }
     
     /* Calculate RHS of curve equation */
@@ -197,7 +186,7 @@ final public class ECP {
         let r=FP(x);
         r.sqr();
     
-        if ECP.CURVETYPE==ECP.WEIERSTRASS
+        if ECP.CURVETYPE == ECP.WEIERSTRASS
         { // x^3+Ax+B
             let b=FP(BIG(ROM.CURVE_B))
             r.mul(x)
@@ -210,7 +199,7 @@ final public class ECP {
             }
             r.add(b);
         }
-        if (ECP.CURVETYPE==ECP.EDWARDS)
+        if (ECP.CURVETYPE == ECP.EDWARDS)
         { // (Ax^2-1)/(Bx^2-1)
             let b=FP(BIG(ROM.CURVE_B))
     
@@ -222,7 +211,7 @@ final public class ECP {
             b.inverse()
             r.mul(b);
         }
-        if ECP.CURVETYPE==ECP.MONTGOMERY
+        if ECP.CURVETYPE == ECP.MONTGOMERY
         { // x^3+Ax^2+x
             let x3=FP(0)
             x3.copy(r);
@@ -244,7 +233,7 @@ final public class ECP {
         INF=true
         let rhs=ECP.RHS(x);
     
-        if ECP.CURVETYPE==ECP.MONTGOMERY
+        if ECP.CURVETYPE == ECP.MONTGOMERY
         {
             if rhs.jacobi()==1 {INF=false}
             else {inf()}
@@ -296,24 +285,16 @@ final public class ECP {
     {
         if is_infinity() {return}
         let one=FP(1)
-        if (z.equals(one)) {return}
+        if (z.equals(one)) {
+            x.reduce(); y.reduce()
+            return
+        }
         z.inverse()
-        if ECP.CURVETYPE==ECP.WEIERSTRASS
+
+        x.mul(z); x.reduce()
+        if ECP.CURVETYPE != ECP.MONTGOMERY
         {
-            let z2=FP(z)
-            z2.sqr()
-            x.mul(z2); x.reduce()
-            y.mul(z2)
-            y.mul(z);  y.reduce()
-        }
-        if ECP.CURVETYPE==ECP.EDWARDS
-        {
-            x.mul(z); x.reduce()
             y.mul(z); y.reduce()
-        }
-        if ECP.CURVETYPE==ECP.MONTGOMERY
-        {
-            x.mul(z); x.reduce()
  
         }
         z.copy(one)
@@ -402,66 +383,112 @@ final public class ECP {
     /* self*=2 */
     func dbl()
     {
-        if (ECP.CURVETYPE==ECP.WEIERSTRASS)
+        if INF {return} 
+        if (ECP.CURVETYPE == ECP.WEIERSTRASS)
         {
-            if INF {return}
-            if y.iszilch()
+
+            if ROM.CURVE_A == 0
             {
-				inf()
-				return
+                let t0=FP(y)        
+                t0.sqr()
+                let t1=FP(y)
+                t1.mul(z);
+                let t2=FP(z)
+                t2.sqr()
+
+                z.copy(t0)
+                z.add(t0); z.norm() 
+                z.add(z); z.add(z); z.norm()
+                t2.imul(3*ROM.CURVE_B_I)
+
+                let x3=FP(t2)
+                x3.mul(z)
+
+                let y3=FP(t0)
+                y3.add(t2); y3.norm()
+                z.mul(t1)
+                t1.copy(t2); t1.add(t2); t2.add(t1)
+                t0.sub(t2); t0.norm(); y3.mul(t0); y3.add(x3)
+                t1.copy(x); t1.mul(y)
+                x.copy(t0); x.norm(); x.mul(t1); x.add(x)
+                x.norm()
+                y.copy(y3); y.norm()
             }
-    
-            let w1=FP(x)
-            let w6=FP(z)
-            let w2=FP(0)
-            let w3=FP(x)
-            let w8=FP(x)
-    
-            if (ROM.CURVE_A == -3)
-            {
-				w6.sqr()
-				w1.copy(w6)
-				w1.neg()
-				w3.add(w1)
-				w8.add(w6)
-                w3.norm(); w8.norm();
-				w3.mul(w8)
-				w8.copy(w3)
-				w8.imul(3)
+            else {
+                let t0=FP(x)
+                let t1=FP(y)
+                let t2=FP(z)
+                let t3=FP(x)
+                let z3=FP(z)
+                let y3=FP(0)
+                let x3=FP(0)
+                let b=FP(0)
+
+                if ROM.CURVE_B_I==0
+                {
+                    b.copy(FP(BIG(ROM.CURVE_B)))
+                }
+
+                t0.sqr()  //1    x^2
+                t1.sqr()  //2    y^2
+                t2.sqr()  //3
+
+                t3.mul(y) //4
+                t3.add(t3); t3.norm()//5
+                z3.mul(x)   //6
+                z3.add(z3);  z3.norm()//7
+                y3.copy(t2) 
+                
+                if ROM.CURVE_B_I==0 {
+                    y3.mul(b) //8
+                }
+                else { 
+                    y3.imul(ROM.CURVE_B_I)
+                }
+
+                y3.sub(z3) //y3.norm(); //9  ***
+                x3.copy(y3); x3.add(y3); x3.norm()//10
+
+                y3.add(x3) //y3.norm();//11
+                x3.copy(t1); x3.sub(y3); x3.norm()//12
+                y3.add(t1); y3.norm()//13
+                y3.mul(x3) //14
+                x3.mul(t3) //15
+                t3.copy(t2); t3.add(t2) //t3.norm(); //16
+                t2.add(t3) //t2.norm(); //17
+
+                if ROM.CURVE_B_I==0 {
+                    z3.mul(b) //18
+                }
+                else {
+                    z3.imul(ROM.CURVE_B_I)
+                }
+
+                z3.sub(t2) //z3.norm();//19
+                z3.sub(t0); z3.norm()//20  ***
+                t3.copy(z3); t3.add(z3) //t3.norm();//21
+
+                z3.add(t3); z3.norm() //22
+                t3.copy(t0); t3.add(t0) //t3.norm(); //23
+                t0.add(t3) //t0.norm();//24
+                t0.sub(t2); t0.norm()//25
+
+                t0.mul(z3)//26
+                y3.add(t0) //y3.norm();//27
+                t0.copy(y); t0.mul(z)//28
+                t0.add(t0); t0.norm() //29
+                z3.mul(t0)//30
+                x3.sub(z3) //x3.norm();//31
+                t0.add(t0); t0.norm()//32
+                t1.add(t1); t1.norm()//33
+                z3.copy(t0); z3.mul(t1)//34
+
+                x.copy(x3); x.norm()
+                y.copy(y3); y.norm()
+                z.copy(z3); z.norm()                
             }
-            else
-            {
-				w1.sqr()
-				w8.copy(w1)
-				w8.imul(3)
-            }
-    
-            w2.copy(y); w2.sqr()
-            w3.copy(x); w3.imul(4); w3.mul(w2)
-            
-            w1.copy(w3); w1.neg()
-            w1.norm()
-    
-            x.copy(w8); x.sqr()
-            x.add(w1)
-            x.add(w1)
-            x.norm()
-    
-            z.add(z); z.norm()
-            z.mul(y)
-            
-    
-            w2.add(w2); w2.norm()
-            w2.sqr()
-            w2.add(w2)
-            w3.sub(x); w3.norm()
-            y.copy(w8); y.mul(w3)
-            //w2.norm();
-            y.sub(w2)
-            y.norm()
-            z.norm()
         }
-        if ECP.CURVETYPE==ECP.EDWARDS
+        if ECP.CURVETYPE == ECP.EDWARDS
         {
             let C=FP(x)
             let D=FP(y)
@@ -481,20 +508,15 @@ final public class ECP {
             y.mul(C)
             z.mul(J)
     
-         //   x.norm();
-         //   y.norm();
-         //   z.norm();
         }
-        if ECP.CURVETYPE==ECP.MONTGOMERY
+        if ECP.CURVETYPE == ECP.MONTGOMERY
         {
             let A=FP(x)
             let B=FP(x);
             let AA=FP(0);
             let BB=FP(0);
             let C=FP(0);
-    
-            if INF {return}
-    
+        
             A.add(z); A.norm()
             AA.copy(A); AA.sqr()
             B.sub(z); B.norm()
@@ -507,8 +529,6 @@ final public class ECP {
     
             BB.add(A); BB.norm()
             z.copy(BB); z.mul(C)
-        //    x.norm()
-        //    z.norm()
         }
         return
     }
@@ -516,81 +536,158 @@ final public class ECP {
     /* self+=Q */
     func add(_ Q:ECP)
     {
-        if ECP.CURVETYPE==ECP.WEIERSTRASS
+        if (INF)
         {
-            if (INF)
-            {
-				copy(Q)
-				return
-            }
-            if Q.INF {return}
-    
-            var aff=false;
-    
-            let one=FP(1);
-            if Q.z.equals(one) {aff=true}
-    
-            var A:FP
-            var C:FP
-            let B=FP(z)
-            let D=FP(z)
-            if (!aff)
-            {
-				A=FP(Q.z)
-				C=FP(Q.z)
-    
-				A.sqr(); B.sqr()
-				C.mul(A); D.mul(B)
-    
-				A.mul(x)
-				C.mul(y)
-            }
-            else
-            {
-				A=FP(x)
-				C=FP(y)
-    
-				B.sqr()
-				D.mul(B)
-            }
-    
-            B.mul(Q.x); B.sub(A)
-            D.mul(Q.y); D.sub(C)
-    
-            if B.iszilch()
-            {
-				if (D.iszilch())
-				{
-                    dbl()
-                    return
-				}
-				else
-				{
-                    INF=true
-                    return
-				}
-            }
-    
-            if !aff {z.mul(Q.z)}
-            z.mul(B);
-    
-            let e=FP(B); e.sqr()
-            B.mul(e)
-            A.mul(e)
-    
-            e.copy(A)
-            e.add(A); e.add(B); e.norm(); D.norm()
-            x.copy(D); x.sqr(); x.sub(e)
-    
-            A.sub(x); A.norm()
-            y.copy(A); y.mul(D)
-            C.mul(B); y.sub(C)
-    
-            x.norm()
-            y.norm()
-        //    z.norm()
+            copy(Q)
+            return
         }
-        if ECP.CURVETYPE==ECP.EDWARDS
+        if Q.INF {return}
+
+        if ECP.CURVETYPE == ECP.WEIERSTRASS
+        {
+
+                if ROM.CURVE_A == 0
+                {
+                    let b=3*ROM.CURVE_B_I
+                    let t0=FP(x)
+                    t0.mul(Q.x)
+                    let t1=FP(y)
+                    t1.mul(Q.y)
+                    let t2=FP(z)
+                    t2.mul(Q.z)
+                    let t3=FP(x)
+                    t3.add(y); t3.norm()
+                    let t4=FP(Q.x)
+                    t4.add(Q.y); t4.norm()
+                    t3.mul(t4)
+                    t4.copy(t0); t4.add(t1)
+
+                    t3.sub(t4); t3.norm()
+                    t4.copy(y)
+                    t4.add(z); t4.norm()
+                    let x3=FP(Q.y)
+                    x3.add(Q.z); x3.norm()
+
+                    t4.mul(x3)
+                    x3.copy(t1)
+                    x3.add(t2)
+    
+                    t4.sub(x3); t4.norm()
+                    x3.copy(x); x3.add(z); x3.norm()
+                    let y3=FP(Q.x)
+                    y3.add(Q.z); y3.norm()
+                    x3.mul(y3)
+                    y3.copy(t0)
+                    y3.add(t2)
+                    y3.rsub(x3); y3.norm()
+                    x3.copy(t0); x3.add(t0)
+                    t0.add(x3); t0.norm()
+                    t2.imul(b);
+
+                    let z3=FP(t1); z3.add(t2); z3.norm()
+                    t1.sub(t2); t1.norm()
+                    y3.imul(b)
+    
+                    x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2)
+                    y3.mul(t0); t1.mul(z3); y3.add(t1)
+                    t0.mul(t3); z3.mul(t4); z3.add(t0)
+
+                    x.copy(x3); x.norm() 
+                    y.copy(y3); y.norm()
+                    z.copy(z3); z.norm()
+                } 
+                else {
+
+                    let t0=FP(x)
+                    let t1=FP(y)
+                    let t2=FP(z)
+                    let t3=FP(x)
+                    let t4=FP(Q.x)
+                    let z3=FP(0)
+                    let y3=FP(Q.x)
+                    let x3=FP(Q.y)
+                    let b=FP(0)
+
+                    if ROM.CURVE_B_I==0
+                    {
+                        b.copy(FP(BIG(ROM.CURVE_B)))
+                    }
+
+                    t0.mul(Q.x) //1
+                    t1.mul(Q.y) //2
+                    t2.mul(Q.z) //3
+
+                    t3.add(y); t3.norm() //4
+                    t4.add(Q.y); t4.norm()//5
+                    t3.mul(t4)//6
+                    t4.copy(t0); t4.add(t1) //t4.norm(); //7
+                    t3.sub(t4); t3.norm() //8
+                    t4.copy(y); t4.add(z); t4.norm()//9
+                    x3.add(Q.z); x3.norm()//10
+                    t4.mul(x3) //11
+                    x3.copy(t1); x3.add(t2) //x3.norm();//12
+
+                    t4.sub(x3); t4.norm()//13
+                    x3.copy(x); x3.add(z); x3.norm() //14
+                    y3.add(Q.z); y3.norm()//15
+
+                    x3.mul(y3) //16
+                    y3.copy(t0); y3.add(t2) //y3.norm();//17
+
+                    y3.rsub(x3); y3.norm() //18
+                    z3.copy(t2)
+                
+
+                    if ROM.CURVE_B_I==0
+                    {
+                        z3.mul(b) //18
+                    }
+                    else {
+                        z3.imul(ROM.CURVE_B_I)
+                    }
+                
+                    x3.copy(y3); x3.sub(z3); x3.norm() //20
+                    z3.copy(x3); z3.add(x3) //z3.norm(); //21
+
+                    x3.add(z3) //x3.norm(); //22
+                    z3.copy(t1); z3.sub(x3); z3.norm() //23
+                    x3.add(t1); x3.norm() //24
+
+                    if ROM.CURVE_B_I==0
+                    {
+                        y3.mul(b) //18
+                    }
+                    else {
+                        y3.imul(ROM.CURVE_B_I)
+                    }
+
+                    t1.copy(t2); t1.add(t2) //t1.norm();//26
+                    t2.add(t1) //t2.norm();//27
+
+                    y3.sub(t2) //y3.norm(); //28
+
+                    y3.sub(t0); y3.norm() //29
+                    t1.copy(y3); t1.add(y3) //t1.norm();//30
+                    y3.add(t1); y3.norm() //31
+
+                    t1.copy(t0); t1.add(t0) //t1.norm(); //32
+                    t0.add(t1) //t0.norm();//33
+                    t0.sub(t2); t0.norm()//34
+                    t1.copy(t4); t1.mul(y3)//35
+                    t2.copy(t0); t2.mul(y3)//36
+                    y3.copy(x3); y3.mul(z3)//37
+                    y3.add(t2) //y3.norm();//38
+                    x3.mul(t3)//39
+                    x3.sub(t1)//40
+                    z3.mul(t4)//41
+                    t1.copy(t3); t1.mul(t0)//42
+                    z3.add(t1)
+                    x.copy(x3); x.norm() 
+                    y.copy(y3); y.norm()
+                    z.copy(z3); z.norm()
+                }
+        }
+        if ECP.CURVETYPE == ECP.EDWARDS
         {
             let b=FP(BIG(ROM.CURVE_B))
             let A=FP(z)
@@ -634,7 +731,7 @@ final public class ECP {
             }
             y.copy(A); y.mul(C)
             z.copy(F); z.mul(G)
-            //x.norm(); //y.norm(); //z.norm()
+
         }
         return;
     }
@@ -654,20 +751,21 @@ final public class ECP {
     
         C.add(Q.z)
         D.sub(Q.z)
+        A.norm()
     
+        D.norm()
         DA.copy(D); DA.mul(A)
+
+        C.norm();
+        B.norm();        
         CB.copy(C); CB.mul(B)
         
-        A.copy(DA); A.add(CB); A.sqr()
-        B.copy(DA); B.sub(CB); B.sqr()
+        A.copy(DA); A.add(CB); A.norm(); A.sqr()
+        B.copy(DA); B.sub(CB); B.norm(); B.sqr()
     
         x.copy(A)
         z.copy(W.x); z.mul(B)
-    
-        if z.iszilch() {inf()}
-        else {INF=false}
-    
-        x.norm()
+
     }
     /* this-=Q */
     func sub(_ Q:ECP)
@@ -676,60 +774,11 @@ final public class ECP {
         add(Q)
         Q.neg()
     }
-    static func multiaffine(_ m: Int,_ P:[ECP])
-    {
-        let t1=FP(0)
-        let t2=FP(0)
-    
-        var work=[FP]()
-        
-        for _ in 0 ..< m
-            {work.append(FP(0))}
-    
-        work[0].one()
-        work[1].copy(P[0].z)
-    
-        for i in 2 ..< m
-        {
-            work[i].copy(work[i-1])
-            work[i].mul(P[i-1].z)
-        }
-    
-        t1.copy(work[m-1]);
-        t1.mul(P[m-1].z);
-        t1.inverse();
-        t2.copy(P[m-1].z);
-        work[m-1].mul(t1);
-        var i=m-2;
-        while (true)
-        {
-            if i==0
-            {
-				work[0].copy(t1)
-				work[0].mul(t2)
-				break
-            }
-            work[i].mul(t2);
-            work[i].mul(t1);
-            t2.mul(P[i].z);
-            i=i-1;
-        }
-    /* now work[] contains inverses of all Z coordinates */
-    
-        for i in 0 ..< m
-        {
-            P[i].z.one();
-            t1.copy(work[i]);
-            t1.sqr();
-            P[i].x.mul(t1);
-            t1.mul(work[i]);
-            P[i].y.mul(t1);
-        }
-    }
+
     /* constant time multiply by small integer of length bts - use ladder */
     func pinmul(_ e:Int32,_ bts:Int32) -> ECP
     {
-        if ECP.CURVETYPE==ECP.MONTGOMERY
+        if ECP.CURVETYPE == ECP.MONTGOMERY
             {return self.mul(BIG(Int(e)))}
         else
         {
@@ -760,7 +809,7 @@ final public class ECP {
         if (e.iszilch() || is_infinity()) {return ECP()}
     
         let P=ECP()
-        if ECP.CURVETYPE==ECP.MONTGOMERY
+        if ECP.CURVETYPE == ECP.MONTGOMERY
         {
             /* use Ladder */
             let D=ECP()
@@ -809,10 +858,6 @@ final public class ECP {
 				W[i].copy(W[i-1])
 				W[i].add(Q)
             }
-    
-    // convert the table to affine
-            if ECP.CURVETYPE==ECP.WEIERSTRASS
-                {ECP.multiaffine(8,W)}
     
     // make exponent odd - add 2P if even, P if odd
             t.copy(e);
@@ -884,9 +929,6 @@ final public class ECP {
         W[4].copy(W[5]); W[4].sub(S)
         W[7].copy(W[6]); W[7].add(S)
     
-    // convert the table to affine
-        if ECP.CURVETYPE==ECP.WEIERSTRASS
-            {ECP.multiaffine(8,W)}
     
     // if multiplier is odd, add 2, else add 1 to multiplier, and add 2P or P to correction
     

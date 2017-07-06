@@ -20,13 +20,17 @@ under the License.
 use c25519::big::NLEN;
 use arch::Chunk;
 
+// Base Bits= 56
 // Curve25519 Modulus
 pub const MODULUS:[Chunk;NLEN]=[0xFFFFFFFFFFFFED,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0x7FFFFFFF];
-pub const MCONST:Chunk=19;
+pub const R2MODP:[Chunk;NLEN]=[0xA4000000000000,0x5,0x0,0x0,0x0];
+pub const MCONST:Chunk=0x13;
 
 // c25519 Curve
 pub const CURVE_A:isize = 486662;
+pub const CURVE_B_I:isize = 0;
 pub const CURVE_B:[Chunk;NLEN]=[0x0,0x0,0x0,0x0,0x0];
 pub const CURVE_ORDER:[Chunk;NLEN]=[0x12631A5CF5D3ED,0xF9DEA2F79CD658,0x14DE,0x0,0x10000000];
 pub const CURVE_GX:[Chunk;NLEN]=[0x9,0x0,0x0,0x0,0x0];
 pub const CURVE_GY:[Chunk;NLEN]=[0x0,0x0,0x0,0x0,0x0];
+

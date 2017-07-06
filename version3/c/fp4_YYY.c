@@ -284,7 +284,7 @@ FP2_YYY_norm(&t1);
 /* SU= 200 */
 void FP4_YYY_times_i(FP4_YYY *w)
 {
-    BIG_XXX z;
+    FP_YYY z;
     FP2_YYY s,t;
 
 //    FP4_YYY_norm(w);
@@ -292,9 +292,9 @@ void FP4_YYY_times_i(FP4_YYY *w)
 
     FP2_YYY_copy(&s,&t);
 
-    BIG_XXX_copy(z,s.a);
-    FP_YYY_neg(s.a,s.b);
-    BIG_XXX_copy(s.b,z);
+    FP_YYY_copy(&z,&(s.a));
+    FP_YYY_neg(&(s.a),&(s.b));
+    FP_YYY_copy(&(s.b),&z);
 
     FP2_YYY_add(&t,&t,&s);
 

@@ -40,6 +40,9 @@ public class BIG {
 
 
 	protected int[] w=new int[NLEN];
+
+
+
 /* Constructors */
 
 	public BIG()
@@ -186,7 +189,6 @@ public class BIG {
 		int ak,carry=0;
 		int[] cr=new int[2];
 
-//		norm();
 		for (int i=0;i<NLEN;i++)
 		{
 			ak=w[i];
@@ -252,12 +254,11 @@ public class BIG {
 	}
 
 /* return a*b as DBIG */
+/* Inputs must be normed */
 	public static DBIG mul(BIG a,BIG b)
 	{
 		long t,co;
 		DBIG c=new DBIG(0);
-	//	a.norm();
-	//	b.norm();
 
 		long[] d=new long[NLEN];
 		long s;
@@ -283,13 +284,12 @@ public class BIG {
 	}
 
 /* return a^2 as DBIG */
+/* Input must be normed */
 	public static DBIG sqr(BIG a)
 	{
 		int i,j,last;
 		long t,co;
 		DBIG c=new DBIG(0);
-	//	a.norm();
-
 
 		t=(long)a.w[0]*a.w[0]; 
 		c.w[0]=(int)t&BMASK; co=t>>BASEBITS;
@@ -350,7 +350,6 @@ public class BIG {
 			b.w[k-NLEN]=(int)t&BMASK; c=(t>>BASEBITS)+d.w[k+1]; s-=dd[k-NLEN+1];
 		}
 		b.w[NLEN-1]=(int)c&BMASK;	
-	//	b.norm();
 		return b;		
 	}
 
@@ -621,7 +620,7 @@ public class BIG {
 
 		for (i=8;i<BIGBITS;i<<=1)
 		{
-		U.norm();
+			U.norm();
 			b.copy(this); b.mod2m(i);
 			BIG t1=BIG.smul(U,b); 
 			t1.shr(i);
@@ -631,7 +630,7 @@ public class BIG {
 			BIG t2=BIG.smul(U,c); t2.mod2m(i);
 
 			t1.add(t2);
-		t1.norm();
+			t1.norm();
 			b=BIG.smul(t1,U); t1.copy(b);
 			t1.mod2m(i);
 
@@ -667,12 +666,6 @@ public class BIG {
 			r.sub(m);
 			r.norm();
 			cmove(r,(int)(1-((r.w[NLEN-1]>>(CHUNK-1))&1)));
-/*
-			if (comp(this,m)>=0)
-			{
-				sub(m);
-				norm();
-			} */
 			k--;
 		}
 	}
@@ -708,15 +701,6 @@ public class BIG {
 			r.add(e);
 			r.norm();
 			cmove(r,d);
-
-/*
-			if (comp(b,m)>=0)
-			{
-				add(e);
-				norm();
-				b.sub(m);
-				b.norm();
-			} */
 			k--;
 		}
 	}

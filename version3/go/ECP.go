@@ -43,7 +43,7 @@ type ECP struct {
 func NewECP() *ECP {
 	E:=new(ECP)
 	E.x=NewFPint(0)
-	E.y=NewFPint(0)
+	E.y=NewFPint(1)
 	E.z=NewFPint(0)
 	E.INF=true
 	return E
@@ -103,10 +103,20 @@ func NewECPbig(ix *BIG) *ECP {
 
 /* test for O point-at-infinity */
 func (E *ECP) Is_infinity() bool {
+	if E.INF {return true}
+	E.x.reduce(); E.z.reduce()
 	if CURVETYPE==EDWARDS {
-		E.x.reduce(); E.y.reduce(); E.z.reduce()
-		return (E.x.iszilch() && E.y.equals(E.z))
-	} else {return E.INF}
+		E.y.reduce();
+		E.INF=(E.x.iszilch() && E.y.equals(E.z))
+	} 
+	if CURVETYPE==WEIERSTRASS {
+		E.y.reduce();
+		E.INF=(E.x.iszilch() && E.z.iszilch())
+	}
+	if CURVETYPE==MONTGOMERY {
+		E.INF=E.z.iszilch()
+	}
+	return E.INF
 }
 
 /* Conditional swap of P and Q dependant on d */
@@ -114,13 +124,13 @@ func (E *ECP) cswap(Q *ECP,d int) {
 	E.x.cswap(Q.x,d)
 	if CURVETYPE!=MONTGOMERY {E.y.cswap(Q.y,d)}
 	E.z.cswap(Q.z,d)
-	if CURVETYPE!=EDWARDS {
-		bd:=true
-		if d==0 {bd=false}
-		bd=bd&&(E.INF!=Q.INF)
-		E.INF=(bd!=E.INF)
-		Q.INF=(bd!=Q.INF)
-	}
+
+	bd:=true
+	if d==0 {bd=false}
+	bd=bd&&(E.INF!=Q.INF)
+	E.INF=(bd!=E.INF)
+	Q.INF=(bd!=Q.INF)
+
 }
 
 /* Conditional move of Q to P dependant on d */
@@ -128,11 +138,10 @@ func (E *ECP) cmove(Q *ECP,d int) {
 	E.x.cmove(Q.x,d)
 	if CURVETYPE!=MONTGOMERY {E.y.cmove(Q.y,d)}
 	E.z.cmove(Q.z,d);
-	if CURVETYPE!=EDWARDS {
-		bd:=true
-		if d==0 {bd=false}
-		E.INF=(E.INF!=((E.INF!=Q.INF)&&bd))
-	}
+
+	bd:=true
+	if d==0 {bd=false}
+	E.INF=(E.INF!=((E.INF!=Q.INF)&&bd))
 }
 
 /* return 1 if b==c, no branching */
@@ -152,7 +161,7 @@ func (E *ECP) Copy(P *ECP) {
 
 /* this=-this */
 func (E *ECP) neg() {
-	if E.Is_infinity() {return}
+//	if E.Is_infinity() {return}
 	if CURVETYPE==WEIERSTRASS {
 		E.y.neg(); E.y.norm()
 	}
@@ -188,37 +197,28 @@ func (E *ECP) selector(W []*ECP,b int32) {
 func (E *ECP) inf() {
 	E.INF=true;
 	E.x.zero()
-	E.y.one()
-	E.z.one()
+	if CURVETYPE!=MONTGOMERY {E.y.one()}
+	if CURVETYPE!=EDWARDS {
+		E.z.zero()
+	} else {E.z.one()}
 }
 
 /* Test P == Q */
 func( E *ECP) equals(Q *ECP) bool {
 	if E.Is_infinity() && Q.Is_infinity() {return true}
 	if E.Is_infinity() || Q.Is_infinity() {return false}
-	if CURVETYPE==WEIERSTRASS {
-		zs2:=NewFPcopy(E.z); zs2.sqr()
-		zo2:=NewFPcopy(Q.z); zo2.sqr()
-		zs3:=NewFPcopy(zs2); zs3.mul(E.z)
-		zo3:=NewFPcopy(zo2); zo3.mul(Q.z)
-		zs2.mul(Q.x)
-		zo2.mul(E.x)
-		if !zs2.equals(zo2) {return false}
-		zs3.mul(Q.y)
-		zo3.mul(E.y)
-		if !zs3.equals(zo3) {return false}
-	} else {
-		a:=NewFPint(0)
-		b:=NewFPint(0)
-		a.copy(E.x); a.mul(Q.z); a.reduce()
-		b.copy(Q.x); b.mul(E.z); b.reduce()
+
+	a:=NewFPint(0)
+	b:=NewFPint(0)
+	a.copy(E.x); a.mul(Q.z); a.reduce()
+	b.copy(Q.x); b.mul(E.z); b.reduce()
+	if !a.equals(b) {return false}
+	if CURVETYPE!=MONTGOMERY {
+		a.copy(E.y); a.mul(Q.z); a.reduce()
+		b.copy(Q.y); b.mul(E.z); b.reduce()
 		if !a.equals(b) {return false}
-		if CURVETYPE==EDWARDS {
-			a.copy(E.y); a.mul(Q.z); a.reduce()
-			b.copy(Q.y); b.mul(E.z); b.reduce()
-			if !a.equals(b) {return false}
-		}
 	}
+
 	return true
 }
 
@@ -268,21 +268,12 @@ func (E *ECP) affine() {
 	one:=NewFPint(1)
 	if E.z.equals(one) {return}
 	E.z.inverse()
-	if CURVETYPE==WEIERSTRASS {
-		z2:=NewFPcopy(E.z)
-		z2.sqr()
-		E.x.mul(z2); E.x.reduce()
-		E.y.mul(z2)
-		E.y.mul(E.z);  E.y.reduce()
-	}
-	if CURVETYPE==EDWARDS {
-		E.x.mul(E.z); E.x.reduce()
+	E.x.mul(E.z); E.x.reduce()
+
+	if CURVETYPE!=MONTGOMERY {
 		E.y.mul(E.z); E.y.reduce()
 	}
-	if CURVETYPE==MONTGOMERY {
-		E.x.mul(E.z); E.x.reduce()
-	}
-	E.z.one()
+	E.z.copy(one)
 }
 
 /* extract x as a BIG */
@@ -361,69 +352,104 @@ func (E *ECP) toString() string {
 
 /* this*=2 */
 func (E *ECP) dbl() {
+
+	if E.INF {return}
 	if CURVETYPE==WEIERSTRASS {
-		if E.INF {return}
-		if E.y.iszilch() {
-			E.inf()
-			return
-		}
+		if CURVE_A==0 {
+			t0:=NewFPcopy(E.y)                      /*** Change ***/    // Edits made
+			t0.sqr()
+			t1:=NewFPcopy(E.y)
+			t1.mul(E.z)
+			t2:=NewFPcopy(E.z)
+			t2.sqr()
 
-		w1:=NewFPcopy(E.x);
-		w6:=NewFPcopy(E.z);
-		w2:=NewFPint(0);
-		w3:=NewFPcopy(E.x)
-		w8:=NewFPcopy(E.x)
+			E.z.copy(t0)
+			E.z.add(t0); E.z.norm(); 
+			E.z.add(E.z); E.z.add(E.z); E.z.norm()
+			t2.imul(3*CURVE_B_I)
 
-		if CURVE_A==-3 {
-			w6.sqr()
-			w1.copy(w6)
-			w1.neg()
-			w3.add(w1)
+			x3:=NewFPcopy(t2)
+			x3.mul(E.z)
 
-			w8.add(w6)
-			w3.norm(); w8.norm()
-			w3.mul(w8)
-			w8.copy(w3)
-			w8.imul(3)
+			y3:=NewFPcopy(t0)
+			y3.add(t2); y3.norm()
+			E.z.mul(t1)
+			t1.copy(t2); t1.add(t2); t2.add(t1)
+			t0.sub(t2); t0.norm(); y3.mul(t0); y3.add(x3)
+			t1.copy(E.x); t1.mul(E.y) 
+			E.x.copy(t0); E.x.norm(); E.x.mul(t1); E.x.add(E.x)
+			E.x.norm(); 
+			E.y.copy(y3); E.y.norm();
 		} else {
-			w1.sqr()
-			w8.copy(w1)
-			w8.imul(3)
+			t0:=NewFPcopy(E.x)
+			t1:=NewFPcopy(E.y)
+			t2:=NewFPcopy(E.z)
+			t3:=NewFPcopy(E.x)
+			z3:=NewFPcopy(E.z)
+			y3:=NewFPint(0)
+			x3:=NewFPint(0)
+			b:=NewFPint(0)
+
+			if CURVE_B_I==0 {b.copy(NewFPbig(NewBIGints(CURVE_B)))}
+
+			t0.sqr()  //1    x^2
+			t1.sqr()  //2    y^2
+			t2.sqr()  //3
+
+			t3.mul(E.y) //4
+			t3.add(t3); t3.norm() //5
+			z3.mul(E.x);   //6
+			z3.add(z3);  z3.norm()//7
+			y3.copy(t2) 
+				
+			if CURVE_B_I==0 {
+				y3.mul(b)
+			} else {
+				y3.imul(CURVE_B_I)
+			}
+				
+			y3.sub(z3) //y3.norm(); //9  ***
+			x3.copy(y3); x3.add(y3); x3.norm() //10
+
+			y3.add(x3) //y3.norm();//11
+			x3.copy(t1); x3.sub(y3); x3.norm() //12
+			y3.add(t1); y3.norm() //13
+			y3.mul(x3)  //14
+			x3.mul(t3)  //15
+			t3.copy(t2); t3.add(t2)  //t3.norm(); //16
+			t2.add(t3)  //t2.norm(); //17
+
+			if CURVE_B_I==0 {
+				z3.mul(b)
+			} else {
+				z3.imul(CURVE_B_I)
+			}
+
+			z3.sub(t2) //z3.norm();//19
+			z3.sub(t0); z3.norm()//20  ***
+			t3.copy(z3); t3.add(z3) //t3.norm();//21
+
+			z3.add(t3); z3.norm()  //22
+			t3.copy(t0); t3.add(t0)  //t3.norm(); //23
+			t0.add(t3)  //t0.norm();//24
+			t0.sub(t2); t0.norm() //25
+
+			t0.mul(z3) //26
+			y3.add(t0) //y3.norm();//27
+			t0.copy(E.y); t0.mul(E.z)//28
+			t0.add(t0); t0.norm() //29
+			z3.mul(t0)//30
+			x3.sub(z3) //x3.norm();//31
+			t0.add(t0); t0.norm() //32
+			t1.add(t1); t1.norm() //33
+			z3.copy(t0); z3.mul(t1) //34
+
+			E.x.copy(x3); E.x.norm() 
+			E.y.copy(y3); E.y.norm()
+			E.z.copy(z3); E.z.norm()
 		}
-
-		w2.copy(E.y); w2.sqr()
-
-	w3.copy(E.x); w3.imul(4);
-
-	//	w3.copy(E.x); 
-		w3.mul(w2)
-	//	w3.imul(4); //w3.norm()
-		w1.copy(w3); w1.neg()
-		w1.norm(); //w8.norm()
-
-
-		E.x.copy(w8); E.x.sqr()
-		E.x.add(w1)
-		E.x.add(w1)
-	
-		E.x.norm()
-
-		E.z.add(E.z); E.z.norm()
-		E.z.mul(E.y)
-		
-
-		w2.add(w2); w2.norm()
-		w2.sqr()
-		w2.add(w2)
-		w3.sub(E.x); w3.norm()
-		E.y.copy(w8); E.y.mul(w3);
-	//		w2.norm();
-		E.y.sub(w2)
-
-		E.y.norm()
-		E.z.norm()
-
 	}
+
 	if CURVETYPE==EDWARDS {
 		C:=NewFPcopy(E.x)
 		D:=NewFPcopy(E.y)
@@ -435,7 +461,7 @@ func (E *ECP) dbl() {
 		D.sqr()
 		if CURVE_A==-1 {C.neg()}	
 		E.y.copy(C); E.y.add(D); E.y.norm()
-	//		y.norm();
+
 		H.sqr(); H.add(H)
 		E.z.copy(E.y)
 		J.copy(E.y); J.sub(H); J.norm()
@@ -444,9 +470,7 @@ func (E *ECP) dbl() {
 		E.y.mul(C)
 		E.z.mul(J)
 
-	//	E.x.norm()
-	//	E.y.norm()
-	//	E.z.norm()
+
 	}
 	if CURVETYPE==MONTGOMERY {
 		A:=NewFPcopy(E.x)
@@ -470,83 +494,151 @@ func (E *ECP) dbl() {
 
 		BB.add(A); BB.norm()
 		E.z.copy(BB); E.z.mul(C)
-	//		x.reduce();
-	//		z.reduce();
-	//	E.x.norm()
-	//	E.z.norm()
 	}
 	return;
 }
 
 /* this+=Q */
 func (E *ECP) add(Q *ECP) {
+
+	if E.INF {
+		E.Copy(Q)
+		return
+	}
+	if Q.INF {return}
+
 	if CURVETYPE==WEIERSTRASS {
-		if E.INF {
-			E.Copy(Q)
-			return
-		}
-		if Q.INF {return}
+		if CURVE_A==0 {
+			b:=3*CURVE_B_I
+			t0:=NewFPcopy(E.x)
+			t0.mul(Q.x)
+			t1:=NewFPcopy(E.y)
+			t1.mul(Q.y)
+			t2:=NewFPcopy(E.z)
+			t2.mul(Q.z)
+			t3:=NewFPcopy(E.x)
+			t3.add(E.y); t3.norm()
+			t4:=NewFPcopy(Q.x)
+			t4.add(Q.y); t4.norm()
+			t3.mul(t4)
+			t4.copy(t0); t4.add(t1)
 
-		aff:=false
+			t3.sub(t4); t3.norm()
+			t4.copy(E.y)
+			t4.add(E.z); t4.norm()
+			x3:=NewFPcopy(Q.y)
+			x3.add(Q.z); x3.norm()
 
-		one:=NewFPint(1)
-		if Q.z.equals(one) {aff=true}
-
-		var A,C *FP
-		B:=NewFPcopy(E.z)
-		D:=NewFPcopy(E.z)
-		if !aff {
-			A=NewFPcopy(Q.z)
-			C=NewFPcopy(Q.z)
-
-			A.sqr(); B.sqr()
-			C.mul(A); D.mul(B)
-
-			A.mul(E.x)
-			C.mul(E.y)
-		} else {
-			A=NewFPcopy(E.x)
-			C=NewFPcopy(E.y)
+			t4.mul(x3)
+			x3.copy(t1)
+			x3.add(t2)
 	
-			B.sqr()
-			D.mul(B)
-		}
+			t4.sub(x3); t4.norm()
+			x3.copy(E.x); x3.add(E.z); x3.norm()
+			y3:=NewFPcopy(Q.x)
+			y3.add(Q.z); y3.norm()
+			x3.mul(y3)
+			y3.copy(t0)
+			y3.add(t2)
+			y3.rsub(x3); y3.norm()
+			x3.copy(t0); x3.add(t0) 
+			t0.add(x3); t0.norm()
+			t2.imul(b)
 
-		B.mul(Q.x); B.sub(A)
-		D.mul(Q.y); D.sub(C)
+			z3:=NewFPcopy(t1); z3.add(t2); z3.norm()
+			t1.sub(t2); t1.norm() 
+			y3.imul(b)
+	
+			x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2)
+			y3.mul(t0); t1.mul(z3); y3.add(t1)
+			t0.mul(t3); z3.mul(t4); z3.add(t0)
 
-		if B.iszilch() {
-			if D.iszilch() {
-				E.dbl()
-				return
+			E.x.copy(x3); E.x.norm()
+			E.y.copy(y3); E.y.norm()
+			E.z.copy(z3); E.z.norm()	
+		} else {
+
+			t0:=NewFPcopy(E.x)
+			t1:=NewFPcopy(E.y)
+			t2:=NewFPcopy(E.z)
+			t3:=NewFPcopy(E.x)
+			t4:=NewFPcopy(Q.x)
+			z3:=NewFPint(0)
+			y3:=NewFPcopy(Q.x)
+			x3:=NewFPcopy(Q.y)
+			b:=NewFPint(0)
+
+			if CURVE_B_I==0 {b.copy(NewFPbig(NewBIGints(CURVE_B)))}
+
+			t0.mul(Q.x) //1
+			t1.mul(Q.y) //2
+			t2.mul(Q.z) //3
+
+			t3.add(E.y); t3.norm() //4
+			t4.add(Q.y); t4.norm() //5
+			t3.mul(t4) //6
+			t4.copy(t0); t4.add(t1) //t4.norm(); //7
+			t3.sub(t4); t3.norm() //8
+			t4.copy(E.y); t4.add(E.z); t4.norm() //9
+			x3.add(Q.z); x3.norm() //10
+			t4.mul(x3) //11
+			x3.copy(t1); x3.add(t2) //x3.norm();//12
+
+			t4.sub(x3); t4.norm() //13
+			x3.copy(E.x); x3.add(E.z); x3.norm() //14
+			y3.add(Q.z); y3.norm() //15
+
+			x3.mul(y3) //16
+			y3.copy(t0); y3.add(t2) //y3.norm();//17
+
+			y3.rsub(x3); y3.norm() //18
+			z3.copy(t2) 
+				
+			if CURVE_B_I==0 {
+				z3.mul(b)
 			} else {
-				E.INF=true
-				return
+				z3.imul(CURVE_B_I)
 			}
+				
+			x3.copy(y3); x3.sub(z3); x3.norm() //20
+			z3.copy(x3); z3.add(x3) //z3.norm(); //21
+
+			x3.add(z3) //x3.norm(); //22
+			z3.copy(t1); z3.sub(x3); z3.norm() //23
+			x3.add(t1); x3.norm() //24
+
+			if CURVE_B_I==0 {
+				y3.mul(b)
+			} else {
+				y3.imul(CURVE_B_I)
+			}
+
+			t1.copy(t2); t1.add(t2); //t1.norm();//26
+			t2.add(t1) //t2.norm();//27
+
+			y3.sub(t2) //y3.norm(); //28
+
+			y3.sub(t0); y3.norm() //29
+			t1.copy(y3); t1.add(y3) //t1.norm();//30
+			y3.add(t1); y3.norm() //31
+
+			t1.copy(t0); t1.add(t0) //t1.norm(); //32
+			t0.add(t1) //t0.norm();//33
+			t0.sub(t2); t0.norm() //34
+			t1.copy(t4); t1.mul(y3) //35
+			t2.copy(t0); t2.mul(y3) //36
+			y3.copy(x3); y3.mul(z3) //37
+			y3.add(t2) //y3.norm();//38
+			x3.mul(t3) //39
+			x3.sub(t1) //40
+			z3.mul(t4) //41
+			t1.copy(t3); t1.mul(t0) //42
+			z3.add(t1) 
+			E.x.copy(x3); E.x.norm() 
+			E.y.copy(y3); E.y.norm()
+			E.z.copy(z3); E.z.norm()
+
 		}
-
-		if !aff {E.z.mul(Q.z)}
-		E.z.mul(B)
-
-		e:=NewFPcopy(B); e.sqr()
-		B.mul(e)
-		A.mul(e)
-
-		e.copy(A)
-		e.add(A); e.add(B)
-		D.norm(); e.norm()
-		E.x.copy(D); E.x.sqr(); E.x.sub(e);
-
-		A.sub(E.x); A.norm()
-		E.y.copy(A); E.y.mul(D)
-		C.mul(B); E.y.sub(C)
-
-		//	x.reduce();
-		//	y.reduce();
-		//	z.reduce();
-		E.x.norm()
-		E.y.norm()
-	//	E.z.norm()
 	}
 	if CURVETYPE==EDWARDS {
 		b:=NewFPbig(NewBIGints(CURVE_B))
@@ -557,8 +649,6 @@ func (E *ECP) add(Q *ECP) {
 		EE:=NewFPint(0)
 		F:=NewFPint(0)
 		G:=NewFPint(0)
-		//H:=NewFPint(0)
-		//I:=NewFPint(0)
 	
 		A.mul(Q.z);
 		B.copy(A); B.sqr()
@@ -591,8 +681,6 @@ func (E *ECP) add(Q *ECP) {
 		}
 		E.y.copy(A); E.y.mul(C)
 		E.z.copy(F); E.z.mul(G)
-		//	x.reduce(); y.reduce(); z.reduce();
-	//	E.x.norm(); E.y.norm(); E.z.norm()
 	}
 	return
 }
@@ -624,12 +712,10 @@ func (E *ECP) dadd(Q *ECP,W *ECP) {
 	E.x.copy(A)
 	E.z.copy(W.x); E.z.mul(B)
 
-	if E.z.iszilch() {
-		E.inf()
-	} else {E.INF=false;}
+//	if E.z.iszilch() {
+//		E.inf()
+//	} else {E.INF=false;}
 
-	//	x.reduce();
-//	E.x.norm();
 }
 
 /* this-=Q */
@@ -637,52 +723,6 @@ func (E *ECP) sub(Q *ECP) {
 	Q.neg()
 	E.add(Q)
 	Q.neg()
-}
-
-func multiaffine(m int,P []*ECP) {
-	t1:=NewFPint(0)
-	t2:=NewFPint(0)
-
-	var work []*FP
-
-	for i:=0;i<m;i++ {
-		work=append(work,NewFPint(0))
-	}
-	
-	work[0].one()
-	work[1].copy(P[0].z)
-
-	for i:=2;i<m;i++ {
-		work[i].copy(work[i-1])
-		work[i].mul(P[i-1].z)
-	}
-
-	t1.copy(work[m-1])
-	t1.mul(P[m-1].z)
-	t1.inverse()
-	t2.copy(P[m-1].z)
-	work[m-1].mul(t1)
-
-	for i:=m-2;;i-- {
-		if i==0 {
-			work[0].copy(t1)
-			work[0].mul(t2)
-			break
-		}
-		work[i].mul(t2)
-		work[i].mul(t1)
-		t2.mul(P[i].z)
-	}
-/* now work[] contains inverses of all Z coordinates */
-
-	for i:=0;i<m;i++ {
-		P[i].z.one()
-		t1.copy(work[i])
-		t1.sqr()
-		P[i].x.mul(t1)
-		t1.mul(work[i])
-		P[i].y.mul(t1)
-	}    
 }
 
 /* constant time multiply by small integer of length bts - use ladder */
@@ -756,13 +796,6 @@ func (E *ECP) mul(e *BIG) *ECP {
 			W[i].add(Q)
 		}
 
-
-// convert the table to affine 
-		if CURVETYPE==WEIERSTRASS {
-			multiaffine(8,W[:])
-		}
-
-
 // make exponent odd - add 2P if even, P if odd 
 		t.copy(e)
 		s:=int(t.parity())
@@ -834,11 +867,6 @@ func (E *ECP) mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 	W[6].Copy(W[2]); W[6].add(T);
 	W[4].Copy(W[5]); W[4].sub(S);
 	W[7].Copy(W[6]); W[7].add(S);
-
-// convert the table to affine 
-	if CURVETYPE==WEIERSTRASS { 
-		multiaffine(8,W)
-	}
 
 // if multiplier is odd, add 2, else add 1 to multiplier, and add 2P or P to correction 
 

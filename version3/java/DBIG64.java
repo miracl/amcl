@@ -104,8 +104,6 @@ public class DBIG {
 	public void cmove(DBIG g,int d)
 	{
 		int i;
-		//long b=-d;
-
 		for (i=0;i<BIG.DNLEN;i++)
 		{
 			w[i]^=(w[i]^g.w[i])&BIG.cast_to_chunk(-d);
@@ -137,8 +135,6 @@ public class DBIG {
 		for (int i=BIG.NLEN+1;i<BIG.DNLEN;i++) w[i]=0;
 	}
 
-
-
 /* Copy from another DBIG */
 	public void copy(DBIG x)
 	{
@@ -154,18 +150,6 @@ public class DBIG {
 		for (int i=BIG.NLEN;i<BIG.DNLEN;i++)
 			w[i]=x.w[i-BIG.NLEN];
 	}
-
-/* Copy from a BIG 
-	public void copy(BIG x)
-	{
-		for (int i=0; i<BIG.NLEN-1; i++)
-			w[i]=x.w[i];
-
-		w[BIG.NLEN-1]=x.w[BIG.NLEN-1]&BIG.BMASK; 
-		w[BIG.NLEN]=x.w[BIG.NLEN-1]>>BIG.BASEBITS;
-
-		for (int i=BIG.NLEN+1; i<BIG.DNLEN; i++) w[i]=0;
-	} */
 
 /* test this=0? */
 	public boolean iszilch() {
@@ -250,44 +234,11 @@ public class DBIG {
 			r.sub(m);
 			r.norm();
 			cmove(r,(int)(1-((r.w[BIG.DNLEN-1]>>(BIG.CHUNK-1))&1)));
-/*
-			if (comp(this,m)>=0)
-			{
-				sub(m);
-				norm();
-			}
-*/
+
 			k--;
 		}
 		return new BIG(this);
 	}
-
-/* reduces this DBIG mod a DBIG in place */
-/*	public void mod(DBIG m)
-	{
-		int k=0;
-		if (comp(this,m)<0) return;
-
-		do
-		{
-			m.shl(1);
-			k++;
-		}
-		while (comp(this,m)>=0);
-
-		while (k>0)
-		{
-			m.shr(1);
-			if (comp(this,m)>=0)
-			{
-				sub(m);
-				norm();
-			}
-			k--;
-		}
-		return;
-
-	}*/
 
 /* return this/c */
 	public BIG div(BIG c)
@@ -321,14 +272,6 @@ public class DBIG {
 			r.add(e);
 			r.norm();
 			a.cmove(r,d);
-/*
-			if (comp(this,m)>0)
-			{
-				a.add(e);
-				a.norm();
-				sub(m);
-				norm();
-			} */
 			k--;
 		}
 		return a;

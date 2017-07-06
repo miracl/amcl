@@ -34,14 +34,17 @@ under the License.
 #if MODTYPE_YYY == PSEUDO_MERSENNE
 /* r=d mod m */
 
-/* Converts from BIG integer to n-residue form mod Modulus */
-void FP_YYY_nres(BIG_XXX a)
+/* Converts from BIG integer to residue form mod Modulus */
+void FP_YYY_nres(FP_YYY *y,BIG_XXX x)
 {
+	BIG_XXX_copy(y->g,x);
+	y->XES=1;
 }
 
-/* Converts from n-residue form back to BIG integer form */
-void FP_YYY_redc(BIG_XXX a)
+/* Converts from residue form back to BIG integer form */
+void FP_YYY_redc(BIG_XXX x,FP_YYY *y)
 {
+	BIG_XXX_copy(x,y->g);
 }
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
@@ -84,14 +87,16 @@ void FP_YYY_mod(BIG_XXX r,DBIG_XXX d)
 /* This only applies to Curve C448, so specialised (for now) */
 #if MODTYPE_YYY == GENERALISED_MERSENNE
 
-/* Converts from BIG integer to n-residue form mod Modulus */
-void FP_YYY_nres(BIG_XXX a)
+void FP_YYY_nres(FP_YYY *y,BIG_XXX x)
 {
+	BIG_XXX_copy(y->g,x);
+	y->XES=1;
 }
 
-/* Converts from n-residue form back to BIG integer form */
-void FP_YYY_redc(BIG_XXX a)
+/* Converts from residue form back to BIG integer form */
+void FP_YYY_redc(BIG_XXX x,FP_YYY *y)
 {
+	BIG_XXX_copy(x,y->g);
 }
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
@@ -129,23 +134,23 @@ void FP_YYY_mod(BIG_XXX r,DBIG_XXX d)
 #if MODTYPE_YYY == MONTGOMERY_FRIENDLY
 
 /* convert to Montgomery n-residue form */
-void FP_YYY_nres(BIG_XXX a)
+void FP_YYY_nres(FP_YYY *y,BIG_XXX x)
 {
     DBIG_XXX d;
-    BIG_XXX m;
-    BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_dscopy(d,a);
-    BIG_XXX_dshl(d,NLEN_XXX*BASEBITS_XXX);
-    BIG_XXX_dmod(a,d,m);
+    BIG_XXX r;
+    BIG_XXX_rcopy(r,R2modp_YYY);
+	BIG_XXX_mul(d,x,r);
+	FP_YYY_mod(y->g,d);
+	y->XES=2;
 }
 
 /* convert back to regular form */
-void FP_YYY_redc(BIG_XXX a)
+void FP_YYY_redc(BIG_XXX x,FP_YYY *y)
 {
     DBIG_XXX d;
     BIG_XXX_dzero(d);
-    BIG_XXX_dscopy(d,a);
-    FP_YYY_mod(a,d);
+    BIG_XXX_dscopy(d,y->g);
+    FP_YYY_mod(x,d);
 }
 
 /* fast modular reduction from DBIG to BIG exploiting special form of the modulus */
@@ -164,27 +169,26 @@ void FP_YYY_mod(BIG_XXX a,DBIG_XXX d)
 
 #if MODTYPE_YYY == NOT_SPECIAL
 
-/* convert BIG a to Montgomery n-residue form */
-/* SU= 120 */
-void FP_YYY_nres(BIG_XXX a)
+/* convert to Montgomery n-residue form */
+void FP_YYY_nres(FP_YYY *y,BIG_XXX x)
 {
     DBIG_XXX d;
-    BIG_XXX m;
-    BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_dscopy(d,a);
-    BIG_XXX_dshl(d,NLEN_XXX*BASEBITS_XXX);
-    BIG_XXX_dmod(a,d,m);
+    BIG_XXX r;
+    BIG_XXX_rcopy(r,R2modp_YYY);
+	BIG_XXX_mul(d,x,r);
+	FP_YYY_mod(y->g,d);
+	y->XES=2;
 }
 
-/* SU= 80 */
 /* convert back to regular form */
-void FP_YYY_redc(BIG_XXX a)
+void FP_YYY_redc(BIG_XXX x,FP_YYY *y)
 {
     DBIG_XXX d;
     BIG_XXX_dzero(d);
-    BIG_XXX_dscopy(d,a);
-    FP_YYY_mod(a,d);
+    BIG_XXX_dscopy(d,y->g);
+    FP_YYY_mod(x,d);
 }
+
 
 /* reduce a DBIG to a BIG using Montgomery's no trial division method */
 /* d is expected to be dnormed before entry */
@@ -200,27 +204,74 @@ void FP_YYY_mod(BIG_XXX a,DBIG_XXX d)
 
 /* test x==0 ? */
 /* SU= 48 */
-int FP_YYY_iszilch(BIG_XXX x)
+int FP_YYY_iszilch(FP_YYY *x)
 {
     BIG_XXX m;
     BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_mod(x,m);
-    return BIG_XXX_iszilch(x);
+    BIG_XXX_mod(x->g,m);
+    return BIG_XXX_iszilch(x->g);
+}
+
+void FP_YYY_copy(FP_YYY *y,FP_YYY *x)
+{
+	BIG_XXX_copy(y->g,x->g);
+	y->XES=x->XES;
+}
+
+void FP_YYY_rcopy(FP_YYY *y, const BIG_XXX c)
+{
+	BIG_XXX b;
+	BIG_XXX_rcopy(b,c);
+	FP_YYY_nres(y,b);
+}
+
+/* Swap a and b if d=1 */
+void FP_YYY_cswap(FP_YYY *a,FP_YYY *b,int d)
+{
+	sign32 t,c=d;
+	BIG_XXX_cswap(a->g,b->g,d);
+
+    c=~(c-1);
+	t=c&((a->XES)^(b->XES));
+	a->XES^=t;
+	b->XES^=t;
+
+}
+
+/* Move b to a if d=1 */
+void FP_YYY_cmove(FP_YYY *a,FP_YYY *b,int d)
+{
+	sign32 c=-d;
+
+	BIG_XXX_cmove(a->g,b->g,d);
+	a->XES^=(a->XES^b->XES)&c;
+}
+
+void FP_YYY_zero(FP_YYY *x)
+{
+	BIG_XXX_zero(x->g);
+	x->XES=1;
+}
+
+int FP_YYY_equals(FP_YYY *x,FP_YYY *y)
+{
+	FP_YYY_reduce(x); FP_YYY_reduce(y);
+	if (BIG_XXX_comp(x->g,y->g)==0) return 1;
+	return 0;
 }
 
 /* output FP */
 /* SU= 48 */
-void FP_YYY_output(BIG_XXX r)
+void FP_YYY_output(FP_YYY *r)
 {
     BIG_XXX c;
-    BIG_XXX_copy(c,r);
-    FP_YYY_redc(c);
+    FP_YYY_redc(c,r);
     BIG_XXX_output(c);
 }
 
-void FP_YYY_rawoutput(BIG_XXX r)
+void FP_YYY_rawoutput(FP_YYY *r)
 {
-    BIG_XXX_rawoutput(r);
+    BIG_XXX_rawoutput(r->g);
 }
 
 #ifdef GET_STATS
@@ -238,151 +289,157 @@ int tdadd=0,rdadd=0,tdneg=0,rdneg=0;
 /* r=a*b mod Modulus */
 /* product must be less that p.R - and we need to know this in advance! */
 /* SU= 88 */
-void FP_YYY_mul(BIG_XXX r,BIG_XXX a,BIG_XXX b)
+void FP_YYY_mul(FP_YYY *r,FP_YYY *a,FP_YYY *b)
 {
     DBIG_XXX d;
     chunk ea,eb;
 //    BIG_XXX_norm(a);
 //    BIG_XXX_norm(b);
-    ea=EXCESS_YYY(a);
-    eb=EXCESS_YYY(b);
+//    ea=EXCESS_YYY(a->g);
+//    eb=EXCESS_YYY(b->g);
 
-#ifdef dchunk
-    if ((dchunk)(ea+1)*(eb+1)>(dchunk)FEXCESS_YYY)
-#else
-    if ((ea+1)>FEXCESS_YYY/(eb+1))
-#endif
-    {
+
+	if ((sign64)a->XES*b->XES>(sign64)FEXCESS_YYY)
+	{
 #ifdef DEBUG_REDUCE
-        printf("Product too large - reducing it %d %d %d\n",ea,eb,FEXCESS_YYY);
+        printf("Product too large - reducing it\n");
 #endif
         FP_YYY_reduce(a);  /* it is sufficient to fully reduce just one of them < p */
-#ifdef GET_STATS
-        rmul++;
-    }
-
-    tmul++;
-#else
-    }
-#endif
+	}
 
 #ifdef FUSED_MODMUL
-	FP_YYY_modmul(r,a,b);
+	FP_YYY_modmul(r->g,a->g,b->g);
 #else
-    BIG_XXX_mul(d,a,b);
-    FP_YYY_mod(r,d);
+    BIG_XXX_mul(d,a->g,b->g);
+    FP_YYY_mod(r->g,d);
 #endif
+	r->XES=2;
 }
 
 
 /* multiplication by an integer, r=a*c */
 /* SU= 136 */
-void FP_YYY_imul(BIG_XXX r,BIG_XXX a,int c)
+void FP_YYY_imul(FP_YYY *r,FP_YYY *a,int c)
 {
     DBIG_XXX d;
-    BIG_XXX m;
+	BIG_XXX k;
+	FP_YYY f;
+ 
     int s=0;
-    chunk afx;
-//    BIG_XXX_norm(a);
+   
     if (c<0)
     {
         c=-c;
         s=1;
     }
-    afx=(EXCESS_YYY(a)+1)*(c+1)+1;
-    if (c<=NEXCESS_XXX && afx<FEXCESS_YYY)
+   
+#if MODTYPE_YYY==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE
+	
+	BIG_XXX_pxmul(d,a->g,c);
+	FP_YYY_mod(r->g,d);
+	r->XES=2;
+
+#else
+	//Montgomery
+	if (a->XES*c<=FEXCESS_YYY)
 	{
-        BIG_XXX_imul(r,a,c);
-		BIG_XXX_norm(r);
+		BIG_XXX_pmul(r->g,a->g,c);
+		r->XES=a->XES*c;    // careful here - XES jumps!
+	}
+	else
+	{// don't want to do this - only a problem for Montgomery modulus and larger constants
+		BIG_XXX_zero(k);
+		BIG_XXX_inc(k,c);
+		FP_YYY_nres(&f,k);
+		FP_YYY_mul(r,a,&f);
+	}
+#endif
+/*
+    if (c<=NEXCESS_XXX && a->XES*c <= FEXCESS_YYY)
+	{
+        BIG_XXX_imul(r->g,a->g,c);
+		r->XES=a->XES*c;
+		FP_YYY_norm(r);
 	}
     else
     {
-        if (afx<FEXCESS_YYY)
-        {
-            BIG_XXX_pmul(r,a,c);
-        }
-        else
-        {
+            BIG_XXX_pxmul(d,a->g,c);
+
             BIG_XXX_rcopy(m,Modulus_YYY);
-            BIG_XXX_pxmul(d,a,c);
-            BIG_XXX_dmod(r,d,m);
-        }
+			BIG_XXX_dmod(r->g,d,m);
+            //FP_YYY_mod(r->g,d);                /// BIG problem here! Too slow for PM, How to do fast for Monty?
+			r->XES=2;
     }
+*/
     if (s) 
 	{
 		FP_YYY_neg(r,r);
-		BIG_XXX_norm(r);
+		FP_YYY_norm(r);
 	}
 }
 
 /* Set r=a^2 mod m */
 /* SU= 88 */
-void FP_YYY_sqr(BIG_XXX r,BIG_XXX a)
+void FP_YYY_sqr(FP_YYY *r,FP_YYY *a)
 {
     DBIG_XXX d;
-    chunk ea;
+//    chunk ea;
 //    BIG_XXX_norm(a);
-    ea=EXCESS_YYY(a);
-#ifdef dchunk
-    if ((dchunk)(ea+1)*(ea+1)>(dchunk)FEXCESS_YYY)
-#else
-    if ((ea+1)>FEXCESS_YYY/(ea+1))
-#endif
-    {
+//    ea=EXCESS_YYY(a->g);
+
+
+	if ((sign64)a->XES*a->XES>(sign64)FEXCESS_YYY)
+	{
 #ifdef DEBUG_REDUCE
-        printf("Product too large - reducing it %d\n",ea);
+        printf("Product too large - reducing it\n");
 #endif
         FP_YYY_reduce(a);
-#ifdef GET_STATS
-        rsqr++;
     }
-    tsqr++;
-#else
-    }
-#endif
 
-    BIG_XXX_sqr(d,a);
-    FP_YYY_mod(r,d);
+    BIG_XXX_sqr(d,a->g);
+    FP_YYY_mod(r->g,d);
+	r->XES=2;
 }
 
 /* SU= 16 */
 /* Set r=a+b */
-void FP_YYY_add(BIG_XXX r,BIG_XXX a,BIG_XXX b)
+void FP_YYY_add(FP_YYY *r,FP_YYY *a,FP_YYY *b)
 {
-    BIG_XXX_add(r,a,b);
-    if (EXCESS_YYY(r)+2>=FEXCESS_YYY)  /* +2 because a and b not normalised */
-    {
+    BIG_XXX_add(r->g,a->g,b->g);
+	r->XES=a->XES+b->XES;
+	if (r->XES>FEXCESS_YYY)
+	{
 #ifdef DEBUG_REDUCE
-        printf("Sum too large - reducing it %d\n",EXCESS_YYY(r));
+        printf("Sum too large - reducing it \n");
 #endif
         FP_YYY_reduce(r);
-#ifdef GET_STATS
-        radd++;
     }
-    tadd++;
-#else
-    }
-#endif
 }
 
 /* Set r=a-b mod m */
 /* SU= 56 */
-void FP_YYY_sub(BIG_XXX r,BIG_XXX a,BIG_XXX b)
+void FP_YYY_sub(FP_YYY *r,FP_YYY *a,FP_YYY *b)
 {
-    BIG_XXX n;
+    FP_YYY n;
 //	BIG_XXX_norm(b);
-    FP_YYY_neg(n,b);
+    FP_YYY_neg(&n,b);
 //	BIG_XXX_norm(n);
-    FP_YYY_add(r,a,n);
+    FP_YYY_add(r,a,&n);
 }
 
 /* SU= 48 */
 /* Fully reduce a mod Modulus */
-void FP_YYY_reduce(BIG_XXX a)
+void FP_YYY_reduce(FP_YYY *a)
 {
     BIG_XXX m;
     BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_mod(a,m);
+    BIG_XXX_mod(a->g,m);
+	a->XES=1;
+}
+
+void FP_YYY_norm(FP_YYY *x)
+{
+	BIG_XXX_norm(x->g);
 }
 
 // https://graphics.stanford.edu/~seander/bithacks.html
@@ -400,111 +457,110 @@ static int logb2(unsign32 v)
     v = v - ((v >> 1) & 0x55555555);
     v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
     r = (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
-    return r+1;
+    return r;
 }
 
 /* Set r=-a mod Modulus */
 /* SU= 64 */
-void FP_YYY_neg(BIG_XXX r,BIG_XXX a)
+void FP_YYY_neg(FP_YYY *r,FP_YYY *a)
 {
     int sb;
     BIG_XXX m;
 
     BIG_XXX_rcopy(m,Modulus_YYY);
-//    BIG_XXX_norm(a);
 
-    sb=logb2((unsign32)EXCESS_YYY(a)+1);
+    sb=logb2(a->XES-1);
     BIG_XXX_fshl(m,sb);
-    BIG_XXX_sub(r,m,a);
+    BIG_XXX_sub(r->g,m,a->g);
+	r->XES=((sign32)1<<sb);
 
-    if (EXCESS_YYY(r)>=FEXCESS_YYY)
+    if (r->XES>FEXCESS_YYY)
     {
 #ifdef DEBUG_REDUCE
-        printf("Negation too large -  reducing it %d\n",EXCESS_YYY(r));
+        printf("Negation too large -  reducing it \n");
 #endif
         FP_YYY_reduce(r);
-#ifdef GET_STATS
-        rneg++;
-    }
-    tneg++;
-#else
-    }
-#endif
+	}
 
 }
 
 /* Set r=a/2. */
 /* SU= 56 */
-void FP_YYY_div2(BIG_XXX r,BIG_XXX a)
+void FP_YYY_div2(FP_YYY *r,FP_YYY *a)
 {
     BIG_XXX m;
     BIG_XXX_rcopy(m,Modulus_YYY);
+    FP_YYY_copy(r,a);
 //    BIG_XXX_norm(a);
-    if (BIG_XXX_parity(a)==0)
+    if (BIG_XXX_parity(a->g)==0)
     {
-        BIG_XXX_copy(r,a);
-        BIG_XXX_fshr(r,1);
+
+        BIG_XXX_fshr(r->g,1);
     }
     else
     {
-        BIG_XXX_add(r,a,m);
-        BIG_XXX_norm(r);
-        BIG_XXX_fshr(r,1);
+        BIG_XXX_add(r->g,r->g,m);
+        BIG_XXX_norm(r->g);
+        BIG_XXX_fshr(r->g,1);
     }
 }
 
 /* set w=1/x */
-void FP_YYY_inv(BIG_XXX w,BIG_XXX x)
+void FP_YYY_inv(FP_YYY *w,FP_YYY *x)
 {
     BIG_XXX m;
+	BIG_XXX b;
     BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_copy(w,x);
-    FP_YYY_redc(w);
+    BIG_XXX_copy(w->g,x->g);
+    FP_YYY_redc(b,w);
 
-    BIG_XXX_invmodp(w,w,m);
-    FP_YYY_nres(w);
+    BIG_XXX_invmodp(b,b,m);
+    FP_YYY_nres(w,b);
 }
 
 /* SU=8 */
 /* set n=1 */
-void FP_YYY_one(BIG_XXX n)
+void FP_YYY_one(FP_YYY *n)
 {
-    BIG_XXX_one(n);
-    FP_YYY_nres(n);
+	BIG_XXX b;
+    BIG_XXX_one(b);
+    FP_YYY_nres(n,b);
 }
 
 /* Set r=a^b mod Modulus */
 /* SU= 136 */
-void FP_YYY_pow(BIG_XXX r,BIG_XXX a,BIG_XXX b)
+void FP_YYY_pow(FP_YYY *r,FP_YYY *a,BIG_XXX b)
 {
-    BIG_XXX w,z,zilch;
+    BIG_XXX z,zilch;
+	FP_YYY w;
     int bt;
     BIG_XXX_zero(zilch);
 
     BIG_XXX_norm(b);
     BIG_XXX_copy(z,b);
-    BIG_XXX_copy(w,a);
+    FP_YYY_copy(&w,a);
     FP_YYY_one(r);
     while(1)
     {
         bt=BIG_XXX_parity(z);
         BIG_XXX_fshr(z,1);
-        if (bt) FP_YYY_mul(r,r,w);
+        if (bt) FP_YYY_mul(r,r,&w);
         if (BIG_XXX_comp(z,zilch)==0) break;
-        FP_YYY_sqr(w,w);
+        FP_YYY_sqr(&w,&w);
     }
     FP_YYY_reduce(r);
 }
 
 /* is r a QR? */
-int FP_YYY_qr(BIG_XXX r)
+int FP_YYY_qr(FP_YYY *r)
 {
     int j;
     BIG_XXX m;
+	BIG_XXX b;
     BIG_XXX_rcopy(m,Modulus_YYY);
-    FP_YYY_redc(r);
-    j=BIG_XXX_jacobi(r,m);
-    FP_YYY_nres(r);
+    FP_YYY_redc(b,r);
+    j=BIG_XXX_jacobi(b,m);
+    FP_YYY_nres(r,b);
     if (j==1) return 1;
     return 0;
 
@@ -512,27 +568,28 @@ int FP_YYY_qr(BIG_XXX r)
 
 /* Set a=sqrt(b) mod Modulus */
 /* SU= 160 */
-void FP_YYY_sqrt(BIG_XXX r,BIG_XXX a)
+void FP_YYY_sqrt(FP_YYY *r,FP_YYY *a)
 {
-    BIG_XXX v,i,b;
+	FP_YYY v,i;
+    BIG_XXX b;
     BIG_XXX m;
     BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_mod(a,m);
+    BIG_XXX_mod(a->g,m);
     BIG_XXX_copy(b,m);
     if (MOD8_YYY==5)
     {
         BIG_XXX_dec(b,5);
         BIG_XXX_norm(b);
         BIG_XXX_fshr(b,3); /* (p-5)/8 */
-        BIG_XXX_copy(i,a);
-        BIG_XXX_fshl(i,1);
-        FP_YYY_pow(v,i,b);
-        FP_YYY_mul(i,i,v);
-        FP_YYY_mul(i,i,v);
-        BIG_XXX_dec(i,1);
-        FP_YYY_mul(r,a,v);
-        FP_YYY_mul(r,r,i);
-        BIG_XXX_mod(r,m);
+        FP_YYY_copy(&i,a);
+        BIG_XXX_fshl(i.g,1);
+        FP_YYY_pow(&v,&i,b);
+        FP_YYY_mul(&i,&i,&v);
+        FP_YYY_mul(&i,&i,&v);
+        BIG_XXX_dec(i.g,1);
+        FP_YYY_mul(r,a,&v);
+        FP_YYY_mul(r,r,&i);
+        FP_YYY_reduce(r);
     }
     if (MOD8_YYY==3 || MOD8_YYY==7)
     {

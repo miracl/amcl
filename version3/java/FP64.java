@@ -33,7 +33,7 @@ public final class FP {
 	public static final int MOD8=@M8@;  /* Modulus mod 8 */
 	public static final int MODTYPE=@MT@;
 
-	public static final long FEXCESS =((long)1<<(BIG.BASEBITS*BIG.NLEN-MODBITS-1)); 
+	public static final int FEXCESS =((int)1<<@SH@);  // BASEBITS*NLEN-MODBITS or 2^30 max!
 	public static final long OMASK=(long)(-1)<<(MODBITS%BIG.BASEBITS);
 	public static final int TBITS=MODBITS%BIG.BASEBITS; // Number of active bits in top word 
 	public static final long TMASK=((long)1<<TBITS)-1;
@@ -41,33 +41,10 @@ public final class FP {
 
 	public final BIG x;
 	public static BIG p=new BIG(ROM.Modulus);
+	public static BIG r2modp=new BIG(ROM.R2modp);
+	public int XES;
 
 /**************** 64-bit specific ************************/
-
-/* calculate Field Excess */
-	public static long EXCESS(BIG a)
-	{
-		return ((a.w[BIG.NLEN-1]&OMASK)>>(MODBITS%BIG.BASEBITS))+1;
-	}
-
-/* Check if product causes excess */
-	public static boolean pexceed(long ea,long eb)
-	{
-	//	long ea,eb;
-	//	ea=EXCESS(a);
-	//	eb=EXCESS(b);
-		if ((ea+1)>FEXCESS/(eb+1)) return true;
-		return false;
-	}
-
-/* Check if square causes excess */
-	public static boolean sexceed(long ea)
-	{
-	//	long ea;
-	//	ea=EXCESS(a);
-		if ((ea+1)>FEXCESS/(ea+1)) return true;
-		return false;
-	}
 
 /* reduce a DBIG to a BIG using the appropriate form of the modulus */
 	public static BIG mod(DBIG d)
@@ -81,18 +58,15 @@ public final class FP {
 
 			v=t.pmul((int)ROM.MConst);
 
-	t.add(b);
-	t.norm();
+			t.add(b);
+			t.norm();
 
 			tw=t.w[BIG.NLEN-1];
 			t.w[BIG.NLEN-1]&=FP.TMASK;
 			t.w[0]+=(ROM.MConst*((tw>>TBITS)+(v<<(BIG.BASEBITS-TBITS))));
 
-//			b.add(t);    // out
-//			b.norm();    // out
-//			return b;    // out	
-	t.norm();
-	return t;			
+			t.norm();
+			return t;			
 		}
 		if (FP.MODTYPE==MONTGOMERY_FRIENDLY)
 		{
@@ -138,8 +112,7 @@ public final class FP {
 		}
 		if (MODTYPE==NOT_SPECIAL)
 		{
-			BIG m=new BIG(ROM.Modulus);
-			return BIG.monty(m,ROM.MConst,d);
+			return BIG.monty(p,ROM.MConst,d);
 		}
 
 		return new BIG(0);
@@ -160,6 +133,7 @@ public final class FP {
 	public FP()
 	{
 		x=new BIG(0);
+		XES=1;
 	}
 
 	public FP(BIG a)
@@ -171,6 +145,7 @@ public final class FP {
 	public FP(FP a)
 	{
 		x=new BIG(a.x);
+		XES=a.XES;
 	}
 
 /* convert to string */
@@ -191,10 +166,11 @@ public final class FP {
 	{
 		if (MODTYPE!=PSEUDO_MERSENNE && MODTYPE!=GENERALISED_MERSENNE)
 		{
-			DBIG d=new DBIG(x);
-			d.shl(BIG.NLEN*BIG.BASEBITS);
-			x.copy(d.mod(p));
+			DBIG d=BIG.mul(x,r2modp);  /*** Change ***/
+			x.copy(mod(d));
+			XES=2;
 		}
+		else XES=1;
 	}
 
 /* convert back to regular form */
@@ -222,12 +198,14 @@ public final class FP {
 	public void copy(FP b)
 	{
 		x.copy(b.x);
+		XES=b.XES;
 	}
 
 /* set this=0 */
 	public void zero()
 	{
 		x.zero();
+		XES=1;
 	}
 	
 /* set this=1 */
@@ -246,24 +224,29 @@ public final class FP {
 	public void cswap(FP b,int d)
 	{
 		x.cswap(b.x,d);
+		int t,c=d;
+		c=~(c-1);
+		t=c&(XES^b.XES);
+		XES^=t;
+		b.XES^=t;
 	}
 
 /* copy FPs depending on d */
 	public void cmove(FP b,int d)
 	{
 		x.cmove(b.x,d);
+		XES^=(XES^b.XES)&(-d);
+
 	}
 
 /* this*=b mod Modulus */
 	public void mul(FP b)
 	{
-//		norm();
-//		b.norm();
-
-		if (pexceed(EXCESS(x),EXCESS(b.x))) reduce();
+		if ((long)XES*b.XES>(long)FEXCESS) reduce();
 
 		DBIG d=BIG.mul(x,b.x);
 		x.copy(mod(d));
+		XES=2;
 	}
 
 /* this*=c mod Modulus, where c is a small int */
@@ -276,39 +259,61 @@ public final class FP {
 			c=-c;
 			s=true;
 		}
-		if (c<=BIG.NEXCESS && ((EXCESS(x)+1)*(c+1)+1)<FEXCESS)
+
+		if (MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE)
+		{
+			DBIG d=x.pxmul(c);
+			x.copy(mod(d));
+			XES=2;
+		}
+		else
+		{
+			if (XES*c<=FEXCESS)
+			{
+				x.pmul(c);
+				XES*=c;
+			}
+			else
+			{  // this is not good
+				FP n=new FP(c);
+				mul(n);
+			}
+		}
+		
+/*
+		if (c<=BIG.NEXCESS && XES*c<=FEXCESS)
 		{
 			x.imul(c);
+			XES*=c;
 			x.norm();
 		}
 		else
 		{
-			if (((EXCESS(x)+1)*(c+1)+1)<FEXCESS) x.pmul(c);
-			else
-			{
-				DBIG d=x.pxmul(c);
-				x.copy(d.mod(p));
-			}
+			DBIG d=x.pxmul(c);
+			x.copy(mod(d));
+			XES=2;
 		}
+*/
 		if (s) {neg(); norm();}
+
 	}
 
 /* this*=this mod Modulus */
 	public void sqr()
 	{
 		DBIG d;
-//		norm();
-
-		if (sexceed(EXCESS(x))) reduce();
+		if ((long)XES*XES>(long)FEXCESS) reduce();
 
 		d=BIG.sqr(x);	
 		x.copy(mod(d));
+		XES=2;
 	}
 
 /* this+=b */
 	public void add(FP b) {
 		x.add(b.x);
-		if (EXCESS(x)+2>=FEXCESS) reduce();
+		XES+=b.XES;
+		if (XES>FEXCESS) reduce();
 	}
 
 // https://graphics.stanford.edu/~seander/bithacks.html
@@ -326,7 +331,7 @@ public final class FP {
 		v = v - ((v >>> 1) & 0x55555555);                  
 		v = (v & 0x33333333) + ((v >>> 2) & 0x33333333);  
 		r = ((v + (v >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24; 
-		return r+1;
+		return r;
 	}
 
 /* this = -this mod Modulus */
@@ -335,11 +340,12 @@ public final class FP {
 		int sb;
 		BIG m=new BIG(p);
 
-		sb=logb2((int)EXCESS(x)+1);
+		sb=logb2(XES-1);
 		m.fshl(sb);
 		x.rsub(m);		
 
-		if (EXCESS(x)>=FEXCESS) reduce();
+		XES=(1<<sb);
+		if (XES>FEXCESS) reduce();
 	}
 
 /* this-=b */
@@ -347,14 +353,20 @@ public final class FP {
 	{
 		FP n=new FP(b);
 		n.neg();
-//	n.norm();
+		this.add(n);
+	}
+
+	public void rsub(FP b)
+	{
+		FP n=new FP(this);
+		n.neg();
+		this.copy(b);
 		this.add(n);
 	}
 
 /* this/=2 mod Modulus */
 	public void div2()
 	{
-//		x.norm();
 		if (x.parity()==0)
 			x.fshr(1);
 		else
@@ -387,6 +399,7 @@ public final class FP {
 	public void reduce()
 	{
 		x.mod(p);
+		XES=1;
 	}
 
 /* return this^e mod Modulus */

@@ -71,12 +71,14 @@ void mhashit(int sha,int n,octet *x,octet *w)
             }
         }
     }
+
     if (x!=NULL) for (i=0; i<x->len; i++)
         {
             switch(sha)
             {
             case SHA256:
                 HASH256_process(&sha256,x->val[i]);
+
                 break;
             case SHA384:
                 HASH384_process(&sha512,x->val[i]);

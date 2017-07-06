@@ -25,60 +25,66 @@ package XXX
 
 /* Line function */
 func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
-	P:=NewECP2()
-
-	P.Copy(A);
-	ZZ:=NewFP2copy(P.getz())
-	ZZ.sqr()
-	var D int
-	if A==B {
-		D=A.dbl() 
-	} else {D=A.add(B)}
-
-	if D<0 {return NewFP12int(1)}
-
-	Z3:=NewFP2copy(A.getz())
-
 	var a *FP4
 	var b *FP4
 	c:=NewFP4int(0)
 
-	if (D==0) { /* Addition */
-		X:=NewFP2copy(B.getx())
-		Y:=NewFP2copy(B.gety())
-		T:=NewFP2copy(P.getz()) 
-		T.mul(Y)
-		ZZ.mul(T)
+	if (A==B) { /* Doubling */
+		XX:=NewFP2copy(A.getx())  //X
+		YY:=NewFP2copy(A.gety())  //Y
+		ZZ:=NewFP2copy(A.getz())  //Z
+		YZ:=NewFP2copy(YY)        //Y 
+		YZ.mul(ZZ)                //YZ
+		XX.sqr()	               //X^2
+		YY.sqr()	               //Y^2
+		ZZ.sqr()			       //Z^2
+			
+		YZ.imul(4)
+		YZ.neg(); YZ.norm()       //-2YZ
+		YZ.pmul(Qy);               //-2YZ.Ys
 
-		NY:=NewFP2copy(P.gety()); NY.neg(); NY.norm()
-		ZZ.add(NY); ZZ.norm()
-		Z3.pmul(Qy)
-		T.mul(P.getx());
-		X.mul(NY);
-		T.add(X); T.norm()
-		a=NewFP4fp2s(Z3,T)
-		ZZ.neg(); ZZ.norm()
-		ZZ.pmul(Qx)
-		b=NewFP4fp2(ZZ)
-	} else { /* Doubling */
-		X:=NewFP2copy(P.getx())
-		Y:=NewFP2copy(P.gety())
-		T:=NewFP2copy(P.getx())
-		T.sqr()
-		T.imul(3)
+		XX.imul(6)                //3X^2
+		XX.pmul(Qx);               //3X^2.Xs
 
-		Y.sqr()
-		Y.add(Y)
-		Z3.mul(ZZ)
-		Z3.pmul(Qy)
+		sb:=3*CURVE_B_I
+		ZZ.imul(sb); 	
+			
+		ZZ.div_ip2();  ZZ.norm() // 3b.Z^2 
 
-		X.mul(T)
-		X.sub(Y); X.norm()
-		a=NewFP4fp2s(Z3,X)
-		T.neg(); T.norm()
-		ZZ.mul(T)
-		ZZ.pmul(Qx)
-		b=NewFP4fp2(ZZ)
+		YY.add(YY)
+		ZZ.sub(YY); ZZ.norm()     // 3b.Z^2-Y^2
+
+		a=NewFP4fp2s(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
+		b=NewFP4fp2(XX)             // L(0,1) | L(0,0) | L(1,0)
+
+		A.dbl();
+
+	} else { /* Addition */
+
+		X1:=NewFP2copy(A.getx())    // X1
+		Y1:=NewFP2copy(A.gety())    // Y1
+		T1:=NewFP2copy(A.getz())    // Z1
+		T2:=NewFP2copy(A.getz())    // Z1
+			
+		T1.mul(B.gety())    // T1=Z1.Y2 
+		T2.mul(B.getx())    // T2=Z1.X2
+
+		X1.sub(T2); X1.norm()  // X1=X1-Z1.X2
+		Y1.sub(T1); Y1.norm()  // Y1=Y1-Z1.Y2
+
+		T1.copy(X1)            // T1=X1-Z1.X2
+		X1.pmul(Qy)            // X1=(X1-Z1.X2).Ys
+		T1.mul(B.gety())       // T1=(X1-Z1.X2).Y2
+
+		T2.copy(Y1)           // T2=Y1-Z1.Y2
+		T2.mul(B.getx())       // T2=(Y1-Z1.Y2).X2
+		T2.sub(T1); T2.norm()          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+		Y1.pmul(Qx);  Y1.neg(); Y1.norm() // Y1=-(Y1-Z1.Y2).Xs
+
+		a=NewFP4fp2s(X1,T2)       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+		b=NewFP4fp2(Y1)
+
+		A.add(B);
 	}
 	return NewFP12fp4s(a,b,c)
 }

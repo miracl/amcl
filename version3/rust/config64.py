@@ -94,6 +94,15 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fpath+"fp.rs","@M8@",m8)
 	replace(fpath+"fp.rs","@MT@",mt)
 
+	ib=int(base)
+	inb=int(nb)
+	inbt=int(nbt)
+	sh=ib*(1+((8*inb-1)//ib))-inbt
+	if sh > 30 :
+		sh=30
+	replace(fpath+"fp.rs","@SH@",str(sh))
+
+
 	replace(fpath+"ecp.rs","@CT@",ct)
 	replace(fpath+"ecp.rs","@PF@",pf)
 
@@ -142,20 +151,26 @@ print("7. goldilocks")
 print("8. nist384")
 print("9. c41417")
 print("10. nist521\n")
+print("11. nums256w")
+print("12. nums256e")
+print("13. nums384w")
+print("14. nums384e")
+print("15. nums512w")
+print("16. nums512e\n")
 
 print("Pairing-Friendly Elliptic Curves")
-print("11. bn254")
-print("12. bn254CX")
-print("13. bls383\n")
+print("17. bn254")
+print("18. bn254CX")
+print("19. bls383\n")
 
 print("RSA")
-print("14. rsa2048")
-print("15. rsa3072")
-print("16. rsa4096")
+print("20. rsa2048")
+print("21. rsa3072")
+print("22. rsa4096")
 
 selection=[]
 ptr=0
-max=17
+max=23
 
 curve_selected=False
 pfcurve_selected=False
@@ -208,7 +223,7 @@ while ptr<max:
 		curveset("hifive","42","60","336","5","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==7:
-		curveset("goldilocks","56","60","448","7","GENERALISED_MERSENNE","EDWARDS","NOT")
+		curveset("goldilocks","56","58","448","7","GENERALISED_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==8:
 		curveset("nist384","48","56","384","7","NOT_SPECIAL","WEIERSTRASS","NOT")
@@ -221,13 +236,32 @@ while ptr<max:
 		curve_selected=True
 
 	if x==11:
+		curveset("nums256w","32","56","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curve_selected=True
+	if x==12:
+		curveset("nums256e","32","56","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curve_selected=True
+	if x==13:
+		curveset("nums384w","48","58","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curve_selected=True
+	if x==14:
+		curveset("nums384e","48","56","384","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curve_selected=True
+	if x==15:
+		curveset("nums512w","64","60","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curve_selected=True
+	if x==16:
+		curveset("nums512e","64","60","512","7","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curve_selected=True
+
+	if x==17:
 		curveset("bn254","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
 		pfcurve_selected=True
-	if x==12:
+	if x==18:
 		curveset("bn254CX","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
 		pfcurve_selected=True
-	if x==13:
-		curveset("bls383","48","56","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
+	if x==19:
+		curveset("bls383","48","58","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
 		pfcurve_selected=True
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
@@ -235,17 +269,17 @@ while ptr<max:
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==14:
+	if x==20:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("rsa2048","128","58","2")
 		#rsaset("RSA2048","64","60","4")
 		#rsaset("RSA2048","32","56","8")
 		rsa_selected=True
-	if x==15:
+	if x==21:
 		rsaset("rsa3072","48","56","8")
 		rsa_selected=True
-	if x==16:
+	if x==22:
 		#rsaset("RSA4096","32","56","16")
 		rsaset("rsa4096","64","60","8")
 		rsa_selected=True

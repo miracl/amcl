@@ -39,17 +39,15 @@ static void mpin_hash(int sha,FP4_YYY *f, ECP_ZZZ *P,octet *w)
     hash512 sha512;
     char t[6*MODBYTES_XXX];  // to hold 6 BIGs
     int hlen=sha;
-    BIG_XXX_copy(x,f->a.a);
-    FP_YYY_redc(x);
+
+
+	FP_YYY_redc(x,&(f->a.a));
     BIG_XXX_toBytes(&t[0],x);
-    BIG_XXX_copy(x,f->a.b);
-    FP_YYY_redc(x);
+    FP_YYY_redc(x,&(f->a.b));
     BIG_XXX_toBytes(&t[MODBYTES_XXX],x);
-    BIG_XXX_copy(x,f->b.a);
-    FP_YYY_redc(x);
+    FP_YYY_redc(x,&(f->b.a));
     BIG_XXX_toBytes(&t[2*MODBYTES_XXX],x);
-    BIG_XXX_copy(x,f->b.b);
-    FP_YYY_redc(x);
+    FP_YYY_redc(x,&(f->b.b));
     BIG_XXX_toBytes(&t[3*MODBYTES_XXX],x);
     ECP_ZZZ_get(x,y,P);
     BIG_XXX_toBytes(&t[4*MODBYTES_XXX],x);
@@ -121,10 +119,15 @@ static void mapit(octet *h,ECP_ZZZ *P)
     BIG_XXX_fromBytes(x,h->val);
     BIG_XXX_rcopy(q,Modulus_YYY);
     BIG_XXX_mod(x,q);
+	int k=0;
+//printf("x= "); BIG_XXX_output(x); printf("\n");
+
 
     while (!ECP_ZZZ_setx(P,x,0))
-        BIG_XXX_inc(x,1);
-
+	{
+        BIG_XXX_inc(x,1); k++;
+	}
+//printf("k= %d\n",k);
     BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
     ECP_ZZZ_mul(P,c);
 }
@@ -497,14 +500,10 @@ int MPIN_ZZZ_GET_SERVER_SECRET(octet *S,octet *SST)
     int res=0;
 
     BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
-    BIG_XXX_rcopy(qx.a,CURVE_Pxa_ZZZ);
-    FP_YYY_nres(qx.a);
-    BIG_XXX_rcopy(qx.b,CURVE_Pxb_ZZZ);
-    FP_YYY_nres(qx.b);
-    BIG_XXX_rcopy(qy.a,CURVE_Pya_ZZZ);
-    FP_YYY_nres(qy.a);
-    BIG_XXX_rcopy(qy.b,CURVE_Pyb_ZZZ);
-    FP_YYY_nres(qy.b);
+    FP_YYY_rcopy(&(qx.a),CURVE_Pxa_ZZZ);
+    FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
+    FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
+    FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
     ECP2_ZZZ_set(&Q,&qx,&qy);
 
     if (res==0)
@@ -529,9 +528,18 @@ int MPIN_ZZZ_GET_CLIENT_PERMIT(int sha,int date,octet *S,octet *CID,octet *CTT)
     mhashit(sha,date,CID,&H);
 
     mapit(&H,&P);
-    BIG_XXX_fromBytes(s,S->val);
-    PAIR_ZZZ_G1mul(&P,s);
 
+//printf("P= "); ECP_ZZZ_output(&P); printf("\n");
+//exit(0);
+
+    BIG_XXX_fromBytes(s,S->val);
+
+
+
+//printf("s= "); BIG_XXX_output(s); printf("\n");
+    PAIR_ZZZ_G1mul(&P,s);
+//printf("OP= "); ECP_ZZZ_output(&P); printf("\n");
+//
     ECP_ZZZ_toOctet(CTT,&P);
     return 0;
 }
@@ -581,14 +589,10 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     ECP_ZZZ P,R;
     int res=0;
 
-    BIG_XXX_rcopy(qx.a,CURVE_Pxa_ZZZ);
-    FP_YYY_nres(qx.a);
-    BIG_XXX_rcopy(qx.b,CURVE_Pxb_ZZZ);
-    FP_YYY_nres(qx.b);
-    BIG_XXX_rcopy(qy.a,CURVE_Pya_ZZZ);
-    FP_YYY_nres(qy.a);
-    BIG_XXX_rcopy(qy.b,CURVE_Pyb_ZZZ);
-    FP_YYY_nres(qy.b);
+    FP_YYY_rcopy(&(qx.a),CURVE_Pxa_ZZZ);
+    FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
+    FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
+    FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
 
     if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
 
@@ -632,6 +636,7 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     }
     if (res==0)
     {
+
         PAIR_ZZZ_double_ate(&g,&Q,&R,&sQ,&P);
         PAIR_ZZZ_fexp(&g);
 
@@ -712,7 +717,7 @@ int MPIN_ZZZ_KANGAROO(octet *E,octet *F)
         //FP_YYY_redc(w);
         //i=BIG_XXX_lastbits(w,20)%MR_TS;
 
-        i=t.a.a.a[0]%MR_TS;
+        i=t.a.a.a.g[0]%MR_TS;
 
         FP12_YYY_mul(&t,&table[i]);
         FP12_YYY_reduce(&t);
@@ -731,7 +736,7 @@ int MPIN_ZZZ_KANGAROO(octet *E,octet *F)
         //FP_YYY_redc(w);
         //i=BIG_XXX_lastbits(w,20)%MR_TS;
 
-        i=ge.a.a.a[0]%MR_TS;
+        i=ge.a.a.a.g[0]%MR_TS;
 
         FP12_YYY_mul(&ge,&table[i]);
         FP12_YYY_reduce(&ge);
@@ -776,14 +781,10 @@ int MPIN_ZZZ_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
         }
         else
         {
-            BIG_XXX_rcopy(qx.a,CURVE_Pxa_ZZZ);
-            FP_YYY_nres(qx.a);
-            BIG_XXX_rcopy(qx.b,CURVE_Pxb_ZZZ);
-            FP_YYY_nres(qx.b);
-            BIG_XXX_rcopy(qy.a,CURVE_Pya_ZZZ);
-            FP_YYY_nres(qy.a);
-            BIG_XXX_rcopy(qy.b,CURVE_Pyb_ZZZ);
-            FP_YYY_nres(qy.b);
+            FP_YYY_rcopy(&(qx.a),CURVE_Pxa_ZZZ);
+            FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
+            FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
+            FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
             if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
         }
     }

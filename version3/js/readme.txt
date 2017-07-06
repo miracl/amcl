@@ -30,7 +30,7 @@ or
 
 python3 config.py
 
-Then select options 1, 23 and 26 (these are fixed for the example 
+Then select options 1, 17 and 20 (these are fixed for the example 
 programs provided). Select 0 to exit.
 
 Then load TestALL.html or BenchtestALL.html into your favourite browser.

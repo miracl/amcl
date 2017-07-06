@@ -32,12 +32,13 @@ public final class ECP2 {
 		INF=true;
 		x=new FP2(0);
 		y=new FP2(1);
-		z=new FP2(1);
+		z=new FP2(0);
 	}
 
 /* Test this=O? */
 	public boolean is_infinity() {
-		return INF;
+		if (INF) return true;                    //******
+		return (x.iszilch() && z.iszilch());
 	}
 /* copy this=P */
 	public void copy(ECP2 P)
@@ -51,7 +52,7 @@ public final class ECP2 {
 	public void inf() {
 		INF=true;
 		x.zero();
-		y.zero();
+		y.one();
 		z.zero();
 	}
 
@@ -104,23 +105,23 @@ public final class ECP2 {
 		if (is_infinity() && Q.is_infinity()) return true;
 		if (is_infinity() || Q.is_infinity()) return false;
 
-		FP2 zs2=new FP2(z); zs2.sqr();
-		FP2 zo2=new FP2(Q.z); zo2.sqr();
-		FP2 zs3=new FP2(zs2); zs3.mul(z);
-		FP2 zo3=new FP2(zo2); zo3.mul(Q.z);
-		zs2.mul(Q.x);
-		zo2.mul(x);
-		if (!zs2.equals(zo2)) return false;
-		zs3.mul(Q.y);
-		zo3.mul(y);
-		if (!zs3.equals(zo3)) return false;
+
+		FP2 a=new FP2(x);                            // *****
+		FP2 b=new FP2(Q.x);
+		a.mul(Q.z); 
+		b.mul(z); 
+		if (!a.equals(b)) return false;
+
+		a.copy(y); a.mul(Q.z); 
+		b.copy(Q.y); b.mul(z); 
+		if (!a.equals(b)) return false;
 
 		return true;
 	}
 /* set this=-this */
 	public void neg() {
-		if (is_infinity()) return;
-	y.norm();
+//		if (is_infinity()) return;
+		y.norm();
 		y.neg(); y.norm();
 		return;
 	}
@@ -128,14 +129,16 @@ public final class ECP2 {
 	public void affine() {
 		if (is_infinity()) return;
 		FP2 one=new FP2(1);
-		if (z.equals(one)) return;
+		if (z.equals(one))
+		{
+			x.reduce();
+			y.reduce();
+			return;
+		}
 		z.inverse();
 
-		FP2 z2=new FP2(z);
-		z2.sqr();
-		x.mul(z2); x.reduce();
-		y.mul(z2); 
-		y.mul(z);  y.reduce();
+		x.mul(z); x.reduce();               // *****
+		y.mul(z); y.reduce();
 		z.copy(one);
 	}
 /* extract affine x as FP2 */
@@ -254,51 +257,42 @@ public final class ECP2 {
 
 /* this+=this */
 	public int dbl() {
-		if (INF) return -1;
-		if (y.iszilch())
-		{
-			inf();
-			return -1;
-		}
+		if (INF) return -1;      
+//System.out.println("Into dbl");
+		FP2 iy=new FP2(y);
+		iy.mul_ip(); iy.norm();
 
-		FP2 w1=new FP2(x);
-		FP2 w2=new FP2(0);
-		FP2 w3=new FP2(x);
-		FP2 w8=new FP2(x);
+		FP2 t0=new FP2(y);                  //***** Change 
+		t0.sqr();            t0.mul_ip();   
+		FP2 t1=new FP2(iy);  
+		t1.mul(z);
+		FP2 t2=new FP2(z);
+		t2.sqr();
 
-		w1.sqr();
-		w8.copy(w1);
-		w8.imul(3);
+		z.copy(t0);
+		z.add(t0); z.norm(); 
+		z.add(z); 
+		z.add(z); 
+		z.norm();  
 
-		w2.copy(y); w2.sqr();
-		w3.copy(x); w3.imul(4); w3.mul(w2);
-		
-		w1.copy(w3); w1.neg();
-		w1.norm();
+		t2.imul(3*ROM.CURVE_B_I); 
 
-		x.copy(w8); x.sqr();
-		x.add(w1);
-		x.add(w1);
-		x.norm();
+		FP2 x3=new FP2(t2);
+		x3.mul(z); 
 
-		z.add(z); z.norm();
-		z.mul(y);
-		
+		FP2 y3=new FP2(t0);   
 
-		w2.add(w2);
-	w2.norm();
-		w2.sqr();
-		w2.add(w2);
-		w3.sub(x);
-	w2.norm();
-	w3.norm();
-		y.copy(w8); y.mul(w3);
-	//	w2.norm();
-		y.sub(w2);
+		y3.add(t2); y3.norm();
+		z.mul(t1);
+		t1.copy(t2); t1.add(t2); t2.add(t1); t2.norm();  
+		t0.sub(t2); t0.norm();                           //y^2-9bz^2
+		y3.mul(t0); y3.add(x3);                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+		t1.copy(x); t1.mul(iy);						//
+		x.copy(t0); x.norm(); x.mul(t1); x.add(x);       //(y^2-9bz^2)xy2
 
-		y.norm();
-		z.norm();
-
+		x.norm(); 
+		y.copy(y3); y.norm();
+//System.out.println("Out of dbl");
 		return 1;
 	}
 
@@ -310,73 +304,62 @@ public final class ECP2 {
 			return -1;
 		}
 		if (Q.INF) return -1;
+//System.out.println("Into add");
+		int b=3*ROM.CURVE_B_I;
+		FP2 t0=new FP2(x);
+		t0.mul(Q.x);         // x.Q.x
+		FP2 t1=new FP2(y);
+		t1.mul(Q.y);		 // y.Q.y
 
-		boolean aff=false;
+		FP2 t2=new FP2(z);
+		t2.mul(Q.z);
+		FP2 t3=new FP2(x);
+		t3.add(y); t3.norm();          //t3=X1+Y1
+		FP2 t4=new FP2(Q.x);            
+		t4.add(Q.y); t4.norm();			//t4=X2+Y2
+		t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
+		t4.copy(t0); t4.add(t1);		//t4=X1.X2+Y1.Y2
 
-		if (Q.z.isunity()) aff=true;
+		t3.sub(t4); t3.norm(); t3.mul_ip();  t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 
-		FP2 A,C;
-		FP2 B=new FP2(z);
-		FP2 D=new FP2(z);
-		if (!aff)
-		{
-			A=new FP2(Q.z);
-			C=new FP2(Q.z);
+		t4.copy(y);                    
+		t4.add(z); t4.norm();			//t4=Y1+Z1
+		FP2 x3=new FP2(Q.y);
+		x3.add(Q.z); x3.norm();			//x3=Y2+Z2
 
-			A.sqr(); B.sqr();
-			C.mul(A); D.mul(B);
-
-			A.mul(x);
-			C.mul(y);
-		}
-		else
-		{
-			A=new FP2(x);
-			C=new FP2(y);
+		t4.mul(x3);						//t4=(Y1+Z1)(Y2+Z2)
+		x3.copy(t1);					//
+		x3.add(t2);						//X3=Y1.Y2+Z1.Z2
 	
-			B.sqr();
-			D.mul(B);
-		}
+		t4.sub(x3); t4.norm(); t4.mul_ip(); t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 
-		B.mul(Q.x); B.sub(A);
-		D.mul(Q.y); D.sub(C);
+		x3.copy(x); x3.add(z); x3.norm();	// x3=X1+Z1
+		FP2 y3=new FP2(Q.x);				
+		y3.add(Q.z); y3.norm();				// y3=X2+Z2
+		x3.mul(y3);							// x3=(X1+Z1)(X2+Z2)
+		y3.copy(t0);
+		y3.add(t2);							// y3=X1.X2+Z1+Z2
+		y3.rsub(x3); y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-		if (B.iszilch())
-		{
-			if (D.iszilch())
-			{
-				dbl();
-				return 1;
-			}
-			else
-			{
-				INF=true;
-				return -1;
-			}
-		}
+		t0.mul_ip(); t0.norm(); // x.Q.x
+		t1.mul_ip(); t1.norm(); // y.Q.y
 
-		if (!aff) z.mul(Q.z);
-		z.mul(B);
+		x3.copy(t0); x3.add(t0); 
+		t0.add(x3); t0.norm();
+		t2.imul(b); 	
 
-		FP2 e=new FP2(B); e.sqr();
-		B.mul(e);
-		A.mul(e);
+		FP2 z3=new FP2(t1); z3.add(t2); z3.norm();
+		t1.sub(t2); t1.norm(); 
+		y3.imul(b); 
 
-		e.copy(A);
-		e.add(A); e.add(B);
-	e.norm();
-	D.norm();
-		x.copy(D); x.sqr(); x.sub(e);
-	x.norm();
-		A.sub(x);
-	A.norm();
-		y.copy(A); y.mul(D); 
-		C.mul(B); y.sub(C);
+		x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2);
+		y3.mul(t0); t1.mul(z3); y3.add(t1);
+		t0.mul(t3); z3.mul(t4); z3.add(t0);
 
-		//x.norm();
-		y.norm();
-		z.norm();
-
+		x.copy(x3); x.norm(); 
+		y.copy(y3); y.norm();
+		z.copy(z3); z.norm();
+//System.out.println("Out of add");
 		return 0;
 	}
 
@@ -392,62 +375,16 @@ public final class ECP2 {
 	{
 		if (INF) return;
 		FP2 X2=new FP2(X);
+
 		X2.sqr();
 		x.conj();
 		y.conj();
 		z.conj();
 		z.reduce();
 		x.mul(X2);
+
 		y.mul(X2);
 		y.mul(X);
-	}
-
-/* normalises m-array of ECP2 points. Requires work vector of m FP2s */
-
-	public static void multiaffine(int m,ECP2[] P)
-	{
-		int i;
-		FP2 t1=new FP2(0);
-		FP2 t2=new FP2(0);
-
-		FP2[] work=new FP2[m];
-		work[0]=new FP2(1);
-		work[1]=new FP2(P[0].z);
-		for (i=2;i<m;i++)
-		{
-			work[i]=new FP2(work[i-1]);
-			work[i].mul(P[i-1].z);
-		}
-
-		t1.copy(work[m-1]); t1.mul(P[m-1].z);
-
-		t1.inverse();
-
-		t2.copy(P[m-1].z);
-		work[m-1].mul(t1);
-
-		for (i=m-2;;i--)
-		{
-			if (i==0)
-			{
-				work[0].copy(t1);
-				work[0].mul(t2);
-				break;
-			}
-			work[i].mul(t2);
-			work[i].mul(t1);
-			t2.mul(P[i].z);
-		}
-/* now work[] contains inverses of all Z coordinates */
-
-		for (i=0;i<m;i++)
-		{
-			P[i].z.one();
-			t1.copy(work[i]); t1.sqr();
-			P[i].x.mul(t1);
-			t1.mul(work[i]);
-			P[i].y.mul(t1);
-		}    
 	}
 
 /* P*=e */
@@ -479,10 +416,6 @@ public final class ECP2 {
 			W[i].copy(W[i-1]);
 			W[i].add(Q);
 		}
-
-/* convert the table to affine */
-
-		multiaffine(8,W);
 
 /* make exponent odd - add 2P if even, P if odd */
 		t.copy(e);
@@ -541,6 +474,7 @@ public final class ECP2 {
 /* precompute table */
 
 		W[0]=new ECP2(); W[0].copy(Q[0]); W[0].sub(Q[1]);
+
 		W[1]=new ECP2(); W[1].copy(W[0]);
 		W[2]=new ECP2(); W[2].copy(W[0]);
 		W[3]=new ECP2(); W[3].copy(W[0]);
@@ -558,8 +492,6 @@ public final class ECP2 {
 		W[3].add(T);
 		W[4].sub(T);
 		W[7].add(T);
-
-		multiaffine(8,W);
 
 /* if multiplier is even add 1 to multiplier, and add P to correction */
 		mt.zero(); C.inf();

@@ -30,19 +30,19 @@ def addit(fname):
 			incfile.write("<script type=\"text/javascript\" src=\""+fname+"\"></script>\n")
 
 def rsaset(tb,tff,nb,base,ml) :
-
-	fname="BIG_"+tb+".js"
+	bd=tb+"_"+base
+	fname="BIG_"+bd+".js"
 	os.system(copytext+" BIG_XXX.js "+fname)
 
-	replace(fname,"XXX",tb)
+	replace(fname,"XXX",bd)
 	replace(fname,"@NB@",nb)
 	replace(fname,"@BASE@",base)
 	addit(fname)
 
-	fname="DBIG_"+tb+".js"
+	fname="DBIG_"+bd+".js"
 	os.system(copytext+" DBIG_XXX.js "+fname)
 
-	replace(fname,"XXX",tb)
+	replace(fname,"XXX",bd)
 	addit(fname)
 
 
@@ -50,7 +50,7 @@ def rsaset(tb,tff,nb,base,ml) :
 	os.system(copytext+" FF_WWW.js "+fname)
 
 	replace(fname,"WWW",tff)
-	replace(fname,"XXX",tb)
+	replace(fname,"XXX",bd)
 	replace(fname,"@ML@",ml)
 	addit(fname)
 
@@ -58,40 +58,49 @@ def rsaset(tb,tff,nb,base,ml) :
 	os.system(copytext+" RSA_WWW.js "+fname)
 
 	replace(fname,"WWW",tff)
-	replace(fname,"XXX",tb)
+	replace(fname,"XXX",bd)
 	addit(fname)
 
 
 def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
-
-	fname="BIG_"+tb+".js"
+	bd=tb+"_"+base
+	fname="BIG_"+bd+".js"
 	os.system(copytext+" BIG_XXX.js "+fname)
 
-	replace(fname,"XXX",tb)
+	replace(fname,"XXX",bd)
 	replace(fname,"@NB@",nb)
 	replace(fname,"@BASE@",base)
 	addit(fname)
 
-	fname="DBIG_"+tb+".js"
+	fname="DBIG_"+bd+".js"
 	os.system(copytext+" DBIG_XXX.js "+fname)
 
-	replace(fname,"XXX",tb)
+	replace(fname,"XXX",bd)
 	addit(fname)
 
 	fname="FP_"+tf+".js"
 	os.system(copytext+" FP_YYY.js "+fname)
 
-	replace(fname,"XXX",tb)
+	replace(fname,"XXX",bd)
 	replace(fname,"YYY",tf)
 	replace(fname,"@NBT@",nbt)
 	replace(fname,"@M8@",m8)
 	replace(fname,"@MT@",mt)
+
+	ib=int(base)
+	inb=int(nb)
+	inbt=int(nbt)
+	sh=ib*(1+((8*inb-1)//ib))-inbt
+	if sh > 30 :
+		sh=30
+	replace(fname,"@SH@",str(sh))
+
 	addit(fname)
 
 	fname="ECP_"+tc+".js"
 	os.system(copytext+" ECP_ZZZ.js "+fname)
 
-	replace(fname,"XXX",tb)
+	replace(fname,"XXX",bd)
 	replace(fname,"YYY",tf)
 	replace(fname,"ZZZ",tc)
 	replace(fname,"@CT@",ct)
@@ -103,7 +112,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 
 	replace(fname,"ZZZ",tc)
 	replace(fname,"YYY",tf)
-	replace(fname,"XXX",tb)
+	replace(fname,"XXX",bd)
 	addit(fname)
 
 	fname="ROM_FIELD_"+tf+".js"
@@ -115,39 +124,39 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		fname="FP2_"+tf+".js"
 		os.system(copytext+" FP2_YYY.js "+fname)
 		replace(fname,"YYY",tf)
-		replace(fname,"XXX",tb)
+		replace(fname,"XXX",bd)
 		addit(fname)
 
 		fname="FP4_"+tf+".js"
 		os.system(copytext+" FP4_YYY.js "+fname)
 		replace(fname,"YYY",tf)
-		replace(fname,"XXX",tb)
+		replace(fname,"XXX",bd)
 		addit(fname)
 
 		fname="FP12_"+tf+".js"
 		os.system(copytext+" FP12_YYY.js "+fname)
 		replace(fname,"YYY",tf)
-		replace(fname,"XXX",tb)
+		replace(fname,"XXX",bd)
 		addit(fname)
 
 		fname="ECP2_"+tc+".js"
 		os.system(copytext+" ECP2_ZZZ.js "+fname)
 		replace(fname,"YYY",tf)
-		replace(fname,"XXX",tb)
+		replace(fname,"XXX",bd)
 		replace(fname,"ZZZ",tc)
 		addit(fname)
 
 		fname="PAIR_"+tc+".js"
 		os.system(copytext+" PAIR_ZZZ.js "+fname)
 		replace(fname,"YYY",tf)
-		replace(fname,"XXX",tb)
+		replace(fname,"XXX",bd)
 		replace(fname,"ZZZ",tc)
 		addit(fname)
 
 		fname="MPIN_"+tc+".js"
 		os.system(copytext+" MPIN_ZZZ.js "+fname)
 		replace(fname,"YYY",tf)
-		replace(fname,"XXX",tb)
+		replace(fname,"XXX",bd)
 		replace(fname,"ZZZ",tc)
 		addit(fname)
 
@@ -162,33 +171,28 @@ print("7. GOLDILOCKS")
 print("8. NIST384")
 print("9. C41417")
 print("10. NIST521\n")
-print("11. MF254 WEIERSTRASS")
-print("12. MF254 EDWARDS")
-print("13. MF254 MONTGOMERY")
-print("14. MF256 WEIERSTRASS")
-print("15. MF256 EDWARDS")
-print("16. MF256 MONTGOMERY")
-print("17. MS255 WEIERSTRASS")
-print("18. MS255 EDWARDS")
-print("19. MS255 MONTGOMERY")
-print("20. MS256 WEIERSTRASS")
-print("21. MS256 EDWARDS")
-print("22. MS256 MONTGOMERY")
+
+print("11. NUMS256W")
+print("12. NUMS256E")
+print("13. NUMS384W")
+print("14. NUMS384E")
+print("15. NUMS512W")
+print("16. NUMS512E\n")
 
 
 print("Pairing-Friendly Elliptic Curves")
-print("23. BN254")
-print("24. BN254CX")
-print("25. BLS383\n")
+print("17. BN254")
+print("18. BN254CX")
+print("19. BLS383\n")
 
 print("RSA")
-print("26. RSA2048")
-print("27. RSA3072")
-print("28. RSA4096")
+print("20. RSA2048")
+print("21. RSA3072")
+print("22. RSA4096")
 
 selection=[]
 ptr=0
-max=29
+max=23
 
 curve_selected=False
 pfcurve_selected=False
@@ -244,7 +248,7 @@ while ptr<max:
 		curveset("448","GOLDILOCKS","GOLDILOCKS","56","23","448","7","GENERALISED_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==8:
-		curveset("384","NIST384","NIST384","48","","28","56","384","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("384","NIST384","NIST384","48","23","384","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==9:
 		curveset("416","C41417","C41417","52","23","414","7","PSEUDO_MERSENNE","EDWARDS","NOT")
@@ -254,49 +258,31 @@ while ptr<max:
 		curve_selected=True
 
 	if x==11:
-		curveset("256","254MF","MF254W","32","24","254","7","MONTGOMERY_FRIENDLY","WEIERSTRASS","NOT")
+		curveset("256","256PM","NUMS256W","32","24","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==12:
-		curveset("256","254MF","MF254E","32","24","254","7","MONTGOMERY_FRIENDLY","EDWARDS","NOT")
+		curveset("256","256PM","NUMS256E","32","24","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==13:
-		curveset("256","254MF","MF254M","32","24","254","7","MONTGOMERY_FRIENDLY","MONTGOMERY","NOT")
+		curveset("384","384PM","NUMS384W","48","23","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==14:
-		curveset("256","256MF","MF256W","32","24","256","7","MONTGOMERY_FRIENDLY","WEIERSTRASS","NOT")
+		curveset("384","384PM","NUMS384E","48","23","384","3","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==15:
-		curveset("256","256MF","MF256E","32","24","256","7","MONTGOMERY_FRIENDLY","EDWARDS","NOT")
+		curveset("512","512PM","NUMS512W","64","23","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==16:
-		curveset("256","256MF","MF256M","32","24","256","7","MONTGOMERY_FRIENDLY","MONTGOMERY","NOT")
-		curve_selected=True
-	if x==17:
-		curveset("256","255MS","MS255W","32","24","255","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
-		curve_selected=True
-	if x==18:
-		curveset("256","255MS","MS255E","32","24","255","3","PSEUDO_MERSENNE","EDWARDS","NOT")
-		curve_selected=True
-	if x==19:
-		curveset("256","255MS","MS255M","32","24","255","3","PSEUDO_MERSENNE","MONTGOMERY","NOT")
-		curve_selected=True
-	if x==20:
-		curveset("256","256MS","MS256W","32","24","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
-		curve_selected=True
-	if x==21:
-		curveset("256","256MS","MS256E","32","24","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
-		curve_selected=True
-	if x==22:
-		curveset("256","256MS","MS256M","32","24","256","3","PSEUDO_MERSENNE","MONTGOMERY","NOT")
+		curveset("512","512PM","NUMS512E","64","23","512","7","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 
-	if x==23:
+	if x==17:
 		curveset("256","BN254","BN254","32","24","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
 		pfcurve_selected=True
-	if x==24:
+	if x==18:
 		curveset("256","BN254CX","BN254CX","32","24","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
 		pfcurve_selected=True
-	if x==25:
+	if x==19:
 		curveset("384","BLS383","BLS383","48","23","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
 		pfcurve_selected=True
 
@@ -309,17 +295,17 @@ while ptr<max:
 # multiplier is 2^m (see above)
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==26:
+	if x==20:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("1024","2048","128","22","2")
 		#rsaset("512","2048","64","23","4")
 		#rsaset("256","2048","32","24","8")
 		rsa_selected=True
-	if x==27:
+	if x==21:
 		rsaset("384","3072","48","23","8")
 		rsa_selected=True
-	if x==28:
+	if x==22:
 		#rsaset("256","4096","32","24","16")
 		rsaset("512","4096","64","23","8")
 		rsa_selected=True

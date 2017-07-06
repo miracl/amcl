@@ -71,7 +71,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	os.system(copytext+"ARCH32.go "+fpath+"ARCH.go")
 	os.system(copytext+"BIG32.go "+fpath+"BIG.go")
 	os.system(copytext+"DBIG.go "+fpath+"DBIG.go")
-	os.system(copytext+"FP32.go "+fpath+"FP.go")
+	os.system(copytext+"FP.go "+fpath+"FP.go")
 	os.system(copytext+"ECP.go "+fpath+"ECP.go")
 	os.system(copytext+"ECDH.go "+fpath+"ECDH.go")
 	os.system(copytext+"ROM_"+tc+"_32.go "+fpath+"ROM.go")
@@ -89,6 +89,15 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fpath+"FP.go","@NBT@",nbt)
 	replace(fpath+"FP.go","@M8@",m8)
 	replace(fpath+"FP.go","@MT@",mt)
+
+	ib=int(base)
+	inb=int(nb)
+	inbt=int(nbt)
+	sh=ib*(1+((8*inb-1)//ib))-inbt
+	if sh > 30 :
+		sh=30
+	replace(fpath+"FP.go","@SH@",str(sh))
+
 
 	replace(fpath+"ECP.go","@CT@",ct)
 	replace(fpath+"ECP.go","@PF@",pf)
@@ -134,33 +143,27 @@ print("7. GOLDILOCKS")
 print("8. NIST384")
 print("9. C41417")
 print("10. NIST521\n")
-print("11. MF254 WEIERSTRASS")
-print("12. MF254 EDWARDS")
-print("13. MF254 MONTGOMERY")
-print("14. MF256 WEIERSTRASS")
-print("15. MF256 EDWARDS")
-print("16. MF256 MONTGOMERY")
-print("17. MS255 WEIERSTRASS")
-print("18. MS255 EDWARDS")
-print("19. MS255 MONTGOMERY")
-print("20. MS256 WEIERSTRASS")
-print("21. MS256 EDWARDS")
-print("22. MS256 MONTGOMERY")
+print("11. NUMS256W")
+print("12. NUMS256E")
+print("13. NUMS384W")
+print("14. NUMS384E")
+print("15. NUMS512W")
+print("16. NUMS512E\n")
 
 
 print("Pairing-Friendly Elliptic Curves")
-print("23. BN254")
-print("24. BN254CX")
-print("25. BLS383\n")
+print("17. BN254")
+print("18. BN254CX")
+print("19. BLS383\n")
 
 print("RSA")
-print("26. RSA2048")
-print("27. RSA3072")
-print("28. RSA4096")
+print("20. RSA2048")
+print("21. RSA3072")
+print("22. RSA4096")
 
 selection=[]
 ptr=0
-max=29
+max=23
 
 curve_selected=False
 pfcurve_selected=False
@@ -200,13 +203,13 @@ while ptr<max:
 		curveset("C25519","32","29","255","5","PSEUDO_MERSENNE","MONTGOMERY","NOT")
 		curve_selected=True
 	if x==3:
-		curveset("NIST256","32","29","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("NIST256","32","28","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==4:
-		curveset("BRAINPOOL","32","29","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("BRAINPOOL","32","28","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==5:
-		curveset("ANSSI","32","29","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("ANSSI","32","28","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 
 	if x==6:
@@ -216,7 +219,7 @@ while ptr<max:
 		curveset("GOLDILOCKS","56","29","448","7","GENERALISED_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==8:
-		curveset("NIST384","48","28","384","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("NIST384","48","29","384","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==9:
 		curveset("C41417","52","29","414","7","PSEUDO_MERSENNE","EDWARDS","NOT")
@@ -226,50 +229,32 @@ while ptr<max:
 		curve_selected=True
 
 	if x==11:
-		curveset("MF254W","32","29","254","7","MONTGOMERY_FRIENDLY","WEIERSTRASS","NOT")
+		curveset("NUMS256W","32","28","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==12:
-		curveset("MF254E","32","29","254","7","MONTGOMERY_FRIENDLY","EDWARDS","NOT")
+		curveset("NUMS256E","32","29","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==13:
-		curveset("MF254M","32","29","254","7","MONTGOMERY_FRIENDLY","MONTGOMERY","NOT")
+		curveset("NUMS384W","48","29","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==14:
-		curveset("MF256W","32","29","256","7","MONTGOMERY_FRIENDLY","WEIERSTRASS","NOT")
+		curveset("NUMS384E","48","29","384","3","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==15:
-		curveset("MF256E","32","29","256","7","MONTGOMERY_FRIENDLY","EDWARDS","NOT")
+		curveset("NUMS512W","64","29","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==16:
-		curveset("MF256M","32","29","256","7","MONTGOMERY_FRIENDLY","MONTGOMERY","NOT")
-		curve_selected=True
-	if x==17:
-		curveset("MS255W","32","29","255","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
-		curve_selected=True
-	if x==18:
-		curveset("MS255E","32","29","255","3","PSEUDO_MERSENNE","EDWARDS","NOT")
-		curve_selected=True
-	if x==19:
-		curveset("MS255M","32","29","255","3","PSEUDO_MERSENNE","MONTGOMERY","NOT")
-		curve_selected=True
-	if x==20:
-		curveset("MS256W","32","29","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
-		curve_selected=True
-	if x==21:
-		curveset("MS256E","32","29","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
-		curve_selected=True
-	if x==22:
-		curveset("MS256M","32","29","256","3","PSEUDO_MERSENNE","MONTGOMERY","NOT")
+		curveset("NUMS512E","64","29","512","7","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 
-	if x==23:
-		curveset("BN254","32","29","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+	if x==17:
+		curveset("BN254","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
 		pfcurve_selected=True
-	if x==24:
-		curveset("BN254CX","32","29","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+	if x==18:
+		curveset("BN254CX","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
 		pfcurve_selected=True
-	if x==25:
-		curveset("BLS383","48","28","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
+	if x==19:
+		curveset("BLS383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
 		pfcurve_selected=True
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
@@ -277,17 +262,17 @@ while ptr<max:
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==26:
+	if x==20:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("RSA2048","128","28","2")
 		#rsaset("RSA2048","64","29","4")
 		#rsaset("RSA2048","32","29","8")
 		rsa_selected=True
-	if x==27:
+	if x==21:
 		rsaset("RSA3072","48","28","8")
 		rsa_selected=True
-	if x==28:
+	if x==22:
 		#rsaset("RSA4096","32","29","16")
 		rsaset("RSA4096","64","29","8")
 		rsa_selected=True

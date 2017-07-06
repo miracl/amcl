@@ -907,7 +907,7 @@ func logb2(w uint32) uint {
 	v = v - ((v >> 1) & 0x55555555)                 
 	v = (v & 0x33333333) + ((v >> 2) & 0x33333333)  
 	r:= uint((   ((v + (v >> 4)) & 0xF0F0F0F)   * 0x1010101) >> 24)
-	return (r+1)
+	return (r)
 }
 
 

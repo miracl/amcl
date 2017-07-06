@@ -24,6 +24,8 @@ under the License.
 
 int ECP2_ZZZ_isinf(ECP2_ZZZ *P)
 {
+	if (P->inf) return 1;
+	P->inf=FP2_YYY_iszilch(&(P->x)) & FP2_YYY_iszilch(&(P->z));
     return P->inf;
 }
 
@@ -43,7 +45,7 @@ void ECP2_ZZZ_inf(ECP2_ZZZ *P)
 {
     P->inf=1;
     FP2_YYY_zero(&(P->x));
-    FP2_YYY_zero(&(P->y));
+    FP2_YYY_one(&(P->y));
     FP2_YYY_zero(&(P->z));
 }
 
@@ -92,21 +94,16 @@ static void ECP2_ZZZ_select(ECP2_ZZZ *P,ECP2_ZZZ W[],sign32 b)
 /* SU= 312 */
 int ECP2_ZZZ_equals(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 {
-    FP2_YYY pz2,qz2,a,b;
-    if (P->inf && Q->inf) return 1;
-    if (P->inf || Q->inf) return 0;
+    FP2_YYY a,b;
+    if (ECP2_ZZZ_isinf(P) && ECP2_ZZZ_isinf(Q)) return 1;
+    if (ECP2_ZZZ_isinf(P) || ECP2_ZZZ_isinf(Q)) return 0;
 
-    FP2_YYY_sqr(&pz2,&(P->z));
-    FP2_YYY_sqr(&qz2,&(Q->z));
-
-    FP2_YYY_mul(&a,&(P->x),&qz2);
-    FP2_YYY_mul(&b,&(Q->x),&pz2);
+    FP2_YYY_mul(&a,&(P->x),&(Q->z));
+    FP2_YYY_mul(&b,&(Q->x),&(P->z));
     if (!FP2_YYY_equals(&a,&b)) return 0;
 
-    FP2_YYY_mul(&a,&(P->y),&qz2);
-    FP2_YYY_mul(&a,&a,&(Q->z));
-    FP2_YYY_mul(&b,&(Q->y),&pz2);
-    FP2_YYY_mul(&b,&b,&(P->z));
+    FP2_YYY_mul(&a,&(P->y),&(Q->z));
+    FP2_YYY_mul(&b,&(Q->y),&(P->z));
     if (!FP2_YYY_equals(&a,&b)) return 0;
     return 1;
 }
@@ -115,8 +112,8 @@ int ECP2_ZZZ_equals(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 /* SU= 232 */
 void ECP2_ZZZ_affine(ECP2_ZZZ *P)
 {
-    FP2_YYY one,iz,izn;
-    if (P->inf) return;
+    FP2_YYY one,iz;
+    if (ECP2_ZZZ_isinf(P)) return;
 
     FP2_YYY_one(&one);
     if (FP2_YYY_isunity(&(P->z)))
@@ -127,10 +124,8 @@ void ECP2_ZZZ_affine(ECP2_ZZZ *P)
     }
 
     FP2_YYY_inv(&iz,&(P->z));
-    FP2_YYY_sqr(&izn,&iz);
-    FP2_YYY_mul(&(P->x),&(P->x),&izn);
-    FP2_YYY_mul(&izn,&izn,&iz);
-    FP2_YYY_mul(&(P->y),&(P->y),&izn);
+    FP2_YYY_mul(&(P->x),&(P->x),&iz);
+    FP2_YYY_mul(&(P->y),&(P->y),&iz);
 
     FP2_YYY_reduce(&(P->x));
     FP2_YYY_reduce(&(P->y));
@@ -189,33 +184,37 @@ void ECP2_ZZZ_outputxyz(ECP2_ZZZ *P)
 /* Convert Q to octet string */
 void ECP2_ZZZ_toOctet(octet *W,ECP2_ZZZ *Q)
 {
-    FP2_YYY qx,qy;
+	BIG_XXX b;
+	FP2_YYY qx,qy;
     ECP2_ZZZ_get(&qx,&qy,Q);
-    FP_YYY_redc(qx.a);
-    FP_YYY_redc(qx.b);
-    FP_YYY_redc(qy.a);
-    FP_YYY_redc(qy.b);
+
+	FP_YYY_redc(b,&(qx.a));
+    BIG_XXX_toBytes(&(W->val[0]),b);
+    FP_YYY_redc(b,&(qx.b));
+    BIG_XXX_toBytes(&(W->val[MODBYTES_XXX]),b);
+    FP_YYY_redc(b,&(qy.a));
+    BIG_XXX_toBytes(&(W->val[2*MODBYTES_XXX]),b);
+    FP_YYY_redc(b,&(qy.b));
+    BIG_XXX_toBytes(&(W->val[3*MODBYTES_XXX]),b);
+
     W->len=4*MODBYTES_XXX;
 
-    BIG_XXX_toBytes(&(W->val[0]),qx.a);
-    BIG_XXX_toBytes(&(W->val[MODBYTES_XXX]),qx.b);
-    BIG_XXX_toBytes(&(W->val[2*MODBYTES_XXX]),qy.a);
-    BIG_XXX_toBytes(&(W->val[3*MODBYTES_XXX]),qy.b);
 }
 
 /* SU= 176 */
 /* restore Q from octet string */
 int ECP2_ZZZ_fromOctet(ECP2_ZZZ *Q,octet *W)
 {
+	BIG_XXX b;
     FP2_YYY qx,qy;
-    BIG_XXX_fromBytes(qx.a,&(W->val[0]));
-    BIG_XXX_fromBytes(qx.b,&(W->val[MODBYTES_XXX]));
-    BIG_XXX_fromBytes(qy.a,&(W->val[2*MODBYTES_XXX]));
-    BIG_XXX_fromBytes(qy.b,&(W->val[3*MODBYTES_XXX]));
-    FP_YYY_nres(qx.a);
-    FP_YYY_nres(qx.b);
-    FP_YYY_nres(qy.a);
-    FP_YYY_nres(qy.b);
+    BIG_XXX_fromBytes(b,&(W->val[0]));
+	FP_YYY_nres(&(qx.a),b);
+    BIG_XXX_fromBytes(b,&(W->val[MODBYTES_XXX]));
+    FP_YYY_nres(&(qx.b),b);
+    BIG_XXX_fromBytes(b,&(W->val[2*MODBYTES_XXX]));
+    FP_YYY_nres(&(qy.a),b);
+    BIG_XXX_fromBytes(b,&(W->val[3*MODBYTES_XXX]));
+    FP_YYY_nres(&(qy.b),b);
 
     if (ECP2_ZZZ_set(Q,&qx,&qy)) return 1;
     return 0;
@@ -249,10 +248,9 @@ void ECP2_ZZZ_rhs(FP2_YYY *rhs,FP2_YYY *x)
 /* SU= 232 */
 int ECP2_ZZZ_set(ECP2_ZZZ *P,FP2_YYY *x,FP2_YYY *y)
 {
-    FP2_YYY one,rhs,y2;
-    FP2_YYY_copy(&y2,y);
+    FP2_YYY rhs,y2;
 
-    FP2_YYY_sqr(&y2,&y2);
+    FP2_YYY_sqr(&y2,y);
     ECP2_ZZZ_rhs(&rhs,x);
 
     if (!FP2_YYY_equals(&y2,&rhs))
@@ -265,8 +263,7 @@ int ECP2_ZZZ_set(ECP2_ZZZ *P,FP2_YYY *x,FP2_YYY *y)
     FP2_YYY_copy(&(P->x),x);
     FP2_YYY_copy(&(P->y),y);
 
-    FP2_YYY_one(&one);
-    FP2_YYY_copy(&(P->z),&one);
+    FP2_YYY_one(&(P->z));
     return 1;
 }
 
@@ -294,6 +291,7 @@ int ECP2_ZZZ_setx(ECP2_ZZZ *P,FP2_YYY *x)
 /* SU= 8 */
 void ECP2_ZZZ_neg(ECP2_ZZZ *P)
 {
+//	if (ECP2_ZZZ_isinf(P)) return;
 	FP2_YYY_norm(&(P->y));
     FP2_YYY_neg(&(P->y),&(P->y));
     FP2_YYY_norm(&(P->y));
@@ -304,63 +302,57 @@ void ECP2_ZZZ_neg(ECP2_ZZZ *P)
 /* SU= 448 */
 int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
 {
-    FP2_YYY w1,w7,w8,w2,w3;
+    FP2_YYY t0,t1,t2,t3,iy,x3,y3;
     if (P->inf) return -1;
 
-    if (FP2_YYY_iszilch(&(P->y)))
-    {
-        P->inf=1;
-        return -1;
-    }
+	FP2_YYY_copy(&iy,&(P->y));		//FP2 iy=new FP2(y);
+	FP2_YYY_mul_ip(&iy);			//iy.mul_ip(); 
+	FP2_YYY_norm(&iy);				//iy.norm();
 
-    /* Assuming A=0 */
-    FP2_YYY_sqr(&w1,&(P->x));
-    FP2_YYY_imul(&w8,&w1,3);
+	//FP2_YYY_copy(&t0,&(P->y));		//FP2 t0=new FP2(y);                  //***** Change 
+	FP2_YYY_sqr(&t0,&(P->y));			//t0.sqr();            
+	FP2_YYY_mul_ip(&t0);			//t0.mul_ip();   
+	//FP2_YYY_copy(&t1,&iy);				//FP2 t1=new FP2(iy);  
+	FP2_YYY_mul(&t1,&iy,&(P->z));	//t1.mul(z);
+	//FP2_YYY_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
+	FP2_YYY_sqr(&t2,&(P->z));				//t2.sqr();
 
-    FP2_YYY_sqr(&w2,&(P->y));
+	//FP2_YYY_copy(&(P->z),&t0);		//z.copy(t0);
+	FP2_YYY_add(&(P->z),&t0,&t0);	//z.add(t0); 
+	FP2_YYY_norm(&(P->z));				//z.norm(); 
+	FP2_YYY_add(&(P->z),&(P->z),&(P->z));	//z.add(z); 
+	FP2_YYY_add(&(P->z),&(P->z),&(P->z));	//z.add(z); 
+	FP2_YYY_norm(&(P->z));			//z.norm();  
 
-	FP2_YYY_imul(&w3,&(P->x),4);
-	FP2_YYY_mul(&w3,&w3,&w2);
-	
-//    FP2_YYY_mul(&w3,&(P->x),&w2);
-//    FP2_YYY_imul(&w3,&w3,4);
+	FP2_YYY_imul(&t2,&t2,3*CURVE_B_I_ZZZ);	//t2.imul(3*ROM.CURVE_B_I); 
 
-    FP2_YYY_neg(&w1,&w3);
-    FP2_YYY_norm(&w1);
+	//FP2_YYY_copy(&x3,&t2);			//FP2 x3=new FP2(t2);
+	FP2_YYY_mul(&x3,&t2,&(P->z));	//x3.mul(z); 
 
-    FP2_YYY_sqr(&(P->x),&w8);
-    FP2_YYY_add(&(P->x),&(P->x),&w1);
-    FP2_YYY_add(&(P->x),&(P->x),&w1);
+	//FP2_YYY_copy(&y3,&t0);			//FP2 y3=new FP2(t0);   
 
-    FP2_YYY_norm(&(P->x));
+	FP2_YYY_add(&y3,&t0,&t2);		//y3.add(t2); 
+	FP2_YYY_norm(&y3);				//y3.norm();
+	FP2_YYY_mul(&(P->z),&(P->z),&t1);	//z.mul(t1);
 
-	if (FP2_YYY_isunity(&(P->z)))
-	{
-		FP2_YYY_add(&(P->z),&(P->y),&(P->y));
-	}
-	else
-	{
-		FP2_YYY_add(&(P->z),&(P->z),&(P->z)); FP2_YYY_norm(&(P->z)); 
-		FP2_YYY_mul(&(P->z),&(P->z),&(P->y));
-	}
+	//FP2_YYY_copy(&t1,&t2);			//t1.copy(t2); 
+	FP2_YYY_add(&t1,&t2,&t2);		//t1.add(t2); 
+	FP2_YYY_add(&t2,&t2,&t1);		//t2.add(t1); 
+	FP2_YYY_norm(&t2);				//t2.norm();  
+	FP2_YYY_sub(&t0,&t0,&t2);		//t0.sub(t2); 
+	FP2_YYY_norm(&t0);				//t0.norm();                           //y^2-9bz^2
+	FP2_YYY_mul(&y3,&y3,&t0);		//y3.mul(t0); 
+	FP2_YYY_add(&(P->y),&y3,&x3);		//y3.add(x3);                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+	//FP2_YYY_copy(&t1,&(P->x));		//t1.copy(x); 
+	FP2_YYY_mul(&t1,&(P->x),&iy);		//t1.mul(iy);						//
+	//FP2_YYY_copy(&(P->x),&t0);		//x.copy(t0); 
+	FP2_YYY_norm(&t0);			//x.norm(); 
+	FP2_YYY_mul(&(P->x),&t0,&t1);	//x.mul(t1); 
+	FP2_YYY_add(&(P->x),&(P->x),&(P->x));	//x.add(x);       //(y^2-9bz^2)xy2
 
-//    if (FP2_YYY_isunity(&(P->z))) FP2_YYY_copy(&(P->z),&(P->y));
-//    else FP2_YYY_mul(&(P->z),&(P->z),&(P->y));
-//    FP2_YYY_add(&(P->z),&(P->z),&(P->z));
-
-    FP2_YYY_add(&w7,&w2,&w2);
-FP2_YYY_norm(&w7);
-    FP2_YYY_sqr(&w2,&w7);
-
-    FP2_YYY_add(&w2,&w2,&w2);
-    FP2_YYY_sub(&w3,&w3,&(P->x));
-FP2_YYY_norm(&w2);
-FP2_YYY_norm(&w3);
-    FP2_YYY_mul(&(P->y),&w8,&w3);
-    FP2_YYY_sub(&(P->y),&(P->y),&w2);
-
-    FP2_YYY_norm(&(P->y));
-    FP2_YYY_norm(&(P->z));
+	FP2_YYY_norm(&(P->x));			//x.norm(); 
+	//FP2_YYY_copy(&(P->y),&y3);		//y.copy(y3); 
+	FP2_YYY_norm(&(P->y));			//y.norm();
 
     return 1;
 }
@@ -369,8 +361,8 @@ FP2_YYY_norm(&w3);
 /* SU= 400 */
 int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 {
-    int aff;
-    FP2_YYY B,D,E,C,A;
+    FP2_YYY t0,t1,t2,t3,t4,x3,y3,z3;
+	int b3=3*CURVE_B_I_ZZZ;
     if (Q->inf) return 0;
     if (P->inf)
     {
@@ -378,72 +370,92 @@ int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
         return 0;
     }
 
-    aff=1;
-    if (!FP2_YYY_isunity(&(Q->z))) aff=0;
+	//FP2_YYY_copy(&t0,&(P->x));		//FP2 t0=new FP2(x);
+	FP2_YYY_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
+	//FP2_YYY_copy(&t1,&(P->y));		//FP2 t1=new FP2(y);
+	FP2_YYY_mul(&t1,&(P->y),&(Q->y));	//t1.mul(Q.y);		 // y.Q.y
 
-    if (!aff)
-    {
-        FP2_YYY_sqr(&A,&(Q->z));
-        FP2_YYY_mul(&C,&A,&(Q->z));
+	//FP2_YYY_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
+	FP2_YYY_mul(&t2,&(P->z),&(Q->z));	//t2.mul(Q.z);
+	//FP2_YYY_copy(&t3,&(P->x));		//FP2 t3=new FP2(x);
+	FP2_YYY_add(&t3,&(P->x),&(P->y));	//t3.add(y); 
+	FP2_YYY_norm(&t3);				//t3.norm();          //t3=X1+Y1
+	//FP2_YYY_copy(&t4,&(Q->x));		//FP2 t4=new FP2(Q.x);            
+	FP2_YYY_add(&t4,&(Q->x),&(Q->y));	//t4.add(Q.y); 
+	FP2_YYY_norm(&t4);				//t4.norm();			//t4=X2+Y2
+	FP2_YYY_mul(&t3,&t3,&t4);		//t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
+	//FP2_YYY_copy(&t4,&t0);			//t4.copy(t0); 
+	FP2_YYY_add(&t4,&t0,&t1);		//t4.add(t1);		//t4=X1.X2+Y1.Y2
 
-        FP2_YYY_sqr(&B,&(P->z));
-        FP2_YYY_mul(&D,&B,&(P->z));
+	FP2_YYY_sub(&t3,&t3,&t4);		//t3.sub(t4); 
+	FP2_YYY_norm(&t3);				//t3.norm(); 
+	FP2_YYY_mul_ip(&t3);			//t3.mul_ip();  
+	FP2_YYY_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 
-        FP2_YYY_mul(&A,&(P->x),&A);
-        FP2_YYY_mul(&C,&(P->y),&C);
-    }
-    else
-    {
-        FP2_YYY_copy(&A,&(P->x));
-        FP2_YYY_copy(&C,&(P->y));
+	//FP2_YYY_copy(&t4,&(P->y));		//t4.copy(y);                    
+	FP2_YYY_add(&t4,&(P->y),&(P->z));	//t4.add(z); 
+	FP2_YYY_norm(&t4);				//t4.norm();			//t4=Y1+Z1
+	//FP2_YYY_copy(&x3,&(Q->y));		//FP2 x3=new FP2(Q.y);
+	FP2_YYY_add(&x3,&(Q->y),&(Q->z));	//x3.add(Q.z); 
+	FP2_YYY_norm(&x3);				//x3.norm();			//x3=Y2+Z2
 
-        FP2_YYY_sqr(&B,&(P->z));
-        FP2_YYY_mul(&D,&B,&(P->z));
-    }
+	FP2_YYY_mul(&t4,&t4,&x3);		//t4.mul(x3);						//t4=(Y1+Z1)(Y2+Z2)
+	//FP2_YYY_copy(&x3,&t1);			//x3.copy(t1);					//
+	FP2_YYY_add(&x3,&t1,&t2);		//x3.add(t2);						//X3=Y1.Y2+Z1.Z2
+	
+	FP2_YYY_sub(&t4,&t4,&x3);		//t4.sub(x3); 
+	FP2_YYY_norm(&t4);				//t4.norm(); 
+	FP2_YYY_mul_ip(&t4);			//t4.mul_ip(); 
+	FP2_YYY_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 
-    FP2_YYY_mul(&B,&(Q->x),&B);
-    FP2_YYY_sub(&B,&B,&A); /* B=Qx.z^2-x.Qz^2 */
-    FP2_YYY_mul(&D,&(Q->y),&D);
-    FP2_YYY_sub(&D,&D,&C); /* D=Qy.z^3-y.Qz^3 */
+	//FP2_YYY_copy(&x3,&(P->x));		//x3.copy(x); 
+	FP2_YYY_add(&x3,&(P->x),&(P->z));	//x3.add(z); 
+	FP2_YYY_norm(&x3);				//x3.norm();	// x3=X1+Z1
+	//FP2_YYY_copy(&y3,&(Q->x));		//FP2 y3=new FP2(Q.x);				
+	FP2_YYY_add(&y3,&(Q->x),&(Q->z));	//y3.add(Q.z); 
+	FP2_YYY_norm(&y3);				//y3.norm();				// y3=X2+Z2
+	FP2_YYY_mul(&x3,&x3,&y3);		//x3.mul(y3);							// x3=(X1+Z1)(X2+Z2)
+	//FP2_YYY_copy(&y3,&t0);			//y3.copy(t0);
+	FP2_YYY_add(&y3,&t0,&t2);		//y3.add(t2);							// y3=X1.X2+Z1+Z2
+	FP2_YYY_sub(&y3,&x3,&y3);		//y3.rsub(x3); 
+	FP2_YYY_norm(&y3);				//y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-    if (FP2_YYY_iszilch(&B))
-    {
-        if (FP2_YYY_iszilch(&D))
-        {
-            ECP2_ZZZ_dbl(P);
-            return 1;
-        }
-        else
-        {
-            ECP2_ZZZ_inf(P);
-            return -1;
-        }
-    }
-    if (!aff) FP2_YYY_mul(&(P->z),&(P->z),&(Q->z));
-    FP2_YYY_mul(&(P->z),&(P->z),&B);
+	FP2_YYY_mul_ip(&t0);			//t0.mul_ip(); 
+	FP2_YYY_norm(&t0);				//t0.norm(); // x.Q.x
+	FP2_YYY_mul_ip(&t1);			//t1.mul_ip(); 
+	FP2_YYY_norm(&t1);				//t1.norm(); // y.Q.y
 
-    FP2_YYY_sqr(&E,&B);
-    FP2_YYY_mul(&B,&B,&E);
-    FP2_YYY_mul(&A,&A,&E);
+	//FP2_YYY_copy(&x3,&t0);			//x3.copy(t0); 
+	FP2_YYY_add(&x3,&t0,&t0);		//x3.add(t0); 
+	FP2_YYY_add(&t0,&t0,&x3);		//t0.add(x3); 
+	FP2_YYY_norm(&t0);				//t0.norm();
+	FP2_YYY_imul(&t2,&t2,b3);		//t2.imul(b); 	
 
-    FP2_YYY_add(&E,&A,&A);
-    FP2_YYY_add(&E,&E,&B);
+	//FP2_YYY_copy(&z3,&t1);			//FP2 z3=new FP2(t1); 
+	FP2_YYY_add(&z3,&t1,&t2);		//z3.add(t2); 
+	FP2_YYY_norm(&z3);				//z3.norm();
+	FP2_YYY_sub(&t1,&t1,&t2);		//t1.sub(t2); 
+	FP2_YYY_norm(&t1);				//t1.norm(); 
+	FP2_YYY_imul(&y3,&y3,b3);		//y3.imul(b); 
 
-FP2_YYY_norm(&D);
-FP2_YYY_norm(&E);
+	//FP2_YYY_copy(&x3,&y3);			//x3.copy(y3); 
+	FP2_YYY_mul(&x3,&y3,&t4);		//x3.mul(t4); 
+	//FP2_YYY_copy(&t2,&t3);			//t2.copy(t3); 
+	FP2_YYY_mul(&t2,&t3,&t1);		//t2.mul(t1); 
+	FP2_YYY_sub(&(P->x),&t2,&x3);		//x3.rsub(t2);
+	FP2_YYY_mul(&y3,&y3,&t0);		//y3.mul(t0); 
+	FP2_YYY_mul(&t1,&t1,&z3);		//t1.mul(z3); 
+	FP2_YYY_add(&(P->y),&y3,&t1);		//y3.add(t1);
+	FP2_YYY_mul(&t0,&t0,&t3);		//t0.mul(t3); 
+	FP2_YYY_mul(&z3,&z3,&t4);		//z3.mul(t4); 
+	FP2_YYY_add(&(P->z),&z3,&t0);		//z3.add(t0);
 
-    FP2_YYY_sqr(&(P->x),&D);
-    FP2_YYY_sub(&(P->x),&(P->x),&E);
-FP2_YYY_norm(&(P->x));
-    FP2_YYY_sub(&A,&A,&(P->x));
-FP2_YYY_norm(&A);
-    FP2_YYY_mul(&(P->y),&A,&D);
-    FP2_YYY_mul(&C,&C,&B);
-    FP2_YYY_sub(&(P->y),&(P->y),&C);
-
-    FP2_YYY_norm(&(P->x));
-    FP2_YYY_norm(&(P->y));
-    FP2_YYY_norm(&(P->z));
+	//FP2_YYY_copy(&(P->x),&x3);		//x.copy(x3); 
+	FP2_YYY_norm(&(P->x));			//x.norm(); 
+	//FP2_YYY_copy(&(P->y),&y3);		//y.copy(y3); 
+	FP2_YYY_norm(&(P->y));			//y.norm();
+	//FP2_YYY_copy(&(P->z),&z3);		//z.copy(z3); 
+	FP2_YYY_norm(&(P->z));			//z.norm();
 
     return 0;
 }
@@ -455,47 +467,6 @@ void ECP2_ZZZ_sub(ECP2_ZZZ *P,ECP2_ZZZ *Q)
     ECP2_ZZZ_neg(Q);
     ECP2_ZZZ_add(P,Q);
     ECP2_ZZZ_neg(Q);
-}
-
-/* normalises m-array of ECP2 points. Requires work vector of m FP2s */
-/* SU= 200 */
-static void ECP2_ZZZ_multiaffine(int m,ECP2_ZZZ *P,FP2_YYY *work)
-{
-    int i;
-    FP2_YYY t1,t2;
-
-    FP2_YYY_one(&work[0]);
-    FP2_YYY_copy(&work[1],&(P[0].z));
-    for (i=2; i<m; i++)
-        FP2_YYY_mul(&work[i],&work[i-1],&(P[i-1].z));
-    FP2_YYY_mul(&t1,&work[m-1],&(P[m-1].z));
-
-    FP2_YYY_inv(&t1,&t1);
-
-    FP2_YYY_copy(&t2,&(P[m-1].z));
-    FP2_YYY_mul(&work[m-1],&work[m-1],&t1);
-
-    for (i=m-2;; i--)
-    {
-        if (i==0)
-        {
-            FP2_YYY_mul(&work[0],&t1,&t2);
-            break;
-        }
-        FP2_YYY_mul(&work[i],&work[i],&t2);
-        FP2_YYY_mul(&work[i],&work[i],&t1);
-        FP2_YYY_mul(&t2,&(P[i].z),&t2);
-    }
-    /* now work[] contains inverses of all Z coordinates */
-
-    for (i=0; i<m; i++)
-    {
-        FP2_YYY_one(&(P[i].z));
-        FP2_YYY_sqr(&t1,&work[i]);
-        FP2_YYY_mul(&(P[i].x),&(P[i].x),&t1);
-        FP2_YYY_mul(&t1,&work[i],&t1);
-        FP2_YYY_mul(&(P[i].y),&(P[i].y),&t1);
-    }
 }
 
 /* P*=e */
@@ -524,10 +495,6 @@ void ECP2_ZZZ_mul(ECP2_ZZZ *P,BIG_XXX e)
         ECP2_ZZZ_copy(&W[i],&W[i-1]);
         ECP2_ZZZ_add(&W[i],&Q);
     }
-
-    /* convert the table to affine */
-
-    ECP2_ZZZ_multiaffine(8,W,work);
 
     /* make exponent odd - add 2P if even, P if odd */
     BIG_XXX_copy(t,e);
@@ -574,7 +541,9 @@ void ECP2_ZZZ_frob(ECP2_ZZZ *P,FP2_YYY *X)
 {
     FP2_YYY X2;
     if (P->inf) return;
+//printf("X= "); FP2_YYY_output(X); printf("\n");
     FP2_YYY_sqr(&X2,X);
+//printf("X2= "); FP2_YYY_output(&X2); printf("\n");
     FP2_YYY_conj(&(P->x),&(P->x));
     FP2_YYY_conj(&(P->y),&(P->y));
     FP2_YYY_conj(&(P->z),&(P->z));
@@ -583,6 +552,11 @@ void ECP2_ZZZ_frob(ECP2_ZZZ *P,FP2_YYY *X)
     FP2_YYY_mul(&(P->x),&X2,&(P->x));
     FP2_YYY_mul(&(P->y),&X2,&(P->y));
     FP2_YYY_mul(&(P->y),X,&(P->y));
+
+
+//printf("Px= "); FP2_YYY_output(&(P->x)); printf("\n");
+//printf("Py= "); FP2_YYY_output(&(P->y)); printf("\n");
+//printf("Pz= "); FP2_YYY_output(&(P->z)); printf("\n");
 }
 
 void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ Q[4],BIG_XXX u[4])
@@ -624,8 +598,6 @@ void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ Q[4],BIG_XXX u[4])
     ECP2_ZZZ_add(&W[3],&T);
     ECP2_ZZZ_sub(&W[4],&T);
     ECP2_ZZZ_add(&W[7],&T);
-
-    ECP2_ZZZ_multiaffine(8,W,work);
 
     /* if multiplier is even add 1 to multiplier, and add P to correction */
     ECP2_ZZZ_inf(&C);

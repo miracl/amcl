@@ -55,7 +55,7 @@ fn main()
 	rng.seed(100,&raw);	
 
 
-	println!("Testing/Timing ED25519 ECC");
+	println!("Testing/Timing ed25519 ECC");
 
 	if ed25519::ecp::CURVETYPE==ed25519::ecp::WEIERSTRASS {
 		println!("Weierstrass parameterization");

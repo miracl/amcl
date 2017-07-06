@@ -28,7 +28,7 @@ def replace(namefile,oldtext,newtext):
 	f.close()
 
 
-def rsaset(tb,nb,base32,base64,ml) :
+def rsaset(tb,nb,base,ml) :
 	global deltext,slashtext,copytext
 	global cptr,chosen
 
@@ -44,8 +44,9 @@ def rsaset(tb,nb,base32,base64,ml) :
 	os.system(copytext+"rsa.swift "+fpath+"rsa.swift")
 
 	replace(fpath+"big.swift","@NB@",nb)
-	replace(fpath+"big.swift","@BASE32@",base32)
-	replace(fpath+"big.swift","@BASE64@",base64)
+	replace(fpath+"big.swift","@BASE32@",base)
+	replace(fpath+"big.swift","@BASE64@",base)
+
 
 	replace(fpath+"ff.swift","@ML@",ml);
 
@@ -54,7 +55,7 @@ def rsaset(tb,nb,base32,base64,ml) :
 	os.system("rmdir amcl"+slashtext+tb)
 
 
-def curveset(tc,nb,base32,base64,nbt,m8,mt,ct,pf) :
+def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	global deltext,slashtext,copytext
 	global cptr,chosen
 
@@ -71,12 +72,20 @@ def curveset(tc,nb,base32,base64,nbt,m8,mt,ct,pf) :
 	os.system(copytext+"rom_"+tc+".swift "+fpath+"rom.swift")
 
 	replace(fpath+"big.swift","@NB@",nb)
-	replace(fpath+"big.swift","@BASE32@",base32)
-	replace(fpath+"big.swift","@BASE64@",base64)
+	replace(fpath+"big.swift","@BASE32@",base)
+	replace(fpath+"big.swift","@BASE64@",base)
 
 	replace(fpath+"fp.swift","@NBT@",nbt)
 	replace(fpath+"fp.swift","@M8@",m8)
 	replace(fpath+"fp.swift","@MT@",mt)
+
+	ib=int(base)
+	inb=int(nb)
+	inbt=int(nbt)
+	sh=ib*(1+((8*inb-1)//ib))-inbt
+	if sh > 30 :
+		sh=30
+	replace(fpath+"fp.swift","@SH@",str(sh))
 
 	replace(fpath+"ecp.swift","@CT@",ct)
 	replace(fpath+"ecp.swift","@PF@",pf)
@@ -117,20 +126,26 @@ print("7. goldilocks")
 print("8. nist384")
 print("9. c41417")
 print("10. nist521\n")
+print("11. nums256w")
+print("12. nums256e")
+print("13. nums384w")
+print("14. nums384e")
+print("15. nums512w")
+print("16. nums512e\n")
 
 print("Pairing-Friendly Elliptic Curves")
-print("11. bn254")
-print("12. bn254CX")
-print("13. bls383\n")
+print("17. bn254")
+print("18. bn254CX")
+print("19. bls383\n")
 
 print("RSA")
-print("14. rsa2048")
-print("15. rsa3072")
-print("16. rsa4096")
+print("20. rsa2048")
+print("21. rsa3072")
+print("22. rsa4096")
 
 selection=[]
 ptr=0
-max=17
+max=23
 
 curve_selected=False
 pfcurve_selected=False
@@ -164,45 +179,64 @@ while ptr<max:
 
 
 	if x==1:
-		curveset("ed25519","32","29","56","255","5","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("ed25519","32","56","255","5","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==2:
-		curveset("c25519","32","29","56","255","5","PSEUDO_MERSENNE","MONTGOMERY","NOT")
+		curveset("c25519","32","56","255","5","PSEUDO_MERSENNE","MONTGOMERY","NOT")
 		curve_selected=True
 	if x==3:
-		curveset("nist256","32","29","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("nist256","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==4:
-		curveset("brainpool","32","29","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("brainpool","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==5:
-		curveset("anssi","32","29","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("anssi","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 
 	if x==6:
-		curveset("hifive","42","29","60","336","5","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("hifive","42","60","336","5","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==7:
-		curveset("goldilocks","56","29","60","448","7","GENERALISED_MERSENNE","EDWARDS","NOT")
+		curveset("goldilocks","56","58","448","7","GENERALISED_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==8:
-		curveset("nist384","48","28","56","384","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("nist384","48","56","384","7","NOT_SPECIAL","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==9:
-		curveset("c41417","52","29","60","414","7","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("c41417","52","60","414","7","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==10:
-		curveset("nist521","66","28","60","521","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("nist521","66","60","521","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
 		curve_selected=True
 
 	if x==11:
-		curveset("bn254","32","29","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
-		pfcurve_selected=True
+		curveset("nums256w","32","56","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curve_selected=True
 	if x==12:
-		curveset("bn254CX","32","29","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
-		pfcurve_selected=True
+		curveset("nums256e","32","56","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curve_selected=True
 	if x==13:
-		curveset("bls383","48","28","56","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
+		curveset("nums384w","48","58","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curve_selected=True
+	if x==14:
+		curveset("nums384e","48","56","384","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curve_selected=True
+	if x==15:
+		curveset("nums512w","64","60","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curve_selected=True
+	if x==16:
+		curveset("nums512e","64","60","512","7","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curve_selected=True
+
+	if x==17:
+		curveset("bn254","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		pfcurve_selected=True
+	if x==18:
+		curveset("bn254CX","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		pfcurve_selected=True
+	if x==19:
+		curveset("bls383","48","58","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
 		pfcurve_selected=True
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
@@ -210,19 +244,19 @@ while ptr<max:
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==14:
+	if x==20:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
-		rsaset("rsa2048","128","28","58","2")
-		#rsaset("rsa2048","64","29","60",4")
-		#rsaset("rsa2048","32","29","56",8")
+		rsaset("rsa2048","128","58","2")
+		#rsaset("rsa2048","64","60",4")
+		#rsaset("rsa2048","32","56",8")
 		rsa_selected=True
-	if x==15:
-		rsaset("rsa3072","48","28","56","8")
+	if x==21:
+		rsaset("rsa3072","48","56","8")
 		rsa_selected=True
-	if x==16:
-		#rsaset("rsa4096","32","29","56",16")
-		rsaset("rsa4096","64","29","60","8")
+	if x==22:
+		#rsaset("rsa4096","32","56",16")
+		rsaset("rsa4096","64","60","8")
 		rsa_selected=True
 
 os.system(deltext+" hash*.swift")

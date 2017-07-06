@@ -142,14 +142,11 @@ public final class FP2 {
 /* negate this mod Modulus */
 	public void neg()
 	{
-//		norm();
 		FP m=new FP(a);
 		FP t=new FP(0);
 
 		m.add(b);
-//	m.norm();
 		m.neg();
-		//m.norm();
 		t.copy(m); t.add(b);
 		b.copy(m);
 		b.add(a);
@@ -159,9 +156,8 @@ public final class FP2 {
 /* set to a-ib */
 	public void conj()
 	{
-//	b.norm();
 		b.neg();
-	b.norm();
+		b.norm();
 	}
 
 /* this+=a */
@@ -176,8 +172,13 @@ public final class FP2 {
 	{
 		FP2 m=new FP2(x);
 		m.neg();
-//	m.norm();
 		add(m);
+	}
+
+	public void rsub(FP2 x)       // *****
+	{
+		neg();
+		add(x);
 	}
 
 /* this*=s, where s is an FP */
@@ -201,41 +202,34 @@ public final class FP2 {
 		FP w3=new FP(a);
 		FP mb=new FP(b);
 
-
-//		w3.mul(b);  // out
 		w1.add(b);
-
-w3.add(a);
-w3.norm();
-b.mul(w3);
-
-
 		mb.neg();
+
+		w3.add(a);
+		w3.norm();
+		b.mul(w3);
+
 		a.add(mb);
 
-	w1.norm();
-	a.norm();
+		w1.norm();
+		a.norm();
 
 		a.mul(w1);
-//		b.copy(w3); b.add(w3);  // out
-//	b.norm();					// out
 	}
 
 /* this*=y */
 /* Now uses Lazy reduction */
 	public void mul(FP2 y)
 	{
-
-		if (FP.pexceed(FP.EXCESS(a.x)+FP.EXCESS(b.x)+1,FP.EXCESS(y.a.x)+FP.EXCESS(y.b.x)+1))
+		if ((long)(a.XES+b.XES)*(y.a.XES+y.b.XES)>(long)FP.FEXCESS)
 		{
-			if (FP.EXCESS(a.x)>0) a.reduce();
-			if (FP.EXCESS(b.x)>0) b.reduce();			
+			if (a.XES>1) a.reduce();
+			if (b.XES>1) b.reduce();		
 		}
 
 		DBIG pR=new DBIG(0);
 		BIG C=new BIG(a.x);
 		BIG D=new BIG(y.a.x);
-	//	BIG p=new BIG(ROM.Modulus);
 
 		pR.ucopy(FP.p);
 
@@ -252,32 +246,8 @@ b.mul(w3);
 		A.add(B); A.norm();
 		E.sub(F); E.norm();
 
-		a.x.copy(FP.mod(A));
-		b.x.copy(FP.mod(E));
-
-/*		
-		FP w1=new FP(a);
-		FP w2=new FP(b);
-		FP w5=new FP(a);
-		FP mw=new FP(0);
-
-		w1.mul(y.a);  // w1=a*y.a 
-		w2.mul(y.b);  // w2=b*y.b 
-		w5.add(b);    // w5=a+b
-		b.copy(y.a); b.add(y.b); // b=y.a+y.b
-
-	w5.norm();
-	b.norm();
-
-		b.mul(w5);
-		mw.copy(w1); mw.add(w2); 
-	//mw.norm(); 
-		mw.neg();
-
-		b.add(mw); mw.add(w1);
-		a.copy(w1);	a.add(mw);
-
-		norm(); */
+		a.x.copy(FP.mod(A)); a.XES=3;
+		b.x.copy(FP.mod(E)); b.XES=2;
 	}
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */
@@ -330,7 +300,7 @@ b.mul(w3);
 		w1.inverse();
 		a.mul(w1);
 		w1.neg();
-	w1.norm();
+		w1.norm();
 		b.mul(w1);
 	}
 
@@ -344,7 +314,6 @@ b.mul(w3);
 /* this*=sqrt(-1) */
 	public void times_i()
 	{
-	//	a.norm();
 		FP z=new FP(a);
 		a.copy(b); a.neg();
 		b.copy(z);
@@ -354,14 +323,20 @@ b.mul(w3);
 /* where X*2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
 	public void mul_ip()
 	{
-//		norm();
 		FP2 t=new FP2(this);
 		FP z=new FP(a);
 		a.copy(b);
 		a.neg();
 		b.copy(z);
 		add(t);
-//		norm();
+	}
+
+	public void div_ip2()
+	{
+		FP2 t=new FP2(0);
+		t.a.copy(a); t.a.add(b);
+		t.b.copy(b); t.b.sub(a);
+		copy(t);
 	}
 
 /* w/=(1+sqrt(-1)) */
@@ -372,7 +347,7 @@ b.mul(w3);
 		t.a.copy(a); t.a.add(b);
 		t.b.copy(b); t.b.sub(a);
 		copy(t);
-	norm();
+		norm();
 		div2();
 	}
 /*

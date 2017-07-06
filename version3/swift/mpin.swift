@@ -168,8 +168,7 @@ final public class MPIN
         let X=FP2(Fra,Frb);
         x=BIG(ROM.CURVE_Bnx);
     
-        let T=ECP2(); T.copy(Q)
-        T.mul(x); T.neg()
+        let T=Q.mul(x); T.neg()
         let K=ECP2(); K.copy(T)
         K.dbl(); K.add(T); K.affine()
     

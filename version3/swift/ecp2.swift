@@ -37,12 +37,13 @@ final public class ECP2 {
         INF=true
         x=FP2(0)
         y=FP2(1)
-        z=FP2(1)
+        z=FP2(0)
     }
     /* Test self=O? */
     public func is_infinity() -> Bool
     {
-        return INF
+        if INF {return true}
+        return x.iszilch() && z.iszilch()
     }
     /* copy self=P */
     public func copy(_ P:ECP2)
@@ -56,7 +57,7 @@ final public class ECP2 {
     func inf() {
         INF=true
         x.zero()
-        y.zero()
+        y.one()
         z.zero()
     }
     /* Conditional move of Q to P dependant on d */
@@ -108,23 +109,20 @@ final public class ECP2 {
         if is_infinity() && Q.is_infinity() {return true}
         if is_infinity() || Q.is_infinity() {return false}
     
-        let zs2=FP2(z); zs2.sqr()
-        let zo2=FP2(Q.z); zo2.sqr()
-        let zs3=FP2(zs2); zs3.mul(z)
-        let zo3=FP2(zo2); zo3.mul(Q.z)
-        zs2.mul(Q.x)
-        zo2.mul(x)
-        if !zs2.equals(zo2) {return false}
-        zs3.mul(Q.y)
-        zo3.mul(y)
-        if !zs3.equals(zo3) {return false}
+        let a=FP2(x)                            // *****
+        let b=FP2(Q.x)
+        a.mul(Q.z); b.mul(z) 
+        if !a.equals(b) {return false}
+        a.copy(y); a.mul(Q.z)
+        b.copy(Q.y); b.mul(z)
+        if !a.equals(b) {return false}
     
         return true;
     }
     /* set self=-self */
     func neg()
     {
-        if is_infinity() {return}
+    //    if is_infinity() {return}
         y.norm(); y.neg(); y.norm()
         return
     }
@@ -132,14 +130,14 @@ final public class ECP2 {
     func affine() {
         if is_infinity() {return}
         let one=FP2(1)
-        if z.equals(one) {return}
+        if z.equals(one) {
+            x.reduce(); y.reduce()
+            return
+        }
         z.inverse()
     
-        let z2=FP2(z)
-        z2.sqr()
-        x.mul(z2); x.reduce()
-        y.mul(z2)
-        y.mul(z);  y.reduce()
+        x.mul(z); x.reduce()
+        y.mul(z); y.reduce()
         z.copy(one)
     }
     /* extract affine x as FP2 */
@@ -270,40 +268,39 @@ final public class ECP2 {
             return -1;
         }
     
-        let w1=FP2(x)
-        let w2=FP2(0)
-        let w3=FP2(x)
-        let w8=FP2(x)
-    
-        w1.sqr()
-        w8.copy(w1)
-        w8.imul(3)
-    
-        w2.copy(y); w2.sqr()
-        w3.copy(x); w3.imul(4); w3.mul(w2)
-        
-        w1.copy(w3); w1.neg()
-        w1.norm()
-    
-        x.copy(w8); x.sqr()
-        x.add(w1)
-        x.add(w1)
-        x.norm()
-    
-        z.add(z); z.norm()
-        z.mul(y)
-        
-    
-        w2.add(w2); w2.norm()
-        w2.sqr()
-        w2.add(w2)
-        w3.sub(x); w2.norm(); w3.norm()
-        y.copy(w8); y.mul(w3)
-    
-        y.sub(w2)
-        y.norm()
-        z.norm()
-    
+        let iy=FP2(y)
+        iy.mul_ip(); iy.norm()
+
+        let t0=FP2(y) 
+        t0.sqr(); t0.mul_ip()   
+        let t1=FP2(iy)  
+        t1.mul(z)
+        let t2=FP2(z)
+        t2.sqr()
+
+        z.copy(t0)
+        z.add(t0); z.norm() 
+        z.add(z)
+        z.add(z) 
+        z.norm()  
+
+        t2.imul(3*ROM.CURVE_B_I) 
+
+        let x3=FP2(t2)
+        x3.mul(z) 
+
+        let y3=FP2(t0)   
+
+        y3.add(t2); y3.norm()
+        z.mul(t1)
+        t1.copy(t2); t1.add(t2); t2.add(t1); t2.norm()  
+        t0.sub(t2); t0.norm()                           //y^2-9bz^2
+        y3.mul(t0); y3.add(x3)                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+        t1.copy(x); t1.mul(iy)                     //
+        x.copy(t0); x.norm(); x.mul(t1); x.add(x)       //(y^2-9bz^2)xy2
+
+        x.norm() 
+        y.copy(y3); y.norm()
         return 1
     }
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
@@ -315,71 +312,62 @@ final public class ECP2 {
             return -1
         }
         if Q.INF {return -1}
+
+        let b=3*ROM.CURVE_B_I
+        let t0=FP2(x)
+        t0.mul(Q.x)         // x.Q.x
+        let t1=FP2(y)
+        t1.mul(Q.y)         // y.Q.y
+
+        let t2=FP2(z)
+        t2.mul(Q.z)
+        let t3=FP2(x)
+        t3.add(y); t3.norm()          //t3=X1+Y1
+        let t4=FP2(Q.x)            
+        t4.add(Q.y); t4.norm()         //t4=X2+Y2
+        t3.mul(t4)                     //t3=(X1+Y1)(X2+Y2)
+        t4.copy(t0); t4.add(t1)        //t4=X1.X2+Y1.Y2
+
+        t3.sub(t4); t3.norm(); t3.mul_ip();  t3.norm()         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+
+        t4.copy(y)                    
+        t4.add(z); t4.norm()           //t4=Y1+Z1
+        let x3=FP2(Q.y)
+        x3.add(Q.z); x3.norm()         //x3=Y2+Z2
+
+        t4.mul(x3)                     //t4=(Y1+Z1)(Y2+Z2)
+        x3.copy(t1)                    //
+        x3.add(t2)                     //X3=Y1.Y2+Z1.Z2
     
-        var aff=false
-    
-        if Q.z.isunity() {aff=true}
-    
-        var A:FP2
-        var C:FP2
-        let B=FP2(z)
-        let D=FP2(z)
-        if (!aff)
-        {
-            A=FP2(Q.z)
-            C=FP2(Q.z)
-    
-            A.sqr(); B.sqr()
-            C.mul(A); D.mul(B)
-    
-            A.mul(x)
-            C.mul(y)
-        }
-        else
-        {
-            A=FP2(x)
-            C=FP2(y)
-    
-            B.sqr()
-            D.mul(B)
-        }
-    
-        B.mul(Q.x); B.sub(A)
-        D.mul(Q.y); D.sub(C)
-    
-        if B.iszilch()
-        {
-            if D.iszilch()
-            {
-				dbl()
-				return 1
-            }
-            else
-            {
-				INF=true
-				return -1
-            }
-        }
-    
-        if !aff {z.mul(Q.z)}
-        z.mul(B)
-    
-        let e=FP2(B); e.sqr()
-        B.mul(e)
-        A.mul(e)
-    
-        e.copy(A)
-        e.add(A); e.add(B); e.norm(); D.norm()
-        x.copy(D); x.sqr(); x.sub(e); x.norm()
-    
-        A.sub(x); A.norm()
-        y.copy(A); y.mul(D)
-        C.mul(B); y.sub(C)
-    
-    //    x.norm()
-        y.norm()
-        z.norm()
-    
+        t4.sub(x3); t4.norm(); t4.mul_ip(); t4.norm()          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+
+        x3.copy(x); x3.add(z); x3.norm()   // x3=X1+Z1
+        let y3=FP2(Q.x)                
+        y3.add(Q.z); y3.norm()             // y3=X2+Z2
+        x3.mul(y3)                         // x3=(X1+Z1)(X2+Z2)
+        y3.copy(t0)
+        y3.add(t2)                         // y3=X1.X2+Z1+Z2
+        y3.rsub(x3); y3.norm()             // y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
+
+        t0.mul_ip(); t0.norm() // x.Q.x
+        t1.mul_ip(); t1.norm() // y.Q.y
+
+        x3.copy(t0); x3.add(t0) 
+        t0.add(x3); t0.norm()
+        t2.imul(b)
+
+        let z3=FP2(t1); z3.add(t2); z3.norm()
+        t1.sub(t2); t1.norm()
+        y3.imul(b)
+
+        x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2)
+        y3.mul(t0); t1.mul(z3); y3.add(t1)
+        t0.mul(t3); z3.mul(t4); z3.add(t0)
+
+        x.copy(x3); x.norm()
+        y.copy(y3); y.norm()
+        z.copy(z3); z.norm()    
+
         return 0
     }
 
@@ -404,58 +392,6 @@ final public class ECP2 {
         x.mul(X2)
         y.mul(X2)
         y.mul(X)
-    }
-    /* normalises m-array of ECP2 points. Requires work vector of m FP2s */
-    
-    private static func multiaffine(_ m:Int,_ P:[ECP2])
-    {
-        let t1=FP2(0)
-        let t2=FP2(0)
-    
-        var work=[FP2]()
-        for _ in 0 ..< m
-            {work.append(FP2(0))}
-     
-        work[0].one()
-        work[1].copy(P[0].z)
-        
-        for i in 2 ..< m
-        {
-            work[i].copy(work[i-1])
-            work[i].mul(P[i-1].z)
-        }
-    
-        t1.copy(work[m-1]); t1.mul(P[m-1].z)
-    
-        t1.inverse()
-    
-        t2.copy(P[m-1].z)
-        work[m-1].mul(t1)
-    
-        var i=m-2
-        while true
-        {
-            if (i==0)
-            {
-				work[0].copy(t1)
-				work[0].mul(t2)
-				break;
-            }
-            work[i].mul(t2)
-            work[i].mul(t1)
-            t2.mul(P[i].z)
-            i-=1
-        }
-    /* now work[] contains inverses of all Z coordinates */
-    
-        for i in 0 ..< m
-        {
-            P[i].z.one()
-            t1.copy(work[i]); t1.sqr()
-            P[i].x.mul(t1)
-            t1.mul(work[i])
-            P[i].y.mul(t1)
-        }
     }
     
     /* P*=e */
@@ -487,10 +423,6 @@ final public class ECP2 {
             W[i].copy(W[i-1])
             W[i].add(Q)
         }
-    
-    /* convert the table to affine */
- 
-        ECP2.multiaffine(8,W);
     
     /* make exponent odd - add 2P if even, P if odd */
         t.copy(e)
@@ -568,8 +500,6 @@ final public class ECP2 {
         W[3].add(T)
         W[4].sub(T)
         W[7].add(T)
-    
-        ECP2.multiaffine(8,W);
     
     /* if multiplier is even add 1 to multiplier, and add P to correction */
         mt.zero(); C.inf()

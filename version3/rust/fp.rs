@@ -24,11 +24,12 @@ use xxx::rom;
 use arch::Chunk;
 
 //#[cfg(D32)]
-use arch::DChunk;
+//use arch::DChunk;
 
 #[derive(Copy, Clone)]
 pub struct FP {
- 	pub x:BIG
+ 	pub x:BIG,
+    pub xes:i32
 }
 
 pub const NOT_SPECIAL:usize =0;
@@ -40,7 +41,7 @@ pub const MODBITS:usize = @NBT@; /* Number of bits in Modulus */
 pub const MOD8: usize = @M8@;  /* Modulus mod 8 */
 pub const MODTYPE:usize=@MT@;
 
-pub const FEXCESS:Chunk = ((1 as Chunk)<<(big::BASEBITS*(big::NLEN)-MODBITS-1));
+pub const FEXCESS:i32 = ((1 as i32)<<@SH@);
 pub const OMASK:Chunk = (-1)<<(MODBITS%big::BASEBITS);
 pub const TBITS:usize=MODBITS%big::BASEBITS; // Number of active bits in top word
 pub const TMASK:Chunk=(1<<TBITS)-1;
@@ -48,46 +49,12 @@ pub const TMASK:Chunk=(1<<TBITS)-1;
 
 impl FP {
 
-/* calculate Field Excess */
-    pub fn excess(a:&BIG) -> Chunk {
-        return ((a.w[big::NLEN-1]&OMASK)>>(MODBITS%big::BASEBITS))+1;
-    }
-
-//#[cfg(D32)]
-    pub fn pexceed(ea: Chunk,eb: Chunk) -> bool {
-        //let ea=FP::excess(a);
-        //let eb=FP::excess(b);        
-        if ((ea+1) as DChunk)*((eb+1) as DChunk) > FEXCESS as DChunk {return true}
-        return false
-    }
-
-//#[cfg(D32)]
-    pub fn sexceed(ea: Chunk) -> bool {
-        //let ea=FP::excess(a);
-        if ((ea+1) as DChunk)*((ea+1) as DChunk) > FEXCESS as DChunk {return true}
-        return false
-    }
-/*
-#[cfg(D64)]
-    pub fn pexceed(a: &BIG,b: &BIG) -> bool {
-        let ea=FP::excess(a);
-        let eb=FP::excess(b);        
-        if (ea+1) > FEXCESS/(eb+1) {return true}
-        return false
-    }
-
-#[cfg(D64)]
-    pub fn sexceed(a: &BIG) -> bool {
-        let ea=FP::excess(a);
-        if (ea+1) > FEXCESS/(ea+1) {return true}
-        return false
-    }    
-*/
 /* Constructors */
 	pub fn new() -> FP {
 		FP {
-				x: BIG::new()
-		}
+				x: BIG::new(),
+                xes:1
+            }
 	}
 
 	pub fn new_int(a:isize) -> FP {
@@ -100,6 +67,7 @@ impl FP {
 	pub fn new_copy(y:&FP) -> FP {
 		let mut f=FP::new(); 
 		f.x.copy(&(y.x));
+        f.xes=y.xes;
 		return f;
 	}
 
@@ -112,11 +80,14 @@ impl FP {
 
     pub fn nres(&mut self) {
         if MODTYPE != PSEUDO_MERSENNE && MODTYPE != GENERALISED_MERSENNE {
-   			let p = BIG::new_ints(&rom::MODULUS);        	
-            let mut d=DBIG::new_scopy(&(self.x));
-            d.shl(big::NLEN*(big::BASEBITS as usize));
-            self.x.copy(&d.dmod(&p));
+            let r=BIG::new_ints(&rom::R2MODP);
+            let mut d=BIG::mul(&(self.x),&r);
+            self.x.copy(&FP::modulo(&mut d));
+            self.xes=2;
+        } else {
+            self.xes=1;
         }
+
     }
 
 /* convert back to regular form */
@@ -141,18 +112,15 @@ impl FP {
             b.dcopy(&d);
             let v=t.pmul(rom::MCONST as isize);
 
-    t.add(&b);
-    t.norm();
+            t.add(&b);
+            t.norm();
 
 
             let tw=t.w[big::NLEN-1];
             t.w[big::NLEN-1] &= TMASK;
             t.w[0]+=rom::MCONST*((tw>>TBITS)+(v<<(big::BASEBITS-TBITS)));
-    t.norm();
-    return t;
-        //    b.add(&t);
-        //   b.norm();
-        //    return b;
+            t.norm();
+            return t;
         }
     
         if MODTYPE==MONTGOMERY_FRIENDLY
@@ -217,7 +185,8 @@ impl FP {
 /* reduce this mod Modulus */
     pub fn reduce(&mut self) {
   		let p = BIG::new_ints(&rom::MODULUS);      	
-        self.x.rmod(&p)
+        self.x.rmod(&p);
+        self.xes=1;
     }
     
 /* test this=0? */
@@ -229,6 +198,7 @@ impl FP {
 /* copy from FP b */
     pub fn copy(&mut self,b: &FP) {
         self.x.copy(&(b.x));
+        self.xes=b.xes;
     }
     
 /* copy from BIG b */
@@ -240,6 +210,7 @@ impl FP {
 /* set this=0 */
     pub fn zero(&mut self) {
         self.x.zero();
+        self.xes=1;
     }
     
 /* set this=1 */
@@ -254,20 +225,28 @@ impl FP {
 /* swap FPs depending on d */
     pub fn cswap(&mut self,b: &mut FP,d: isize) {
         self.x.cswap(&mut (b.x),d);
+        let mut c=d as i32;
+        c=!(c-1);
+        let t=c&(self.xes^b.xes);
+        self.xes^=t;
+        b.xes^=t;
     }
     
 /* copy FPs depending on d */
     pub fn cmove(&mut self,b: &FP,d: isize) {
         self.x.cmove(&(b.x),d);
+        let c=d as i32;
+        self.xes^=(self.xes^b.xes)&(-c);
     }
 
 /* this*=b mod Modulus */
     pub fn mul(&mut self,b: &FP)
     {
-        if FP::pexceed(FP::excess(&(self.x)),FP::excess(&(b.x))) {self.reduce()}
+        if (self.xes as i64)*(b.xes as i64) > FEXCESS as i64 {self.reduce()}
 
         let mut d=BIG::mul(&(self.x),&(b.x));
-        self.x.copy(&FP::modulo(&mut d))
+        self.x.copy(&FP::modulo(&mut d));
+        self.xes=2;
     }
 
     fn logb2(w: u32) -> usize {
@@ -281,24 +260,19 @@ impl FP {
         v = v - ((v >> 1) & 0x55555555);                 
         v = (v & 0x33333333) + ((v >> 2) & 0x33333333);  
         let r= ((   ((v + (v >> 4)) & 0xF0F0F0F).wrapping_mul(0x1010101)) >> 24) as usize;
-        return r+1;    
+        return r;    
     }
 
 /* this = -this mod Modulus */
     pub fn neg(&mut self) {
   		let mut p = BIG::new_ints(&rom::MODULUS);   
-    
-    //    self.norm();
-
-        let sb=FP::logb2((FP::excess(&(self.x))+1) as u32);
-
-    //    let mut ov=BIG::excess(&(self.x));
-    //    let mut sb=1; while ov != 0 {sb += 1;ov>>=1}
+        let sb=FP::logb2((self.xes-1) as u32);
     
         p.fshl(sb);
         self.x.rsub(&p);
-    
-        if FP::excess(&(self.x))>=FEXCESS {self.reduce()}
+        self.xes=1<<(sb as i32);
+        if self.xes>FEXCESS {self.reduce()}
+
     }
 
     /* this*=c mod Modulus, where c is a small int */
@@ -310,41 +284,48 @@ impl FP {
             cc = -cc;
             s=true;
         }
-        let afx=(FP::excess(&(self.x))+1)*((cc as Chunk)+1)+1;
-        if cc<=big::NEXCESS && afx<FEXCESS {
-            self.x.imul(cc);
-            self.norm();
+
+        if MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE {
+            let mut d=self.x.pxmul(cc);
+            self.x.copy(&FP::modulo(&mut d));
+            self.xes=2
         } else {
-            if afx<FEXCESS {
-            	self.x.pmul(cc);
+            if self.xes*(cc as i32) <= FEXCESS {
+                self.x.pmul(cc);
+                self.xes*=cc as i32;
             } else {
-  				let p = BIG::new_ints(&rom::MODULUS);               	
-				let mut d=self.x.pxmul(cc);
-				self.x.copy(&d.dmod(&p));
+                let n=FP::new_int(cc);
+                self.mul(&n);
             }
+
         }
+
         if s {self.neg(); self.norm();}
     }
 
 /* self*=self mod Modulus */
     pub fn sqr(&mut self) {
     //    self.norm();
-        if FP::sexceed(FP::excess(&(self.x))) {self.reduce()}
+        if (self.xes as i64)*(self.xes as i64) > FEXCESS as i64 {self.reduce()}
+
 
         let mut d=BIG::sqr(&(self.x));
-        self.x.copy(&FP::modulo(&mut d))
+        self.x.copy(&FP::modulo(&mut d));
+        self.xes=2
     }
 
 /* self+=b */
     pub fn add(&mut self,b: &FP) {
         self.x.add(&(b.x));
-        if FP::excess(&(self.x))+2>=FEXCESS {self.reduce()}
+        self.xes+=b.xes;
+        if self.xes>FEXCESS {self.reduce()}
     }
 
 /* self+=self */
     pub fn dbl(&mut self) {
         self.x.dbl();
-        if FP::excess(&(self.x))+2>=FEXCESS {self.reduce()}
+        self.xes+=self.xes;        
+        if self.xes>FEXCESS {self.reduce()}
     }
     
 /* self-=b */
@@ -354,6 +335,13 @@ impl FP {
         n.neg();
         self.add(&n);
     }    
+
+/* self=b-self */
+    pub fn rsub(&mut self,b: &FP)
+    {
+        self.neg();
+        self.add(&b);
+    }  
 
 /* self/=2 mod Modulus */
     pub fn div2(&mut self) {

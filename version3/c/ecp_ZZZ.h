@@ -6,6 +6,7 @@
 
 /* Curve Params - see rom_zzz.c */
 extern const int CURVE_A_ZZZ;     /**< Elliptic curve A parameter */
+extern const int CURVE_B_I_ZZZ;
 extern const BIG_XXX CURVE_B_ZZZ;     /**< Elliptic curve B parameter */
 extern const BIG_XXX CURVE_Order_ZZZ; /**< Elliptic curve group order */
 extern const BIG_XXX CURVE_Cof_ZZZ;   /**< Elliptic curve cofactor */
@@ -43,14 +44,13 @@ extern const BIG_XXX CURVE_BB_ZZZ[4][4]; /**< BN curve constant for GS decomposi
 
 typedef struct
 {
-#if CURVETYPE_ZZZ!=EDWARDS
     int inf; /**< Infinity Flag - not needed for Edwards representation */
-#endif
-    BIG_XXX x; /**< x-coordinate of point */
+
+    FP_YYY x; /**< x-coordinate of point */
 #if CURVETYPE_ZZZ!=MONTGOMERY
-    BIG_XXX y; /**< y-coordinate of point. Not needed for Montgomery representation */
+    FP_YYY y; /**< y-coordinate of point. Not needed for Montgomery representation */
 #endif
-    BIG_XXX z;/**< z-coordinate of point */
+    FP_YYY z;/**< z-coordinate of point */
 } ECP_ZZZ;
 
 
@@ -91,7 +91,7 @@ extern void ECP_ZZZ_inf(ECP_ZZZ *P);
 	@param r BIG n-residue value of f(x)
 	@param x BIG n-residue x
  */
-extern void ECP_ZZZ_rhs(BIG_XXX r,BIG_XXX x);
+extern void ECP_ZZZ_rhs(FP_YYY *r,FP_YYY *x);
 /**	@brief Set ECP to point(x,y) given just x and sign of y
  *
 	Point P set to infinity if no such point on the curve. If x is on the curve then y is calculated from the curve equation.
@@ -173,6 +173,13 @@ extern void ECP_ZZZ_outputxyz(ECP_ZZZ *P);
 	@param P ECP instance to be printed
  */
 extern void ECP_ZZZ_output(ECP_ZZZ * P);
+
+/**	@brief Formats and outputs an ECP point to the console
+ *
+	@param P ECP instance to be printed
+ */
+extern void ECP_ZZZ_rawoutput(ECP_ZZZ * P);
+
 /**	@brief Formats and outputs an ECP point to an octet string
  *
 	The octet string is created in the standard form 04|x|y, except for Montgomery curve in which case it is 06|x

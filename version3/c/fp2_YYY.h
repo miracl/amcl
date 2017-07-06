@@ -9,8 +9,8 @@
 
 typedef struct
 {
-    BIG_XXX a; /**< real part of FP2 */
-    BIG_XXX b; /**< imaginary part of FP2 */
+    FP_YYY a; /**< real part of FP2 */
+    FP_YYY b; /**< imaginary part of FP2 */
 } FP2_YYY;
 
 /* FP2 prototypes */
@@ -42,13 +42,13 @@ extern int FP2_YYY_isunity(FP2_YYY *x);
 	@return 1 if x=y, else returns 0
  */
 extern int FP2_YYY_equals(FP2_YYY *x,FP2_YYY *y);
-/**	@brief Initialise FP2 from two BIGs in n-residue form
+/**	@brief Initialise FP2 from two FP numbers
  *
 	@param x FP2 instance to be initialised
-	@param a BIG to form real part of FP2
-	@param b BIG to form imaginary part of FP2
+	@param a FP to form real part of FP2
+	@param b FP to form imaginary part of FP2
  */
-extern void FP2_YYY_from_FPs(FP2_YYY *x,BIG_XXX a,BIG_XXX b);
+extern void FP2_YYY_from_FPs(FP2_YYY *x,FP_YYY *a,FP_YYY *b);
 /**	@brief Initialise FP2 from two BIG integers
  *
 	@param x FP2 instance to be initialised
@@ -56,13 +56,13 @@ extern void FP2_YYY_from_FPs(FP2_YYY *x,BIG_XXX a,BIG_XXX b);
 	@param b BIG to form imaginary part of FP2
  */
 extern void FP2_YYY_from_BIGs(FP2_YYY *x,BIG_XXX a,BIG_XXX b);
-/**	@brief Initialise FP2 from single BIG in n-residue form
+/**	@brief Initialise FP2 from single FP
  *
 	Imaginary part is set to zero
 	@param x FP2 instance to be initialised
-	@param a BIG to form real part of FP2
+	@param an FP to form real part of FP2
  */
-extern void FP2_YYY_from_FP(FP2_YYY *x,BIG_XXX a);
+extern void FP2_YYY_from_FP(FP2_YYY *x,FP_YYY *a);
 /**	@brief Initialise FP2 from single BIG
  *
 	Imaginary part is set to zero
@@ -113,13 +113,13 @@ extern void FP2_YYY_add(FP2_YYY *x,FP2_YYY *y,FP2_YYY *z);
 	@param z FP2 instance
  */
 extern void FP2_YYY_sub(FP2_YYY *x,FP2_YYY *y,FP2_YYY *z);
-/**	@brief Multiplication of an FP2 by an n-residue
+/**	@brief Multiplication of an FP2 by an FP
  *
 	@param x FP2 instance, on exit = y*b
 	@param y FP2 instance
-	@param b BIG n-residue
+	@param b FP residue
  */
-extern void FP2_YYY_pmul(FP2_YYY *x,FP2_YYY *y,BIG_XXX b);
+extern void FP2_YYY_pmul(FP2_YYY *x,FP2_YYY *y,FP_YYY *b);
 /**	@brief Multiplication of an FP2 by a small integer
  *
 	@param x FP2 instance, on exit = y*i
@@ -168,6 +168,12 @@ extern void FP2_YYY_div2(FP2_YYY *x,FP2_YYY *y);
 	@param x FP2 instance, on exit = x*(1+sqrt(-1))
  */
 extern void FP2_YYY_mul_ip(FP2_YYY *x);
+/**	@brief Divide an FP2 by (1+sqrt(-1))/2 - 
+ *
+	Note that (1+sqrt(-1)) is irreducible for FP4
+	@param x FP2 instance, on exit = 2x/(1+sqrt(-1))
+ */
+extern void FP2_YYY_div_ip2(FP2_YYY *x);
 /**	@brief Divide an FP2 by (1+sqrt(-1))
  *
 	Note that (1+sqrt(-1)) is irreducible for FP4

@@ -64,6 +64,7 @@ public class MPIN
 		{
 			HASH256 H=new HASH256();
 			if (n>0) H.process_num(n);
+
 			H.process_array(B);
 			R=H.hash();
 		}
@@ -109,8 +110,13 @@ public class MPIN
 
 	public static byte[] HASH_ALL(int sha,byte[] HID,byte[] xID,byte[] xCID,byte[] SEC,byte[] Y,byte[] R,byte[] W,int len)
 	{
-		int i,tlen=0;
-		byte[] T = new byte[1284];
+		int i,ilen,tlen=0;
+
+		ilen=HID.length+SEC.length+Y.length+R.length+W.length;
+		if (xCID!=null) ilen+=xCID.length;
+		else ilen+=xID.length;
+
+		byte[] T = new byte[ilen];
 
 		for (i=0;i<HID.length;i++) T[i]=HID[i];
 		tlen+=HID.length;
@@ -187,6 +193,7 @@ public class MPIN
 		BIG x=BIG.fromBytes(h);
 		x.mod(q);
 		ECP P;
+
 		while (true)
 		{
 			P=new ECP(x,0);
@@ -225,7 +232,7 @@ public class MPIN
 		x=new BIG(ROM.CURVE_Bnx);
 
 		T=new ECP2(); T.copy(Q);
-		T.mul(x); T.neg();
+		T=T.mul(x); T.neg();
 		K=new ECP2(); K.copy(T);
 		K.dbl(); K.add(T); K.affine();
 
@@ -548,7 +555,9 @@ public class MPIN
 		ECP P=mapit(h);
 
 		BIG s=BIG.fromBytes(S);
-		PAIR.G1mul(P,s).toBytes(CTT);
+		ECP OP=PAIR.G1mul(P,s);
+
+		OP.toBytes(CTT);
 		return 0;
 	}
 

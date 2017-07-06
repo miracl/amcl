@@ -1,5 +1,6 @@
 NOTE: This version of the library requires Version 1.17+ of Rust for 64-bit 
-support. 
+support. Unfortunately support for the 128-bit integer type is still
+flagged as unstable, and so for now a nightly build of rust must be used.
 
 Namespaces are used to separate different curves.
 
@@ -17,7 +18,7 @@ or
 
 python3 config64.py
 
-Then select options 1, 11 and 14 (these are fixed for the example 
+Then select options 1, 17 and 20 (these are fixed for the example 
 program provided). Select 0 to exit.
 
 Then copy the library from amcl/target/release/libamcl.rlib to the
@@ -39,7 +40,7 @@ If you wish to test/benchtest other curves:-
 ed25519 to nist256
 
 (b) Go throught the process above again from scratch, but this time
-select options 3, 11 and 14
+select options 3, 17 and 20
 
 And thats it!
 

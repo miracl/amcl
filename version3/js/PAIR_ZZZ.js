@@ -21,62 +21,66 @@ var PAIR_ZZZ = {
 /* Line function */
 	line: function(A,B,Qx,Qy)
 	{
-		var P=new ECP2_ZZZ();
 		var a,b,c;
-		var r=new FP12_YYY(1);
-		P.copy(A);
-
-		var ZZ=new FP2_YYY(P.getz()); //ZZ.copy(P.getz());
-		ZZ.sqr();
-		var D;
-		if (A==B) D=A.dbl(); 
-		else D=A.add(B);
-		if (D<0) return r;
-		var Z3=new FP2_YYY(A.getz()); //Z3.copy(A.getz());
 		c=new FP4_YYY(0);
-		var X,Y,T;
-		if (D===0)
-		{ /* Addition */
-			X=new FP2_YYY(B.getx()); //X.copy(B.getx());
-			Y=new FP2_YYY(B.gety()); //Y.copy(B.gety());
-			T=new FP2_YYY(P.getz()); //T.copy(P.getz());
+		var r=new FP12_YYY(1);
+		if (A==B)
+		{ /* Doubling */
+			var XX=new FP2_YYY(A.getx()); 
+			var YY=new FP2_YYY(A.gety()); 
+			var ZZ=new FP2_YYY(A.getz()); 
+			var YZ=new FP2_YYY(YY);
 
-			T.mul(Y);
-			ZZ.mul(T);
+			YZ.mul(ZZ);                //YZ
+			XX.sqr();	               //X^2
+			YY.sqr();	               //Y^2
+			ZZ.sqr();			       //Z^2
+			
+			YZ.imul(4);
+			YZ.neg(); YZ.norm();       //-2YZ
+			YZ.pmul(Qy);               //-2YZ.Ys
 
-			var NY=new FP2_YYY(P.gety()); /*NY.copy(P.gety());*/ NY.neg(); NY.norm();
-			ZZ.add(NY); // ZZ.norm();
-			Z3.pmul(Qy);
-			T.mul(P.getx());
-			X.mul(NY);
-			T.add(X); T.norm();
-			a=new FP4_YYY(Z3,T); //a.set(Z3,T);
-			ZZ.neg(); ZZ.norm();
-			ZZ.pmul(Qx);
-			b=new FP4_YYY(ZZ); //b.seta(ZZ);
+			XX.imul(6);                //3X^2
+			XX.pmul(Qx);               //3X^2.Xs
+
+			var sb=3*ROM_CURVE_ZZZ.CURVE_B_I;
+			ZZ.imul(sb); ZZ.div_ip2();  ZZ.norm(); // 3b.Z^2 
+
+			YY.add(YY);
+			ZZ.sub(YY); ZZ.norm();     // 3b.Z^2-Y^2
+
+			a=new FP4_YYY(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
+			b=new FP4_YYY(XX);             // L(0,1) | L(0,0) | L(1,0)
+
+			A.dbl();
 		}
 		else
-		{ /* Doubling */
-			X=new FP2_YYY(P.getx()); //X.copy(P.getx());
-			Y=new FP2_YYY(P.gety()); //Y.copy(P.gety());
-			T=new FP2_YYY(P.getx()); //T.copy(P.getx());
-			T.sqr();
-			T.imul(3);
+		{ /* Addition */
 
-			Y.sqr();
-			Y.add(Y);
-			Z3.mul(ZZ);
-			Z3.pmul(Qy);
+			var X1=new FP2_YYY(A.getx());    // X1
+			var Y1=new FP2_YYY(A.gety());    // Y1
+			var T1=new FP2_YYY(A.getz());    // Z1
+			var T2=new FP2_YYY(A.getz());    // Z1
+			
+			T1.mul(B.gety());    // T1=Z1.Y2 
+			T2.mul(B.getx());    // T2=Z1.X2
 
-			X.mul(T);
-			X.sub(Y); X.norm();
-			a=new FP4_YYY(Z3,X); //a.set(Z3,X);
-			T.neg(); T.norm();
-			ZZ.mul(T);
+			X1.sub(T2); X1.norm();  // X1=X1-Z1.X2
+			Y1.sub(T1); Y1.norm();  // Y1=Y1-Z1.Y2
 
-			ZZ.pmul(Qx);
+			T1.copy(X1);            // T1=X1-Z1.X2
+			X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
+			T1.mul(B.gety());       // T1=(X1-Z1.X2).Y2
 
-			b=new FP4_YYY(ZZ); //b.seta(ZZ);
+			T2.copy(Y1);            // T2=Y1-Z1.Y2
+			T2.mul(B.getx());       // T2=(Y1-Z1.Y2).X2
+			T2.sub(T1); T2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+			Y1.pmul(Qx);  Y1.neg(); Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
+
+			a=new FP4_YYY(X1,T2);       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+			b=new FP4_YYY(Y1);
+
+			A.add(B);
 		}
 		r.set(a,b,c);
 		return r;		
@@ -350,49 +354,6 @@ var PAIR_ZZZ = {
 			r.copy(y1);
 			r.reduce();
 
-
-/*
-			x0=new FP12_YYY(r);
-			x1=new FP12_YYY(r);
-			lv.copy(r); lv.frob(f);
-			x3=new FP12_YYY(lv); x3.conj(); x1.mul(x3);
-			lv.frob(f); lv.frob(f);
-			x1.mul(lv);
-
-			r.copy(r.pow(x));  //r=r.pow(x);
-			x3.copy(r); x3.conj(); x1.mul(x3);
-			lv.copy(r); lv.frob(f);
-			x0.mul(lv);
-			lv.frob(f);
-			x1.mul(lv);
-			lv.frob(f);
-			x3.copy(lv); x3.conj(); x0.mul(x3);
-
-			r.copy(r.pow(x));
-			x0.mul(r);
-			lv.copy(r); lv.frob(f); lv.frob(f);
-			x3.copy(lv); x3.conj(); x0.mul(x3);
-			lv.frob(f);
-			x1.mul(lv);
-
-			r.copy(r.pow(x));
-			lv.copy(r); lv.frob(f);
-			x3.copy(lv); x3.conj(); x0.mul(x3);
-			lv.frob(f);
-			x1.mul(lv);
-
-			r.copy(r.pow(x));
-			x3.copy(r); x3.conj(); x0.mul(x3);
-			lv.copy(r); lv.frob(f);
-			x1.mul(lv);
-
-			r.copy(r.pow(x));
-			x1.mul(r);
-
-			x0.usqr();
-			x0.mul(x1);
-			r.copy(x0);
-			r.reduce(); */
 		}
 		return r;
 	}
