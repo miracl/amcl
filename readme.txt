@@ -1,6 +1,6 @@
 The Apache Milagro Cryptographic Library
 
-Note that the AMCL currently comes in two supported versions, version 2.2 
+Note that the AMCL currently comes in two versions, version 2.2 
 and version 3.1
 
 AMCL v2.2 is presented in what might be called a pre-library state.
@@ -33,9 +33,9 @@ on 64-bit processors.
 
 Version 3.1 is a major "under the hood" upgrade. Field arithmetic is 
 performed using ideas from http://eprint.iacr.org/2017/437 to ensure 
-that key calculations are performed in constant time. This strongly 
+that critical calculations are performed in constant time. This strongly 
 mitigates against side-channel attacks. Exception-free formulae are 
 now used for Weierstrass elliptic curves. A new standardised script 
-builds for the same set of curves across  all languages.
+builds for the same set of curves across all languages.
 
 
