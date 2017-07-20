@@ -537,9 +537,9 @@ static inline chunk muladd(chunk x,chunk y,chunk c,chunk *r)
 {
     chunk x0,x1,y0,y1;
     chunk bot,top,mid,carry;
-    x0=x&HMASK;
+    x0=x&HMASK_XXX;
     x1=(x>>HBITS_XXX);
-    y0=y&HMASK;
+    y0=y&HMASK_XXX;
     y1=(y>>HBITS_XXX);
     bot=x0*y0;
     top=x1*y1;
