@@ -439,12 +439,13 @@ final public class PAIR {
 	} else {
 		let x=BIG(ROM.CURVE_Bnx)
 		let w=BIG(e)
-		for i in 0 ..< 4
+		for i in 0 ..< 3
 		{
 			u.append(BIG(w))
 			u[i].mod(x)
 			w.div(x)
 		}
+		u.append(BIG(w))
 	}
         return u
     }	

@@ -431,12 +431,13 @@ public final class PAIR {
 		{
 			BIG x=new BIG(ROM.CURVE_Bnx);
 			BIG w=new BIG(e);
-			for (int i=0;i<4;i++)
+			for (int i=0;i<3;i++)
 			{
 				u[i]=new BIG(w);
 				u[i].mod(x);
 				w.div(x);
 			}
+			u[3]=new BIG(w);
 		}
 		return u;
 	}	

@@ -558,12 +558,13 @@ static void gs(BIG_XXX u[4],BIG_XXX e)
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
     BIG_XXX_copy(w,e);
 
-    for (i=0; i<4; i++)
+    for (i=0; i<3; i++)
     {
         BIG_XXX_copy(u[i],w);
         BIG_XXX_mod(u[i],x);
         BIG_XXX_sdiv(w,x);
     }
+	BIG_XXX_copy(u[3],w);
 
 #endif
     return;
