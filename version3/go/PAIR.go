@@ -442,11 +442,12 @@ func gs(e *BIG) []*BIG {
 	} else {
 		x:=NewBIGints(CURVE_Bnx)
 		w:=NewBIGcopy(e)
-		for i:=0;i<4;i++ {
+		for i:=0;i<3;i++ {
 			u=append(u,NewBIGcopy(w))
 			u[i].mod(x)
 			w.div(x)
 		}
+		u=append(u,NewBIGcopy(w))
 	}
 	return u
 }	

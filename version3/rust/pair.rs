@@ -457,11 +457,12 @@ pub fn gs(e: &BIG) -> [BIG;4] {
 	} else {
 		let x=BIG::new_ints(&rom::CURVE_BNX);
 		let mut w=BIG::new_copy(&e);
-		for i in 0..4 {
+		for i in 0..3 {
 			u[i].copy(&w);
 			u[i].rmod(&x);
 			w.div(&x);
 		}
+		u[3].copy(&w);
 	}
 	return u;
 }	

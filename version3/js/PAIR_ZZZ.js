@@ -437,12 +437,13 @@ PAIR_ZZZ.gs= function(e)
 	{
 		var x=new BIG_XXX(0); x.rcopy(ROM_CURVE_ZZZ.CURVE_Bnx);
 		var w=new BIG_XXX(e);
-		for (var i=0;i<4;i++)
+		for (var i=0;i<3;i++)
 		{
 			u[i]=new BIG_XXX(w);
 			u[i].mod(x);
 			w.div(x);
 		}
+		u[3]=new BIG_XXX(w);
 	}
 	return u;
 };	
