@@ -110,7 +110,7 @@ void FP4_YYY_neg(FP4_YYY *w,FP4_YYY *x)
     FP2_YYY_add(&t,&m,&(x->b));
     FP2_YYY_add(&(w->b),&m,&(x->a));
     FP2_YYY_copy(&(w->a),&t);
-	FP4_YYY_norm(w);
+    FP4_YYY_norm(w);
 }
 
 /* Set w=conj(x) */
@@ -119,7 +119,7 @@ void FP4_YYY_conj(FP4_YYY *w,FP4_YYY *x)
 {
     FP2_YYY_copy(&(w->a), &(x->a));
     FP2_YYY_neg(&(w->b), &(x->b));
-FP4_YYY_norm(w);
+    FP4_YYY_norm(w);
 }
 
 /* Set w=-conj(x) */
@@ -128,7 +128,7 @@ void FP4_YYY_nconj(FP4_YYY *w,FP4_YYY *x)
 {
     FP2_YYY_copy(&(w->b),&(x->b));
     FP2_YYY_neg(&(w->a), &(x->a));
-FP4_YYY_norm(w);
+    FP4_YYY_norm(w);
 }
 
 /* Set w=x+y */
@@ -194,8 +194,8 @@ void FP4_YYY_sqr(FP4_YYY *w,FP4_YYY *x)
 
     FP2_YYY_add(&t2,&(x->a),&t2);
 
-	FP2_YYY_norm(&t1);  // 2
-	FP2_YYY_norm(&t2);  // 2
+    FP2_YYY_norm(&t1);  // 2
+    FP2_YYY_norm(&t2);  // 2
 
     FP2_YYY_mul(&(w->a),&t1,&t2);
 
@@ -204,7 +204,7 @@ void FP4_YYY_sqr(FP4_YYY *w,FP4_YYY *x)
 
     FP2_YYY_add(&t2,&t2,&t3);
 
-	FP2_YYY_norm(&t2);  // 2
+    FP2_YYY_norm(&t2);  // 2
     FP2_YYY_neg(&t2,&t2);
     FP2_YYY_add(&(w->a),&(w->a),&t2);  /* a=(a+b)(a+i^2.b)-i^2.ab-ab = a*a+ib*ib */
     FP2_YYY_add(&(w->b),&t3,&t3);  /* b=2ab */
@@ -218,23 +218,23 @@ void FP4_YYY_mul(FP4_YYY *w,FP4_YYY *x,FP4_YYY *y)
 {
 
     FP2_YYY t1,t2,t3,t4;
-    FP2_YYY_mul(&t1,&(x->a),&(y->a)); 
-    FP2_YYY_mul(&t2,&(x->b),&(y->b)); 
+    FP2_YYY_mul(&t1,&(x->a),&(y->a));
+    FP2_YYY_mul(&t2,&(x->b),&(y->b));
 
     FP2_YYY_add(&t3,&(y->b),&(y->a));
     FP2_YYY_add(&t4,&(x->b),&(x->a));
 
-	FP2_YYY_norm(&t4); // 2
-	FP2_YYY_norm(&t3); // 2
+    FP2_YYY_norm(&t4); // 2
+    FP2_YYY_norm(&t3); // 2
 
     FP2_YYY_mul(&t4,&t4,&t3); /* (xa+xb)(ya+yb) */
 
-	FP2_YYY_neg(&t3,&t1);  // 1
-	FP2_YYY_add(&t4,&t4,&t3);  //t4E=3
+    FP2_YYY_neg(&t3,&t1);  // 1
+    FP2_YYY_add(&t4,&t4,&t3);  //t4E=3
     FP2_YYY_norm(&t4);
 
-	FP2_YYY_neg(&t3,&t2);  // 1
-	FP2_YYY_add(&(w->b),&t4,&t3); //wbE=3
+    FP2_YYY_neg(&t3,&t2);  // 1
+    FP2_YYY_add(&(w->b),&t4,&t3); //wbE=3
 
     FP2_YYY_mul_ip(&t2);
     FP2_YYY_add(&(w->a),&t2,&t1);
@@ -271,12 +271,12 @@ void FP4_YYY_inv(FP4_YYY *w,FP4_YYY *x)
     FP2_YYY_sqr(&t1,&(x->a));
     FP2_YYY_sqr(&t2,&(x->b));
     FP2_YYY_mul_ip(&t2);
-FP2_YYY_norm(&t2);
+    FP2_YYY_norm(&t2);
     FP2_YYY_sub(&t1,&t1,&t2);
     FP2_YYY_inv(&t1,&t1);
     FP2_YYY_mul(&(w->a),&t1,&(x->a));
     FP2_YYY_neg(&t1,&t1);
-FP2_YYY_norm(&t1);
+    FP2_YYY_norm(&t1);
     FP2_YYY_mul(&(w->b),&t1,&(x->b));
 }
 
@@ -300,7 +300,7 @@ void FP4_YYY_times_i(FP4_YYY *w)
 
     FP2_YYY_copy(&(w->b),&(w->a));
     FP2_YYY_copy(&(w->a),&t);
-	FP4_YYY_norm(w);
+    FP4_YYY_norm(w);
 }
 
 /* Set w=w^p using Frobenius */
@@ -346,10 +346,10 @@ void FP4_YYY_xtr_A(FP4_YYY *r,FP4_YYY *w,FP4_YYY *x,FP4_YYY *y,FP4_YYY *z)
     FP4_YYY_copy(r,x);
 //FP4_YYY_norm(y);
     FP4_YYY_sub(&t1,w,y);
-FP4_YYY_norm(&t1);
+    FP4_YYY_norm(&t1);
     FP4_YYY_pmul(&t1,&t1,&(r->a));
     FP4_YYY_add(&t2,w,y);
-FP4_YYY_norm(&t2);
+    FP4_YYY_norm(&t2);
     FP4_YYY_pmul(&t2,&t2,&(r->b));
     FP4_YYY_times_i(&t2);
 
@@ -368,7 +368,7 @@ void FP4_YYY_xtr_D(FP4_YYY *r,FP4_YYY *x)
     FP4_YYY_conj(&w,r);
     FP4_YYY_add(&w,&w,&w);
     FP4_YYY_sqr(r,r);
-FP4_YYY_norm(&w);
+    FP4_YYY_norm(&w);
     FP4_YYY_sub(r,r,&w);
     FP4_YYY_reduce(r);    /* reduce here as multiple calls trigger automatic reductions */
 }

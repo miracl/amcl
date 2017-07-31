@@ -120,7 +120,7 @@ void RAND_seed(csprng *rng,int rawlen,char *raw)
             b[1]=digest[4*i+1];
             b[2]=digest[4*i+2];
             b[3]=digest[4*i+3];
-            //	printf("%08x\n",pack(b));
+            // printf("%08x\n",pack(b));
             sirand(rng,pack(b));
         }
     }

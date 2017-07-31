@@ -26,81 +26,81 @@ under the License.
 /* Line function */
 static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,FP_YYY *Qx,FP_YYY *Qy)
 {
-	FP2_YYY X1,Y1,T1,T2;
-	FP2_YYY XX,YY,ZZ,YZ;
+    FP2_YYY X1,Y1,T1,T2;
+    FP2_YYY XX,YY,ZZ,YZ;
     FP4_YYY a,b,c;
-	FP4_YYY_zero(&c);
+    FP4_YYY_zero(&c);
 
     if (A==B)
     {
         /* doubling */
- 		FP2_YYY_copy(&XX,&(A->x));	//FP2 XX=new FP2(A.getx());  //X
-		FP2_YYY_copy(&YY,&(A->y));	//FP2 YY=new FP2(A.gety());  //Y
-		FP2_YYY_copy(&ZZ,&(A->z));	//FP2 ZZ=new FP2(A.getz());  //Z
-		FP2_YYY_copy(&YZ,&YY);		//FP2 YZ=new FP2(YY);        //Y 
-		FP2_YYY_mul(&YZ,&YZ,&ZZ);		//YZ.mul(ZZ);                //YZ
-		FP2_YYY_sqr(&XX,&XX);		//XX.sqr();	               //X^2
-		FP2_YYY_sqr(&YY,&YY);		//YY.sqr();	               //Y^2
-		FP2_YYY_sqr(&ZZ,&ZZ);		//ZZ.sqr();			       //Z^2
-			
-		FP2_YYY_imul(&YZ,&YZ,4);	//YZ.imul(4);
-		FP2_YYY_neg(&YZ,&YZ);		//YZ.neg(); 
-		FP2_YYY_norm(&YZ);			//YZ.norm();       //-2YZ
-		FP2_YYY_pmul(&YZ,&YZ,Qy);	//YZ.pmul(Qy);               //-2YZ.Ys
+        FP2_YYY_copy(&XX,&(A->x));	//FP2 XX=new FP2(A.getx());  //X
+        FP2_YYY_copy(&YY,&(A->y));	//FP2 YY=new FP2(A.gety());  //Y
+        FP2_YYY_copy(&ZZ,&(A->z));	//FP2 ZZ=new FP2(A.getz());  //Z
+        FP2_YYY_copy(&YZ,&YY);		//FP2 YZ=new FP2(YY);        //Y
+        FP2_YYY_mul(&YZ,&YZ,&ZZ);		//YZ.mul(ZZ);                //YZ
+        FP2_YYY_sqr(&XX,&XX);		//XX.sqr();	               //X^2
+        FP2_YYY_sqr(&YY,&YY);		//YY.sqr();	               //Y^2
+        FP2_YYY_sqr(&ZZ,&ZZ);		//ZZ.sqr();			       //Z^2
 
-		FP2_YYY_imul(&XX,&XX,6);	//XX.imul(6);                //3X^2
-		FP2_YYY_pmul(&XX,&XX,Qx);		//XX.pmul(Qx);               //3X^2.Xs
+        FP2_YYY_imul(&YZ,&YZ,4);	//YZ.imul(4);
+        FP2_YYY_neg(&YZ,&YZ);		//YZ.neg();
+        FP2_YYY_norm(&YZ);			//YZ.norm();       //-2YZ
+        FP2_YYY_pmul(&YZ,&YZ,Qy);	//YZ.pmul(Qy);               //-2YZ.Ys
 
-		FP2_YYY_imul(&ZZ,&ZZ,3*CURVE_B_I_ZZZ);	//int sb=3*ROM.CURVE_B_I; ZZ.imul(sb); 
+        FP2_YYY_imul(&XX,&XX,6);	//XX.imul(6);                //3X^2
+        FP2_YYY_pmul(&XX,&XX,Qx);		//XX.pmul(Qx);               //3X^2.Xs
+
+        FP2_YYY_imul(&ZZ,&ZZ,3*CURVE_B_I_ZZZ);	//int sb=3*ROM.CURVE_B_I; ZZ.imul(sb);
 
 //printf("ZZ= "); FP2_YYY_output(&ZZ); printf("\n");
 
-		FP2_YYY_div_ip2(&ZZ);		//ZZ.div_ip2();  
-		FP2_YYY_norm(&ZZ);			//ZZ.norm(); // 3b.Z^2 
+        FP2_YYY_div_ip2(&ZZ);		//ZZ.div_ip2();
+        FP2_YYY_norm(&ZZ);			//ZZ.norm(); // 3b.Z^2
 
-		FP2_YYY_add(&YY,&YY,&YY);	//YY.add(YY);
-		FP2_YYY_sub(&ZZ,&ZZ,&YY);	//ZZ.sub(YY); 
-		FP2_YYY_norm(&ZZ);			//ZZ.norm();     // 3b.Z^2-Y^2
+        FP2_YYY_add(&YY,&YY,&YY);	//YY.add(YY);
+        FP2_YYY_sub(&ZZ,&ZZ,&YY);	//ZZ.sub(YY);
+        FP2_YYY_norm(&ZZ);			//ZZ.norm();     // 3b.Z^2-Y^2
 
-		FP4_YYY_from_FP2s(&a,&YZ,&ZZ); //a=new FP4(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
-		FP4_YYY_from_FP2(&b,&XX);		//b=new FP4(XX);             // L(0,1) | L(0,0) | L(1,0)
+        FP4_YYY_from_FP2s(&a,&YZ,&ZZ); //a=new FP4(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs
+        FP4_YYY_from_FP2(&b,&XX);		//b=new FP4(XX);             // L(0,1) | L(0,0) | L(1,0)
 
-		ECP2_ZZZ_dbl(A);				//A.dbl();
+        ECP2_ZZZ_dbl(A);				//A.dbl();
     }
     else
     {
         /* addition */
 
-		FP2_YYY_copy(&X1,&(A->x));		//FP2 X1=new FP2(A.getx());    // X1
-		FP2_YYY_copy(&Y1,&(A->y));		//FP2 Y1=new FP2(A.gety());    // Y1
-		FP2_YYY_copy(&T1,&(A->z));		//FP2 T1=new FP2(A.getz());    // Z1
-		FP2_YYY_copy(&T2,&(A->z));		//FP2 T2=new FP2(A.getz());    // Z1
-			
-		FP2_YYY_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());    // T1=Z1.Y2 
-		FP2_YYY_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());    // T2=Z1.X2
+        FP2_YYY_copy(&X1,&(A->x));		//FP2 X1=new FP2(A.getx());    // X1
+        FP2_YYY_copy(&Y1,&(A->y));		//FP2 Y1=new FP2(A.gety());    // Y1
+        FP2_YYY_copy(&T1,&(A->z));		//FP2 T1=new FP2(A.getz());    // Z1
+        FP2_YYY_copy(&T2,&(A->z));		//FP2 T2=new FP2(A.getz());    // Z1
 
-		FP2_YYY_sub(&X1,&X1,&T2);		//X1.sub(T2); 
-		FP2_YYY_norm(&X1);				//X1.norm();  // X1=X1-Z1.X2
-		FP2_YYY_sub(&Y1,&Y1,&T1);		//Y1.sub(T1); 
-		FP2_YYY_norm(&Y1);				//Y1.norm();  // Y1=Y1-Z1.Y2
+        FP2_YYY_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());    // T1=Z1.Y2
+        FP2_YYY_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());    // T2=Z1.X2
 
-		FP2_YYY_copy(&T1,&X1);			//T1.copy(X1);            // T1=X1-Z1.X2
-		FP2_YYY_pmul(&X1,&X1,Qy);		//X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
-		FP2_YYY_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());       // T1=(X1-Z1.X2).Y2
+        FP2_YYY_sub(&X1,&X1,&T2);		//X1.sub(T2);
+        FP2_YYY_norm(&X1);				//X1.norm();  // X1=X1-Z1.X2
+        FP2_YYY_sub(&Y1,&Y1,&T1);		//Y1.sub(T1);
+        FP2_YYY_norm(&Y1);				//Y1.norm();  // Y1=Y1-Z1.Y2
 
-		FP2_YYY_copy(&T2,&Y1);			//T2.copy(Y1);            // T2=Y1-Z1.Y2
-		FP2_YYY_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());       // T2=(Y1-Z1.Y2).X2
-		FP2_YYY_sub(&T2,&T2,&T1);		//T2.sub(T1); 
-		FP2_YYY_norm(&T2);				//T2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
-		FP2_YYY_pmul(&Y1,&Y1,Qx);		//Y1.pmul(Qx);  
-		FP2_YYY_neg(&Y1,&Y1);			//Y1.neg(); 
-		FP2_YYY_norm(&Y1);				//Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
+        FP2_YYY_copy(&T1,&X1);			//T1.copy(X1);            // T1=X1-Z1.X2
+        FP2_YYY_pmul(&X1,&X1,Qy);		//X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
+        FP2_YYY_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());       // T1=(X1-Z1.X2).Y2
+
+        FP2_YYY_copy(&T2,&Y1);			//T2.copy(Y1);            // T2=Y1-Z1.Y2
+        FP2_YYY_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());       // T2=(Y1-Z1.Y2).X2
+        FP2_YYY_sub(&T2,&T2,&T1);		//T2.sub(T1);
+        FP2_YYY_norm(&T2);				//T2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+        FP2_YYY_pmul(&Y1,&Y1,Qx);		//Y1.pmul(Qx);
+        FP2_YYY_neg(&Y1,&Y1);			//Y1.neg();
+        FP2_YYY_norm(&Y1);				//Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
 
 
-		FP4_YYY_from_FP2s(&a,&X1,&T2);	//a=new FP4(X1,T2);       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
-		FP4_YYY_from_FP2(&b,&Y1);		//b=new FP4(Y1);
+        FP4_YYY_from_FP2s(&a,&X1,&T2);	//a=new FP4(X1,T2);       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+        FP4_YYY_from_FP2(&b,&Y1);		//b=new FP4(Y1);
 
-		ECP2_ZZZ_add(A,B);			//A.add(B);
+        ECP2_ZZZ_add(A,B);			//A.add(B);
     }
     FP12_YYY_from_FP4s(v,&a,&b,&c);
 //	FP12_YYY_norm(v);
@@ -111,7 +111,7 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 {
     FP2_YYY X;
     BIG_XXX x,n;
-	FP_YYY Qx,Qy;
+    FP_YYY Qx,Qy;
     int i,nb;
     ECP2_ZZZ A;
     FP12_YYY lv;
@@ -134,8 +134,8 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 
     BIG_XXX_norm(n);
 
-//    ECP2_ZZZ_affine(P);
-//    ECP_ZZZ_affine(Q);
+    // ECP2_ZZZ_affine(P);
+    // ECP_ZZZ_affine(Q);
 
     FP_YYY_copy(&Qx,&(Q->x));
     FP_YYY_copy(&Qy,&(Q->y));
@@ -189,7 +189,7 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 {
     FP2_YYY X;
     BIG_XXX x,n;
-	FP_YYY Qx,Qy,Sx,Sy;
+    FP_YYY Qx,Qy,Sx,Sy;
     int i,nb;
     ECP2_ZZZ A,B;
     FP12_YYY lv;
@@ -241,7 +241,7 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
         }
         FP12_YYY_sqr(r,r);
 
-	}
+    }
 
     PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
     FP12_YYY_smul(r,&lv);
@@ -289,7 +289,7 @@ void PAIR_ZZZ_fexp(FP12_YYY *r)
 {
     FP2_YYY X;
     BIG_XXX x;
-	FP_YYY a,b;
+    FP_YYY a,b;
     FP12_YYY t0,y0,y1,y2,y3;
 
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
@@ -564,7 +564,7 @@ static void gs(BIG_XXX u[4],BIG_XXX e)
         BIG_XXX_mod(u[i],x);
         BIG_XXX_sdiv(w,x);
     }
-	BIG_XXX_copy(u[3],w);
+    BIG_XXX_copy(u[3],w);
 
 #endif
     return;
@@ -576,7 +576,7 @@ void PAIR_ZZZ_G1mul(ECP_ZZZ *P,BIG_XXX e)
 #ifdef USE_GLV_ZZZ   /* Note this method is patented */
     int np,nn;
     ECP_ZZZ Q;
-	FP_YYY cru;
+    FP_YYY cru;
     BIG_XXX t,q;
     BIG_XXX u[2];
 
@@ -678,7 +678,7 @@ void PAIR_ZZZ_GTpow(FP12_YYY *f,BIG_XXX e)
     FP12_YYY g[4];
     FP2_YYY X;
     BIG_XXX t,q;
-	FP_YYY fx,fy;
+    FP_YYY fx,fy;
     BIG_XXX u[4];
 
     FP_YYY_rcopy(&fx,Fra_YYY);

@@ -6,6 +6,16 @@
 #include <inttypes.h>
 #include "arch.h"
 
+#ifdef CMAKE
+#define AMCL_VERSION_MAJOR @AMCL_VERSION_MAJOR@ /**< Major version of the library */
+#define AMCL_VERSION_MINOR @AMCL_VERSION_MINOR@ /**< Minor version of the library */
+#define AMCL_VERSION_PATCH @AMCL_VERSION_PATCH@ /**< Patch version of the library */
+#define OS "@OS@"                               /**< Operative system */
+#cmakedefine USE_PATENTS   /**< Use Patents */
+#cmakedefine USE_ANONYMOUS /**< Use Anonymous Configuration in MPin */
+#cmakedefine USE_DVS /**< Use Key-escrow less Scheme Configuration in MPin  */
+#endif
+
 /* modulus types */
 
 #define NOT_SPECIAL 0	       /**< Modulus of no exploitable form */

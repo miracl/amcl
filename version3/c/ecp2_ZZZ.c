@@ -24,8 +24,8 @@ under the License.
 
 int ECP2_ZZZ_isinf(ECP2_ZZZ *P)
 {
-	if (P->inf) return 1;
-	P->inf=FP2_YYY_iszilch(&(P->x)) & FP2_YYY_iszilch(&(P->z));
+    if (P->inf) return 1;
+    P->inf=FP2_YYY_iszilch(&(P->x)) & FP2_YYY_iszilch(&(P->z));
     return P->inf;
 }
 
@@ -184,11 +184,11 @@ void ECP2_ZZZ_outputxyz(ECP2_ZZZ *P)
 /* Convert Q to octet string */
 void ECP2_ZZZ_toOctet(octet *W,ECP2_ZZZ *Q)
 {
-	BIG_XXX b;
-	FP2_YYY qx,qy;
+    BIG_XXX b;
+    FP2_YYY qx,qy;
     ECP2_ZZZ_get(&qx,&qy,Q);
 
-	FP_YYY_redc(b,&(qx.a));
+    FP_YYY_redc(b,&(qx.a));
     BIG_XXX_toBytes(&(W->val[0]),b);
     FP_YYY_redc(b,&(qx.b));
     BIG_XXX_toBytes(&(W->val[MODBYTES_XXX]),b);
@@ -205,10 +205,10 @@ void ECP2_ZZZ_toOctet(octet *W,ECP2_ZZZ *Q)
 /* restore Q from octet string */
 int ECP2_ZZZ_fromOctet(ECP2_ZZZ *Q,octet *W)
 {
-	BIG_XXX b;
+    BIG_XXX b;
     FP2_YYY qx,qy;
     BIG_XXX_fromBytes(b,&(W->val[0]));
-	FP_YYY_nres(&(qx.a),b);
+    FP_YYY_nres(&(qx.a),b);
     BIG_XXX_fromBytes(b,&(W->val[MODBYTES_XXX]));
     FP_YYY_nres(&(qx.b),b);
     BIG_XXX_fromBytes(b,&(W->val[2*MODBYTES_XXX]));
@@ -292,7 +292,7 @@ int ECP2_ZZZ_setx(ECP2_ZZZ *P,FP2_YYY *x)
 void ECP2_ZZZ_neg(ECP2_ZZZ *P)
 {
 //	if (ECP2_ZZZ_isinf(P)) return;
-	FP2_YYY_norm(&(P->y));
+    FP2_YYY_norm(&(P->y));
     FP2_YYY_neg(&(P->y),&(P->y));
     FP2_YYY_norm(&(P->y));
 }
@@ -305,54 +305,54 @@ int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
     FP2_YYY t0,t1,t2,iy,x3,y3;
     if (P->inf) return -1;
 
-	FP2_YYY_copy(&iy,&(P->y));		//FP2 iy=new FP2(y);
-	FP2_YYY_mul_ip(&iy);			//iy.mul_ip(); 
-	FP2_YYY_norm(&iy);				//iy.norm();
+    FP2_YYY_copy(&iy,&(P->y));		//FP2 iy=new FP2(y);
+    FP2_YYY_mul_ip(&iy);			//iy.mul_ip();
+    FP2_YYY_norm(&iy);				//iy.norm();
 
-	//FP2_YYY_copy(&t0,&(P->y));		//FP2 t0=new FP2(y);                  //***** Change 
-	FP2_YYY_sqr(&t0,&(P->y));			//t0.sqr();            
-	FP2_YYY_mul_ip(&t0);			//t0.mul_ip();   
-	//FP2_YYY_copy(&t1,&iy);				//FP2 t1=new FP2(iy);  
-	FP2_YYY_mul(&t1,&iy,&(P->z));	//t1.mul(z);
-	//FP2_YYY_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
-	FP2_YYY_sqr(&t2,&(P->z));				//t2.sqr();
+    //FP2_YYY_copy(&t0,&(P->y));		//FP2 t0=new FP2(y);                  //***** Change
+    FP2_YYY_sqr(&t0,&(P->y));			//t0.sqr();
+    FP2_YYY_mul_ip(&t0);			//t0.mul_ip();
+    //FP2_YYY_copy(&t1,&iy);				//FP2 t1=new FP2(iy);
+    FP2_YYY_mul(&t1,&iy,&(P->z));	//t1.mul(z);
+    //FP2_YYY_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
+    FP2_YYY_sqr(&t2,&(P->z));				//t2.sqr();
 
-	//FP2_YYY_copy(&(P->z),&t0);		//z.copy(t0);
-	FP2_YYY_add(&(P->z),&t0,&t0);	//z.add(t0); 
-	FP2_YYY_norm(&(P->z));				//z.norm(); 
-	FP2_YYY_add(&(P->z),&(P->z),&(P->z));	//z.add(z); 
-	FP2_YYY_add(&(P->z),&(P->z),&(P->z));	//z.add(z); 
-	FP2_YYY_norm(&(P->z));			//z.norm();  
+    //FP2_YYY_copy(&(P->z),&t0);		//z.copy(t0);
+    FP2_YYY_add(&(P->z),&t0,&t0);	//z.add(t0);
+    FP2_YYY_norm(&(P->z));				//z.norm();
+    FP2_YYY_add(&(P->z),&(P->z),&(P->z));	//z.add(z);
+    FP2_YYY_add(&(P->z),&(P->z),&(P->z));	//z.add(z);
+    FP2_YYY_norm(&(P->z));			//z.norm();
 
-	FP2_YYY_imul(&t2,&t2,3*CURVE_B_I_ZZZ);	//t2.imul(3*ROM.CURVE_B_I); 
+    FP2_YYY_imul(&t2,&t2,3*CURVE_B_I_ZZZ);	//t2.imul(3*ROM.CURVE_B_I);
 
-	//FP2_YYY_copy(&x3,&t2);			//FP2 x3=new FP2(t2);
-	FP2_YYY_mul(&x3,&t2,&(P->z));	//x3.mul(z); 
+    //FP2_YYY_copy(&x3,&t2);			//FP2 x3=new FP2(t2);
+    FP2_YYY_mul(&x3,&t2,&(P->z));	//x3.mul(z);
 
-	//FP2_YYY_copy(&y3,&t0);			//FP2 y3=new FP2(t0);   
+    //FP2_YYY_copy(&y3,&t0);			//FP2 y3=new FP2(t0);
 
-	FP2_YYY_add(&y3,&t0,&t2);		//y3.add(t2); 
-	FP2_YYY_norm(&y3);				//y3.norm();
-	FP2_YYY_mul(&(P->z),&(P->z),&t1);	//z.mul(t1);
+    FP2_YYY_add(&y3,&t0,&t2);		//y3.add(t2);
+    FP2_YYY_norm(&y3);				//y3.norm();
+    FP2_YYY_mul(&(P->z),&(P->z),&t1);	//z.mul(t1);
 
-	//FP2_YYY_copy(&t1,&t2);			//t1.copy(t2); 
-	FP2_YYY_add(&t1,&t2,&t2);		//t1.add(t2); 
-	FP2_YYY_add(&t2,&t2,&t1);		//t2.add(t1); 
-	FP2_YYY_norm(&t2);				//t2.norm();  
-	FP2_YYY_sub(&t0,&t0,&t2);		//t0.sub(t2); 
-	FP2_YYY_norm(&t0);				//t0.norm();                           //y^2-9bz^2
-	FP2_YYY_mul(&y3,&y3,&t0);		//y3.mul(t0); 
-	FP2_YYY_add(&(P->y),&y3,&x3);		//y3.add(x3);                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
-	//FP2_YYY_copy(&t1,&(P->x));		//t1.copy(x); 
-	FP2_YYY_mul(&t1,&(P->x),&iy);		//t1.mul(iy);						//
-	//FP2_YYY_copy(&(P->x),&t0);		//x.copy(t0); 
-	FP2_YYY_norm(&t0);			//x.norm(); 
-	FP2_YYY_mul(&(P->x),&t0,&t1);	//x.mul(t1); 
-	FP2_YYY_add(&(P->x),&(P->x),&(P->x));	//x.add(x);       //(y^2-9bz^2)xy2
+    //FP2_YYY_copy(&t1,&t2);			//t1.copy(t2);
+    FP2_YYY_add(&t1,&t2,&t2);		//t1.add(t2);
+    FP2_YYY_add(&t2,&t2,&t1);		//t2.add(t1);
+    FP2_YYY_norm(&t2);				//t2.norm();
+    FP2_YYY_sub(&t0,&t0,&t2);		//t0.sub(t2);
+    FP2_YYY_norm(&t0);				//t0.norm();                           //y^2-9bz^2
+    FP2_YYY_mul(&y3,&y3,&t0);		//y3.mul(t0);
+    FP2_YYY_add(&(P->y),&y3,&x3);		//y3.add(x3);                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+    //FP2_YYY_copy(&t1,&(P->x));		//t1.copy(x);
+    FP2_YYY_mul(&t1,&(P->x),&iy);		//t1.mul(iy);						//
+    //FP2_YYY_copy(&(P->x),&t0);		//x.copy(t0);
+    FP2_YYY_norm(&t0);			//x.norm();
+    FP2_YYY_mul(&(P->x),&t0,&t1);	//x.mul(t1);
+    FP2_YYY_add(&(P->x),&(P->x),&(P->x));	//x.add(x);       //(y^2-9bz^2)xy2
 
-	FP2_YYY_norm(&(P->x));			//x.norm(); 
-	//FP2_YYY_copy(&(P->y),&y3);		//y.copy(y3); 
-	FP2_YYY_norm(&(P->y));			//y.norm();
+    FP2_YYY_norm(&(P->x));			//x.norm();
+    //FP2_YYY_copy(&(P->y),&y3);		//y.copy(y3);
+    FP2_YYY_norm(&(P->y));			//y.norm();
 
     return 1;
 }
@@ -362,7 +362,7 @@ int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
 int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 {
     FP2_YYY t0,t1,t2,t3,t4,x3,y3,z3;
-	int b3=3*CURVE_B_I_ZZZ;
+    int b3=3*CURVE_B_I_ZZZ;
     if (Q->inf) return 0;
     if (P->inf)
     {
@@ -370,92 +370,92 @@ int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
         return 0;
     }
 
-	//FP2_YYY_copy(&t0,&(P->x));		//FP2 t0=new FP2(x);
-	FP2_YYY_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
-	//FP2_YYY_copy(&t1,&(P->y));		//FP2 t1=new FP2(y);
-	FP2_YYY_mul(&t1,&(P->y),&(Q->y));	//t1.mul(Q.y);		 // y.Q.y
+    //FP2_YYY_copy(&t0,&(P->x));		//FP2 t0=new FP2(x);
+    FP2_YYY_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
+    //FP2_YYY_copy(&t1,&(P->y));		//FP2 t1=new FP2(y);
+    FP2_YYY_mul(&t1,&(P->y),&(Q->y));	//t1.mul(Q.y);		 // y.Q.y
 
-	//FP2_YYY_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
-	FP2_YYY_mul(&t2,&(P->z),&(Q->z));	//t2.mul(Q.z);
-	//FP2_YYY_copy(&t3,&(P->x));		//FP2 t3=new FP2(x);
-	FP2_YYY_add(&t3,&(P->x),&(P->y));	//t3.add(y); 
-	FP2_YYY_norm(&t3);				//t3.norm();          //t3=X1+Y1
-	//FP2_YYY_copy(&t4,&(Q->x));		//FP2 t4=new FP2(Q.x);            
-	FP2_YYY_add(&t4,&(Q->x),&(Q->y));	//t4.add(Q.y); 
-	FP2_YYY_norm(&t4);				//t4.norm();			//t4=X2+Y2
-	FP2_YYY_mul(&t3,&t3,&t4);		//t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
-	//FP2_YYY_copy(&t4,&t0);			//t4.copy(t0); 
-	FP2_YYY_add(&t4,&t0,&t1);		//t4.add(t1);		//t4=X1.X2+Y1.Y2
+    //FP2_YYY_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
+    FP2_YYY_mul(&t2,&(P->z),&(Q->z));	//t2.mul(Q.z);
+    //FP2_YYY_copy(&t3,&(P->x));		//FP2 t3=new FP2(x);
+    FP2_YYY_add(&t3,&(P->x),&(P->y));	//t3.add(y);
+    FP2_YYY_norm(&t3);				//t3.norm();          //t3=X1+Y1
+    //FP2_YYY_copy(&t4,&(Q->x));		//FP2 t4=new FP2(Q.x);
+    FP2_YYY_add(&t4,&(Q->x),&(Q->y));	//t4.add(Q.y);
+    FP2_YYY_norm(&t4);				//t4.norm();			//t4=X2+Y2
+    FP2_YYY_mul(&t3,&t3,&t4);		//t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
+    //FP2_YYY_copy(&t4,&t0);			//t4.copy(t0);
+    FP2_YYY_add(&t4,&t0,&t1);		//t4.add(t1);		//t4=X1.X2+Y1.Y2
 
-	FP2_YYY_sub(&t3,&t3,&t4);		//t3.sub(t4); 
-	FP2_YYY_norm(&t3);				//t3.norm(); 
-	FP2_YYY_mul_ip(&t3);			//t3.mul_ip();  
-	FP2_YYY_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+    FP2_YYY_sub(&t3,&t3,&t4);		//t3.sub(t4);
+    FP2_YYY_norm(&t3);				//t3.norm();
+    FP2_YYY_mul_ip(&t3);			//t3.mul_ip();
+    FP2_YYY_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 
-	//FP2_YYY_copy(&t4,&(P->y));		//t4.copy(y);                    
-	FP2_YYY_add(&t4,&(P->y),&(P->z));	//t4.add(z); 
-	FP2_YYY_norm(&t4);				//t4.norm();			//t4=Y1+Z1
-	//FP2_YYY_copy(&x3,&(Q->y));		//FP2 x3=new FP2(Q.y);
-	FP2_YYY_add(&x3,&(Q->y),&(Q->z));	//x3.add(Q.z); 
-	FP2_YYY_norm(&x3);				//x3.norm();			//x3=Y2+Z2
+    //FP2_YYY_copy(&t4,&(P->y));		//t4.copy(y);
+    FP2_YYY_add(&t4,&(P->y),&(P->z));	//t4.add(z);
+    FP2_YYY_norm(&t4);				//t4.norm();			//t4=Y1+Z1
+    //FP2_YYY_copy(&x3,&(Q->y));		//FP2 x3=new FP2(Q.y);
+    FP2_YYY_add(&x3,&(Q->y),&(Q->z));	//x3.add(Q.z);
+    FP2_YYY_norm(&x3);				//x3.norm();			//x3=Y2+Z2
 
-	FP2_YYY_mul(&t4,&t4,&x3);		//t4.mul(x3);						//t4=(Y1+Z1)(Y2+Z2)
-	//FP2_YYY_copy(&x3,&t1);			//x3.copy(t1);					//
-	FP2_YYY_add(&x3,&t1,&t2);		//x3.add(t2);						//X3=Y1.Y2+Z1.Z2
-	
-	FP2_YYY_sub(&t4,&t4,&x3);		//t4.sub(x3); 
-	FP2_YYY_norm(&t4);				//t4.norm(); 
-	FP2_YYY_mul_ip(&t4);			//t4.mul_ip(); 
-	FP2_YYY_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+    FP2_YYY_mul(&t4,&t4,&x3);		//t4.mul(x3);						//t4=(Y1+Z1)(Y2+Z2)
+    //FP2_YYY_copy(&x3,&t1);			//x3.copy(t1);					//
+    FP2_YYY_add(&x3,&t1,&t2);		//x3.add(t2);						//X3=Y1.Y2+Z1.Z2
 
-	//FP2_YYY_copy(&x3,&(P->x));		//x3.copy(x); 
-	FP2_YYY_add(&x3,&(P->x),&(P->z));	//x3.add(z); 
-	FP2_YYY_norm(&x3);				//x3.norm();	// x3=X1+Z1
-	//FP2_YYY_copy(&y3,&(Q->x));		//FP2 y3=new FP2(Q.x);				
-	FP2_YYY_add(&y3,&(Q->x),&(Q->z));	//y3.add(Q.z); 
-	FP2_YYY_norm(&y3);				//y3.norm();				// y3=X2+Z2
-	FP2_YYY_mul(&x3,&x3,&y3);		//x3.mul(y3);							// x3=(X1+Z1)(X2+Z2)
-	//FP2_YYY_copy(&y3,&t0);			//y3.copy(t0);
-	FP2_YYY_add(&y3,&t0,&t2);		//y3.add(t2);							// y3=X1.X2+Z1+Z2
-	FP2_YYY_sub(&y3,&x3,&y3);		//y3.rsub(x3); 
-	FP2_YYY_norm(&y3);				//y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
+    FP2_YYY_sub(&t4,&t4,&x3);		//t4.sub(x3);
+    FP2_YYY_norm(&t4);				//t4.norm();
+    FP2_YYY_mul_ip(&t4);			//t4.mul_ip();
+    FP2_YYY_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 
-	FP2_YYY_mul_ip(&t0);			//t0.mul_ip(); 
-	FP2_YYY_norm(&t0);				//t0.norm(); // x.Q.x
-	FP2_YYY_mul_ip(&t1);			//t1.mul_ip(); 
-	FP2_YYY_norm(&t1);				//t1.norm(); // y.Q.y
+    //FP2_YYY_copy(&x3,&(P->x));		//x3.copy(x);
+    FP2_YYY_add(&x3,&(P->x),&(P->z));	//x3.add(z);
+    FP2_YYY_norm(&x3);				//x3.norm();	// x3=X1+Z1
+    //FP2_YYY_copy(&y3,&(Q->x));		//FP2 y3=new FP2(Q.x);
+    FP2_YYY_add(&y3,&(Q->x),&(Q->z));	//y3.add(Q.z);
+    FP2_YYY_norm(&y3);				//y3.norm();				// y3=X2+Z2
+    FP2_YYY_mul(&x3,&x3,&y3);		//x3.mul(y3);							// x3=(X1+Z1)(X2+Z2)
+    //FP2_YYY_copy(&y3,&t0);			//y3.copy(t0);
+    FP2_YYY_add(&y3,&t0,&t2);		//y3.add(t2);							// y3=X1.X2+Z1+Z2
+    FP2_YYY_sub(&y3,&x3,&y3);		//y3.rsub(x3);
+    FP2_YYY_norm(&y3);				//y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-	//FP2_YYY_copy(&x3,&t0);			//x3.copy(t0); 
-	FP2_YYY_add(&x3,&t0,&t0);		//x3.add(t0); 
-	FP2_YYY_add(&t0,&t0,&x3);		//t0.add(x3); 
-	FP2_YYY_norm(&t0);				//t0.norm();
-	FP2_YYY_imul(&t2,&t2,b3);		//t2.imul(b); 	
+    FP2_YYY_mul_ip(&t0);			//t0.mul_ip();
+    FP2_YYY_norm(&t0);				//t0.norm(); // x.Q.x
+    FP2_YYY_mul_ip(&t1);			//t1.mul_ip();
+    FP2_YYY_norm(&t1);				//t1.norm(); // y.Q.y
 
-	//FP2_YYY_copy(&z3,&t1);			//FP2 z3=new FP2(t1); 
-	FP2_YYY_add(&z3,&t1,&t2);		//z3.add(t2); 
-	FP2_YYY_norm(&z3);				//z3.norm();
-	FP2_YYY_sub(&t1,&t1,&t2);		//t1.sub(t2); 
-	FP2_YYY_norm(&t1);				//t1.norm(); 
-	FP2_YYY_imul(&y3,&y3,b3);		//y3.imul(b); 
+    //FP2_YYY_copy(&x3,&t0);			//x3.copy(t0);
+    FP2_YYY_add(&x3,&t0,&t0);		//x3.add(t0);
+    FP2_YYY_add(&t0,&t0,&x3);		//t0.add(x3);
+    FP2_YYY_norm(&t0);				//t0.norm();
+    FP2_YYY_imul(&t2,&t2,b3);		//t2.imul(b);
 
-	//FP2_YYY_copy(&x3,&y3);			//x3.copy(y3); 
-	FP2_YYY_mul(&x3,&y3,&t4);		//x3.mul(t4); 
-	//FP2_YYY_copy(&t2,&t3);			//t2.copy(t3); 
-	FP2_YYY_mul(&t2,&t3,&t1);		//t2.mul(t1); 
-	FP2_YYY_sub(&(P->x),&t2,&x3);		//x3.rsub(t2);
-	FP2_YYY_mul(&y3,&y3,&t0);		//y3.mul(t0); 
-	FP2_YYY_mul(&t1,&t1,&z3);		//t1.mul(z3); 
-	FP2_YYY_add(&(P->y),&y3,&t1);		//y3.add(t1);
-	FP2_YYY_mul(&t0,&t0,&t3);		//t0.mul(t3); 
-	FP2_YYY_mul(&z3,&z3,&t4);		//z3.mul(t4); 
-	FP2_YYY_add(&(P->z),&z3,&t0);		//z3.add(t0);
+    //FP2_YYY_copy(&z3,&t1);			//FP2 z3=new FP2(t1);
+    FP2_YYY_add(&z3,&t1,&t2);		//z3.add(t2);
+    FP2_YYY_norm(&z3);				//z3.norm();
+    FP2_YYY_sub(&t1,&t1,&t2);		//t1.sub(t2);
+    FP2_YYY_norm(&t1);				//t1.norm();
+    FP2_YYY_imul(&y3,&y3,b3);		//y3.imul(b);
 
-	//FP2_YYY_copy(&(P->x),&x3);		//x.copy(x3); 
-	FP2_YYY_norm(&(P->x));			//x.norm(); 
-	//FP2_YYY_copy(&(P->y),&y3);		//y.copy(y3); 
-	FP2_YYY_norm(&(P->y));			//y.norm();
-	//FP2_YYY_copy(&(P->z),&z3);		//z.copy(z3); 
-	FP2_YYY_norm(&(P->z));			//z.norm();
+    //FP2_YYY_copy(&x3,&y3);			//x3.copy(y3);
+    FP2_YYY_mul(&x3,&y3,&t4);		//x3.mul(t4);
+    //FP2_YYY_copy(&t2,&t3);			//t2.copy(t3);
+    FP2_YYY_mul(&t2,&t3,&t1);		//t2.mul(t1);
+    FP2_YYY_sub(&(P->x),&t2,&x3);		//x3.rsub(t2);
+    FP2_YYY_mul(&y3,&y3,&t0);		//y3.mul(t0);
+    FP2_YYY_mul(&t1,&t1,&z3);		//t1.mul(z3);
+    FP2_YYY_add(&(P->y),&y3,&t1);		//y3.add(t1);
+    FP2_YYY_mul(&t0,&t0,&t3);		//t0.mul(t3);
+    FP2_YYY_mul(&z3,&z3,&t4);		//z3.mul(t4);
+    FP2_YYY_add(&(P->z),&z3,&t0);		//z3.add(t0);
+
+    //FP2_YYY_copy(&(P->x),&x3);		//x.copy(x3);
+    FP2_YYY_norm(&(P->x));			//x.norm();
+    //FP2_YYY_copy(&(P->y),&y3);		//y.copy(y3);
+    FP2_YYY_norm(&(P->y));			//y.norm();
+    //FP2_YYY_copy(&(P->z),&z3);		//z.copy(z3);
+    FP2_YYY_norm(&(P->z));			//z.norm();
 
     return 0;
 }

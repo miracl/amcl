@@ -1,3 +1,30 @@
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
+
+/**
+ * @file fp12_ZZZ.h
+ * @author Mike Scott
+ * @date 2nd June 2015
+ * @brief FP12 functions
+ *
+ */
+
 #ifndef FP12_YYY_H
 #define FP12_YYY_H
 
@@ -116,7 +143,7 @@ extern void FP12_YYY_pow(FP12_YYY *r,FP12_YYY *x,BIG_XXX b);
  */
 extern void FP12_YYY_pinpow(FP12_YYY *x,int i,int b);
 
-/**	@brief Raises an FP12 instance x to a BIG power, compressed to FP4 
+/**	@brief Raises an FP12 instance x to a BIG power, compressed to FP4
  *
 	@param c FP4 instance, on exit = x^(e mod r) as FP4
 	@param x FP12 input
