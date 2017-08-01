@@ -232,20 +232,19 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 replace("arch.h","@WL@","16")
 print("Elliptic Curves")
 print("1. ED25519")
-print("2. C25519")
-print("3. NUMS256E")
+print("2. NUMS256E")
 
 print("Pairing-Friendly Elliptic Curves")
-print("4. BN254")
-print("5. BN254CX")
+print("3. BN254")
+print("4. BN254CX")
 
 print("RSA")
-print("6. RSA2048")
+print("5. RSA2048")
 
 
 selection=[]
 ptr=0
-max=7
+max=6
 
 curve_selected=False
 pfcurve_selected=False
@@ -282,17 +281,14 @@ while ptr<max:
 		curveset("256","25519","ED25519","32","13","255","5","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==2:
-		curveset("256","25519","C25519","32","13","255","5","PSEUDO_MERSENNE","MONTGOMERY","NOT")
-		curve_selected=True
-	if x==3:
 		curveset("256","256PME","NUMS256E","32","13","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 
 
-	if x==4:
+	if x==3:
 		curveset("256","BN254","BN254","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
 		pfcurve_selected=True
-	if x==5:
+	if x==4:
 		curveset("256","BN254CX","BN254CX","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
 		pfcurve_selected=True
 
@@ -305,7 +301,7 @@ while ptr<max:
 # multiplier is 2^m (see above)
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==6:
+	if x==5:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("256","2048","32","13","8")
