@@ -67,6 +67,16 @@ typedef struct
 
 /* RSA Auxiliary Functions */
 
+
+/**	@brief RSA Key Pair Generator
+ *
+	@param R is a pointer to a cryptographically secure random number generator
+	@param e the encryption exponent
+	@param PRIV the output RSA private key
+	@param PUB the output RSA public key
+        @param P Input prime number. Used when R is equal to NULL for testing
+        @param Q Inpuy prime number. Used when R is equal to NULL for testing
+ */
 extern void RSA_WWW_KEY_PAIR(csprng *R,sign32 e,rsa_private_key_WWW* PRIV,rsa_public_key_WWW* PUB,octet *P, octet* Q);
 
 /**	@brief RSA encryption of suitably padded plaintext

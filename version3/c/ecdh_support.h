@@ -36,7 +36,18 @@ under the License.
 
 /* Auxiliary Functions */
 
-extern void ehashit(int,octet *,int,octet *,octet *,int);
+/* general purpose hash function w=hash(p|n|x|y) */
+
+/** @brief general purpose hash function w=hash(p|n|x|y) 
+ *
+	@param sha is the hash type
+	@param p first octect involved in the hash
+	@param n integer involved in the hash
+	@param x second octect involved in the h ash
+	@param w output
+	@param pad padding
+ */
+extern void ehashit(int sha,octet *p,int n,octet *x,octet *w,int pad);
 
 /**	@brief hash an octet into another octet
  *

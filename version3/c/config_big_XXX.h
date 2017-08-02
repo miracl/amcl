@@ -33,8 +33,8 @@ under the License.
 
 // BIG stuff
 
-#define MODBYTES_XXX @NB@
-#define BASEBITS_XXX @BASE@
+#define MODBYTES_XXX @NB@		/**< Number of bytes in Modulus */
+#define BASEBITS_XXX @BASE@		/**< Numbers represented to base 2*BASEBITS */
 
 
 #endif

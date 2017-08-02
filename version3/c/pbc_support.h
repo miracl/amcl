@@ -33,8 +33,14 @@ under the License.
 
 #define TIME_SLOT_MINUTES 1440  /**< Time Slot = 1 day */
 
-extern void mhashit(int,int,octet *,octet *);
-
+/** @brief general purpose hash function w=hash(n|x) 
+ *
+	@param sha is the hash type
+	@param n integer involved in the hash
+	@param x octect involved in the h ash
+	@param w output
+ */
+extern void mhashit(int sha,int n,octet *x,octet *w);
 
 /**	@brief Supply today's date as days from the epoch
  *

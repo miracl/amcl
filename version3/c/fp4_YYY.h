@@ -18,14 +18,10 @@ under the License.
 */
 
 /**
- * @file fp4_ZZZ.h
+ * @file fp4_YYY.h
  * @author Mike Scott
  * @date 2nd June 2015
  * @brief FP4 functions
- *
- * Allows some user configuration
- * defines structures
- * declares functions
  *
  */
 

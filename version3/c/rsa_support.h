@@ -31,7 +31,7 @@ under the License.
 
 #include "amcl.h"
 
-#define MAX_RSA_BYTES 512 // Maximum of 4096
+#define MAX_RSA_BYTES 512 /**< Maximum of 4096 */
 
 /**	@brief PKCS V1.5 padding of a message prior to RSA signature
  *

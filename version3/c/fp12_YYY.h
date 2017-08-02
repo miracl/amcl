@@ -18,7 +18,7 @@ under the License.
 */
 
 /**
- * @file fp12_ZZZ.h
+ * @file fp12_YYY.h
  * @author Mike Scott
  * @date 2nd June 2015
  * @brief FP12 functions

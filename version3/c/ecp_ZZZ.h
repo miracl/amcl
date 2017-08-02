@@ -34,7 +34,7 @@ under the License.
 
 /* Curve Params - see rom_zzz.c */
 extern const int CURVE_A_ZZZ;     /**< Elliptic curve A parameter */
-extern const int CURVE_B_I_ZZZ;
+extern const int CURVE_B_I_ZZZ;   /**< Elliptic curve B_i parameter */
 extern const BIG_XXX CURVE_B_ZZZ;     /**< Elliptic curve B parameter */
 extern const BIG_XXX CURVE_Order_ZZZ; /**< Elliptic curve group order */
 extern const BIG_XXX CURVE_Cof_ZZZ;   /**< Elliptic curve cofactor */

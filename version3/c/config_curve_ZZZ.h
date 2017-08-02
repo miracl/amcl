@@ -18,7 +18,7 @@ under the License.
 */
 
 /**
- * @file config_curve.h
+ * @file config_curve_ZZZ.h
  * @author Mike Scott
  * @date January 2017
  * @brief Auxiliary values for elliptic curves
@@ -34,8 +34,8 @@ under the License.
 
 // ECP stuff
 
-#define CURVETYPE_ZZZ @CT@
-#define PAIRING_FRIENDLY_ZZZ @PF@
+#define CURVETYPE_ZZZ @CT@			/**< Type of the representation of curve, can be Weiestrass, Montgomery or Edwards */
+#define PAIRING_FRIENDLY_ZZZ @PF@	/**< True if the curve is pairing friendly */
 
 /*
 #define CURVETYPE_ZZZ EDWARDS

@@ -18,7 +18,7 @@ under the License.
 */
 
 /**
- * @file epc2_ZZZ.h
+ * @file ecp2_ZZZ.h
  * @author Mike Scott
  * @date 2nd June 2015
  * @brief Functions for EC points in G2

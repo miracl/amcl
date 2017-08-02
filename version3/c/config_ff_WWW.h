@@ -18,7 +18,7 @@ under the License.
 */
 
 /**
- * @file config_ff.h
+ * @file config_ff_WWW.h
  * @author Mike Scott
  * @date January 2017
  * @brief Auxiliary functions for finite fields
