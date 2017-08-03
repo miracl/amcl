@@ -18,9 +18,9 @@ under the License.
 */
 
 /*
- * Implementation of the Secure Hashing Algorithm (SHA-256/384/512)
+ * Implementation of the Secure Hashing Algorithm (SHA-256/384/512 and SHA3)
  *
- * Generates a 256/384/512 bit message digest. It should be impossible to come
+ * Generates a message digest. It should be impossible to come
  * come up with two messages that hash to the same value ("collision free").
  *
  * For use with byte-oriented messages only. Could/Should be speeded
@@ -351,6 +351,170 @@ void HASH512_hash(hash512 *sh,char *hash)
         hash[i]=(char)((sh->h[i/8]>>(8*(7-i%8))) & 0xffL);
     }
     HASH512_init(sh);
+}
+
+
+
+/* SHA3 */
+
+#define SHA3_ROUNDS 24
+#define rotl(x,n) (((x)<<n) | ((x)>>(64-n)))
+
+/* round constants */
+
+static const unsign64 RC[24]={
+0x0000000000000001UL,0x0000000000008082UL,0x800000000000808AUL,0x8000000080008000UL,
+0x000000000000808BUL,0x0000000080000001UL,0x8000000080008081UL,0x8000000000008009UL,
+0x000000000000008AUL,0x0000000000000088UL,0x0000000080008009UL,0x000000008000000AUL,
+0x000000008000808BUL,0x800000000000008BUL,0x8000000000008089UL,0x8000000000008003UL,
+0x8000000000008002UL,0x8000000000000080UL,0x000000000000800AUL,0x800000008000000AUL,
+0x8000000080008081UL,0x8000000000008080UL,0x0000000080000001UL,0x8000000080008008UL};
+
+/* permutation */
+
+static void SHA3_transform(sha3 *sh)
+{
+	int i,j,k;
+	unsign64 C[5],D[5],B[5][5];
+	
+	for (k=0;k<SHA3_ROUNDS;k++)
+	{
+		C[0]=sh->S[0][0]^sh->S[0][1]^sh->S[0][2]^sh->S[0][3]^sh->S[0][4];
+		C[1]=sh->S[1][0]^sh->S[1][1]^sh->S[1][2]^sh->S[1][3]^sh->S[1][4];
+		C[2]=sh->S[2][0]^sh->S[2][1]^sh->S[2][2]^sh->S[2][3]^sh->S[2][4];
+		C[3]=sh->S[3][0]^sh->S[3][1]^sh->S[3][2]^sh->S[3][3]^sh->S[3][4];
+		C[4]=sh->S[4][0]^sh->S[4][1]^sh->S[4][2]^sh->S[4][3]^sh->S[4][4];
+
+		D[0]=C[4]^rotl(C[1],1);
+		D[1]=C[0]^rotl(C[2],1);
+		D[2]=C[1]^rotl(C[3],1);
+		D[3]=C[2]^rotl(C[4],1);
+		D[4]=C[3]^rotl(C[0],1);
+
+		for (i=0;i<5;i++)
+			for (j=0;j<5;j++)
+				sh->S[i][j]^=D[i];  /* let the compiler unroll it! */
+
+		B[0][0]=sh->S[0][0];
+		B[1][3]=rotl(sh->S[0][1],36);
+		B[2][1]=rotl(sh->S[0][2],3);
+		B[3][4]=rotl(sh->S[0][3],41);
+		B[4][2]=rotl(sh->S[0][4],18);
+
+		B[0][2]=rotl(sh->S[1][0],1);
+		B[1][0]=rotl(sh->S[1][1],44);
+		B[2][3]=rotl(sh->S[1][2],10);
+		B[3][1]=rotl(sh->S[1][3],45);
+		B[4][4]=rotl(sh->S[1][4],2);
+
+		B[0][4]=rotl(sh->S[2][0],62);
+		B[1][2]=rotl(sh->S[2][1],6);
+		B[2][0]=rotl(sh->S[2][2],43);
+		B[3][3]=rotl(sh->S[2][3],15);
+		B[4][1]=rotl(sh->S[2][4],61);
+
+		B[0][1]=rotl(sh->S[3][0],28);
+		B[1][4]=rotl(sh->S[3][1],55);
+		B[2][2]=rotl(sh->S[3][2],25);
+		B[3][0]=rotl(sh->S[3][3],21);
+		B[4][3]=rotl(sh->S[3][4],56);
+
+		B[0][3]=rotl(sh->S[4][0],27);
+		B[1][1]=rotl(sh->S[4][1],20);
+		B[2][4]=rotl(sh->S[4][2],39);
+		B[3][2]=rotl(sh->S[4][3],8);
+		B[4][0]=rotl(sh->S[4][4],14);
+
+		for (i=0;i<5;i++)
+			for (j=0;j<5;j++)
+				sh->S[i][j]=B[i][j]^(~B[(i+1)%5][j]&B[(i+2)%5][j]);
+
+		sh->S[0][0]^=RC[k];
+	}
+}
+
+/* Re-Initialize. olen is output length in bytes - 
+   should be 28, 32, 48 or 64 (224, 256, 384, 512 bits resp.) */
+
+void SHA3_init(sha3 *sh,int olen)
+{ 
+    int i,j;
+    for (i=0;i<5;i++) 
+		for (j=0;j<5;j++)
+			sh->S[i][j]=0;    /* 5x5x8 bytes = 200 bytes of state */
+    sh->length=0;
+	sh->len=olen;
+	sh->rate=200-2*olen; /* number of bytes consumed in one gulp. Note that some bytes in the 
+	                        state ("capacity") are not touched. Gulps are smaller for larger digests. 
+							Important that olen<rate */
+}
+
+/* process a single byte */
+void SHA3_process(sha3 *sh,int byte)
+{
+	int cnt=(int)(sh->length%sh->rate);
+	int i,j,b=cnt%8;
+	cnt/=8;
+	i=cnt%5; j=cnt/5;  /* process by columns! */
+	sh->S[i][j]^=((unsign64)byte<<(8*b));
+	sh->length++;
+	if (sh->length%sh->rate==0) SHA3_transform(sh);
+}
+
+/* squeeze the sponge */
+void SHA3_squeeze(sha3 *sh,char *buff,int len)
+{
+	int done,i,j,k,m=0;
+	unsign64 el;
+/* extract by columns */
+	done=0;
+	for (;;)
+	{
+		for (j=0;j<5;j++)
+		{
+			for (i=0;i<5;i++)
+			{
+				el=sh->S[i][j];
+				for (k=0;k<8;k++)
+				{
+					buff[m++]=(el&0xff);
+					if (m>=len || m%sh->rate==0) {done=1; break;} 
+					el>>=8;
+				}
+				if (done) break;
+			}
+			if (done) break;
+		}
+		if (m>=len) break;
+		done=0;
+		SHA3_transform(sh);
+	}
+}
+
+void SHA3_hash(sha3 *sh,char *hash)
+{ /* generate a SHA3 hash of appropriate size */
+	int q=sh->rate-(sh->length%sh->rate);
+	if (q==1) SHA3_process(sh,0x86); 
+	else
+	{
+		SHA3_process(sh,0x06);   /* 0x06 for SHA-3 */
+		while (sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
+		SHA3_process(sh,0x80); /* this will force a final transform */
+	}
+	SHA3_squeeze(sh,hash,sh->len);
+}
+
+void SHA3_shake(sha3 *sh,char *buff,int len)
+{ /* SHAKE out a buffer of variable length len */
+	int q=sh->rate-(sh->length%sh->rate);
+	if (q==1) SHA3_process(sh,0x9f); 
+	else
+	{
+		SHA3_process(sh,0x1f);   // 0x06 for SHA-3 !!!!
+		while (sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
+		SHA3_process(sh,0x80); /* this will force a final transform */
+	}
+	SHA3_squeeze(sh,buff,len);
 }
 
 

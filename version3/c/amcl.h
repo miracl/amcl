@@ -1,3 +1,23 @@
+/*
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
+*/
+
+
 #ifndef AMCL_H
 #define AMCL_H
 
@@ -50,9 +70,37 @@ typedef struct
  * @brief SHA384 hash function instance */
 typedef hash512 hash384;
 
+/**
+ * @brief SHA3 hash function instance */
+typedef struct {
+	unsign64 length;
+	unsign64 S[5][5];
+	int rate,len;
+} sha3;
+
 #define SHA256 32 /**< SHA-256 hashing */
 #define SHA384 48 /**< SHA-384 hashing */
 #define SHA512 64 /**< SHA-512 hashing */
+
+#define SHA3_224 28 /**< SHA3 224 bit hash */
+#define SHA3_256 32 /**< SHA3 256 bit hash */
+#define SHA3_384 48 /**< SHA3 384 bit hash */
+#define SHA3_512 64 /**< SHA3 512 bit hash */
+
+#define SHAKE_128 16 /**< SHAKE128   hash */
+#define SHAKE_256 32 /**< SHAKE256 hash */
+
+
+/* NewHope parameters */
+
+//q= 12289
+
+#define RLWE_PRIME 0x3001	// q in Hex
+#define RLWE_LGN 10			// Degree n=2^LGN
+#define RLWE_ND 0xF7002FFF	// 1/(R-q) mod R
+#define RLWE_ONE 0x2AC8		// R mod q
+#define RLWE_R2MODP 0x1620	// R^2 mod q
+#define RLWE_PROOT 7
 
 /* Symmetric Encryption AES structure */
 
@@ -364,6 +412,41 @@ extern void HASH512_process(hash512 *H,int b);
 	@param h is the output 64-byte hash
  */
 extern void HASH512_hash(hash512 *H,char *h);
+
+
+/**	@brief Initialise an instance of SHA3
+ *
+	@param H an instance SHA3
+	@param t the instance type
+ */
+extern void  SHA3_init(sha3 *H,int t);
+/**	@brief process a byte for SHA3
+ *
+	@param H an instance SHA3
+	@param b a byte of date to be processed
+ */
+extern void  SHA3_process(sha3 *H,int b);
+/**	@brief create fixed length hash output of SHA3
+ *
+	@param H an instance SHA3
+	@param h a byte array to take hash
+ */
+extern void  SHA3_hash(sha3 *H,char *h);
+/**	@brief create variable length hash output of SHA3
+ *
+	@param H an instance SHA3
+	@param h a byte array to take hash
+	@param len is the length of the hash
+ */
+extern void  SHA3_shake(sha3 *H,char *h,int len);
+/**	@brief generate further hash output of SHA3
+ *
+	@param H an instance SHA3
+	@param h a byte array to take hash
+	@param len is the length of the hash
+ */
+extern void  SHA3_squeeze(sha3 *H,char *h,int len);
+
 
 
 /* AES functions */

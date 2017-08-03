@@ -2,6 +2,7 @@
 #include "ecp_BRAINPOOL.h"
 
 /* Brainpool Curve  */
+/* Note that the original curve has been transformed to an isomorphic curve with A=-3 */
 
 #if CHUNK==16
 

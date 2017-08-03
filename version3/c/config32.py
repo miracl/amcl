@@ -419,6 +419,7 @@ os.system("gcc -O3 -std=c99 -c rand.c")
 os.system("gcc -O3 -std=c99 -c oct.c")
 os.system("gcc -O3 -std=c99 -c aes.c")
 os.system("gcc -O3 -std=c99 -c gcm.c")
+os.system("gcc -O3 -std=c99 -c newhope.c")
 
 os.system("ar rc amcl.a *.o")
 os.system(deltext+" *.o")

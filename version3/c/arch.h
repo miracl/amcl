@@ -58,14 +58,18 @@
 #endif
 
 #ifndef C99  /* You are on your own! These are for Microsoft C */
+#define byte unsigned char		/**< 8-bit unsigned integer */
 #define sign32 __int32			/**< 32-bit signed integer */
 #define sign8 signed char		/**< 8-bit signed integer */
+#define sign16 short int		/**< 16-bit signed integer */
 #define sign64 long long		/**< 64-bit signed integer */
 #define unsign32 unsigned __int32 /**< 32-bit unsigned integer */
 #define unsign64 unsigned long long  /**< 64-bit unsigned integer */
 #else
 #include <stdint.h>
+#define byte uint8_t			/**< 8-bit unsigned integer */
 #define sign8 int8_t			/**< 8-bit signed integer */
+#define sign16 int16_t			/**< 16-bit signed integer */
 #define sign32 int32_t			/**< 32-bit signed integer */
 #define sign64 int64_t			/**< 64-bit signed integer */
 #define unsign32 uint32_t		/**< 32-bit unsigned integer */
