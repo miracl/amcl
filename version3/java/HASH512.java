@@ -30,6 +30,7 @@ under the License.
 package amcl;
 
 public class HASH512 {
+
 	private long[] length=new long[2];
 	private long[] h=new long[8];
 	private long[] w=new long[80];

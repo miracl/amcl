@@ -17,6 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
+/* Note that the original curve has been transformed to an isomorphic curve with A=-3 */
+
 use brainpool::big::NLEN;
 use arch::Chunk;
 

@@ -19,6 +19,9 @@
 
 /* Fixed Data in ROM - Field and Curve parameters */
 
+/* Note that the original curve has been transformed to an isomorphic curve with A=-3 */
+
+
 var ROM_CURVE_BRAINPOOL={
 
 // Brainpool curve

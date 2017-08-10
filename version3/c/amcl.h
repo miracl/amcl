@@ -82,13 +82,13 @@ typedef struct {
 #define SHA384 48 /**< SHA-384 hashing */
 #define SHA512 64 /**< SHA-512 hashing */
 
-#define SHA3_224 28 /**< SHA3 224 bit hash */
-#define SHA3_256 32 /**< SHA3 256 bit hash */
-#define SHA3_384 48 /**< SHA3 384 bit hash */
-#define SHA3_512 64 /**< SHA3 512 bit hash */
+#define SHA3_HASH224 28 /**< SHA3 224 bit hash */
+#define SHA3_HASH256 32 /**< SHA3 256 bit hash */
+#define SHA3_HASH384 48 /**< SHA3 384 bit hash */
+#define SHA3_HASH512 64 /**< SHA3 512 bit hash */
 
-#define SHAKE_128 16 /**< SHAKE128   hash */
-#define SHAKE_256 32 /**< SHAKE256 hash */
+#define SHAKE128 16 /**< SHAKE128   hash */
+#define SHAKE256 32 /**< SHAKE256 hash */
 
 
 /* NewHope parameters */
@@ -100,7 +100,6 @@ typedef struct {
 #define RLWE_ND 0xF7002FFF	// 1/(R-q) mod R
 #define RLWE_ONE 0x2AC8		// R mod q
 #define RLWE_R2MODP 0x1620	// R^2 mod q
-#define RLWE_PROOT 7
 
 /* Symmetric Encryption AES structure */
 

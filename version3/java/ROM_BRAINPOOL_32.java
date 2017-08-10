@@ -19,6 +19,8 @@ under the License.
 
 /* Fixed Data in ROM - Field and Curve parameters */
 
+/* Note that the original curve has been transformed to an isomorphic curve with A=-3 */
+
 
 package amcl.BRAINPOOL;
 

@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>JavaScript Test NHS</title>
+</head>
+<body>
+<h1>JavaScript Test NHS</h1>
+<script type="text/javascript" src="NHS.js"></script>
+<script type="text/javascript" src="UInt64.js"></script>
+<script type="text/javascript" src="SHA3.js"></script>
+<script type="text/javascript" src="HASH256.js"></script>
+<script type="text/javascript" src="RAND.js"></script>
+
+<script>
+
+// Test NewHope Simple 
+
+	var RAW=[];
+	var srng=new RAND(); srng.clean();
+								var crng=new RAND(); crng.clean(); 
+
+	for (i=0;i<100;i++) RAW[i]=i+1;
+	srng.seed(100,RAW);
+
+								for (i=0;i<100;i++) RAW[i]=i+2;
+								crng.seed(100,RAW);
+	var S=[];
+					var SB=[];
+					var UC=[];
+	var KEYA=[];
+								var KEYB=[];
+
+	NHS.SERVER_1(srng,SB,S);
+
+								NHS.CLIENT(crng,SB,UC,KEYB);
+
+	NHS.SERVER_2(S,UC,KEYA);
+
+	window.document.write("Alice Key= 0x"+NHS.bytestostring(KEYA)+ "<br>");
+	window.document.write("Bob's Key= 0x"+NHS.bytestostring(KEYA)+ "<br>");
+
+
+</script>
+</body>
+</html>

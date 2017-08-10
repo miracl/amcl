@@ -109,6 +109,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 
 os.system("mkdir amcl")
 os.system(copytext+ "hash*.swift amcl"+slashtext+".")
+os.system(copytext+ "sha3.swift amcl"+slashtext+".")
 os.system(copytext+ "rand.swift amcl"+slashtext+".")
 os.system(copytext+ "aes.swift amcl"+slashtext+".")
 os.system(copytext+ "gcm.swift amcl"+slashtext+".")
@@ -263,6 +264,7 @@ while ptr<max:
 		rsa_selected=True
 
 os.system(deltext+" hash*.swift")
+os.system(deltext+" sha3.swift")
 os.system(deltext+" aes.swift")
 os.system(deltext+" rand.swift")
 os.system(deltext+" gcm.swift")

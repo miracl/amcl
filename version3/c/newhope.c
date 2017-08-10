@@ -17,7 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-/* NewHope API implementation
+/* NewHope API implementation. Constant time.
+
+	LOOK - no if statements!
+
    M.Scott 21/07/2017
 */
 
@@ -31,9 +34,14 @@ const sign16 invpr= 0x2c2a;
 #define DEGREE (1<<RLWE_LGN)
 #define WL 32
 
-#define abs(x)  ((x)<0? (-(x)) : (x))
 #define round(a,b) (((a)+((b)/2))/(b))
 
+/* constant time absolute vaue */
+static sign32 nabs(sign32 x)
+{
+	sign32 mask=(x>>31);
+	return (x+mask)^mask;
+}
 
 /* Montgomery stuff */
 
@@ -56,7 +64,7 @@ static sign32 modmul(unsign32 a,unsign32 b)
 /* NTT code */
 /* Cooley-Tukey NTT */
 
-static void ntt(const sign16 *roots,sign32 *x)
+static void ntt(sign32 *x)
 {
 	int m,i,j,k,t=DEGREE/2;
 	sign32 S,U,V,W,q=RLWE_PRIME;
@@ -88,7 +96,7 @@ static void ntt(const sign16 *roots,sign32 *x)
 
 /* Gentleman-Sande INTT */
 
-static void intt(const sign16 inv,const sign16 invpr,const sign16 *iroots,sign32 *x)
+static void intt(sign32 *x)
 {
 	int m,i,j,k,t=1;
 	sign32 S,U,V,W,q=RLWE_PRIME;
@@ -138,35 +146,45 @@ static void intt(const sign16 inv,const sign16 invpr,const sign16 *iroots,sign32
 
 static void NHSEncode(byte *key,sign32 *poly)
 {
-	int i,j,b,kj,q2;
+	int i,j,b,k,kj,q2;
 
 	q2=RLWE_PRIME/2;
-	kj=key[0];
-	for (i=j=0;i<256;i++)
+	for (i=j=0;i<256;)
 	{
-		if (i%8==0) kj=key[j++];
-		b=kj&1;
-		poly[i]=b*q2;
-		poly[i+256]=b*q2;
-		poly[i+512]=b*q2;
-		poly[i+768]=b*q2;
-		kj>>=1; 
-	}
+		kj=key[j++];
+		for (k=0;k<8;k++)
+		{
+			b=kj&1;
+			poly[i]=b*q2;
+			poly[i+256]=b*q2;
+			poly[i+512]=b*q2;
+			poly[i+768]=b*q2;
+			kj>>=1;
+			i++;
+		}
+	}		
 }
 
 static void NHSDecode(sign32 *poly,byte *key)
 {
-	int i,j,b,t,q2;
+	int i,j,k;
+	sign32 b,t,q2;
 	q2=RLWE_PRIME/2;
 	for (i=0;i<32;i++)
 		key[i]=0;
-	for (i=j=0;i<256;i++)
+
+	for (i=j=0;i<256;)
 	{
-		t=abs(poly[i]-q2)+abs(poly[i+256]-q2)+abs(poly[i+512]-q2)+abs(poly[i+768]-q2);
-		if (t<RLWE_PRIME) b=1;
-		else b=0;
-		key[j]=(key[j]>>1)+(b<<7);
-		if ((i+1)%8==0) j++;
+		for (k=0;k<8;k++)
+		{
+			t=nabs(poly[i]-q2)+nabs(poly[i+256]-q2)+nabs(poly[i+512]-q2)+nabs(poly[i+768]-q2);
+
+			b=t-RLWE_PRIME;
+			b=(b>>31)&1;
+			key[j]=(key[j]>>1)+(b<<7);
+			i++;
+		}
+		j++;
 	}
 }
 
@@ -179,13 +197,14 @@ static void parse(byte *seed,sign32 *poly)
 	byte hash[4*DEGREE];
 	sha3 sh;
 
-	SHA3_init(&sh,SHAKE_128);
+	SHA3_init(&sh,SHAKE128);
 	for (i=0;i<32;i++)
 		SHA3_process(&sh,seed[i]);
 	SHA3_shake(&sh,hash,4*DEGREE);
 
 	for (i=j=0;i<DEGREE;i++)
 	{
+
 		n=hash[j]&0x7f; n<<=8;
 		n+=hash[j+1]; n<<=8;
 		n+=hash[j+2]; n<<=8;
@@ -196,85 +215,81 @@ static void parse(byte *seed,sign32 *poly)
 
 /* Compress 14 bits polynomial coefficients into byte array */
 /* 7 bytes is 3x14 */
+
 static void NHSCOMencode(sign32 *poly,byte *array)
 {
 	int i,j;
-	unsign64 col=0;
-	for (i=j=0;i<DEGREE;i++)
+	sign32 a,b,c,d;
+
+	for (i=j=0;i<DEGREE; )
 	{
-		col=(col<<14)+poly[i];
-		if ((i+1)%4==0)
-		{
-			array[j]=col&0xff;
-			array[j+1]=(col>>8)&0xff;
-			array[j+2]=(col>>16)&0xff;
-			array[j+3]=(col>>24)&0xff;
-			array[j+4]=(col>>32)&0xff;
-			array[j+5]=(col>>40)&0xff;
-			array[j+6]=(col>>48)&0xff;
-			j+=7; col=0;
-		}
+		a=poly[i++]; b=poly[i++]; c=poly[i++]; d=poly[i++];
+		array[j++]=(byte)(a&0xff);
+		array[j++]=(byte)(((a>>8)|(b<<6))&0xff);
+		array[j++]=(byte)((b>>2)&0xff);
+		array[j++]=(byte)(((b>>10)|(c<<4))&0xff);
+		array[j++]=(byte)((c>>4)&0xff);
+		array[j++]=(byte)(((c>>12)|(d<<2))&0xff);
+		array[j++]=(byte)(d>>6);
 	}
 }
 
 static void NHSCOMdecode(byte *array,sign32 *poly)
 {
-	int i,j,b;
-	unsign64 col=0;
-	for (i=j=0;i<DEGREE;i++)
+	int i,j;
+	sign32 a,b,c,d,e,f,g;
+
+	for (i=j=0;i<DEGREE; )
 	{
-		if (i%4==0)
-		{
-			col=array[j+6];
-			col=(col<<8)+array[j+5];
-			col=(col<<8)+array[j+4];
-			col=(col<<8)+array[j+3];
-			col=(col<<8)+array[j+2];
-			col=(col<<8)+array[j+1];
-			col=(col<<8)+array[j];
-			j+=7;
-		}
-		b=(col&0xFFFC0000000000UL)>>42; col<<=14;
-		poly[i]=b; 
+		a=((sign32)array[j++])&0xff; b=((sign32)array[j++])&0xff; c=((sign32)array[j++])&0xff; d=((sign32)array[j++])&0xff; e=((sign32)array[j++])&0xff; f=((sign32)array[j++])&0xff; g=((sign32)array[j++])&0xff;
+		poly[i++]=a|((b&0x3f)<<8);
+		poly[i++]=(b>>6)|(c<<2)|((d&0xf)<<10);
+		poly[i++]=(d>>4)|(e<<4)|((f&3)<<12);
+		poly[i++]=(f>>2)|(g<<6);
 	}
 }
+
+
 
 /* See https://eprint.iacr.org/2016/1157.pdf */ 
 
 static void NHSCompress(sign32 *poly,byte *array)
 {
-	int i,j,b;
+	int i,j,k,b;
 	unsign32 col=0;
-	for (i=j=0;i<DEGREE;i++)
+
+	for (i=j=0;i<DEGREE;)
 	{
-		b=round((poly[i]*8),RLWE_PRIME)%8;
-		col=(col<<3)+b;
-		if ((i+1)%8==0)
+		for (k=0;k<8;k++)
 		{
-			array[j]=col&0xff;
-			array[j+1]=(col>>8)&0xff;
-			array[j+2]=(col>>16)&0xff;
-			j+=3; col=0;
+			b=round((poly[i]*8),RLWE_PRIME)&7; 
+			col=(col<<3)+b;
+			i++;
 		}
+		array[j]=col&0xff;
+		array[j+1]=(col>>8)&0xff;
+		array[j+2]=(col>>16)&0xff;
+		j+=3; col=0;
 	}
 }
 
 static void NHSDecompress(byte *array,sign32 *poly)
 {
-	int i,j,b;
+	int i,j,k,b;
 	unsign32 col=0;
-	for (i=j=0;i<DEGREE;i++)
-	{
-		if (i%8==0)
-		{
-			col=array[j+2];
-			col=(col<<8)+array[j+1];
-			col=(col<<8)+array[j];
 
-			j+=3;
+	for (i=j=0;i<DEGREE;)
+	{
+		col=array[j+2];
+		col=(col<<8)+array[j+1];
+		col=(col<<8)+array[j];
+		j+=3;
+		for (k=0;k<8;k++)
+		{
+			b=(col&0xe00000)>>21; col<<=3;
+			poly[i]=round((b*RLWE_PRIME),8);
+			i++;
 		}
-		b=(col&0xe00000)>>21; col<<=3;
-		poly[i]=round((b*RLWE_PRIME),8);
 	}
 }
 
@@ -356,26 +371,27 @@ void NHS_SERVER_1(csprng *RNG,octet *SB,octet *S)
 		seed[i]=RAND_byte(RNG);
 
 	parse(seed,b);
-
+	
 	NHSError(RNG,e);
 	NHSError(RNG,s);
 
-	ntt(roots,s);
-	ntt(roots,e);
+	ntt(s);
+	ntt(e);
 	poly_mul(b,b,s);
 	poly_add(b,b,e);
 	poly_hard_reduce(b);
-
 
 	NHSCOMencode(b,array);
 	OCT_empty(SB);
 	OCT_jbytes(SB,seed,32);
 	OCT_jbytes(SB,array,1792);
+
 	poly_hard_reduce(s);
 
 	NHSCOMencode(s,array);
 	OCT_empty(S);
 	OCT_jbytes(S,array,1792);
+
 }
 
 void NHS_CLIENT(csprng *RNG,octet *SB,octet *UC,octet *KEY)
@@ -387,8 +403,8 @@ void NHS_CLIENT(csprng *RNG,octet *SB,octet *UC,octet *KEY)
 	NHSError(RNG,sd);
 	NHSError(RNG,ed);
 
-	ntt(roots,sd);
-	ntt(roots,ed);
+	ntt(sd);
+	ntt(ed);
 
 	for (i=0;i<32;i++)
 		seed[i]=SB->val[i];
@@ -405,23 +421,24 @@ void NHS_CLIENT(csprng *RNG,octet *SB,octet *UC,octet *KEY)
 	for (i=0;i<32;i++)
 		key[i]=RAND_byte(RNG);
 
-	SHA3_init(&sh,SHA3_256);
+	SHA3_init(&sh,SHA3_HASH256);
 	for (i=0;i<32;i++)
 		SHA3_process(&sh,key[i]);
 	SHA3_hash(&sh,key);
 
 	NHSEncode(key,k);
+
 	NHSCOMdecode(array,c);
 
 	poly_mul(c,c,sd);
-	intt(inv,invpr,iroots,c);
+	intt(c);
 	NHSError(RNG,ed);
 	poly_add(c,c,ed);
 	poly_add(c,c,k);
 
 	NHSCompress(c,cc);
 
-	SHA3_init(&sh,SHA3_256);
+	SHA3_init(&sh,SHA3_HASH256);
 	for (i=0;i<32;i++)
 		SHA3_process(&sh,key[i]);
 	SHA3_hash(&sh,key);
@@ -459,13 +476,13 @@ void NHS_SERVER_2(octet *S,octet *UC,octet *KEY)
 	NHSCOMdecode(array,s);
 
 	poly_mul(k,k,s);
-	intt(inv,invpr,iroots,k);
+	intt(k);
 	poly_sub(k,c,k);
 	poly_soft_reduce(k);
 
 	NHSDecode(k,key);
 
-	SHA3_init(&sh,SHA3_256);
+	SHA3_init(&sh,SHA3_HASH256);
 	for (i=0;i<32;i++)
 		SHA3_process(&sh,key[i]);
 	SHA3_hash(&sh,key);

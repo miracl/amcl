@@ -125,9 +125,13 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 
 os.system("mkdir amcl")
 os.system(copytext+ "HASH*.java amcl"+slashtext+".")
+os.system(copytext+ "SHA3.java amcl"+slashtext+".")
 os.system(copytext+ "RAND.java amcl"+slashtext+".")
 os.system(copytext+ "AES.java amcl"+slashtext+".")
 os.system(copytext+ "GCM.java amcl"+slashtext+".")
+os.system(copytext+ "NewHope.java amcl"+slashtext+".")
+
+os.system("javac amcl"+slashtext+"*.java")
 
 print("Elliptic Curves")
 print("1. ED25519")
@@ -277,9 +281,11 @@ while ptr<max:
 
 
 os.system(deltext+" HASH*.java")
+os.system(deltext+" SHA3.java")
 os.system(deltext+" AES.java")
 os.system(deltext+" RAND.java")
 os.system(deltext+" GCM.java")
+os.system(deltext+" NewHope.java")
 
 os.system(deltext+" BIG*.java")
 os.system(deltext+" DBIG*.java")

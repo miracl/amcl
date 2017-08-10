@@ -540,7 +540,6 @@ fcc7c71a557e2db9 66c3e9fa91746039
 */
 /*
 #include <stdio.h>
-#include "aracrypt.h"
 
 char test160[]="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
 char test256[]="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
@@ -548,18 +547,13 @@ char test512[]="abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmno
 
 int main()
 {
-    char digest[64];
+    char digest[100];
     int i;
-	hash160 sh160;
+
     hash256 sh256;
 	hash384 sh384;
 	hash512 sh512;
-
-    HASH160_init(&sh160);
-    for (i=0;test256[i]!=0;i++) HASH160_process(&sh160,test160[i]);
-    HASH160_hash(&sh160,digest);
-    for (i=0;i<20;i++) printf("%02x",(unsigned char)digest[i]);
-    printf("\n");
+	sha3 SHA3;
 
     HASH256_init(&sh256);
     for (i=0;test256[i]!=0;i++) HASH256_process(&sh256,test256[i]);
@@ -577,6 +571,24 @@ int main()
     for (i=0;test512[i]!=0;i++) HASH512_process(&sh512,test512[i]);
     HASH512_hash(&sh512,digest);
     for (i=0;i<64;i++) printf("%02x",(unsigned char)digest[i]);
+    printf("\n");
+
+	SHA3_init(&SHA3,SHA3_HASH256);
+    for (i=0;test512[i]!=0;i++) SHA3_process(&SHA3,test512[i]);
+    SHA3_hash(&sh512,digest);
+    for (i=0;i<32;i++) printf("%02x",(unsigned char)digest[i]);
+    printf("\n");
+
+	SHA3_init(&SHA3,SHA3_HASH512);
+    for (i=0;test512[i]!=0;i++) SHA3_process(&SHA3,test512[i]);
+    SHA3_hash(&sh512,digest);
+    for (i=0;i<64;i++) printf("%02x",(unsigned char)digest[i]);
+    printf("\n");
+
+	SHA3_init(&SHA3,SHAKE256);
+    for (i=0;test512[i]!=0;i++) SHA3_process(&SHA3,test512[i]);
+    SHA3_shake(&sh512,digest,72);
+    for (i=0;i<72;i++) printf("%02x",(unsigned char)digest[i]);
     printf("\n");
 
 
