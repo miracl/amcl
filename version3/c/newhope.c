@@ -200,7 +200,7 @@ static void parse(byte *seed,sign32 *poly)
 	SHA3_init(&sh,SHAKE128);
 	for (i=0;i<32;i++)
 		SHA3_process(&sh,seed[i]);
-	SHA3_shake(&sh,hash,4*DEGREE);
+	SHA3_shake(&sh,(char *)hash,4*DEGREE);
 
 	for (i=j=0;i<DEGREE;i++)
 	{
@@ -383,14 +383,14 @@ void NHS_SERVER_1(csprng *RNG,octet *SB,octet *S)
 
 	NHSpack(b,array);
 	OCT_empty(SB);
-	OCT_jbytes(SB,seed,32);
-	OCT_jbytes(SB,array,1792);
+	OCT_jbytes(SB,(char *)seed,32);
+	OCT_jbytes(SB,(char *)array,1792);
 
 	poly_hard_reduce(s);
 
 	NHSpack(s,array);
 	OCT_empty(S);
-	OCT_jbytes(S,array,1792);
+	OCT_jbytes(S,(char *)array,1792);
 
 }
 
@@ -424,7 +424,7 @@ void NHS_CLIENT(csprng *RNG,octet *SB,octet *UC,octet *KEY)
 	SHA3_init(&sh,SHA3_HASH256);
 	for (i=0;i<32;i++)
 		SHA3_process(&sh,key[i]);
-	SHA3_hash(&sh,key);
+	SHA3_hash(&sh,(char *)key);
 
 	NHSEncode(key,k);
 
@@ -441,16 +441,16 @@ void NHS_CLIENT(csprng *RNG,octet *SB,octet *UC,octet *KEY)
 	SHA3_init(&sh,SHA3_HASH256);
 	for (i=0;i<32;i++)
 		SHA3_process(&sh,key[i]);
-	SHA3_hash(&sh,key);
+	SHA3_hash(&sh,(char *)key);
 
 	OCT_empty(KEY);
-	OCT_jbytes(KEY,key,32);
+	OCT_jbytes(KEY,(char *)key,32);
 
 	NHSpack(u,array);
 
 	OCT_empty(UC);
-	OCT_jbytes(UC,array,1792);
-	OCT_jbytes(UC,cc,384);
+	OCT_jbytes(UC,(char *)array,1792);
+	OCT_jbytes(UC,(char *)cc,384);
 }
 
 void NHS_SERVER_2(octet *S,octet *UC,octet *KEY)
@@ -485,9 +485,9 @@ void NHS_SERVER_2(octet *S,octet *UC,octet *KEY)
 	SHA3_init(&sh,SHA3_HASH256);
 	for (i=0;i<32;i++)
 		SHA3_process(&sh,key[i]);
-	SHA3_hash(&sh,key);
+	SHA3_hash(&sh,(char *)key);
 
 	OCT_empty(KEY);
-	OCT_jbytes(KEY,key,32);
+	OCT_jbytes(KEY,(char *)key,32);
 }
 

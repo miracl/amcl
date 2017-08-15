@@ -113,6 +113,11 @@
 #ifdef __GNUC__
 #define dchunk __int128		/**< Always define double length chunk type if available - GCC supports 128 bit type  ??? */
 #endif
+
+#ifdef __clang__
+#define dchunk __int128
+#endif
+
 #endif
 #endif
 
