@@ -19,6 +19,8 @@ under the License.
 
 /* test driver and function exerciser for NewHope Functions */
 
+// See https://eprint.iacr.org/2016/1157 (Alkim, Ducas, Popplemann and Schwabe)
+
 /* gcc -O2 testnhs.c amcl.a -o testnhs.exe */
 
 #include <stdio.h>

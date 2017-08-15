@@ -20,6 +20,7 @@
 //
 //  TestNHS.swift - Tests NewHope Simple API
 //  swift -I. -L. -lamcl TestNHS.swift
+// See https://eprint.iacr.org/2016/1157 (Alkim, Ducas, Popplemann and Schwabe)
 
 
 import Foundation

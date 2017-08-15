@@ -19,6 +19,8 @@ under the License.
 
 /* test driver and function exerciser for NewHope API Functions */
 
+// See https://eprint.iacr.org/2016/1157 (Alkim, Ducas, Popplemann and Schwabe)
+
 // javac -cp amcl.jar; TestNHS.java
 // java -cp amcl.jar; TestNHS
 

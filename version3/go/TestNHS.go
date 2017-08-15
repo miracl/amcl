@@ -18,6 +18,8 @@ under the License.
 */
 
 /* test driver and function exerciser for NewHope Simple Functions */
+// See https://eprint.iacr.org/2016/1157 (Alkim, Ducas, Popplemann and Schwabe)
+
 
 package main
 

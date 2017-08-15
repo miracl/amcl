@@ -19,6 +19,8 @@ under the License.
 
 //  TestNHS.rs - Tests NewHope Simple API
 
+// See https://eprint.iacr.org/2016/1157 (Alkim, Ducas, Popplemann and Schwabe)
+
 // rustc TestNHS.rs --extern amcl=libamcl.rlib
 
 extern crate amcl;
