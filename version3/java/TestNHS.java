@@ -19,9 +19,11 @@ under the License.
 
 /* test driver and function exerciser for NewHope API Functions */
 
+// javac -cp amcl.jar; TestNHS.java
+// java -cp amcl.jar; TestNHS
 
 import amcl.RAND;
-import amcl.NewHope;
+import amcl.NHS;
 
 public class TestNHS
 {	
@@ -46,9 +48,9 @@ public class TestNHS
 
 // NewHope Simple key exchange
 
-		NewHope.SERVER_1(SRNG,SB,S);
-										NewHope.CLIENT(CRNG,SB,UC,KEYB);
-		NewHope.SERVER_2(S,UC,KEYA);
+		NHS.SERVER_1(SRNG,SB,S);
+										NHS.CLIENT(CRNG,SB,UC,KEYB);
+		NHS.SERVER_2(S,UC,KEYA);
 
 		System.out.printf("Alice key= 0x");
 		for (i=0;i<KEYA.length;i++)

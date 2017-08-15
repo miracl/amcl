@@ -202,7 +202,7 @@ var NHS =  {
 
 /* Compress 14 bits polynomial coefficients into byte array */
 /* 7 bytes is 3x14 */
-	COMencode: function(poly,array)
+	pack: function(poly,array)
 	{
 		var i,j,k;
 		var a,b,c,d;
@@ -220,7 +220,7 @@ var NHS =  {
 		}
 	},
 
-	COMdecode: function(array,poly)
+	unpack: function(array,poly)
 	{
 		var i,j,k;
 		var a,b,c,d,e,f,g;
@@ -385,7 +385,7 @@ var NHS =  {
 		NHS.poly_add(b,b,e);
 		NHS.poly_hard_reduce(b);
 
-		NHS.COMencode(b,array);
+		NHS.pack(b,array);
 		
 		for (i=0;i<32;i++)
 			SB[i]=seed[i];
@@ -394,7 +394,7 @@ var NHS =  {
 
 		NHS.poly_hard_reduce(s);
 
-		NHS.COMencode(s,array);
+		NHS.pack(s,array);
 
 		for (i=0;i<1792;i++)
 			S[i]=array[i];
@@ -443,7 +443,7 @@ var NHS =  {
 
 		NHS.Encode(key,k);
 
-		NHS.COMdecode(array,c);
+		NHS.unpack(array,c);
 
 		NHS.poly_mul(c,c,sd);
 		NHS.intt(c);
@@ -461,7 +461,7 @@ var NHS =  {
 		for (i=0;i<32;i++)
 			KEY[i]=key[i];
 
-		NHS.COMencode(u,array);
+		NHS.pack(u,array);
 
 		for (i=0;i<1792;i++)
 			UC[i]=array[i];
@@ -485,7 +485,7 @@ var NHS =  {
 		for (i=0;i<1792;i++)
 			array[i]=UC[i];
 
-		NHS.COMdecode(array,k);
+		NHS.unpack(array,k);
 
 		for (i=0;i<384;i++)
 			cc[i]=UC[i+1792];
@@ -495,7 +495,7 @@ var NHS =  {
 		for (i=0;i<1792;i++)
 			array[i]=S[i];
 
-		NHS.COMdecode(array,s);
+		NHS.unpack(array,s);
 
 		NHS.poly_mul(k,k,s);
 		NHS.intt(k);

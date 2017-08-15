@@ -129,7 +129,7 @@ os.system(copytext+ "SHA3.java amcl"+slashtext+".")
 os.system(copytext+ "RAND.java amcl"+slashtext+".")
 os.system(copytext+ "AES.java amcl"+slashtext+".")
 os.system(copytext+ "GCM.java amcl"+slashtext+".")
-os.system(copytext+ "NewHope.java amcl"+slashtext+".")
+os.system(copytext+ "NHS.java amcl"+slashtext+".")
 
 os.system("javac amcl"+slashtext+"*.java")
 
@@ -285,7 +285,7 @@ os.system(deltext+" SHA3.java")
 os.system(deltext+" AES.java")
 os.system(deltext+" RAND.java")
 os.system(deltext+" GCM.java")
-os.system(deltext+" NewHope.java")
+os.system(deltext+" NHS.java")
 
 os.system(deltext+" BIG*.java")
 os.system(deltext+" DBIG*.java")

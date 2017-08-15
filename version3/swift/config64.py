@@ -113,6 +113,7 @@ os.system(copytext+ "sha3.swift amcl"+slashtext+".")
 os.system(copytext+ "rand.swift amcl"+slashtext+".")
 os.system(copytext+ "aes.swift amcl"+slashtext+".")
 os.system(copytext+ "gcm.swift amcl"+slashtext+".")
+os.system(copytext+ "nhs.swift amcl"+slashtext+".")
 
 os.system("swiftc amcl"+slashtext+"*.swift -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name amcl")
 
@@ -265,6 +266,7 @@ os.system(deltext+" sha3.swift")
 os.system(deltext+" aes.swift")
 os.system(deltext+" rand.swift")
 os.system(deltext+" gcm.swift")
+os.system(deltext+" nhs.swift")
 
 os.system(deltext+" big.swift")
 os.system(deltext+" dbig.swift")

@@ -216,7 +216,7 @@ static void parse(byte *seed,sign32 *poly)
 /* Compress 14 bits polynomial coefficients into byte array */
 /* 7 bytes is 3x14 */
 
-static void NHSCOMencode(sign32 *poly,byte *array)
+static void NHSpack(sign32 *poly,byte *array)
 {
 	int i,j;
 	sign32 a,b,c,d;
@@ -234,7 +234,7 @@ static void NHSCOMencode(sign32 *poly,byte *array)
 	}
 }
 
-static void NHSCOMdecode(byte *array,sign32 *poly)
+static void NHSunpack(byte *array,sign32 *poly)
 {
 	int i,j;
 	sign32 a,b,c,d,e,f,g;
@@ -381,14 +381,14 @@ void NHS_SERVER_1(csprng *RNG,octet *SB,octet *S)
 	poly_add(b,b,e);
 	poly_hard_reduce(b);
 
-	NHSCOMencode(b,array);
+	NHSpack(b,array);
 	OCT_empty(SB);
 	OCT_jbytes(SB,seed,32);
 	OCT_jbytes(SB,array,1792);
 
 	poly_hard_reduce(s);
 
-	NHSCOMencode(s,array);
+	NHSpack(s,array);
 	OCT_empty(S);
 	OCT_jbytes(S,array,1792);
 
@@ -428,7 +428,7 @@ void NHS_CLIENT(csprng *RNG,octet *SB,octet *UC,octet *KEY)
 
 	NHSEncode(key,k);
 
-	NHSCOMdecode(array,c);
+	NHSunpack(array,c);
 
 	poly_mul(c,c,sd);
 	intt(c);
@@ -446,7 +446,7 @@ void NHS_CLIENT(csprng *RNG,octet *SB,octet *UC,octet *KEY)
 	OCT_empty(KEY);
 	OCT_jbytes(KEY,key,32);
 
-	NHSCOMencode(u,array);
+	NHSpack(u,array);
 
 	OCT_empty(UC);
 	OCT_jbytes(UC,array,1792);
@@ -463,7 +463,7 @@ void NHS_SERVER_2(octet *S,octet *UC,octet *KEY)
 	for (i=0;i<1792;i++)
 		array[i]=UC->val[i];
 
-	NHSCOMdecode(array,k);
+	NHSunpack(array,k);
 
 	for (i=0;i<384;i++)
 		cc[i]=UC->val[i+1792];
@@ -473,7 +473,7 @@ void NHS_SERVER_2(octet *S,octet *UC,octet *KEY)
 	for (i=0;i<1792;i++)
 		array[i]=S->val[i];
 
-	NHSCOMdecode(array,s);
+	NHSunpack(array,s);
 
 	poly_mul(k,k,s);
 	intt(k);
