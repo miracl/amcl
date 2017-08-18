@@ -27,7 +27,7 @@ including all of the modules that you will need.
 
 The configuration files assume the gcc compliler. For clang edit the
 config32.py and config64.py files and substitute "clang" for "gcc".
-Note that clang is about 10-15% faster.
+Note that clang is about 10-15% faster.*
 
 As a quick example execute
 
@@ -64,3 +64,11 @@ if using MINGW in Windows. Or for Linux
 gcc -O2 -std=c99 benchtest_all.c amcl.a -o benchtest_all
 
 This program provides some timings.
+
+*Using clang on Windows
+Download clang 4.0.1 from http://releases.llvm.org/download.html
+Choose Clang for Windows (64-bit) (.sig) 
+Download Visual C++ 2015 build tools from http://landinghub.visualstudio.com/visual-cpp-build-tools
+(This is a free download)
+Open a command window and type "\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64"
+Now use "clang" wherever "gcc" was used before.
