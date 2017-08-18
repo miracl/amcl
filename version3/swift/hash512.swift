@@ -175,7 +175,7 @@ final public class HASH512{
         process(UInt8(n&0xff))
     }
     
-    /* Generate 48-byte Hash */
+    /* Generate 64-byte Hash */
     public func hash() -> [UInt8]
     { /* pad message and finish - supply digest */
         var digest=[UInt8](repeating: 0,count: 64)

@@ -126,9 +126,11 @@ os.system("mkdir pkg")
 
 os.system("mkdir src"+slashtext+"amcl")
 os.system(copytext+ "HASH*.go src"+slashtext+"amcl"+slashtext+".")
+os.system(copytext+ "SHA3.go src"+slashtext+"amcl"+slashtext+".")
 os.system(copytext+ "RAND.go src"+slashtext+"amcl"+slashtext+".")
 os.system(copytext+ "AES.go src"+slashtext+"amcl"+slashtext+".")
 os.system(copytext+ "GCM.go src"+slashtext+"amcl"+slashtext+".")
+os.system(copytext+ "NHS.go src"+slashtext+"amcl"+slashtext+".")
 
 os.system("go install amcl")
 
@@ -279,10 +281,11 @@ while ptr<max:
 
 
 os.system(deltext+" HASH*.go")
+os.system(deltext+" SHA3.go")
 os.system(deltext+" AES.go")
 os.system(deltext+" RAND.go")
 os.system(deltext+" GCM.go")
-
+os.system(deltext+" NHS.go")
 
 os.system(deltext+" ARCH*.go")
 os.system(deltext+" BIG*.go")

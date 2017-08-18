@@ -82,8 +82,8 @@ void BIG_XXX_rawoutput(BIG_XXX a)
     printf("(");
     for (i=0; i<NLEN_XXX-1; i++)
 #if CHUNK==64
-        printf("%"PRIxMAX",",(uint64_t) a[i]);
-    printf("%"PRIxMAX")",(uint64_t) a[NLEN_XXX-1]);
+        printf("%"PRIxMAX",",(uintmax_t) a[i]);
+    printf("%"PRIxMAX")",(uintmax_t) a[NLEN_XXX-1]);
 #else
         printf("%x,",(unsigned int) a[i]);
     printf("%x)",(unsigned int) a[NLEN_XXX-1]);
@@ -218,8 +218,8 @@ void BIG_XXX_drawoutput(DBIG_XXX a)
     printf("(");
     for (i=0; i<DNLEN_XXX-1; i++)
 #if CHUNK==64
-        printf("%"PRIxMAX",",(uint64_t) a[i]);
-    printf("%"PRIxMAX")",(uint64_t) a[DNLEN_XXX-1]);
+        printf("%"PRIxMAX",",(uintmax_t) a[i]);
+    printf("%"PRIxMAX")",(uintmax_t) a[DNLEN_XXX-1]);
 #else
         printf("%x,",(unsigned int) a[i]);
     printf("%x)",(unsigned int) a[DNLEN_XXX-1]);

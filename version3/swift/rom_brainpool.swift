@@ -24,6 +24,9 @@
 //  Copyright (c) 2015 Michael Scott. All rights reserved.
 //
 
+// Note that the original curve has been transformed to an isomorphic curve with A=-3 
+
+
 final public class ROM{
  
 #if D32

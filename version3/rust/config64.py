@@ -131,9 +131,11 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 os.system("cargo new amcl")
 #os.system("mkdir amcl"+slashtext+"src")
 os.system(copytext+ "hash*.rs amcl"+slashtext+"src"+slashtext+".")
+os.system(copytext+ "sha3.rs amcl"+slashtext+"src"+slashtext+".")
 os.system(copytext+ "rand.rs amcl"+slashtext+"src"+slashtext+".")
 os.system(copytext+ "aes.rs amcl"+slashtext+"src"+slashtext+".")
 os.system(copytext+ "gcm.rs amcl"+slashtext+"src"+slashtext+".")
+os.system(copytext+ "nhs.rs amcl"+slashtext+"src"+slashtext+".")
 os.system(copytext+ "arch64.rs amcl"+slashtext+"src"+slashtext+"arch.rs")
 os.system(copytext+ "lib.rs amcl"+slashtext+"src"+slashtext+"lib.rs")
 
@@ -287,9 +289,11 @@ while ptr<max:
 os.system("cargo rustc --manifest-path amcl"+slashtext+"Cargo.toml --release --lib -- --cfg D64")
 
 os.system(deltext+" hash*.rs")
+os.system(deltext+" sha3.rs")
 os.system(deltext+" aes.rs")
 os.system(deltext+" rand.rs")
 os.system(deltext+" gcm.rs")
+os.system(deltext+" nhs.rs")
 
 os.system(deltext+" arch*.rs")
 os.system(deltext+" big.rs")

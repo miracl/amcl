@@ -333,16 +333,16 @@ while ptr<max:
 		curveset("256","256PME","NUMS256E","32","56","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==13:
-		curveset("384","384PM","NUMS384W","48","56","254","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("384","384PM","NUMS384W","48","56","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==14:
-		curveset("384","384PM","NUMS384E","48","56","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("384","384PM","NUMS384E","48","56","384","3","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 	if x==15:
-		curveset("512","512PM","NUMS512W","64","56","256","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("512","512PM","NUMS512W","64","56","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
 		curve_selected=True
 	if x==16:
-		curveset("512","512PM","NUMS512E","64","56","256","7","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("512","512PM","NUMS512E","64","56","512","7","PSEUDO_MERSENNE","EDWARDS","NOT")
 		curve_selected=True
 
 
@@ -412,6 +412,7 @@ os.system("gcc -O3 -std=c99 -c rand.c")
 os.system("gcc -O3 -std=c99 -c oct.c")
 os.system("gcc -O3 -std=c99 -c aes.c")
 os.system("gcc -O3 -std=c99 -c gcm.c")
+os.system("gcc -O3 -std=c99 -c newhope.c")
 
 os.system("ar rc amcl.a *.o")
 os.system(deltext+" *.o")

@@ -169,7 +169,7 @@ func (H *HASH512) Process_num(n int32) {
 	H.Process(byte(n&0xff));
 }
 
-/* Generate 32-byte Hash */
+/* Generate 64-byte Hash */
 func (H *HASH512) Hash() []byte { /* pad message and finish - supply digest */
 	var digest [64]byte
 	len0:=H.length[0]
