@@ -180,8 +180,8 @@ extern void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ *Q,BIG_XXX *b);
 /**	@brief Maps random BIG to curve point of correct order
  *
 	@param P ECP2 instance of correct order
-	@param x BIG number to be mapped
+	@param W OCTET byte array to be mapped
  */
-extern void ECP2_ZZZ_mapit2(ECP2_ZZZ *P,BIG_XXX x);
+extern void ECP2_ZZZ_mapit2(ECP2_ZZZ *P,octet *w);
 
 #endif

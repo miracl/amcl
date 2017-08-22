@@ -645,16 +645,16 @@ void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ Q[4],BIG_XXX u[4])
 
 
 /* Map to hash value to point on G2 from random BIG */
-void ECP2_ZZZ_mapit2(ECP2_ZZZ *Q,BIG_XXX hv)
+void ECP2_ZZZ_mapit2(ECP2_ZZZ *Q,octet *W)
 {
-    BIG_XXX q,one,Fx,Fy,x;
+    BIG_XXX q,one,Fx,Fy,x,hv;
     FP2_YYY X;
 #if (PAIRING_FRIENDLY_ZZZ == BN)
     ECP2_ZZZ T,K;
 #elif (PAIRING_FRIENDLY_ZZZ == BLS)
     ECP2_ZZZ xQ, x2Q;
 #endif
-
+	BIG_XXX_fromBytes(hv,W->val);
     BIG_XXX_rcopy(q,Modulus_ZZZ);
     BIG_XXX_one(one);
     BIG_XXX_mod(hv,q);
