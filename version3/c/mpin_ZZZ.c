@@ -227,7 +227,6 @@ int MPIN_ZZZ_RANDOM_GENERATE(csprng *RNG,octet* S)
 int MPIN_ZZZ_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
 {
     ECP_ZZZ P,R;
-	BIG_XXX x;
     int res=0;
     char h[MODBYTES_XXX];
     octet H= {0,sizeof(h),h};
@@ -236,9 +235,7 @@ int MPIN_ZZZ_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
     if (res==0)
     {
         mhashit(sha,-1,CID,&H);
-		BIG_XXX_fromBytes(x,H.val);
-
-        ECP_ZZZ_mapit(&R,x);
+        ECP_ZZZ_mapit(&R,&H);
 
         pin%=MAXPIN_ZZZ;
 
@@ -303,8 +300,7 @@ int MPIN_ZZZ_GET_G1_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     }
     else 
 	{
-		BIG_XXX_fromBytes(r,G->val);
-		ECP_ZZZ_mapit(&P,r);
+		ECP_ZZZ_mapit(&P,G);
 	}
 
     if (res==0)
@@ -386,8 +382,7 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
 
     mhashit(sha,-1,CLIENT_ID,&H);
 
-	BIG_XXX_fromBytes(r,H.val);
-    ECP_ZZZ_mapit(&P,r);
+    ECP_ZZZ_mapit(&P,&H);
 
     if (!ECP_ZZZ_fromOctet(&T,TOKEN)) res=MPIN_INVALID_POINT;
 
@@ -408,8 +403,7 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
             }
             mhashit(sha,date,&H,&H);
 
-			BIG_XXX_fromBytes(r,H.val);
-            ECP_ZZZ_mapit(&W,r);
+            ECP_ZZZ_mapit(&W,&H);
             if (xID!=NULL)
             {
                 PAIR_ZZZ_G1mul(&P,x);				// P=x.H(ID)
@@ -476,8 +470,7 @@ int MPIN_ZZZ_GET_CLIENT_PERMIT(int sha,int date,octet *S,octet *CID,octet *CTT)
 
     mhashit(sha,date,CID,&H);
 
-	BIG_XXX_fromBytes(s,H.val);
-    ECP_ZZZ_mapit(&P,s);
+    ECP_ZZZ_mapit(&P,&H);
 
 //printf("P= "); ECP_ZZZ_output(&P); printf("\n");
 //exit(0);
@@ -506,12 +499,12 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 	BIG_XXX x;
 
 #ifdef USE_ANONYMOUS
-	BIG_XXX_fromBytes(x,CID->val);
+    ECP_ZZZ_mapit(&P,CID);
 #else
     mhashit(sha,-1,CID,&H);
-	BIG_XXX_fromBytes(x,H.val);
+    ECP_ZZZ_mapit(&P,&H);
 #endif
-    ECP_ZZZ_mapit(&P,x);
+
     ECP_ZZZ_toOctet(HID,&P);  // new
 
     if (date)
@@ -522,8 +515,7 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 #else
         mhashit(sha,date,&H,&H);
 #endif
-		BIG_XXX_fromBytes(x,H.val);
-        ECP_ZZZ_mapit(&R,x);
+        ECP_ZZZ_mapit(&R,&H);
         ECP_ZZZ_add(&P,&R);
         ECP_ZZZ_toOctet(HTID,&P);
     }
@@ -727,8 +719,7 @@ int MPIN_ZZZ_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
 
     if (res==0)
     {
-		BIG_XXX_fromBytes(x,CID->val);
-        ECP_ZZZ_mapit(&P,x);
+        ECP_ZZZ_mapit(&P,CID);
         if (CP!=NULL)
         {
             if (!ECP2_ZZZ_fromOctet(&Q,CP)) res=MPIN_INVALID_POINT;

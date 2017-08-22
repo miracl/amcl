@@ -1323,9 +1323,10 @@ void ECP_ZZZ_mul2(ECP_ZZZ *P,ECP_ZZZ *Q,BIG_XXX e,BIG_XXX f)
 /* map BIG to point on curve of correct order */
 /* The BIG should be the output of some hash function */
 
-void ECP_ZZZ_mapit(ECP_ZZZ *P,BIG_XXX x)
+void ECP_ZZZ_mapit(ECP_ZZZ *P,octet *W)
 {
-    BIG_XXX q,c;
+    BIG_XXX q,c,x;
+	BIG_XXX_fromBytes(x,W->val);
     BIG_XXX_rcopy(q,Modulus_YYY);
     BIG_XXX_mod(x,q);
 	int k=0;

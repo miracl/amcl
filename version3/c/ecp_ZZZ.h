@@ -229,8 +229,8 @@ extern void ECP_ZZZ_mul2(ECP_ZZZ *P,ECP_ZZZ *Q,BIG_XXX e,BIG_XXX f);
 /**	@brief Maps random BIG to curve point of correct order
  *
 	@param Q ECP instance of correct order
-	@param x BIG number to be mapped
+	@param w OCTET byte array to be mapped
  */
-extern void ECP_ZZZ_mapit(ECP_ZZZ *Q,BIG_XXX x);
+extern void ECP_ZZZ_mapit(ECP_ZZZ *Q,octet *w);
 
 #endif
