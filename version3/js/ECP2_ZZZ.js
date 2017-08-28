@@ -545,3 +545,62 @@ ECP2_ZZZ.teq=function(b,c)
 	return ((x>>31)&1);
 };
 
+/* needed for SOK */
+ECP2_ZZZ.mapit= function(h)
+{
+	var q=new BIG_XXX(0); q.rcopy(ROM_FIELD_YYY.Modulus);
+	var x=BIG_XXX.fromBytes(h);
+	var one=new BIG_XXX(1);
+	x.mod(q);
+	var Q,T,K,X,xQ,x2Q;
+	while (true)
+	{
+		X=new FP2_YYY(one,x);
+		Q=new ECP2_ZZZ(); Q.setx(X);
+		if (!Q.is_infinity()) break;
+		x.inc(1); x.norm();
+	}
+/* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
+
+	var Fa=new BIG_XXX(0); Fa.rcopy(ROM_FIELD_YYY.Fra);
+	var Fb=new BIG_XXX(0); Fb.rcopy(ROM_FIELD_YYY.Frb);
+	X=new FP2_YYY(Fa,Fb); 
+	x=new BIG_XXX(0); x.rcopy(ROM_CURVE_ZZZ.CURVE_Bnx);
+
+	if (ECP_ZZZ.CURVE_PAIRING_TYPE==ECP_ZZZ.BN)
+	{
+		T=new ECP2_ZZZ(); T.copy(Q);
+		T=T.mul(x); T.neg();
+		K=new ECP2_ZZZ(); K.copy(T);
+		K.dbl(); K.add(T); //K.affine();
+
+		K.frob(X);
+		Q.frob(X); Q.frob(X); Q.frob(X);
+		Q.add(T); Q.add(K);
+		T.frob(X); T.frob(X);
+		Q.add(T);
+	}
+	if (ECP_ZZZ.CURVE_PAIRING_TYPE==ECP_ZZZ.BLS)
+	{
+		xQ=new ECP2_ZZZ();
+		x2Q=new ECP2_ZZZ();
+
+		xQ=Q.mul(x);
+		x2Q=xQ.mul(x);
+
+		x2Q.sub(xQ);
+		x2Q.sub(Q);
+
+		xQ.sub(Q);
+		xQ.frob(X);
+
+		Q.dbl();
+		Q.frob(X);
+		Q.frob(X);
+
+		Q.add(x2Q);
+		Q.add(xQ);
+	}
+	Q.affine();
+	return Q;
+};

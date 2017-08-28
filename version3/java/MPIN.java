@@ -185,68 +185,6 @@ public class MPIN
 		return R;
 	}
 
-
-
-	public static ECP mapit(byte[] h)
-	{
-		BIG q=new BIG(ROM.Modulus);
-		BIG x=BIG.fromBytes(h);
-		x.mod(q);
-		ECP P;
-
-		while (true)
-		{
-			P=new ECP(x,0);
-			if (!P.is_infinity()) break;
-			x.inc(1); x.norm();
-		}
-
-		if (ECP.CURVE_PAIRING_TYPE!=ECP.BN)
-		{
-			BIG c=new BIG(ROM.CURVE_Cof);
-			P=P.mul(c);
-		}
-		return P;
-	}
-
-/* needed for SOK */
-	public static ECP2 mapit2(byte[] h)
-	{
-		BIG q=new BIG(ROM.Modulus);
-		BIG x=BIG.fromBytes(h);
-		BIG one=new BIG(1);
-		FP2 X;
-		ECP2 Q,T,K;
-		x.mod(q);
-		while (true)
-		{
-			X=new FP2(one,x);
-			Q=new ECP2(X);
-			if (!Q.is_infinity()) break;
-			x.inc(1); x.norm();
-		}
-/* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
-		BIG Fra=new BIG(ROM.Fra);
-		BIG Frb=new BIG(ROM.Frb);
-		X=new FP2(Fra,Frb);
-		x=new BIG(ROM.CURVE_Bnx);
-
-		T=new ECP2(); T.copy(Q);
-		T=T.mul(x); T.neg();
-		K=new ECP2(); K.copy(T);
-		K.dbl(); K.add(T); K.affine();
-
-		K.frob(X);
-		Q.frob(X); Q.frob(X); Q.frob(X);
-		Q.add(T); Q.add(K);
-		T.frob(X); T.frob(X);
-		Q.add(T);
-		Q.affine();
-		return Q;
-	}
-
-
-
 /* these next two functions help to implement elligator squared - http://eprint.iacr.org/2014/043 */
 /* maps a random u to a point on the curve */
 	public static ECP map(BIG u,int cb)
@@ -396,7 +334,7 @@ public class MPIN
 		ECP P=ECP.fromBytes(TOKEN);
 		if (P.is_infinity()) return INVALID_POINT;
 		byte[] h=hashit(sha,0,CID,EFS);
-		ECP R=mapit(h);
+		ECP R=ECP.mapit(h);
 
 
 		pin%=MAXPIN;
@@ -451,7 +389,7 @@ public class MPIN
 //		byte[] t=new byte[EFS];
 
 		byte[] h=hashit(sha,0,CLIENT_ID,EFS);
-		P=mapit(h);
+		P=ECP.mapit(h);
 	
 		T=ECP.fromBytes(TOKEN);
 		if (T.is_infinity()) return INVALID_POINT;
@@ -465,7 +403,7 @@ public class MPIN
 			if (W.is_infinity()) return INVALID_POINT;
 			T.add(W);
 			h=hashit(sha,date,h,EFS);
-			W=mapit(h);
+			W=ECP.mapit(h);
 			if (xID!=null)
 			{
 				P=PAIR.G1mul(P,x);
@@ -535,7 +473,7 @@ public class MPIN
 			if (P.is_infinity()) return INVALID_POINT;
 		}
 		else
-			P=mapit(G);
+			P=ECP.mapit(G);
 
 		PAIR.G1mul(P,x).toBytes(W);
 		return 0;
@@ -552,7 +490,7 @@ public class MPIN
 	public static int GET_CLIENT_PERMIT(int sha,int date,byte[] S,byte[] CID,byte[] CTT)
 	{
 		byte[] h=hashit(sha,date,CID,EFS);
-		ECP P=mapit(h);
+		ECP P=ECP.mapit(h);
 
 		BIG s=BIG.fromBytes(S);
 		ECP OP=PAIR.G1mul(P,s);
@@ -565,14 +503,14 @@ public class MPIN
 	public static void SERVER_1(int sha,int date,byte[] CID,byte[] HID,byte[] HTID)
 	{
 		byte[] h=hashit(sha,0,CID,EFS);
-		ECP R,P=mapit(h);
+		ECP R,P=ECP.mapit(h);
 
 		P.toBytes(HID);   // new
 		if (date!=0)
 		{
 	//		if (HID!=null) P.toBytes(HID);
 			h=hashit(sha,date,h,EFS);
-			R=mapit(h);
+			R=ECP.mapit(h);
 			P.add(R);
 			P.toBytes(HTID);
 		}
@@ -706,7 +644,7 @@ public class MPIN
 		T=ECP.fromBytes(TOKEN);
 		if (T.is_infinity()) return INVALID_POINT; 
 
-		P=mapit(CID);
+		P=ECP.mapit(CID);
 
 		ECP2 Q=new ECP2(new FP2(new BIG(ROM.CURVE_Pxa),new BIG(ROM.CURVE_Pxb)),new FP2(new BIG(ROM.CURVE_Pya),new BIG(ROM.CURVE_Pyb)));
 

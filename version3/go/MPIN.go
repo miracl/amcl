@@ -113,57 +113,6 @@ func mhashit(sha int,n int32,ID []byte) []byte {
 	return W[:]
 }
 
-func mapit(h []byte) *ECP {
-	q:=NewBIGints(Modulus)
-	x:=fromBytes(h[:])
-	x.mod(q)
-	var P *ECP
-	for true {
-		P=NewECPbigint(x,0)
-		if !P.Is_infinity() {break}
-		x.inc(1); x.norm()
-	}
-	if CURVE_PAIRING_TYPE!=BN {
-		c:=NewBIGints(CURVE_Cof)
-		P=P.mul(c)
-	}	
-	return P
-}
-
-/* needed for SOK */
-func mapit2(h []byte) *ECP2 {
-	q:=NewBIGints(Modulus)
-	x:=fromBytes(h[:])
-	one:=NewBIGint(1)
-	var X *FP2
-	var Q,T,K *ECP2
-	x.mod(q)
-	for true {
-		X=NewFP2bigs(one,x)
-		Q=NewECP2fp2(X)
-		if !Q.Is_infinity() {break}
-		x.inc(1); x.norm()
-	}
-/* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
-	Fra:=NewBIGints(Fra)
-	Frb:=NewBIGints(Frb)
-	X=NewFP2bigs(Fra,Frb)
-	x=NewBIGints(CURVE_Bnx)
-
-	T=NewECP2(); T.Copy(Q)
-	T=T.mul(x); T.neg()
-	K=NewECP2(); K.Copy(T)
-	K.dbl(); K.add(T); K.affine()
-
-	K.frob(X)
-	Q.frob(X); Q.frob(X); Q.frob(X)
-	Q.add(T); Q.add(K)
-	T.frob(X); T.frob(X)
-	Q.add(T)
-	Q.affine()
-	return Q
-}
-
 /* return time in slots since epoch */
 func Today() int {
 	now:=time.Now()
@@ -307,7 +256,7 @@ func MPIN_EXTRACT_PIN(sha int,CID []byte,pin int,TOKEN []byte) int {
 	P:=ECP_fromBytes(TOKEN)
 	if P.Is_infinity() {return INVALID_POINT}
 	h:=mhashit(sha,0,CID)
-	R:=mapit(h)
+	R:=ECP_mapit(h)
 
 	R=R.pinmul(int32(pin)%MAXPIN,PBLEN)
 	P.sub(R)
@@ -352,7 +301,7 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *amcl.RAND,X []byte,pin
 	}
 
 	h:=mhashit(sha,0,CLIENT_ID)
-	P:=mapit(h)
+	P:=ECP_mapit(h)
 	
 	T:=ECP_fromBytes(TOKEN)
 	if T.Is_infinity() {return INVALID_POINT}
@@ -364,7 +313,7 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *amcl.RAND,X []byte,pin
 		if W.Is_infinity() {return INVALID_POINT}
 		T.add(W)
 		h=mhashit(sha,int32(date),h)
-		W=mapit(h)
+		W=ECP_mapit(h)
 		if xID!=nil {
 			P=G1mul(P,x)
 			P.toBytes(xID)
@@ -419,7 +368,7 @@ func MPIN_GET_G1_MULTIPLE(rng *amcl.RAND,typ int,X []byte,G []byte,W []byte) int
 	if typ==0 {
 		P=ECP_fromBytes(G)
 		if P.Is_infinity() {return INVALID_POINT}
-	} else {P=mapit(G)}
+	} else {P=ECP_mapit(G)}
 
 	G1mul(P,x).toBytes(W)
 	return 0
@@ -434,7 +383,7 @@ func MPIN_GET_CLIENT_SECRET(S []byte,CID []byte,CST []byte) int {
 /* Time Permit CTT=S*(date|H(CID)) where S is master secret */
 func MPIN_GET_CLIENT_PERMIT(sha,date int,S []byte,CID []byte,CTT []byte) int {
 	h:=mhashit(sha,int32(date),CID)
-	P:=mapit(h)
+	P:=ECP_mapit(h)
 
 	s:=fromBytes(S)
 	G1mul(P,s).toBytes(CTT)
@@ -444,13 +393,13 @@ func MPIN_GET_CLIENT_PERMIT(sha,date int,S []byte,CID []byte,CTT []byte) int {
 /* Outputs H(CID) and H(T|H(CID)) for time permits. If no time permits set HID=HTID */
 func MPIN_SERVER_1(sha int,date int,CID []byte,HID []byte,HTID []byte) {
 	h:=mhashit(sha,0,CID)
-	P:=mapit(h)
+	P:=ECP_mapit(h)
 	
 	P.toBytes(HID);
 	if date!=0 {
 	//	if HID!=nil {P.toBytes(HID)}
 		h=mhashit(sha,int32(date),h)
-		R:=mapit(h)
+		R:=ECP_mapit(h)
 		P.add(R)
 		P.toBytes(HTID)
 	} //else {P.toBytes(HID)}
@@ -574,7 +523,7 @@ func MPIN_PRECOMPUTE(TOKEN []byte,CID []byte,G1 []byte,G2 []byte) int {
 	T=ECP_fromBytes(TOKEN)
 	if T.Is_infinity() {return INVALID_POINT} 
 
-	P=mapit(CID)
+	P=ECP_mapit(CID)
 
 	Q:=NewECP2fp2s(NewFP2bigs(NewBIGints(CURVE_Pxa),NewBIGints(CURVE_Pxb)),NewFP2bigs(NewBIGints(CURVE_Pya),NewBIGints(CURVE_Pyb)))
 

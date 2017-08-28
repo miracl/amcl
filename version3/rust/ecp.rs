@@ -926,6 +926,24 @@ impl ECP {
 		return S;
 	}
 
+#[allow(non_snake_case)]
+	pub fn mapit(h: &[u8]) -> ECP {
+		let mut q=BIG::new_ints(&rom::MODULUS);
+		let mut x=BIG::frombytes(h);
+		x.rmod(&mut q);
+		let mut P:ECP;
+
+		loop {
+			P=ECP::new_bigint(&x,0);
+			if !P.is_infinity() {break}
+			x.inc(1); x.norm();
+		}
+		if CURVE_PAIRING_TYPE!=BN {
+			let mut c=BIG::new_ints(&rom::CURVE_COF);
+			P=P.mul(&mut c);
+		}	
+		return P;
+	}
 
 }
 /*

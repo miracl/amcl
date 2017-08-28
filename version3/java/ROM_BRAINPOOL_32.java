@@ -32,6 +32,7 @@ public class ROM
 	public static final int[] R2modp= {0xB9A3787,0x9E04F49,0x8F3CF49,0x2931721,0xF1DBC89,0x54E8C3C,0xF7559CA,0xBB411A3,0x773E15F,0x9};
 	public static final int MConst= 0xEFD89B9;
 
+	public static final int CURVE_Cof= 1;
 	public static final int CURVE_A= -3;
 	public static final int CURVE_B_I= 0;
 	public static final int[] CURVE_B= {0xEE92B04,0xE58101F,0xF49256A,0xEBC4AF2,0x6B7BF93,0x733D0B7,0x4FE66A7,0x30D84EA,0x62C61C4,0x6};

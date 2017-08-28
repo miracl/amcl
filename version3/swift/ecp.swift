@@ -972,7 +972,25 @@ final public class ECP {
         return S;
     }
     
-    
+    static func mapit(_ h:[UInt8]) -> ECP
+    {
+        let q=BIG(ROM.Modulus)
+        let x=BIG.fromBytes(h)
+        x.mod(q)
+        var P=ECP(x,0)
+        while (true)
+        {
+            if !P.is_infinity() {break}
+            x.inc(1); x.norm();
+            P=ECP(x,0);
+        }
+        if ECP.CURVE_PAIRING_TYPE != ECP.BN {
+            let c=BIG(ROM.CURVE_Cof)
+            P=P.mul(c)
+        }
+
+        return P
+    }    
    
     
 }

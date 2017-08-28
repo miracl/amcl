@@ -35,6 +35,7 @@ static let R2modp:[Chunk] = [0x0,0x4448000,0x6,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0
 static let MConst:Chunk = 0x13D
 
 //  nums384 Weierstrass Curve
+static let CURVE_Cof:Int = 1
 static let CURVE_A:Int = -3
 static let CURVE_B_I:Int = -34568
 static let CURVE_B:[Chunk] = [0x1FFF77BB,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x7F]
@@ -54,6 +55,7 @@ static let R2modp:[Chunk] = [0x88900000000000,0x6,0x0,0x0,0x0,0x0,0x0]
 static let MConst:Chunk = 0x13D
 
 //  nums384 Weierstrass Curve
+static let CURVE_Cof:Int = 1
 static let CURVE_A:Int = -3
 static let CURVE_B_I:Int = -34568
 static let CURVE_B:[Chunk] = [0x3FFFFFFFFFF77BB,0x3FFFFFFFFFFFFFF,0x3FFFFFFFFFFFFFF,0x3FFFFFFFFFFFFFF,0x3FFFFFFFFFFFFFF,0x3FFFFFFFFFFFFFF,0xFFFFFFFFF]

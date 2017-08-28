@@ -962,6 +962,29 @@ public final class ECP {
 		return S;
 	}
 
+/* Hash byte string to curve point */
+	public static ECP mapit(byte[] h)
+	{
+		BIG q=new BIG(ROM.Modulus);
+		BIG x=BIG.fromBytes(h);
+		x.mod(q);
+		ECP P;
+
+		while (true)
+		{
+			P=new ECP(x,0);
+			if (!P.is_infinity()) break;
+			x.inc(1); x.norm();
+		}
+
+		if (ECP.CURVE_PAIRING_TYPE!=ECP.BN)
+		{
+			BIG c=new BIG(ROM.CURVE_Cof);
+			P=P.mul(c);
+		}
+		return P;
+	}
+
 /*
 	public static void main(String[] args) {
 

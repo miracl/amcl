@@ -533,6 +533,78 @@ public final class ECP2 {
 		return P;
 	}
 
+
+/* needed for SOK */
+	public static ECP2 mapit(byte[] h)
+	{
+		BIG q=new BIG(ROM.Modulus);
+		BIG x=BIG.fromBytes(h);
+		BIG one=new BIG(1);
+		FP2 X;
+		ECP2 Q;
+		x.mod(q);
+		while (true)
+		{
+			X=new FP2(one,x);
+			Q=new ECP2(X);
+			if (!Q.is_infinity()) break;
+			x.inc(1); x.norm();
+		}
+
+		BIG Fra=new BIG(ROM.Fra);
+		BIG Frb=new BIG(ROM.Frb);
+		X=new FP2(Fra,Frb);
+		x=new BIG(ROM.CURVE_Bnx);
+
+/* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
+
+		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
+		{
+			ECP2 T,K;
+
+			T=new ECP2(); T.copy(Q);
+			T=T.mul(x); T.neg();
+			K=new ECP2(); K.copy(T);
+			K.dbl(); K.add(T); //K.affine();
+
+			K.frob(X);
+			Q.frob(X); Q.frob(X); Q.frob(X);
+			Q.add(T); Q.add(K);
+			T.frob(X); T.frob(X);
+			Q.add(T);
+
+		}
+
+/* Efficient hash maps to G2 on BLS curves - Budroni, Pintore */
+/* Q -> x2Q -xQ -Q +F(xQ -Q) +F(F(2Q)) */
+
+		if (ECP.CURVE_PAIRING_TYPE==ECP.BLS)
+		{
+			ECP2 xQ,x2Q;
+			xQ=new ECP2();
+			x2Q=new ECP2();
+
+			xQ=Q.mul(x);
+			x2Q=xQ.mul(x);
+
+			x2Q.sub(xQ);
+			x2Q.sub(Q);
+
+			xQ.sub(Q);
+			xQ.frob(X);
+
+			Q.dbl();
+			Q.frob(X);
+			Q.frob(X);
+
+			Q.add(x2Q);
+			Q.add(xQ);
+		}
+		Q.affine();
+		return Q;
+	}
+
+
 /*
 	public static void main(String[] args) {
 		BIG r=new BIG(ROM.Modulus);

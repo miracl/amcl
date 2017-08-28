@@ -26,7 +26,6 @@ use xxx::ecp2::ECP2;
 use xxx::fp4::FP4;
 use xxx::fp12::FP12;
 use xxx::big::BIG;
-use xxx::ecp;
 use xxx::pair;
 use xxx::big;
 use xxx::rom;
@@ -140,25 +139,6 @@ fn hashit(sha: usize,n: usize,id: &[u8],w: &mut [u8]) -> bool {
 	}
 
 	return true;
-}
-
-#[allow(non_snake_case)]
-fn mapit(h: &[u8]) -> ECP {
-	let mut q=BIG::new_ints(&rom::MODULUS);
-	let mut x=BIG::frombytes(h);
-	x.rmod(&mut q);
-	let mut P:ECP;
-
-	loop {
-		P=ECP::new_bigint(&x,0);
-		if !P.is_infinity() {break}
-		x.inc(1); x.norm();
-	}
-	if ecp::CURVE_PAIRING_TYPE!=ecp::BN {
-		let mut c=BIG::new_ints(&rom::CURVE_COF);
-		P=P.mul(&mut c);
-	}	
-	return P;
 }
 
 /* return time in slots since epoch */
@@ -343,7 +323,7 @@ pub fn get_g1_multiple(rng: Option<&mut RAND>,typ: usize,x: &mut [u8],g: &[u8],w
 		P=ECP::frombytes(g);
 		if P.is_infinity() {return INVALID_POINT}
 	} else {
-		P=mapit(g)
+		P=ECP::mapit(g)
 	}
 
 
@@ -367,7 +347,7 @@ pub fn extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isize {
 	let mut h:[u8;RM]=[0;RM];
 	if P.is_infinity() {return INVALID_POINT}
 	hashit(sha,0,cid,&mut h);
-	let mut R=mapit(&h);
+	let mut R=ECP::mapit(&h);
 
 	R=R.pinmul(pin%MAXPIN,PBLEN);
 	P.sub(&mut R);
@@ -383,7 +363,7 @@ pub fn precompute(token: &[u8],cid: &[u8],g1: &mut [u8],g2: &mut [u8]) -> isize 
 	let T=ECP::frombytes(&token);
 	if T.is_infinity() {return INVALID_POINT} 
 
-	let P=mapit(&cid);
+	let P=ECP::mapit(&cid);
 
 	let Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
 
@@ -404,7 +384,7 @@ pub fn get_client_permit(sha: usize,date: usize,s: &[u8],cid: &[u8],ctt: &mut [u
 	const RM:usize=big::MODBYTES as usize;
 	let mut h:[u8;RM]=[0;RM];	
 	hashit(sha,date,cid,&mut h);
-	let mut P=mapit(&h);
+	let mut P=ECP::mapit(&h);
 
 	let mut sc=BIG::frombytes(s);
 	pair::g1mul(&mut P,&mut sc).tobytes(ctt);
@@ -433,7 +413,7 @@ pub fn client_1(sha: usize,date: usize,client_id: &[u8],rng: Option<&mut RAND>,x
 	let mut h:[u8;RM]=[0;RM];
 
 	hashit(sha,0,&client_id,&mut h);
-	let mut P=mapit(&h);
+	let mut P=ECP::mapit(&h);
 	
 	let mut T=ECP::frombytes(&token);
 	if T.is_infinity() {return INVALID_POINT}
@@ -446,7 +426,7 @@ pub fn client_1(sha: usize,date: usize,client_id: &[u8],rng: Option<&mut RAND>,x
 		T.add(&mut W);
 		let mut h2:[u8;RM]=[0;RM];		
 		hashit(sha,date,&h,&mut h2);
-		W=mapit(&h2);
+		W=ECP::mapit(&h2);
 		if let Some(mut rxid)=xid {
 			P=pair::g1mul(&mut P,&mut sx);
 			P.tobytes(&mut rxid);
@@ -476,13 +456,13 @@ pub fn server_1(sha: usize,date: usize,cid: &[u8],hid: &mut [u8],htid: Option<&m
 
 	hashit(sha,0,cid,&mut h);	
 
-	let mut P=mapit(&h);
+	let mut P=ECP::mapit(&h);
 	
 	P.tobytes(hid);
 	if date!=0 {
 		let mut h2:[u8;RM]=[0;RM];		
 		hashit(sha,date,&h,&mut h2);
-		let mut R=mapit(&h2);
+		let mut R=ECP::mapit(&h2);
 		P.add(&mut R);
 		if let Some(rhtid)=htid {P.tobytes(rhtid);}
 	} 

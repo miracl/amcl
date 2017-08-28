@@ -505,3 +505,58 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 	return P
 }
 
+/* needed for SOK */
+func ECP2_mapit(h []byte) *ECP2 {
+	q:=NewBIGints(Modulus)
+	x:=fromBytes(h[:])
+	one:=NewBIGint(1)
+	var X *FP2
+	var Q,T,K,xQ,x2Q *ECP2
+	x.mod(q)
+	for true {
+		X=NewFP2bigs(one,x)
+		Q=NewECP2fp2(X)
+		if !Q.Is_infinity() {break}
+		x.inc(1); x.norm()
+	}
+/* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
+	Fra:=NewBIGints(Fra)
+	Frb:=NewBIGints(Frb)
+	X=NewFP2bigs(Fra,Frb)
+	x=NewBIGints(CURVE_Bnx)
+
+	if CURVE_PAIRING_TYPE==BN {
+		T=NewECP2(); T.Copy(Q)
+		T=T.mul(x); T.neg()
+		K=NewECP2(); K.Copy(T)
+		K.dbl(); K.add(T); //K.affine()
+
+		K.frob(X)
+		Q.frob(X); Q.frob(X); Q.frob(X)
+		Q.add(T); Q.add(K)
+		T.frob(X); T.frob(X)
+		Q.add(T)
+	}
+	if CURVE_PAIRING_TYPE==BLS {
+		xQ=NewECP2()
+		x2Q=NewECP2()
+
+		xQ=Q.mul(x)
+		x2Q=xQ.mul(x)
+
+		x2Q.sub(xQ)
+		x2Q.sub(Q)
+
+		xQ.sub(Q)
+		xQ.frob(X)
+
+		Q.dbl()
+		Q.frob(X)
+		Q.frob(X)
+
+		Q.add(x2Q)
+		Q.add(xQ)
+	}
+	Q.affine()
+	return Q
+}

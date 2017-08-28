@@ -909,6 +909,23 @@ func (E *ECP) mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 	return S
 }
 
+func ECP_mapit(h []byte) *ECP {
+	q:=NewBIGints(Modulus)
+	x:=fromBytes(h[:])
+	x.mod(q)
+	var P *ECP
+	for true {
+		P=NewECPbigint(x,0)
+		if !P.Is_infinity() {break}
+		x.inc(1); x.norm()
+	}
+	if CURVE_PAIRING_TYPE!=BN {
+		c:=NewBIGints(CURVE_Cof)
+		P=P.mul(c)
+	}	
+	return P
+}
+
 /*
 func main() {
 	Gx:=NewBIGints(CURVE_Gx);

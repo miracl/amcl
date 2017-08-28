@@ -19,6 +19,7 @@ under the License.
 
 use xxx::rom;
 use xxx::big;
+use xxx::ecp;
 use xxx::fp2::FP2;
 use xxx::big::BIG;
 
@@ -525,6 +526,60 @@ impl ECP2 {
 
 		P.affine();
 		return P;
+	}
+
+
+#[allow(non_snake_case)]
+	pub fn mapit(h: &[u8]) -> ECP2 {
+		let mut q=BIG::new_ints(&rom::MODULUS);
+		let mut x=BIG::frombytes(h);
+		x.rmod(&mut q);
+		let mut Q:ECP2;
+		let one=BIG::new_int(1);
+
+		loop {
+			let X=FP2::new_bigs(&one,&x);
+			Q=ECP2::new_fp2(&X);
+			if !Q.is_infinity() {break}
+			x.inc(1); x.norm();
+		}
+		let X = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
+		x = BIG::new_ints(&rom::CURVE_BNX);
+
+		if ecp::CURVE_PAIRING_TYPE==ecp::BN {
+
+			let mut T=Q.mul(&mut x);
+			T.neg();
+        	let mut K=ECP2::new(); K.copy(&T);
+        	K.dbl(); K.add(&T); 
+    
+        	K.frob(&X);
+        	Q.frob(&X); Q.frob(&X); Q.frob(&X);
+        	Q.add(&T); Q.add(&K);
+        	T.frob(&X); T.frob(&X);
+        	Q.add(&T);
+		}	
+		if ecp::CURVE_PAIRING_TYPE==ecp::BLS {
+
+        	let mut xQ=Q.mul(&mut x);
+        	let mut x2Q=xQ.mul(&mut x);
+
+        	x2Q.sub(&xQ);
+        	x2Q.sub(&Q);
+
+        	xQ.sub(&Q);
+        	xQ.frob(&X);
+
+        	Q.dbl();
+        	Q.frob(&X);
+        	Q.frob(&X);
+
+        	Q.add(&x2Q);
+        	Q.add(&xQ);
+		}	
+
+		Q.affine();
+		return Q;
 	}
 
 }

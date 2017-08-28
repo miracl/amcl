@@ -127,59 +127,6 @@ final public class MPIN
         return W
     }
     
-    static func mapit(_ h:[UInt8]) -> ECP
-    {
-        let q=BIG(ROM.Modulus)
-        let x=BIG.fromBytes(h)
-        x.mod(q)
-        var P=ECP(x,0)
-        while (true)
-        {
-            if !P.is_infinity() {break}
-            x.inc(1); x.norm();
-            P=ECP(x,0);
-        }
-        if ECP.CURVE_PAIRING_TYPE != ECP.BN {
-            let c=BIG(ROM.CURVE_Cof)
-            P=P.mul(c)
-        }
-
-        return P
-    }
-
-    // needed for SOK
-    static func mapit2(_ h:[UInt8]) -> ECP2
-    {
-        let q=BIG(ROM.Modulus)
-        var x=BIG.fromBytes(h)
-        let one=BIG(1)
-        var Q=ECP2()
-        x.mod(q);
-        while (true)
-        {
-            let X=FP2(one,x);
-            Q=ECP2(X);
-            if !Q.is_infinity() {break}
-            x.inc(1); x.norm();
-        }
-    // Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez
-        let Fra=BIG(ROM.Fra);
-        let Frb=BIG(ROM.Frb);
-        let X=FP2(Fra,Frb);
-        x=BIG(ROM.CURVE_Bnx);
-    
-        let T=Q.mul(x); T.neg()
-        let K=ECP2(); K.copy(T)
-        K.dbl(); K.add(T); K.affine()
-    
-        K.frob(X)
-        Q.frob(X); Q.frob(X); Q.frob(X)
-        Q.add(T); Q.add(K)
-        T.frob(X); T.frob(X)
-        Q.add(T)
-        Q.affine()
-        return Q
-    }
     
     // return time in slots since epoch
     static public func today() -> Int32
@@ -335,7 +282,7 @@ final public class MPIN
         let P=ECP.fromBytes(TOKEN)
         if P.is_infinity() {return INVALID_POINT}
         let h=MPIN.hashit(sha,0,CID)
-        var R=MPIN.mapit(h)
+        var R=ECP.mapit(h)
 
         R=R.pinmul(pin%MAXPIN,MPIN.PBLEN)
         P.sub(R)
@@ -387,7 +334,7 @@ final public class MPIN
     //    var t=[UInt8](count:EFS,repeatedValue:0)
 
         var h=MPIN.hashit(sha,0,CLIENT_ID)
-        var P=mapit(h);
+        var P=ECP.mapit(h);
     
         let T=ECP.fromBytes(TOKEN);
         if T.is_infinity() {return INVALID_POINT}
@@ -400,7 +347,7 @@ final public class MPIN
             if W.is_infinity() {return INVALID_POINT}
             T.add(W);
             h=MPIN.hashit(sha,date,h)
-            W=MPIN.mapit(h);
+            W=ECP.mapit(h);
             if xID != nil
             {
 				P=PAIR.G1mul(P,x)
@@ -469,7 +416,7 @@ final public class MPIN
             if P.is_infinity() {return INVALID_POINT}
         }
         else
-            {P=MPIN.mapit(G)}
+            {P=ECP.mapit(G)}
     
         PAIR.G1mul(P,x).toBytes(&W)
         return 0;
@@ -484,7 +431,7 @@ final public class MPIN
     static public func GET_CLIENT_PERMIT(_ sha:Int,_ date:Int32,_ S:[UInt8],_ CID:[UInt8],_ CTT:inout [UInt8]) -> Int
     {
         let h=MPIN.hashit(sha,date,CID)
-        let P=MPIN.mapit(h)
+        let P=ECP.mapit(h)
     
         let s=BIG.fromBytes(S)
         PAIR.G1mul(P,s).toBytes(&CTT)
@@ -495,14 +442,14 @@ final public class MPIN
     static public func SERVER_1(_ sha:Int,_ date:Int32,_ CID:[UInt8],_ HID:inout [UInt8],_ HTID:inout [UInt8]?)
     {
         var h=MPIN.hashit(sha,0,CID)
-        let P=MPIN.mapit(h)
+        let P=ECP.mapit(h)
 
 	P.toBytes(&HID)
         if date != 0
         {
        //     if HID != nil {P.toBytes(&HID!)}
             h=hashit(sha,date,h)
-            let R=MPIN.mapit(h)
+            let R=ECP.mapit(h)
             P.add(R)
             P.toBytes(&HTID!)
         }
@@ -626,7 +573,7 @@ final public class MPIN
         let T=ECP.fromBytes(TOKEN);
         if T.is_infinity() {return INVALID_POINT}
     
-        let P=MPIN.mapit(CID)
+        let P=ECP.mapit(CID)
     
         let Q=ECP2(FP2(BIG(ROM.CURVE_Pxa),BIG(ROM.CURVE_Pxb)),FP2(BIG(ROM.CURVE_Pya),BIG(ROM.CURVE_Pyb)))
     

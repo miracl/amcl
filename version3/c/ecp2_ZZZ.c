@@ -645,7 +645,7 @@ void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ Q[4],BIG_XXX u[4])
 
 
 /* Map to hash value to point on G2 from random BIG */
-void ECP2_ZZZ_mapit2(ECP2_ZZZ *Q,octet *W)
+void ECP2_ZZZ_mapit(ECP2_ZZZ *Q,octet *W)
 {
     BIG_XXX q,one,Fx,Fy,x,hv;
     FP2_YYY X;
@@ -681,7 +681,7 @@ void ECP2_ZZZ_mapit2(ECP2_ZZZ *Q,octet *W)
     ECP2_ZZZ_copy(&K,&T);
     ECP2_ZZZ_dbl(&K);
     ECP2_ZZZ_add(&K,&T);
-    ECP2_ZZZ_affine(&K);
+    //ECP2_ZZZ_affine(&K);
 
     ECP2_ZZZ_frob(&K,&X);
     ECP2_ZZZ_frob(Q,&X);

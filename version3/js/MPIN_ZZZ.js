@@ -157,62 +157,6 @@ var MPIN_ZZZ = {
 		return W;
 	},
 
-	mapit: function(h)
-	{
-		var q=new BIG_XXX(0); q.rcopy(ROM_FIELD_YYY.Modulus);
-		var x=BIG_XXX.fromBytes(h);
-		x.mod(q);
-		var P=new ECP_ZZZ();
-		while (true)
-		{
-			P.setxi(x,0);
-			if (!P.is_infinity()) break;
-			x.inc(1); x.norm();
-		}
-		if (ECP_ZZZ.CURVE_PAIRING_TYPE!=ECP_ZZZ.BN)
-		{
-			var c=new BIG_XXX(0); c.rcopy(ROM_CURVE_ZZZ.CURVE_Cof);
-			P=P.mul(c);
-		}
-		return P;
-	},
-
-/* needed for SOK */
-	mapit2: function(h)
-	{
-		var q=new BIG_XXX(0); q.rcopy(ROM_FIELD_YYY.Modulus);
-		var x=BIG_XXX.fromBytes(h);
-		var one=new BIG_XXX(1);
-		x.mod(q);
-		var Q,T,K,X;
-		while (true)
-		{
-			X=new FP2_YYY(one,x);
-			Q=new ECP2_ZZZ(); Q.setx(X);
-			if (!Q.is_infinity()) break;
-			x.inc(1); x.norm();
-		}
-/* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
-
-		var Fa=new BIG_XXX(0); Fa.rcopy(ROM_FIELD_YYY.Fra);
-		var Fb=new BIG_XXX(0); Fb.rcopy(ROM_FIELD_YYY.Frb);
-		X=new FP2_YYY(Fa,Fb); 
-		x=new BIG_XXX(0); x.rcopy(ROM_CURVE_ZZZ.CURVE_Bnx);
-
-		T=new ECP2_ZZZ(); T.copy(Q);
-		T=T.mul(x); T.neg();
-		K=new ECP2_ZZZ(); K.copy(T);
-		K.dbl(); K.add(T); K.affine();
-
-		K.frob(X);
-		Q.frob(X); Q.frob(X); Q.frob(X);
-		Q.add(T); Q.add(K);
-		T.frob(X); T.frob(X);
-		Q.add(T);
-		Q.affine();
-		return Q;
-
-	},
 
 /* these next two functions help to implement elligator squared - http://eprint.iacr.org/2014/043 */
 /* maps a random u to a point on the curve */
@@ -365,7 +309,7 @@ var MPIN_ZZZ = {
 		var P=ECP_ZZZ.fromBytes(TOKEN);
 		if (P.is_infinity()) return this.INVALID_POINT;
 		var h=this.hashit(sha,0,CID);
-		var R=this.mapit(h);
+		var R=ECP_ZZZ.mapit(h);
 
 		pin%=this.MAXPIN;
 
@@ -450,7 +394,7 @@ var MPIN_ZZZ = {
 			if (P.is_infinity()) return INVALID_POINT;
 		}
 		else
-			P=this.mapit(G);
+			P=ECP_ZZZ.mapit(G);
 
 		PAIR_ZZZ.G1mul(P,x).toBytes(W);
 		return 0;
@@ -467,7 +411,7 @@ var MPIN_ZZZ = {
 	GET_CLIENT_PERMIT: function(sha,date,S,CID,CTT)
 	{
 		var h=this.hashit(sha,date,CID);
-		var P=this.mapit(h);
+		var P=ECP_ZZZ.mapit(h);
 
 		var s=BIG_XXX.fromBytes(S);
 		P=PAIR_ZZZ.G1mul(P,s);
@@ -497,7 +441,7 @@ var MPIN_ZZZ = {
 		var P,T,W;
 
 		var h=this.hashit(sha,0,CLIENT_ID);
-		P=this.mapit(h);
+		P=ECP_ZZZ.mapit(h);
 		T=ECP_ZZZ.fromBytes(TOKEN);
 		if (T.is_infinity()) return this.INVALID_POINT;
 
@@ -511,7 +455,7 @@ var MPIN_ZZZ = {
 			if (W.is_infinity()) return this.INVALID_POINT;
 			T.add(W);
 			h=this.hashit(sha,date,h);
-			W=this.mapit(h);
+			W=ECP_ZZZ.mapit(h);
 			if (xID!=null)
 			{
 				P=PAIR_ZZZ.G1mul(P,x);
@@ -563,14 +507,14 @@ var MPIN_ZZZ = {
 	SERVER_1: function(sha,date,CID,HID,HTID)
 	{
 		var h=this.hashit(sha,0,CID);
-		var R,P=this.mapit(h);
+		var R,P=ECP_ZZZ.mapit(h);
 
 		P.toBytes(HID);
 		if (date!==0)
 		{
 			//if (HID!=null) P.toBytes(HID);
 			h=this.hashit(sha,date,h);
-			R=this.mapit(h);
+			R=ECP_ZZZ.mapit(h);
 			P.add(R);
 			P.toBytes(HTID);
 		}
@@ -779,7 +723,7 @@ var MPIN_ZZZ = {
 		T=ECP_ZZZ.fromBytes(TOKEN);
 		if (T.is_infinity()) return INVALID_POINT; 
 
-		P=this.mapit(CID);
+		P=ECP_ZZZ.mapit(CID);
 
 		var A=new BIG_XXX(0);
 		var B=new BIG_XXX(0);

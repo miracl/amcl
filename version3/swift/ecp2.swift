@@ -544,6 +544,57 @@ final public class ECP2 {
         return P
     }
     
+     // needed for SOK
+    static func mapit(_ h:[UInt8]) -> ECP2
+    {
+        let q=BIG(ROM.Modulus)
+        var x=BIG.fromBytes(h)
+        let one=BIG(1)
+        var Q=ECP2()
+        x.mod(q);
+        while (true)
+        {
+            let X=FP2(one,x);
+            Q=ECP2(X);
+            if !Q.is_infinity() {break}
+            x.inc(1); x.norm();
+        }
+    // Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez
+        let Fra=BIG(ROM.Fra);
+        let Frb=BIG(ROM.Frb);
+        let X=FP2(Fra,Frb);
+        x=BIG(ROM.CURVE_Bnx);
     
+        if ECP.CURVE_PAIRING_TYPE == ECP.BN {
+            let T=Q.mul(x); T.neg()
+            let K=ECP2(); K.copy(T)
+            K.dbl(); K.add(T); //K.affine()
+    
+            K.frob(X)
+            Q.frob(X); Q.frob(X); Q.frob(X)
+            Q.add(T); Q.add(K)
+            T.frob(X); T.frob(X)
+            Q.add(T)
+        }
+        if ECP.CURVE_PAIRING_TYPE == ECP.BLS {
+            let xQ=Q.mul(x);
+            let x2Q=xQ.mul(x);
+
+            x2Q.sub(xQ)
+            x2Q.sub(Q)
+
+            xQ.sub(Q)
+            xQ.frob(X)
+
+            Q.dbl()
+            Q.frob(X)
+            Q.frob(X)
+
+            Q.add(x2Q)
+            Q.add(xQ)
+        }        
+        Q.affine()
+        return Q
+    }   
     
 }

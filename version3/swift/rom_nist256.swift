@@ -34,6 +34,7 @@ static let R2modp:[Chunk] = [0x50000,0x300000,0x0,0x0,0xFFFFFFA,0xFFFFFBF,0xFFFF
 static let MConst:Chunk = 0x1
 
 //  nist256 Curve
+static let CURVE_Cof:Int = 1
 static let CURVE_A:Int = -3
 static let CURVE_B_I:Int = 0
 static let CURVE_B:[Chunk] = [0x7D2604B,0xCE3C3E2,0x3B0F63B,0x6B0CC5,0x6BC651D,0x5576988,0x7B3EBBD,0xAA3A93E,0xAC635D8,0x5]
@@ -52,6 +53,7 @@ static let R2modp:[Chunk] = [0x3000000050000,0x0,0xFFFFFBFFFFFFFA,0xFFFAFFFFFFFE
 static let MConst:Chunk = 0x1
 
 //  nist256 Curve
+static let CURVE_Cof:Int = 1
 static let CURVE_A:Int = -3
 static let CURVE_B_I:Int = 0
 static let CURVE_B:[Chunk] = [0xCE3C3E27D2604B,0x6B0CC53B0F63B,0x55769886BC651D,0xAA3A93E7B3EBBD,0x5AC635D8]

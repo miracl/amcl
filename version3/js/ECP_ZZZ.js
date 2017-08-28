@@ -966,3 +966,23 @@ ECP_ZZZ.RHS= function(x)
 	r.reduce();
 	return r;
 };
+
+ECP_ZZZ.mapit= function(h)
+{
+	var q=new BIG_XXX(0); q.rcopy(ROM_FIELD_YYY.Modulus);
+	var x=BIG_XXX.fromBytes(h);
+	x.mod(q);
+	var P=new ECP_ZZZ();
+	while (true)
+	{
+		P.setxi(x,0);
+		if (!P.is_infinity()) break;
+		x.inc(1); x.norm();
+	}
+	if (ECP_ZZZ.CURVE_PAIRING_TYPE!=ECP_ZZZ.BN)
+	{
+		var c=new BIG_XXX(0); c.rcopy(ROM_CURVE_ZZZ.CURVE_Cof);
+		P=P.mul(c);
+	}
+	return P;
+};
