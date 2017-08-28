@@ -1,6 +1,6 @@
 [package]
 name = "amcl"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   "Vyacheslav Gudkov <vyacheslav.gudkov@dsr-company.com>",
   "Evgeniy Razinkov <evgeniy.razinkov@dsr-company.com.ru>"
