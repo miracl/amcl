@@ -13,4 +13,12 @@ repository = "https://github.com/MRJCrunch/amcl"
 name = "amcl"
 path = "src/lib.rs"
 
+[features]
+default = ["BLS383"]
+Ed25519 = []
+GOLDILOCKS = []
+BN254 = []
+BLS383 = []
+BLS455 = []
+
 [dependencies]

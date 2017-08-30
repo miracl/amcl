@@ -1,4 +1,4 @@
 [root]
-name = "rust"
-version = "0.1.0"
+name = "amcl"
+version = "0.1.2"
 
