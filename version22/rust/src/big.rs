@@ -17,10 +17,14 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use rom;
-use rom::Chunk;
+use std::fmt;
+use std::cmp::Ordering;
+use std::str::SplitWhitespace;
 
-#[cfg(D32)]
+use rom;
+use rom::{Chunk, NLEN};
+
+#[cfg(target_pointer_width = "32")]
 use rom::DChunk;
 
 #[derive(Copy, Clone)]
@@ -32,6 +36,47 @@ pub struct BIG {
 
 use dbig::DBIG;
 use rand::RAND;
+
+impl fmt::Display for BIG {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut big = self.clone();
+        write!(f, "BIG: [ {} ]", big.tostring())
+    }
+}
+
+impl fmt::Debug for BIG {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut big = self.clone();
+        write!(f, "BIG: [ {} ]", big.tostring())
+    }
+}
+
+impl PartialEq for BIG {
+    fn eq(&self, other: &BIG) -> bool {
+        return self.w == other.w;
+    }
+}
+
+impl Ord for BIG {
+    fn cmp(&self, other: &BIG) -> Ordering {
+        let r = BIG::comp(self, other);
+        if r > 0 {
+            return Ordering::Greater;
+        }
+        if r < 0 {
+            return Ordering::Less;
+        }
+        return Ordering::Equal;
+    }
+}
+
+impl Eq for BIG { }
+
+impl PartialOrd for BIG {
+    fn partial_cmp(&self, other: &BIG) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
 
 impl BIG {
 
@@ -140,7 +185,7 @@ impl BIG {
         return (a.w[rom::NLEN-1]&rom::P_OMASK)>>(rom::P_MB)
     }
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn pexceed(a: &BIG,b: &BIG) -> bool {
         let ea=BIG::excess(a);
         let eb=BIG::excess(b);        
@@ -148,14 +193,14 @@ impl BIG {
         return false
     }
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn sexceed(a: &BIG) -> bool {
         let ea=BIG::excess(a);
         if ((ea+1) as DChunk)*((ea+1) as DChunk) > rom::FEXCESS as DChunk {return true}
         return false
     }
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn ff_pexceed(a: &BIG,b: &BIG) -> bool {
         let ea=BIG::ff_excess(a);
         let eb=BIG::ff_excess(b);
@@ -163,7 +208,7 @@ impl BIG {
         return false;
     }
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn ff_sexceed(a: &BIG) -> bool {
         let ea=BIG::ff_excess(a);
         if ((ea+1) as DChunk)*((ea+1) as DChunk) > rom::P_FEXCESS as DChunk {return true}
@@ -171,7 +216,7 @@ impl BIG {
     }
 
 /* Get top and bottom half of =x*y+c+r */
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
         let prod:DChunk = (a as DChunk)*(b as DChunk)+(c as DChunk)+(r as DChunk);
         let bot=(prod&(rom::BMASK as DChunk)) as Chunk;
@@ -179,7 +224,7 @@ impl BIG {
         return (top,bot);     
     }
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn pexceed(a: &BIG,b: &BIG) -> bool {
         let ea=BIG::excess(a);
         let eb=BIG::excess(b);        
@@ -187,14 +232,14 @@ impl BIG {
         return false
     }
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn sexceed(a: &BIG) -> bool {
         let ea=BIG::excess(a);
         if (ea+1) > rom::FEXCESS/(ea+1) {return true}
         return false
     }
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn ff_pexceed(a: &BIG,b: &BIG) -> bool {
         let ea=BIG::ff_excess(a);
         let eb=BIG::ff_excess(b);
@@ -202,14 +247,14 @@ impl BIG {
         return false;
     }
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn ff_sexceed(a: &BIG) -> bool {
         let ea=BIG::ff_excess(a);
         if (ea+1) > rom::P_FEXCESS/(ea+1) {return true}
         return false;
     }    
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
         let x0=a&rom::HMASK;
         let x1=(a>>rom::HBITS);
@@ -313,7 +358,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
 	pub fn nbits(&mut self) -> usize {
 		let mut k=rom::NLEN-1;
 		self.norm();
-		while (k as isize)>=0 && self.w[k]==0 {k=k-1}
+		while (k as isize)>=0 && self.w[k]==0 {k=k.wrapping_sub(1)}
 		if (k as isize) <0 {return 0}
 		let mut bts=rom::BASEBITS*k;
 		let mut c=self.w[k];
@@ -438,6 +483,39 @@ alise BIG - force all digits < 2^rom::BASEBITS */
 		return BIG::frombytearray(b,0)
 	}
 
+    pub fn to_hex(&self) -> String {
+        let mut ret: String = String::with_capacity(NLEN * 16 + NLEN - 1);
+
+        for i in 0..NLEN {
+            if i == NLEN-1 {
+                ret.push_str(&format!("{:X}", self.w[i]));
+            } else {
+                ret.push_str(&format!("{:X} ", self.w[i]));
+            }
+        }
+        return ret;
+    }
+
+    pub fn from_hex_iter(iter: &mut SplitWhitespace) -> BIG {
+        let mut ret:BIG = BIG::new();
+        for i in 0..NLEN {
+            let v = iter.next();
+            match v {
+                Some(x) => {
+                    ret.w[i] = u64::from_str_radix(x, 16).unwrap() as Chunk;
+                },
+                None => {
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
+
+    pub fn from_hex(val: String) -> BIG {
+        let mut iter = val.split_whitespace();
+        return BIG::from_hex_iter(&mut iter);
+    }
 
 /* self*=x, where x is >NEXCESS */
     pub fn pmul(&mut self,c: isize) -> Chunk {
@@ -802,7 +880,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     }
 
    /* return a*b as DBIG */
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let rm=rom::BMASK as DChunk;
@@ -838,7 +916,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     }
 
 /* return a^2 as DBIG */
-#[cfg(D32)]  
+#[cfg(target_pointer_width = "32")]
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let rm=rom::BMASK as DChunk;
@@ -881,7 +959,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     }
 
 
-#[cfg(D32)]
+#[cfg(target_pointer_width = "32")]
     fn monty(d: &mut DBIG) -> BIG {
         let mut b=BIG::new();           
         let md=BIG::new_ints(&rom::MODULUS);
@@ -923,7 +1001,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
 
 
 /* return a*b as DBIG */
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let mut carry = 0 as Chunk;
@@ -940,7 +1018,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     } 
 
 /* return a^2 as DBIG */
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let mut carry = 0 as Chunk;
@@ -966,7 +1044,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
         return c;
     } 
 
-#[cfg(D64)]
+#[cfg(target_pointer_width = "64")]
     fn monty(d: &mut DBIG) -> BIG {
         let mut b=BIG::new();     
         let md=BIG::new_ints(&rom::MODULUS);
@@ -979,7 +1057,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
                 if (rom::MCONST==1) {
                     m=d.w[i];
                 } else {
-                    m=(rom::MCONST*d.w[i])&rom::BMASK;
+                    m=(rom::MCONST.wrapping_mul(d.w[i]))&rom::BMASK;
                 }
             }
 

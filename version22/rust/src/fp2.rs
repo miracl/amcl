@@ -17,13 +17,16 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use std::fmt;
+use std::str::SplitWhitespace;
+
 #[derive(Copy, Clone)]
 pub struct FP2 {
 	a:FP,
 	b:FP,
 }
 
-//use rom;
+use rom::BIG_HEX_STRING_LEN;
 //mod fp;
 use fp::FP;
 //mod big;
@@ -34,6 +37,25 @@ use big::BIG;
 //mod hash256;
 //mod rom;
 //use rom;
+
+impl fmt::Display for FP2 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "FP2: [ {}, {} ]", self.a, self.b)
+	}
+}
+
+impl fmt::Debug for FP2 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "FP2: [ {}, {} ]", self.a, self.b)
+	}
+}
+
+impl PartialEq for FP2 {
+	fn eq(&self, other: &FP2) -> bool {
+		return (self.a == other.a) &&
+			(self.b == other.b);
+	}
+}
 
 impl FP2 {
 
@@ -263,6 +285,24 @@ impl FP2 {
 /* output to hex string */
 	pub fn tostring(&mut self) -> String {
 		return format!("[{},{}]",self.a.tostring(),self.b.tostring());		
+	}
+
+	pub fn to_hex(&self) -> String {
+		let mut ret: String = String::with_capacity(2 * BIG_HEX_STRING_LEN);
+		ret.push_str(&format!("{} {}", self.a.to_hex(), self.b.to_hex()));
+		return ret;
+	}
+
+	pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP2 {
+		let mut ret:FP2 = FP2::new();
+		ret.a = FP::from_hex_iter(iter);
+		ret.b = FP::from_hex_iter(iter);
+		return ret;
+	}
+
+	pub fn from_hex(val: String) -> FP2 {
+		let mut iter = val.split_whitespace();
+		return FP2::from_hex_iter(&mut iter);
 	}
 
 /* self=1/self */

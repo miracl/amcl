@@ -76,23 +76,29 @@ impl HASH256 {
 
 	fn transform(&mut self) { /* basic transformation step */
 		for j in 16..64 {
-			self.w[j]=HASH256::theta1(self.w[j-2])+self.w[j-7]+HASH256::theta0(self.w[j-15])+self.w[j-16];
+			self.w[j]=HASH256::theta1(self.w[j-2]).wrapping_add(self.w[j-7]).wrapping_add(HASH256::theta0(self.w[j-15])).wrapping_add(self.w[j-16]);
 		}
-		let mut a=self.h[0]; let mut b=self.h[1]; let mut c=self.h[2]; let mut d=self.h[3]; 
+		let mut a=self.h[0]; let mut b=self.h[1]; let mut c=self.h[2]; let mut d=self.h[3];
 		let mut e=self.h[4]; let mut f=self.h[5]; let mut g=self.h[6]; let mut hh=self.h[7];
 		for j in 0..64 { /* 64 times - mush it up */
-			let t1=hh+HASH256::sig1(e)+HASH256::ch(e,f,g)+HASH256_K[j]+self.w[j];
-			let t2=HASH256::sig0(a)+HASH256::maj(a,b,c);
+			let t1=hh.wrapping_add(HASH256::sig1(e)).wrapping_add(HASH256::ch(e,f,g)).wrapping_add(HASH256_K[j]).wrapping_add(self.w[j]);
+			let t2=HASH256::sig0(a).wrapping_add(HASH256::maj(a,b,c));
 			hh=g; g=f; f=e;
-			e=d+t1;
+			e=d.wrapping_add(t1);
 			d=c;
 			c=b;
 			b=a;
-			a=t1+t2 ; 
+			a=t1.wrapping_add(t2);
 		}
-		self.h[0]+=a; self.h[1]+=b; self.h[2]+=c; self.h[3]+=d;
-		self.h[4]+=e; self.h[5]+=f; self.h[6]+=g; self.h[7]+=hh; 
-	} 	
+		self.h[0] = self.h[0].wrapping_add(a);
+		self.h[1] = self.h[1].wrapping_add(b);
+		self.h[2] = self.h[2].wrapping_add(c);
+		self.h[3] = self.h[3].wrapping_add(d);
+		self.h[4] = self.h[4].wrapping_add(e);
+		self.h[5] = self.h[5].wrapping_add(f);
+		self.h[6] = self.h[6].wrapping_add(g);
+		self.h[7] = self.h[7].wrapping_add(hh);
+	}
 
 /* Initialise Hash function */
 	pub fn init(&mut self) { /* initialise */

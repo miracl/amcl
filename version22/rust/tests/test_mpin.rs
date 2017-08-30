@@ -19,22 +19,25 @@ under the License.
 
 use std::io;
 
-mod mpin;
-mod ecp;
-mod ecp2;
-mod fp;
-mod fp2;
-mod fp4;
-mod fp12;
-mod pair;
-mod big;
-mod dbig;
-mod rand;
-mod hash256;
-mod hash384;
-mod hash512;
-mod aes;
-mod rom;
+extern crate amcl;
+
+use amcl::mpin;
+use amcl::ecp;
+use amcl::ecp2;
+use amcl::fp;
+use amcl::fp2;
+use amcl::fp4;
+use amcl::fp12;
+use amcl::pair;
+use amcl::big;
+use amcl::dbig;
+use amcl::rand;
+use amcl::hash256;
+use amcl::hash384;
+use amcl::hash512;
+use amcl::aes;
+use amcl::rom;
+
 use rand::RAND;
 
 pub fn printbinary(array: &[u8]) {
@@ -42,9 +45,10 @@ pub fn printbinary(array: &[u8]) {
 		print!("{:02X}", array[i])
 	}
 	println!("")
-} 
+}
 
-fn main()
+#[test]
+fn test_mpin()
 {
 	let mut raw:[u8;100]=[0;100];	
 	let mut s:[u8;mpin::EGS]=[0;mpin::EGS];

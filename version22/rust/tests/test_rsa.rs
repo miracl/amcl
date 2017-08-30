@@ -17,16 +17,18 @@ specific language governing permissions and limitations
 under the License.
 */
 
+extern crate amcl;
 
-mod ff;
-mod big;
-mod dbig;
-mod rom;
-mod rand;
-mod hash256;
-mod hash384;
-mod hash512;
-mod rsa;
+use  amcl::ff;
+use  amcl::big;
+use  amcl::dbig;
+use  amcl::rom;
+use  amcl::rand;
+use  amcl::hash256;
+use  amcl::hash384;
+use  amcl::hash512;
+use  amcl::rsa;
+
 use rand::RAND;
 
 pub fn printbinary(array: &[u8]) {
@@ -39,7 +41,8 @@ pub fn printbinary(array: &[u8]) {
 use std::str;
 //use std::process;
 
-fn main()
+#[test]
+fn test_rsa()
 {
 	let sha=rsa::HASH_TYPE;
 	let message:&[u8] = b"Hello World\n";

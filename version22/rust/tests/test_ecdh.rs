@@ -17,21 +17,23 @@ specific language governing permissions and limitations
 under the License.
 */
 
-mod ecdh;
-mod ecp;
-mod ecp2;
-mod fp;
-mod fp2;
-mod fp4;
-mod fp12;
-mod big;
-mod dbig;
-mod rand;
-mod hash256;
-mod hash384;
-mod hash512;
-mod aes;
-mod rom;
+extern crate amcl;
+
+use amcl::ecdh;
+use amcl::ecp;
+use amcl::ecp2;
+use amcl::fp;
+use amcl::fp2;
+use amcl::fp4;
+use amcl::fp12;
+use amcl::big;
+use amcl::dbig;
+use amcl::rand;
+use amcl::hash256;
+use amcl::hash384;
+use amcl::hash512;
+use amcl::aes;
+use amcl::rom;
 use rand::RAND;
 
 pub fn printbinary(array: &[u8]) {
@@ -39,9 +41,10 @@ pub fn printbinary(array: &[u8]) {
 		print!("{:02X}", array[i])
 	}
 	println!("")
-} 
+}
 
-fn main()
+#[test]
+fn test_ecdh()
 {
 	let pw="M0ng00se";
 	let pp:&[u8] = b"M0ng00se";

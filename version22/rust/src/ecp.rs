@@ -17,6 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use std::fmt;
+use std::str::SplitWhitespace;
+
+#[derive(Copy, Clone)]
 pub struct ECP {
 	x:FP,
 	y:FP,
@@ -36,6 +40,28 @@ use big::BIG;
 //mod hash256;
 //mod rom;
 use rom;
+use rom::BIG_HEX_STRING_LEN;
+
+impl fmt::Display for ECP {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP: [ {}, {}, {}, {} ]", self.inf, self.x, self.y, self.z)
+	}
+}
+
+impl fmt::Debug for ECP {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP: [ {}, {}, {}, {} ]", self.inf, self.x, self.y, self.z)
+	}
+}
+
+impl PartialEq for ECP {
+	fn eq(&self, other: &ECP) -> bool {
+		return (self.inf == other.inf) &&
+			(self.x == other.x) &&
+			(self.y == other.y) &&
+			(self.z == other.z);
+	}
+}
 
 #[allow(non_snake_case)]
 impl ECP {
@@ -357,6 +383,28 @@ impl ECP {
 			if BIG::comp(&py,&p)>=0 {return ECP::new()}
 			return ECP::new_bigs(&px,&py);
 		} else {return ECP::new_big(&px)}
+	}
+
+	pub fn to_hex(&self) -> String {
+		let mut ret: String = String::with_capacity(4 * BIG_HEX_STRING_LEN);
+		ret.push_str(&format!("{} {} {} {}", self.inf, self.x.to_hex(), self.y.to_hex(), self.z.to_hex()));
+		return ret;
+	}
+
+	pub fn from_hex_iter(iter: &mut SplitWhitespace) -> ECP {
+		let mut ret:ECP = ECP::new();
+		if let Some(x) = iter.next() {
+			ret.inf = x == "true";
+			ret.x = FP::from_hex_iter(iter);
+			ret.y = FP::from_hex_iter(iter);
+			ret.z = FP::from_hex_iter(iter);
+		}
+		return ret;
+	}
+
+	pub fn from_hex(val: String) -> ECP {
+		let mut iter = val.split_whitespace();
+		return ECP::from_hex_iter(&mut iter);
 	}
 
 /* convert to hex string */

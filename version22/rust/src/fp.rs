@@ -17,6 +17,9 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use std::fmt;
+use std::str::SplitWhitespace;
+
 #[derive(Copy, Clone)]
 pub struct FP {
  	x:BIG
@@ -25,7 +28,25 @@ pub struct FP {
 use big::BIG;
 use dbig::DBIG;
 use rom;
-use rom::Chunk;
+use rom::{Chunk, BIG_HEX_STRING_LEN};
+
+impl fmt::Display for FP {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "FP: [ {} ]", self.x)
+    }
+}
+
+impl fmt::Debug for FP {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "FP: [ {} ]", self.x)
+    }
+}
+
+impl PartialEq for FP {
+    fn eq(&self, other: &FP) -> bool {
+        return self.x == other.x;
+    }
+}
 
 impl FP {
 
@@ -80,6 +101,23 @@ impl FP {
 	pub fn tostring(&mut self) -> String {
         let s=self.redc().tostring();
         return s;
+    }
+
+    pub fn to_hex(&self) -> String {
+        let mut ret: String = String::with_capacity(2 * BIG_HEX_STRING_LEN);
+        ret.push_str(&format!("{}", self.x.to_hex()));
+        return ret;
+    }
+
+    pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP {
+        FP {
+            x: BIG::from_hex_iter(iter)
+        }
+    }
+
+    pub fn from_hex(val: String) -> FP {
+        let mut iter = val.split_whitespace();
+        return FP::from_hex_iter(&mut iter);
     }
 
 /* reduce this mod Modulus */
@@ -150,7 +188,7 @@ impl FP {
 
         v = v - ((v >> 1) & 0x55555555);                 
         v = (v & 0x33333333) + ((v >> 2) & 0x33333333);  
-        let r= ((   ((v + (v >> 4)) & 0xF0F0F0F)   * 0x1010101) >> 24) as usize;
+        let r= ((   ((v + (v >> 4)) & 0xF0F0F0F).wrapping_mul(0x1010101)) >> 24) as usize;
         return r+1;    
     }
 

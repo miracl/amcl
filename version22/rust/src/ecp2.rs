@@ -17,6 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use std::fmt;
+use std::str::SplitWhitespace;
+
+#[derive(Copy, Clone)]
 pub struct ECP2 {
 	x:FP2,
 	y:FP2,
@@ -26,6 +30,7 @@ pub struct ECP2 {
 
 
 use rom;
+use rom::BIG_HEX_STRING_LEN;
 //mod fp2;
 use fp2::FP2;
 //mod fp;
@@ -37,6 +42,27 @@ use big::BIG;
 //mod rand;
 //mod hash256;
 //mod rom;
+
+impl fmt::Display for ECP2 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP2: [ {}, {}, {}, {} ]", self.inf, self.x, self.y, self.z)
+	}
+}
+
+impl fmt::Debug for ECP2 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP2: [ {}, {}, {}, {} ]", self.inf, self.x, self.y, self.z)
+	}
+}
+
+impl PartialEq for ECP2 {
+	fn eq(&self, other: &ECP2) -> bool {
+		return (self.inf == other.inf) &&
+			(self.x == other.x) &&
+			(self.y == other.y) &&
+			(self.z == other.z);
+	}
+}
 
 #[allow(non_snake_case)]
 impl ECP2 {
@@ -251,7 +277,29 @@ impl ECP2 {
 		if self.is_infinity() {return String::from("infinity")}
 		self.affine();
 		return format!("({},{})",self.x.tostring(),self.y.tostring());
-}	
+}
+
+	pub fn to_hex(&self) -> String {
+		let mut ret: String = String::with_capacity(7 * BIG_HEX_STRING_LEN);
+		ret.push_str(&format!("{} {} {} {}", self.inf, self.x.to_hex(), self.y.to_hex(), self.z.to_hex()));
+		return ret;
+	}
+
+	pub fn from_hex_iter(iter: &mut SplitWhitespace) -> ECP2 {
+		let mut ret:ECP2 = ECP2::new();
+		if let Some(x) = iter.next() {
+			ret.inf = x == "true";
+			ret.x = FP2::from_hex_iter(iter);
+			ret.y = FP2::from_hex_iter(iter);
+			ret.z = FP2::from_hex_iter(iter);
+		}
+		return ret;
+	}
+
+	pub fn from_hex(val: String) -> ECP2 {
+		let mut iter = val.split_whitespace();
+		return ECP2::from_hex_iter(&mut iter);
+	}
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 	pub fn rhs(x:&mut FP2) -> FP2 {

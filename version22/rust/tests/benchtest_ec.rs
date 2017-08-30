@@ -17,23 +17,26 @@ specific language governing permissions and limitations
 under the License.
 */
 
-mod ecdh;
-mod ecp;
-mod ecp2;
-mod fp;
-mod fp2;
-mod fp4;
-mod fp12;
-mod big;
-mod dbig;
-mod rand;
-mod hash256;
-mod hash384;
-mod hash512;
-mod aes;
-mod rom;
-mod ff;
-mod rsa;
+extern crate amcl;
+
+use  amcl::ecdh;
+use  amcl::ecp;
+use  amcl::ecp2;
+use  amcl::fp;
+use  amcl::fp2;
+use  amcl::fp4;
+use  amcl::fp12;
+use  amcl::big;
+use  amcl::dbig;
+use  amcl::rand;
+use  amcl::hash256;
+use  amcl::hash384;
+use  amcl::hash512;
+use  amcl::aes;
+use  amcl::rom;
+use  amcl::ff;
+use  amcl::rsa;
+
 use rand::RAND;
 use ecp::ECP;
 use big::BIG;
@@ -44,7 +47,8 @@ const MIN_ITERS:isize=10;
 const MIN_TIME: isize=10;
 
 #[allow(non_snake_case)]
-fn main()
+#[test]
+fn benchtest_ec()
 {
 	let mut raw:[u8;100]=[0;100];	
 	let mut fail=false;
@@ -177,4 +181,5 @@ fn main()
 		println!("All tests pass");
 	}
 
+	assert!(!fail)
 }
