@@ -60,10 +60,10 @@ impl RAND {
 		for i in 0..RAND_NK { /* calculate next NK values */
 			if k==RAND_NK {k=0}
 			let t=self.ira[k];
-			let pdiff=t-self.ira[i]-self.borrow;
+			let pdiff=t.wrapping_sub(self.ira[i]).wrapping_sub(self.borrow);
 			if pdiff<t {self.borrow=0}
 			if pdiff>t {self.borrow=1}
-			self.ira[i]=pdiff; 
+			self.ira[i]=pdiff;
 			k+=1;
 		}
 		return self.ira[0];
@@ -79,7 +79,7 @@ impl RAND {
 			let inn=(RAND_NV*i)%RAND_NK;
 			self.ira[inn]^=m;      /* note XOR */
 			let t=m;
-			m=sd-m;
+			m=sd.wrapping_sub(m);
 			sd=t;
 		}
 		for _ in 0..10000 {self.sbrand();} /* "warm-up" & stir the generator */

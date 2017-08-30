@@ -358,7 +358,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
 	pub fn nbits(&mut self) -> usize {
 		let mut k=rom::NLEN-1;
 		self.norm();
-		while (k as isize)>=0 && self.w[k]==0 {k=k-1}
+		while (k as isize)>=0 && self.w[k]==0 {k=k.wrapping_sub(1)}
 		if (k as isize) <0 {return 0}
 		let mut bts=rom::BASEBITS*k;
 		let mut c=self.w[k];
@@ -1057,7 +1057,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
                 if (rom::MCONST==1) {
                     m=d.w[i];
                 } else {
-                    m=(rom::MCONST*d.w[i])&rom::BMASK;
+                    m=(rom::MCONST.wrapping_mul(d.w[i]))&rom::BMASK;
                 }
             }
 
