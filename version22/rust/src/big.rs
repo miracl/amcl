@@ -257,15 +257,15 @@ impl BIG {
 #[cfg(target_pointer_width = "64")]
     pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
         let x0=a&rom::HMASK;
-        let x1=(a>>rom::HBITS);
+        let x1=a>>rom::HBITS;
         let y0=b&rom::HMASK;
-        let y1=(b>>rom::HBITS);
+        let y1=b>>rom::HBITS;
         let mut bot=x0*y0;
         let mut top=x1*y1;
         let mid=x0*y1+x1*y0;
         let u0=mid&rom::HMASK;
-        let u1=(mid>>rom::HBITS);
-        bot+= (u0 <<rom::HBITS);
+        let u1=mid>>rom::HBITS;
+        bot+= u0 <<rom::HBITS;
         bot+=c; bot+=r;
         top+=u1;
         let carry=bot>>rom::BASEBITS;
@@ -1004,7 +1004,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
 #[cfg(target_pointer_width = "64")]
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
-        let mut carry = 0 as Chunk;
+        let mut carry;
 
         for i in 0 ..rom::NLEN {
             carry=0;
@@ -1021,7 +1021,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
 #[cfg(target_pointer_width = "64")]
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();
-        let mut carry = 0 as Chunk;
+        let mut carry;
 
         for i in 0 ..rom::NLEN {
             carry=0;
@@ -1048,13 +1048,13 @@ alise BIG - force all digits < 2^rom::BASEBITS */
     fn monty(d: &mut DBIG) -> BIG {
         let mut b=BIG::new();     
         let md=BIG::new_ints(&rom::MODULUS);
-        let mut carry=0 as Chunk; 
-        let mut m=0 as Chunk;
+        let mut carry;
+        let mut m;
         for i in 0 ..rom::NLEN {
             if rom::MCONST==-1 { 
                 m=(-d.w[i])&rom::BMASK;
             } else {
-                if (rom::MCONST==1) {
+                if rom::MCONST==1 {
                     m=d.w[i];
                 } else {
                     m=(rom::MCONST.wrapping_mul(d.w[i]))&rom::BMASK;
