@@ -66,7 +66,7 @@ impl DBIG {
             carry= (self.w[i]<<(rom::BASEBITS-m))&rom::BMASK;
             t.set(i-rom::NLEN+1,nw);
         }
-        self.w[rom::NLEN-1]&=(((1 as Chunk)<<m)-1);
+        self.w[rom::NLEN-1]&=((1 as Chunk)<<m)-1;
         return t;
     }
 

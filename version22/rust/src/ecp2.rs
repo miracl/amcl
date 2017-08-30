@@ -144,7 +144,7 @@ impl ECP2 {
 		if d==0 {bd=false}
 		else {bd=true}
 
-		self.inf=(self.inf!=(self.inf!=Q.inf)&&bd);
+		self.inf=self.inf!=(self.inf!=Q.inf)&&bd;
 	}
 
 /* return 1 if b==c, no branching */

@@ -204,7 +204,7 @@ impl ECP {
 		if rom::CURVETYPE!=rom::EDWARDS {
 			let mut bd=true;
 			if d==0 {bd=false}
-			self.inf=(self.inf!=((self.inf!=Q.inf)&&bd));
+			self.inf=self.inf!=((self.inf!=Q.inf)&&bd);
 		}
 	}
 
