@@ -56,8 +56,8 @@ extern const BIG_XXX CURVE_Bnx_ZZZ; /**< BN curve x parameter */
 
 extern const BIG_XXX CURVE_Cru_ZZZ; /**< BN curve Cube Root of Unity */
 
-extern const BIG_XXX CURVE_Fra_ZZZ; /**< real part of BN curve Frobenius Constant */
-extern const BIG_XXX CURVE_Frb_ZZZ; /**< imaginary part of BN curve Frobenius Constant */
+extern const BIG_XXX Fra_YYY; /**< real part of BN curve Frobenius Constant */
+extern const BIG_XXX Frb_YYY; /**< imaginary part of BN curve Frobenius Constant */
 
 
 extern const BIG_XXX CURVE_W_ZZZ[2];	 /**< BN curve constant for GLV decomposition */
@@ -253,5 +253,12 @@ extern void ECP_ZZZ_mul(ECP_ZZZ *P,BIG_XXX b);
 	@param f BIG number multiplier
  */
 extern void ECP_ZZZ_mul2(ECP_ZZZ *P,ECP_ZZZ *Q,BIG_XXX e,BIG_XXX f);
+
+/**	@brief Maps random BIG to curve point of correct order
+ *
+	@param Q ECP instance of correct order
+	@param w OCTET byte array to be mapped
+ */
+extern void ECP_ZZZ_mapit(ECP_ZZZ *Q,octet *w);
 
 #endif

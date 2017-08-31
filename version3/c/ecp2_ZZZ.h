@@ -50,6 +50,11 @@ extern const int CURVE_B_I_ZZZ;		/**< Elliptic curve B parameter */
 extern const BIG_XXX CURVE_B_ZZZ;     /**< Elliptic curve B parameter */
 extern const BIG_XXX CURVE_Order_ZZZ; /**< Elliptic curve group order */
 extern const BIG_XXX CURVE_Cof_ZZZ;   /**< Elliptic curve cofactor */
+extern const BIG_XXX CURVE_Bnx_ZZZ;   /**< Elliptic curve parameter */
+
+extern const BIG_XXX Fra_YYY; /**< real part of BN curve Frobenius Constant */
+extern const BIG_XXX Frb_YYY; /**< imaginary part of BN curve Frobenius Constant */
+
 
 /* Generator point on G1 */
 extern const BIG_XXX CURVE_Gx_ZZZ; /**< x-coordinate of generator point in group G1  */
@@ -200,6 +205,11 @@ extern void ECP2_ZZZ_frob(ECP2_ZZZ *P,FP2_YYY *f);
  */
 extern void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ *Q,BIG_XXX *b);
 
-
+/**	@brief Maps random BIG to curve point of correct order
+ *
+	@param P ECP2 instance of correct order
+	@param W OCTET byte array to be mapped
+ */
+extern void ECP2_ZZZ_mapit2(ECP2_ZZZ *P,octet *w);
 
 #endif

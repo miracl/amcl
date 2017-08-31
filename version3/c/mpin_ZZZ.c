@@ -112,69 +112,6 @@ static int unmap(BIG_XXX u,int *cb,ECP_ZZZ *P)
     return r;
 }
 
-/* map octet string containing hash to point on curve of correct order */
-static void mapit(octet *h,ECP_ZZZ *P)
-{
-    BIG_XXX q,x,c;
-    BIG_XXX_fromBytes(x,h->val);
-    BIG_XXX_rcopy(q,Modulus_YYY);
-    BIG_XXX_mod(x,q);
-    int k=0;
-//printf("x= "); BIG_XXX_output(x); printf("\n");
-
-
-    while (!ECP_ZZZ_setx(P,x,0))
-    {
-        BIG_XXX_inc(x,1);
-        k++;
-    }
-//printf("k= %d\n",k);
-    BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
-    ECP_ZZZ_mul(P,c);
-}
-
-/* needed for SOK */
-/* static void mapit2(octet *h,ECP2_ZZZ *Q) */
-/* { */
-/* 	BIG_XXX q,one,Fx,Fy,x,hv; */
-/* 	FP2_YYY X; */
-/* 	ECP2_ZZZ T,K; */
-/* 	BIG_XXX_fromBytes(hv,h->val); */
-/* 	BIG_XXX_rcopy(q,Modulus_YYY); */
-/* 	BIG_XXX_one(one); */
-/* 	BIG_XXX_mod(hv,q); */
-
-/* 	for (;;) */
-/* 	{ */
-/* 		FP2_YYY_from_BIGs(&X,one,hv); */
-/* 		if (ECP2_ZZZ_setx(Q,&X)) break; */
-/* 		BIG_XXX_inc(hv,1);  */
-/* 	} */
-
-/* /\* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez *\/ */
-/* 	BIG_XXX_rcopy(Fx,Fra_YYY); */
-/* 	BIG_XXX_rcopy(Fy,Frb_YYY); */
-/* 	FP2_YYY_from_BIGs(&X,Fx,Fy); */
-/* 	BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ); */
-
-/* 	ECP2_ZZZ_copy(&T,Q); */
-/* 	ECP2_ZZZ_mul(&T,x); */
-/* 	ECP2_ZZZ_neg(&T);  /\* our x is negative *\/ */
-/* 	ECP2_ZZZ_copy(&K,&T); */
-/* 	ECP2_ZZZ_dbl(&K); */
-/* 	ECP2_ZZZ_add(&K,&T); */
-/* 	ECP2_ZZZ_affine(&K); */
-
-/* 	ECP2_ZZZ_frob(&K,&X); */
-/* 	ECP2_ZZZ_frob(Q,&X); ECP2_ZZZ_frob(Q,&X); ECP2_ZZZ_frob(Q,&X);  */
-/* 	ECP2_ZZZ_add(Q,&T); */
-/* 	ECP2_ZZZ_add(Q,&K); */
-/* 	ECP2_ZZZ_frob(&T,&X); ECP2_ZZZ_frob(&T,&X); */
-/* 	ECP2_ZZZ_add(Q,&T); */
-/* 	ECP2_ZZZ_affine(Q); */
-/* } */
-
-
 /* these next two functions implement elligator squared - http://eprint.iacr.org/2014/043 */
 /* Elliptic curve point E in format (0x04,x,y} is converted to form {0x0-,u,v} */
 /* Note that u and v are indistinguisible from random strings */
@@ -298,7 +235,7 @@ int MPIN_ZZZ_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
     if (res==0)
     {
         mhashit(sha,-1,CID,&H);
-        mapit(&H,&R);
+        ECP_ZZZ_mapit(&R,&H);
 
         pin%=MAXPIN_ZZZ;
 
@@ -361,7 +298,10 @@ int MPIN_ZZZ_GET_G1_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     {
         if (!ECP_ZZZ_fromOctet(&P,G)) res=MPIN_INVALID_POINT;
     }
-    else mapit(G,&P);
+    else 
+	{
+		ECP_ZZZ_mapit(&P,G);
+	}
 
     if (res==0)
     {
@@ -441,7 +381,8 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
         BIG_XXX_fromBytes(x,X->val);
 
     mhashit(sha,-1,CLIENT_ID,&H);
-    mapit(&H,&P);
+
+    ECP_ZZZ_mapit(&P,&H);
 
     if (!ECP_ZZZ_fromOctet(&T,TOKEN)) res=MPIN_INVALID_POINT;
 
@@ -461,7 +402,8 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
                 ECP_ZZZ_add(&T,&W);					// SEC=s.H(ID)+s.H(T|ID)
             }
             mhashit(sha,date,&H,&H);
-            mapit(&H,&W);
+
+            ECP_ZZZ_mapit(&W,&H);
             if (xID!=NULL)
             {
                 PAIR_ZZZ_G1mul(&P,x);				// P=x.H(ID)
@@ -528,7 +470,7 @@ int MPIN_ZZZ_GET_CLIENT_PERMIT(int sha,int date,octet *S,octet *CID,octet *CTT)
 
     mhashit(sha,date,CID,&H);
 
-    mapit(&H,&P);
+    ECP_ZZZ_mapit(&P,&H);
 
 //printf("P= "); ECP_ZZZ_output(&P); printf("\n");
 //exit(0);
@@ -554,12 +496,13 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
     char h[MODBYTES_XXX];
     octet H= {0,sizeof(h),h};
     ECP_ZZZ P,R;
+	BIG_XXX x;
 
 #ifdef USE_ANONYMOUS
-    mapit(CID,&P);
+    ECP_ZZZ_mapit(&P,CID);
 #else
     mhashit(sha,-1,CID,&H);
-    mapit(&H,&P);
+    ECP_ZZZ_mapit(&P,&H);
 #endif
 
     ECP_ZZZ_toOctet(HID,&P);  // new
@@ -572,7 +515,7 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 #else
         mhashit(sha,date,&H,&H);
 #endif
-        mapit(&H,&R);
+        ECP_ZZZ_mapit(&R,&H);
         ECP_ZZZ_add(&P,&R);
         ECP_ZZZ_toOctet(HTID,&P);
     }
@@ -787,13 +730,14 @@ int MPIN_ZZZ_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
     ECP2_ZZZ Q;
     FP2_YYY qx,qy;
     FP12_YYY g;
+	BIG_XXX x;
     int res=0;
 
     if (!ECP_ZZZ_fromOctet(&T,TOKEN)) res=MPIN_INVALID_POINT;
 
     if (res==0)
     {
-        mapit(CID,&P);
+        ECP_ZZZ_mapit(&P,CID);
         if (CP!=NULL)
         {
             if (!ECP2_ZZZ_fromOctet(&Q,CP)) res=MPIN_INVALID_POINT;
@@ -1059,30 +1003,3 @@ int MPIN_ZZZ_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa)
     return res;
 }
 
-/*
-int main()
-{
-	ECP2_ZZZ X;
-	FP2_YYY x,y,rhs;
-	BIG_XXX r;
-	char hcid[HASH_BYTES],client_id[100];
-	octet HCID={0,sizeof(hcid),hcid};
-	octet CLIENT_ID={0,sizeof(client_id),client_id};
-
-	OCT_jstring(&CLIENT_ID,"testUser@certivox.com");
-	HASH_ID(&CLIENT_ID,&HCID);
-
-	printf("Client ID= "); OCT_output_string(&CLIENT_ID); printf("\n");
-
-	mapit2(&HCID,&X);
-
-	ECP2_ZZZ_output(&X);
-
-	BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
-
-	ECP2_ZZZ_mul(&X,r);
-
-	ECP2_ZZZ_output(&X);
-
-}
-*/

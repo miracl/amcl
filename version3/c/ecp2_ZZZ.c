@@ -641,6 +641,85 @@ void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ Q[4],BIG_XXX u[4])
     ECP2_ZZZ_affine(P);
 }
 
+
+/* Map to hash value to point on G2 from random BIG */
+void ECP2_ZZZ_mapit2(ECP2_ZZZ *Q,octet *W)
+{
+    BIG_XXX q,one,Fx,Fy,x,hv;
+    FP2_YYY X;
+#if (PAIRING_FRIENDLY_ZZZ == BN)
+    ECP2_ZZZ T,K;
+#elif (PAIRING_FRIENDLY_ZZZ == BLS)
+    ECP2_ZZZ xQ, x2Q;
+#endif
+	BIG_XXX_fromBytes(hv,W->val);
+    BIG_XXX_rcopy(q,Modulus_ZZZ);
+    BIG_XXX_one(one);
+    BIG_XXX_mod(hv,q);
+
+    for (;;)
+    {
+        FP2_YYY_from_BIGs(&X,one,hv);
+        if (ECP2_ZZZ_setx(Q,&X)) break;
+        BIG_XXX_inc(hv,1);
+    }
+
+    BIG_XXX_rcopy(Fx,Fra_YYY);
+    BIG_XXX_rcopy(Fy,Frb_YYY);
+    FP2_YYY_from_BIGs(&X,Fx,Fy);
+    BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
+
+#if (PAIRING_FRIENDLY_ZZZ == BN)
+
+    /* Faster Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
+    /* Q -> xQ + F(3xQ) + F(F(xQ)) + F(F(F(Q))). */
+    ECP2_ZZZ_copy(&T,Q);
+    ECP2_ZZZ_mul(&T,x);
+    ECP2_ZZZ_neg(&T);   // our x is negative
+    ECP2_ZZZ_copy(&K,&T);
+    ECP2_ZZZ_dbl(&K);
+    ECP2_ZZZ_add(&K,&T);
+    ECP2_ZZZ_affine(&K);
+
+    ECP2_ZZZ_frob(&K,&X);
+    ECP2_ZZZ_frob(Q,&X);
+    ECP2_ZZZ_frob(Q,&X);
+    ECP2_ZZZ_frob(Q,&X);
+    ECP2_ZZZ_add(Q,&T);
+    ECP2_ZZZ_add(Q,&K);
+    ECP2_ZZZ_frob(&T,&X);
+    ECP2_ZZZ_frob(&T,&X);
+    ECP2_ZZZ_add(Q,&T);
+    ECP2_ZZZ_affine(Q);
+
+#elif (PAIRING_FRIENDLY_ZZZ == BLS)
+
+    /* Efficient hash maps to G2 on BLS curves - Budroni, Pintore */
+    /* Q -> x2Q -xQ -Q +F(xQ -Q) +F(F(2Q)) */
+
+    ECP2_ZZZ_copy(&xQ,Q);
+    ECP2_ZZZ_mul(&xQ,x);
+    ECP2_ZZZ_copy(&x2Q,&xQ);
+    ECP2_ZZZ_mul(&x2Q,x);
+
+    ECP2_ZZZ_sub(&x2Q,&xQ);
+    ECP2_ZZZ_sub(&x2Q,Q);
+
+    ECP2_ZZZ_sub(&xQ,Q);
+    ECP2_ZZZ_frob(&xQ,&X);
+
+    ECP2_ZZZ_dbl(Q);
+    ECP2_ZZZ_frob(Q,&X);
+    ECP2_ZZZ_frob(Q,&X);
+
+    ECP2_ZZZ_add(Q,&x2Q);
+    ECP2_ZZZ_add(Q,&xQ);
+
+    ECP2_ZZZ_affine(Q);
+
+#endif
+}
+
 /*
 
 int main()

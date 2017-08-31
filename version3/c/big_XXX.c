@@ -175,7 +175,7 @@ void BIG_XXX_fromBytesLen(BIG_XXX a,char *b,int s)
     int i,len=s;
     BIG_XXX_zero(a);
 
-    if (s>MODBYTES_XXX) s=MODBYTES_XXX;
+    if (len>MODBYTES_XXX) len=MODBYTES_XXX;
     for (i=0; i<len; i++)
     {
         BIG_XXX_fshl(a,8);
