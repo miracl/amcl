@@ -537,7 +537,7 @@ var ECDH_ZZZ = {
 		for (i=0;i<this.EFS;i++) VZ[2*this.EFS+1+i]=Z[i];
 
 
-		var K=this.KDF2(sha,VZ,P1,EFS);
+		var K=this.KDF2(sha,VZ,P1,this.EFS);
 
 		for (i=0;i<this.EAS;i++) {K1[i]=K[i]; K2[i]=K[this.EAS+i];} 
 
