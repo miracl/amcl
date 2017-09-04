@@ -94,8 +94,8 @@ ECP2_ZZZ.prototype={
 		if (this.is_infinity() && Q.is_infinity()) return true;
 		if (this.is_infinity() || Q.is_infinity()) return false;
 
-		var a=new FP_YYY(0); a.copy(this.x);
-		var b=new FP_YYY(0); b.copy(Q.x);
+		var a=new FP2_YYY(0); a.copy(this.x);
+		var b=new FP2_YYY(0); b.copy(Q.x);
 
 		a.copy(this.x); a.mul(Q.z); a.reduce();
 		b.copy(Q.x); b.mul(this.z); b.reduce();

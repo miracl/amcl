@@ -56,7 +56,7 @@ ECP_ZZZ.prototype={
 		}
 		if (ECP_ZZZ.CURVETYPE==ECP_ZZZ.MONTGOMERY)
 		{
-			this.INF= (z.iszilch());
+			this.INF= (this.z.iszilch());
 		}		
 		return this.INF;
 	},
@@ -341,7 +341,7 @@ ECP_ZZZ.prototype={
 				var b=new FP_YYY(0); //FP b=new FP(0);
 //System.out.println("Into dbl");
 				if (ROM_CURVE_ZZZ.CURVE_B_I==0)
-					b.copy(new FP(new BIG(ROM_CURVE_ZZZ.CURVE_B)));
+					b.rcopy(ROM_CURVE_ZZZ.CURVE_B);
 //System.out.println("b= "+b.toString());
 				t0.sqr();  //1    x^2
 				t1.sqr();  //2    y^2
