@@ -902,34 +902,34 @@ var MPIN_ZZZ = {
     */
     GET_DVS_KEYPAIR: function(rng, Z, Pa) {
 
-        Q = new ctx.ECP2();
-        var r = new ctx.BIG(0);
-        r.rcopy(ctx.ROM_CURVE.CURVE_Order);
+        Q = new ECP2_ZZZ();
+        var r = new BIG_ZZZ(0);
+        r.rcopy(ROM_CURVE_ZZZ.CURVE_Order);
 
         if (rng != null)
             this.RANDOM_GENERATE(rng, Z);
 
-        var z = ctx.BIG.fromBytes(Z);
+        var z = BIG_ZZZ.fromBytes(Z);
         z.invmodp(r);
 
-        var pa = new ctx.BIG(0);
-        pa.rcopy(ctx.ROM_CURVE.CURVE_Pxa);
-        var pb = new ctx.BIG(0);
-        pb.rcopy(ctx.ROM_CURVE.CURVE_Pxb);
-        var QX = new ctx.FP2(0);
+        var pa = new BIG_ZZZ(0);
+        pa.rcopy(ROM_CURVE_ZZZ.CURVE_Pxa);
+        var pb = new BIG_ZZZ(0);
+        pb.rcopy(ROM_CURVE_ZZZ.CURVE_Pxb);
+        var QX = new FP2_YYY(0);
         QX.bset(pa, pb);
-        var pa = new ctx.BIG(0);
-        pa.rcopy(ctx.ROM_CURVE.CURVE_Pya);
-        var pb = new ctx.BIG(0);
-        pb.rcopy(ctx.ROM_CURVE.CURVE_Pyb);
-        var QY = new ctx.FP2(0);
+        var pa = new BIG_ZZZ(0);
+        pa.rcopy(ROM_CURVE_ZZZ.CURVE_Pya);
+        var pb = new BIG_ZZZ(0);
+        pb.rcopy(ROM_CURVE_ZZZ.CURVE_Pyb);
+        var QY = new FP2_YYY(0);
         QY.bset(pa, pb);
 
         Q.setxy(QX, QY);
         if (Q.INF)
-            return MPIN.INVALID_POINT;
+            return this.INVALID_POINT;
 
-        Q = ctx.PAIR.G2mul(Q, z);
+        Q = PAIR_ZZZ.G2mul(Q, z);
         Q.toBytes(Pa);
         return 0;
     }
