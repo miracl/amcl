@@ -666,51 +666,67 @@ var MPIN_ZZZ = {
 	},
 
         /* One pass MPIN_ZZZ Client */
-	CLIENT: function(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,xID,xCID,PERMIT,TimeValue,Y)
+	CLIENT: function(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,xID,xCID,PERMIT,TimeValue,Y,Message)
 	{
 
-                var rtn=0;
-                var pID;
-                if (date == 0) {
-                  pID = xID;
+        var rtn=0;
+        var pID;
+        var M = [];
+        if (date == 0) {
+            pID = xID;
 		} else {
-                  pID = xCID;
-                  xID = null;
+            pID = xCID;
+            xID = null;
 		}
 
-                rtn = this.CLIENT_1(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,xID,xCID,PERMIT);
-                if (rtn != 0)
-                  return rtn;
+        rtn = this.CLIENT_1(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,xID,xCID,PERMIT);
+        if (rtn != 0)
+          return rtn;
 
-                this.GET_Y(sha,TimeValue,pID,Y);
+    	M = pID.slice();
 
-                rtn = this.CLIENT_2(X,Y,SEC);
-                if (rtn != 0)
-                  return rtn;
+    	if ((Message != undefined) || (Message != null)) {
+            for (var i = 0; i < Message.length; i++)
+                M.push(Message[i]);
+        }
 
-                return 0;
-        },
+        this.GET_Y(sha,TimeValue,pID,Y);
+
+        rtn = this.CLIENT_2(X,Y,SEC);
+        if (rtn != 0)
+          return rtn;
+
+        return 0;
+    },
 
         /* One pass MPIN_ZZZ Server */
-	SERVER: function(sha,date,HID,HTID,Y,SST,xID,xCID,mSEC,E,F,CID,TimeValue)
+	SERVER: function(sha,date,HID,HTID,Y,SST,xID,xCID,mSEC,E,F,CID,TimeValue,Message,Pa)
         {
-                var rtn=0;
-                var pID;
-                if (date == 0) {
-                  pID = xID;
-		} else {
-                  pID = xCID;
-		}
+	        var rtn=0;
+	        var pID;
+	        var M = [];
+        	if (date == 0) {
+              	pID = xID;
+			} else {
+              	pID = xCID;
+			}
 
-                this.SERVER_1(sha,date,CID,HID,HTID);
+            this.SERVER_1(sha,date,CID,HID,HTID);
 
-                this.GET_Y(sha,TimeValue,pID,Y);
+            M = pID.slice();
+
+            if ((Message != undefined) || (Message != null)) {
+                for (var i = 0; i < Message.length; i++)
+                    M.push(Message[i]);
+            }
+
+            this.GET_Y(sha,TimeValue,pID,Y);
   
-                rtn = this.SERVER_2(date,HID,HTID,Y,SST,xID,xCID,mSEC,E,F);
-                if (rtn != 0)
-                  return rtn;
+            rtn = this.SERVER_2(date,HID,HTID,Y,SST,xID,xCID,mSEC,E,F);
+            if (rtn != 0)
+              	return rtn;
 
-                return 0;
+            return 0;
         },
 
 /* Functions to support M-Pin Full */
@@ -876,5 +892,45 @@ var MPIN_ZZZ = {
 		for (var i=0;i<this.PAS;i++) SK[i]=t[i];
 
 		return 0;
-	}
+	},
+
+    /* Generate a public key and the corresponding z for the key-escrow less scheme */
+    /*
+        if R==NULL then Z is passed in
+        if R!=NULL then Z is passed out
+        Pa=(z^-1).Q
+    */
+    GET_DVS_KEYPAIR: function(rng, Z, Pa) {
+
+        Q = new ctx.ECP2();
+        var r = new ctx.BIG(0);
+        r.rcopy(ctx.ROM_CURVE.CURVE_Order);
+
+        if (rng != null)
+            this.RANDOM_GENERATE(rng, Z);
+
+        var z = ctx.BIG.fromBytes(Z);
+        z.invmodp(r);
+
+        var pa = new ctx.BIG(0);
+        pa.rcopy(ctx.ROM_CURVE.CURVE_Pxa);
+        var pb = new ctx.BIG(0);
+        pb.rcopy(ctx.ROM_CURVE.CURVE_Pxb);
+        var QX = new ctx.FP2(0);
+        QX.bset(pa, pb);
+        var pa = new ctx.BIG(0);
+        pa.rcopy(ctx.ROM_CURVE.CURVE_Pya);
+        var pb = new ctx.BIG(0);
+        pb.rcopy(ctx.ROM_CURVE.CURVE_Pyb);
+        var QY = new ctx.FP2(0);
+        QY.bset(pa, pb);
+
+        Q.setxy(QX, QY);
+        if (Q.INF)
+            return MPIN.INVALID_POINT;
+
+        Q = ctx.PAIR.G2mul(Q, z);
+        Q.toBytes(Pa);
+        return 0;
+    }
 };
