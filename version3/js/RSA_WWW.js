@@ -19,6 +19,21 @@
 
 /* RSA_WWW API Functions */
 
+var rsa_private_key=function(n)
+{
+	this.p=new FF_WWW(n);
+	this.q=new FF_WWW(n);
+	this.dp=new FF_WWW(n);
+	this.dq=new FF_WWW(n);
+	this.c=new FF_WWW(n);
+};
+
+var rsa_public_key=function(m)
+{
+	this.e=0;
+	this.n=new FF_WWW(m);
+};
+
 RSA_WWW= {
 	RFS: BIG_XXX.MODBYTES*FF_WWW.FFLEN,
 	SHA256 : 32,
@@ -373,19 +388,5 @@ RSA_WWW= {
 
 		g.toBytes(F);
 	}
-};
 
-RSA_WWW.rsa_private_key=function(n)
-{
-	this.p=new FF_WWW(n);
-	this.q=new FF_WWW(n);
-	this.dp=new FF_WWW(n);
-	this.dq=new FF_WWW(n);
-	this.c=new FF_WWW(n);
-};
-
-RSA_WWW.rsa_public_key=function(m)
-{
-	this.e=0;
-	this.n=new FF_WWW(m);
 };
