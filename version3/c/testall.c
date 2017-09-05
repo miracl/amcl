@@ -678,7 +678,7 @@ int mpin_BN254(csprng *RNG)
 #endif
 
 
-    rtn=MPIN_BN254_SERVER(HASH_TYPE_MPIN_BN254,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,NULL,timeValue);
+    rtn=MPIN_BN254_SERVER(HASH_TYPE_MPIN_BN254,date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,pID,NULL,timeValue,NULL);
 
 #ifdef FULL
     HASH_ID(HASH_TYPE_MPIN_BN254,&CLIENT_ID,&HSID);  // new
@@ -720,7 +720,7 @@ int mpin_BN254(csprng *RNG)
 
     // Server Second phase. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. 
     // If PIN error not required, set E and F = NULL 
-    rtn=MPIN_BN254_SERVER_2(date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF);
+    rtn=MPIN_BN254_SERVER_2(date,pHID,pHTID,&Y,&SST,pxID,pxCID,&SEC,pE,pF,NULL);
 #endif // SINGLE_PASS
 
     if (rtn!=0)

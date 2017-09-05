@@ -524,7 +524,7 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 }
 
 /* Implement M-Pin on server side */
-int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F)
+int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F,octet *Pa)
 {
     BIG_XXX px,py,y;
     FP2_YYY qx,qy;
@@ -538,7 +538,13 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
     FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
 
-    if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+    // key-escrow less scheme: use Pa instead of Q in pairing computation
+    // Q left for backward compatiblity
+    if (Pa!=NULL)
+    {
+        if (!ECP2_ZZZ_fromOctet(&Q, Pa)) res=MPIN_INVALID_POINT;
+    }
+    else if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
 
     if (res==0)
     {
@@ -880,7 +886,7 @@ void MPIN_ZZZ_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
 }
 
 /* One pass MPIN Client */
-int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *TOKEN,octet *V,octet *U,octet *UT,octet *TP,/*octet *MESSAGE,*/int TimeValue,octet *Y)
+int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *TOKEN,octet *V,octet *U,octet *UT,octet *TP,octet *MESSAGE,int TimeValue,octet *Y)
 {
     int rtn=0;
     char m[2*PFS_ZZZ+1];
@@ -897,10 +903,10 @@ int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octe
         return rtn;
 
     OCT_joctet(&M,pID);
-//    if (MESSAGE!=NULL)
-//    {
-//        OCT_joctet(&M,MESSAGE);
-//    }
+   if (MESSAGE!=NULL)
+   {
+       OCT_joctet(&M,MESSAGE);
+   }
 
     MPIN_ZZZ_GET_Y(sha,TimeValue,&M,Y);
 
@@ -912,7 +918,7 @@ int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octe
 }
 
 /* One pass MPIN Server */
-int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,/*octet *MESSAGE,*/int TimeValue)
+int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue, octet *Pa)
 {
     int rtn=0;
     char m[2*PFS_ZZZ+1];
@@ -927,16 +933,51 @@ int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,o
     MPIN_ZZZ_SERVER_1(sha,date,ID,HID,HTID);
 
     OCT_joctet(&M,pU);
-//    if (MESSAGE!=NULL)
-//    {
-//        OCT_joctet(&M,MESSAGE);
-//    }
+   if (MESSAGE!=NULL)
+   {
+       OCT_joctet(&M,MESSAGE);
+   }
 
     MPIN_ZZZ_GET_Y(sha,TimeValue,&M,Y);
 
-    rtn = MPIN_ZZZ_SERVER_2(date,HID,HTID,Y,sQ,U,UT,V,E,F);
+    rtn = MPIN_ZZZ_SERVER_2(date,HID,HTID,Y,sQ,U,UT,V,E,F,Pa);
     if (rtn != 0)
         return rtn;
 
     return 0;
+}
+
+int MPIN_ZZZ_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa)
+{
+    BIG_XXX z,r;
+    FP2_YYY qx,qy;
+    ECP2_ZZZ Q;
+    int res=0;
+
+    BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
+
+    if (R!=NULL)
+    {
+        BIG_XXX_randomnum(z,r,R);
+        Z->len=MODBYTES_XXX;
+        BIG_XXX_toBytes(Z->val,z);
+    }
+    else
+        BIG_XXX_fromBytes(z,Z->val);
+
+    BIG_XXX_invmodp(z,z,r);
+
+    FP_YYY_rcopy(&(qx.a),CURVE_Pxa_ZZZ);
+    FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
+    FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
+    FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
+    if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+
+    if (res==0)
+    {
+        PAIR_ZZZ_G2mul(&Q,z);
+        ECP2_ZZZ_toOctet(Pa,&Q);
+    }
+
+    return res;
 }

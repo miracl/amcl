@@ -521,18 +521,27 @@ var MPIN_ZZZ = {
 		//else P.toBytes(HID);
 	},
 
-/* Implement step 1 of MPin protocol on server side */
-	SERVER_2: function(date,HID,HTID,Y,SST,xID,xCID,mSEC,E,F)
+	/* Implement step 1 of MPin protocol on server side. Pa is the client public key in case of DVS, otherwise must be set to null */
+	SERVER_2: function(date,HID,HTID,Y,SST,xID,xCID,mSEC,E,F,Pa)
 	{
-		var A=new BIG_XXX(0);
-		var B=new BIG_XXX(0);
-		A.rcopy(ROM_CURVE_ZZZ.CURVE_Pxa); B.rcopy(ROM_CURVE_ZZZ.CURVE_Pxb);
-		var QX=new FP2_YYY(0); QX.bset(A,B);
-		A.rcopy(ROM_CURVE_ZZZ.CURVE_Pya); B.rcopy(ROM_CURVE_ZZZ.CURVE_Pyb);
-		var QY=new FP2_YYY(0); QY.bset(A,B);
+		if ((Pa === undefined) || (Pa == null)) {
+            var A = new BIG_XXX(0);
+            var B = new BIG_XXX(0);
+            A.rcopy(ROM_CURVE_ZZZ.CURVE_Pxa);
+            B.rcopy(ROM_CURVE_ZZZ.CURVE_Pxb);
+            var QX = new FP2_YYY(0);
+            QX.bset(A, B);
+            A.rcopy(ROM_CURVE_ZZZ.CURVE_Pya);
+            B.rcopy(ROM_CURVE_ZZZ.CURVE_Pyb);
+            var QY = new FP2_YYY(0);
+            QY.bset(A, B);
 
-		var Q=new ECP2_ZZZ();
-		Q.setxy(QX,QY);
+            var Q = new ECP2_ZZZ();
+            Q.setxy(QX, QY);
+        } else {
+            var Q = ECP2_ZZZ.fromBytes(Pa);
+            if (Q.is_infinity()) return this.INVALID_POINT;
+        }
 
 		var sQ=ECP2_ZZZ.fromBytes(SST);
 		if (sQ.is_infinity()) return this.INVALID_POINT;	
@@ -690,7 +699,7 @@ var MPIN_ZZZ = {
                 M.push(Message[i]);
         }
 
-        this.GET_Y(sha,TimeValue,pID,Y);
+        this.GET_Y(sha,TimeValue,M,Y);
 
         rtn = this.CLIENT_2(X,Y,SEC);
         if (rtn != 0)
@@ -720,9 +729,9 @@ var MPIN_ZZZ = {
                     M.push(Message[i]);
             }
 
-            this.GET_Y(sha,TimeValue,pID,Y);
+            this.GET_Y(sha,TimeValue,M,Y);
   
-            rtn = this.SERVER_2(date,HID,HTID,Y,SST,xID,xCID,mSEC,E,F);
+            rtn = this.SERVER_2(date,HID,HTID,Y,SST,xID,xCID,mSEC,E,F, Pa);
             if (rtn != 0)
               	return rtn;
 
@@ -903,24 +912,24 @@ var MPIN_ZZZ = {
     GET_DVS_KEYPAIR: function(rng, Z, Pa) {
 
         Q = new ECP2_ZZZ();
-        var r = new BIG_ZZZ(0);
+        var r = new BIG_XXX(0);
         r.rcopy(ROM_CURVE_ZZZ.CURVE_Order);
 
         if (rng != null)
             this.RANDOM_GENERATE(rng, Z);
 
-        var z = BIG_ZZZ.fromBytes(Z);
+        var z = BIG_XXX.fromBytes(Z);
         z.invmodp(r);
 
-        var pa = new BIG_ZZZ(0);
+        var pa = new BIG_XXX(0);
         pa.rcopy(ROM_CURVE_ZZZ.CURVE_Pxa);
-        var pb = new BIG_ZZZ(0);
+        var pb = new BIG_XXX(0);
         pb.rcopy(ROM_CURVE_ZZZ.CURVE_Pxb);
         var QX = new FP2_YYY(0);
         QX.bset(pa, pb);
-        var pa = new BIG_ZZZ(0);
+        var pa = new BIG_XXX(0);
         pa.rcopy(ROM_CURVE_ZZZ.CURVE_Pya);
-        var pb = new BIG_ZZZ(0);
+        var pb = new BIG_XXX(0);
         pb.rcopy(ROM_CURVE_ZZZ.CURVE_Pyb);
         var QY = new FP2_YYY(0);
         QY.bset(pa, pb);
