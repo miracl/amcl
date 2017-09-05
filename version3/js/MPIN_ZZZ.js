@@ -525,21 +525,21 @@ var MPIN_ZZZ = {
 	SERVER_2: function(date,HID,HTID,Y,SST,xID,xCID,mSEC,E,F,Pa)
 	{
 		if ((Pa === undefined) || (Pa == null)) {
-            var A = new ctx.BIG(0);
-            var B = new ctx.BIG(0);
-            A.rcopy(ctx.ROM_CURVE.CURVE_Pxa);
-            B.rcopy(ctx.ROM_CURVE.CURVE_Pxb);
-            var QX = new ctx.FP2(0);
+            var A = new BIG_XXX(0);
+            var B = new BIG_XXX(0);
+            A.rcopy(ROM_CURVE_ZZZ.CURVE_Pxa);
+            B.rcopy(ROM_CURVE_ZZZ.CURVE_Pxb);
+            var QX = new FP2_YYY(0);
             QX.bset(A, B);
-            A.rcopy(ctx.ROM_CURVE.CURVE_Pya);
-            B.rcopy(ctx.ROM_CURVE.CURVE_Pyb);
-            var QY = new ctx.FP2(0);
+            A.rcopy(ROM_CURVE_ZZZ.CURVE_Pya);
+            B.rcopy(ROM_CURVE_ZZZ.CURVE_Pyb);
+            var QY = new FP2_YYY(0);
             QY.bset(A, B);
 
-            var Q = new ctx.ECP2();
+            var Q = new ECP2_ZZZ();
             Q.setxy(QX, QY);
         } else {
-            var Q = ctx.ECP2.fromBytes(Pa);
+            var Q = ECP2_ZZZ.fromBytes(Pa);
             if (Q.is_infinity()) return this.INVALID_POINT;
         }
 
@@ -699,7 +699,7 @@ var MPIN_ZZZ = {
                 M.push(Message[i]);
         }
 
-        this.GET_Y(sha,TimeValue,pID,Y);
+        this.GET_Y(sha,TimeValue,M,Y);
 
         rtn = this.CLIENT_2(X,Y,SEC);
         if (rtn != 0)
@@ -912,24 +912,24 @@ var MPIN_ZZZ = {
     GET_DVS_KEYPAIR: function(rng, Z, Pa) {
 
         Q = new ECP2_ZZZ();
-        var r = new BIG_ZZZ(0);
+        var r = new BIG_XXX(0);
         r.rcopy(ROM_CURVE_ZZZ.CURVE_Order);
 
         if (rng != null)
             this.RANDOM_GENERATE(rng, Z);
 
-        var z = BIG_ZZZ.fromBytes(Z);
+        var z = BIG_XXX.fromBytes(Z);
         z.invmodp(r);
 
-        var pa = new BIG_ZZZ(0);
+        var pa = new BIG_XXX(0);
         pa.rcopy(ROM_CURVE_ZZZ.CURVE_Pxa);
-        var pb = new BIG_ZZZ(0);
+        var pb = new BIG_XXX(0);
         pb.rcopy(ROM_CURVE_ZZZ.CURVE_Pxb);
         var QX = new FP2_YYY(0);
         QX.bset(pa, pb);
-        var pa = new BIG_ZZZ(0);
+        var pa = new BIG_XXX(0);
         pa.rcopy(ROM_CURVE_ZZZ.CURVE_Pya);
-        var pb = new BIG_ZZZ(0);
+        var pb = new BIG_XXX(0);
         pb.rcopy(ROM_CURVE_ZZZ.CURVE_Pyb);
         var QY = new FP2_YYY(0);
         QY.bset(pa, pb);
