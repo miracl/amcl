@@ -5,6 +5,9 @@ deltext=""
 if sys.platform.startswith("linux")  :
 	deltext="rm"
 	copytext="cp"
+if sys.platform.startswith("darwin")  :
+	deltext="rm"
+	copytext="cp"
 if sys.platform.startswith("win") :
 	deltext="del"
 	copytext="copy"
