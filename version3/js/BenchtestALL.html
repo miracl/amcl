@@ -6,23 +6,37 @@
 <body>
 <h1>JavaScript Benchmarks </h1>
 
-<script type="text/javascript" src="UInt64.js"></script>
-<script type="text/javascript" src="HASH256.js"></script>
-<script type="text/javascript" src="HASH384.js"></script>
-<script type="text/javascript" src="HASH512.js"></script>
-<script type="text/javascript" src="RAND.js"></script>
-<script type="text/javascript" src="AES.js"></script>
-<script type="text/javascript" src="GCM.js"></script>
-<script type="text/javascript" src="BIG_256_24.js"></script>
-<script type="text/javascript" src="DBIG_256_24.js"></script>
-<script type="text/javascript" src="FP_25519.js"></script>
-<script type="text/javascript" src="ECP_ED25519.js"></script>
-<script type="text/javascript" src="ECDH_ED25519.js"></script>
-<script type="text/javascript" src="ROM_FIELD_25519.js"></script>
-<script type="text/javascript" src="ROM_CURVE_ED25519.js"></script>
+<script type="text/javascript"src=./rand.js></script>
+<script type="text/javascript"src=./rom_curve.js></script>
+<script type="text/javascript"src=./rom_field.js></script>
+<script type="text/javascript"src=./uint64.js></script>
+<script type="text/javascript"src=./aes.js></script>
+<script type="text/javascript"src=./big.js></script>
+<script type="text/javascript"src=./gcm.js></script>
+<script type="text/javascript"src=./hash256.js></script>
+<script type="text/javascript"src=./hash384.js></script>
+<script type="text/javascript"src=./hash512.js></script>
+<script type="text/javascript"src=./sha3.js></script>
+<script type="text/javascript"src=./newhope.js></script>
+<script type="text/javascript"src=./nhs.js></script>
+<script type="text/javascript"src=./fp.js></script>
+<script type="text/javascript"src=./fp2.js></script>
+<script type="text/javascript"src=./fp4.js></script>
+<script type="text/javascript"src=./fp12.js></script>
+<script type="text/javascript"src=./ff.js></script>
+<script type="text/javascript"src=./rsa.js></script>
+<script type="text/javascript"src=./ecp.js></script>
+<script type="text/javascript"src=./ecp2.js></script>
+<script type="text/javascript"src=./ecdh.js></script>
+<script type="text/javascript"src=./pair.js></script>
+<script type="text/javascript"src=./mpin.js></script>
+<script type="text/javascript"src=./ctx.js></script>
 
 <script>
 /* test driver and function exerciser ECC functions */
+
+		var ctx1 = new CTX('ED25519');
+
 		var i,j;
 		var result;
 		var MIN_ITERS=5;
@@ -30,7 +44,7 @@
 		var fail=false;
 		var RAW=[];
 
-		var rng=new RAND();
+		var rng=new ctx1.RAND();
 
 		rng.clean();
 		for (i=0;i<100;i++) RAW[i]=i;
@@ -38,55 +52,55 @@
 		rng.seed(100,RAW);
 
 		window.document.write("Curve ED25519"+ "<br>");
-		if (ECP_ED25519.CURVETYPE==ECP_ED25519.WEIERSTRASS)
+		if (ctx1.ECP.CURVETYPE==ctx1.ECP.WEIERSTRASS)
 		{
 			window.document.write("Weierstrass parameterization "+ "<br>");
 		}		
-		if (ECP_ED25519.CURVETYPE==ECP_ED25519.EDWARDS)
+		if (ctx1.ECP.CURVETYPE==ctx1.ECP.EDWARDS)
 		{
 			window.document.write("Edwards parameterization"+ "<br>");
 		}
-		if (ECP_ED25519.CURVETYPE==ECP_ED25519.MONTGOMERY)
+		if (ctx1.ECP.CURVETYPE==ctx1.ECP.MONTGOMERY)
 		{
 			window.document.write("Montgomery parameterization"+ "<br>");
 		}
 
-		if (FP_25519.MODTYPE==FP_25519.PSEUDO_MERSENNE)
+		if (ctx1.FP.MODTYPE==ctx1.FP.PSEUDO_MERSENNE)
 		{
 			window.document.write("Pseudo-Mersenne Modulus"+ "<br>");
 		}
-		if (FP_25519.MODTYPE==FP_25519.MONTGOMERY_FRIENDLY)
+		if (ctx1.FP.MODTYPE==ctx1.FP.MONTGOMERY_FRIENDLY)
 		{
 			window.document.write("Montgomery friendly Modulus"+ "<br>");
 		}
-		if (FP_25519.MODTYPE==FP_25519.GENERALISED_MERSENNE)
+		if (ctx1.FP.MODTYPE==ctx1.FP.GENERALISED_MERSENNE)
 		{
 			window.document.write("Generalised-Mersenne Modulus"+ "<br>");
 		}
-		if (FP_25519.MODTYPE==FP_25519.NOT_SPECIAL)
+		if (ctx1.FP.MODTYPE==ctx1.FP.NOT_SPECIAL)
 		{
 			window.document.write("Not special Modulus"+ "<br>");
 		}
 
-		window.document.write("Modulus size "+FP_25519.MODBITS+ " bits"+ "<br>"); 
+		window.document.write("Modulus size "+ctx1.FP.MODBITS+ " bits"+ "<br>"); 
 
 		var r,gx,gy,s;
 		var G,WP;
 		var res=0;
 
-		G=new ECP_ED25519(0);
+		G=new ctx1.ECP(0);
 
-		gx=new BIG_256_24(0); gx.rcopy(ROM_CURVE_ED25519.CURVE_Gx);
+		gx=new ctx1.BIG(0); gx.rcopy(ctx1.ROM_CURVE.CURVE_Gx);
 
-		if (ECP_ED25519.CURVETYPE!=ECP_ED25519.MOMTGOMERY)
+		if (ctx1.ECP.CURVETYPE!=ctx1.ECP.MOMTGOMERY)
 		{
-			gy=new BIG_256_24(0); gy.rcopy(ROM_CURVE_ED25519.CURVE_Gy);
+			gy=new ctx1.BIG(0); gy.rcopy(ctx1.ROM_CURVE.CURVE_Gy);
 			G.setxy(gx,gy);
 		}
 		else G.setx(gx);
 
-		r=new BIG_256_24(0); r.rcopy(ROM_CURVE_ED25519.CURVE_Order);
-		s=BIG_256_24.randomnum(r,rng);
+		r=new ctx1.BIG(0); r.rcopy(ctx1.ROM_CURVE.CURVE_Order);
+		s=ctx1.BIG.randomnum(r,rng);
 			
 		WP=G.mul(r);
 		if (!WP.is_infinity())
@@ -105,52 +119,39 @@
 		dur=elapsed/iterations;
 		window.document.write("EC  mul - " + iterations + " iterations  ");
 		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
-</script>
-<script type="text/javascript" src="BIG_256_24.js"></script>
-<script type="text/javascript" src="DBIG_256_24.js"></script>
-<script type="text/javascript" src="FP_BN254.js"></script>
-<script type="text/javascript" src="ECP_BN254.js"></script>
-<script type="text/javascript" src="ROM_FIELD_BN254.js"></script>
-<script type="text/javascript" src="ROM_CURVE_BN254.js"></script>
-<script type="text/javascript" src="FP2_BN254.js"></script>
-<script type="text/javascript" src="FP4_BN254.js"></script>
-<script type="text/javascript" src="FP12_BN254.js"></script>
-<script type="text/javascript" src="ECP2_BN254.js"></script>
-<script type="text/javascript" src="PAIR_BN254.js"></script>
-<script type="text/javascript" src="MPIN_BN254.js"></script>
 
-<script>
-
-/* Note that reloading BIG_256_24.js and DBIG_256_24.js seems to be important for Google Chrome.. */
 
 		window.document.write("<br> Pairing-friendly Curve BN254"+ "<br>");
+
+		var ctx2 = new CTX('BN254');
+
 		var i;
 		var result;
 		var MIN_ITERS=5;
 		var MIN_TIME=5;
-		var G=new ECP_BN254(0);
-		var Q=new ECP2_BN254(0);
+		var G=new ctx2.ECP(0);
+		var Q=new ctx2.ECP2(0);
 
 
-		if (ECP_BN254.CURVE_PAIRING_TYPE==ECP_BN254.BN_CURVE)
+		if (ctx2.ECP.CURVE_PAIRING_TYPE==ctx2.ECP.BN_CURVE)
 		{
 			window.document.write("BN Pairing-Friendly Curve"+ "<br>");
 		}
-		if (ECP_BN254.CURVE_PAIRING_TYPE==ECP_BN254.BLS_CURVE)
+		if (ctx2.ECP.CURVE_PAIRING_TYPE==ctx2.ECP.BLS_CURVE)
 		{
 			window.document.write("BLS Pairing-Friendly Curve"+ "<br>");
 		}
 
-		window.document.write("Modulus size " + FP_BN254.MODBITS + " bits"+ "<br>"); 
+		window.document.write("Modulus size " + ctx2.FP.MODBITS + " bits"+ "<br>"); 
 
-		var gx=new BIG_256_24(0); gx.rcopy(ROM_CURVE_BN254.CURVE_Gx);	
-		var gy=new BIG_256_24(0); gy.rcopy(ROM_CURVE_BN254.CURVE_Gy);
+		var gx=new ctx2.BIG(0); gx.rcopy(ctx2.ROM_CURVE.CURVE_Gx);	
+		var gy=new ctx2.BIG(0); gy.rcopy(ctx2.ROM_CURVE.CURVE_Gy);
 		G.setxy(gx,gy);			
 
-		r=new BIG_256_24(0); r.rcopy(ROM_CURVE_BN254.CURVE_Order);
-		s=BIG_256_24.randomnum(r,rng);
+		r=new ctx2.BIG(0); r.rcopy(ctx2.ROM_CURVE.CURVE_Order);
+		s=ctx2.BIG.randomnum(r,rng);
 
-		var P=PAIR_BN254.G1mul(G,r);
+		var P=ctx2.PAIR.G1mul(G,r);
 
 		if (!P.is_infinity())
 		{
@@ -162,7 +163,7 @@
 		var start = performance.now();
 		iterations=0;
 		do {
-			P=PAIR_BN254.G1mul(G,s);
+			P=ctx2.PAIR.G1mul(G,s);
 			iterations++;
 			elapsed=(performance.now()-start);
 		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
@@ -170,15 +171,15 @@
 		window.document.write("G1 mul -                " + iterations + " iterations  ");
 		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
 
-		var A=new BIG_256_24(0);
-		var B=new BIG_256_24(0);
-		A.rcopy(ROM_CURVE_BN254.CURVE_Pxa); B.rcopy(ROM_CURVE_BN254.CURVE_Pxb);
-		var QX=new FP2_BN254(0); QX.bset(A,B);
-		A.rcopy(ROM_CURVE_BN254.CURVE_Pya); B.rcopy(ROM_CURVE_BN254.CURVE_Pyb);
-		var QY=new FP2_BN254(0); QY.bset(A,B);
+		var A=new ctx2.BIG(0);
+		var B=new ctx2.BIG(0);
+		A.rcopy(ctx2.ROM_CURVE.CURVE_Pxa); B.rcopy(ctx2.ROM_CURVE.CURVE_Pxb);
+		var QX=new ctx2.FP2(0); QX.bset(A,B);
+		A.rcopy(ctx2.ROM_CURVE.CURVE_Pya); B.rcopy(ctx2.ROM_CURVE.CURVE_Pyb);
+		var QY=new ctx2.FP2(0); QY.bset(A,B);
 		Q.setxy(QX,QY);
 
-		W=PAIR_BN254.G2mul(Q,r);
+		W=ctx2.PAIR.G2mul(Q,r);
 
 		if (!W.is_infinity())
 		{
@@ -189,7 +190,7 @@
 		start = performance.now();
 		iterations=0;
 		do {
-			W=PAIR_BN254.G2mul(Q,s);
+			W=ctx2.PAIR.G2mul(Q,s);
 			iterations++;
 			elapsed=(performance.now()-start);
 		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
@@ -197,10 +198,10 @@
 		window.document.write("G2 mul -                " + iterations + " iteration  ");
 		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
 
-		var w=PAIR_BN254.ate(Q,P);
-		w=PAIR_BN254.fexp(w);
+		var w=ctx2.PAIR.ate(Q,P);
+		w=ctx2.PAIR.fexp(w);
 
-		var g=PAIR_BN254.GTpow(w,r);
+		var g=ctx2.PAIR.GTpow(w,r);
 
 		if (!g.isunity())
 		{
@@ -211,7 +212,7 @@
 		start = performance.now();
 		iterations=0;
 		do {
-			g=PAIR_BN254.GTpow(w,s);
+			g=ctx2.PAIR.GTpow(w,s);
 			iterations++;
 			elapsed=(performance.now()-start);
 		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
@@ -219,20 +220,20 @@
 		window.document.write("GT pow -                " + iterations + " iteration  ");
 		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
 
-//		var fa=new BIG_256_24(0); fa.rcopy(ROM_FIELD_BN254.Fra);
-//		var fb=new BIG_256_24(0); fb.rcopy(ROM_FIELD_BN254.Frb);
-//		var f=new FP2_BN254(fa,fb); //f.bset(fa,fb);
+//		var fa=new ctx2.BIG(0); fa.rcopy(ctx2.ROM_FIELD.Fra);
+//		var fb=new ctx2.BIG(0); fb.rcopy(ctx2.ROM_FIELD.Frb);
+//		var f=new ctx2.FP2(fa,fb); //f.bset(fa,fb);
 
-//		q=new BIG_256_24(0); q.rcopy(ROM_FIELD_BN254.Modulus);
+//		q=new ctx2.BIG(0); q.rcopy(ctx2.ROM_FIELD.Modulus);
 
 /*
-		var m=new BIG_256_24(q);
+		var m=new ctx2.BIG(q);
 		m.mod(r);
 
-		var a=new BIG_256_24(s);
+		var a=new ctx2.BIG(s);
 		a.mod(m);
 
-		var b=new BIG_256_24(s);
+		var b=new ctx2.BIG(s);
 		b.div(m);
 
 		g.copy(w);
@@ -262,7 +263,7 @@
 		start = performance.now();
 		iterations=0;
 		do {
-			w=PAIR_BN254.ate(Q,P);
+			w=ctx2.PAIR.ate(Q,P);
 			iterations++;
 			elapsed=(performance.now()-start);
 		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
@@ -273,7 +274,7 @@
 		start = performance.now();
 		iterations=0;
 		do {
-			g=PAIR_BN254.fexp(w);
+			g=ctx2.PAIR.fexp(w);
 			iterations++;
 			elapsed=(performance.now()-start);
 		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
@@ -284,14 +285,14 @@
 		P.copy(G);
 		Q.copy(W);
 
-		P=PAIR_BN254.G1mul(P,s);
-		g=PAIR_BN254.ate(Q,P);
-		g=PAIR_BN254.fexp(g);
+		P=ctx2.PAIR.G1mul(P,s);
+		g=ctx2.PAIR.ate(Q,P);
+		g=ctx2.PAIR.fexp(g);
 
 		P.copy(G);
-		Q=PAIR_BN254.G2mul(Q,s);
-		w=PAIR_BN254.ate(Q,P);
-		w=PAIR_BN254.fexp(w);
+		Q=ctx2.PAIR.G2mul(Q,s);
+		w=ctx2.PAIR.ate(Q,P);
+		w=ctx2.PAIR.fexp(w);
 
 		if (!g.equals(w))
 		{
@@ -300,9 +301,9 @@
 		}
 
 		Q.copy(W);
-		g=PAIR_BN254.ate(Q,P);
-		g=PAIR_BN254.fexp(g);
-		g=PAIR_BN254.GTpow(g,s);
+		g=ctx2.PAIR.ate(Q,P);
+		g=ctx2.PAIR.fexp(g);
+		g=ctx2.PAIR.GTpow(g,s);
 
 		if (!g.equals(w))
 		{
@@ -310,27 +311,22 @@
 			fail=true;
 		}
 
-</script>
-<script type="text/javascript" src="BIG_1024_22.js"></script>
-<script type="text/javascript" src="DBIG_1024_22.js"></script>
-<script type="text/javascript" src="FF_2048.js"></script>
-<script type="text/javascript" src="RSA_2048.js"></script>
-<script>
+		window.document.write("<br> Generating 2048 bit RSA public/private key pair"+ "<br>");
 
-		var pub=new rsa_public_key(FF_2048.FFLEN);
-		var priv=new rsa_private_key(FF_2048.HFLEN);
+		var ctx3 = new CTX('RSA2048');
+
+		var pub=new ctx3.rsa_public_key(ctx3.FF.FFLEN);
+		var priv=new ctx3.rsa_private_key(ctx3.FF.HFLEN);
 
 		var M=[];
 		var C=[];
 		var P=[];
 
-		window.document.write("<br> Generating 2048 bit RSA public/private key pair"+ "<br>");
-
 		MIN_ITERS=1;
 		start = performance.now();
 		iterations=0;
 		do {
-			RSA_2048.KEY_PAIR(rng,65537,priv,pub);
+			ctx3.RSA.KEY_PAIR(rng,65537,priv,pub);
 			iterations++;
 			elapsed=(performance.now()-start);
 		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
@@ -340,12 +336,12 @@
 
 		MIN_ITERS=5;
 
-		for (i=0;i<RSA_2048.RFS;i++) M[i]=(i%128);
+		for (i=0;i<ctx3.RSA.RFS;i++) M[i]=(i%128);
 
 		start = performance.now();
 		iterations=0;
 		do {
-			RSA_2048.ENCRYPT(pub,M,C);
+			ctx3.RSA.ENCRYPT(pub,M,C);
 			iterations++;
 			elapsed=(performance.now()-start);
 		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
@@ -356,7 +352,7 @@
 		start = performance.now();
 		iterations=0;
 		do {
-			RSA_2048.DECRYPT(priv,C,P);
+			ctx3.RSA.DECRYPT(priv,C,P);
 			iterations++;
 			elapsed=(performance.now()-start);
 		} while (elapsed<MIN_TIME*1000 || iterations<MIN_ITERS);
@@ -365,7 +361,7 @@
 		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
 
 		var cmp=true;
-		for (i=0;i<RSA_2048.RFS;i++)
+		for (i=0;i<ctx3.RSA.RFS;i++)
 		{
 			if (P[i]!=M[i]) cmp=false;
 		}

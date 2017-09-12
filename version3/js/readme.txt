@@ -1,39 +1,46 @@
-Namespaces are sinulated to separate different curves.
+Suppose you want to implement ECDH with NIST256 elliptic curve. First you need to initialize the context:
 
-To this end the BIG type is renamed to BIG_XXX, where XXX can be changed to 
-describe the size of the BIG variable. Similarily the FP type is renamed
-FP_YYY, where YYY reflects the modulus used. Also the ECP type is renamed
-ECP_ZZZ, where ZZZ describes the actual curve. Function names are also 
-decorated in the same way.
+```
+var ctx = new CTX("NIST256");
+```
+then you can call the functions as follows:
+```
+ctx.ECDH.KEY_PAIR_GENERATE(...);
+ctx.ECDH.ECPSVDP_DH(...);
+```
+If you need to use more than one elliptic curve in the same script you only need to initialize two different contexts, for example
+```
+var ctx1 = new CTX("NIST256");
+var ctx2 = new CTX("C25519");
+```
+The following is the list of all elliptic curves supported by MCJS
+```
+['ED25519', 'C25519', 'C41417', 'GOLDILOCKS', 'NIST256', 'NIST384','NIST521', 'BRAINPOOL', 'ANSSI', 'HIFIVE', 'NUMS256W', 'NUMS256E', 'NUMS384W', 'NUMS384E', 'NUMS512W', 'NUMS512E', 'BN254', 'BN254CX', 'BLS383'];
+```
 
-So for example to support both ED25519 and the NIST P256 curve, we would 
-need to create BIG_256, FP_25519, ECP_ED25519 and FP_GM256, ECP_NIST256. 
-Note that both of these curves could be built on top of BIG_256, as both 
-require support for 256-bit numbers.
+This library supports also RSA encryption/decryption and RSA signature. The following is a quick example on how to use RSA. First initialize the context
+```
+var ctx = new CTX("RSA2048");
+```
+then you can call the RSA functions as follows:
+```
+ctx.RSA.ENCRYPT(...);
+ctx.RSA.DECRYPT(...);
+```
+The following is the list of all the RSA security level supported by *MCJS*
+```
+['RSA2048','RSA3072','RSA4096'];
+```
 
-Separate ROM files provide the constants required for each curve. The
-files BIG_XXX.js, FP_YYY.js and ECP_ZZZ.js also specify 
-certain constants that must be set for the particular curve.
+MCJS supports also SHA256, SHA384, SHA512, AES-GCM encryption and Marsaglia & Zaman random number generator. Those functions are contained in every context initialized with RSA or with an elliptic curve. If you want to create a context supporting only those general functions then initialize it with no parameter as follows:
+```
+var ctx = new CTX();
+```
 
 --------------------------------------
 
-To build the library and see it in action,  copy all of the files in 
-this directory to a fresh directory and execute the python3 script 
-config.py, and select the curves that you wish to support. Javascript 
-files are created for all of the modules you will need.
 
-As a quick example execute
-
-py config.py
-
-or
-
-python3 config.py
-
-Then select options 1, 17 and 20 (these are fixed for the example 
-programs provided). Select 0 to exit.
-
-Then load TestALL.html or BenchtestALL.html into your favourite browser.
+To see some running examples, load TestALL.html or BenchtestALL.html into your favourite browser.
 You might have to wait a minute or two for the scripts to complete.
 
 For TestALL.html the PIN number is 1234.
