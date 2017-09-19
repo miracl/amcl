@@ -571,6 +571,7 @@ unsign32 AES_encrypt(amcl_aes* a,char *buff)
         AES_ecb_encrypt(a,(uchar *)st);
         for (j=0; j<bytes; j++) buff[j]^=st[j];
         increment(a->f);
+		return 0;
 
     default:
         return 0;
@@ -640,6 +641,7 @@ unsign32 AES_decrypt(amcl_aes *a,char *buff)
         AES_ecb_encrypt(a,(uchar *)st);
         for (j=0; j<bytes; j++) buff[j]^=st[j];
         increment(a->f);
+		return 0;
 
     default:
         return 0;
