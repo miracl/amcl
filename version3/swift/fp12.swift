@@ -587,14 +587,15 @@ final public class FP12
     /* convert exponent to signed 1-bit window */
         for j in 0 ..< nb
         {
-            for i in 0 ..< 4
-            {
-				a[i]=Int32(t[i].lastbits(2)-2)
-				t[i].dec(Int(a[i]));
-                t[i].norm()
-				t[i].fshr(1)
-            }
-            w[j]=Int8(8*a[0]+4*a[1]+2*a[2]+a[3])
+            	for i in 0 ..< 4
+            	{
+			a[i]=Int32(t[i].lastbits(2)-2)
+			t[i].dec(Int(a[i]));
+                	t[i].norm()
+			t[i].fshr(1)
+            	}
+		let sum=8*a[0]+4*a[1]+2*a[2]+a[3]
+  		w[j]=Int8(sum)
         }
         w[nb]=Int8(8*t[0].lastbits(2)+4*t[1].lastbits(2))
         w[nb]+=Int8(2*t[2].lastbits(2)+t[3].lastbits(2))

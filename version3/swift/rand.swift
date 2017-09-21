@@ -94,7 +94,12 @@ final public class RAND {
     
     private func pack(_ b: [UInt8]) -> UInt32
     {
-        return (UInt32(b[3])<<24)|(UInt32(b[2])<<16)|(UInt32(b[1])<<8)|(UInt32(b[0]))
+	var r=UInt32(b[3])<<24
+	r |=  UInt32(b[2])<<16
+	r |=  UInt32(b[1])<<8
+	r |=  UInt32(b[0])
+	return r
+        //return (UInt32(b[3])<<24)|(UInt32(b[2])<<16)|(UInt32(b[1])<<8)|(UInt32(b[0]))
     }
   
 /* Initialize RNG with some real entropy from some external source */

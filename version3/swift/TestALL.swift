@@ -129,8 +129,8 @@ public func TestECDH(_ rng: RAND)
     
     for i in 0 ..< 8 {SALT[i]=UInt8(i+1)}  // set Salt
     
-    print("\nAlice's Passphrase= " + pp!)
-    let PW=[UInt8]( (pp!).utf8 )
+    print("\nAlice's Passphrase= " + pp)
+    let PW=[UInt8]( (pp).utf8 )
     
     /* private key S0 of size EGS bytes derived from Password and Salt */
     
