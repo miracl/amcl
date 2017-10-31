@@ -120,7 +120,7 @@ func (E *ECP2) equals(Q *ECP2) bool {
 }
 
 /* set to Affine - (x,y,z) to (x,y) */
-func (E *ECP2) affine() {
+func (E *ECP2) Affine() {
 	if E.Is_infinity() {return}
 	one:=NewFP2int(1)
 	if E.z.equals(one) {E.x.reduce(); E.y.reduce(); return}
@@ -133,12 +133,12 @@ func (E *ECP2) affine() {
 
 /* extract affine x as FP2 */
 func (E *ECP2) getX() *FP2 {
-	E.affine()
+	E.Affine()
 	return E.x
 }
 /* extract affine y as FP2 */
 func (E *ECP2) getY() *FP2 {
-	E.affine();
+	E.Affine();
 	return E.y;
 }
 /* extract projective x */
@@ -159,7 +159,7 @@ func (E *ECP2) toBytes(b []byte) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
 
-	E.affine()
+	E.Affine()
 	E.x.getA().toBytes(t[:])
 	for i:=0;i<MB;i++ { b[i]=t[i]}
 	E.x.getB().toBytes(t[:])
@@ -194,7 +194,7 @@ func ECP2_fromBytes(b []byte) *ECP2 {
 /* convert this to hex string */
 func (E *ECP2) toString() string {
 	if E.Is_infinity() {return "infinity"}
-	E.affine()
+	E.Affine()
 	return "("+E.x.toString()+","+E.y.toString()+")"
 }
 
@@ -383,7 +383,7 @@ func (E *ECP2) mul(e *BIG) *ECP2 {
 	var W []*ECP2
 	var w [1+(NLEN*int(BASEBITS)+3)/4]int8
 
-	E.affine()
+	E.Affine()
 
 /* precompute table */
 	Q.Copy(E)
@@ -425,7 +425,7 @@ func (E *ECP2) mul(e *BIG) *ECP2 {
 		P.add(Q)
 	}
 	P.sub(C)
-	P.affine()
+	P.Affine()
 	return P
 }
 
@@ -445,7 +445,7 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 
 	for i:=0;i<4;i++ {
 		t=append(t,NewBIGcopy(u[i]));
-		Q[i].affine();
+		Q[i].Affine();
 	}
 
 /* precompute table */
@@ -501,7 +501,7 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 	}
 	P.sub(C) /* apply correction */
 
-	P.affine()
+	P.Affine()
 	return P
 }
 
@@ -529,7 +529,7 @@ func ECP2_mapit(h []byte) *ECP2 {
 		T=NewECP2(); T.Copy(Q)
 		T=T.mul(x); T.neg()
 		K=NewECP2(); K.Copy(T)
-		K.dbl(); K.add(T); //K.affine()
+		K.dbl(); K.add(T); //K.Affine()
 
 		K.frob(X)
 		Q.frob(X); Q.frob(X); Q.frob(X)
@@ -557,6 +557,6 @@ func ECP2_mapit(h []byte) *ECP2 {
 		Q.add(x2Q)
 		Q.add(xQ)
 	}
-	Q.affine()
+	Q.Affine()
 	return Q
 }

@@ -263,7 +263,7 @@ func RHS(x *FP) *FP {
 }
 
 /* set to affine - from (x,y,z) to (x,y) */
-func (E *ECP) affine() {
+func (E *ECP) Affine() {
 	if E.Is_infinity() {return}
 	one:=NewFPint(1)
 	if E.z.equals(one) {return}
@@ -278,18 +278,18 @@ func (E *ECP) affine() {
 
 /* extract x as a BIG */
 func (E *ECP) getX() *BIG {
-	E.affine()
+	E.Affine()
 	return E.x.redc()
 }
 /* extract y as a BIG */
 func (E *ECP) getY() *BIG {
-	E.affine()
+	E.Affine()
 	return E.y.redc()
 }
 
 /* get sign of Y */
 func (E *ECP) getS() int {
-	E.affine()
+	E.Affine()
 	y:=E.getY()
 	return y.parity()
 }
@@ -314,7 +314,7 @@ func (E *ECP) toBytes(b []byte) {
 		b[0]=0x04
 	} else {b[0]=0x02}
 	
-	E.affine()
+	E.Affine()
 	E.x.redc().toBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+1]=t[i]}
 	if CURVETYPE!=MONTGOMERY {
@@ -344,7 +344,7 @@ func ECP_fromBytes(b []byte) *ECP {
 /* convert to hex string */
 func (E *ECP) toString() string {
 	if E.Is_infinity() {return "infinity"}
-	E.affine();
+	E.Affine();
 	if CURVETYPE==MONTGOMERY {
 		return "("+E.x.redc().toString()+")"
 	} else {return "("+E.x.redc().toString()+","+E.y.redc().toString()+")"}
@@ -744,7 +744,7 @@ func (E *ECP) pinmul(e int32,bts int32) *ECP {
 			R0.cswap(R1,b)
 		}
 		P.Copy(R0)
-		P.affine()
+		P.Affine()
 		return P
 	}
 }
@@ -760,7 +760,7 @@ func (E *ECP) mul(e *BIG) *ECP {
 		R0:=NewECP(); R0.Copy(E)
 		R1:=NewECP(); R1.Copy(E)
 		R1.dbl()
-		D.Copy(E); D.affine()
+		D.Copy(E); D.Affine()
 		nb:=e.nbits()
 		for i:=nb-2;i>=0;i-- {
 			b:=int(e.bit(i))
@@ -782,7 +782,7 @@ func (E *ECP) mul(e *BIG) *ECP {
 		var W []*ECP
 		var w [1+(NLEN*int(BASEBITS)+3)/4]int8
 
-		E.affine();
+		E.Affine();
 
 		Q.Copy(E);
 		Q.dbl();
@@ -825,7 +825,7 @@ func (E *ECP) mul(e *BIG) *ECP {
 		}
 		P.sub(C) /* apply correction */
 	}
-	P.affine()
+	P.Affine()
 	return P
 }
 
@@ -847,8 +847,8 @@ func (E *ECP) mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 	//ECP[] W=new ECP[8];
 	var w [1+(NLEN*int(BASEBITS)+1)/2]int8		
 
-	E.affine()
-	Q.affine()
+	E.Affine()
+	Q.Affine()
 
 	te.copy(e)
 	tf.copy(f)
@@ -905,7 +905,7 @@ func (E *ECP) mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 		S.add(T)
 	}
 	S.sub(C) /* apply correction */
-	S.affine()
+	S.Affine()
 	return S
 }
 

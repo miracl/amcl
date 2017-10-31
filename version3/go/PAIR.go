@@ -456,7 +456,7 @@ func gs(e *BIG) []*BIG {
 func G1mul(P *ECP,e *BIG) *ECP {
 	var R *ECP
 	if (USE_GLV) {
-		P.affine()
+		P.Affine()
 		R=NewECP()
 		R.Copy(P)
 		Q:=NewECP()
@@ -501,7 +501,7 @@ func G2mul(P *ECP2,e *BIG) *ECP2 {
 		u:=gs(e)
 
 		t:=NewBIGint(0)
-		P.affine()
+		P.Affine()
 		Q=append(Q,NewECP2());  Q[0].Copy(P);
 		for i:=1;i<4;i++ {
 			Q=append(Q,NewECP2()); Q[i].Copy(Q[i-1])
