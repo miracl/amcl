@@ -23,6 +23,7 @@ import java.util.Scanner;
 
 import amcl.ED25519.*;
 import amcl.RAND;
+import amcl.AES;
 
 public class TestECDH
 {
@@ -44,7 +45,7 @@ public class TestECDH
 
 		int EGS=ECDH.EGS;
 		int EFS=ECDH.EFS;
-		int EAS=amcl.AES.KS;
+		int EAS=AES.KS;
 		int sha=ECDH.HASH_TYPE;
 
 		byte[] S1=new byte[EGS];
