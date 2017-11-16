@@ -27,7 +27,7 @@ under the License.
  */
 
 
-package amcl;
+package org.apache.milagro.amcl;
 
 public class HASH512 {
 

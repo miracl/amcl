@@ -21,7 +21,7 @@
 
 /* Note that the original curve has been transformed to an isomorphic curve with A=-3 */
 
-package amcl.BRAINPOOL;
+package org.apache.milagro.amcl.BRAINPOOL;
 
 public class ROM
 {

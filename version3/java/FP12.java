@@ -20,7 +20,7 @@ under the License.
 /* AMCL Fp^12 functions */
 /* FP12 elements are of the form a+i.b+i^2.c */
 
-package amcl.XXX;
+package org.apache.milagro.amcl.XXX;
 
 public final class FP12 {
 	private final FP4 a;

@@ -19,12 +19,12 @@ under the License.
 
 /* RSA API high-level functions  */
 
-package amcl.XXX;
+package org.apache.milagro.amcl.XXX;
 
-import amcl.RAND;
-import amcl.HASH256;
-import amcl.HASH384;
-import amcl.HASH512;
+import org.apache.milagro.amcl.RAND;
+import org.apache.milagro.amcl.HASH256;
+import org.apache.milagro.amcl.HASH384;
+import org.apache.milagro.amcl.HASH512;
 
 public final class RSA {
 

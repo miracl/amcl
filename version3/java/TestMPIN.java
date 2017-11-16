@@ -18,10 +18,11 @@ under the License.
 */
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
+package org.apache.milagro;
 
 import java.util.Scanner;
-import amcl.RAND;
-import amcl.BN254.*;
+import org.apache.milagro.amcl.RAND;
+import org.apache.milagro.amcl.BN254.*;
 
 
 public class TestMPIN

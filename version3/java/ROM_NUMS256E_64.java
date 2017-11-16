@@ -20,7 +20,7 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl.NUMS256E;
+package org.apache.milagro.amcl.NUMS256E;
 
 public class ROM
 {

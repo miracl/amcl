@@ -19,7 +19,7 @@ under the License.
 
 /* AMCL BN Curve Pairing functions */
 
-package amcl.XXX;
+package org.apache.milagro.amcl.XXX;
 
 public final class PAIR {
 

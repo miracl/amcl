@@ -20,8 +20,8 @@ under the License.
 /* Large Finite Field arithmetic */
 /* AMCL mod p functions */
 
-package amcl.XXX;
-import amcl.RAND;
+package org.apache.milagro.amcl.XXX;
+import org.apache.milagro.amcl.RAND;
 
 public final class FF {
 

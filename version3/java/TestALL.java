@@ -16,8 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+package org.apache.milagro;
 
-import amcl.RAND;
+import org.apache.milagro.amcl.RAND;
 
 public class TestALL 
 {

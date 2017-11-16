@@ -20,7 +20,7 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl.NUMS384E;
+package org.apache.milagro.amcl.NUMS384E;
 
 public class ROM
 {

@@ -20,7 +20,7 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl.ED25519;
+package org.apache.milagro.amcl.ED25519;
 
 public class ROM
 {

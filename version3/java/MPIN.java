@@ -19,15 +19,15 @@ under the License.
 
 /* MPIN API Functions */
 
-package amcl.XXX;
+package org.apache.milagro.amcl.XXX;
 
 import java.util.Date;
 
-import amcl.RAND;
-import amcl.HASH256;
-import amcl.HASH384;
-import amcl.HASH512;
-import amcl.AES;
+import org.apache.milagro.amcl.RAND;
+import org.apache.milagro.amcl.HASH256;
+import org.apache.milagro.amcl.HASH384;
+import org.apache.milagro.amcl.HASH512;
+import org.apache.milagro.amcl.AES;
 
 public class MPIN
 {

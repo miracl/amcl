@@ -4,6 +4,10 @@ import sys
 deltext=""
 slashtext=""
 copytext=""
+org1text="org"
+org2text="apache"
+org3text="milagro"
+
 if sys.platform.startswith("linux")  :
 	copytext="cp "
 	deltext="rm "
@@ -35,8 +39,8 @@ def rsaset(tb,nb,base,ml) :
 	chosen.append(tb)
 	cptr=cptr+1
 
-	fpath="amcl"+slashtext+tb+slashtext
-	os.system("mkdir amcl"+slashtext+tb)
+	fpath="amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+tb+slashtext
+	os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+tb)
 
 	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
@@ -58,7 +62,7 @@ def rsaset(tb,nb,base,ml) :
 
 	replace(fpath+"FF.java","@ML@",ml);
 
-	os.system("javac "+fpath+"*.java")
+	os.system("javac "+fpath+"*.java -d amcl"+slashtext+"target"+slashtext+"classes -cp amcl"+slashtext+"target"+slashtext+"classes")
 
 
 def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
@@ -68,8 +72,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	chosen.append(tc)
 	cptr=cptr+1
 
-	fpath="amcl"+slashtext+tc+slashtext
-	os.system("mkdir amcl"+slashtext+tc)
+	fpath="amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+tc+slashtext
+	os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+tc)
 
 	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
@@ -120,18 +124,33 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fpath+"PAIR.java","XXX",tc)
 		replace(fpath+"MPIN.java","XXX",tc)
 	
-	os.system("javac "+fpath+"*.java")
+	os.system("javac "+fpath+"*.java -d amcl"+slashtext+"target"+slashtext+"classes -cp amcl"+slashtext+"target"+slashtext+"classes")
 
 
 os.system("mkdir amcl")
-os.system(copytext+ "HASH*.java amcl"+slashtext+".")
-os.system(copytext+ "SHA3.java amcl"+slashtext+".")
-os.system(copytext+ "RAND.java amcl"+slashtext+".")
-os.system(copytext+ "AES.java amcl"+slashtext+".")
-os.system(copytext+ "GCM.java amcl"+slashtext+".")
-os.system(copytext+ "NHS.java amcl"+slashtext+".")
+os.system("mkdir amcl"+slashtext+"src")
+os.system("mkdir amcl"+slashtext+"src"+slashtext+"main")
+os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java")
+os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+org1text)
+os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+org1text+slashtext+org2text)
+os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+org1text+slashtext+org2text+slashtext+org3text)
 
-os.system("javac amcl"+slashtext+"*.java")
+os.system("mkdir amcl"+slashtext+"target")
+os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes")
+os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes"+slashtext+org1text)
+os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes"+slashtext+org1text+slashtext+org2text)
+os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes"+slashtext+org1text+slashtext+org2text+slashtext+org3text)
+os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes"+slashtext+org1text+slashtext+org2text+slashtext+org3text+slashtext+"amcl")
+
+
+os.system(copytext+ "HASH*.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
+os.system(copytext+ "SHA3.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
+os.system(copytext+ "RAND.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
+os.system(copytext+ "AES.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
+os.system(copytext+ "GCM.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
+os.system(copytext+ "NHS.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
+
+os.system("javac amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+"*.java -d amcl"+slashtext+"target"+slashtext+"classes")
 
 print("Elliptic Curves")
 print("1. ED25519")
@@ -303,14 +322,11 @@ os.system(deltext+" ROM*.java")
 
 # create library
 
-os.system("jar cf amcl.jar amcl")
+os.system("jar cf amcl"+slashtext+"target"+slashtext+"amcl.jar -C amcl"+slashtext+"target"+slashtext+"classes .")
 
-for i in range(0,cptr):
-	os.system(deltext+" amcl"+slashtext+chosen[i]+slashtext+"*.java")
-	os.system(deltext+" amcl"+slashtext+chosen[i]+slashtext+"*.class")
-	os.system("rmdir amcl"+slashtext+chosen[i])
+os.system(copytext+" *.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+org1text+slashtext+org2text+slashtext+org3text+slashtext+".")
+os.system(deltext+ "Time*.java")
+os.system(deltext+ "Test*.java")
+os.system(deltext+ "BenchtestALL.java")
 
-os.system(deltext+" amcl"+slashtext+"*.java")
-os.system(deltext+" amcl"+slashtext+"*.class")
-os.system("rmdir amcl")
 

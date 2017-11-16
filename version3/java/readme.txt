@@ -1,3 +1,4 @@
+
 Namespaces are used to separate different curves.
 
 To build the library and see it in action, copy all of the files in 
@@ -11,31 +12,25 @@ As a quick example execute
 
 py config64.py
 
-or
+or perhaps
 
 python3 config64.py
 
 Then select options 1, 17 and 20 (these are fixed for the example 
 programs provided, but easily changed). Select 0 to exit.
 
-Then compile and run the test program by executing on windows
+If these options have been selected, then compile and build the test 
+programs by executing
 
-javac -cp amcl.jar; TestALL.java
-java -cp amcl.jar; TestALL
+py build.py
 
-Or on Linux
+Run all of the test programs
 
-javac -cp amcl.jar: TestALL.java
-java -cp amcl.jar: TestALL
+java -cp amcl/target/classes org.apache.milagro.TestALL
 
 The correct PIN is 1234
 
-Next compile and run the Benchmarking program by executing on windows
+Next compile and run the Benchmarking program by executing
 
-javac -cp amcl.jar; BenchtestALL.java
-java -cp amcl.jar; BenchtestALL
+java -cp amcl/target/classes org.apache.milagro.BenchtestALL
 
-Or on Linux
-
-javac -cp amcl.jar: BenchtestALL.java
-java -cp amcl.jar: BenchtestALL

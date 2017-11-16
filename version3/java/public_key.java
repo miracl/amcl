@@ -1,5 +1,5 @@
 
-package amcl.XXX;
+package org.apache.milagro.amcl.XXX;
 
 public final class public_key
 {

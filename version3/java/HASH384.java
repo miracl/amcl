@@ -26,7 +26,7 @@ under the License.
  * For use with byte-oriented messages only. 
  */
 
-package amcl;
+package org.apache.milagro.amcl;
 
 public class HASH384 {
 	private long[] length=new long[2];

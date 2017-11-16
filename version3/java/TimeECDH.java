@@ -18,11 +18,12 @@ under the License.
 */
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
+package org.apache.milagro;
 
 import java.util.Scanner;
 
-import amcl.ED25519.*;
-import amcl.RAND;
+import org.apache.milagro.amcl.ED25519.*;
+import org.apache.milagro.amcl.RAND;
 
 public class TimeECDH
 {

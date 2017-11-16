@@ -19,7 +19,7 @@ under the License.
 
 /* Elliptic Curve Point class */
 
-package amcl.XXX;
+package org.apache.milagro.amcl.XXX;
 
 public final class ECP {
 

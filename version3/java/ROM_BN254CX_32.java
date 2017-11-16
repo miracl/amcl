@@ -20,7 +20,7 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl.BN254CX;
+package org.apache.milagro.amcl.BN254CX;
 
 public class ROM
 {

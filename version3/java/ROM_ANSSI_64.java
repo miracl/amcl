@@ -20,7 +20,7 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl.ANSSI;
+package org.apache.milagro.amcl.ANSSI;
 
 public class ROM
 {

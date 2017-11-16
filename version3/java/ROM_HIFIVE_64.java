@@ -20,7 +20,7 @@
 /* Fixed Data in ROM - Field and Curve parameters */
 
 
-package amcl.HIFIVE;
+package org.apache.milagro.amcl.HIFIVE;
 
 public class ROM
 {

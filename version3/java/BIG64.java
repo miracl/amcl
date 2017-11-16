@@ -19,8 +19,8 @@ under the License.
 
 /* AMCL BIG number class */ 
 
-package amcl.XXX;
-import amcl.RAND;
+package org.apache.milagro.amcl.XXX;
+import org.apache.milagro.amcl.RAND;
 
 public class BIG {
 

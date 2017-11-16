@@ -37,7 +37,7 @@ under the License.
  * See http://www.mindspring.com/~dmcgrew/gcm-nist-6.pdf
  */
 
-package amcl;
+package org.apache.milagro.amcl;
 
 public class GCM {
 	public static final int NB=4;

@@ -17,7 +17,9 @@ specific language governing permissions and limitations
 under the License.
 */
 
-import amcl.RAND;
+package org.apache.milagro;
+
+import org.apache.milagro.amcl.RAND;
 
 public class BenchtestALL 
 {

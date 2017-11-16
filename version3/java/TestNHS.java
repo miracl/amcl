@@ -24,8 +24,10 @@ under the License.
 // javac -cp amcl.jar; TestNHS.java
 // java -cp amcl.jar; TestNHS
 
-import amcl.RAND;
-import amcl.NHS;
+package org.apache.milagro;
+
+import org.apache.milagro.amcl.RAND;
+import org.apache.milagro.amcl.NHS;
 
 public class TestNHS
 {	

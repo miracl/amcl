@@ -19,11 +19,12 @@ under the License.
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
 
+package org.apache.milagro;
 
 import java.util.Scanner;
 
-import amcl.RSA2048.*;
-import amcl.RAND;
+import org.apache.milagro.amcl.RSA2048.*;
+import org.apache.milagro.amcl.RAND;
 
 public class TimeRSA
 {   
