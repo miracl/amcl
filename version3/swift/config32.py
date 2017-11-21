@@ -90,6 +90,10 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fpath+"ecp.swift","@CT@",ct)
 	replace(fpath+"ecp.swift","@PF@",pf)
 
+	if tc == "fp256bn" :
+		replace(fpath+"ecp.swift","@ST@","M_TYPE")
+	else :
+		replace(fpath+"ecp.swift","@ST@","D_TYPE")
 
 	if pf != "NOT" :
 		os.system(copytext+"ecp2.swift "+fpath+"ecp2.swift")
@@ -138,16 +142,17 @@ print("16. nums512e\n")
 print("Pairing-Friendly Elliptic Curves")
 print("17. bn254")
 print("18. bn254CX")
-print("19. bls383\n")
+print("19. bls383")
+print("20. fp256bn\n")
 
 print("RSA")
-print("20. rsa2048")
-print("21. rsa3072")
-print("22. rsa4096")
+print("21. rsa2048")
+print("22. rsa3072")
+print("23. rsa4096")
 
 selection=[]
 ptr=0
-max=23
+max=24
 
 curve_selected=False
 pfcurve_selected=False
@@ -233,7 +238,6 @@ while ptr<max:
 		curve_selected=True
 
 
-
 	if x==17:
 		curveset("bn254","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
 		pfcurve_selected=True
@@ -243,23 +247,26 @@ while ptr<max:
 	if x==19:
 		curveset("bls383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
 		pfcurve_selected=True
+	if x==20:
+		curveset("fp256bn","32","28","256","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		pfcurve_selected=True
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
 # The RSA name reflects the modulus size, which is a 2^m multiplier
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==20:
+	if x==21:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("rsa2048","128","28","2")
 		#rsaset("rsa2048","64","29","60",4")
 		#rsaset("rsa2048","32","29","56","8")
 		rsa_selected=True
-	if x==21:
+	if x==22:
 		rsaset("rsa3072","48","28","8")
 		rsa_selected=True
-	if x==22:
+	if x==23:
 		#rsaset("rsa4096","32","29","56",16")
 		rsaset("rsa4096","64","29","8")
 		rsa_selected=True

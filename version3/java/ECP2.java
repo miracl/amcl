@@ -221,7 +221,19 @@ public final class ECP2 {
 		FP2 r=new FP2(x);
 		r.sqr();
 		FP2 b=new FP2(new BIG(ROM.CURVE_B));
-		b.div_ip();
+
+		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		{
+			b.div_ip();
+		}
+		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		{
+			b.norm();
+			b.mul_ip();
+			b.norm();
+		}
+
+
 		r.mul(x);
 		r.add(b);
 
@@ -260,10 +272,16 @@ public final class ECP2 {
 		if (INF) return -1;      
 //System.out.println("Into dbl");
 		FP2 iy=new FP2(y);
-		iy.mul_ip(); iy.norm();
-
+		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		{
+			iy.mul_ip(); iy.norm();
+		}
 		FP2 t0=new FP2(y);                  //***** Change 
-		t0.sqr();            t0.mul_ip();   
+		t0.sqr();            
+		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		{		
+			t0.mul_ip();
+		}
 		FP2 t1=new FP2(iy);  
 		t1.mul(z);
 		FP2 t2=new FP2(z);
@@ -276,6 +294,11 @@ public final class ECP2 {
 		z.norm();  
 
 		t2.imul(3*ROM.CURVE_B_I); 
+		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		{
+			t2.mul_ip();
+			t2.norm();
+		}
 
 		FP2 x3=new FP2(t2);
 		x3.mul(z); 
@@ -320,8 +343,11 @@ public final class ECP2 {
 		t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
 		t4.copy(t0); t4.add(t1);		//t4=X1.X2+Y1.Y2
 
-		t3.sub(t4); t3.norm(); t3.mul_ip();  t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
-
+		t3.sub(t4); t3.norm(); 
+		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		{		
+			t3.mul_ip();  t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+		}
 		t4.copy(y);                    
 		t4.add(z); t4.norm();			//t4=Y1+Z1
 		FP2 x3=new FP2(Q.y);
@@ -331,8 +357,11 @@ public final class ECP2 {
 		x3.copy(t1);					//
 		x3.add(t2);						//X3=Y1.Y2+Z1.Z2
 	
-		t4.sub(x3); t4.norm(); t4.mul_ip(); t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
-
+		t4.sub(x3); t4.norm(); 
+		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		{	
+			t4.mul_ip(); t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+		}
 		x3.copy(x); x3.add(z); x3.norm();	// x3=X1+Z1
 		FP2 y3=new FP2(Q.x);				
 		y3.add(Q.z); y3.norm();				// y3=X2+Z2
@@ -341,17 +370,26 @@ public final class ECP2 {
 		y3.add(t2);							// y3=X1.X2+Z1+Z2
 		y3.rsub(x3); y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-		t0.mul_ip(); t0.norm(); // x.Q.x
-		t1.mul_ip(); t1.norm(); // y.Q.y
-
+		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		{
+			t0.mul_ip(); t0.norm(); // x.Q.x
+			t1.mul_ip(); t1.norm(); // y.Q.y
+		}
 		x3.copy(t0); x3.add(t0); 
 		t0.add(x3); t0.norm();
 		t2.imul(b); 	
-
+		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		{
+			t2.mul_ip();
+		}
 		FP2 z3=new FP2(t1); z3.add(t2); z3.norm();
 		t1.sub(t2); t1.norm(); 
 		y3.imul(b); 
-
+		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		{
+			y3.mul_ip(); 
+			y3.norm();
+		}
 		x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2);
 		y3.mul(t0); t1.mul(z3); y3.add(t1);
 		t0.mul(t3); z3.mul(t4); z3.add(t0);
@@ -554,6 +592,13 @@ public final class ECP2 {
 		BIG Fra=new BIG(ROM.Fra);
 		BIG Frb=new BIG(ROM.Frb);
 		X=new FP2(Fra,Frb);
+
+		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		{
+			X.inverse();
+			X.norm();
+		}
+
 		x=new BIG(ROM.CURVE_Bnx);
 
 /* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */

@@ -204,7 +204,15 @@ func RHS2(x *FP2) *FP2 {
 	r:=NewFP2copy(x)
 	r.sqr()
 	b:=NewFP2big(NewBIGints(CURVE_B))
-	b.div_ip()
+
+	if SEXTIC_TWIST == D_TYPE {
+		b.div_ip()
+	}
+	if SEXTIC_TWIST == M_TYPE {
+		b.norm()
+		b.mul_ip()
+		b.norm()
+	}	
 	r.mul(x)
 	r.add(b)
 
@@ -246,10 +254,15 @@ func (E *ECP2) dbl() int {
 	if E.INF {return -1}
 
 	iy:=NewFP2copy(E.y)
-	iy.mul_ip(); iy.norm()
+	if SEXTIC_TWIST == D_TYPE {
+		iy.mul_ip(); iy.norm()
+	}
 
 	t0:=NewFP2copy(E.y)                  //***** Change 
-	t0.sqr();  t0.mul_ip()   
+	t0.sqr();  
+	if SEXTIC_TWIST == D_TYPE {	
+		t0.mul_ip()   
+	}
 	t1:=NewFP2copy(iy)  
 	t1.mul(E.z)
 	t2:=NewFP2copy(E.z)
@@ -262,7 +275,10 @@ func (E *ECP2) dbl() int {
 	E.z.norm()  
 
 	t2.imul(3*CURVE_B_I) 
-
+	if SEXTIC_TWIST == M_TYPE {
+		t2.mul_ip()
+		t2.norm()
+	}
 	x3:=NewFP2copy(t2)
 	x3.mul(E.z) 
 
@@ -305,8 +321,10 @@ func (E *ECP2) add(Q *ECP2) int {
 	t3.mul(t4)						//t3=(X1+Y1)(X2+Y2)
 	t4.copy(t0); t4.add(t1)		//t4=X1.X2+Y1.Y2
 
-	t3.sub(t4); t3.norm(); t3.mul_ip();  t3.norm()         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
-
+	t3.sub(t4); t3.norm(); 
+	if SEXTIC_TWIST == D_TYPE {
+		t3.mul_ip();  t3.norm()         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+	}
 	t4.copy(E.y);                    
 	t4.add(E.z); t4.norm()			//t4=Y1+Z1
 	x3:=NewFP2copy(Q.y)
@@ -316,8 +334,10 @@ func (E *ECP2) add(Q *ECP2) int {
 	x3.copy(t1)					//
 	x3.add(t2)						//X3=Y1.Y2+Z1.Z2
 	
-	t4.sub(x3); t4.norm(); t4.mul_ip(); t4.norm()          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
-
+	t4.sub(x3); t4.norm();
+	if SEXTIC_TWIST == D_TYPE {	
+		t4.mul_ip(); t4.norm()          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+	}
 	x3.copy(E.x); x3.add(E.z); x3.norm()	// x3=X1+Z1
 	y3:=NewFP2copy(Q.x)				
 	y3.add(Q.z); y3.norm()				// y3=X2+Z2
@@ -326,17 +346,23 @@ func (E *ECP2) add(Q *ECP2) int {
 	y3.add(t2)							// y3=X1.X2+Z1+Z2
 	y3.rsub(x3); y3.norm()				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-	t0.mul_ip(); t0.norm() // x.Q.x
-	t1.mul_ip(); t1.norm() // y.Q.y
-
+	if SEXTIC_TWIST == D_TYPE {
+		t0.mul_ip(); t0.norm() // x.Q.x
+		t1.mul_ip(); t1.norm() // y.Q.y
+	}
 	x3.copy(t0); x3.add(t0) 
 	t0.add(x3); t0.norm()
 	t2.imul(b) 	
-
+	if SEXTIC_TWIST == M_TYPE {
+		t2.mul_ip()
+	}
 	z3:=NewFP2copy(t1); z3.add(t2); z3.norm()
 	t1.sub(t2); t1.norm()
 	y3.imul(b) 
-
+	if SEXTIC_TWIST == M_TYPE {
+		y3.mul_ip()
+		y3.norm()
+	}
 	x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2)
 	y3.mul(t0); t1.mul(z3); y3.add(t1)
 	t0.mul(t3); z3.mul(t4); z3.add(t0)
@@ -523,6 +549,11 @@ func ECP2_mapit(h []byte) *ECP2 {
 	Fra:=NewBIGints(Fra)
 	Frb:=NewBIGints(Frb)
 	X=NewFP2bigs(Fra,Frb)
+	if SEXTIC_TWIST == M_TYPE {
+		X.inverse()
+		X.norm()
+	}
+
 	x=NewBIGints(CURVE_Bnx)
 
 	if CURVE_PAIRING_TYPE==BN {

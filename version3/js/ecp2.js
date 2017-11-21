@@ -232,13 +232,17 @@ ECP2 = function(ctx) {
 
             var iy = new ctx.FP2(0);
             iy.copy(this.y); //FP2 iy=new FP2(y);
-            iy.mul_ip();
-            iy.norm();
 
+			if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.D_TYPE) {
+				iy.mul_ip();
+				iy.norm();
+			}
             var t0 = new ctx.FP2(0);
             t0.copy(this.y); //FP2 t0=new FP2(y);                  //***** Change 
             t0.sqr();
-            t0.mul_ip();
+			if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.D_TYPE) {
+				t0.mul_ip();
+			}
             var t1 = new ctx.FP2(0);
             t1.copy(iy); //FP2 t1=new FP2(iy);  
             t1.mul(this.z);
@@ -254,7 +258,10 @@ ECP2 = function(ctx) {
             this.z.norm();
 
             t2.imul(3 * ctx.ROM_CURVE.CURVE_B_I);
-
+			if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.M_TYPE) {
+				t2.mul_ip();
+				t2.norm();
+			}
             var x3 = new ctx.FP2(0);
             x3.copy(t2); //FP2 x3=new FP2(t2);
             x3.mul(this.z);
@@ -320,9 +327,10 @@ ECP2 = function(ctx) {
 
             t3.sub(t4);
             t3.norm();
-            t3.mul_ip();
-            t3.norm(); //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
-
+			if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.D_TYPE) {
+				t3.mul_ip();
+				t3.norm(); //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+			}
             t4.copy(this.y);
             t4.add(this.z);
             t4.norm(); //t4=Y1+Z1
@@ -337,9 +345,10 @@ ECP2 = function(ctx) {
 
             t4.sub(x3);
             t4.norm();
-            t4.mul_ip();
-            t4.norm(); //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
-
+			if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.D_TYPE) {
+				t4.mul_ip();
+				t4.norm(); //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+			}
             x3.copy(this.x);
             x3.add(this.z);
             x3.norm(); // x3=X1+Z1
@@ -353,17 +362,20 @@ ECP2 = function(ctx) {
             y3.rsub(x3);
             y3.norm(); // y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-            t0.mul_ip();
-            t0.norm(); // x.Q.x
-            t1.mul_ip();
-            t1.norm(); // y.Q.y
-
+	        if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.D_TYPE) {		
+				t0.mul_ip();
+				t0.norm(); // x.Q.x
+				t1.mul_ip();
+				t1.norm(); // y.Q.y
+			}
             x3.copy(t0);
             x3.add(t0);
             t0.add(x3);
             t0.norm();
             t2.imul(b);
-
+			if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.M_TYPE) {
+				t2.mul_ip();
+			}
             var z3 = new ctx.FP2(0);
             z3.copy(t1); //FP2 z3=new FP2(t1); 
             z3.add(t2);
@@ -371,7 +383,10 @@ ECP2 = function(ctx) {
             t1.sub(t2);
             t1.norm();
             y3.imul(b);
-
+			if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.M_TYPE) {
+				y3.mul_ip();
+				y3.norm();
+			}
             x3.copy(y3);
             x3.mul(t4);
             t2.copy(t3);
@@ -501,7 +516,16 @@ ECP2 = function(ctx) {
         var c = new ctx.BIG(0);
         c.rcopy(ctx.ROM_CURVE.CURVE_B);
         var b = new ctx.FP2(c); //b.bseta(c);
-        b.div_ip();
+
+        if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.D_TYPE) {
+			b.div_ip();
+		}
+        if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.M_TYPE) {
+			b.norm();
+			b.mul_ip();
+			b.norm();
+		}
+
         r.mul(x);
         r.add(b);
 
@@ -629,6 +653,11 @@ ECP2 = function(ctx) {
         var Fb = new ctx.BIG(0);
         Fb.rcopy(ctx.ROM_FIELD.Frb);
         X = new ctx.FP2(Fa, Fb);
+
+        if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.M_TYPE) {
+			X.inverse();
+			X.norm();
+		}
         x = new ctx.BIG(0);
         x.rcopy(ctx.ROM_CURVE.CURVE_Bnx);
 

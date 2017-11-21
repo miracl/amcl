@@ -110,6 +110,7 @@ void help()
 		printf("17. BN254\n");
 		printf("18. BN254CX\n");
 		printf("19. BLS383\n");
+		printf("20. FP256BN\n");
 
 		printf("\nromgen curve wordlength basebits language\n");
 		printf("where wordlength is 16, 32 or 64\n");
@@ -664,6 +665,7 @@ int main(int argc, char **argv)
 		mip->TWIST=MR_SEXTIC_D;
 	}
 
+
 	if (strcmp(curvename,"BN254CX")==0)
 	{
 		curve=18;
@@ -716,6 +718,30 @@ int main(int argc, char **argv)
 		P*=cof;
 		P.get(gx,gy);
 	}
+
+	if (strcmp(curvename,"FP256BN")==0)
+	{
+		curve=20;
+		printf("Curve= FP256BN\n");
+		mbits=256;
+		words=(1+((mbits-1)/bb));
+		curvetype=WEIERSTRASS;
+		modtype=NOT_SPECIAL;
+		curve_a=0;
+		mip->IOBASE=16;
+		x=(char *)"6882F5C030B0A801";    // Fast but not not GT_STRONG parameter
+
+		p=36*pow(x,4)-36*pow(x,3)+24*x*x-6*x+1;
+		t=6*x*x+1;
+		r=p+1-t;
+		curve_b=3;
+		gx=1;
+		gy=2;
+		cof=1;
+		ecurve((Big)0,curve_b,p,MR_AFFINE);
+		mip->TWIST=MR_SEXTIC_M;
+	}
+
 	if (curve==0) {help(); return 0;}
 
 	cout << "\nMOD8 = " << p%8 << endl;
@@ -827,7 +853,7 @@ int main(int argc, char **argv)
 
 	}
 
-	if (curve>=19)
+	if (curve==19)
 	{
 		cout << endl;
 		set_frobenius_constant(X);
@@ -901,5 +927,77 @@ int main(int argc, char **argv)
 		cout << close << term << endl;
 
 	}
+
+	if (curve==20)
+	{
+		cout << endl;
+		set_frobenius_constant(X);
+		X.get(a,b);
+		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
+
+		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1; output(chunk,words,x,m); cout << term << endl;
+
+		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
+		
+
+		cru=(18*pow(x,3)-18*x*x+9*x-2);
+		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
+
+		Q.set((ZZn2)1);
+		//while (!Q.set(randn2())) ;
+		Q=(p-1+t)*Q;
+
+		Q.get(Xa,Ya);
+		Xa.get(a,b);
+		cout << pre1 << toupperit((char *)"CURVE_Pxa",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pxb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+		Ya.get(a,b);
+		cout << pre1 << toupperit((char *)"CURVE_Pya",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pyb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+
+
+		Q*=r;
+		if (!Q.iszero())
+		{
+			cout << "**** Failed ****" << endl;
+			cout << "\nQ= " << Q << endl << endl;
+		}
+
+		cout << pre3 << "CURVE_W"  << post3 << open; output(chunk,words,6*x*x-4*x+1,m);cout << ","; output(chunk,words,(2*x-1),m); cout << close << term << endl;
+		cout << pre4 << "CURVE_SB" << post4 << open; cout << open; output(chunk,words,6*x*x-2*x,m); cout << ","; output(chunk,words,(2*x-1),m); cout << close;cout << ","; cout << open; output(chunk,words,(2*x-1),m); cout << ","; output(chunk,words,r-(6*x*x-4*x+1),m); cout << close; cout << close << term  << endl;
+
+		cout << pre5 << "CURVE_WB" << post5 << open; output(chunk,words,2*x*x-3*x+1,m); cout << ","; output(chunk,words,12*x*x*x-8*x*x+x,m); 
+		cout << ","; output(chunk,words,6*x*x*x-4*x*x+x,m); cout << ","; output(chunk,words,2*x*x-x,m); cout << close << term << endl;
+	
+		cout << pre6 << "CURVE_BB" << post6 << open; 
+		cout << open;
+		output(chunk,words,r-x+1,m); 
+		cout << ","; output(chunk,words,r-x,m); 
+		cout << ","; output(chunk,words,r-x,m); 
+		cout << ","; output(chunk,words,2*x,m); 
+		cout << close;
+
+		cout << ","; cout << open;output(chunk,words,2*x-1,m); 
+		cout << ","; output(chunk,words,r-x,m); 
+		cout << ","; output(chunk,words,r-x+1,m); 
+		cout << ","; output(chunk,words,r-x,m); 
+		cout << close;
+		cout << ","; cout << open; output(chunk,words,2*x,m); 
+		cout << ","; output(chunk,words,2*x-1,m); 
+		cout << ","; output(chunk,words,2*x-1,m); 
+		cout << ","; output(chunk,words,2*x-1,m); 
+		cout << close;
+
+		cout << ","; cout << open; output(chunk,words,x+1,m); 
+		cout << ","; output(chunk,words,4*x-2,m); 
+		cout << ","; output(chunk,words,r-2*x-1,m); 
+		cout << ","; output(chunk,words,x+1,m); 
+		cout << close;
+		cout << close << term << endl;
+
+	}
+
+
 
 }

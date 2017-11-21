@@ -46,6 +46,9 @@
 #define BN 1
 #define BLS 2
 
+#define D_TYPE 0
+#define M_TYPE 1
+
 /**
  * @brief SHA256 hash function instance */
 typedef struct

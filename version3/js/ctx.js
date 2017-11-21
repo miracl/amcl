@@ -31,7 +31,8 @@ var CTXLIST = {
         "@M8": 5,
         "@MT": 1,
         "@CT": 1,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "C25519": {
@@ -44,7 +45,8 @@ var CTXLIST = {
         "@M8": 5,
         "@MT": 1,
         "@CT": 2,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "NIST256": {
@@ -57,7 +59,8 @@ var CTXLIST = {
         "@M8": 7,
         "@MT": 0,
         "@CT": 0,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "NIST384": {
@@ -65,12 +68,13 @@ var CTXLIST = {
         "FIELD": "NIST384",
         "CURVE": "NIST384",
         "@NB": 48,
-        "@BASE": 56,
+        "@BASE": 23,
         "@NBT": 384,
         "@M8": 7,
         "@MT": 0,
         "@CT": 0,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "BRAINPOOL": {
@@ -83,7 +87,8 @@ var CTXLIST = {
         "@M8": 7,
         "@MT": 0,
         "@CT": 0,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "ANSSI": {
@@ -96,7 +101,8 @@ var CTXLIST = {
         "@M8": 7,
         "@MT": 0,
         "@CT": 0,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "HIFIVE": {
@@ -109,7 +115,8 @@ var CTXLIST = {
         "@M8": 5,
         "@MT": 1,
         "@CT": 1,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "GOLDILOCKS": {
@@ -122,7 +129,8 @@ var CTXLIST = {
         "@M8": 7,
         "@MT": 2,
         "@CT": 1,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "C41417": {
@@ -135,7 +143,8 @@ var CTXLIST = {
         "@M8": 7,
         "@MT": 1,
         "@CT": 1,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "NIST521": {
@@ -148,7 +157,8 @@ var CTXLIST = {
         "@M8": 7,
         "@MT": 1,
         "@CT": 0,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "NUMS256W": {
@@ -161,7 +171,8 @@ var CTXLIST = {
         "@M8": 3,
         "@MT": 1,
         "@CT": 0,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "NUMS256E": {
@@ -174,7 +185,8 @@ var CTXLIST = {
         "@M8": 3,
         "@MT": 1,
         "@CT": 1,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "NUMS384W": {
@@ -187,7 +199,8 @@ var CTXLIST = {
         "@M8": 3,
         "@MT": 1,
         "@CT": 0,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "NUMS384E": {
@@ -200,7 +213,8 @@ var CTXLIST = {
         "@M8": 3,
         "@MT": 1,
         "@CT": 1,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "NUMS512W": {
@@ -213,7 +227,8 @@ var CTXLIST = {
         "@M8": 7,
         "@MT": 1,
         "@CT": 0,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
     },
 
     "NUMS512E": {
@@ -226,7 +241,22 @@ var CTXLIST = {
         "@M8": 7,
         "@MT": 1,
         "@CT": 1,
-        "@PF": 0
+        "@PF": 0,
+		"@ST": 0
+    },
+
+    "FP256BN": {
+        "BITS": "256",
+        "FIELD": "FP256BN",
+        "CURVE": "FP256BN",
+        "@NB": 32,
+        "@BASE": 24,
+        "@NBT": 256,
+        "@M8": 3,
+        "@MT": 0,
+        "@CT": 0,
+        "@PF": 1,
+		"@ST": 1
     },
 
     "BN254": {
@@ -239,7 +269,8 @@ var CTXLIST = {
         "@M8": 3,
         "@MT": 0,
         "@CT": 0,
-        "@PF": 1
+        "@PF": 1,
+		"@ST": 0
     },
 
     "BN254CX": {
@@ -252,7 +283,8 @@ var CTXLIST = {
         "@M8": 3,
         "@MT": 0,
         "@CT": 0,
-        "@PF": 1
+        "@PF": 1,
+		"@ST": 0
     },
 
     "BLS383": {
@@ -265,7 +297,8 @@ var CTXLIST = {
         "@M8": 3,
         "@MT": 0,
         "@CT": 0,
-        "@PF": 2
+        "@PF": 2,
+		"@ST": 0
     },
 
     "RSA2048": {
@@ -376,6 +409,9 @@ CTX = function(input_parameter) {
                 case "NUMS512E":
                     this.ROM_CURVE = ROM_CURVE_NUMS512E();
                     break;
+                case "FP256BN":
+                    this.ROM_CURVE = ROM_CURVE_FP256BN();
+                    break;
                 case "BN254":
                     this.ROM_CURVE = ROM_CURVE_BN254();
                     break;
@@ -426,6 +462,9 @@ CTX = function(input_parameter) {
                     break;
                 case "512PM":
                     this.ROM_FIELD = ROM_FIELD_512PM();
+                    break;
+                case "FP256BN":
+                    this.ROM_FIELD = ROM_FIELD_FP256BN();
                     break;
                 case "BN254":
                     this.ROM_FIELD = ROM_FIELD_BN254();

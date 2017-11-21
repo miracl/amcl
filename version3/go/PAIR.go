@@ -27,7 +27,7 @@ package XXX
 func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 	var a *FP4
 	var b *FP4
-	c:=NewFP4int(0)
+	var c *FP4
 
 	if (A==B) { /* Doubling */
 		XX:=NewFP2copy(A.getx())  //X
@@ -48,15 +48,30 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 
 		sb:=3*CURVE_B_I
 		ZZ.imul(sb); 	
-			
-		ZZ.div_ip2();  ZZ.norm() // 3b.Z^2 
+		if SEXTIC_TWIST == D_TYPE {	
+			ZZ.div_ip2();
+		}
+		if SEXTIC_TWIST == M_TYPE {
+			ZZ.mul_ip();
+			ZZ.add(ZZ);
+			YZ.mul_ip();
+			YZ.norm();
+		}
+		ZZ.norm() // 3b.Z^2 
 
 		YY.add(YY)
 		ZZ.sub(YY); ZZ.norm()     // 3b.Z^2-Y^2
 
 		a=NewFP4fp2s(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
-		b=NewFP4fp2(XX)             // L(0,1) | L(0,0) | L(1,0)
+		if SEXTIC_TWIST == D_TYPE {	
 
+			b=NewFP4fp2(XX)             // L(0,1) | L(0,0) | L(1,0)
+			c=NewFP4int(0)
+		}
+		if SEXTIC_TWIST == M_TYPE {
+			b=NewFP4int(0)
+			c=NewFP4fp2(XX); c.times_i()
+		}
 		A.dbl();
 
 	} else { /* Addition */
@@ -74,6 +89,12 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 
 		T1.copy(X1)            // T1=X1-Z1.X2
 		X1.pmul(Qy)            // X1=(X1-Z1.X2).Ys
+
+		if SEXTIC_TWIST == M_TYPE {
+			X1.mul_ip()
+			X1.norm()
+		}
+
 		T1.mul(B.gety())       // T1=(X1-Z1.X2).Y2
 
 		T2.copy(Y1)           // T2=Y1-Z1.Y2
@@ -82,8 +103,14 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 		Y1.pmul(Qx);  Y1.neg(); Y1.norm() // Y1=-(Y1-Z1.Y2).Xs
 
 		a=NewFP4fp2s(X1,T2)       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
-		b=NewFP4fp2(Y1)
-
+		if SEXTIC_TWIST == D_TYPE {
+			b=NewFP4fp2(Y1)
+			c=NewFP4int(0)
+		}
+		if SEXTIC_TWIST == M_TYPE {
+			b=NewFP4int(0)
+			c=NewFP4fp2(Y1); c.times_i()
+		}
 		A.add(B);
 	}
 	return NewFP12fp4s(a,b,c)
@@ -97,6 +124,11 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 	K:=NewECP2()
 	var lv *FP12
 	
+	if SEXTIC_TWIST==M_TYPE {
+		f.inverse();
+		f.norm();
+	}
+
 	if CURVE_PAIRING_TYPE == BN {
 		n.pmul(6); n.dec(2)
 	} else {n.copy(x)}
@@ -115,22 +147,22 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 
 	for i:=nb-2;i>=1;i-- {
 		lv=line(A,A,Qx,Qy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 		if n.bit(i)==1 {
 	
 			lv=line(A,P,Qx,Qy)
 			
-			r.smul(lv)
+			r.smul(lv,SEXTIC_TWIST)
 		}		
 		r.sqr()
 	}
 
 	lv=line(A,A,Qx,Qy)
-	r.smul(lv)
+	r.smul(lv,SEXTIC_TWIST)
 
 	if n.parity()==1 {
 		lv=line(A,P,Qx,Qy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 	}
 
 /* R-ate fixup required for BN curves */
@@ -141,11 +173,11 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 		K.frob(f)
 		A.neg()
 		lv=line(A,K,Qx,Qy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 		K.frob(f)
 		K.neg()
 		lv=line(A,K,Qx,Qy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 	}
 
 	return r
@@ -158,6 +190,11 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 	n:=NewBIGcopy(x)
 	K:=NewECP2()
 	var lv *FP12
+
+	if SEXTIC_TWIST==M_TYPE {
+		f.inverse();
+		f.norm();
+	}
 
 	if CURVE_PAIRING_TYPE == BN {
 		n.pmul(6); n.dec(2)
@@ -184,28 +221,28 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 
 	for i:=nb-2;i>=1;i-- {
 		lv=line(A,A,Qx,Qy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 		lv=line(B,B,Sx,Sy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 
 		if n.bit(i)==1 {
 			lv=line(A,P,Qx,Qy)
-			r.smul(lv)
+			r.smul(lv,SEXTIC_TWIST)
 			lv=line(B,R,Sx,Sy)
-			r.smul(lv)
+			r.smul(lv,SEXTIC_TWIST)
 		}
 		r.sqr()
 	}
 
 	lv=line(A,A,Qx,Qy)
-	r.smul(lv)
+	r.smul(lv,SEXTIC_TWIST)
 	lv=line(B,B,Sx,Sy)
-	r.smul(lv)
+	r.smul(lv,SEXTIC_TWIST)
 	if n.parity()==1 {
 		lv=line(A,P,Qx,Qy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 		lv=line(B,R,Sx,Sy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 	}
 
 /* R-ate fixup */
@@ -215,21 +252,21 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 		K.frob(f)
 		A.neg()
 		lv=line(A,K,Qx,Qy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 		K.frob(f)
 		K.neg()
 		lv=line(A,K,Qx,Qy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 
 		K.Copy(R)
 		K.frob(f)
 		B.neg()
 		lv=line(B,K,Sx,Sy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 		K.frob(f)
 		K.neg()
 		lv=line(B,K,Sx,Sy)
-		r.smul(lv)
+		r.smul(lv,SEXTIC_TWIST)
 	}
 
 	return r
@@ -497,6 +534,12 @@ func G2mul(P *ECP2,e *BIG) *ECP2 {
 	if (USE_GS_G2) {
 		var Q []*ECP2
 		f:=NewFP2bigs(NewBIGints(Fra),NewBIGints(Frb))
+
+		if SEXTIC_TWIST==M_TYPE {
+			f.inverse();
+			f.norm();
+		}
+
 		q:=NewBIGints(CURVE_Order)
 		u:=gs(e)
 

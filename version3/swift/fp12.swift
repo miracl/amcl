@@ -266,42 +266,93 @@ final public class FP12
     }
     
     /* Special case of multiplication arises from special form of ATE pairing line function */
-    func smul(_ y:FP12)
+    func smul(_ y:FP12,_ twist:Int)
     {
-        let z0=FP4(a)
-        let z2=FP4(b)
-        let z3=FP4(b)
-        let t0=FP4(0)
-        let t1=FP4(y.a)
+        if twist == ECP.D_TYPE {
+            let z0=FP4(a)
+            let z2=FP4(b)
+            let z3=FP4(b)
+            let t0=FP4(0)
+            let t1=FP4(y.a)
     
-        z0.mul(y.a)
-        z2.pmul(y.b.real())
-        b.add(a)
-        t1.real().add(y.b.real())
+            z0.mul(y.a)
+            z2.pmul(y.b.real())
+            b.add(a)
+            t1.real().add(y.b.real())
     
-        b.norm(); t1.norm()
+            b.norm(); t1.norm()
 
-        b.mul(t1)
-        z3.add(c); z3.norm()
-        z3.pmul(y.b.real())
+            b.mul(t1)
+            z3.add(c); z3.norm()
+            z3.pmul(y.b.real())
     
-        t0.copy(z0); t0.neg()
-        t1.copy(z2); t1.neg()
+            t0.copy(z0); t0.neg()
+            t1.copy(z2); t1.neg()
     
-        b.add(t0)
+            b.add(t0)
     
-        b.add(t1)
-        z3.add(t1)
-        z2.add(t0)
+            b.add(t1)
+            z3.add(t1)
+            z2.add(t0)
     
-        t0.copy(a); t0.add(c)
-        t0.norm(); z3.norm()
-        t0.mul(y.a)
-        c.copy(z2); c.add(t0)
+            t0.copy(a); t0.add(c)
+            t0.norm(); z3.norm()
+            t0.mul(y.a)
+            c.copy(z2); c.add(t0)
     
-        z3.times_i()
-        a.copy(z0); a.add(z3)
+            z3.times_i()
+            a.copy(z0); a.add(z3)
+        }
+        if twist == ECP.M_TYPE {
+            let z0=FP4(a)
+            let z1=FP4(0)
+            let z2=FP4(0)
+            let z3=FP4(0)
+            let t0=FP4(a)
+            let t1=FP4(0)
+        
+            z0.mul(y.a)
+            t0.add(b)
+            t0.norm()
+
+            z1.copy(t0); z1.mul(y.a)
+            t0.copy(b); t0.add(c)
+            t0.norm();
+
+            z3.copy(t0); //z3.mul(y.c);
+            z3.pmul(y.c.getb())
+            z3.times_i()
+
+            t0.copy(z0); t0.neg()
+
+            z1.add(t0)
+            b.copy(z1);
+            z2.copy(t0)
+
+            t0.copy(a); t0.add(c)
+            t1.copy(y.a); t1.add(y.c)
+
+            t0.norm()
+            t1.norm()
     
+            t0.mul(t1)
+            z2.add(t0)
+
+            t0.copy(c)
+            
+            t0.pmul(y.c.getb())
+            t0.times_i()
+
+            t1.copy(t0); t1.neg()
+
+            c.copy(z2); c.add(t1)
+            z3.add(t1)
+            t0.times_i()
+            b.add(t0)
+            z3.norm();
+            z3.times_i()
+            a.copy(z0); a.add(z3)      
+        }
         norm()
     }
     /* self=1/self */

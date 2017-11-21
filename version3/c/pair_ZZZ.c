@@ -29,14 +29,15 @@ static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,FP_YYY *Qx,FP_YYY 
 	FP2_YYY X1,Y1,T1,T2;
 	FP2_YYY XX,YY,ZZ,YZ;
     FP4_YYY a,b,c;
-	FP4_YYY_zero(&c);
 
-    if (A==B)
+	if (A==B)
     {
         /* doubling */
  		FP2_YYY_copy(&XX,&(A->x));	//FP2 XX=new FP2(A.getx());  //X
 		FP2_YYY_copy(&YY,&(A->y));	//FP2 YY=new FP2(A.gety());  //Y
 		FP2_YYY_copy(&ZZ,&(A->z));	//FP2 ZZ=new FP2(A.getz());  //Z
+
+
 		FP2_YYY_copy(&YZ,&YY);		//FP2 YZ=new FP2(YY);        //Y 
 		FP2_YYY_mul(&YZ,&YZ,&ZZ);		//YZ.mul(ZZ);                //YZ
 		FP2_YYY_sqr(&XX,&XX);		//XX.sqr();	               //X^2
@@ -45,25 +46,39 @@ static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,FP_YYY *Qx,FP_YYY 
 			
 		FP2_YYY_imul(&YZ,&YZ,4);	//YZ.imul(4);
 		FP2_YYY_neg(&YZ,&YZ);		//YZ.neg(); 
-		FP2_YYY_norm(&YZ);			//YZ.norm();       //-2YZ
-		FP2_YYY_pmul(&YZ,&YZ,Qy);	//YZ.pmul(Qy);               //-2YZ.Ys
+		FP2_YYY_norm(&YZ);			//YZ.norm();       //-4YZ
 
-		FP2_YYY_imul(&XX,&XX,6);	//XX.imul(6);                //3X^2
-		FP2_YYY_pmul(&XX,&XX,Qx);		//XX.pmul(Qx);               //3X^2.Xs
+		FP2_YYY_imul(&XX,&XX,6);					//6X^2
+		FP2_YYY_pmul(&XX,&XX,Qx);	               //6X^2.Xs
 
-		FP2_YYY_imul(&ZZ,&ZZ,3*CURVE_B_I_ZZZ);	//int sb=3*ROM.CURVE_B_I; ZZ.imul(sb); 
+		FP2_YYY_imul(&ZZ,&ZZ,3*CURVE_B_I_ZZZ);	//3Bz^2 
 
-//printf("ZZ= "); FP2_YYY_output(&ZZ); printf("\n");
+		FP2_YYY_pmul(&YZ,&YZ,Qy);	//-4YZ.Ys
 
-		FP2_YYY_div_ip2(&ZZ);		//ZZ.div_ip2();  
-		FP2_YYY_norm(&ZZ);			//ZZ.norm(); // 3b.Z^2 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+		FP2_YYY_div_ip2(&ZZ);		//6(b/i)z^2
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP2_YYY_mul_ip(&ZZ);
+		FP2_YYY_add(&ZZ,&ZZ,&ZZ);  // 6biz^2
+		FP2_YYY_mul_ip(&YZ);
+		FP2_YYY_norm(&YZ);	
+#endif
+		FP2_YYY_norm(&ZZ);			// 6bi.Z^2 
 
-		FP2_YYY_add(&YY,&YY,&YY);	//YY.add(YY);
-		FP2_YYY_sub(&ZZ,&ZZ,&YY);	//ZZ.sub(YY); 
-		FP2_YYY_norm(&ZZ);			//ZZ.norm();     // 3b.Z^2-Y^2
+		FP2_YYY_add(&YY,&YY,&YY);	// 2y^2
+		FP2_YYY_sub(&ZZ,&ZZ,&YY);	// 
+		FP2_YYY_norm(&ZZ);			// 6b.Z^2-2Y^2
 
-		FP4_YYY_from_FP2s(&a,&YZ,&ZZ); //a=new FP4(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
-		FP4_YYY_from_FP2(&b,&XX);		//b=new FP4(XX);             // L(0,1) | L(0,0) | L(1,0)
+		FP4_YYY_from_FP2s(&a,&YZ,&ZZ); // -4YZ.Ys | 6b.Z^2-2Y^2 | 6X^2.Xs 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+		FP4_YYY_from_FP2(&b,&XX);	
+		FP4_YYY_zero(&c);
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP4_YYY_zero(&b);
+		FP4_YYY_from_FP2H(&c,&XX);
+#endif
 
 		ECP2_ZZZ_dbl(A);				//A.dbl();
     }
@@ -74,8 +89,9 @@ static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,FP_YYY *Qx,FP_YYY 
 		FP2_YYY_copy(&X1,&(A->x));		//FP2 X1=new FP2(A.getx());    // X1
 		FP2_YYY_copy(&Y1,&(A->y));		//FP2 Y1=new FP2(A.gety());    // Y1
 		FP2_YYY_copy(&T1,&(A->z));		//FP2 T1=new FP2(A.getz());    // Z1
-		FP2_YYY_copy(&T2,&(A->z));		//FP2 T2=new FP2(A.getz());    // Z1
 			
+		FP2_YYY_copy(&T2,&T1);		//FP2 T2=new FP2(A.getz());    // Z1
+
 		FP2_YYY_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());    // T1=Z1.Y2 
 		FP2_YYY_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());    // T2=Z1.X2
 
@@ -85,7 +101,13 @@ static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,FP_YYY *Qx,FP_YYY 
 		FP2_YYY_norm(&Y1);				//Y1.norm();  // Y1=Y1-Z1.Y2
 
 		FP2_YYY_copy(&T1,&X1);			//T1.copy(X1);            // T1=X1-Z1.X2
+
 		FP2_YYY_pmul(&X1,&X1,Qy);		//X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP2_YYY_mul_ip(&X1);
+		FP2_YYY_norm(&X1);
+#endif
+
 		FP2_YYY_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());       // T1=(X1-Z1.X2).Y2
 
 		FP2_YYY_copy(&T2,&Y1);			//T2.copy(Y1);            // T2=Y1-Z1.Y2
@@ -96,12 +118,18 @@ static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,FP_YYY *Qx,FP_YYY 
 		FP2_YYY_neg(&Y1,&Y1);			//Y1.neg(); 
 		FP2_YYY_norm(&Y1);				//Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
 
-
-		FP4_YYY_from_FP2s(&a,&X1,&T2);	//a=new FP4(X1,T2);       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+		FP4_YYY_from_FP2s(&a,&X1,&T2);	// (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+#if SEXTIC_TWIST_ZZZ==D_TYPE
 		FP4_YYY_from_FP2(&b,&Y1);		//b=new FP4(Y1);
-
+		FP4_YYY_zero(&c);
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP4_YYY_zero(&b);
+		FP4_YYY_from_FP2H(&c,&Y1);		//b=new FP4(Y1);
+#endif
 		ECP2_ZZZ_add(A,B);			//A.add(B);
     }
+
     FP12_YYY_from_FP4s(v,&a,&b,&c);
 //	FP12_YYY_norm(v);
 }
@@ -122,6 +150,11 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
     FP_YYY_rcopy(&Qx,Fra_YYY);
     FP_YYY_rcopy(&Qy,Frb_YYY);
     FP2_YYY_from_FPs(&X,&Qx,&Qy);
+
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP2_YYY_inv(&X,&X);
+	FP2_YYY_norm(&X);
+#endif
 
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
 
@@ -148,23 +181,23 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
     for (i=nb-2; i>=1; i--)
     {
         PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
-        FP12_YYY_smul(r,&lv);
+        FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         if (BIG_XXX_bit(n,i))
         {
 
             PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
-            FP12_YYY_smul(r,&lv);
+            FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
         FP12_YYY_sqr(r,r);
     }
 
     PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
-    FP12_YYY_smul(r,&lv);
+    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
     if (BIG_XXX_parity(n))
     {
         PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
-        FP12_YYY_smul(r,&lv);
+        FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
     }
 
     /* R-ate fixup required for BN curves */
@@ -176,11 +209,11 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
     FP12_YYY_conj(r,r);
 
     PAIR_ZZZ_line(&lv,&A,&KA,&Qx,&Qy);
-    FP12_YYY_smul(r,&lv);
+    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
     ECP2_ZZZ_frob(&KA,&X);
     ECP2_ZZZ_neg(&KA);
     PAIR_ZZZ_line(&lv,&A,&KA,&Qx,&Qy);
-    FP12_YYY_smul(r,&lv);
+    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 #endif
 }
 
@@ -199,6 +232,11 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
     FP_YYY_rcopy(&Qx,Fra_YYY);
     FP_YYY_rcopy(&Qy,Frb_YYY);
     FP2_YYY_from_FPs(&X,&Qx,&Qy);
+
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP2_YYY_inv(&X,&X);
+	FP2_YYY_norm(&X);
+#endif
 
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
 
@@ -226,36 +264,36 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
     for (i=nb-2; i>=1; i--)
     {
         PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
-        FP12_YYY_smul(r,&lv);
+        FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
         PAIR_ZZZ_line(&lv,&B,&B,&Sx,&Sy);
-        FP12_YYY_smul(r,&lv);
+        FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
         if (BIG_XXX_bit(n,i))
         {
             PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
-            FP12_YYY_smul(r,&lv);
+            FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
             PAIR_ZZZ_line(&lv,&B,R,&Sx,&Sy);
-            FP12_YYY_smul(r,&lv);
+            FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
         FP12_YYY_sqr(r,r);
 
 	}
 
     PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
-    FP12_YYY_smul(r,&lv);
+    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
     PAIR_ZZZ_line(&lv,&B,&B,&Sx,&Sy);
-    FP12_YYY_smul(r,&lv);
+    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
     if (BIG_XXX_parity(n))
     {
         PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
-        FP12_YYY_smul(r,&lv);
+        FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
         PAIR_ZZZ_line(&lv,&B,R,&Sx,&Sy);
-        FP12_YYY_smul(r,&lv);
+        FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
     }
 
     /* R-ate fixup required for BN curves */
@@ -266,21 +304,21 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
     ECP2_ZZZ_frob(&K,&X);
     ECP2_ZZZ_neg(&A);
     PAIR_ZZZ_line(&lv,&A,&K,&Qx,&Qy);
-    FP12_YYY_smul(r,&lv);
+    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
     ECP2_ZZZ_frob(&K,&X);
     ECP2_ZZZ_neg(&K);
     PAIR_ZZZ_line(&lv,&A,&K,&Qx,&Qy);
-    FP12_YYY_smul(r,&lv);
+    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
     ECP2_ZZZ_copy(&K,R);
     ECP2_ZZZ_frob(&K,&X);
     ECP2_ZZZ_neg(&B);
     PAIR_ZZZ_line(&lv,&B,&K,&Sx,&Sy);
-    FP12_YYY_smul(r,&lv);
+    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
     ECP2_ZZZ_frob(&K,&X);
     ECP2_ZZZ_neg(&K);
     PAIR_ZZZ_line(&lv,&B,&K,&Sx,&Sy);
-    FP12_YYY_smul(r,&lv);
+    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 #endif
 }
 
@@ -508,7 +546,7 @@ static void glv(BIG_XXX u[2],BIG_XXX e)
 
     BIG_XXX x,x2,q;
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
-    BIG_XXX_smul(x2,x,x);
+    BIG_XXX_mul(x2,x,x);
     BIG_XXX_copy(u[0],e);
     BIG_XXX_mod(u[0],x2);
     BIG_XXX_copy(u[1],e);
@@ -627,6 +665,11 @@ void PAIR_ZZZ_G2mul(ECP2_ZZZ *P,BIG_XXX e)
     FP_YYY_rcopy(&fx,Fra_YYY);
     FP_YYY_rcopy(&fy,Frb_YYY);
     FP2_YYY_from_FPs(&X,&fx,&fy);
+
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP2_YYY_inv(&X,&X);
+	FP2_YYY_norm(&X);
+#endif
 
     BIG_XXX_rcopy(y,CURVE_Order_ZZZ);
     gs(u,e);

@@ -71,6 +71,14 @@ void FP4_YYY_from_FP2(FP4_YYY *w,FP2_YYY *x)
     FP2_YYY_zero(&(w->b));
 }
 
+/* set high part of FP4 from FP2 */
+/* SU= 8 */
+void FP4_YYY_from_FP2H(FP4_YYY *w,FP2_YYY *x)
+{
+    FP2_YYY_copy(&(w->b), x);
+    FP2_YYY_zero(&(w->a));
+}
+
 /* FP4 copy w=x */
 /* SU= 16 */
 void FP4_YYY_copy(FP4_YYY *w,FP4_YYY *x)
@@ -384,9 +392,11 @@ void FP4_YYY_xtr_pow(FP4_YYY *r,FP4_YYY *x,BIG_XXX n)
 
     BIG_XXX_zero(v);
     BIG_XXX_inc(v,3);
+	BIG_XXX_norm(v);
     FP2_YYY_from_BIG(&w,v);
     FP4_YYY_from_FP2(&a,&w);
-    FP4_YYY_copy(&b,x);
+    
+	FP4_YYY_copy(&b,x);
     FP4_YYY_xtr_D(&c,x);
 
     BIG_XXX_norm(n);
@@ -400,7 +410,6 @@ void FP4_YYY_xtr_pow(FP4_YYY *r,FP4_YYY *x,BIG_XXX n)
     }
 
     nb=BIG_XXX_nbits(v);
-
     for (i=nb-1; i>=0; i--)
     {
         if (!BIG_XXX_bit(v,i))
@@ -421,6 +430,7 @@ void FP4_YYY_xtr_pow(FP4_YYY *r,FP4_YYY *x,BIG_XXX n)
             FP4_YYY_xtr_D(&c,&c);
         }
     }
+
     if (par==0) FP4_YYY_copy(r,&c);
     else FP4_YYY_copy(r,&b);
     FP4_YYY_reduce(r);
@@ -450,7 +460,6 @@ void FP4_YYY_xtr_pow2(FP4_YYY *r,FP4_YYY *ck,FP4_YYY *cl,FP4_YYY *ckml,FP4_YYY *
         BIG_XXX_shr(e,1);
         f2++;
     }
-
     while (BIG_XXX_comp(d,e)!=0)
     {
         if (BIG_XXX_comp(d,e)>0)
@@ -555,7 +564,6 @@ void FP4_YYY_xtr_pow2(FP4_YYY *r,FP4_YYY *ck,FP4_YYY *cl,FP4_YYY *ckml,FP4_YYY *
             }
         }
     }
-
     FP4_YYY_xtr_A(r,&cu,&cv,&cumv,&cum2v);
     for (i=0; i<f2; i++)	FP4_YYY_xtr_D(r,r);
     FP4_YYY_xtr_pow(r,r,d);

@@ -247,40 +247,91 @@ func (F *FP12) mul(y *FP12) {
 }
 
 /* Special case of multiplication arises from special form of ATE pairing line function */
-func (F *FP12) smul(y *FP12) {
-	z0:=NewFP4copy(F.a)
-	z2:=NewFP4copy(F.b)
-	z3:=NewFP4copy(F.b)
-	t0:=NewFP4int(0)
-	t1:=NewFP4copy(y.a)
+func (F *FP12) smul(y *FP12,twist int ) {
+	if twist==D_TYPE {
+		z0:=NewFP4copy(F.a)
+		z2:=NewFP4copy(F.b)
+		z3:=NewFP4copy(F.b)
+		t0:=NewFP4int(0)
+		t1:=NewFP4copy(y.a)
 		
-	z0.mul(y.a)
-	z2.pmul(y.b.real());
-	F.b.add(F.a)
-	t1.real().add(y.b.real())
+		z0.mul(y.a)
+		z2.pmul(y.b.real());
+		F.b.add(F.a)
+		t1.real().add(y.b.real())
 
-	t1.norm(); F.b.norm()
-	F.b.mul(t1)
-	z3.add(F.c); z3.norm()
-	z3.pmul(y.b.real())
+		t1.norm(); F.b.norm()
+		F.b.mul(t1)
+		z3.add(F.c); z3.norm()
+		z3.pmul(y.b.real())
 
-	t0.copy(z0); t0.neg()
-	t1.copy(z2); t1.neg()
+		t0.copy(z0); t0.neg()
+		t1.copy(z2); t1.neg()
 
-	F.b.add(t0)
+		F.b.add(t0)
 	//F.b.norm();
 
-	F.b.add(t1)
-	z3.add(t1); z3.norm()
-	z2.add(t0)
+		F.b.add(t1)
+		z3.add(t1); z3.norm()
+		z2.add(t0)
 
-	t0.copy(F.a); t0.add(F.c); t0.norm()
-	t0.mul(y.a)
-	F.c.copy(z2); F.c.add(t0)
+		t0.copy(F.a); t0.add(F.c); t0.norm()
+		t0.mul(y.a)
+		F.c.copy(z2); F.c.add(t0)
 
-	z3.times_i()
-	F.a.copy(z0); F.a.add(z3)
+		z3.times_i()
+		F.a.copy(z0); F.a.add(z3)
+	}
+	if twist==M_TYPE {
+		z0:=NewFP4copy(F.a)
+		z1:=NewFP4int(0)
+		z2:=NewFP4int(0)
+		z3:=NewFP4int(0)
+		t0:=NewFP4copy(F.a)
+		t1:=NewFP4int(0)
+		
+		z0.mul(y.a)
+		t0.add(F.b)
+		t0.norm()
 
+		z1.copy(t0); z1.mul(y.a)
+		t0.copy(F.b); t0.add(F.c)
+		t0.norm()
+
+		z3.copy(t0) //z3.mul(y.c);
+		z3.pmul(y.c.getb())
+		z3.times_i()
+
+		t0.copy(z0); t0.neg()
+
+		z1.add(t0)
+		F.b.copy(z1) 
+		z2.copy(t0)
+
+		t0.copy(F.a); t0.add(F.c)
+		t1.copy(y.a); t1.add(y.c)
+
+		t0.norm()
+		t1.norm()
+	
+		t0.mul(t1)
+		z2.add(t0)
+
+		t0.copy(F.c)
+			
+		t0.pmul(y.c.getb())
+		t0.times_i()
+
+		t1.copy(t0); t1.neg()
+
+		F.c.copy(z2); F.c.add(t1)
+		z3.add(t1)
+		t0.times_i()
+		F.b.add(t0)
+		z3.norm()
+		z3.times_i()
+		F.a.copy(z0); F.a.add(z3)
+	}
 	F.norm()
 }
 

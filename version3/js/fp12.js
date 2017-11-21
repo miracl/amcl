@@ -254,49 +254,102 @@ FP12 = function(ctx) {
         },
 
         /* Special case this*=y that arises from special form of ATE pairing line function */
-        smul: function(y) {
-            var z0 = new ctx.FP4(this.a); //z0.copy(this.a);
-            var z2 = new ctx.FP4(this.b); //z2.copy(this.b);
-            var z3 = new ctx.FP4(this.b); //z3.copy(this.b);
-            var t0 = new ctx.FP4(0);
-            var t1 = new ctx.FP4(y.a); //t1.copy(y.a);
+        smul: function(y,twist) {
+			if (twist == ctx.ECP.D_TYPE)
+			{
+				var z0 = new ctx.FP4(this.a); //z0.copy(this.a);
+				var z2 = new ctx.FP4(this.b); //z2.copy(this.b);
+				var z3 = new ctx.FP4(this.b); //z3.copy(this.b);
+				var t0 = new ctx.FP4(0);
+				var t1 = new ctx.FP4(y.a); //t1.copy(y.a);
 
-            z0.mul(y.a);
-            z2.pmul(y.b.real());
-            this.b.add(this.a);
-            t1.real().add(y.b.real());
+				z0.mul(y.a);
+				z2.pmul(y.b.real());
+				this.b.add(this.a);
+				t1.real().add(y.b.real());
 
-            this.b.norm();
-            t1.norm();
+				this.b.norm();
+				t1.norm();
 
-            this.b.mul(t1);
-            z3.add(this.c);
-            z3.norm();
-            z3.pmul(y.b.real());
+				this.b.mul(t1);
+				z3.add(this.c);
+				z3.norm();
+				z3.pmul(y.b.real());
 
-            t0.copy(z0);
-            t0.neg();
-            t1.copy(z2);
-            t1.neg();
+				t0.copy(z0);
+				t0.neg();
+				t1.copy(z2);
+				t1.neg();
 
-            this.b.add(t0);
+				this.b.add(t0);
 
-            this.b.add(t1);
-            z3.add(t1);
-            z2.add(t0);
+				this.b.add(t1);
+				z3.add(t1);
+				z2.add(t0);
 
-            t0.copy(this.a);
-            t0.add(this.c);
-            t0.norm();
-            t0.mul(y.a);
-            this.c.copy(z2);
-            this.c.add(t0);
+				t0.copy(this.a);
+				t0.add(this.c);
+				t0.norm();
+				t0.mul(y.a);
+				this.c.copy(z2);
+				this.c.add(t0);
             //z3.norm();
-            z3.times_i();
-            this.a.copy(z0);
-            this.a.add(z3);
+				z3.times_i();
+				this.a.copy(z0);
+				this.a.add(z3);
+			}
+			if (twist == ctx.ECP.M_TYPE)
+			{
+				var z0=new ctx.FP4(this.a);
+				var z1=new ctx.FP4(0);
+				var z2=new ctx.FP4(0);
+				var z3=new ctx.FP4(0);
+				var t0=new ctx.FP4(this.a);
+				var t1=new ctx.FP4(0);
+		
+				z0.mul(y.a);
+				t0.add(this.b);
+				t0.norm();
 
-            this.norm();
+				z1.copy(t0); z1.mul(y.a);
+				t0.copy(this.b); t0.add(this.c);
+				t0.norm();
+
+				z3.copy(t0); //z3.mul(y.c);
+				z3.pmul(y.c.getb());
+				z3.times_i();
+
+				t0.copy(z0); t0.neg();
+
+				z1.add(t0);
+				this.b.copy(z1); 
+				z2.copy(t0);
+
+				t0.copy(this.a); t0.add(this.c);
+				t1.copy(y.a); t1.add(y.c);
+
+				t0.norm();
+				t1.norm();
+	
+				t0.mul(t1);
+				z2.add(t0);
+
+				t0.copy(this.c); 
+			
+				t0.pmul(y.c.getb());
+				t0.times_i();
+
+				t1.copy(t0); t1.neg();
+
+				this.c.copy(z2); this.c.add(t1);
+				z3.add(t1);
+				t0.times_i();
+				this.b.add(t0);
+				z3.norm();
+				z3.times_i();
+				this.a.copy(z0); this.a.add(z3);
+			}
+			this.norm();
         },
 
         /* this=1/this */

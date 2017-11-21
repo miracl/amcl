@@ -34,7 +34,7 @@ public final class PAIR {
 	{
 //System.out.println("Into line");
 		FP4 a,b,c;                            // Edits here
-		c=new FP4(0);
+//		c=new FP4(0);
 		if (A==B)
 		{ // Doubling
 			FP2 XX=new FP2(A.getx());  //X
@@ -56,14 +56,34 @@ public final class PAIR {
 			int sb=3*ROM.CURVE_B_I;
 			ZZ.imul(sb); 	
 			
-			ZZ.div_ip2();  ZZ.norm(); // 3b.Z^2 
+			if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+			{
+				ZZ.div_ip2();
+			}
+			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			{
+				ZZ.mul_ip();
+				ZZ.add(ZZ);
+				YZ.mul_ip();
+				YZ.norm();
+			}
+			
+			ZZ.norm(); // 3b.Z^2 
 
 			YY.add(YY);
 			ZZ.sub(YY); ZZ.norm();     // 3b.Z^2-Y^2
 
 			a=new FP4(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
-			b=new FP4(XX);             // L(0,1) | L(0,0) | L(1,0)
-
+			if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+			{			
+				b=new FP4(XX);             // L(0,1) | L(0,0) | L(1,0)
+				c=new FP4(0);
+			}
+			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			{
+				b=new FP4(0);
+				c=new FP4(XX); c.times_i();
+			}
 			A.dbl();
 		}
 		else
@@ -82,6 +102,13 @@ public final class PAIR {
 
 			T1.copy(X1);            // T1=X1-Z1.X2
 			X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
+
+			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			{
+				X1.mul_ip();
+				X1.norm();
+			}
+
 			T1.mul(B.gety());       // T1=(X1-Z1.X2).Y2
 
 			T2.copy(Y1);            // T2=Y1-Z1.Y2
@@ -90,8 +117,16 @@ public final class PAIR {
 			Y1.pmul(Qx);  Y1.neg(); Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
 
 			a=new FP4(X1,T2);       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
-			b=new FP4(Y1);
-
+			if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+			{
+				b=new FP4(Y1);
+				c=new FP4(0);
+			}
+			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			{
+				b=new FP4(0);
+				c=new FP4(Y1); c.times_i();
+			}
 			A.add(B);
 		}
 //System.out.println("Out of line");
@@ -106,6 +141,12 @@ public final class PAIR {
 		BIG n=new BIG(x);
 		ECP2 K=new ECP2();
 		FP12 lv;
+
+		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		{
+			f.inverse();
+			f.norm();
+		}
 
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
@@ -127,22 +168,22 @@ public final class PAIR {
 		for (int i=nb-2;i>=1;i--)
 		{
 			lv=line(A,A,Qx,Qy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 
 			if (n.bit(i)==1)
 			{
 				lv=line(A,P,Qx,Qy);
-				r.smul(lv);
+				r.smul(lv,ECP.SEXTIC_TWIST);
 			}
 			r.sqr();
 		}
 
 		lv=line(A,A,Qx,Qy);
-		r.smul(lv);
+		r.smul(lv,ECP.SEXTIC_TWIST);
 		if (n.parity()==1)
 		{
 			lv=line(A,P,Qx,Qy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 		}
 
 /* R-ate fixup required for BN curves */
@@ -153,11 +194,11 @@ public final class PAIR {
 			K.frob(f);
 			A.neg();
 			lv=line(A,K,Qx,Qy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 			K.frob(f);
 			K.neg();
 			lv=line(A,K,Qx,Qy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 		}
 		return r;
 	}
@@ -170,6 +211,12 @@ public final class PAIR {
 		BIG n=new BIG(x);
 		ECP2 K=new ECP2();
 		FP12 lv;
+
+		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		{
+			f.inverse();
+			f.norm();
+		}
 
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
@@ -195,32 +242,32 @@ public final class PAIR {
 		for (int i=nb-2;i>=1;i--)
 		{
 			lv=line(A,A,Qx,Qy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 
 			lv=line(B,B,Sx,Sy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 
 			if (n.bit(i)==1)
 			{
 				lv=line(A,P,Qx,Qy);
-				r.smul(lv);
+				r.smul(lv,ECP.SEXTIC_TWIST);
 				lv=line(B,R,Sx,Sy);
-				r.smul(lv);
+				r.smul(lv,ECP.SEXTIC_TWIST);
 			}
 			r.sqr();
 
 		}
 
 		lv=line(A,A,Qx,Qy);
-		r.smul(lv);
+		r.smul(lv,ECP.SEXTIC_TWIST);
 		lv=line(B,B,Sx,Sy);
-		r.smul(lv);
+		r.smul(lv,ECP.SEXTIC_TWIST);
 		if (n.parity()==1)
 		{
 			lv=line(A,P,Qx,Qy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 			lv=line(B,R,Sx,Sy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 		}
 
 /* R-ate fixup required for BN curves */
@@ -231,21 +278,21 @@ public final class PAIR {
 			K.frob(f);
 			A.neg();
 			lv=line(A,K,Qx,Qy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 			K.frob(f);
 			K.neg();
 			lv=line(A,K,Qx,Qy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 
 			K.copy(R);
 			K.frob(f);
 			B.neg();
 			lv=line(B,K,Sx,Sy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 			K.frob(f);
 			K.neg();
 			lv=line(B,K,Sx,Sy);
-			r.smul(lv);
+			r.smul(lv,ECP.SEXTIC_TWIST);
 		}
 		return r;
 	}
@@ -496,6 +543,13 @@ public final class PAIR {
 		{
 			ECP2[] Q=new ECP2[4];
 			FP2 f=new FP2(new BIG(ROM.Fra),new BIG(ROM.Frb));
+
+			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			{
+				f.inverse();
+				f.norm();
+			}
+
 			BIG q=new BIG(ROM.CURVE_Order);
 			BIG[] u=gs(e);
 

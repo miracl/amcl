@@ -32,9 +32,12 @@ final public class ECP {
     static public let NOT=0
     static public let BN=1
     static public let BLS=2
+    static public let D_TYPE=0
+    static public let M_TYPE=1
 
     static public let CURVETYPE = @CT@
     static public let CURVE_PAIRING_TYPE = @PF@
+    static public let SEXTIC_TWIST = @ST@
 
     private var x:FP
     private var y:FP

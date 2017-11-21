@@ -18,6 +18,7 @@ under the License.
 */
 
 use xxx::big;
+use xxx::ecp;
 use xxx::fp2::FP2;
 use xxx::fp4::FP4;
 use xxx::big::BIG;
@@ -271,43 +272,95 @@ impl FP12 {
 	}
 
 /* Special case of multiplication arises from special form of ATE pairing line function */
-	pub fn smul(&mut self,y: &FP12) {
-		let mut z0=FP4::new_copy(&self.a);
-		let mut z2=FP4::new_copy(&self.b);
-		let mut z3=FP4::new_copy(&self.b);
-		let mut t0=FP4::new();
-		let mut t1=FP4::new_copy(&y.a);
+	pub fn smul(&mut self,y: &FP12,twist: usize) {
+
+		if twist==ecp::D_TYPE {
+			let mut z0=FP4::new_copy(&self.a);
+			let mut z2=FP4::new_copy(&self.b);
+			let mut z3=FP4::new_copy(&self.b);
+			let mut t0=FP4::new();
+			let mut t1=FP4::new_copy(&y.a);
 		
-		z0.mul(&y.a);
-		z2.pmul(&y.b.real());
-		self.b.add(&self.a);
-		t1.padd(&y.b.real());
+			z0.mul(&y.a);
+			z2.pmul(&y.b.real());
+			self.b.add(&self.a);
+			t1.padd(&y.b.real());
 
-		self.b.norm(); t1.norm();
+			self.b.norm(); t1.norm();
 
-		self.b.mul(&t1);
-		z3.add(&self.c); z3.norm();
-		z3.pmul(&y.b.real());
+			self.b.mul(&t1);
+			z3.add(&self.c); z3.norm();
+			z3.pmul(&y.b.real());
 
-		t0.copy(&z0); t0.neg();
-		t1.copy(&z2); t1.neg();
+			t0.copy(&z0); t0.neg();
+			t1.copy(&z2); t1.neg();
 	
-		self.b.add(&t0);
+			self.b.add(&t0);
 		//self.b.norm();
 
-		self.b.add(&t1);
-		z3.add(&t1);
-		z2.add(&t0);
+			self.b.add(&t1);
+			z3.add(&t1);
+			z2.add(&t0);
 
-		t0.copy(&self.a); t0.add(&self.c);
-		t0.norm(); z3.norm();
+			t0.copy(&self.a); t0.add(&self.c);
+			t0.norm(); z3.norm();
 			
-		t0.mul(&y.a);
-		self.c.copy(&z2); self.c.add(&t0);
+			t0.mul(&y.a);
+			self.c.copy(&z2); self.c.add(&t0);
 
-		z3.times_i();
-		self.a.copy(&z0); self.a.add(&z3);
+			z3.times_i();
+			self.a.copy(&z0); self.a.add(&z3);
+		}
+		if twist==ecp::M_TYPE {
+			let mut z0=FP4::new_copy(&self.a);
+			let mut z1=FP4::new();
+			let mut z2=FP4::new();
+			let mut z3=FP4::new();
+			let mut t0=FP4::new_copy(&self.a);
+			let mut t1=FP4::new();
+		
+			z0.mul(&y.a);
+			t0.add(&self.b);
+			t0.norm();
 
+			z1.copy(&t0); z1.mul(&y.a);
+			t0.copy(&self.b); t0.add(&self.c);
+			t0.norm();
+
+			z3.copy(&t0); //z3.mul(y.c);
+			z3.pmul(&y.c.getb());
+			z3.times_i();
+
+			t0.copy(&z0); t0.neg();
+
+			z1.add(&t0);
+			self.b.copy(&z1); 
+			z2.copy(&t0);
+
+			t0.copy(&self.a); t0.add(&self.c);
+			t1.copy(&y.a); t1.add(&y.c);
+
+			t0.norm();
+			t1.norm();
+	
+			t0.mul(&t1);
+			z2.add(&t0);
+
+			t0.copy(&self.c);
+			
+			t0.pmul(&y.c.getb());
+			t0.times_i();
+
+			t1.copy(&t0); t1.neg();
+
+			self.c.copy(&z2); self.c.add(&t1);
+			z3.add(&t1);
+			t0.times_i();
+			self.b.add(&t0);
+			z3.norm();
+			z3.times_i();
+			self.a.copy(&z0); self.a.add(&z3);
+		}
 		self.norm();		
 	}
 

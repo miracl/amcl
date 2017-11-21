@@ -87,8 +87,9 @@ extern void FP12_YYY_sqr(FP12_YYY *x,FP12_YYY *y);
 	Here the multiplier has a special form that can be exploited
 	@param x FP12 instance, on exit = x*y
 	@param y FP12 instance, of special form
+	@param t D_TYPE or M_TYPE twist
  */
-extern void FP12_YYY_smul(FP12_YYY *x,FP12_YYY *y);
+extern void FP12_YYY_smul(FP12_YYY *x,FP12_YYY *y,int t);
 /**	@brief Multiplication of two FP12s
  *
 	@param x FP12 instance, on exit = x*y

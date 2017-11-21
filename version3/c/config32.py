@@ -111,6 +111,11 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fnameh,"@CT@",ct)
 	replace(fnameh,"@PF@",pf)
 
+	if tc == "FP256BN" :
+		replace(fnameh,"@ST@","M_TYPE")
+	else :
+		replace(fnameh,"@ST@","D_TYPE")
+
 
 	fnamec="big_"+bd+".c"
 	fnameh="big_"+bd+".h"
@@ -262,16 +267,17 @@ print("16. NUMS512E\n")
 print("Pairing-Friendly Elliptic Curves")
 print("17. BN254")
 print("18. BN254CX")
-print("19. BLS383\n")
+print("19. BLS383")
+print("20. FP256BN\n")
 
 print("RSA")
-print("20. RSA2048")
-print("21. RSA3072")
-print("22. RSA4096")
+print("21. RSA2048")
+print("22. RSA3072")
+print("23. RSA4096")
 
 selection=[]
 ptr=0
-max=23
+max=24
 
 curve_selected=False
 pfcurve_selected=False
@@ -365,6 +371,10 @@ while ptr<max:
 	if x==19:
 		curveset("384","BLS383","BLS383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
 		pfcurve_selected=True
+	if x==20:
+		curveset("256","FP256BN","FP256BN","32","28","256","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		pfcurve_selected=True
+
 
 # rsaset(big,ring,big_length_bytes,16_bit_bits_in_base,32_bit_bits_in_base,64_bit_bits_in_base,multiplier)
 # for each choice give distinct names for "big" and "ring".
@@ -375,17 +385,17 @@ while ptr<max:
 # multiplier is 2^m (see above)
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==20:
+	if x==21:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("1024","2048","128","28","2")
 		#rsaset("512","2048","64","29","4")
 		#rsaset("256","2048","32","29","8")
 		rsa_selected=True
-	if x==21:
+	if x==22:
 		rsaset("384","3072","48","28","8")
 		rsa_selected=True
-	if x==22:
+	if x==23:
 		#rsaset("256","4096","32","29","16")
 		rsaset("512","4096","64","29","8")
 		rsa_selected=True

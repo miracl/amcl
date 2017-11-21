@@ -2,6 +2,7 @@
 #define ECP2_ZZZ_H
 
 #include "fp2_YYY.h"
+#include "config_curve_ZZZ.h"
 
 /**
 	@brief ECP2 Structure - Elliptic Curve Point over quadratic extension field

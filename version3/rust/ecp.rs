@@ -35,9 +35,12 @@ pub const MONTGOMERY:usize=2;
 pub const NOT: usize=0;
 pub const BN: usize=1;
 pub const BLS: usize=2;
+pub const D_TYPE: usize=0;
+pub const M_TYPE: usize=1;
 
 pub const CURVETYPE:usize=@CT@;
 pub const CURVE_PAIRING_TYPE:usize=@PF@;
+pub const SEXTIC_TWIST:usize=@ST@;
 
 
 #[allow(non_snake_case)]

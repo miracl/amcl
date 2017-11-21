@@ -108,6 +108,11 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fpath+"ECP.java","@CT@",ct)
 	replace(fpath+"ECP.java","@PF@",pf)
 
+	if tc == "FP256BN" :
+		replace(fpath+"ECP.java","@ST@","M_TYPE")
+	else :
+		replace(fpath+"ECP.java","@ST@","D_TYPE")
+
 
 	if pf != "NOT" :
 		os.system(copytext+"ECP2.java "+fpath+"ECP2.java")
@@ -174,16 +179,17 @@ print("16. NUMS512E\n")
 print("Pairing-Friendly Elliptic Curves")
 print("17. BN254")
 print("18. BN254CX")
-print("19. BLS383\n")
+print("19. BLS383")
+print("20. FP256BN\n")
 
 print("RSA")
-print("20. RSA2048")
-print("21. RSA3072")
-print("22. RSA4096")
+print("21. RSA2048")
+print("22. RSA3072")
+print("23. RSA4096")
 
 selection=[]
 ptr=0
-max=23
+max=24
 
 curve_selected=False
 pfcurve_selected=False
@@ -269,31 +275,35 @@ while ptr<max:
 
 
 	if x==17:
-		curveset("BN254","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN")  # change to 28
+		curveset("BN254","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN")  
 		pfcurve_selected=True
 	if x==18:
-		curveset("BN254CX","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN")  # change to 28
+		curveset("BN254CX","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN")  
 		pfcurve_selected=True
 	if x==19:
-		curveset("BLS383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")  # change to 29
+		curveset("BLS383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS") 
 		pfcurve_selected=True
+	if x==20:
+		curveset("FP256BN","32","28","256","3","NOT_SPECIAL","WEIERSTRASS","BN") 
+		pfcurve_selected=True
+
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
 # The RSA name reflects the modulus size, which is a 2^m multiplier
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==20:
+	if x==21:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("RSA2048","128","28","2")
 		#rsaset("RSA2048","64","29","4")
 		#rsaset("RSA2048","32","29","8")
 		rsa_selected=True
-	if x==21:
+	if x==22:
 		rsaset("RSA3072","48","28","8")
 		rsa_selected=True
-	if x==22:
+	if x==23:
 		#rsaset("RSA4096","32","29","16")
 		rsaset("RSA4096","64","29","8")
 		rsa_selected=True

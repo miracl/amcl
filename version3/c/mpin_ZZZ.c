@@ -88,7 +88,9 @@ static void map(ECP_ZZZ *P,BIG_XXX u,int cb)
     BIG_XXX_mod(x,q);
 
     while (!ECP_ZZZ_setx(P,x,cb))
-        BIG_XXX_inc(x,1);
+	{
+        BIG_XXX_inc(x,1); BIG_XXX_norm(x);
+	}
 }
 
 /* returns u derived from P. Random value in range 1 to return value should then be added to u */
@@ -101,7 +103,7 @@ static int unmap(BIG_XXX u,int *cb,ECP_ZZZ *P)
     BIG_XXX_copy(u,x);
     do
     {
-        BIG_XXX_dec(u,1);
+        BIG_XXX_dec(u,1); BIG_XXX_norm(u);
         r++;
     }
     while (!ECP_ZZZ_setx(P,u,s));
@@ -123,7 +125,6 @@ int MPIN_ZZZ_ENCODING(csprng *RNG,octet *E)
     ECP_ZZZ P,W;
 
     if (!ECP_ZZZ_fromOctet(&P,E)) res=MPIN_INVALID_POINT;
-
     if (res==0)
     {
         BIG_XXX_rcopy(q,Modulus_YYY);
@@ -145,7 +146,6 @@ int MPIN_ZZZ_ENCODING(csprng *RNG,octet *E)
         BIG_XXX_toBytes(&(E->val[1]),u);
         BIG_XXX_toBytes(&(E->val[PFS_ZZZ+1]),v);
     }
-
     return res;
 }
 
@@ -165,13 +165,12 @@ int MPIN_ZZZ_DECODING(octet *D)
 
         su=D->val[0]&1;
         sv=(D->val[0]>>1)&1;
-
         map(&W,u,su);
         map(&P,v,sv);
-
         ECP_ZZZ_add(&P,&W);
         ECP_ZZZ_toOctet(D,&P);
     }
+
     return res;
 }
 
@@ -447,10 +446,12 @@ int MPIN_ZZZ_GET_SERVER_SECRET(octet *S,octet *SST)
     FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
     FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
     FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
+
     ECP2_ZZZ_set(&Q,&qx,&qy);
 
     if (res==0)
     {
+
         BIG_XXX_fromBytes(s,S->val);
         PAIR_ZZZ_G2mul(&Q,s);
         ECP2_ZZZ_toOctet(SST,&Q);

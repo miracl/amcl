@@ -272,45 +272,98 @@ t1.norm();
 	}
 
 /* Special case of multiplication arises from special form of ATE pairing line function */
-	public void smul(FP12 y)
+	public void smul(FP12 y,int type)
 	{
 //System.out.println("Into smul");
-		FP4 z0=new FP4(a);
-		FP4 z2=new FP4(b);
-		FP4 z3=new FP4(b);
-		FP4 t0=new FP4(0);
-		FP4 t1=new FP4(y.a);
 
-		z0.mul(y.a);
-		z2.pmul(y.b.real());
-		b.add(a);
-		t1.real().add(y.b.real());
+		if (type==ECP.D_TYPE)
+		{
+			FP4 z0=new FP4(a);
+			FP4 z2=new FP4(b);
+			FP4 z3=new FP4(b);
+			FP4 t0=new FP4(0);
+			FP4 t1=new FP4(y.a);
+			z0.mul(y.a);
+			z2.pmul(y.b.real());
+			b.add(a);
+			t1.real().add(y.b.real());
 
-		t1.norm();
-		b.norm();
-		b.mul(t1);
-		z3.add(c);
-		z3.norm();
-		z3.pmul(y.b.real());
+			t1.norm();
+			b.norm();
+			b.mul(t1);
+			z3.add(c);
+			z3.norm();
+			z3.pmul(y.b.real());
 
-		t0.copy(z0); t0.neg();
-		t1.copy(z2); t1.neg();
+			t0.copy(z0); t0.neg();
+			t1.copy(z2); t1.neg();
 
-		b.add(t0);
+			b.add(t0);
 
-		b.add(t1);
-		z3.add(t1);
-		z2.add(t0);
+			b.add(t1);
+			z3.add(t1);
+			z2.add(t0);
 
-		t0.copy(a); t0.add(c);
-		t0.norm();
-		z3.norm();
-		t0.mul(y.a);
-		c.copy(z2); c.add(t0);
+			t0.copy(a); t0.add(c);
+			t0.norm();
+			z3.norm();
+			t0.mul(y.a);
+			c.copy(z2); c.add(t0);
 
-		z3.times_i();
-		a.copy(z0); a.add(z3);
+			z3.times_i();
+			a.copy(z0); a.add(z3);
+		}
+		if (type==ECP.M_TYPE)
+		{
+			FP4 z0=new FP4(a);
+			FP4 z1=new FP4(0);
+			FP4 z2=new FP4(0);
+			FP4 z3=new FP4(0);
+			FP4 t0=new FP4(a);
+			FP4 t1=new FP4(0);
+		
+			z0.mul(y.a);
+			t0.add(b);
+			t0.norm();
 
+			z1.copy(t0); z1.mul(y.a);
+			t0.copy(b); t0.add(c);
+			t0.norm();
+
+			z3.copy(t0); //z3.mul(y.c);
+			z3.pmul(y.c.getb());
+			z3.times_i();
+
+			t0.copy(z0); t0.neg();
+
+			z1.add(t0);
+			b.copy(z1); 
+			z2.copy(t0);
+
+			t0.copy(a); t0.add(c);
+			t1.copy(y.a); t1.add(y.c);
+
+			t0.norm();
+			t1.norm();
+	
+			t0.mul(t1);
+			z2.add(t0);
+
+			t0.copy(c); 
+			
+			t0.pmul(y.c.getb());
+			t0.times_i();
+
+			t1.copy(t0); t1.neg();
+
+			c.copy(z2); c.add(t1);
+			z3.add(t1);
+			t0.times_i();
+			b.add(t0);
+			z3.norm();
+			z3.times_i();
+			a.copy(z0); a.add(z3);
+		}
 		norm();
 //System.out.println("Out of smul");
 	}

@@ -16,7 +16,7 @@ or perhaps
 
 python3 config64.py
 
-Then select options 1, 17 and 20 (these are fixed for the example 
+Then select options 1, 17 and 21 (these are fixed for the example 
 programs provided, but easily changed). Select 0 to exit.
 
 If these options have been selected, then compile and build the test 

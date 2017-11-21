@@ -54,6 +54,16 @@ extern void FP4_YYY_from_FP2s(FP4_YYY *x,FP2_YYY *a,FP2_YYY *b);
 	@param a FP2 to form real part of FP4
  */
 extern void FP4_YYY_from_FP2(FP4_YYY *x,FP2_YYY *a);
+
+/**	@brief Initialise FP4 from single FP2
+ *
+	real part is set to zero
+	@param x FP4 instance to be initialised
+	@param a FP2 to form imaginary part of FP4
+ */
+extern void FP4_YYY_from_FP2H(FP4_YYY *x,FP2_YYY *a);
+
+
 /**	@brief Copy FP4 to another FP4
  *
 	@param x FP4 instance, on exit = y

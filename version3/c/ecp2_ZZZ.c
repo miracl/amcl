@@ -221,7 +221,7 @@ int ECP2_ZZZ_fromOctet(ECP2_ZZZ *Q,octet *W)
 }
 
 /* SU= 128 */
-/* Calculate RHS of twisted curve equation x^3+B/i */
+/* Calculate RHS of twisted curve equation x^3+B/i or x^3+Bi*/
 void ECP2_ZZZ_rhs(FP2_YYY *rhs,FP2_YYY *x)
 {
     /* calculate RHS of elliptic curve equation */
@@ -237,7 +237,17 @@ void ECP2_ZZZ_rhs(FP2_YYY *rhs,FP2_YYY *x)
 
     FP2_YYY_from_BIG(&t,b);
 
-    FP2_YYY_div_ip(&t);   /* IMPORTANT - here we use the SEXTIC twist of the curve */
+#if SEXTIC_TWIST_ZZZ == D_TYPE	
+    FP2_YYY_div_ip(&t);   /* IMPORTANT - here we use the correct SEXTIC twist of the curve */
+#endif
+
+#if SEXTIC_TWIST_ZZZ == M_TYPE	
+	FP2_YYY_norm(&t);
+    FP2_YYY_mul_ip(&t);   /* IMPORTANT - here we use the correct SEXTIC twist of the curve */
+	FP2_YYY_norm(&t);
+
+#endif
+
 
     FP2_YYY_add(rhs,&t,rhs);
     FP2_YYY_reduce(rhs);
@@ -306,12 +316,15 @@ int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
     if (P->inf) return -1;
 
 	FP2_YYY_copy(&iy,&(P->y));		//FP2 iy=new FP2(y);
+#if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP2_YYY_mul_ip(&iy);			//iy.mul_ip(); 
 	FP2_YYY_norm(&iy);				//iy.norm();
-
+#endif
 	//FP2_YYY_copy(&t0,&(P->y));		//FP2 t0=new FP2(y);                  //***** Change 
-	FP2_YYY_sqr(&t0,&(P->y));			//t0.sqr();            
-	FP2_YYY_mul_ip(&t0);			//t0.mul_ip();   
+	FP2_YYY_sqr(&t0,&(P->y));			//t0.sqr();   
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP2_YYY_mul_ip(&t0);			//t0.mul_ip(); 
+#endif
 	//FP2_YYY_copy(&t1,&iy);				//FP2 t1=new FP2(iy);  
 	FP2_YYY_mul(&t1,&iy,&(P->z));	//t1.mul(z);
 	//FP2_YYY_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
@@ -325,6 +338,10 @@ int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
 	FP2_YYY_norm(&(P->z));			//z.norm();  
 
 	FP2_YYY_imul(&t2,&t2,3*CURVE_B_I_ZZZ);	//t2.imul(3*ROM.CURVE_B_I); 
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP2_YYY_mul_ip(&t2);
+	FP2_YYY_norm(&t2);
+#endif
 
 	//FP2_YYY_copy(&x3,&t2);			//FP2 x3=new FP2(t2);
 	FP2_YYY_mul(&x3,&t2,&(P->z));	//x3.mul(z); 
@@ -389,9 +406,10 @@ int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 
 	FP2_YYY_sub(&t3,&t3,&t4);		//t3.sub(t4); 
 	FP2_YYY_norm(&t3);				//t3.norm(); 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP2_YYY_mul_ip(&t3);			//t3.mul_ip();  
 	FP2_YYY_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
-
+#endif
 	//FP2_YYY_copy(&t4,&(P->y));		//t4.copy(y);                    
 	FP2_YYY_add(&t4,&(P->y),&(P->z));	//t4.add(z); 
 	FP2_YYY_norm(&t4);				//t4.norm();			//t4=Y1+Z1
@@ -405,9 +423,10 @@ int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 	
 	FP2_YYY_sub(&t4,&t4,&x3);		//t4.sub(x3); 
 	FP2_YYY_norm(&t4);				//t4.norm(); 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP2_YYY_mul_ip(&t4);			//t4.mul_ip(); 
 	FP2_YYY_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
-
+#endif
 	//FP2_YYY_copy(&x3,&(P->x));		//x3.copy(x); 
 	FP2_YYY_add(&x3,&(P->x),&(P->z));	//x3.add(z); 
 	FP2_YYY_norm(&x3);				//x3.norm();	// x3=X1+Z1
@@ -419,25 +438,30 @@ int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 	FP2_YYY_add(&y3,&t0,&t2);		//y3.add(t2);							// y3=X1.X2+Z1+Z2
 	FP2_YYY_sub(&y3,&x3,&y3);		//y3.rsub(x3); 
 	FP2_YYY_norm(&y3);				//y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
-
+#if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP2_YYY_mul_ip(&t0);			//t0.mul_ip(); 
 	FP2_YYY_norm(&t0);				//t0.norm(); // x.Q.x
 	FP2_YYY_mul_ip(&t1);			//t1.mul_ip(); 
 	FP2_YYY_norm(&t1);				//t1.norm(); // y.Q.y
-
+#endif
 	//FP2_YYY_copy(&x3,&t0);			//x3.copy(t0); 
 	FP2_YYY_add(&x3,&t0,&t0);		//x3.add(t0); 
 	FP2_YYY_add(&t0,&t0,&x3);		//t0.add(x3); 
 	FP2_YYY_norm(&t0);				//t0.norm();
 	FP2_YYY_imul(&t2,&t2,b3);		//t2.imul(b); 	
-
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP2_YYY_mul_ip(&t2);
+#endif
 	//FP2_YYY_copy(&z3,&t1);			//FP2 z3=new FP2(t1); 
 	FP2_YYY_add(&z3,&t1,&t2);		//z3.add(t2); 
 	FP2_YYY_norm(&z3);				//z3.norm();
 	FP2_YYY_sub(&t1,&t1,&t2);		//t1.sub(t2); 
 	FP2_YYY_norm(&t1);				//t1.norm(); 
 	FP2_YYY_imul(&y3,&y3,b3);		//y3.imul(b); 
-
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP2_YYY_mul_ip(&y3);
+	FP2_YYY_norm(&y3);
+#endif
 	//FP2_YYY_copy(&x3,&y3);			//x3.copy(y3); 
 	FP2_YYY_mul(&x3,&y3,&t4);		//x3.mul(t4); 
 	//FP2_YYY_copy(&t2,&t3);			//t2.copy(t3); 
@@ -669,6 +693,12 @@ void ECP2_ZZZ_mapit(ECP2_ZZZ *Q,octet *W)
     BIG_XXX_rcopy(Fx,Fra_YYY);
     BIG_XXX_rcopy(Fy,Frb_YYY);
     FP2_YYY_from_BIGs(&X,Fx,Fy);
+
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP2_YYY_inv(&X,&X);
+	FP2_YYY_norm(&X);
+#endif
+
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
 
 #if (PAIRING_FRIENDLY_ZZZ == BN)
