@@ -87,6 +87,47 @@ void set_frobenius_constant(ZZn2 &X)
     X=pow(X,(p-1)/6);
 }
 
+void q_power_frobenius(ECn2 &A,ZZn2 &F)
+{ 
+// Fast multiplication of A by q (for Trace-Zero group members only)
+    ZZn2 x,y,z,w,r;
+
+    A.get(x,y);
+
+	w=F*F;
+	r=F;
+
+	if (get_mip()->TWIST==MR_SEXTIC_M) r=inverse(F);  // could be precalculated
+	if (get_mip()->TWIST==MR_SEXTIC_D) r=F;
+
+	w=r*r;
+	x=w*conj(x);
+	y=r*w*conj(y);
+
+    A.set(x,y);
+
+}
+
+//
+// Faster Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez
+//
+
+void cofactor(ECn2& S,ZZn2 &F,Big& x)
+{
+	ECn2 T,K;
+	T=S;
+	T*=(-x);
+	T.norm();
+	K=(T+T)+T;
+	K.norm();
+	q_power_frobenius(K,F);
+	q_power_frobenius(S,F); q_power_frobenius(S,F); q_power_frobenius(S,F); 
+	S+=T; S+=K;
+	q_power_frobenius(T,F); q_power_frobenius(T,F);
+	S+=T;
+	S.norm();
+}
+
 void help()
 {
 		printf("Elliptic Curves\n");
@@ -807,9 +848,12 @@ int main(int argc, char **argv)
 		Ya.set((ZZn)1,ZZn(0));
 		Q.set(Xa,Ya);
 
-//		cofactor(Q,X,x);
+		if (curve==18)
+			cofactor(Q,X,x);
+		else
+			Q=(p-1+t)*Q;
 
-		Q=(p-1+t)*Q;
+		//cout << "r*Q= " << r*Q << endl;
 
 		Q.get(Xa,Ya);
 		Xa.get(a,b);
