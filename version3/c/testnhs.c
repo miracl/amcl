@@ -31,7 +31,7 @@ int main()
 {
 	int i,ii,j,err;
     unsigned long ran;
-	byte raw[100];
+	char raw[100];
 	csprng SRNG,CRNG;
 	RAND_clean(&SRNG); RAND_clean(&CRNG);
 	char s[1792],sb[1824],uc[2176],keyA[32],keyB[32];

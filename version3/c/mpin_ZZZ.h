@@ -45,8 +45,8 @@ under the License.
 #define MPIN_INVALID_POINT  -14	/**< Point is NOT on the curve */
 #define MPIN_BAD_PIN        -19 /**< Bad PIN number entered */
 
-#define MAXPIN_ZZZ 10000         /**< max PIN */
-#define PBLEN_ZZZ 14             /**< max length of PIN in bits */
+#define MAXPIN 10000         /**< max PIN */
+#define PBLEN 14             /**< max length of PIN in bits */
 
 #define HASH_TYPE_MPIN_ZZZ SHA256   /**< Choose Hash function */
 

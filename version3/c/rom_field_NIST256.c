@@ -1,7 +1,7 @@
 #include "arch.h"
 #include "fp_NIST256.h"
 
-/* Curve 25519 */
+/* Curve NIST256 */
 
 #if CHUNK==16
 

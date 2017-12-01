@@ -1,7 +1,7 @@
 #include "arch.h"
 #include "ecp_NUMS384E.h"
 
-/*  NUMS 256-bit Curve - Edwards */
+/*  NUMS 384-bit Curve - Edwards */
 
 #if CHUNK==16
 

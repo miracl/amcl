@@ -236,9 +236,9 @@ int MPIN_ZZZ_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
         mhashit(sha,-1,CID,&H);
         ECP_ZZZ_mapit(&R,&H);
 
-        pin%=MAXPIN_ZZZ;
+        pin%=MAXPIN;
 
-        ECP_ZZZ_pinmul(&R,pin,PBLEN_ZZZ);
+        ECP_ZZZ_pinmul(&R,pin,PBLEN);
         ECP_ZZZ_sub(&P,&R);
 
         ECP_ZZZ_toOctet(TOKEN,&P);
@@ -387,10 +387,10 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
 
     if (res==0)
     {
-        pin%=MAXPIN_ZZZ;
+        pin%=MAXPIN;
 
         ECP_ZZZ_copy(&W,&P);				// W=H(ID)
-        ECP_ZZZ_pinmul(&W,pin,PBLEN_ZZZ);			// W=alpha.H(ID)
+        ECP_ZZZ_pinmul(&W,pin,PBLEN);			// W=alpha.H(ID)
         ECP_ZZZ_add(&T,&W);					// T=Token+alpha.H(ID) = s.H(ID)
 
         if (date)
@@ -626,12 +626,12 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     return res;
 }
 
-#if MAXPIN_ZZZ==10000
+#if MAXPIN==10000
 #define MR_TS 10  /* 2^10/10 approx = sqrt(MAXPIN) */
 #define TRAP 200  /* 2*sqrt(MAXPIN) */
 #endif
 
-#if MAXPIN_ZZZ==1000000
+#if MAXPIN==1000000
 #define MR_TS 14
 #define TRAP 2000
 #endif
@@ -678,7 +678,7 @@ int MPIN_ZZZ_KANGAROO(octet *E,octet *F)
     FP12_YYY_conj(&gf,&t);
     steps=0;
     dm=0;
-    while (dm-dn<MAXPIN_ZZZ)
+    while (dm-dn<MAXPIN)
     {
         steps++;
         if (steps>4*TRAP) break;
@@ -703,7 +703,7 @@ int MPIN_ZZZ_KANGAROO(octet *E,octet *F)
             break;
         }
     }
-    if (steps>4*TRAP || dm-dn>=MAXPIN_ZZZ)
+    if (steps>4*TRAP || dm-dn>=MAXPIN)
     {
         res=0;    /* Trap Failed  - probable invalid token */
     }
@@ -781,7 +781,7 @@ int MPIN_ZZZ_CLIENT_KEY(int sha,octet *G1,octet *G2,int pin,octet *R,octet *X,oc
         BIG_XXX_add(z,z,h);    // new
         BIG_XXX_mod(z,r);
 
-        FP12_YYY_pinpow(&g2,pin,PBLEN_ZZZ);
+        FP12_YYY_pinpow(&g2,pin,PBLEN);
         FP12_YYY_mul(&g1,&g2);
 
 		PAIR_ZZZ_G1mul(&W,x);

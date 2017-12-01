@@ -1,7 +1,7 @@
 #include "arch.h"
 #include "ecp_NUMS512W.h"
 
-/*  NUMS 256-bit Curve - Weierstrass */
+/*  NUMS 512-bit Curve - Weierstrass */
 
 #if CHUNK==16
 

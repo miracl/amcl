@@ -1,9 +1,9 @@
 #include "arch.h"
 #include "ecp_FP256BN.h"
 
-/* Curve BN254 - Pairing friendly BN curve */
+/* Curve FP256BN - Pairing friendly BN curve */
 
-/* Nogami's fast curve */
+/* ISO curve */
 
 #if CHUNK==16
 
