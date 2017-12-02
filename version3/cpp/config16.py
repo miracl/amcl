@@ -46,7 +46,7 @@ def rsaset(tb,tff,nb,base,ml) :
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -c "+fnamec)
+	os.system("g++ -O3 -c "+fnamec)
 
 	fnamec="ff_"+tff+".cpp"
 	fnameh="ff_"+tff+".h"
@@ -58,7 +58,7 @@ def rsaset(tb,tff,nb,base,ml) :
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -c "+fnamec)
+	os.system("g++ -O3 -c "+fnamec)
 
 	fnamec="rsa_"+tff+".cpp"
 	fnameh="rsa_"+tff+".h"
@@ -70,7 +70,7 @@ def rsaset(tb,tff,nb,base,ml) :
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -c "+fnamec)
+	os.system("g++ -O3 -c "+fnamec)
 
 def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	bd="B"+tb+"_"+base
@@ -113,7 +113,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -c "+fnamec)
+	os.system("g++ -O3 -c "+fnamec)
 
 	fnamec="fp_"+tf+".cpp"
 	fnameh="fp_"+tf+".h"
@@ -125,9 +125,9 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -c "+fnamec)
+	os.system("g++ -O3 -c "+fnamec)
 
-	os.system("gcc -O3 -c rom_field_"+tf+".cpp");
+	os.system("g++ -O3 -c rom_field_"+tf+".cpp");
 
 	fnamec="ecp_"+tc+".cpp"
 	fnameh="ecp_"+tc+".h"
@@ -141,7 +141,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -c "+fnamec)
+	os.system("g++ -O3 -c "+fnamec)
 
 	fnamec="ecdh_"+tc+".cpp"
 	fnameh="ecdh_"+tc+".h"
@@ -155,9 +155,9 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -c "+fnamec)
+	os.system("g++ -O3 -c "+fnamec)
 
-	os.system("gcc -O3 -c rom_curve_"+tc+".cpp");
+	os.system("g++ -O3 -c rom_curve_"+tc+".cpp");
 
 	if pf != "NOT" :
 		fnamec="fp2_"+tf+".cpp"
@@ -169,7 +169,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fnamec,"XXX",bd)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -c "+fnamec)
+		os.system("g++ -O3 -c "+fnamec)
 
 		fnamec="fp4_"+tf+".cpp"
 		fnameh="fp4_"+tf+".h"
@@ -180,7 +180,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fnamec,"XXX",bd)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -c "+fnamec)
+		os.system("g++ -O3 -c "+fnamec)
 
 		fnamec="fp12_"+tf+".cpp"
 		fnameh="fp12_"+tf+".h"
@@ -191,7 +191,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fnamec,"XXX",bd)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -c "+fnamec)
+		os.system("g++ -O3 -c "+fnamec)
 
 		fnamec="ecp2_"+tc+".cpp"
 		fnameh="ecp2_"+tc+".h"
@@ -204,7 +204,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fnameh,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -c "+fnamec)
+		os.system("g++ -O3 -c "+fnamec)
 
 		fnamec="pair_"+tc+".cpp"
 		fnameh="pair_"+tc+".h"
@@ -217,7 +217,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fnameh,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -c "+fnamec)
+		os.system("g++ -O3 -c "+fnamec)
 
 		fnamec="mpin_"+tc+".cpp"
 		fnameh="mpin_"+tc+".h"
@@ -230,7 +230,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fnameh,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -c "+fnamec)
+		os.system("g++ -O3 -c "+fnamec)
 
 replace("arch.h","@WL@","16")
 print("Elliptic Curves")
@@ -329,20 +329,20 @@ os.system(deltext+" pair.*")
 os.system(deltext+" mpin.*")
 
 # create library
-os.system("gcc -O3 -c randapi.cpp")
+os.system("g++ -O3 -c randapi.cpp")
 if curve_selected :
-	os.system("gcc -O3 -c ecdh_support.cpp")
+	os.system("g++ -O3 -c ecdh_support.cpp")
 if rsa_selected :
-	os.system("gcc -O3 -c rsa_support.cpp")
+	os.system("g++ -O3 -c rsa_support.cpp")
 if pfcurve_selected :
-	os.system("gcc -O3 -c mpin_support.cpp")
+	os.system("g++ -O3 -c mpin_support.cpp")
 
-os.system("gcc -O3 -c hash.cpp")
-os.system("gcc -O3 -c rand.cpp")
-os.system("gcc -O3 -c oct.cpp")
-os.system("gcc -O3 -c aes.cpp")
-os.system("gcc -O3 -c gcm.cpp")
-os.system("gcc -O3 -c newhope.cpp")
+os.system("g++ -O3 -c hash.cpp")
+os.system("g++ -O3 -c rand.cpp")
+os.system("g++ -O3 -c oct.cpp")
+os.system("g++ -O3 -c aes.cpp")
+os.system("g++ -O3 -c gcm.cpp")
+os.system("g++ -O3 -c newhope.cpp")
 
 os.system("ar rc amcl.a *.o")
 os.system(deltext+" *.o")
