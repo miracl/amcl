@@ -477,11 +477,11 @@ func frombytearray(b []byte,n int) *BIG {
 	return m
 }
 
-func (r *BIG) toBytes(b []byte) {
+func (r *BIG) ToBytes(b []byte) {
 	r.tobytearray(b,0)
 }
 
-func fromBytes(b []byte) *BIG {
+func FromBytes(b []byte) *BIG {
 	return frombytearray(b,0)
 }
 
@@ -588,7 +588,7 @@ func (r *BIG) invmod2m() {
 }
 
 /* reduce this mod m */
-func (r *BIG) mod(m *BIG) {
+func (r *BIG) Mod(m *BIG) {
 	sr:=NewBIG()
 	r.norm()
 	if comp(r,m)<0 {return}
@@ -734,28 +734,28 @@ func nafbits(x *BIG,x3 *BIG ,i int) [3]int {
 */
 
 /* return a*b mod m */
-func modmul(a,b,m *BIG) *BIG {
-	a.mod(m)
-	b.mod(m)
+func Modmul(a,b,m *BIG) *BIG {
+	a.Mod(m)
+	b.Mod(m)
 	d:=mul(a,b);
 	return d.mod(m)
 }
 
 /* return a^2 mod m */
-func modsqr(a,m *BIG) *BIG {
-	a.mod(m)
+func Modsqr(a,m *BIG) *BIG {
+	a.Mod(m)
 	d:=sqr(a)
 	return d.mod(m)
 }
 
 /* return -a mod m */
-func modneg(a,m *BIG) *BIG {
-	a.mod(m)
+func Modneg(a,m *BIG) *BIG {
+	a.Mod(m)
 	return m.minus(a)
 }
 
 /* Jacobi Symbol (this/p). Returns 0, 1 or -1 */
-func (r *BIG) jacobi(p *BIG) int {
+func (r *BIG) Jacobi(p *BIG) int {
 	m:=0;
 	t:=NewBIGint(0)
 	x:=NewBIGint(0)
@@ -766,7 +766,7 @@ func (r *BIG) jacobi(p *BIG) int {
 	r.norm()
 	x.copy(r)
 	n.copy(p)
-	x.mod(p)
+	x.Mod(p)
 
 	for comp(n,one)>0 {
 		if comp(x,zilch)==0 {return 0}
@@ -779,7 +779,7 @@ func (r *BIG) jacobi(p *BIG) int {
 		if k%2==1 {m+=(n8*n8-1)/8}
 		m+=(n8-1)*(x.lastbits(2)-1)/4
 		t.copy(n)
-		t.mod(x)
+		t.Mod(x)
 		n.copy(x)
 		x.copy(t)
 		m%=2
@@ -790,8 +790,8 @@ func (r *BIG) jacobi(p *BIG) int {
 }
 
 /* this=1/this mod p. Binary method */
-func (r *BIG) invmodp(p *BIG) {
-	r.mod(p)
+func (r *BIG) Invmodp(p *BIG) {
+	r.Mod(p)
 	u:=NewBIGcopy(r)
 
 	v:=NewBIGcopy(p)
@@ -855,9 +855,9 @@ func (r *BIG) powmod(e *BIG,m *BIG) *BIG {
 	for true {
 		bt:=z.parity()
 		z.fshr(1)
-		if bt==1 {a=modmul(a,s,m)}
+		if bt==1 {a=Modmul(a,s,m)}
 		if z.iszilch() {break}
-		s=modsqr(s,m)
+		s=Modsqr(s,m)
 	}
 	return a;
 }

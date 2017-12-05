@@ -67,7 +67,7 @@ func NewECPbigs(ix *BIG,iy *BIG) *ECP {
 	} else {
 		y2:=NewFPcopy(E.y)
 		y2.sqr()
-		if y2.equals(rhs) {
+		if y2.Equals(rhs) {
 			E.INF=false
 		} else {E.inf()}
 	}
@@ -110,7 +110,7 @@ func (E *ECP) Is_infinity() bool {
 	E.x.reduce(); E.z.reduce()
 	if CURVETYPE==EDWARDS {
 		E.y.reduce();
-		E.INF=(E.x.iszilch() && E.y.equals(E.z))
+		E.INF=(E.x.iszilch() && E.y.Equals(E.z))
 	} 
 	if CURVETYPE==WEIERSTRASS {
 		E.y.reduce();
@@ -207,7 +207,7 @@ func (E *ECP) inf() {
 }
 
 /* Test P == Q */
-func( E *ECP) equals(Q *ECP) bool {
+func( E *ECP) Equals(Q *ECP) bool {
 	if E.Is_infinity() && Q.Is_infinity() {return true}
 	if E.Is_infinity() || Q.Is_infinity() {return false}
 
@@ -215,11 +215,11 @@ func( E *ECP) equals(Q *ECP) bool {
 	b:=NewFPint(0)
 	a.copy(E.x); a.mul(Q.z); a.reduce()
 	b.copy(Q.x); b.mul(E.z); b.reduce()
-	if !a.equals(b) {return false}
+	if !a.Equals(b) {return false}
 	if CURVETYPE!=MONTGOMERY {
 		a.copy(E.y); a.mul(Q.z); a.reduce()
 		b.copy(Q.y); b.mul(E.z); b.reduce()
-		if !a.equals(b) {return false}
+		if !a.Equals(b) {return false}
 	}
 
 	return true
@@ -269,7 +269,7 @@ func RHS(x *FP) *FP {
 func (E *ECP) Affine() {
 	if E.Is_infinity() {return}
 	one:=NewFPint(1)
-	if E.z.equals(one) {return}
+	if E.z.Equals(one) {return}
 	E.z.inverse()
 	E.x.mul(E.z); E.x.reduce()
 
@@ -280,20 +280,20 @@ func (E *ECP) Affine() {
 }
 
 /* extract x as a BIG */
-func (E *ECP) getX() *BIG {
+func (E *ECP) GetX() *BIG {
 	E.Affine()
 	return E.x.redc()
 }
 /* extract y as a BIG */
-func (E *ECP) getY() *BIG {
+func (E *ECP) GetY() *BIG {
 	E.Affine()
 	return E.y.redc()
 }
 
 /* get sign of Y */
-func (E *ECP) getS() int {
+func (E *ECP) GetS() int {
 	E.Affine()
-	y:=E.getY()
+	y:=E.GetY()
 	return y.parity()
 }
 /* extract x as an FP */
@@ -310,7 +310,7 @@ func (E *ECP) getz() *FP {
 }
 
 /* convert to byte array */
-func (E *ECP) toBytes(b []byte) {
+func (E *ECP) ToBytes(b []byte) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
 	if CURVETYPE!=MONTGOMERY {
@@ -318,10 +318,10 @@ func (E *ECP) toBytes(b []byte) {
 	} else {b[0]=0x02}
 	
 	E.Affine()
-	E.x.redc().toBytes(t[:])
+	E.x.redc().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+1]=t[i]}
 	if CURVETYPE!=MONTGOMERY {
-		E.y.redc().toBytes(t[:])
+		E.y.redc().ToBytes(t[:])
 		for i:=0;i<MB;i++ {b[i+MB+1]=t[i]}
 	}
 }
@@ -333,12 +333,12 @@ func ECP_fromBytes(b []byte) *ECP {
 	p:=NewBIGints(Modulus)
 
 	for i:=0;i<MB;i++ {t[i]=b[i+1]}
-	px:=fromBytes(t[:])
+	px:=FromBytes(t[:])
 	if comp(px,p)>=0 {return NewECP()}
 
 	if (b[0]==0x04) {
 		for i:=0;i<MB;i++ {t[i]=b[i+MB+1]}
-		py:=fromBytes(t[:])
+		py:=FromBytes(t[:])
 		if comp(py,p)>=0 {return NewECP()}
 		return NewECPbigs(px,py)
 	} else {return NewECPbig(px)}
@@ -502,7 +502,7 @@ func (E *ECP) dbl() {
 }
 
 /* this+=Q */
-func (E *ECP) add(Q *ECP) {
+func (E *ECP) Add(Q *ECP) {
 
 	if E.INF {
 		E.Copy(Q)
@@ -722,9 +722,9 @@ func (E *ECP) dadd(Q *ECP,W *ECP) {
 }
 
 /* this-=Q */
-func (E *ECP) sub(Q *ECP) {
+func (E *ECP) Sub(Q *ECP) {
 	Q.neg()
-	E.add(Q)
+	E.Add(Q)
 	Q.neg()
 }
 
@@ -740,7 +740,7 @@ func (E *ECP) pinmul(e int32,bts int32) *ECP {
 		for i:=bts-1;i>=0;i-- {
 			b:=int((e>>uint32(i))&1)
 			P.Copy(R1)
-			P.add(R0)
+			P.Add(R0)
 			R0.cswap(R1,b)
 			R1.Copy(P)
 			R0.dbl()
@@ -796,7 +796,7 @@ func (E *ECP) mul(e *BIG) *ECP {
 		for i:=1;i<8;i++ {
 			W=append(W,NewECP())
 			W[i].Copy(W[i-1])
-			W[i].add(Q)
+			W[i].Add(Q)
 		}
 
 // make exponent odd - add 2P if even, P if odd 
@@ -824,9 +824,9 @@ func (E *ECP) mul(e *BIG) *ECP {
 			P.dbl()
 			P.dbl()
 			P.dbl()
-			P.add(Q)
+			P.Add(Q)
 		}
-		P.sub(C) /* apply correction */
+		P.Sub(C) /* apply correction */
 	}
 	P.Affine()
 	return P
@@ -839,7 +839,7 @@ func (E *ECP) Mul(e *BIG) *ECP {
 
 /* Return e.this+f.Q */
 
-func (E *ECP) mul2(e *BIG,Q *ECP,f *BIG) *ECP {
+func (E *ECP) Mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 	te:=NewBIG()
 	tf:=NewBIG()
 	mt:=NewBIG()
@@ -860,16 +860,16 @@ func (E *ECP) mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 	for i:=0;i<8;i++ {
 		W=append(W,NewECP())
 	}
-	W[1].Copy(E); W[1].sub(Q)
-	W[2].Copy(E); W[2].add(Q);
+	W[1].Copy(E); W[1].Sub(Q)
+	W[2].Copy(E); W[2].Add(Q);
 	S.Copy(Q); S.dbl();
-	W[0].Copy(W[1]); W[0].sub(S);
-	W[3].Copy(W[2]); W[3].add(S);
+	W[0].Copy(W[1]); W[0].Sub(S);
+	W[3].Copy(W[2]); W[3].Add(S);
 	T.Copy(E); T.dbl();
-	W[5].Copy(W[1]); W[5].add(T);
-	W[6].Copy(W[2]); W[6].add(T);
-	W[4].Copy(W[5]); W[4].sub(S);
-	W[7].Copy(W[6]); W[7].add(S);
+	W[5].Copy(W[1]); W[5].Add(T);
+	W[6].Copy(W[2]); W[6].Add(T);
+	W[4].Copy(W[5]); W[4].Sub(S);
+	W[7].Copy(W[6]); W[7].Add(S);
 
 // if multiplier is odd, add 2, else add 1 to multiplier, and add 2P or P to correction 
 
@@ -883,7 +883,7 @@ func (E *ECP) mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 	tf.inc(1); tf.norm(); ns=int(tf.parity()); mt.copy(tf); mt.inc(1); mt.norm()
 	tf.cmove(mt,s)
 	S.cmove(Q,ns)
-	C.add(S)
+	C.Add(S)
 
 	mt.copy(te); mt.add(tf); mt.norm()
 	nb:=1+(mt.nbits()+1)/2
@@ -905,17 +905,17 @@ func (E *ECP) mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 		T.selector(W,int32(w[i]));
 		S.dbl()
 		S.dbl()
-		S.add(T)
+		S.Add(T)
 	}
-	S.sub(C) /* apply correction */
+	S.Sub(C) /* apply correction */
 	S.Affine()
 	return S
 }
 
 func ECP_mapit(h []byte) *ECP {
 	q:=NewBIGints(Modulus)
-	x:=fromBytes(h[:])
-	x.mod(q)
+	x:=FromBytes(h[:])
+	x.Mod(q)
 	var P *ECP
 	for true {
 		P=NewECPbigint(x,0)

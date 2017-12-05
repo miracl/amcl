@@ -80,7 +80,7 @@ func (F *FP4) iszilch() bool {
 /* test this==1 ? */
 func (F *FP4) isunity() bool {
 	one:=NewFP2int(1)
-	return F.a.equals(one) && F.b.iszilch()
+	return F.a.Equals(one) && F.b.iszilch()
 }
 
 /* test is w real? That is in a+ib test b is zero */
@@ -100,8 +100,8 @@ func (F *FP4) getb() *FP2 {
 	return F.b
 }
 /* test this=x? */
-func (F *FP4) equals(x *FP4) bool {
-	return (F.a.equals(x.a) && F.b.equals(x.b))
+func (F *FP4) Equals(x *FP4) bool {
+	return (F.a.Equals(x.a) && F.b.Equals(x.b))
 }
 
 /* copy this=x */

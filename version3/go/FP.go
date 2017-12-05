@@ -165,7 +165,7 @@ func mod(d *DBIG) *BIG {
 /* reduce this mod Modulus */
 func (F *FP) reduce() {
 	p:=NewBIGints(Modulus)
-	F.x.mod(p)
+	F.x.Mod(p)
 	F.XES=1
 }
 
@@ -306,13 +306,13 @@ func (F *FP) div2() {
 func (F *FP) inverse() {
 	p:=NewBIGints(Modulus);
 	r:=F.redc()
-	r.invmodp(p)
+	r.Invmodp(p)
 	F.x.copy(r)
 	F.nres()
 }
 
 /* return TRUE if this==a */
-func (F *FP) equals(a *FP) bool {
+func (F *FP) Equals(a *FP) bool {
 	a.reduce()
 	F.reduce()
 	if (comp(a.x,F.x)==0) {return true}
@@ -333,7 +333,7 @@ func (F *FP) pow(e *BIG) *FP {
 		m.sqr();
 	}
 	p:=NewBIGints(Modulus);
-	r.x.mod(p);
+	r.x.Mod(p);
 	return r;
 }
 
@@ -362,5 +362,5 @@ func (F *FP) sqrt() *FP {
 func (F *FP) jacobi() int {
 	w:=F.redc();
 	p:=NewBIGints(Modulus);
-	return w.jacobi(p)
+	return w.Jacobi(p)
 }

@@ -49,13 +49,13 @@ func mpin_hash(sha int,c *FP4,U *ECP) []byte {
 	var t [6*MFS]byte
 	var h []byte
 
-	c.geta().getA().toBytes(w[:]); for i:=0;i<MFS;i++ {t[i]=w[i]}
-	c.geta().getB().toBytes(w[:]); for i:=MFS;i<2*MFS;i++ {t[i]=w[i-MFS]}
-	c.getb().getA().toBytes(w[:]); for i:=2*MFS;i<3*MFS;i++ {t[i]=w[i-2*MFS]}
-	c.getb().getB().toBytes(w[:]); for i:=3*MFS;i<4*MFS;i++ {t[i]=w[i-3*MFS]}
+	c.geta().getA().ToBytes(w[:]); for i:=0;i<MFS;i++ {t[i]=w[i]}
+	c.geta().getB().ToBytes(w[:]); for i:=MFS;i<2*MFS;i++ {t[i]=w[i-MFS]}
+	c.getb().getA().ToBytes(w[:]); for i:=2*MFS;i<3*MFS;i++ {t[i]=w[i-2*MFS]}
+	c.getb().getB().ToBytes(w[:]); for i:=3*MFS;i<4*MFS;i++ {t[i]=w[i-3*MFS]}
 
-	U.getX().toBytes(w[:]); for i:=4*MFS;i<5*MFS;i++ {t[i]=w[i-4*MFS]}
-	U.getY().toBytes(w[:]); for i:=5*MFS;i<6*MFS;i++ {t[i]=w[i-5*MFS]}
+	U.GetX().ToBytes(w[:]); for i:=4*MFS;i<5*MFS;i++ {t[i]=w[i-4*MFS]}
+	U.GetY().ToBytes(w[:]); for i:=5*MFS;i<6*MFS;i++ {t[i]=w[i-5*MFS]}
 
 	if sha==amcl.SHA256 {
 		H:=amcl.NewHASH256()
@@ -125,7 +125,7 @@ func emap(u *BIG,cb int) *ECP {
 	var P *ECP
 	x:=NewBIGcopy(u)
 	p:=NewBIGints(Modulus)
-	x.mod(p)
+	x.Mod(p)
 	for true {
 		P=NewECPbigint(x,cb)
 		if !P.Is_infinity() {break}
@@ -136,10 +136,10 @@ func emap(u *BIG,cb int) *ECP {
 
 /* returns u derived from P. Random value in range 1 to return value should then be added to u */
 func unmap(u* BIG,P *ECP) int {
-	s:=P.getS()
+	s:=P.GetS()
 	var R *ECP
 	r:=0
-	x:=P.getX()
+	x:=P.GetX()
 	u.copy(x)
 	for true {
 		u.dec(1); u.norm()
@@ -161,9 +161,9 @@ func MPIN_ENCODING(rng *amcl.RAND,E []byte) int {
 	var T [MFS]byte
 
 	for i:=0;i<MFS;i++ {T[i]=E[i+1]}
-	u:=fromBytes(T[:])
+	u:=FromBytes(T[:])
 	for i:=0;i<MFS;i++ {T[i]=E[i+MFS+1]}
-	v:=fromBytes(T[:])
+	v:=FromBytes(T[:])
 		
 	P:=NewECPbigs(u,v)
 	if P.Is_infinity() {return INVALID_POINT}
@@ -174,15 +174,15 @@ func MPIN_ENCODING(rng *amcl.RAND,E []byte) int {
 	su:=int(rng.GetByte()); /*if (su<0) su=-su;*/ su%=2
 		
 	W:=emap(u,su)
-	P.sub(W)
-	sv:=P.getS()
+	P.Sub(W)
+	sv:=P.GetS()
 	rn:=unmap(v,P)
 	m:=int(rng.GetByte()); /*if (m<0) m=-m;*/ m%=rn
 	v.inc(m+1)
 	E[0]=byte(su+2*sv)
-	u.toBytes(T[:])
+	u.ToBytes(T[:])
 	for i:=0;i<MFS;i++ {E[i+1]=T[i]}
-	v.toBytes(T[:])
+	v.ToBytes(T[:])
 	for i:=0;i<MFS;i++ {E[i+MFS+1]=T[i]}		
 		
 	return 0
@@ -194,21 +194,21 @@ func MPIN_DECODING(D []byte) int {
 	if (D[0]&0x04)!=0 {return INVALID_POINT}
 
 	for i:=0;i<MFS;i++ {T[i]=D[i+1]}
-	u:=fromBytes(T[:])
+	u:=FromBytes(T[:])
 	for i:=0;i<MFS;i++ {T[i]=D[i+MFS+1]}
-	v:=fromBytes(T[:])
+	v:=FromBytes(T[:])
 
 	su:=int(D[0]&1)
 	sv:=int((D[0]>>1)&1)
 	W:=emap(u,su)
 	P:=emap(v,sv)
-	P.add(W)
-	u=P.getX()
-	v=P.getY()
+	P.Add(W)
+	u=P.GetX()
+	v=P.GetY()
 	D[0]=0x04
-	u.toBytes(T[:])
+	u.ToBytes(T[:])
 	for i:=0;i<MFS;i++ {D[i+1]=T[i]}
-	v.toBytes(T[:])
+	v.ToBytes(T[:])
 	for i:=0;i<MFS;i++ {D[i+MFS+1]=T[i]}		
 		
 	return 0
@@ -221,9 +221,9 @@ func MPIN_RECOMBINE_G1(R1 []byte,R2 []byte,R []byte) int {
 
 	if (P.Is_infinity() || Q.Is_infinity()) {return INVALID_POINT}
 
-	P.add(Q)
+	P.Add(Q)
 
-	P.toBytes(R[:])
+	P.ToBytes(R[:])
 	return 0
 }
 
@@ -234,9 +234,9 @@ func MPIN_RECOMBINE_G2(W1 []byte,W2 []byte,W []byte) int {
 
 	if (P.Is_infinity() || Q.Is_infinity()) {return INVALID_POINT}
 
-	P.add(Q)
+	P.Add(Q)
 	
-	P.toBytes(W)
+	P.ToBytes(W)
 	return 0
 }
 	
@@ -247,7 +247,7 @@ func MPIN_RANDOM_GENERATE(rng *amcl.RAND,S []byte) int {
 	//if AES_S>0 {
 	//	s.mod2m(2*AES_S)
 	//}		
-	s.toBytes(S)
+	s.ToBytes(S)
 	return 0
 }
 
@@ -259,9 +259,9 @@ func MPIN_EXTRACT_PIN(sha int,CID []byte,pin int,TOKEN []byte) int {
 	R:=ECP_mapit(h)
 
 	R=R.pinmul(int32(pin)%MAXPIN,PBLEN)
-	P.sub(R)
+	P.Sub(R)
 
-	P.toBytes(TOKEN)
+	P.ToBytes(TOKEN)
 
 	return 0
 }
@@ -272,16 +272,16 @@ func MPIN_CLIENT_2(X []byte,Y []byte,SEC []byte) int {
 	P:=ECP_fromBytes(SEC)
 	if P.Is_infinity() {return INVALID_POINT}
 
-	px:=fromBytes(X)
-	py:=fromBytes(Y)
+	px:=FromBytes(X)
+	py:=FromBytes(Y)
 	px.add(py)
-	px.mod(r)
+	px.Mod(r)
 	//px.rsub(r)
 
 	P=G1mul(P,px)
 	P.neg()
-	P.toBytes(SEC)
-	//G1mul(P,px).toBytes(SEC)
+	P.ToBytes(SEC)
+	//G1mul(P,px).ToBytes(SEC)
 	return 0
 }
 
@@ -295,9 +295,9 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *amcl.RAND,X []byte,pin
 		//if AES_S>0 {
 		//	x.mod2m(2*AES_S)
 		//}
-		x.toBytes(X)
+		x.ToBytes(X)
 	} else {
-		x=fromBytes(X)
+		x=FromBytes(X)
 	}
 
 	h:=mhashit(sha,0,CLIENT_ID)
@@ -307,32 +307,32 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *amcl.RAND,X []byte,pin
 	if T.Is_infinity() {return INVALID_POINT}
 
 	W:=P.pinmul(int32(pin)%MAXPIN,PBLEN)
-	T.add(W)
+	T.Add(W)
 	if date!=0 {
 		W=ECP_fromBytes(PERMIT)
 		if W.Is_infinity() {return INVALID_POINT}
-		T.add(W)
+		T.Add(W)
 		h=mhashit(sha,int32(date),h)
 		W=ECP_mapit(h)
 		if xID!=nil {
 			P=G1mul(P,x)
-			P.toBytes(xID)
+			P.ToBytes(xID)
 			W=G1mul(W,x)
-			P.add(W)
+			P.Add(W)
 		} else {
-			P.add(W)
+			P.Add(W)
 			P=G1mul(P,x)
 		}
-		if xCID!=nil {P.toBytes(xCID)}
+		if xCID!=nil {P.ToBytes(xCID)}
 	} else {
 		if xID!=nil {
 			P=G1mul(P,x)
-			P.toBytes(xID)
+			P.ToBytes(xID)
 		}
 	}
 
 
-	T.toBytes(SEC)
+	T.ToBytes(SEC)
 	return 0
 }
 
@@ -340,9 +340,9 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *amcl.RAND,X []byte,pin
 func MPIN_GET_SERVER_SECRET(S []byte,SST []byte) int {
 	Q:=NewECP2fp2s(NewFP2bigs(NewBIGints(CURVE_Pxa),NewBIGints(CURVE_Pxb)),NewFP2bigs(NewBIGints(CURVE_Pya),NewBIGints(CURVE_Pyb)))
 
-	s:=fromBytes(S)
+	s:=FromBytes(S)
 	Q=G2mul(Q,s)
-	Q.toBytes(SST)
+	Q.ToBytes(SST)
 	return 0
 }
 
@@ -360,9 +360,9 @@ func MPIN_GET_G1_MULTIPLE(rng *amcl.RAND,typ int,X []byte,G []byte,W []byte) int
 		//if AES_S>0 {
 		//	x.mod2m(2*AES_S)
 		//}
-		x.toBytes(X)
+		x.ToBytes(X)
 	} else {
-		x=fromBytes(X)
+		x=FromBytes(X)
 	}
 	var P *ECP
 	if typ==0 {
@@ -370,7 +370,7 @@ func MPIN_GET_G1_MULTIPLE(rng *amcl.RAND,typ int,X []byte,G []byte,W []byte) int
 		if P.Is_infinity() {return INVALID_POINT}
 	} else {P=ECP_mapit(G)}
 
-	G1mul(P,x).toBytes(W)
+	G1mul(P,x).ToBytes(W)
 	return 0
 }
 
@@ -385,8 +385,8 @@ func MPIN_GET_CLIENT_PERMIT(sha,date int,S []byte,CID []byte,CTT []byte) int {
 	h:=mhashit(sha,int32(date),CID)
 	P:=ECP_mapit(h)
 
-	s:=fromBytes(S)
-	G1mul(P,s).toBytes(CTT)
+	s:=FromBytes(S)
+	G1mul(P,s).ToBytes(CTT)
 	return 0
 }
 
@@ -395,14 +395,14 @@ func MPIN_SERVER_1(sha int,date int,CID []byte,HID []byte,HTID []byte) {
 	h:=mhashit(sha,0,CID)
 	P:=ECP_mapit(h)
 	
-	P.toBytes(HID);
+	P.ToBytes(HID);
 	if date!=0 {
-	//	if HID!=nil {P.toBytes(HID)}
+	//	if HID!=nil {P.ToBytes(HID)}
 		h=mhashit(sha,int32(date),h)
 		R:=ECP_mapit(h)
-		P.add(R)
-		P.toBytes(HTID)
-	} //else {P.toBytes(HID)}
+		P.Add(R)
+		P.ToBytes(HTID)
+	} //else {P.ToBytes(HID)}
 }
 
 /* Implement step 2 of MPin protocol on server side */
@@ -422,7 +422,7 @@ func MPIN_SERVER_2(date int,HID []byte,HTID []byte,Y []byte,SST []byte,xID []byt
 	}
 	if R.Is_infinity() {return INVALID_POINT}
 
-	y:=fromBytes(Y)
+	y:=FromBytes(Y)
 	var P *ECP
 	if date!=0 {
 		P=ECP_fromBytes(HTID)
@@ -434,7 +434,7 @@ func MPIN_SERVER_2(date int,HID []byte,HTID []byte,Y []byte,SST []byte,xID []byt
 	if P.Is_infinity() {return INVALID_POINT}
 
 	P=G1mul(P,y)
-	P.add(R)
+	P.Add(R)
 	P.Affine()
 	R=ECP_fromBytes(mSEC)
 	if R.Is_infinity() {return INVALID_POINT}
@@ -447,7 +447,7 @@ func MPIN_SERVER_2(date int,HID []byte,HTID []byte,Y []byte,SST []byte,xID []byt
 
 	if !g.Isunity() {
 		if (HID!=nil && xID!=nil && E!=nil && F!=nil) {
-			g.toBytes(E)
+			g.ToBytes(E)
 			if date!=0 {
 				P=ECP_fromBytes(HID)
 				if P.Is_infinity() {return INVALID_POINT}
@@ -455,12 +455,12 @@ func MPIN_SERVER_2(date int,HID []byte,HTID []byte,Y []byte,SST []byte,xID []byt
 				if R.Is_infinity() {return INVALID_POINT}
 
 				P=G1mul(P,y)
-				P.add(R)
+				P.Add(R)
 				P.Affine()
 			}
 			g=Ate(Q,P)
 			g=Fexp(g)
-			g.toBytes(F)
+			g.ToBytes(F)
 		}
 		return BAD_PIN
 	}
@@ -488,7 +488,7 @@ func MPIN_KANGAROO(E []byte,F []byte) int {
 	dn:=0
 	for j:=0;j<TRAP;j++ {
 		i=t.geta().geta().getA().lastbits(20)%TS
-		t.mul(table[i])
+		t.Mul(table[i])
 		dn+=distance[i]
 	}
 	gf.Copy(t); gf.conj()
@@ -498,7 +498,7 @@ func MPIN_KANGAROO(E []byte,F []byte) int {
 		steps++
 		if steps>4*TRAP {break}
 		i=ge.geta().geta().getA().lastbits(20)%TS;
-		ge.mul(table[i])
+		ge.Mul(table[i])
 		dm+=distance[i]
 		if ge.Equals(t) {
 			res=dm-dn
@@ -529,11 +529,11 @@ func MPIN_PRECOMPUTE(TOKEN []byte,CID []byte,G1 []byte,G2 []byte) int {
 
 	g=Ate(Q,T)
 	g=Fexp(g)
-	g.toBytes(G1)
+	g.ToBytes(G1)
 
 	g=Ate(Q,P)
 	g=Fexp(g)
-	g.toBytes(G2)
+	g.ToBytes(G2)
 
 	return 0
 }
@@ -571,9 +571,9 @@ func MPIN_CLIENT_KEY(sha int,G1 []byte,G2 []byte,pin int,R []byte,X []byte,H []b
 
 	g1:=FP12_fromBytes(G1)
 	g2:=FP12_fromBytes(G2)
-	z:=fromBytes(R)
-	x:=fromBytes(X)
-	h:=fromBytes(H)
+	z:=FromBytes(R)
+	x:=FromBytes(X)
+	h:=FromBytes(H)
 
 	W:=ECP_fromBytes(wCID)
 	if W.Is_infinity() {return INVALID_POINT} 
@@ -585,18 +585,18 @@ func MPIN_CLIENT_KEY(sha int,G1 []byte,G2 []byte,pin int,R []byte,X []byte,H []b
 //	q:=NewBIGints(Modulus)
 
 	z.add(h);	//new
-	z.mod(r);
+	z.Mod(r);
 
 	g2.pinpow(pin,int(PBLEN))
-	g1.mul(g2)
+	g1.Mul(g2)
 
 	c:=g1.Compow(z,r);
 /*
 	m:=NewBIGcopy(q)
-	m.mod(r)
+	m.Mod(r)
 
 	a:=NewBIGcopy(z)
-	a.mod(m)
+	a.Mod(m)
 
 	b:=NewBIGcopy(z)
 	b.div(m)
@@ -607,9 +607,9 @@ func MPIN_CLIENT_KEY(sha int,G1 []byte,G2 []byte,pin int,R []byte,X []byte,H []b
 	g2.frob(f)
 	cp:=g2.trace()
 	g1.conj()
-	g2.mul(g1)
+	g2.Mul(g1)
 	cpm1:=g2.trace()
-	g2.mul(g1)
+	g2.Mul(g1)
 	cpm2:=g2.trace()
 
 	c=c.xtr_pow2(cp,cpm1,cpm2,a,b)
@@ -638,10 +638,10 @@ func MPIN_SERVER_KEY(sha int,Z []byte,SST []byte,W []byte,H []byte,HID []byte,xI
 	} else	{U=ECP_fromBytes(xID)}
 	if U.Is_infinity() {return INVALID_POINT} 
 
-	w:=fromBytes(W)
-	h:=fromBytes(H)
+	w:=FromBytes(W)
+	h:=FromBytes(H)
 	A=G1mul(A,h)	// new
-	R.add(A)
+	R.Add(A)
 	R.Affine()
 
 	U=G1mul(U,w)
@@ -666,13 +666,13 @@ func MPIN_GET_TIME() int {
 /* Generate Y = H(epoch, xCID/xID) */
 func MPIN_GET_Y(sha int,TimeValue int,xCID []byte,Y []byte) {
 	h:= mhashit(sha,int32(TimeValue),xCID)
-	y:= fromBytes(h)
+	y:= FromBytes(h)
 	q:=NewBIGints(CURVE_Order)
-	y.mod(q)
+	y.Mod(q)
 	//if AES_S>0 {
 	//	y.mod2m(2*AES_S)
 	//}
-	y.toBytes(Y)
+	y.ToBytes(Y)
 }
         
 /* One pass MPIN Client */

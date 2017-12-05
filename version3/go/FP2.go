@@ -99,12 +99,12 @@ func (F *FP2) cmove(g *FP2,d int) {
 /* test this=1 ? */
 func (F *FP2)  isunity() bool {
 	one:=NewFPint(1)
-	return (F.a.equals(one) && F.b.iszilch())
+	return (F.a.Equals(one) && F.b.iszilch())
 }
 
 /* test this=x */
-func (F *FP2) equals(x *FP2) bool {
-	return (F.a.equals(x.a) && F.b.equals(x.b))
+func (F *FP2) Equals(x *FP2) bool {
+	return (F.a.Equals(x.a) && F.b.Equals(x.b))
 }
 
 /* extract a */

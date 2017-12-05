@@ -314,23 +314,23 @@ func ECDH_KEY_PAIR_GENERATE(RNG *amcl.RAND,S []byte,W []byte) int {
 	r:=NewBIGints(CURVE_Order)
 
 	if RNG==nil {
-		s=fromBytes(S)
-		s.mod(r)
+		s=FromBytes(S)
+		s.Mod(r)
 	} else {
 		s=Randomnum(r,RNG)
 		
-	//	s.toBytes(T[:])
+	//	s.ToBytes(T[:])
 	//	for i:=0;i<EGS;i++ {S[i]=T[i]}
 	}
 
 	//if AES_S>0 {
 	//	s.mod2m(2*AES_S)
 	//}
-	s.toBytes(S)
+	s.ToBytes(S)
 
 	WP:=G.mul(s)
 
-	WP.toBytes(W)
+	WP.ToBytes(W)
 
 	return res
 }
@@ -370,19 +370,19 @@ func ECDH_ECPSVDP_DH(S []byte,WD []byte,Z []byte) int {
 	res:=0;
 	var T [EFS]byte
 
-	s:=fromBytes(S)
+	s:=FromBytes(S)
 
 	W:=ECP_fromBytes(WD)
 	if W.Is_infinity() {res=ERROR}
 
 	if res==0 {
 		r:=NewBIGints(CURVE_Order)
-		s.mod(r)
+		s.Mod(r)
 		W=W.mul(s)
 		if W.Is_infinity() { 
 			res=ERROR
 		} else {
-			W.getX().toBytes(T[:])
+			W.GetX().ToBytes(T[:])
 			for i:=0;i<EFS;i++ {Z[i]=T[i]}
 		}
 	}
@@ -401,8 +401,8 @@ func ECDH_ECPSP_DSA(sha int,RNG *amcl.RAND,S []byte,F []byte,C []byte,D []byte) 
 	G:=NewECPbigs(gx,gy)
 	r:=NewBIGints(CURVE_Order)
 
-	s:=fromBytes(S)
-	f:=fromBytes(B[:])
+	s:=FromBytes(S)
+	f:=FromBytes(B[:])
 
 	c:=NewBIGint(0)
 	d:=NewBIGint(0)
@@ -416,21 +416,21 @@ func ECDH_ECPSP_DSA(sha int,RNG *amcl.RAND,S []byte,F []byte,C []byte,D []byte) 
 		//}			
 		V.Copy(G)
 		V=V.mul(u)   		
-		vx:=V.getX()
+		vx:=V.GetX()
 		c.copy(vx)
-		c.mod(r);
+		c.Mod(r);
 		if c.iszilch() {continue}
-		u.copy(modmul(u,w,r))
-		u.invmodp(r)
-		d.copy(modmul(s,c,r))
+		u.copy(Modmul(u,w,r))
+		u.Invmodp(r)
+		d.copy(Modmul(s,c,r))
 		d.add(f)
-		d.copy(modmul(d,w,r))
-		d.copy(modmul(u,d,r))
+		d.copy(Modmul(d,w,r))
+		d.copy(Modmul(u,d,r))
 	} 
        
-	c.toBytes(T[:])
+	c.ToBytes(T[:])
 	for i:=0;i<EFS;i++ {C[i]=T[i]}
-	d.toBytes(T[:])
+	d.ToBytes(T[:])
 	for i:=0;i<EFS;i++ {D[i]=T[i]}
 	return 0
 }
@@ -447,18 +447,18 @@ func ECDH_ECPVP_DSA(sha int,W []byte,F []byte,C []byte,D []byte) int {
 	G:=NewECPbigs(gx,gy)
 	r:=NewBIGints(CURVE_Order)
 
-	c:=fromBytes(C)
-	d:=fromBytes(D)
-	f:=fromBytes(B[:])
+	c:=FromBytes(C)
+	d:=FromBytes(D)
+	f:=FromBytes(B[:])
      
 	if (c.iszilch() || comp(c,r)>=0 || d.iszilch() || comp(d,r)>=0) {
             res=INVALID;
 	}
 
 	if res==0 {
-		d.invmodp(r)
-		f.copy(modmul(f,d,r))
-		h2:=modmul(c,d,r)
+		d.Invmodp(r)
+		f.copy(Modmul(f,d,r))
+		h2:=Modmul(c,d,r)
 
 		WP:=ECP_fromBytes(W)
 		if WP.Is_infinity() {
@@ -467,13 +467,13 @@ func ECDH_ECPVP_DSA(sha int,W []byte,F []byte,C []byte,D []byte) int {
 			P:=NewECP()
 			P.Copy(WP)
 
-			P=P.mul2(h2,G,f)
+			P=P.Mul2(h2,G,f)
 
 			if P.Is_infinity() {
 				res=INVALID;
 			} else {
-				d=P.getX()
-				d.mod(r)
+				d=P.GetX()
+				d.Mod(r)
 
 				if comp(d,c)!=0 {res=INVALID}
 			}

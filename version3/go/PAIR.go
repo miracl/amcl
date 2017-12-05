@@ -111,7 +111,7 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 			b=NewFP4int(0)
 			c=NewFP4fp2(Y1); c.times_i()
 		}
-		A.add(B);
+		A.Add(B);
 	}
 	return NewFP12fp4s(a,b,c)
 }
@@ -280,91 +280,91 @@ func Fexp(m *FP12) *FP12 {
 		
 /* Easy part of final exp */
 	lv:=NewFP12copy(r)
-	lv.inverse()
+	lv.Inverse()
 	r.conj()
 
-	r.mul(lv)
+	r.Mul(lv)
 	lv.Copy(r)
 	r.frob(f)
 	r.frob(f)
-	r.mul(lv)
+	r.Mul(lv)
 /* Hard part of final exp */
 	if CURVE_PAIRING_TYPE == BN {
 		lv.Copy(r)
 		lv.frob(f)
 		x0:=NewFP12copy(lv)
 		x0.frob(f)
-		lv.mul(r)
-		x0.mul(lv)
+		lv.Mul(r)
+		x0.Mul(lv)
 		x0.frob(f)
 		x1:=NewFP12copy(r)
 		x1.conj()
-		x4:=r.pow(x)
+		x4:=r.Pow(x)
 
 		x3:=NewFP12copy(x4)
 		x3.frob(f)
 
-		x2:=x4.pow(x)
+		x2:=x4.Pow(x)
 
 		x5:=NewFP12copy(x2); x5.conj()
-		lv=x2.pow(x)
+		lv=x2.Pow(x)
 
 		x2.frob(f)
 		r.Copy(x2); r.conj()
 
-		x4.mul(r)
+		x4.Mul(r)
 		x2.frob(f)
 
 		r.Copy(lv)
 		r.frob(f)
-		lv.mul(r)
+		lv.Mul(r)
 
 		lv.usqr()
-		lv.mul(x4)
-		lv.mul(x5)
+		lv.Mul(x4)
+		lv.Mul(x5)
 		r.Copy(x3)
-		r.mul(x5)
-		r.mul(lv)
-		lv.mul(x2)
+		r.Mul(x5)
+		r.Mul(lv)
+		lv.Mul(x2)
 		r.usqr()
-		r.mul(lv)
+		r.Mul(lv)
 		r.usqr()
 		lv.Copy(r)
-		lv.mul(x1)
-		r.mul(x0)
+		lv.Mul(x1)
+		r.Mul(x0)
 		lv.usqr()
-		r.mul(lv)
+		r.Mul(lv)
 		r.reduce()
 	} else {
 		
 // Ghamman & Fouotsa Method
 		y0:=NewFP12copy(r); y0.usqr()
-		y1:=y0.pow(x)
-		x.fshr(1); y2:=y1.pow(x); x.fshl(1)
+		y1:=y0.Pow(x)
+		x.fshr(1); y2:=y1.Pow(x); x.fshl(1)
 		y3:=NewFP12copy(r); y3.conj()
-		y1.mul(y3)
+		y1.Mul(y3)
 
 		y1.conj()
-		y1.mul(y2)
+		y1.Mul(y2)
 
-		y2=y1.pow(x)
+		y2=y1.Pow(x)
 
-		y3=y2.pow(x)
+		y3=y2.Pow(x)
 		y1.conj()
-		y3.mul(y1)
+		y3.Mul(y1)
 
 		y1.conj();
 		y1.frob(f); y1.frob(f); y1.frob(f)
 		y2.frob(f); y2.frob(f)
-		y1.mul(y2)
+		y1.Mul(y2)
 
-		y2=y3.pow(x)
-		y2.mul(y0)
-		y2.mul(r)
+		y2=y3.Pow(x)
+		y2.Mul(y0)
+		y2.Mul(r)
 
-		y1.mul(y2)
+		y1.Mul(y2)
 		y2.Copy(y3); y2.frob(f)
-		y1.mul(y2)
+		y1.Mul(y2)
 		r.Copy(y1)
 		r.reduce()
 
@@ -373,42 +373,42 @@ func Fexp(m *FP12) *FP12 {
 		x0:=NewFP12copy(r)
 		x1:=NewFP12copy(r)
 		lv.Copy(r); lv.frob(f)
-		x3:=NewFP12copy(lv); x3.conj(); x1.mul(x3)
+		x3:=NewFP12copy(lv); x3.conj(); x1.Mul(x3)
 		lv.frob(f); lv.frob(f)
-		x1.mul(lv)
+		x1.Mul(lv)
 
-		r.Copy(r.pow(x))  //r=r.pow(x);
-		x3.Copy(r); x3.conj(); x1.mul(x3)
+		r.Copy(r.Pow(x))  //r=r.Pow(x);
+		x3.Copy(r); x3.conj(); x1.Mul(x3)
 		lv.Copy(r); lv.frob(f)
-		x0.mul(lv)
+		x0.Mul(lv)
 		lv.frob(f)
-		x1.mul(lv)
+		x1.Mul(lv)
 		lv.frob(f)
-		x3.Copy(lv); x3.conj(); x0.mul(x3)
+		x3.Copy(lv); x3.conj(); x0.Mul(x3)
 
-		r.Copy(r.pow(x))
-		x0.mul(r)
+		r.Copy(r.Pow(x))
+		x0.Mul(r)
 		lv.Copy(r); lv.frob(f); lv.frob(f)
-		x3.Copy(lv); x3.conj(); x0.mul(x3)
+		x3.Copy(lv); x3.conj(); x0.Mul(x3)
 		lv.frob(f)
-		x1.mul(lv)
+		x1.Mul(lv)
 
-		r.Copy(r.pow(x))
+		r.Copy(r.Pow(x))
 		lv.Copy(r); lv.frob(f)
-		x3.Copy(lv); x3.conj(); x0.mul(x3)
+		x3.Copy(lv); x3.conj(); x0.Mul(x3)
 		lv.frob(f)
-		x1.mul(lv)
+		x1.Mul(lv)
 
-		r.Copy(r.pow(x))
-		x3.Copy(r); x3.conj(); x0.mul(x3)
+		r.Copy(r.Pow(x))
+		x3.Copy(r); x3.conj(); x0.Mul(x3)
 		lv.Copy(r); lv.frob(f)
-		x1.mul(lv)
+		x1.Mul(lv)
 
-		r.Copy(r.pow(x))
-		x1.mul(r)
+		r.Copy(r.Pow(x))
+		x1.Mul(r)
 
 		x0.usqr()
-		x0.mul(x1)
+		x0.Mul(x1)
 		r.Copy(x0)
 		r.reduce() */
 	}
@@ -433,10 +433,10 @@ func glv(e *BIG) []*BIG {
 		for i:=0;i<2;i++ {
 			for j:=0;j<2;j++ {
 				t.copy(NewBIGints(CURVE_SB[j][i]))
-				t.copy(modmul(v[j],t,q))
+				t.copy(Modmul(v[j],t,q))
 				u[i].add(q)
 				u[i].sub(t)
-				u[i].mod(q)
+				u[i].Mod(q)
 			}
 		}
 	} else {
@@ -444,7 +444,7 @@ func glv(e *BIG) []*BIG {
 		x:=NewBIGints(CURVE_Bnx)
 		x2:=smul(x,x)
 		u=append(u,NewBIGcopy(e))
-		u[0].mod(x2)
+		u[0].Mod(x2)
 		u=append(u,NewBIGcopy(e))
 		u[1].div(x2)
 		u[1].rsub(q)
@@ -470,10 +470,10 @@ func gs(e *BIG) []*BIG {
 		for i:=0;i<4;i++ {
 			for j:=0;j<4;j++ {
 				t.copy(NewBIGints(CURVE_BB[j][i]))
-				t.copy(modmul(v[j],t,q))
+				t.copy(Modmul(v[j],t,q))
 				u[i].add(q)
 				u[i].sub(t)
-				u[i].mod(q)
+				u[i].Mod(q)
 			}
 		}
 	} else {
@@ -481,7 +481,7 @@ func gs(e *BIG) []*BIG {
 		w:=NewBIGcopy(e)
 		for i:=0;i<3;i++ {
 			u=append(u,NewBIGcopy(w))
-			u[i].mod(x)
+			u[i].Mod(x)
 			w.div(x)
 		}
 		u=append(u,NewBIGcopy(w))
@@ -505,7 +505,7 @@ func G1mul(P *ECP,e *BIG) *ECP {
 		Q.getx().mul(cru)
 
 		np:=u[0].nbits()
-		t.copy(modneg(u[0],q))
+		t.copy(Modneg(u[0],q))
 		nn:=t.nbits()
 		if nn<np {
 			u[0].copy(t)
@@ -513,14 +513,14 @@ func G1mul(P *ECP,e *BIG) *ECP {
 		}
 
 		np=u[1].nbits()
-		t.copy(modneg(u[1],q))
+		t.copy(Modneg(u[1],q))
 		nn=t.nbits()
 		if nn<np {
 			u[1].copy(t)
 			Q.neg()
 		}
 
-		R=R.mul2(u[0],Q,u[1])
+		R=R.Mul2(u[0],Q,u[1])
 			
 	} else {
 		R=P.mul(e)
@@ -552,7 +552,7 @@ func G2mul(P *ECP2,e *BIG) *ECP2 {
 		}
 		for i:=0;i<4;i++ {
 			np:=u[i].nbits()
-			t.copy(modneg(u[i],q))
+			t.copy(Modneg(u[i],q))
 			nn:=t.nbits()
 			if nn<np {
 				u[i].copy(t)
@@ -588,7 +588,7 @@ func GTpow(d *FP12,e *BIG) *FP12 {
 		}
 		for i:=0;i<4;i++ {
 			np:=u[i].nbits()
-			t.copy(modneg(u[i],q))
+			t.copy(Modneg(u[i],q))
 			nn:=t.nbits()
 			if nn<np {
 				u[i].copy(t)
@@ -597,7 +597,7 @@ func GTpow(d *FP12,e *BIG) *FP12 {
 		}
 		r=pow4(g,u)
 	} else {
-		r=d.pow(e)
+		r=d.Pow(e)
 	}
 	return r
 }
@@ -609,19 +609,19 @@ func GTmember(m *FP12) bool {
 	if m.Isunity() {return false}
 	r:=NewFP12copy(m)
 	r.conj()
-	r.mul(m)
+	r.Mul(m)
 	if !r.Isunity() {return false}
 
 	f:=NewFP2bigs(NewBIGints(Fra),NewBIGints(Frb))
 
 	r.Copy(m); r.frob(f); r.frob(f)
 	w:=NewFP12copy(r); w.frob(f); w.frob(f)
-	w.mul(m)
+	w.Mul(m)
 	if !GT_STRONG {
 		if !w.Equals(r) {return false}
 		x:=NewBIGints(CURVE_Bnx);
-		r.Copy(m); w=r.pow(x); w=w.pow(x)
-		r.Copy(w); r.sqr(); r.mul(w); r.sqr()
+		r.Copy(m); w=r.Pow(x); w=w.Pow(x)
+		r.Copy(w); r.sqr(); r.Mul(w); r.sqr()
 		w.Copy(m); w.frob(f)
 	}
 	return w.Equals(r)

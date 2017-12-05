@@ -103,7 +103,7 @@ func (E *ECP2) selector(W []*ECP2,b int32) {
 }
 
 /* Test if P == Q */
-func (E *ECP2) equals(Q *ECP2) bool {
+func (E *ECP2) Equals(Q *ECP2) bool {
 	if E.Is_infinity() && Q.Is_infinity() {return true}
 	if E.Is_infinity() || Q.Is_infinity() {return false}
 
@@ -111,10 +111,10 @@ func (E *ECP2) equals(Q *ECP2) bool {
 	b:=NewFP2copy(Q.x)
 	a.mul(Q.z); b.mul(E.z)
 
-	if !a.equals(b) {return false}
+	if !a.Equals(b) {return false}
 	a.copy(E.y); b.copy(Q.y)
 	a.mul(Q.z); b.mul(E.z);
-	if !a.equals(b) {return false}
+	if !a.Equals(b) {return false}
 
 	return true
 }
@@ -123,7 +123,7 @@ func (E *ECP2) equals(Q *ECP2) bool {
 func (E *ECP2) Affine() {
 	if E.Is_infinity() {return}
 	one:=NewFP2int(1)
-	if E.z.equals(one) {E.x.reduce(); E.y.reduce(); return}
+	if E.z.Equals(one) {E.x.reduce(); E.y.reduce(); return}
 	E.z.inverse()
 
 	E.x.mul(E.z); E.x.reduce()
@@ -132,12 +132,12 @@ func (E *ECP2) Affine() {
 }
 
 /* extract affine x as FP2 */
-func (E *ECP2) getX() *FP2 {
+func (E *ECP2) GetX() *FP2 {
 	E.Affine()
 	return E.x
 }
 /* extract affine y as FP2 */
-func (E *ECP2) getY() *FP2 {
+func (E *ECP2) GetY() *FP2 {
 	E.Affine();
 	return E.y;
 }
@@ -155,19 +155,19 @@ func (E *ECP2) getz() *FP2 {
 }
 
 /* convert to byte array */
-func (E *ECP2) toBytes(b []byte) {
+func (E *ECP2) ToBytes(b []byte) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
 
 	E.Affine()
-	E.x.getA().toBytes(t[:])
+	E.x.getA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i]=t[i]}
-	E.x.getB().toBytes(t[:])
+	E.x.getB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+MB]=t[i]}
 
-	E.y.getA().toBytes(t[:])
+	E.y.getA().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+2*MB]=t[i]}
-	E.y.getB().toBytes(t[:])
+	E.y.getB().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+3*MB]=t[i]}
 }
 
@@ -177,15 +177,15 @@ func ECP2_fromBytes(b []byte) *ECP2 {
 	MB:=int(MODBYTES)
 
 	for i:=0;i<MB;i++ {t[i]=b[i]}
-	ra:=fromBytes(t[:])
+	ra:=FromBytes(t[:])
 	for i:=0;i<MB;i++ {t[i]=b[i+MB]}
-	rb:=fromBytes(t[:])
+	rb:=FromBytes(t[:])
 	rx:=NewFP2bigs(ra,rb)
 
 	for i:=0;i<MB;i++ {t[i]=b[i+2*MB]}
-	ra=fromBytes(t[:])
+	ra=FromBytes(t[:])
 	for i:=0;i<MB;i++ {t[i]=b[i+3*MB]}
-	rb=fromBytes(t[:])
+	rb=FromBytes(t[:])
 	ry:=NewFP2bigs(ra,rb)
 
 	return NewECP2fp2s(rx,ry)
@@ -229,7 +229,7 @@ func NewECP2fp2s(ix *FP2,iy *FP2) *ECP2 {
 	rhs:=RHS2(E.x)
 	y2:=NewFP2copy(E.y)
 	y2.sqr()
-	if y2.equals(rhs) {
+	if y2.Equals(rhs) {
 		E.INF=false
 	} else {E.x.zero();E.INF=true}
 	return E
@@ -299,7 +299,7 @@ func (E *ECP2) dbl() int {
 }
 
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
-func (E *ECP2) add(Q *ECP2) int {
+func (E *ECP2) Add(Q *ECP2) int {
 	if E.INF {
 		E.Copy(Q)
 		return -1
@@ -375,9 +375,9 @@ func (E *ECP2) add(Q *ECP2) int {
 }
 
 /* set this-=Q */
-func (E *ECP2) sub(Q *ECP2) int {
+func (E *ECP2) Sub(Q *ECP2) int {
 	Q.neg()
-	D:=E.add(Q)
+	D:=E.Add(Q)
 	Q.neg()
 	return D
 }
@@ -421,7 +421,7 @@ func (E *ECP2) mul(e *BIG) *ECP2 {
 	for i:=1;i<8;i++ {
 		W=append(W,NewECP2())
 		W[i].Copy(W[i-1])
-		W[i].add(Q)
+		W[i].Add(Q)
 	}
 
 /* make exponent odd - add 2P if even, P if odd */
@@ -448,11 +448,16 @@ func (E *ECP2) mul(e *BIG) *ECP2 {
 		P.dbl()
 		P.dbl()
 		P.dbl()
-		P.add(Q)
+		P.Add(Q)
 	}
-	P.sub(C)
+	P.Sub(C)
 	P.Affine()
 	return P
+}
+
+/* Public version */
+func (E *ECP2) Mul(e *BIG) *ECP2 {
+	return E.mul(e)
 }
 
 /* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
@@ -476,32 +481,32 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 
 /* precompute table */
 
-	W=append(W,NewECP2()); W[0].Copy(Q[0]); W[0].sub(Q[1])
+	W=append(W,NewECP2()); W[0].Copy(Q[0]); W[0].Sub(Q[1])
 	W=append(W,NewECP2()); W[1].Copy(W[0])
 	W=append(W,NewECP2()); W[2].Copy(W[0])
 	W=append(W,NewECP2()); W[3].Copy(W[0])
-	W=append(W,NewECP2()); W[4].Copy(Q[0]); W[4].add(Q[1])
+	W=append(W,NewECP2()); W[4].Copy(Q[0]); W[4].Add(Q[1])
 	W=append(W,NewECP2()); W[5].Copy(W[4])
 	W=append(W,NewECP2()); W[6].Copy(W[4])
 	W=append(W,NewECP2()); W[7].Copy(W[4])
 
-	T.Copy(Q[2]); T.sub(Q[3])
-	W[1].sub(T)
-	W[2].add(T)
-	W[5].sub(T)
-	W[6].add(T)
-	T.Copy(Q[2]); T.add(Q[3])
-	W[0].sub(T)
-	W[3].add(T)
-	W[4].sub(T)
-	W[7].add(T)
+	T.Copy(Q[2]); T.Sub(Q[3])
+	W[1].Sub(T)
+	W[2].Add(T)
+	W[5].Sub(T)
+	W[6].Add(T)
+	T.Copy(Q[2]); T.Add(Q[3])
+	W[0].Sub(T)
+	W[3].Add(T)
+	W[4].Sub(T)
+	W[7].Add(T)
 
 /* if multiplier is even add 1 to multiplier, and add P to correction */
 	mt.zero(); C.inf()
 	for i:=0;i<4;i++ {
 		if t[i].parity()==0 {
 			t[i].inc(1); t[i].norm()
-			C.add(Q[i])
+			C.Add(Q[i])
 		}
 		mt.add(t[i]); mt.norm()
 	}
@@ -523,9 +528,9 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 	for i:=nb-1;i>=0;i-- {
 		T.selector(W,int32(w[i]))
 		P.dbl()
-		P.add(T)
+		P.Add(T)
 	}
-	P.sub(C) /* apply correction */
+	P.Sub(C) /* apply correction */
 
 	P.Affine()
 	return P
@@ -534,11 +539,11 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 /* needed for SOK */
 func ECP2_mapit(h []byte) *ECP2 {
 	q:=NewBIGints(Modulus)
-	x:=fromBytes(h[:])
+	x:=FromBytes(h[:])
 	one:=NewBIGint(1)
 	var X *FP2
 	var Q,T,K,xQ,x2Q *ECP2
-	x.mod(q)
+	x.Mod(q)
 	for true {
 		X=NewFP2bigs(one,x)
 		Q=NewECP2fp2(X)
@@ -560,13 +565,13 @@ func ECP2_mapit(h []byte) *ECP2 {
 		T=NewECP2(); T.Copy(Q)
 		T=T.mul(x); T.neg()
 		K=NewECP2(); K.Copy(T)
-		K.dbl(); K.add(T); //K.Affine()
+		K.dbl(); K.Add(T); //K.Affine()
 
 		K.frob(X)
 		Q.frob(X); Q.frob(X); Q.frob(X)
-		Q.add(T); Q.add(K)
+		Q.Add(T); Q.Add(K)
 		T.frob(X); T.frob(X)
-		Q.add(T)
+		Q.Add(T)
 	}
 	if CURVE_PAIRING_TYPE==BLS {
 		xQ=NewECP2()
@@ -575,18 +580,18 @@ func ECP2_mapit(h []byte) *ECP2 {
 		xQ=Q.mul(x)
 		x2Q=xQ.mul(x)
 
-		x2Q.sub(xQ)
-		x2Q.sub(Q)
+		x2Q.Sub(xQ)
+		x2Q.Sub(Q)
 
-		xQ.sub(Q)
+		xQ.Sub(Q)
 		xQ.frob(X)
 
 		Q.dbl()
 		Q.frob(X)
 		Q.frob(X)
 
-		Q.add(x2Q)
-		Q.add(xQ)
+		Q.Add(x2Q)
+		Q.Add(xQ)
 	}
 	Q.Affine()
 	return Q
