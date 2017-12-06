@@ -49,10 +49,10 @@ func mpin_hash(sha int,c *FP4,U *ECP) []byte {
 	var t [6*MFS]byte
 	var h []byte
 
-	c.geta().getA().ToBytes(w[:]); for i:=0;i<MFS;i++ {t[i]=w[i]}
-	c.geta().getB().ToBytes(w[:]); for i:=MFS;i<2*MFS;i++ {t[i]=w[i-MFS]}
-	c.getb().getA().ToBytes(w[:]); for i:=2*MFS;i<3*MFS;i++ {t[i]=w[i-2*MFS]}
-	c.getb().getB().ToBytes(w[:]); for i:=3*MFS;i<4*MFS;i++ {t[i]=w[i-3*MFS]}
+	c.geta().GetA().ToBytes(w[:]); for i:=0;i<MFS;i++ {t[i]=w[i]}
+	c.geta().GetB().ToBytes(w[:]); for i:=MFS;i<2*MFS;i++ {t[i]=w[i-MFS]}
+	c.getb().GetA().ToBytes(w[:]); for i:=2*MFS;i<3*MFS;i++ {t[i]=w[i-2*MFS]}
+	c.getb().GetB().ToBytes(w[:]); for i:=3*MFS;i<4*MFS;i++ {t[i]=w[i-3*MFS]}
 
 	U.GetX().ToBytes(w[:]); for i:=4*MFS;i<5*MFS;i++ {t[i]=w[i-4*MFS]}
 	U.GetY().ToBytes(w[:]); for i:=5*MFS;i<6*MFS;i++ {t[i]=w[i-5*MFS]}
@@ -487,7 +487,7 @@ func MPIN_KANGAROO(E []byte,F []byte) int {
 	t.one()
 	dn:=0
 	for j:=0;j<TRAP;j++ {
-		i=t.geta().geta().getA().lastbits(20)%TS
+		i=t.geta().geta().GetA().lastbits(20)%TS
 		t.Mul(table[i])
 		dn+=distance[i]
 	}
@@ -497,7 +497,7 @@ func MPIN_KANGAROO(E []byte,F []byte) int {
 	for dm-dn<int(MAXPIN) {
 		steps++
 		if steps>4*TRAP {break}
-		i=ge.geta().geta().getA().lastbits(20)%TS;
+		i=ge.geta().geta().GetA().lastbits(20)%TS;
 		ge.Mul(table[i])
 		dm+=distance[i]
 		if ge.Equals(t) {

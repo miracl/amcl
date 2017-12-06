@@ -385,7 +385,7 @@ func (r *BIG) add(x *BIG) {
 }
 
 /* return this+x */
-func (r *BIG) plus(x *BIG) *BIG {
+func (r *BIG) Plus(x *BIG) *BIG {
 	s:=new(BIG)
 	for i:=0;i<NLEN;i++ {
 		s.w[i]=r.w[i]+x.w[i];
@@ -411,7 +411,7 @@ func (r *BIG) pxmul(c int) *DBIG {
 }
 
 /* return this-x */
-func (r *BIG) minus(x *BIG) *BIG {
+func (r *BIG) Minus(x *BIG) *BIG {
 	d:=new(BIG)
 	for i:=0;i<NLEN;i++ {
 		d.w[i]=r.w[i]-x.w[i] 
@@ -750,7 +750,7 @@ func Modsqr(a,m *BIG) *BIG {
 /* return -a mod m */
 func Modneg(a,m *BIG) *BIG {
 	a.Mod(m)
-	return m.minus(a)
+	return m.Minus(a)
 }
 
 /* Jacobi Symbol (this/p). Returns 0, 1 or -1 */

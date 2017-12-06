@@ -160,14 +160,14 @@ func (E *ECP2) ToBytes(b []byte) {
 	MB:=int(MODBYTES)
 
 	E.Affine()
-	E.x.getA().ToBytes(t[:])
+	E.x.GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i]=t[i]}
-	E.x.getB().ToBytes(t[:])
+	E.x.GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+MB]=t[i]}
 
-	E.y.getA().ToBytes(t[:])
+	E.y.GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+2*MB]=t[i]}
-	E.y.getB().ToBytes(t[:])
+	E.y.GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+3*MB]=t[i]}
 }
 

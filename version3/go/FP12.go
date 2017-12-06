@@ -453,31 +453,31 @@ func FP12_fromBytes(w []byte) *FP12 {
 func (F *FP12) ToBytes(w []byte) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
-	F.a.geta().getA().ToBytes(t[:])
+	F.a.geta().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i]=t[i]}
-	F.a.geta().getB().ToBytes(t[:])
+	F.a.geta().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+MB]=t[i]}
-	F.a.getb().getA().ToBytes(t[:])
+	F.a.getb().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+2*MB]=t[i]}
-	F.a.getb().getB().ToBytes(t[:])
+	F.a.getb().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+3*MB]=t[i]}
 
-	F.b.geta().getA().ToBytes(t[:])
+	F.b.geta().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+4*MB]=t[i]}
-	F.b.geta().getB().ToBytes(t[:])
+	F.b.geta().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+5*MB]=t[i]}
-	F.b.getb().getA().ToBytes(t[:])
+	F.b.getb().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+6*MB]=t[i]}
-	F.b.getb().getB().ToBytes(t[:])
+	F.b.getb().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+7*MB]=t[i]}
 
-	F.c.geta().getA().ToBytes(t[:])
+	F.c.geta().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+8*MB]=t[i]}
-	F.c.geta().getB().ToBytes(t[:])
+	F.c.geta().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+9*MB]=t[i]}
-	F.c.getb().getA().ToBytes(t[:])
+	F.c.getb().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+10*MB]=t[i]}
-	F.c.getb().getB().ToBytes(t[:])
+	F.c.getb().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ {w[i+11*MB]=t[i]}
 }
 

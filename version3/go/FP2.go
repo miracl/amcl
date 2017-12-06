@@ -108,12 +108,12 @@ func (F *FP2) Equals(x *FP2) bool {
 }
 
 /* extract a */
-func (F *FP2) getA() *BIG { 
+func (F *FP2) GetA() *BIG { 
 	return F.a.redc()
 }
 
 /* extract b */
-func (F *FP2) getB() *BIG {
+func (F *FP2) GetB() *BIG {
 	return F.b.redc()
 }
 
