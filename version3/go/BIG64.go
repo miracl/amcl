@@ -22,7 +22,7 @@ under the License.
 package XXX
 
 import "strconv"
-import "amcl"
+import "github.com/milagro-crypto/amcl/version3/go/amcl"
 
 //import "fmt"
 
