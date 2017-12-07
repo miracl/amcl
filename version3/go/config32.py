@@ -35,8 +35,8 @@ def rsaset(tb,nb,base,ml) :
 	chosen.append(tb)
 	cptr=cptr+1
 
-	fpath="src"+slashtext+"amcl"+slashtext+tb+slashtext
-	os.system("mkdir src"+slashtext+"amcl"+slashtext+tb)
+	fpath="amcl"+slashtext+tb+slashtext
+	os.system("mkdir amcl"+slashtext+tb)
 
 	os.system(copytext+"ARCH32.go "+fpath+"ARCH.go")
 	os.system(copytext+"BIG32.go "+fpath+"BIG.go")
@@ -55,9 +55,6 @@ def rsaset(tb,nb,base,ml) :
 
 	replace(fpath+"FF.go","@ML@",ml);
 
-	os.system("go install amcl"+slashtext+tb)
-
-
 def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	global deltext,slashtext,copytext
 	global cptr,chosen
@@ -65,8 +62,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	chosen.append(tc)
 	cptr=cptr+1
 
-	fpath="src"+slashtext+"amcl"+slashtext+tc+slashtext
-	os.system("mkdir src"+slashtext+"amcl"+slashtext+tc)
+	fpath="amcl"+slashtext+tc+slashtext
+	os.system("mkdir amcl"+slashtext+tc)
 
 	os.system(copytext+"ARCH32.go "+fpath+"ARCH.go")
 	os.system(copytext+"BIG32.go "+fpath+"BIG.go")
@@ -122,22 +119,14 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fpath+"ECP2.go","XXX",tc)
 		replace(fpath+"PAIR.go","XXX",tc)
 		replace(fpath+"MPIN.go","XXX",tc)
-	
-	os.system("go install amcl"+slashtext+tc)
 
-os.system("mkdir src")
-os.system("mkdir bin")
-os.system("mkdir pkg")
-
-os.system("mkdir src"+slashtext+"amcl")
-os.system(copytext+ "HASH*.go src"+slashtext+"amcl"+slashtext+".")
-os.system(copytext+ "SHA3.go src"+slashtext+"amcl"+slashtext+".")
-os.system(copytext+ "RAND.go src"+slashtext+"amcl"+slashtext+".")
-os.system(copytext+ "AES.go src"+slashtext+"amcl"+slashtext+".")
-os.system(copytext+ "GCM.go src"+slashtext+"amcl"+slashtext+".")
-os.system(copytext+ "NHS.go src"+slashtext+"amcl"+slashtext+".")
-
-os.system("go install amcl")
+os.system("mkdir amcl")
+os.system(copytext+ "HASH*.go amcl"+slashtext+".")
+os.system(copytext+ "SHA3.go amcl"+slashtext+".")
+os.system(copytext+ "RAND.go amcl"+slashtext+".")
+os.system(copytext+ "AES.go amcl"+slashtext+".")
+os.system(copytext+ "GCM.go amcl"+slashtext+".")
+os.system(copytext+ "NHS.go amcl"+slashtext+".")
 
 print("Elliptic Curves")
 print("1. ED25519")
@@ -287,28 +276,4 @@ while ptr<max:
 		#rsaset("RSA4096","32","29","16")
 		rsaset("RSA4096","64","29","8")
 		rsa_selected=True
-
-
-os.system(deltext+" HASH*.go")
-os.system(deltext+" SHA3.go")
-os.system(deltext+" AES.go")
-os.system(deltext+" RAND.go")
-os.system(deltext+" GCM.go")
-os.system(deltext+" NHS.go")
-
-os.system(deltext+" ARCH*.go")
-os.system(deltext+" BIG*.go")
-os.system(deltext+" DBIG.go")
-os.system(deltext+" FP*.go")
-os.system(deltext+" ECP.go")
-os.system(deltext+" ECDH.go")
-os.system(deltext+" FF*.go")
-os.system(deltext+" RSA.go")
-os.system(deltext+" ECP2.go")
-os.system(deltext+" PAIR.go")
-os.system(deltext+" MPIN.go")
-os.system(deltext+" ROM*.go")
-
-# create library
-
 

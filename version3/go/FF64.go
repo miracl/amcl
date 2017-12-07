@@ -21,7 +21,7 @@ package XXX
 
 //import "fmt"
 //import "os"
-import "amcl"
+import "github.com/milagro-crypto/amcl/version3/go/amcl"
 
 //var debug bool = false
 
