@@ -18,14 +18,13 @@ under the License.
 */
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
-package org.apache.milagro;
+package org.apache.milagro.amcl.XXX;
 
 import java.util.Scanner;
-
-import org.apache.milagro.amcl.RSA2048.*;
+import junit.framework.TestCase;
 import org.apache.milagro.amcl.RAND;
 
-public class TestRSA
+public class TestRSA extends TestCase
 {
 	private static void printBinary(byte[] array)
 	{
@@ -37,8 +36,16 @@ public class TestRSA
 		System.out.println();
 	}    
 
-	public static void rsa(RAND rng)
+	public static void testRSA()
 	{
+		byte[] RAW=new byte[100];
+		RAND rng=new RAND();
+
+		rng.clean();
+		for (int i=0;i<100;i++) RAW[i]=(byte)(i);
+
+		rng.seed(100,RAW);
+		
 		int i;
 		int RFS=RSA.RFS;
 		int sha=RSA.HASH_TYPE;
@@ -64,7 +71,9 @@ public class TestRSA
 
 		byte[] E=RSA.OAEP_ENCODE(sha,M,rng,null); /* OAEP encode message M to E  */
 
-		if (E.length==0) System.out.println("Encoding failed\n");
+		if (E.length==0) {
+			fail("Encoding failed");
+		}
 
 		RSA.ENCRYPT(pub,E,C);     /* encrypt encoded message */
 		System.out.print("Ciphertext= 0x"); printBinary(C);
@@ -93,24 +102,10 @@ public class TestRSA
 				if (C[j]!=ML[j]) cmp=false;
 		}
 		if (cmp) System.out.println("Signature is valid");
-		else System.out.println("Signature is INVALID");
+		else fail("Signature is INVALID");
 
 		RSA.PRIVATE_KEY_KILL(priv);
 		System.out.println("");
-
-	}
-
-	public static void main(String[] args) 
-	{
-
-		byte[] RAW=new byte[100];
-		RAND rng=new RAND();
-
-		rng.clean();
-		for (int i=0;i<100;i++) RAW[i]=(byte)(i);
-
-		rng.seed(100,RAW);
-		rsa(rng);
 
 	}
 }

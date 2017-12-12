@@ -17,6 +17,8 @@ if sys.platform.startswith("win") :
 	deltext="del "
 	slashtext="\\"
 
+amclpath = "amcl" + slashtext + "src" + slashtext + "main" + slashtext + "java" + slashtext + org1text + slashtext + org2text + slashtext + org3text +slashtext + "amcl"
+amclTestPath = "amcl" + slashtext + "src" + slashtext + "test" + slashtext + "java" + slashtext + org1text + slashtext + org2text + slashtext + org3text +slashtext + "amcl"
 chosen=[]
 cptr=0
 
@@ -39,8 +41,10 @@ def rsaset(tb,nb,base,ml) :
 	chosen.append(tb)
 	cptr=cptr+1
 
-	fpath="amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+tb+slashtext
-	os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+tb)
+	fpath=amclpath+slashtext+tb+slashtext
+	fpathTest=amclTestPath+slashtext+tb+slashtext
+	os.system("mkdir "+amclpath+slashtext+tb)
+	os.system("mkdir "+amclTestPath+slashtext+tb)
 
 	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
@@ -48,21 +52,20 @@ def rsaset(tb,nb,base,ml) :
 	os.system(copytext+"RSA.java "+fpath+"RSA.java")
 	os.system(copytext+"private_key.java "+fpath+"private_key.java")
 	os.system(copytext+"public_key.java "+fpath+"public_key.java")	
-
+	os.system(copytext+"TestRSA.java "+fpathTest+"TestRSA.java")	
+	
 	replace(fpath+"BIG.java","XXX",tb)
 	replace(fpath+"DBIG.java","XXX",tb)
 	replace(fpath+"FF.java","XXX",tb)
 	replace(fpath+"RSA.java","XXX",tb)
 	replace(fpath+"private_key.java","XXX",tb)
 	replace(fpath+"public_key.java","XXX",tb)
-
+	replace(fpathTest+"TestRSA.java","XXX",tb)
 
 	replace(fpath+"BIG.java","@NB@",nb)
 	replace(fpath+"BIG.java","@BASE@",base)
 
 	replace(fpath+"FF.java","@ML@",ml);
-
-	os.system("javac "+fpath+"*.java -d amcl"+slashtext+"target"+slashtext+"classes -cp amcl"+slashtext+"target"+slashtext+"classes")
 
 
 def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
@@ -72,8 +75,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	chosen.append(tc)
 	cptr=cptr+1
 
-	fpath="amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+tc+slashtext
-	os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+tc)
+	fpath=amclpath+slashtext+tc+slashtext
+	os.system("mkdir "+amclpath+slashtext+tc)
 
 	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
@@ -128,34 +131,13 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fpath+"ECP2.java","XXX",tc)
 		replace(fpath+"PAIR.java","XXX",tc)
 		replace(fpath+"MPIN.java","XXX",tc)
-	
-	os.system("javac "+fpath+"*.java -d amcl"+slashtext+"target"+slashtext+"classes -cp amcl"+slashtext+"target"+slashtext+"classes")
 
 
-os.system("mkdir amcl")
-os.system("mkdir amcl"+slashtext+"src")
-os.system("mkdir amcl"+slashtext+"src"+slashtext+"main")
-os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java")
-os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+org1text)
-os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+org1text+slashtext+org2text)
-os.system("mkdir amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+org1text+slashtext+org2text+slashtext+org3text)
+os.system("mkdir " + amclpath)
 
-os.system("mkdir amcl"+slashtext+"target")
-os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes")
-os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes"+slashtext+org1text)
-os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes"+slashtext+org1text+slashtext+org2text)
-os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes"+slashtext+org1text+slashtext+org2text+slashtext+org3text)
-os.system("mkdir amcl"+slashtext+"target"+slashtext+"classes"+slashtext+org1text+slashtext+org2text+slashtext+org3text+slashtext+"amcl")
-
-
-os.system(copytext+ "HASH*.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
-os.system(copytext+ "SHA3.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
-os.system(copytext+ "RAND.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
-os.system(copytext+ "AES.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
-os.system(copytext+ "GCM.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
-os.system(copytext+ "NHS.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+".")
-
-os.system("javac amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+"*.java -d amcl"+slashtext+"target"+slashtext+"classes")
+os.system(copytext + "pom.xml " + "amcl" + slashtext + ".")
+for file in ['HASH*.java', 'SHA3.java', 'RAND.java', 'AES.java', 'GCM.java', 'NHS.java']:
+	os.system(copytext + file + " " + amclpath+slashtext+".")
 
 print("Elliptic Curves")
 print("1. ED25519")
@@ -307,36 +289,4 @@ while ptr<max:
 		#rsaset("RSA4096","32","29","16")
 		rsaset("RSA4096","64","29","8")
 		rsa_selected=True
-
-
-os.system(deltext+" HASH*.java")
-os.system(deltext+" SHA3.java")
-os.system(deltext+" AES.java")
-os.system(deltext+" RAND.java")
-os.system(deltext+" GCM.java")
-os.system(deltext+" NHS.java")
-
-os.system(deltext+" BIG*.java")
-os.system(deltext+" DBIG*.java")
-os.system(deltext+" FP*.java")
-os.system(deltext+" ECP.java")
-os.system(deltext+" ECDH.java")
-os.system(deltext+" FF*.java")
-os.system(deltext+" RSA.java")
-os.system(deltext+" public_key.java")
-os.system(deltext+" private_key.java")
-os.system(deltext+" ECP2.java")
-os.system(deltext+" PAIR.java")
-os.system(deltext+" MPIN.java")
-os.system(deltext+" ROM*.java")
-
-# create library
-
-os.system("jar cf amcl"+slashtext+"target"+slashtext+"amcl.jar -C amcl"+slashtext+"target"+slashtext+"classes .")
-
-os.system(copytext+" *.java amcl"+slashtext+"src"+slashtext+"main"+slashtext+"java"+slashtext+org1text+slashtext+org2text+slashtext+org3text+slashtext+".")
-os.system(deltext+ "Time*.java")
-os.system(deltext+ "Test*.java")
-os.system(deltext+ "BenchtestALL.java")
-
 
