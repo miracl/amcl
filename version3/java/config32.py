@@ -18,6 +18,7 @@ if sys.platform.startswith("win") :
 	slashtext="\\"
 
 amclpath = "amcl" + slashtext + "src" + slashtext + "main" + slashtext + "java" + slashtext + org1text + slashtext + org2text + slashtext + org3text +slashtext + "amcl"
+amclTestPath = "amcl" + slashtext + "src" + slashtext + "test" + slashtext + "java" + slashtext + org1text + slashtext + org2text + slashtext + org3text +slashtext + "amcl"
 chosen=[]
 cptr=0
 
@@ -41,7 +42,9 @@ def rsaset(tb,nb,base,ml) :
 	cptr=cptr+1
 
 	fpath=amclpath+slashtext+tb+slashtext
+	fpathTest=amclTestPath+slashtext+tb+slashtext
 	os.system("mkdir "+amclpath+slashtext+tb)
+	os.system("mkdir "+amclTestPath+slashtext+tb)
 
 	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
@@ -49,14 +52,15 @@ def rsaset(tb,nb,base,ml) :
 	os.system(copytext+"RSA.java "+fpath+"RSA.java")
 	os.system(copytext+"private_key.java "+fpath+"private_key.java")
 	os.system(copytext+"public_key.java "+fpath+"public_key.java")	
-
+	os.system(copytext+"TestRSA.java "+fpathTest+"TestRSA.java")	
+	
 	replace(fpath+"BIG.java","XXX",tb)
 	replace(fpath+"DBIG.java","XXX",tb)
 	replace(fpath+"FF.java","XXX",tb)
 	replace(fpath+"RSA.java","XXX",tb)
 	replace(fpath+"private_key.java","XXX",tb)
 	replace(fpath+"public_key.java","XXX",tb)
-
+	replace(fpathTest+"TestRSA.java","XXX",tb)
 
 	replace(fpath+"BIG.java","@NB@",nb)
 	replace(fpath+"BIG.java","@BASE@",base)
