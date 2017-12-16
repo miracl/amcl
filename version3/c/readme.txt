@@ -13,7 +13,7 @@ on top of BIG_256_56, as both require support for 256-bit numbers using
 an internal number base of 2^56.
 
 Separate ROM files provide the constants required for each curve. The
-associated header files (big_XXX.h, fp_YYY.h and ecp_ZZZ.h) also specify 
+associated header files (big.h, fp.h and ecp.h) also specify 
 certain constants that must be set for the particular curve.
 
 --------------------------------------

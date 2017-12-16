@@ -29,13 +29,13 @@ def rsaset(tb,tff,nb,base,ml) :
 	bd=tb+"_"+base
 	fnameh="config_big_"+bd+".h"
 
-	os.system(copytext+" config_big_XXX.h "+fnameh)
+	os.system(copytext+" config_big.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"@NB@",nb)
 	replace(fnameh,"@BASE@",base)
 
 	fnameh="config_ff_"+tff+".h"
-	os.system(copytext+" config_ff_WWW.h "+fnameh)
+	os.system(copytext+" config_ff.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"@ML@",ml);
@@ -43,8 +43,8 @@ def rsaset(tb,tff,nb,base,ml) :
 	fnamec="big_"+bd+".c"
 	fnameh="big_"+bd+".h"
 
-	os.system(copytext+" big_XXX.c "+fnamec)
-	os.system(copytext+" big_XXX.h "+fnameh)
+	os.system(copytext+" big.c "+fnamec)
+	os.system(copytext+" big.h "+fnameh)
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
@@ -53,8 +53,8 @@ def rsaset(tb,tff,nb,base,ml) :
 	fnamec="ff_"+tff+".c"
 	fnameh="ff_"+tff+".h"
 
-	os.system(copytext+" ff_WWW.c "+fnamec)
-	os.system(copytext+" ff_WWW.h "+fnameh)
+	os.system(copytext+" ff.c "+fnamec)
+	os.system(copytext+" ff.h "+fnameh)
 
 	replace(fnamec,"WWW",tff)
 	replace(fnamec,"XXX",bd)
@@ -65,8 +65,8 @@ def rsaset(tb,tff,nb,base,ml) :
 	fnamec="rsa_"+tff+".c"
 	fnameh="rsa_"+tff+".h"
 
-	os.system(copytext+" rsa_WWW.c "+fnamec)
-	os.system(copytext+" rsa_WWW.h "+fnameh)
+	os.system(copytext+" rsa.c "+fnamec)
+	os.system(copytext+" rsa.h "+fnameh)
 
 	replace(fnamec,"WWW",tff)
 	replace(fnamec,"XXX",bd)
@@ -78,7 +78,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	bd=tb+"_"+base
 
 	fnameh="config_big_"+bd+".h"
-	os.system(copytext+" config_big_XXX.h "+fnameh)
+	os.system(copytext+" config_big.h "+fnameh)
 
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"@NB@",nb)
@@ -86,7 +86,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 
 
 	fnameh="config_field_"+tf+".h"
-	os.system(copytext+" config_field_YYY.h "+fnameh)
+	os.system(copytext+" config_field.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"@NBT@",nbt)
@@ -104,7 +104,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fnameh,"@SH@",str(sh))
 
 	fnameh="config_curve_"+tc+".h"	
-	os.system(copytext+" config_curve_ZZZ.h "+fnameh)
+	os.system(copytext+" config_curve.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"ZZZ",tc)
@@ -120,8 +120,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	fnamec="big_"+bd+".c"
 	fnameh="big_"+bd+".h"
 
-	os.system(copytext+" big_XXX.c "+fnamec)
-	os.system(copytext+" big_XXX.h "+fnameh)
+	os.system(copytext+" big.c "+fnamec)
+	os.system(copytext+" big.h "+fnameh)
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
@@ -130,8 +130,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	fnamec="fp_"+tf+".c"
 	fnameh="fp_"+tf+".h"
 
-	os.system(copytext+" fp_YYY.c "+fnamec)
-	os.system(copytext+" fp_YYY.h "+fnameh)
+	os.system(copytext+" fp.c "+fnamec)
+	os.system(copytext+" fp.h "+fnameh)
 
 	replace(fnamec,"YYY",tf)
 	replace(fnamec,"XXX",bd)
@@ -144,8 +144,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	fnamec="ecp_"+tc+".c"
 	fnameh="ecp_"+tc+".h"
 
-	os.system(copytext+" ecp_ZZZ.c "+fnamec)
-	os.system(copytext+" ecp_ZZZ.h "+fnameh)
+	os.system(copytext+" ecp.c "+fnamec)
+	os.system(copytext+" ecp.h "+fnameh)
 
 	replace(fnamec,"ZZZ",tc)
 	replace(fnamec,"YYY",tf)
@@ -158,8 +158,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	fnamec="ecdh_"+tc+".c"
 	fnameh="ecdh_"+tc+".h"
 
-	os.system(copytext+" ecdh_ZZZ.c "+fnamec)
-	os.system(copytext+" ecdh_ZZZ.h "+fnameh)
+	os.system(copytext+" ecdh.c "+fnamec)
+	os.system(copytext+" ecdh.h "+fnameh)
 
 	replace(fnamec,"ZZZ",tc)
 	replace(fnamec,"YYY",tf)
@@ -175,8 +175,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		fnamec="fp2_"+tf+".c"
 		fnameh="fp2_"+tf+".h"
 
-		os.system(copytext+" fp2_YYY.c "+fnamec)
-		os.system(copytext+" fp2_YYY.h "+fnameh)
+		os.system(copytext+" fp2.c "+fnamec)
+		os.system(copytext+" fp2.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
 		replace(fnameh,"YYY",tf)
@@ -186,8 +186,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		fnamec="fp4_"+tf+".c"
 		fnameh="fp4_"+tf+".h"
 
-		os.system(copytext+" fp4_YYY.c "+fnamec)
-		os.system(copytext+" fp4_YYY.h "+fnameh)
+		os.system(copytext+" fp4.c "+fnamec)
+		os.system(copytext+" fp4.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
 		replace(fnameh,"YYY",tf)
@@ -197,8 +197,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		fnamec="fp12_"+tf+".c"
 		fnameh="fp12_"+tf+".h"
 
-		os.system(copytext+" fp12_YYY.c "+fnamec)
-		os.system(copytext+" fp12_YYY.h "+fnameh)
+		os.system(copytext+" fp12.c "+fnamec)
+		os.system(copytext+" fp12.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
 		replace(fnameh,"YYY",tf)
@@ -208,8 +208,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		fnamec="ecp2_"+tc+".c"
 		fnameh="ecp2_"+tc+".h"
 
-		os.system(copytext+" ecp2_ZZZ.c "+fnamec)
-		os.system(copytext+" ecp2_ZZZ.h "+fnameh)
+		os.system(copytext+" ecp2.c "+fnamec)
+		os.system(copytext+" ecp2.h "+fnameh)
 		replace(fnamec,"ZZZ",tc)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
@@ -221,8 +221,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		fnamec="pair_"+tc+".c"
 		fnameh="pair_"+tc+".h"
 
-		os.system(copytext+" pair_ZZZ.c "+fnamec)
-		os.system(copytext+" pair_ZZZ.h "+fnameh)
+		os.system(copytext+" pair.c "+fnamec)
+		os.system(copytext+" pair.h "+fnameh)
 		replace(fnamec,"ZZZ",tc)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
@@ -234,8 +234,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 		fnamec="mpin_"+tc+".c"
 		fnameh="mpin_"+tc+".h"
 
-		os.system(copytext+" mpin_ZZZ.c "+fnamec)
-		os.system(copytext+" mpin_ZZZ.h "+fnameh)
+		os.system(copytext+" mpin.c "+fnamec)
+		os.system(copytext+" mpin.h "+fnameh)
 		replace(fnamec,"ZZZ",tc)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
@@ -401,22 +401,22 @@ while ptr<max:
 		rsa_selected=True
 
 
-os.system(deltext+" big_XXX.*")
-os.system(deltext+" fp_YYY.*")
-os.system(deltext+" ecp_ZZZ.*")
-os.system(deltext+" ecdh_ZZZ.*")
-os.system(deltext+" ff_WWW.*")
-os.system(deltext+" rsa_WWW.*")
-os.system(deltext+" config_big_XXX.h")
-os.system(deltext+" config_field_YYY.h")
-os.system(deltext+" config_curve_ZZZ.h")
-os.system(deltext+" config_ff_WWW.h")
-os.system(deltext+" fp2_YYY.*")
-os.system(deltext+" fp4_YYY.*")
-os.system(deltext+" fp12_YYY.*")
-os.system(deltext+" ecp2_ZZZ.*")
-os.system(deltext+" pair_ZZZ.*")
-os.system(deltext+" mpin_ZZZ.*")
+os.system(deltext+" big.*")
+os.system(deltext+" fp.*")
+os.system(deltext+" ecp.*")
+os.system(deltext+" ecdh.*")
+os.system(deltext+" ff.*")
+os.system(deltext+" rsa.*")
+os.system(deltext+" config_big.h")
+os.system(deltext+" config_field.h")
+os.system(deltext+" config_curve.h")
+os.system(deltext+" config_ff.h")
+os.system(deltext+" fp2.*")
+os.system(deltext+" fp4.*")
+os.system(deltext+" fp12.*")
+os.system(deltext+" ecp2.*")
+os.system(deltext+" pair.*")
+os.system(deltext+" mpin.*")
 
 # create library
 os.system("gcc -O3 -std=c99 -c randapi.c")
