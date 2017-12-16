@@ -234,6 +234,13 @@ int ZZZ::MPIN_RANDOM_GENERATE(csprng *RNG,octet* S)
 /* Extract PIN from TOKEN for identity CID */
 int ZZZ::MPIN_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
 {
+	pin%=MAXPIN;
+	return MPIN_EXTRACT_FACTOR(sha,CID,pin,PBLEN,TOKEN);
+}
+
+/* Extract a factor < 32 bits for identity CID */
+int ZZZ::MPIN_EXTRACT_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TOKEN)
+{
     ECP P,R;
     int res=0;
     char h[MODBYTES_XXX];
@@ -245,10 +252,30 @@ int ZZZ::MPIN_EXTRACT_PIN(int sha,octet *CID,int pin,octet *TOKEN)
         mhashit(sha,-1,CID,&H);
         ECP_mapit(&R,&H);
 
-        pin%=MAXPIN;
-
-        ECP_pinmul(&R,pin,PBLEN);
+        ECP_pinmul(&R,factor,facbits);
         ECP_sub(&P,&R);
+
+        ECP_toOctet(TOKEN,&P);
+    }
+    return res;
+}
+
+/* Extract a factor < 32 bits for identity CID */
+int ZZZ::MPIN_RESTORE_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TOKEN)
+{
+    ECP P,R;
+    int res=0;
+    char h[MODBYTES_XXX];
+    octet H= {0,sizeof(h),h};
+
+    if (!ECP_fromOctet(&P,TOKEN))  res=MPIN_INVALID_POINT;
+    if (res==0)
+    {
+        mhashit(sha,-1,CID,&H);
+        ECP_mapit(&R,&H);
+
+        ECP_pinmul(&R,factor,facbits);
+        ECP_add(&P,&R);
 
         ECP_toOctet(TOKEN,&P);
     }

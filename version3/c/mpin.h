@@ -56,6 +56,30 @@ under the License.
 
 
 void MPIN_ZZZ_GET_Y(int h,int t,octet *O,octet *Y);
+
+/**	@brief Extract a PIN number from a client secret
+ *
+  	@param h is the hash type
+	@param ID is the input client identity
+	@param factor is an input factor
+	@param facbits is the number of bits in the factor
+	@param CS is the client secret from which the factor is to be extracted
+	@return 0 or an error code
+ */
+int MPIN_ZZZ_EXTRACT_FACTOR(int h,octet *ID,int factor,int facbits,octet *CS);
+
+/**	@brief Extract a PIN number from a client secret
+ *
+  	@param h is the hash type
+	@param ID is the input client identity
+	@param factor is an input factor
+	@param facbits is the number of bits in the factor
+	@param CS is the client secret to which the factor is to be added
+	@return 0 or an error code
+ */
+int MPIN_ZZZ_RESTORE_FACTOR(int h,octet *ID,int factor,int facbits,octet *CS);
+
+
 /**	@brief Extract a PIN number from a client secret
  *
   	@param h is the hash type
@@ -65,6 +89,9 @@ void MPIN_ZZZ_GET_Y(int h,int t,octet *O,octet *Y);
 	@return 0 or an error code
  */
 int MPIN_ZZZ_EXTRACT_PIN(int h,octet *ID,int pin,octet *CS);
+
+
+
 /**	@brief Perform client side of the one-pass version of the M-Pin protocol
  *
 	If Time Permits are disabled, set d = 0, and UT is not generated and can be set to NULL.
