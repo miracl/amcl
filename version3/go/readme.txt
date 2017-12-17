@@ -9,13 +9,20 @@ that must be set for the particular curve.
 
 --------------------------------------
 
-To build the library and see it in action, copy all of the files in this 
-directory to a fresh root directory. Set the GOPATH environmental 
-variable to point to this root directory. Then execute the python3 
+Make sure that the GOPATH environmental variable is set.
+
+Then clone the AMCL repository by executing
+
+go get github.com/milagro-crypto/amcl
+
+This assumes that Git is installed on your machine - see 
+https://git-scm.com/download/
+
+Next navigate to $GOPATH/src/github.com/milagro-crypto/amcl/version3/go
+
+To build the library and see it in action, execute the python3 
 script config32.py or config64.py (depending om whether you want a 
 32 or 64-bit build), and select the curves that you wish to support. 
-Libraries will be built automatically including all of the modules 
-that you will need.
 
 As a quick example execute from your root directory
 
@@ -28,21 +35,13 @@ python3 config64.py
 Then select options 1, 17 and 21 (these are fixed for the example 
 program provided). Select 0 to exit.
 
-Then copy the test program TestALL.go to a src/TestALL subdirectory 
-and install the program by running from your root directory
+Run the test program by executing
 
-go install TestALL
-
-Run the test program by executing the program TestALL.exe in
-the bin/ subdirectory
+go run TestALL.go
 
 The correct PIN is 1234
 
-Next copy the program BenchtestALL.go to a src/BenchtestALL subdirectory
+Next run the Benchmark program by executing
 
-and install the program by running from your root directory
+go run BenchtestALL.go
 
-go install BenchtestALL
-
-Run the test program by executing the program BenchtestALL.exe in
-the bin/ subdirectory

@@ -24,7 +24,9 @@ under the License.
 package main
 
 import "fmt"
-import "amcl"
+
+import "github.com/milagro-crypto/amcl/version3/go/amcl"
+//import "amcl"
 
 func main() {
 

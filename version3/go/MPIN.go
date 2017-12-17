@@ -251,7 +251,43 @@ func MPIN_RANDOM_GENERATE(rng *amcl.RAND,S []byte) int {
 	return 0
 }
 
-/* Extract PIN from TOKEN for identity CID */
+
+func MPIN_EXTRACT_PIN(sha int,CID []byte,pin int,TOKEN []byte) int {
+	return MPIN_EXTRACT_FACTOR(sha,CID,int32(pin)%MAXPIN,PBLEN,TOKEN)
+}
+
+/* Extract factor from TOKEN for identity CID */
+func MPIN_EXTRACT_FACTOR(sha int,CID []byte,factor int32,facbits int32,TOKEN []byte) int {
+	P:=ECP_fromBytes(TOKEN)
+	if P.Is_infinity() {return INVALID_POINT}
+	h:=mhashit(sha,0,CID)
+	R:=ECP_mapit(h)
+
+	R=R.pinmul(factor,facbits)
+	P.Sub(R)
+
+	P.ToBytes(TOKEN)
+
+	return 0
+}
+
+/* Restore factor to TOKEN for identity CID */
+func MPIN_RESTORE_FACTOR(sha int,CID []byte,factor int32,facbits int32,TOKEN []byte) int {
+	P:=ECP_fromBytes(TOKEN)
+	if P.Is_infinity() {return INVALID_POINT}
+	h:=mhashit(sha,0,CID)
+	R:=ECP_mapit(h)
+
+	R=R.pinmul(factor,facbits)
+	P.Add(R)
+
+	P.ToBytes(TOKEN)
+
+	return 0
+}
+
+
+/* Extract PIN from TOKEN for identity CID 
 func MPIN_EXTRACT_PIN(sha int,CID []byte,pin int,TOKEN []byte) int {
 	P:=ECP_fromBytes(TOKEN)
 	if P.Is_infinity() {return INVALID_POINT}
@@ -264,7 +300,7 @@ func MPIN_EXTRACT_PIN(sha int,CID []byte,pin int,TOKEN []byte) int {
 	P.ToBytes(TOKEN)
 
 	return 0
-}
+}*/
 
 /* Implement step 2 on client side of MPin protocol */
 func MPIN_CLIENT_2(X []byte,Y []byte,SEC []byte) int {

@@ -23,10 +23,17 @@ under the License.
 package main
 
 import "fmt"
-import "amcl"
-import "amcl/ED25519"
-import "amcl/BN254"
-import "amcl/RSA2048"
+
+import "github.com/milagro-crypto/amcl/version3/go/amcl"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/ED25519"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/BN254"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/RSA2048"
+
+
+//import "amcl"
+//import "amcl/ED25519"
+//import "amcl/BN254"
+//import "amcl/RSA2048"
 
 
 func printBinary(array []byte) {
