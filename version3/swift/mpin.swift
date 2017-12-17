@@ -276,7 +276,47 @@ final public class MPIN
         s.toBytes(&S);
         return 0;
     }
+
     // Extract PIN from TOKEN for identity CID
+    static public func EXTRACT_PIN(_ sha:Int,_ CID:[UInt8],_ pin:Int32,_ TOKEN:inout [UInt8]) -> Int
+    {
+        return MPIN.EXTRACT_FACTOR(sha,CID,pin%MAXPIN,PBLEN,&TOKEN)
+    }
+
+    // Extract factor from TOKEN for identity CID
+    static public func EXTRACT_FACTOR(_ sha:Int,_ CID:[UInt8],_ factor:Int32,_ facbits:Int32,_ TOKEN:inout [UInt8]) -> Int
+    {
+        let P=ECP.fromBytes(TOKEN)
+        if P.is_infinity() {return INVALID_POINT}
+        let h=MPIN.hashit(sha,0,CID)
+        var R=ECP.mapit(h)
+
+        R=R.pinmul(factor,facbits)
+        P.sub(R)
+    
+        P.toBytes(&TOKEN)
+    
+        return 0
+    }    
+
+    // ERestore factor to TOKEN for identity CID
+    static public func RESTORE_FACTOR(_ sha:Int,_ CID:[UInt8],_ factor:Int32,_ facbits:Int32,_ TOKEN:inout [UInt8]) -> Int
+    {
+        let P=ECP.fromBytes(TOKEN)
+        if P.is_infinity() {return INVALID_POINT}
+        let h=MPIN.hashit(sha,0,CID)
+        var R=ECP.mapit(h)
+
+        R=R.pinmul(factor,facbits)
+        P.add(R)
+    
+        P.toBytes(&TOKEN)
+    
+        return 0
+    }    
+
+    // Extract PIN from TOKEN for identity CID
+    /*
     static public func EXTRACT_PIN(_ sha:Int,_ CID:[UInt8],_ pin:Int32,_ TOKEN:inout [UInt8]) -> Int
     {
         let P=ECP.fromBytes(TOKEN)
@@ -290,7 +330,9 @@ final public class MPIN
         P.toBytes(&TOKEN)
     
         return 0
-    }
+    }*/
+
+
     // Implement step 2 on client side of MPin protocol
     static public func CLIENT_2(_ X:[UInt8],_ Y:[UInt8],_ SEC:inout [UInt8]) -> Int
     {

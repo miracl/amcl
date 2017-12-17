@@ -524,7 +524,7 @@ final public class BIG{
     /* return n last bits */
     func lastbits(_ n: UInt) -> Int
     {
-        let msk=(1<<Chunk(n))-1;
+        let msk=(Chunk(1)<<Chunk(n))-1;
         norm();
         return Int((w[0])&msk)
     }

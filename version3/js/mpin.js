@@ -301,7 +301,43 @@ MPIN = function(ctx) {
             return 0;
         },
 
+
         /* Extract PIN from TOKEN for identity CID */
+        EXTRACT_PIN: function(sha, CID, pin, TOKEN) {
+			this.EXTRACT_FACTOR(sha,CID,pin%this.MAXPIN,this.PBLEN,TOKEN);
+		},
+
+        /* Extract factor from TOKEN for identity CID */
+        EXTRACT_FACTOR: function(sha, CID, factor, facbits, TOKEN) {
+            var P = ctx.ECP.fromBytes(TOKEN);
+            if (P.is_infinity()) return this.INVALID_POINT;
+            var h = this.hashit(sha, 0, CID);
+            var R = ctx.ECP.mapit(h);
+
+            R = R.pinmul(factor, facbits);
+            P.sub(R);
+
+            P.toBytes(TOKEN);
+
+            return 0;
+        },
+
+        /* Restore factor to TOKEN for identity CID */
+        RESTORE_FACTOR: function(sha, CID, factor, facbits, TOKEN) {
+            var P = ctx.ECP.fromBytes(TOKEN);
+            if (P.is_infinity()) return this.INVALID_POINT;
+            var h = this.hashit(sha, 0, CID);
+            var R = ctx.ECP.mapit(h);
+
+            R = R.pinmul(factor, facbits);
+            P.add(R);
+
+            P.toBytes(TOKEN);
+
+            return 0;
+        },
+
+        /* Extract PIN from TOKEN for identity CID 
         EXTRACT_PIN: function(sha, CID, pin, TOKEN) {
             var P = ctx.ECP.fromBytes(TOKEN);
             if (P.is_infinity()) return this.INVALID_POINT;
@@ -316,7 +352,7 @@ MPIN = function(ctx) {
             P.toBytes(TOKEN);
 
             return 0;
-        },
+        },*/
 
         /* Extract Server Secret SST=S*Q where Q is fixed generator in G2 and S is master secret */
         GET_SERVER_SECRET: function(S, SST) {

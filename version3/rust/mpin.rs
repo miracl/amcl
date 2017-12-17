@@ -342,6 +342,48 @@ pub fn get_client_secret(s: &mut [u8],cid: &[u8],cst: &mut [u8]) -> isize {
 /* Extract PIN from TOKEN for identity CID */
 #[allow(non_snake_case)]
 pub fn extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isize {
+	return extract_factor(sha,cid,pin%MAXPIN,PBLEN,token);
+}
+
+/* Extract factor from TOKEN for identity CID */
+#[allow(non_snake_case)]
+pub fn extract_factor(sha: usize,cid: &[u8],factor: i32,facbits: i32,token: &mut [u8]) -> isize {
+	let mut P=ECP::frombytes(&token);
+	const RM:usize=big::MODBYTES as usize;
+	let mut h:[u8;RM]=[0;RM];
+	if P.is_infinity() {return INVALID_POINT}
+	hashit(sha,0,cid,&mut h);
+	let mut R=ECP::mapit(&h);
+
+	R=R.pinmul(factor,facbits);
+	P.sub(&mut R);
+
+	P.tobytes(token);
+
+	return 0;
+}
+
+/* Restore factor to TOKEN for identity CID */
+#[allow(non_snake_case)]
+pub fn restore_factor(sha: usize,cid: &[u8],factor: i32,facbits: i32,token: &mut [u8]) -> isize {
+	let mut P=ECP::frombytes(&token);
+	const RM:usize=big::MODBYTES as usize;
+	let mut h:[u8;RM]=[0;RM];
+	if P.is_infinity() {return INVALID_POINT}
+	hashit(sha,0,cid,&mut h);
+	let mut R=ECP::mapit(&h);
+
+	R=R.pinmul(factor,facbits);
+	P.add(&mut R);
+
+	P.tobytes(token);
+
+	return 0;
+}
+
+/* Extract PIN from TOKEN for identity CID 
+#[allow(non_snake_case)]
+pub fn extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isize {
 	let mut P=ECP::frombytes(&token);
 	const RM:usize=big::MODBYTES as usize;
 	let mut h:[u8;RM]=[0;RM];
@@ -356,6 +398,8 @@ pub fn extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isize {
 
 	return 0;
 }
+*/
+
 
 /* Functions to support M-Pin Full */
 #[allow(non_snake_case)]
