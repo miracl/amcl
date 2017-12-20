@@ -19,26 +19,30 @@ under the License.
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
 
-package org.apache.milagro;
+package org.apache.milagro.amcl.XXX;
 
 import java.util.Scanner;
-
-import org.apache.milagro.amcl.RSA2048.*;
+import junit.framework.TestCase;
 import org.apache.milagro.amcl.RAND;
 
-public class TimeRSA
+public class TesttimeRSA extends TestCase
 {   
 	public static final int MIN_TIME=10; /* seconds */
 	public static final int MIN_ITERS=10; 
 
-	public static void rsa(RAND rng)
+	public static void testtimeRSA()
 	{
-
+		byte[] RAW=new byte[100];
+		RAND rng=new RAND();
 		int i,iterations;
 		long start,elapsed;
 		double dur;
 		public_key pub=new public_key(FF.FFLEN);
 		private_key priv=new private_key(FF.HFLEN);
+
+		rng.clean();
+		for (i=0;i<100;i++) RAW[i]=(byte)(i);
+		rng.seed(100,RAW);
 
 		byte[] P=new byte[RSA.RFS];
 		byte[] M=new byte[RSA.RFS];
@@ -86,14 +90,10 @@ public class TimeRSA
 		{
 			if (P[i]!=M[i])
 			{
-				System.out.print("FAILURE - RSA decryption\n");
-				return;
+				fail("FAILURE - RSA decryption");
 			}
 		}
 
 		System.out.print("All tests pass\n");
-
 	}
-
-
 }

@@ -18,14 +18,13 @@ under the License.
 */
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
-package org.apache.milagro;
+package org.apache.milagro.amcl.XXX;
 
 import java.util.Scanner;
+import junit.framework.TestCase;
 import org.apache.milagro.amcl.RAND;
-import org.apache.milagro.amcl.BN254.*;
 
-
-public class TimeMPIN
+public class TesttimeMPIN extends TestCase
 {
 	public static final int MIN_TIME=10; /* seconds */
 	public static final int MIN_ITERS=10; 
@@ -35,11 +34,19 @@ public class TimeMPIN
 	static boolean FULL=true;
 	static boolean SINGLE_PASS=false;
 
-	public static void mpin(RAND rng)
+	public static void testtimeMPIN()
 	{
+		byte[] RAW=new byte[100];
+		RAND rng=new RAND();
+
 		int i,iterations;
 		long start,elapsed;
 		double dur;
+
+		rng.clean();
+		for (i=0;i<100;i++) RAW[i]=(byte)(i);
+		rng.seed(100,RAW);
+
 
 		System.out.println("\nTesting/Timing BN254 Pairings");
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
@@ -63,8 +70,7 @@ public class TimeMPIN
 
 		if (!P.is_infinity())
 		{
-			System.out.print("FAILURE - rP!=O\n");
-			return;
+			fail("FAILURE - rP!=O");
 		}
 
 		iterations=0;
@@ -83,8 +89,7 @@ public class TimeMPIN
 
 		if (!W.is_infinity())
 		{
-			System.out.print("FAILURE - rQ!=O\n");
-			return;
+			fail("FAILURE - rQ!=O");
 		}
 
 		iterations=0;
@@ -105,8 +110,7 @@ public class TimeMPIN
 
 		if (!g.isunity())
 		{
-			System.out.print("FAILURE - g^r!=1\n");
-			return;
+			fail("FAILURE - g^r!=1");
 		}
 
 		iterations=0;
@@ -172,8 +176,7 @@ public class TimeMPIN
 
 		if (!g.equals(w))
 		{
-			System.out.print("FAILURE - e(sQ,p)!=e(Q,sP) \n");
-			return;
+			fail("FAILURE - e(sQ,p)!=e(Q,sP) ");
 		}
 
 		Q.copy(W);
@@ -183,8 +186,7 @@ public class TimeMPIN
 
 		if (!g.equals(w))
 		{
-			System.out.print("FAILURE - e(sQ,p)!=e(Q,P)^s \n");
-			return;
+			fail("FAILURE - e(sQ,p)!=e(Q,P)^s ");
 		}
 
 		System.out.print("All tests pass\n"); 

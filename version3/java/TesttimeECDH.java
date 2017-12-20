@@ -18,24 +18,28 @@ under the License.
 */
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
-package org.apache.milagro;
+package org.apache.milagro.amcl.XXX;
 
 import java.util.Scanner;
-
-import org.apache.milagro.amcl.ED25519.*;
+import junit.framework.TestCase;
 import org.apache.milagro.amcl.RAND;
 
-public class TimeECDH
+public class TesttimeECDH extends TestCase
 {
 	public static final int MIN_TIME=10; /* seconds */
 	public static final int MIN_ITERS=10; 
 
-	public static void ecdh(RAND rng)
+	public static void testtimeECDH()
 	{
-
+		byte[] RAW=new byte[100];
+		RAND rng=new RAND();
 		int i,iterations;
 		long start,elapsed;
 		double dur;
+
+		rng.clean();
+		for (i=0;i<100;i++) RAW[i]=(byte)(i);
+		rng.seed(100,RAW);
 
 		System.out.println("\nTesting/Timing ED25519 ECC");
 		if (ECP.CURVETYPE==ECP.WEIERSTRASS)
@@ -88,8 +92,7 @@ public class TimeECDH
 		WP=G.mul(r);
 		if (!WP.is_infinity())
 		{
-			System.out.print("FAILURE - rG!=O\n");
-			return;
+			fail("FAILURE - rG!=O");
 		}
 
 		start = System.currentTimeMillis();
@@ -104,6 +107,4 @@ public class TimeECDH
 		System.out.format(" %8.2f ms per iteration\n",dur);
 
 	}
-
-
 }

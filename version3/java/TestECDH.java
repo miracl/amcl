@@ -19,15 +19,14 @@ under the License.
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
 
-package org.apache.milagro;
+package org.apache.milagro.amcl.XXX;  //
 
 import java.util.Scanner;
-
-import org.apache.milagro.amcl.ED25519.*;
+import junit.framework.TestCase;       //
 import org.apache.milagro.amcl.RAND;
 import org.apache.milagro.amcl.AES;
 
-public class TestECDH
+public class TestECDH extends TestCase   //
 {
 	private static void printBinary(byte[] array)
 	{
@@ -39,11 +38,17 @@ public class TestECDH
 		System.out.println();
 	}    
 
-	public static void ecdh(RAND rng)
+	public static void testECDH()
 	{
+		byte[] RAW=new byte[100];
+		RAND rng=new RAND();
 		int i,j=0,res;
 		int result;
 		String pp=new String("M0ng00se");
+
+		rng.clean();
+		for (i=0;i<100;i++) RAW[i]=(byte)(i);
+		rng.seed(100,RAW);
 
 		int EGS=ECDH.EGS;
 		int EFS=ECDH.EFS;
@@ -87,8 +92,7 @@ public class TestECDH
 		res=ECDH.PUBLIC_KEY_VALIDATE(W0);
 		if (res!=0)
 		{
-			System.out.println("ECP Public Key is invalid!\n");
-			return;
+			fail("ECP Public Key is invalid!");
 		}
 /* Random private key for other party */
 		ECDH.KEY_PAIR_GENERATE(rng,S1,W1);
@@ -103,8 +107,7 @@ public class TestECDH
 		res=ECDH.PUBLIC_KEY_VALIDATE(W1);
 		if (res!=0)
 		{
-			System.out.print("ECP Public Key is invalid!\n");
-			return;
+			fail("ECP Public Key is invalid!");
 		}
 
 /* Calculate common key using DH - IEEE 1363 method */
@@ -118,8 +121,7 @@ public class TestECDH
 
 		if (!same)
 		{
-			System.out.println("*** ECPSVDP-DH Failed");
-			return;
+			fail("*** ECPSVDP-DH Failed");
 		}
 
 		byte[] KEY=ECDH.KDF2(sha,Z0,null,EAS);
@@ -147,8 +149,7 @@ public class TestECDH
 			M=ECDH.ECIES_DECRYPT(sha,P1,P2,V,C,T,S1);
 			if (M.length==0)
 			{
-				System.out.println("*** ECIES Decryption Failed\n");
-				return;
+				fail("*** ECIES Decryption Failed");
 			}
 			else System.out.println("Decryption succeeded");
 
@@ -158,8 +159,7 @@ public class TestECDH
 
 			if (ECDH.SP_DSA(sha,rng,S0,M,CS,DS)!=0)
 			{
-				System.out.println("***ECDSA Signature Failed");
-				return;
+				fail("***ECDSA Signature Failed");
 			}
 			System.out.println("Signature= ");
 			System.out.print("C= 0x"); printBinary(CS);
@@ -167,8 +167,7 @@ public class TestECDH
 
 			if (ECDH.VP_DSA(sha,W0,M,CS,DS)!=0)
 			{
-				System.out.println("***ECDSA Verification Failed");
-				return;
+				fail("***ECDSA Verification Failed");
 			}
 			else System.out.println("ECDSA Signature/Verification succeeded "+j);
 			System.out.println("");
@@ -176,7 +175,7 @@ public class TestECDH
 		}
 	}
 
-
+/*
 	public static void main(String[] args) 
 	{
 
@@ -189,5 +188,5 @@ public class TestECDH
 		rng.seed(100,RAW);
 		ecdh(rng);
 
-	}
+	} */
 }

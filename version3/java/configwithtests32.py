@@ -42,9 +42,9 @@ def rsaset(tb,nb,base,ml) :
 	cptr=cptr+1
 
 	fpath=amclpath+slashtext+tb+slashtext
-	#fpathTest=amclTestPath+slashtext+tb+slashtext  #ms
+	fpathTest=amclTestPath+slashtext+tb+slashtext  #ms
 	os.system("mkdir "+amclpath+slashtext+tb)
-	#os.system("mkdir "+amclTestPath+slashtext+tb)  #ms
+	os.system("mkdir "+amclTestPath+slashtext+tb)  #ms
 
 	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
@@ -52,8 +52,8 @@ def rsaset(tb,nb,base,ml) :
 	os.system(copytext+"RSA.java "+fpath+"RSA.java")
 	os.system(copytext+"private_key.java "+fpath+"private_key.java")
 	os.system(copytext+"public_key.java "+fpath+"public_key.java")	
-	#os.system(copytext+"TestRSA.java "+fpathTest+"TestRSA.java")	#ms
-	#os.system(copytext+"TesttimeRSA.java "+fpathTest+"TesttimeRSA.java")	#ms
+	os.system(copytext+"TestRSA.java "+fpathTest+"TestRSA.java")	#ms
+	os.system(copytext+"TesttimeRSA.java "+fpathTest+"TesttimeRSA.java")	#ms
 	
 	replace(fpath+"BIG.java","XXX",tb)
 	replace(fpath+"DBIG.java","XXX",tb)
@@ -61,8 +61,8 @@ def rsaset(tb,nb,base,ml) :
 	replace(fpath+"RSA.java","XXX",tb)
 	replace(fpath+"private_key.java","XXX",tb)
 	replace(fpath+"public_key.java","XXX",tb)
-	#replace(fpathTest+"TestRSA.java","XXX",tb)  #ms
-	#replace(fpathTest+"TesttimeRSA.java","XXX",tb)  #ms
+	replace(fpathTest+"TestRSA.java","XXX",tb)  #ms
+	replace(fpathTest+"TesttimeRSA.java","XXX",tb)  #ms
 
 	replace(fpath+"BIG.java","@NB@",nb)
 	replace(fpath+"BIG.java","@BASE@",base)
@@ -78,9 +78,9 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	cptr=cptr+1
 
 	fpath=amclpath+slashtext+tc+slashtext
-	#fpathTest=amclTestPath+slashtext+tc+slashtext  #ms
+	fpathTest=amclTestPath+slashtext+tc+slashtext  #ms
 	os.system("mkdir "+amclpath+slashtext+tc)
-	#os.system("mkdir "+amclTestPath+slashtext+tc)  #ms
+	os.system("mkdir "+amclTestPath+slashtext+tc)  #ms
 
 	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
@@ -88,8 +88,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	os.system(copytext+"ECP.java "+fpath+"ECP.java")
 	os.system(copytext+"ECDH.java "+fpath+"ECDH.java")
 	os.system(copytext+"ROM_"+tc+"_32.java "+fpath+"ROM.java")
-	#os.system(copytext+"TestECDH.java "+fpathTest+"TestECDH.java")	#ms
-	#os.system(copytext+"TesttimeECDH.java "+fpathTest+"TesttimeECDH.java")	#ms
+	os.system(copytext+"TestECDH.java "+fpathTest+"TestECDH.java")	#ms
+	os.system(copytext+"TesttimeECDH.java "+fpathTest+"TesttimeECDH.java")	#ms
 
 	
 	replace(fpath+"BIG.java","XXX",tc)
@@ -97,8 +97,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fpath+"FP.java","XXX",tc)
 	replace(fpath+"ECP.java","XXX",tc)
 	replace(fpath+"ECDH.java","XXX",tc)
-	#replace(fpathTest+"TestECDH.java","XXX",tc)  #ms
-	#replace(fpathTest+"TesttimeECDH.java","XXX",tc)  #ms
+	replace(fpathTest+"TestECDH.java","XXX",tc)  #ms
+	replace(fpathTest+"TesttimeECDH.java","XXX",tc)  #ms
 
 	replace(fpath+"BIG.java","@NB@",nb)
 	replace(fpath+"BIG.java","@BASE@",base)
@@ -132,8 +132,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 		os.system(copytext+"FP12.java "+fpath+"FP12.java")
 		os.system(copytext+"PAIR.java "+fpath+"PAIR.java")
 		os.system(copytext+"MPIN.java "+fpath+"MPIN.java")
-		#os.system(copytext+"TestMPIN.java "+fpathTest+"TestMPIN.java")	#ms
-		#os.system(copytext+"TesttimeMPIN.java "+fpathTest+"TesttimeMPIN.java")	#ms
+		os.system(copytext+"TestMPIN.java "+fpathTest+"TestMPIN.java")	#ms
+		os.system(copytext+"TesttimeMPIN.java "+fpathTest+"TesttimeMPIN.java")	#ms
 
 		replace(fpath+"FP2.java","XXX",tc)
 		replace(fpath+"FP4.java","XXX",tc)
@@ -141,8 +141,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 		replace(fpath+"ECP2.java","XXX",tc)
 		replace(fpath+"PAIR.java","XXX",tc)
 		replace(fpath+"MPIN.java","XXX",tc)
-		#replace(fpathTest+"TestMPIN.java","XXX",tc)  #ms
-		#replace(fpathTest+"TesttimeMPIN.java","XXX",tc)  #ms
+		replace(fpathTest+"TestMPIN.java","XXX",tc)  #ms
+		replace(fpathTest+"TesttimeMPIN.java","XXX",tc)  #ms
 
 
 os.system("mkdir " + amclpath)

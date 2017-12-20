@@ -18,14 +18,13 @@ under the License.
 */
 
 /* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
-package org.apache.milagro;
+package org.apache.milagro.amcl.XXX;  //
 
 import java.util.Scanner;
+import junit.framework.TestCase;      //
 import org.apache.milagro.amcl.RAND;
-import org.apache.milagro.amcl.BN254.*;
 
-
-public class TestMPIN
+public class TestMPIN extends TestCase //
 {
 	private static void printBinary(byte[] array)
 	{
@@ -43,8 +42,9 @@ public class TestMPIN
 	static boolean FULL=true;
 	static boolean SINGLE_PASS=false;
 
-	public static void mpin(RAND rng)
+	public static void testMPIN()
 	{
+		RAND rng=new RAND();
 		int EGS=MPIN.EGS;
 		int EFS=MPIN.EFS;
 		int G1S=2*EFS+1; /* Group 1 Size */
@@ -77,6 +77,11 @@ public class TestMPIN
 		byte[] SK=new byte[EAS];
 
 		byte[] HSID=null;
+		byte[] RAW=new byte[100];
+
+		rng.clean();
+		for (int i=0;i<100;i++) RAW[i]=(byte)(i);
+		rng.seed(100,RAW);
 
 		System.out.println("Testing MPIN code");
 
@@ -109,7 +114,7 @@ public class TestMPIN
 		System.out.println("Client extracts PIN= "+pin); 
 		int rtn=MPIN.EXTRACT_PIN(sha,CLIENT_ID,pin,TOKEN);
 		if (rtn != 0)
-			System.out.println("FAILURE: EXTRACT_PIN rtn: " + rtn);
+			fail("FAILURE: EXTRACT_PIN rtn: " + rtn);
 
 		System.out.print("Client Token TK: 0x"); printBinary(TOKEN);
 
@@ -133,9 +138,11 @@ public class TestMPIN
 		}
 		else date=0;
 
-		System.out.print("\nPIN= ");
-		Scanner scan=new Scanner(System.in);
-		pin=scan.nextInt();
+//		System.out.print("\nPIN= ");
+//		Scanner scan=new Scanner(System.in);
+//		pin=scan.nextInt();
+
+		pin=1234;
 
 /* Set date=0 and PERMIT=null if time permits not in use
 
@@ -189,7 +196,7 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 			int timeValue = MPIN.GET_TIME();
 			rtn=MPIN.CLIENT(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT,timeValue,Y);
 			if (rtn != 0)
-  				System.out.println("FAILURE: CLIENT rtn: " + rtn);
+  				fail("FAILURE: CLIENT rtn: " + rtn);
 
 			if (FULL)
 			{
@@ -199,7 +206,7 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 
 			rtn=MPIN.SERVER(sha,date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF,CLIENT_ID,timeValue);
 			if (rtn != 0)
-  		    System.out.println("FAILURE: SERVER rtn: " + rtn);
+  				fail("FAILURE: SERVER rtn: " + rtn);
 
 			if (FULL)
 			{
@@ -213,7 +220,7 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
                   /* Send U=x.ID to server, and recreate secret from token and pin */
   			rtn=MPIN.CLIENT_1(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT);
   			if (rtn != 0)
-  				System.out.println("FAILURE: CLIENT_1 rtn: " + rtn);
+  				fail("FAILURE: CLIENT_1 rtn: " + rtn);
   
   			if (FULL)
   			{
@@ -236,7 +243,7 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
                   /* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
   			rtn=MPIN.CLIENT_2(X,Y,SEC);
   			if (rtn != 0)
-  				System.out.println("FAILURE: CLIENT_2 rtn: " + rtn);
+  				fail("FAILURE: CLIENT_2 rtn: " + rtn);
   
                   /* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
                   /* If PIN error not required, set E and F = null */
@@ -244,18 +251,19 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
   			rtn=MPIN.SERVER_2(date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF);
   
   			if (rtn != 0)
-  				System.out.println("FAILURE: SERVER_2 rtn: " + rtn);
+  				fail("FAILURE: SERVER_2 rtn: " + rtn);
 		}
   
 		if (rtn == MPIN.BAD_PIN)
 		{
-			System.out.println("Server says - Bad Pin. I don't know you. Feck off.\n");
 			if (PINERROR)
 			{
 				int err=MPIN.KANGAROO(E,F);
-				if (err!=0) System.out.format("(Client PIN is out by %d)\n",err);
+				if (err!=0) fail("Client PIN is out by "+err);
+				else fail("Server says - Bad Pin. I don't know you. Feck off");
 			}
-			return;
+			else fail("Server says - Bad Pin. I don't know you. Feck off");
+
 		}
 		else System.out.println("Server says - PIN is good! You really are "+IDstr);
 
@@ -272,7 +280,7 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 		}
 		System.out.println("");
 	}
-
+/*
 	public static void main(String[] args) 
 	{
 
@@ -286,5 +294,5 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 
 		mpin(rng);
 
-	}
+	} */
 }
