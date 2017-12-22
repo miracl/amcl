@@ -48,7 +48,7 @@ public class TesttimeMPIN extends TestCase
 		rng.seed(100,RAW);
 
 
-		System.out.println("\nTesting/Timing BN254 Pairings");
+		System.out.println("\nTesting/Timing Pairings");
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
 			System.out.print("BN Pairing-Friendly Curve\n");

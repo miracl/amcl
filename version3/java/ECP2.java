@@ -608,7 +608,12 @@ public final class ECP2 {
 			ECP2 T,K;
 
 			T=new ECP2(); T.copy(Q);
-			T=T.mul(x); T.neg();
+			T=T.mul(x); 
+			
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				T.neg();
+			}	
 			K=new ECP2(); K.copy(T);
 			K.dbl(); K.add(T); //K.affine();
 
@@ -631,6 +636,11 @@ public final class ECP2 {
 
 			xQ=Q.mul(x);
 			x2Q=xQ.mul(x);
+
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				xQ.neg();
+			}	
 
 			x2Q.sub(xQ);
 			x2Q.sub(Q);

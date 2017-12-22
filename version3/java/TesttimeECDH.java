@@ -41,7 +41,7 @@ public class TesttimeECDH extends TestCase
 		for (i=0;i<100;i++) RAW[i]=(byte)(i);
 		rng.seed(100,RAW);
 
-		System.out.println("\nTesting/Timing ED25519 ECC");
+		System.out.println("\nTesting/Timing ECC");
 		if (ECP.CURVETYPE==ECP.WEIERSTRASS)
 		{
 			System.out.print("Weierstrass parameterization\n");

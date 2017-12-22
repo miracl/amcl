@@ -150,7 +150,13 @@ public final class PAIR {
 
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
-			n.pmul(6); n.dec(2);
+			n.pmul(6);
+			if (ECP.SIGN_OF_X==ECP.POSITIVEX)
+			{
+				n.inc(2);
+			} else {
+				n.dec(2);
+			}
 		}
 		else
 			n.copy(x);
@@ -189,10 +195,13 @@ public final class PAIR {
 /* R-ate fixup required for BN curves */
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
-			r.conj();
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				r.conj();
+				A.neg();
+			}
 			K.copy(P);
 			K.frob(f);
-			A.neg();
 			lv=line(A,K,Qx,Qy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 			K.frob(f);
@@ -220,7 +229,13 @@ public final class PAIR {
 
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
-			n.pmul(6); n.dec(2);
+			n.pmul(6); 
+			if (ECP.SIGN_OF_X==ECP.POSITIVEX)
+			{
+				n.inc(2);
+			} else {
+				n.dec(2);
+			}
 		}
 		else
 			n.copy(x);
@@ -273,20 +288,24 @@ public final class PAIR {
 /* R-ate fixup required for BN curves */
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
-			r.conj();
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				r.conj();
+				A.neg();
+				B.neg();
+			}
+
 			K.copy(P);
 			K.frob(f);
-			A.neg();
+
 			lv=line(A,K,Qx,Qy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 			K.frob(f);
 			K.neg();
 			lv=line(A,K,Qx,Qy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
-
 			K.copy(R);
 			K.frob(f);
-			B.neg();
 			lv=line(B,K,Sx,Sy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 			K.frob(f);
@@ -328,15 +347,25 @@ public final class PAIR {
 			x1=new FP12(r);
 			x1.conj();
 			x4=r.pow(x);
+			if (ECP.SIGN_OF_X==ECP.POSITIVEX)
+			{
+				x4.conj();
+			}
 
 			x3=new FP12(x4);
 			x3.frob(f);
 
 			x2=x4.pow(x);
-
+			if (ECP.SIGN_OF_X==ECP.POSITIVEX)
+			{
+				x2.conj();
+			}
 			x5=new FP12(x2); x5.conj();
 			lv=x2.pow(x);
-
+			if (ECP.SIGN_OF_X==ECP.POSITIVEX)
+			{
+				lv.conj();
+			}
 			x2.frob(f);
 			r.copy(x2); r.conj();
 
@@ -371,7 +400,17 @@ public final class PAIR {
 // Ghamman & Fouotsa Method
 			y0=new FP12(r); y0.usqr();
 			y1=y0.pow(x);
-			x.fshr(1); y2=y1.pow(x); x.fshl(1);
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				y1.conj();
+			}
+			x.fshr(1); y2=y1.pow(x); 
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				y2.conj();
+			}			
+			
+			x.fshl(1);
 			y3=new FP12(r); y3.conj();
 			y1.mul(y3);
 
@@ -379,8 +418,15 @@ public final class PAIR {
 			y1.mul(y2);
 
 			y2=y1.pow(x);
-
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				y2.conj();
+			}
 			y3=y2.pow(x);
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				y3.conj();
+			}
 			y1.conj();
 			y3.mul(y1);
 
@@ -390,6 +436,10 @@ public final class PAIR {
 			y1.mul(y2);
 
 			y2=y3.pow(x);
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				y2.conj();
+			}
 			y2.mul(y0);
 			y2.mul(r);
 
@@ -476,6 +526,7 @@ public final class PAIR {
 		}
 		else
 		{
+			BIG q=new BIG(ROM.CURVE_Order);
 			BIG x=new BIG(ROM.CURVE_Bnx);
 			BIG w=new BIG(e);
 			for (int i=0;i<3;i++)
@@ -485,6 +536,11 @@ public final class PAIR {
 				w.div(x);
 			}
 			u[3]=new BIG(w);
+			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			{
+				u[1].copy(BIG.modneg(u[1],q));
+				u[3].copy(BIG.modneg(u[3],q));
+			}
 		}
 		return u;
 	}	

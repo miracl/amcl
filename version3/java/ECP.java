@@ -31,10 +31,13 @@ public final class ECP {
 	public static final int BLS=2;
 	public static final int D_TYPE=0;
 	public static final int M_TYPE=1;
+	public static final int POSITIVEX=0;
+	public static final int NEGATIVEX=1;
 
 	public static final int CURVETYPE=@CT@;
 	public static final int CURVE_PAIRING_TYPE=@PF@;
 	public static final int SEXTIC_TWIST=@ST@;
+	public static final int SIGN_OF_X=@SX@;
 
 	private FP x;
 	private FP y;
