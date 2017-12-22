@@ -707,7 +707,7 @@ void ECP2_ZZZ_mapit(ECP2_ZZZ *Q,octet *W)
     /* Q -> xQ + F(3xQ) + F(F(xQ)) + F(F(F(Q))). */
     ECP2_ZZZ_copy(&T,Q);
     ECP2_ZZZ_mul(&T,x);
-#if SIGN_OF_X==NEGATIVEX
+#if SIGN_OF_X_ZZZ==NEGATIVEX
     ECP2_ZZZ_neg(&T);   // our x is negative
 #endif
 	ECP2_ZZZ_copy(&K,&T);
@@ -737,7 +737,7 @@ void ECP2_ZZZ_mapit(ECP2_ZZZ *Q,octet *W)
     ECP2_ZZZ_copy(&x2Q,&xQ);
     ECP2_ZZZ_mul(&x2Q,x);
 
-#if SIGN_OF_X==NEGATIVEX
+#if SIGN_OF_X_ZZZ==NEGATIVEX
 	ECP2_ZZZ_neg(&xQ);
 #endif
 

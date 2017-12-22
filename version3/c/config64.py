@@ -290,7 +290,7 @@ while ptr<max:
 	selection.append(x)
 	ptr=ptr+1
 
-# curveset(big,field,curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly)
+# curveset(big,field,curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly,sextic twist,sign of x)
 # for each curve give names for big, field and curve. In many cases the latter two will be the same. 
 # Typically "big" is the size in bits, always a multiple of 8, "field" describes the modulus, and "curve" is the common name for the elliptic curve   
 # big_length_bytes is "big" divided by 8
@@ -300,6 +300,7 @@ while ptr<max:
 # modulus_type is NOT_SPECIAL, or PSEUDO_MERSENNE, or MONTGOMERY_Friendly, or GENERALISED_MERSENNE (supported for GOLDILOCKS only)
 # curve_type is WEIERSTRASS, EDWARDS or MONTGOMERY
 # pairing_friendly is BN, BLS or NOT (if not pairing friendly)
+# if pairing friendly. M or D type twist, and sign of the family parameter x
 
 	if x==1:
 		curveset("256","25519","ED25519","32","56","255","5","PSEUDO_MERSENNE","EDWARDS","NOT","","")

@@ -72,7 +72,7 @@ def rsaset(tb,tff,nb,base,ml) :
 	replace(fnameh,"XXX",bd)
 	os.system("g++ -O3 -c "+fnamec)
 
-def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
+def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx) :
 	bd="B"+tb+"_"+base
 	fnameh="config_big_"+bd+".h"
 	os.system(copytext+" config_big.h "+fnameh)
@@ -104,10 +104,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fnameh,"@CT@",ct)
 	replace(fnameh,"@PF@",pf)
 
-	if tc == "FP256BN" :
-		replace(fnameh,"@ST@","M_TYPE")
-	else :
-		replace(fnameh,"@ST@","D_TYPE")
+	replace(fnameh,"@ST@",stw)
+	replace(fnameh,"@SX@",sx)
 
 	fnamec="big_"+bd+".cpp"
 	fnameh="big_"+bd+".h"
@@ -260,16 +258,17 @@ print("Pairing-Friendly Elliptic Curves")
 print("17. BN254")
 print("18. BN254CX")
 print("19. BLS383")
-print("20. FP256BN\n")
+print("20. FP256BN")
+print("21. FP512BN\n")
 
 print("RSA")
-print("21. RSA2048")
-print("22. RSA3072")
-print("23. RSA4096")
+print("22. RSA2048")
+print("23. RSA3072")
+print("24. RSA4096")
 
 selection=[]
 ptr=0
-max=24
+max=25
 
 curve_selected=False
 pfcurve_selected=False
@@ -291,103 +290,108 @@ while ptr<max:
 	selection.append(x)
 	ptr=ptr+1
 
-# curveset(big,field,curve,big_length_bytes,16_bit_bits_in_base,32_bit_bits_in_base,64_bit_bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly)
+# curveset(big,field,curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly,sextic twist,sign of x)
 # for each curve give names for big, field and curve. In many cases the latter two will be the same. 
 # Typically "big" is the size in bits, always a multiple of 8, "field" describes the modulus, and "curve" is the common name for the elliptic curve   
 # big_length_bytes is "big" divided by 8
-# Next give the number base used for 16/32/64 bit architectures, as n where the base is 2^n (note that these must be fixed for the same "big" name, if is ever re-used for another curve)
+# Next give the number base used for 64 bit architectures, as n where the base is 2^n (note that these must be fixed for the same "big" name, if is ever re-used for another curve)
 # modulus_bits is the bit length of the modulus, typically the same or slightly smaller than "big"
 # modulus_mod_8 is the remainder when the modulus is divided by 8
 # modulus_type is NOT_SPECIAL, or PSEUDO_MERSENNE, or MONTGOMERY_Friendly, or GENERALISED_MERSENNE (supported for GOLDILOCKS only)
 # curve_type is WEIERSTRASS, EDWARDS or MONTGOMERY
-# pairing_friendly is BN, BLS or NOT (if not pairing friendly
+# pairing_friendly is BN, BLS or NOT (if not pairing friendly)
+# if pairing friendly. M or D type twist, and sign of the family parameter x
+
 
 	if x==1:
-		curveset("256","F25519","ED25519","32","56","255","5","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("256","F25519","ED25519","32","56","255","5","PSEUDO_MERSENNE","EDWARDS","NOT","","")
 		curve_selected=True
 	if x==2:
-		curveset("256","F25519","C25519","32","56","255","5","PSEUDO_MERSENNE","MONTGOMERY","NOT")
+		curveset("256","F25519","C25519","32","56","255","5","PSEUDO_MERSENNE","MONTGOMERY","NOT","","")
 		curve_selected=True
 	if x==3:
-		curveset("256","NIST256","NIST256","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("256","NIST256","NIST256","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT","","")
 		curve_selected=True
 	if x==4:
-		curveset("256","BRAINPOOL","BRAINPOOL","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("256","BRAINPOOL","BRAINPOOL","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT","","")
 		curve_selected=True
 	if x==5:
-		curveset("256","ANSSI","ANSSI","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("256","ANSSI","ANSSI","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT","","")
 		curve_selected=True
 
 	if x==6:
-		curveset("336","HIFIVE","HIFIVE","42","60","336","5","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("336","HIFIVE","HIFIVE","42","60","336","5","PSEUDO_MERSENNE","EDWARDS","NOT","","")
 		curve_selected=True
 	if x==7:
-		curveset("448","GOLDILOCKS","GOLDILOCKS","56","58","448","7","GENERALISED_MERSENNE","EDWARDS","NOT")
+		curveset("448","GOLDILOCKS","GOLDILOCKS","56","58","448","7","GENERALISED_MERSENNE","EDWARDS","NOT","","")
 		curve_selected=True
 	if x==8:
-		curveset("384","NIST384","NIST384","48","56","384","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("384","NIST384","NIST384","48","56","384","7","NOT_SPECIAL","WEIERSTRASS","NOT","","")
 		curve_selected=True
 	if x==9:
-		curveset("416","C41417","C41417","52","60","414","7","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("416","C41417","C41417","52","60","414","7","PSEUDO_MERSENNE","EDWARDS","NOT","","")
 		curve_selected=True
 	if x==10:
-		curveset("528","NIST521","NIST521","66","60","521","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("528","NIST521","NIST521","66","60","521","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT","","")
 		curve_selected=True
 
 	if x==11:
-		curveset("256","F256PMW","NUMS256W","32","56","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("256","F256PMW","NUMS256W","32","56","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT","","")
 		curve_selected=True
 	if x==12:
-		curveset("256","F256PME","NUMS256E","32","56","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("256","F256PME","NUMS256E","32","56","256","3","PSEUDO_MERSENNE","EDWARDS","NOT","","")
 		curve_selected=True
 	if x==13:
-		curveset("384","F384PM","NUMS384W","48","56","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("384","F384PM","NUMS384W","48","56","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT","","")
 		curve_selected=True
 	if x==14:
-		curveset("384","F384PM","NUMS384E","48","56","384","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("384","F384PM","NUMS384E","48","56","384","3","PSEUDO_MERSENNE","EDWARDS","NOT","","")
 		curve_selected=True
 	if x==15:
-		curveset("512","F512PM","NUMS512W","64","56","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("512","F512PM","NUMS512W","64","56","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT","","")
 		curve_selected=True
 	if x==16:
-		curveset("512","F512PM","NUMS512E","64","56","512","7","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("512","F512PM","NUMS512E","64","56","512","7","PSEUDO_MERSENNE","EDWARDS","NOT","","")
 		curve_selected=True
 
 
 	if x==17:
-		curveset("256","BN254","BN254","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		curveset("256","BN254","BN254","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX")
 		pfcurve_selected=True
 	if x==18:
-		curveset("256","BN254CX","BN254CX","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		curveset("256","BN254CX","BN254CX","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX")
 		pfcurve_selected=True
 	if x==19:
-		curveset("384","BLS383","BLS383","48","56","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
+		curveset("384","BLS383","BLS383","48","56","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","D_TYPE","POSITIVEX")
 		pfcurve_selected=True
 	if x==20:
-		curveset("256","FP256BN","FP256BN","32","56","256","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		curveset("256","FP256BN","FP256BN","32","56","256","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","NEGATIVEX")
+		pfcurve_selected=True
+	if x==21:
+		curveset("512","FP512BN","FP512BN","64","60","512","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","POSITIVEX")
 		pfcurve_selected=True
 
 
-# rsaset(big,ring,big_length_bytes,16_bit_bits_in_base,32_bit_bits_in_base,64_bit_bits_in_base,multiplier)
+# rsaset(big,ring,big_length_bytes,bits_in_base,multiplier)
 # for each choice give distinct names for "big" and "ring".
 # Typically "big" is the length in bits of the underlying big number type
 # "ring" is the RSA modulus size = "big" times 2^m
 # big_length_bytes is "big" divided by 8
-# Next give the number base used for 16/32/64 bit architectures, as n where the base is 2^n
+# Next give the number base used for 64 bit architectures, as n where the base is 2^n
 # multiplier is 2^m (see above)
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==21:
+	if x==22:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("1024","RSA2048","128","58","2")
 		#rsaset("512","RSA2048","64","60","4")
 		#rsaset("256","RSA2048","32","56","8")
 		rsa_selected=True
-	if x==22:
+	if x==23:
 		rsaset("384","RSA3072","48","56","8")
 		rsa_selected=True
-	if x==23:
+	if x==24:
 		#rsaset("256","RSA4096","32","56","16")
 		rsaset("512","RSA4096","64","60","8")
 		rsa_selected=True

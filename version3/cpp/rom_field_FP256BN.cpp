@@ -3,9 +3,9 @@
 
 namespace FP256BN {
 
-/* Curve BN254 - Pairing friendly BN curve */
+/* Curve FP512BN - Pairing friendly BN curve */
 
-/* Nogami's fast curve */
+/* ISO curve */
 
 #if CHUNK==16
 

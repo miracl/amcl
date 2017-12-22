@@ -14,7 +14,12 @@
 #define USE_GS_G2_ZZZ /**< Well we didn't patent it :) But may be covered by GLV patent :( */
 #define USE_GS_GT_ZZZ /**< Not patented, so probably safe to always use this */
 
+
+#define POSITIVEX 0
+#define NEGATIVEX 1
+
 #define SEXTIC_TWIST_ZZZ @ST@
+#define SIGN_OF_X_ZZZ @SX@ 
 
 #endif
 

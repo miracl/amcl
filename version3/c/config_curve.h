@@ -23,7 +23,7 @@
 #define NEGATIVEX 1
 
 #define SEXTIC_TWIST_ZZZ @ST@
-#define SIGN_OF_X @SX@ 
+#define SIGN_OF_X_ZZZ @SX@ 
 
 #endif
 
