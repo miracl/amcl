@@ -72,7 +72,7 @@ def rsaset(tb,tff,nb,base,ml) :
 	replace(fnameh,"XXX",bd)
 	os.system("gcc -O3 -std=c99 -c "+fnamec)
 
-def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
+def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx) :
 	bd=tb+"_"+base
 	fnameh="config_big_"+bd+".h"
 	os.system(copytext+" config_big.h "+fnameh)
@@ -104,6 +104,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fnameh,"@CT@",ct)
 	replace(fnameh,"@PF@",pf)
 
+	replace(fnameh,"@ST@",stw)
+	replace(fnameh,"@SX@",sx)
 
 	fnamec="big_"+bd+".c"
 	fnameh="big_"+bd+".h"
@@ -269,38 +271,38 @@ while ptr<max:
 	selection.append(x)
 	ptr=ptr+1
 
-# curveset(big,field,curve,big_length_bytes,16_bit_bits_in_base,32_bit_bits_in_base,64_bit_bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly)
+# curveset(big,field,curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly)
 # for each curve give names for big, field and curve. In many cases the latter two will be the same. 
 # Typically "big" is the size in bits, always a multiple of 8, "field" describes the modulus, and "curve" is the common name for the elliptic curve   
 # big_length_bytes is "big" divided by 8
-# Next give the number base used for 16/32/64 bit architectures, as n where the base is 2^n (note that these must be fixed for the same "big" name, if is ever re-used for another curve)
+# Next give the number base used for 16 bit architectures, as n where the base is 2^n (note that these must be fixed for the same "big" name, if is ever re-used for another curve)
 # modulus_bits is the bit length of the modulus, typically the same or slightly smaller than "big"
 # modulus_mod_8 is the remainder when the modulus is divided by 8
 # modulus_type is NOT_SPECIAL, or PSEUDO_MERSENNE, or MONTGOMERY_Friendly, or GENERALISED_MERSENNE (supported for GOLDILOCKS only)
 # curve_type is WEIERSTRASS, EDWARDS or MONTGOMERY
-# pairing_friendly is BN, BLS or NOT (if not pairing friendly
+# pairing_friendly is BN, BLS or NOT (if not pairing friendly)
 
 	if x==1:
-		curveset("256","25519","ED25519","32","13","255","5","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("256","25519","ED25519","32","13","255","5","PSEUDO_MERSENNE","EDWARDS","NOT","","")
 		curve_selected=True
 	if x==2:
-		curveset("256","256PME","NUMS256E","32","13","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("256","256PME","NUMS256E","32","13","256","3","PSEUDO_MERSENNE","EDWARDS","NOT","","")
 		curve_selected=True
 
 
 	if x==3:
-		curveset("256","BN254","BN254","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		curveset("256","BN254","BN254","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX")
 		pfcurve_selected=True
 	if x==4:
-		curveset("256","BN254CX","BN254CX","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		curveset("256","BN254CX","BN254CX","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX")
 		pfcurve_selected=True
 
-# rsaset(big,ring,big_length_bytes,16_bit_bits_in_base,32_bit_bits_in_base,64_bit_bits_in_base,multiplier)
+# rsaset(big,ring,big_length_bytes,bits_in_base,multiplier)
 # for each choice give distinct names for "big" and "ring".
 # Typically "big" is the length in bits of the underlying big number type
 # "ring" is the RSA modulus size = "big" times 2^m
 # big_length_bytes is "big" divided by 8
-# Next give the number base used for 16/32/64 bit architectures, as n where the base is 2^n
+# Next give the number base used for 16 bit architecture, as n where the base is 2^n
 # multiplier is 2^m (see above)
 
 # There are choices here, different ways of getting the same result, but some faster than others

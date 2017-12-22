@@ -160,7 +160,11 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 
 #if PAIRING_FRIENDLY_ZZZ==BN
     BIG_XXX_pmul(n,x,6);
+#if SIGN_OF_X==POSITIVEX
+	BIG_XXX_inc(n,2);
+#else
     BIG_XXX_dec(n,2);
+#endif
 #else
     BIG_XXX_copy(n,x);
 #endif
@@ -204,10 +208,10 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 #if PAIRING_FRIENDLY_ZZZ==BN
     ECP2_ZZZ_copy(&KA,P);
     ECP2_ZZZ_frob(&KA,&X);
-
+#if SIGN_OF_X==NEGATIVEX
     ECP2_ZZZ_neg(&A);
     FP12_YYY_conj(r,r);
-
+#endif
     PAIR_ZZZ_line(&lv,&A,&KA,&Qx,&Qy);
     FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
     ECP2_ZZZ_frob(&KA,&X);
@@ -242,7 +246,11 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 
 #if PAIRING_FRIENDLY_ZZZ==BN
     BIG_XXX_pmul(n,x,6);
+#if SIGN_OF_X==POSITIVEX
+	BIG_XXX_inc(n,2);
+#else
     BIG_XXX_dec(n,2);
+#endif
 #else
     BIG_XXX_copy(n,x);
 #endif
@@ -298,11 +306,16 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 
     /* R-ate fixup required for BN curves */
 #if PAIRING_FRIENDLY_ZZZ==BN
+
+#if SIGN_OF_X==NEGATIVEX
     FP12_YYY_conj(r,r);
+    ECP2_ZZZ_neg(&A);
+    ECP2_ZZZ_neg(&B);
+#endif
 
     ECP2_ZZZ_copy(&K,P);
     ECP2_ZZZ_frob(&K,&X);
-    ECP2_ZZZ_neg(&A);
+
     PAIR_ZZZ_line(&lv,&A,&K,&Qx,&Qy);
     FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
     ECP2_ZZZ_frob(&K,&X);
@@ -312,7 +325,7 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 
     ECP2_ZZZ_copy(&K,R);
     ECP2_ZZZ_frob(&K,&X);
-    ECP2_ZZZ_neg(&B);
+
     PAIR_ZZZ_line(&lv,&B,&K,&Sx,&Sy);
     FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
     ECP2_ZZZ_frob(&K,&X);
@@ -350,6 +363,9 @@ void PAIR_ZZZ_fexp(FP12_YYY *r)
     /* Hard part of final exp - see Duquesne & Ghamman eprint 2015/192.pdf */
 #if PAIRING_FRIENDLY_ZZZ==BN
     FP12_YYY_pow(&t0,r,x); // t0=f^-u
+#if SIGN_OF_X==POSITIVEX
+	FP12_YYY_conj(&t0,&t0);
+#endif
     FP12_YYY_usqr(&y3,&t0); // y3=t0^2
     FP12_YYY_copy(&y0,&t0);
     FP12_YYY_mul(&y0,&y3); // y0=t0*y3
@@ -360,6 +376,9 @@ void PAIR_ZZZ_fexp(FP12_YYY *r)
     FP12_YYY_mul(&y2,&y3); // y2=y2*y3
 
     FP12_YYY_pow(&t0,&y0,x);  //t0=y0^-u
+#if SIGN_OF_X==POSITIVEX
+	FP12_YYY_conj(&t0,&t0);
+#endif
     FP12_YYY_conj(&y0,r);     //y0=~r
     FP12_YYY_copy(&y1,&t0);
     FP12_YYY_frob(&y1,&X);
@@ -373,6 +392,9 @@ void PAIR_ZZZ_fexp(FP12_YYY *r)
     FP12_YYY_mul(&y1,&t0); // y1=t0*y1
 
     FP12_YYY_pow(&t0,&y3,x); // t0=y3^-u
+#if SIGN_OF_X==POSITIVEX
+	FP12_YYY_conj(&t0,&t0);
+#endif
     FP12_YYY_usqr(&t0,&t0); //t0=t0^2
     FP12_YYY_conj(&t0,&t0); //t0=~t0
     FP12_YYY_mul(&y3,&t0); // y3=t0*y3
@@ -397,8 +419,18 @@ void PAIR_ZZZ_fexp(FP12_YYY *r)
 
     FP12_YYY_usqr(&y0,r);
     FP12_YYY_pow(&y1,&y0,x);
+#if SIGN_OF_X==NEGATIVEX
+	FP12_YYY_conj(&y1,&y1);
+#endif
+
+
     BIG_XXX_fshr(x,1);
     FP12_YYY_pow(&y2,&y1,x);
+#if SIGN_OF_X==NEGATIVEX
+	FP12_YYY_conj(&y2,&y2);
+#endif
+
+
     BIG_XXX_fshl(x,1); // x must be even
     FP12_YYY_conj(&y3,r);
     FP12_YYY_mul(&y1,&y3);
@@ -407,8 +439,14 @@ void PAIR_ZZZ_fexp(FP12_YYY *r)
     FP12_YYY_mul(&y1,&y2);
 
     FP12_YYY_pow(&y2,&y1,x);
+#if SIGN_OF_X==NEGATIVEX
+	FP12_YYY_conj(&y2,&y2);
+#endif
 
     FP12_YYY_pow(&y3,&y2,x);
+#if SIGN_OF_X==NEGATIVEX
+	FP12_YYY_conj(&y3,&y3);
+#endif
     FP12_YYY_conj(&y1,&y1);
     FP12_YYY_mul(&y3,&y1);
 
@@ -421,6 +459,9 @@ void PAIR_ZZZ_fexp(FP12_YYY *r)
     FP12_YYY_mul(&y1,&y2);
 
     FP12_YYY_pow(&y2,&y3,x);
+#if SIGN_OF_X==NEGATIVEX
+	FP12_YYY_conj(&y2,&y2);
+#endif
     FP12_YYY_mul(&y2,&y0);
     FP12_YYY_mul(&y2,r);
 
@@ -604,7 +645,16 @@ static void gs(BIG_XXX u[4],BIG_XXX e)
     }
 	BIG_XXX_copy(u[3],w);
 
+/*  */
+#if SIGN_OF_X==NEGATIVEX
+	BIG_XXX_modneg(u[1],u[1],q);
+	BIG_XXX_modneg(u[3],u[3],q);
 #endif
+
+#endif
+
+
+
     return;
 }
 
