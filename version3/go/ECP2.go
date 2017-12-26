@@ -563,7 +563,11 @@ func ECP2_mapit(h []byte) *ECP2 {
 
 	if CURVE_PAIRING_TYPE==BN {
 		T=NewECP2(); T.Copy(Q)
-		T=T.mul(x); T.neg()
+		T=T.mul(x); 
+		if SIGN_OF_X==NEGATIVEX {
+			T.neg()
+		}
+		
 		K=NewECP2(); K.Copy(T)
 		K.dbl(); K.Add(T); //K.Affine()
 
@@ -579,6 +583,10 @@ func ECP2_mapit(h []byte) *ECP2 {
 
 		xQ=Q.mul(x)
 		x2Q=xQ.mul(x)
+
+		if SIGN_OF_X==NEGATIVEX {
+			xQ.neg()
+		}
 
 		x2Q.Sub(xQ)
 		x2Q.Sub(Q)

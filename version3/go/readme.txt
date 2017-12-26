@@ -24,7 +24,7 @@ To build the library and see it in action, execute the python3
 script config32.py or config64.py (depending om whether you want a 
 32 or 64-bit build), and select the curves that you wish to support. 
 
-As a quick example execute from your root directory
+As a quick example execute
 
 py config64.py
 
@@ -32,7 +32,7 @@ or
 
 python3 config64.py
 
-Then select options 1, 17 and 21 (these are fixed for the example 
+Then select options 1, 17 and 22 (these are fixed for the example 
 program provided). Select 0 to exit.
 
 Run the test program by executing

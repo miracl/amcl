@@ -130,12 +130,20 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 	}
 
 	if CURVE_PAIRING_TYPE == BN {
-		n.pmul(6); n.dec(2)
+		n.pmul(6)
+		if SIGN_OF_X==POSITIVEX {
+			n.inc(2)
+		} else {
+			n.dec(2)
+		}
 	} else {n.copy(x)}
 	
 	n.norm()
-	//P.affine()
-	//Q.affine()
+
+	n3:=NewBIGcopy(n);
+	n3.pmul(3);
+	n3.norm();
+
 	Qx:=NewFPcopy(Q.getx())
 	Qy:=NewFPcopy(Q.gety())
 
@@ -143,35 +151,36 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 	r:=NewFP12int(1)
 
 	A.Copy(P)
-	nb:=n.nbits()
+	nb:=n3.nbits()
 
 	for i:=nb-2;i>=1;i-- {
+		r.sqr()
 		lv=line(A,A,Qx,Qy)
 		r.smul(lv,SEXTIC_TWIST)
-		if n.bit(i)==1 {
-	
+		bt:=n3.bit(i)-n.bit(i);
+		if bt==1 {
 			lv=line(A,P,Qx,Qy)
-			
 			r.smul(lv,SEXTIC_TWIST)
+		}	
+		if bt==-1 {
+			P.neg()
+			lv=line(A,P,Qx,Qy)
+			r.smul(lv,SEXTIC_TWIST)
+			P.neg()
 		}		
-		r.sqr()
 	}
 
-	lv=line(A,A,Qx,Qy)
-	r.smul(lv,SEXTIC_TWIST)
-
-	if n.parity()==1 {
-		lv=line(A,P,Qx,Qy)
-		r.smul(lv,SEXTIC_TWIST)
-	}
 
 /* R-ate fixup required for BN curves */
 
 	if CURVE_PAIRING_TYPE == BN {
-		r.conj()
+		if SIGN_OF_X==NEGATIVEX {
+			r.conj()
+			A.neg()
+		}
+
 		K.Copy(P)
 		K.frob(f)
-		A.neg()
 		lv=line(A,K,Qx,Qy)
 		r.smul(lv,SEXTIC_TWIST)
 		K.frob(f)
@@ -197,14 +206,19 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 	}
 
 	if CURVE_PAIRING_TYPE == BN {
-		n.pmul(6); n.dec(2)
+		n.pmul(6); 
+		if SIGN_OF_X==POSITIVEX {
+			n.inc(2)
+		} else {
+			n.dec(2)
+		}
 	} else {n.copy(x)}
 	
 	n.norm()
-	//P.affine()
-	//Q.affine()
-	//R.affine()
-	//S.affine()
+
+	n3:=NewBIGcopy(n);
+	n3.pmul(3);
+	n3.norm();
 
 	Qx:=NewFPcopy(Q.getx())
 	Qy:=NewFPcopy(Q.gety())
@@ -217,40 +231,42 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 
 	A.Copy(P)
 	B.Copy(R)
-	nb:=n.nbits()
+	nb:=n3.nbits()
 
 	for i:=nb-2;i>=1;i-- {
+		r.sqr()
 		lv=line(A,A,Qx,Qy)
 		r.smul(lv,SEXTIC_TWIST)
 		lv=line(B,B,Sx,Sy)
 		r.smul(lv,SEXTIC_TWIST)
-
-		if n.bit(i)==1 {
+		bt:=n3.bit(i)-n.bit(i);
+		if bt==1 {
 			lv=line(A,P,Qx,Qy)
 			r.smul(lv,SEXTIC_TWIST)
 			lv=line(B,R,Sx,Sy)
 			r.smul(lv,SEXTIC_TWIST)
 		}
-		r.sqr()
+		if bt==-1 {
+			P.neg(); R.neg()
+			lv=line(A,P,Qx,Qy)
+			r.smul(lv,SEXTIC_TWIST)
+			lv=line(B,R,Sx,Sy)
+			r.smul(lv,SEXTIC_TWIST)
+			P.neg(); R.neg()
+		}
 	}
 
-	lv=line(A,A,Qx,Qy)
-	r.smul(lv,SEXTIC_TWIST)
-	lv=line(B,B,Sx,Sy)
-	r.smul(lv,SEXTIC_TWIST)
-	if n.parity()==1 {
-		lv=line(A,P,Qx,Qy)
-		r.smul(lv,SEXTIC_TWIST)
-		lv=line(B,R,Sx,Sy)
-		r.smul(lv,SEXTIC_TWIST)
-	}
 
 /* R-ate fixup */
 	if CURVE_PAIRING_TYPE == BN {
-		r.conj()
+		if SIGN_OF_X==NEGATIVEX {
+			r.conj()
+			A.neg()
+			B.neg()
+		}
 		K.Copy(P)
 		K.frob(f)
-		A.neg()
+
 		lv=line(A,K,Qx,Qy)
 		r.smul(lv,SEXTIC_TWIST)
 		K.frob(f)
@@ -260,7 +276,7 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 
 		K.Copy(R)
 		K.frob(f)
-		B.neg()
+
 		lv=line(B,K,Sx,Sy)
 		r.smul(lv,SEXTIC_TWIST)
 		K.frob(f)
@@ -300,14 +316,23 @@ func Fexp(m *FP12) *FP12 {
 		x1:=NewFP12copy(r)
 		x1.conj()
 		x4:=r.Pow(x)
+		if SIGN_OF_X==POSITIVEX {
+			x4.conj();
+		}
 
 		x3:=NewFP12copy(x4)
 		x3.frob(f)
 
 		x2:=x4.Pow(x)
+		if SIGN_OF_X==POSITIVEX {
+			x2.conj();
+		}
 
 		x5:=NewFP12copy(x2); x5.conj()
 		lv=x2.Pow(x)
+		if SIGN_OF_X==POSITIVEX {
+			lv.conj();
+		}
 
 		x2.frob(f)
 		r.Copy(x2); r.conj()
@@ -340,7 +365,16 @@ func Fexp(m *FP12) *FP12 {
 // Ghamman & Fouotsa Method
 		y0:=NewFP12copy(r); y0.usqr()
 		y1:=y0.Pow(x)
-		x.fshr(1); y2:=y1.Pow(x); x.fshl(1)
+		if SIGN_OF_X==NEGATIVEX {
+			y1.conj();
+		}
+
+		x.fshr(1); y2:=y1.Pow(x); 
+		if SIGN_OF_X==NEGATIVEX {
+			y2.conj();
+		}
+		
+		x.fshl(1)
 		y3:=NewFP12copy(r); y3.conj()
 		y1.Mul(y3)
 
@@ -348,8 +382,16 @@ func Fexp(m *FP12) *FP12 {
 		y1.Mul(y2)
 
 		y2=y1.Pow(x)
+		if SIGN_OF_X==NEGATIVEX {
+			y2.conj();
+		}
+
 
 		y3=y2.Pow(x)
+		if SIGN_OF_X==NEGATIVEX {
+			y3.conj();
+		}
+
 		y1.conj()
 		y3.Mul(y1)
 
@@ -359,6 +401,10 @@ func Fexp(m *FP12) *FP12 {
 		y1.Mul(y2)
 
 		y2=y3.Pow(x)
+		if SIGN_OF_X==NEGATIVEX {
+			y2.conj();
+		}
+
 		y2.Mul(y0)
 		y2.Mul(r)
 
@@ -477,6 +523,7 @@ func gs(e *BIG) []*BIG {
 			}
 		}
 	} else {
+		q:=NewBIGints(CURVE_Order)
 		x:=NewBIGints(CURVE_Bnx)
 		w:=NewBIGcopy(e)
 		for i:=0;i<3;i++ {
@@ -485,6 +532,10 @@ func gs(e *BIG) []*BIG {
 			w.div(x)
 		}
 		u=append(u,NewBIGcopy(w))
+		if SIGN_OF_X==NEGATIVEX {
+			u[1].copy(Modneg(u[1],q));
+			u[3].copy(Modneg(u[3],q));
+		}
 	}
 	return u
 }	
@@ -498,7 +549,7 @@ func G1mul(P *ECP,e *BIG) *ECP {
 		R.Copy(P)
 		Q:=NewECP()
 		Q.Copy(P)
-		q:=NewBIGints(CURVE_Order);
+		q:=NewBIGints(CURVE_Order)
 		cru:=NewFPbig(NewBIGints(CURVE_Cru))
 		t:=NewBIGint(0)
 		u:=glv(e)

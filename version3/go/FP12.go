@@ -490,10 +490,30 @@ func (F *FP12) toString() string {
 func (F *FP12) Pow(e *BIG) *FP12 {
 	F.norm()
 	e.norm()
-	w:=NewFP12copy(F)
-	z:=NewBIGcopy(e)
-	r:=NewFP12int(1)
+	e3:=NewBIGcopy(e)
+	e3.pmul(3)
+	e3.norm()
 
+	w:=NewFP12copy(F)
+	//z:=NewBIGcopy(e)
+	//r:=NewFP12int(1)
+
+	nb:=e3.nbits()
+	for i:=nb-2;i>=1;i-- {
+		w.usqr()
+		bt:=e3.bit(i)-e.bit(i)
+		if bt==1 {
+			w.Mul(F)
+		}
+		if bt==-1 {
+			F.conj()
+			w.Mul(F)
+			F.conj()	
+		}
+	}
+	w.reduce()
+	return w
+/*
 	for true {
 		bt:=z.parity()
 		z.fshr(1)
@@ -502,7 +522,7 @@ func (F *FP12) Pow(e *BIG) *FP12 {
 		w.usqr()
 	}
 	r.reduce();
-	return r;
+	return r; */
 }
 
 /* constant time powering by small integer of max length bts */
