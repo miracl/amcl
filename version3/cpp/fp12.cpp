@@ -436,9 +436,44 @@ void YYY::FP12_compow(FP4 *c,FP12 *x,BIG e,BIG r)
 }
 
 
+/* Note this is simple square and multiply, so not side-channel safe */
+
+void YYY::FP12_pow(FP12 *r,FP12 *a,BIG b)
+{
+    FP12 w;
+    BIG b3;
+    int i,nb,bt;
+    BIG_norm(b);
+	BIG_pmul(b3,b,3);
+	BIG_norm(b3);
+
+    FP12_copy(&w,a);
+
+	nb=BIG_nbits(b3);
+	for (i=nb-2;i>=1;i--)
+	{
+		FP12_usqr(&w,&w);
+		bt=BIG_bit(b3,i)-BIG_bit(b,i);
+		if (bt==1)
+			FP12_mul(&w,a);
+		if (bt==-1)
+		{
+			FP12_conj(a,a);
+			FP12_mul(&w,a);
+			FP12_conj(a,a);
+		}
+	}
+
+	FP12_copy(r,&w);
+	FP12_reduce(r);
+
+
+}
+
+
 /* SU= 528 */
 /* set r=a^b */
-/* Note this is simple square and multiply, so not side-channel safe */
+/* Note this is simple square and multiply, so not side-channel safe
 
 void YYY::FP12_pow(FP12 *r,FP12 *a,BIG b)
 {
@@ -462,7 +497,7 @@ void YYY::FP12_pow(FP12 *r,FP12 *a,BIG b)
     }
 
     FP12_reduce(r);
-}
+}  */
 
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
 /* Timing attack secure, but not cache attack secure */

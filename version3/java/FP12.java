@@ -535,7 +535,29 @@ t1.norm();
 	{
 		norm();
 		e.norm();
+		BIG e3=new BIG(e);
+		e3.pmul(3);
+		e3.norm();
+
 		FP12 w=new FP12(this);
+
+		int nb=e3.nbits();
+		for (int i=nb-2;i>=1;i--)
+		{
+			w.usqr();
+			int bt=e3.bit(i)-e.bit(i);
+			if (bt==1)
+				w.mul(this);
+			if (bt==-1)
+			{
+				conj(); w.mul(this); conj();
+			}
+		}
+		w.reduce();
+		return w;
+
+
+/*
 		BIG z=new BIG(e);
 		FP12 r=new FP12(1);
 
@@ -548,7 +570,7 @@ t1.norm();
 			w.usqr();
 		}
 		r.reduce();
-		return r;
+		return r; */
 	}
 
 /* constant time powering by small integer of max length bts */

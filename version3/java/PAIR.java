@@ -141,6 +141,7 @@ public final class PAIR {
 		BIG n=new BIG(x);
 		ECP2 K=new ECP2();
 		FP12 lv;
+		int bt;
 
 		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
 		{
@@ -162,6 +163,10 @@ public final class PAIR {
 			n.copy(x);
 		n.norm();
 		
+		BIG n3=new BIG(n);
+		n3.pmul(3);
+		n3.norm();
+
 		FP Qx=new FP(Q.getx());
 		FP Qy=new FP(Q.gety());
 
@@ -169,28 +174,30 @@ public final class PAIR {
 		FP12 r=new FP12(1);
 
 		A.copy(P);
-		int nb=n.nbits();
+		int nb=n3.nbits();
 
 		for (int i=nb-2;i>=1;i--)
 		{
+			r.sqr();
 			lv=line(A,A,Qx,Qy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 
-			if (n.bit(i)==1)
+			bt=n3.bit(i)-n.bit(i); // bt=n.bit(i);
+			if (bt==1)
 			{
 				lv=line(A,P,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
 			}
-			r.sqr();
+			if (bt==-1)
+			{
+				P.neg();
+				lv=line(A,P,Qx,Qy);
+				r.smul(lv,ECP.SEXTIC_TWIST);
+				P.neg();
+			}
 		}
 
-		lv=line(A,A,Qx,Qy);
-		r.smul(lv,ECP.SEXTIC_TWIST);
-		if (n.parity()==1)
-		{
-			lv=line(A,P,Qx,Qy);
-			r.smul(lv,ECP.SEXTIC_TWIST);
-		}
+
 
 /* R-ate fixup required for BN curves */
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
@@ -220,6 +227,7 @@ public final class PAIR {
 		BIG n=new BIG(x);
 		ECP2 K=new ECP2();
 		FP12 lv;
+		int bt;
 
 		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
 		{
@@ -241,6 +249,10 @@ public final class PAIR {
 			n.copy(x);
 		n.norm();
 
+		BIG n3=new BIG(n);
+		n3.pmul(3);
+		n3.norm();
+
 		FP Qx=new FP(Q.getx());
 		FP Qy=new FP(Q.gety());
 		FP Sx=new FP(S.getx());
@@ -252,38 +264,37 @@ public final class PAIR {
 
 		A.copy(P);
 		B.copy(R);
-		int nb=n.nbits();
+		int nb=n3.nbits();
 
 		for (int i=nb-2;i>=1;i--)
 		{
+			r.sqr();
 			lv=line(A,A,Qx,Qy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 
 			lv=line(B,B,Sx,Sy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 
-			if (n.bit(i)==1)
+			bt=n3.bit(i)-n.bit(i); // bt=n.bit(i);
+			if (bt==1)
 			{
 				lv=line(A,P,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
 				lv=line(B,R,Sx,Sy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
 			}
-			r.sqr();
+			if (bt==-1)
+			{
+				P.neg(); R.neg();
+				lv=line(A,P,Qx,Qy);
+				r.smul(lv,ECP.SEXTIC_TWIST);
+				lv=line(B,R,Sx,Sy);
+				r.smul(lv,ECP.SEXTIC_TWIST);
+				P.neg(); R.neg();
+			}
 
 		}
 
-		lv=line(A,A,Qx,Qy);
-		r.smul(lv,ECP.SEXTIC_TWIST);
-		lv=line(B,B,Sx,Sy);
-		r.smul(lv,ECP.SEXTIC_TWIST);
-		if (n.parity()==1)
-		{
-			lv=line(A,P,Qx,Qy);
-			r.smul(lv,ECP.SEXTIC_TWIST);
-			lv=line(B,R,Sx,Sy);
-			r.smul(lv,ECP.SEXTIC_TWIST);
-		}
 
 /* R-ate fixup required for BN curves */
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)

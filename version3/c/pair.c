@@ -138,9 +138,9 @@ static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,FP_YYY *Qx,FP_YYY 
 void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 {
     FP2_YYY X;
-    BIG_XXX x,n;
+    BIG_XXX x,n,n3;
 	FP_YYY Qx,Qy;
-    int i,nb;
+    int i,nb,bt;
     ECP2_ZZZ A;
     FP12_YYY lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
@@ -170,6 +170,8 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 #endif
 
     BIG_XXX_norm(n);
+	BIG_XXX_pmul(n3,n,3);
+	BIG_XXX_norm(n3);    
 
 //    ECP2_ZZZ_affine(P);
 //    ECP_ZZZ_affine(Q);
@@ -179,30 +181,41 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 
     ECP2_ZZZ_copy(&A,P);
     FP12_YYY_one(r);
-    nb=BIG_XXX_nbits(n);
+    nb=BIG_XXX_nbits(n3);  //n
 
     /* Main Miller Loop */
-    for (i=nb-2; i>=1; i--)
+    for (i=nb-2; i>=1; i--)   //0
     {
+        FP12_YYY_sqr(r,r);
         PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
         FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-        if (BIG_XXX_bit(n,i))
+		//bt=BIG_XXX_bit(n,i);
+		bt=BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i);
+        if (bt==1)
         {
 
             PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
             FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
-        FP12_YYY_sqr(r,r);
+        if (bt==-1)
+        {
+			ECP2_ZZZ_neg(P);
+            PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
+            FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+			ECP2_ZZZ_neg(P);
+        }
+
+ //       FP12_YYY_sqr(r,r);
     }
 
-    PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
-    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+//    PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
+//    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
-    if (BIG_XXX_parity(n))
-    {
-        PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
-        FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-    }
+ //   if (BIG_XXX_parity(n))
+ //   {
+  //      PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
+   //     FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+    //}
 
     /* R-ate fixup required for BN curves */
 #if PAIRING_FRIENDLY_ZZZ==BN
@@ -225,9 +238,9 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ *S)
 {
     FP2_YYY X;
-    BIG_XXX x,n;
+    BIG_XXX x,n,n3;
 	FP_YYY Qx,Qy,Sx,Sy;
-    int i,nb;
+    int i,nb,bt;
     ECP2_ZZZ A,B;
     FP12_YYY lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
@@ -256,6 +269,8 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 #endif
 
     BIG_XXX_norm(n);
+	BIG_XXX_pmul(n3,n,3);
+	BIG_XXX_norm(n3);
 
     FP_YYY_copy(&Qx,&(Q->x));
     FP_YYY_copy(&Qy,&(Q->y));
@@ -266,18 +281,21 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
     ECP2_ZZZ_copy(&A,P);
     ECP2_ZZZ_copy(&B,R);
     FP12_YYY_one(r);
-    nb=BIG_XXX_nbits(n);
+    nb=BIG_XXX_nbits(n3);
 
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)
     {
+		FP12_YYY_sqr(r,r);
         PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
         FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
         PAIR_ZZZ_line(&lv,&B,&B,&Sx,&Sy);
         FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
-        if (BIG_XXX_bit(n,i))
+		bt=BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i);
+		//bt=BIG_XXX_bit(n,i);
+        if (bt==1)
         {
             PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
             FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
@@ -285,24 +303,38 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
             PAIR_ZZZ_line(&lv,&B,R,&Sx,&Sy);
             FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
-        FP12_YYY_sqr(r,r);
+
+        if (bt==-1)
+        {
+			ECP2_ZZZ_neg(P); ECP2_ZZZ_neg(R);
+
+            PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
+            FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+
+            PAIR_ZZZ_line(&lv,&B,R,&Sx,&Sy);
+            FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+
+			ECP2_ZZZ_neg(P); ECP2_ZZZ_neg(R);
+        }
+
+        //FP12_YYY_sqr(r,r);
 
 	}
 
-    PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
-    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+   // PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
+   // FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
-    PAIR_ZZZ_line(&lv,&B,&B,&Sx,&Sy);
-    FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+   // PAIR_ZZZ_line(&lv,&B,&B,&Sx,&Sy);
+   // FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
-    if (BIG_XXX_parity(n))
-    {
-        PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
-        FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+   // if (BIG_XXX_parity(n))
+   // {
+   //     PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
+   //     FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
-        PAIR_ZZZ_line(&lv,&B,R,&Sx,&Sy);
-        FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-    }
+   //     PAIR_ZZZ_line(&lv,&B,R,&Sx,&Sy);
+   //     FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+   // }
 
     /* R-ate fixup required for BN curves */
 #if PAIRING_FRIENDLY_ZZZ==BN
