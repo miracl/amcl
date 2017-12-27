@@ -37,10 +37,13 @@ ECP = function(ctx) {
     ECP.BLS = 2;
 	ECP.D_TYPE = 0;
 	ECP.M_TYPE = 1;
+	ECP.POSITIVEX = 0;
+	ECP.NEGATIVEX = 1;
 
     ECP.CURVETYPE = ctx.config["@CT"];
     ECP.CURVE_PAIRING_TYPE = ctx.config["@PF"];
 	ECP.SEXTIC_TWIST = ctx.config["@ST"];
+	ECP.SIGN_OF_X = ctx.config["@SX"];
 
     ECP.prototype = {
         /* test this=O point-at-infinity */

@@ -304,7 +304,7 @@ MPIN = function(ctx) {
 
         /* Extract PIN from TOKEN for identity CID */
         EXTRACT_PIN: function(sha, CID, pin, TOKEN) {
-			this.EXTRACT_FACTOR(sha,CID,pin%this.MAXPIN,this.PBLEN,TOKEN);
+			return this.EXTRACT_FACTOR(sha,CID,pin%this.MAXPIN,this.PBLEN,TOKEN);
 		},
 
         /* Extract factor from TOKEN for identity CID */

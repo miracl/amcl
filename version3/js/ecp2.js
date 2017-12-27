@@ -665,7 +665,11 @@ ECP2 = function(ctx) {
             T = new ECP2();
             T.copy(Q);
             T = T.mul(x);
-            T.neg();
+			if (ctx.ECP.SIGN_OF_X == ctx.ECP.NEGATIVEX)
+			{
+				T.neg();
+			}
+            
             K = new ECP2();
             K.copy(T);
             K.dbl();
@@ -688,6 +692,11 @@ ECP2 = function(ctx) {
             xQ = Q.mul(x);
             x2Q = xQ.mul(x);
 
+			if (ctx.ECP.SIGN_OF_X == ctx.ECP.NEGATIVEX)
+			{
+				xQ.neg();
+			}
+			
             x2Q.sub(xQ);
             x2Q.sub(Q);
 

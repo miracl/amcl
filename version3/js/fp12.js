@@ -462,19 +462,25 @@ FP12 = function(ctx) {
         pow: function(e) {
             this.norm();
             e.norm();
-            var w = new FP12(this); //w.copy(this);
-            var z = new ctx.BIG(e); //z.copy(e);
-            var r = new FP12(1);
+			var e3=new ctx.BIG(e);
+			e3.pmul(3);
+			e3.norm();
 
-            while (true) {
-                var bt = z.parity();
-                z.fshr(1);
-                if (bt == 1) r.mul(w);
-                if (z.iszilch()) break;
-                w.usqr();
+            var w = new FP12(this); //w.copy(this);
+			var nb=e3.nbits();
+
+            for (var i=nb-2;i>=1;i--)
+            {
+				w.usqr();
+				var bt=e3.bit(i)-e.bit(i);
+               
+                if (bt == 1) w.mul(this);
+                if (bt == -1) {
+					this.conj(); w.mul(this); this.conj();
+				}
             }
-            r.reduce();
-            return r;
+            w.reduce();
+            return w;
         },
 
         /* constant time powering by small integer of max length bts */

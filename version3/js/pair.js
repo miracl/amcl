@@ -140,10 +140,18 @@ PAIR = function(ctx) {
 
             if (ctx.ECP.CURVE_PAIRING_TYPE == ctx.ECP.BN) {
                 n.pmul(6);
-                n.dec(2);
+				if (ctx.ECP.SIGN_OF_X == ctx.ECP.POSITIVEX) {
+					n.inc(2)
+				} else {
+					n.dec(2);
+				}
             } else
                 n.copy(x);
             n.norm();
+
+			var n3 = new ctx.BIG(n);
+			n3.pmul(3);
+			n3.norm();
 
             //	P.affine();
             //	Q.affine();
@@ -154,32 +162,39 @@ PAIR = function(ctx) {
             var r = new ctx.FP12(1);
 
             A.copy(P);
-            var nb = n.nbits();
+            var nb = n3.nbits();
 
             for (var i = nb - 2; i >= 1; i--) {
+                r.sqr();
                 lv = PAIR.line(A, A, Qx, Qy);
 
                 r.smul(lv,ctx.ECP.SEXTIC_TWIST);
 
-                if (n.bit(i) == 1) {
+				var bt=n3.bit(i)-n.bit(i);
+
+                if (bt == 1) {
                     lv = PAIR.line(A, P, Qx, Qy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 }
-                r.sqr();
-            }
-            lv = PAIR.line(A, A, Qx, Qy);
-            r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-            if (n.parity() == 1) {
-                lv = line(A, P, Qx, Qy);
-                r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-            }
+                if (bt == -1) {
+					P.neg();
+                    lv = PAIR.line(A, P, Qx, Qy);
+                    r.smul(lv,ctx.ECP.SEXTIC_TWIST);
+					P.neg();
+                }
 
+            }
+ 
             /* R-ate fixup */
             if (ctx.ECP.CURVE_PAIRING_TYPE == ctx.ECP.BN) {
-                r.conj();
+				if (ctx.ECP.SIGN_OF_X == ctx.ECP.NEGATIVEX) { 
+					r.conj();
+					A.neg();
+				}
+
                 K.copy(P);
                 K.frob(f);
-                A.neg();
+
                 lv = PAIR.line(A, K, Qx, Qy);
                 r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 K.frob(f);
@@ -212,15 +227,19 @@ PAIR = function(ctx) {
 
             if (ctx.ECP.CURVE_PAIRING_TYPE == ctx.ECP.BN) {
                 n.pmul(6);
-                n.dec(2);
+				if (ctx.ECP.SIGN_OF_X == ctx.ECP.POSITIVEX) {
+					n.inc(2)
+				} else {
+					n.dec(2);
+				}
             } else
                 n.copy(x);
             n.norm();
 
-            //	P.affine();
-            //	Q.affine();
-            //	R.affine();
-            //	S.affine();
+			var n3 = new ctx.BIG(n);
+			n3.pmul(3);
+			n3.norm();
+
 
             var Qx = new ctx.FP(Q.getx()); //Qx.copy(Q.getx());
             var Qy = new ctx.FP(Q.gety()); //Qy.copy(Q.gety());
@@ -234,40 +253,44 @@ PAIR = function(ctx) {
 
             A.copy(P);
             B.copy(R);
-            var nb = n.nbits();
+            var nb = n3.nbits();
 
             for (var i = nb - 2; i >= 1; i--) {
+                r.sqr();
                 lv = PAIR.line(A, A, Qx, Qy);
                 r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 lv = PAIR.line(B, B, Sx, Sy);
                 r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-                if (n.bit(i) == 1) {
+
+				var bt=n3.bit(i)-n.bit(i);
+
+                if (bt == 1) {
                     lv = PAIR.line(A, P, Qx, Qy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                     lv = PAIR.line(B, R, Sx, Sy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 }
-                r.sqr();
+                if (bt == -1) {
+					P.neg(); R.neg();
+                    lv = PAIR.line(A, P, Qx, Qy);
+                    r.smul(lv,ctx.ECP.SEXTIC_TWIST);
+                    lv = PAIR.line(B, R, Sx, Sy);
+                    r.smul(lv,ctx.ECP.SEXTIC_TWIST);
+					P.neg(); R.neg();
+                }
             }
 
-            lv = PAIR.line(A, A, Qx, Qy);
-            r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-            lv = PAIR.line(B, B, Sx, Sy);
-            r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-            if (n.parity() == 1) {
-                lv = line(A, P, Qx, Qy);
-                r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-                lv = line(B, R, Sx, Sy);
-                r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-            }
 
             /* R-ate fixup required for BN curves */
             if (ctx.ECP.CURVE_PAIRING_TYPE == ctx.ECP.BN) {
-                r.conj();
-
+				if (ctx.ECP.SIGN_OF_X == ctx.ECP.NEGATIVEX) { 
+					r.conj();
+					A.neg();
+					B.neg();
+				}
                 K.copy(P);
                 K.frob(f);
-                A.neg();
+                
                 lv = PAIR.line(A, K, Qx, Qy);
                 r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 K.frob(f);
@@ -277,7 +300,7 @@ PAIR = function(ctx) {
 
                 K.copy(R);
                 K.frob(f);
-                B.neg();
+                
                 lv = PAIR.line(B, K, Sx, Sy);
                 r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 K.frob(f);
@@ -324,15 +347,25 @@ PAIR = function(ctx) {
                 x1.conj();
 
                 x4 = r.pow(x);
+				if (ctx.ECP.SIGN_OF_X == ctx.ECP.POSITIVEX)
+				{
+					x4.conj();
+				}
 
                 x3 = new ctx.FP12(x4); //x3.copy(x4);
                 x3.frob(f);
                 x2 = x4.pow(x);
-
+				if (ctx.ECP.SIGN_OF_X == ctx.ECP.POSITIVEX)
+				{
+					x2.conj();
+				}
                 x5 = new ctx.FP12(x2); /*x5.copy(x2);*/
                 x5.conj();
                 lv = x2.pow(x);
-
+				if (ctx.ECP.SIGN_OF_X == ctx.ECP.POSITIVEX)
+				{
+					lv.conj();
+				}
                 x2.frob(f);
                 r.copy(x2);
                 r.conj();
@@ -366,8 +399,16 @@ PAIR = function(ctx) {
                 y0 = new ctx.FP12(r);
                 y0.usqr();
                 y1 = y0.pow(x);
+				if (ctx.ECP.SIGN_OF_X==ctx.ECP.NEGATIVEX)
+				{
+					y1.conj();
+				}
                 x.fshr(1);
                 y2 = y1.pow(x);
+				if (ctx.ECP.SIGN_OF_X==ctx.ECP.NEGATIVEX)
+				{
+					y2.conj();
+				}
                 x.fshl(1);
                 y3 = new ctx.FP12(r);
                 y3.conj();
@@ -377,8 +418,16 @@ PAIR = function(ctx) {
                 y1.mul(y2);
 
                 y2 = y1.pow(x);
+				if (ctx.ECP.SIGN_OF_X==ctx.ECP.NEGATIVEX)
+				{
+					y2.conj();
+				}
 
                 y3 = y2.pow(x);
+				if (ctx.ECP.SIGN_OF_X==ctx.ECP.NEGATIVEX)
+				{
+					y3.conj();
+				}
                 y1.conj();
                 y3.mul(y1);
 
@@ -391,6 +440,10 @@ PAIR = function(ctx) {
                 y1.mul(y2);
 
                 y2 = y3.pow(x);
+				if (ctx.ECP.SIGN_OF_X==ctx.ECP.NEGATIVEX)
+				{
+					y2.conj();
+				}
                 y2.mul(y0);
                 y2.mul(r);
 
@@ -476,6 +529,8 @@ PAIR = function(ctx) {
         } else {
             var x = new ctx.BIG(0);
             x.rcopy(ctx.ROM_CURVE.CURVE_Bnx);
+            var q = new ctx.BIG(0);
+            q.rcopy(ctx.ROM_CURVE.CURVE_Order);
             var w = new ctx.BIG(e);
             for (var i = 0; i < 3; i++) {
                 u[i] = new ctx.BIG(w);
@@ -483,6 +538,10 @@ PAIR = function(ctx) {
                 w.div(x);
             }
             u[3] = new ctx.BIG(w);
+			if (ctx.ECP.SIGN_OF_X==ctx.ECP.NEGATIVEX) {
+				u[1].copy(ctx.BIG.modneg(u[1], q));
+				u[3].copy(ctx.BIG.modneg(u[3], q));
+			}
         }
         return u;
     };
