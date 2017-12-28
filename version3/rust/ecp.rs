@@ -37,11 +37,13 @@ pub const BN: usize=1;
 pub const BLS: usize=2;
 pub const D_TYPE: usize=0;
 pub const M_TYPE: usize=1;
+pub const POSITIVEX: usize=0;
+pub const NEGATIVEX: usize=1;
 
 pub const CURVETYPE:usize=@CT@;
 pub const CURVE_PAIRING_TYPE:usize=@PF@;
 pub const SEXTIC_TWIST:usize=@ST@;
-
+pub const SIGN_OF_X:usize=@SX@;
 
 #[allow(non_snake_case)]
 impl ECP {

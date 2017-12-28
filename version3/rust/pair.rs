@@ -139,10 +139,20 @@ pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
 	}	
 
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
-		n.pmul(6); n.dec(2);
+		n.pmul(6); 
+		if ecp::SIGN_OF_X == ecp::POSITIVEX {
+			n.inc(2);
+		} else {
+			n.dec(2);		
+		}
+
 	} else {n.copy(&x)}
 	
 	n.norm();
+	let mut n3 = BIG::new_copy(&n);
+	n3.pmul(3);
+	n3.norm();
+
 //	P.affine();
 //	Q.affine();
 	let qx=FP::new_copy(&Q.getpx());
@@ -152,36 +162,42 @@ pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
 	let mut r=FP12::new_int(1);
 
 	A.copy(&P);
-	let nb=n.nbits();
+	let mut NP=ECP2::new();
+	NP.copy(&P);
+	NP.neg();
+
+	let nb=n3.nbits();
 
 	for i in (1..nb-1).rev() {
+		r.sqr();		
 		let mut lv=linedbl(&mut A,&qx,&qy);
 		r.smul(&lv,ecp::SEXTIC_TWIST);
-		if n.bit(i)==1 {
-		
+		let bt=n3.bit(i)-n.bit(i);
+		if bt==1 {
 			lv=lineadd(&mut A,P,&qx,&qy);
-		
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}		
-		r.sqr();	
+		if bt == -1 {
+
+			lv=lineadd(&mut A,&NP,&qx,&qy);
+			r.smul(&lv,ecp::SEXTIC_TWIST);	
+
+		}
 	}
 
-	let mut lv=linedbl(&mut A,&qx,&qy);
-	r.smul(&lv,ecp::SEXTIC_TWIST);
-
-	if n.parity()==1 {
-		lv=lineadd(&mut A,P,&qx,&qy);
-		r.smul(&lv,ecp::SEXTIC_TWIST);
-	}
 
 /* R-ate fixup required for BN curves */
 
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
-		r.conj();
+		if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+			r.conj();
+			A.neg();			
+		}
+
 		K.copy(&P);
 		K.frob(&f);
-		A.neg();
-		lv=lineadd(&mut A,&K,&qx,&qy);
+
+		let mut lv=lineadd(&mut A,&K,&qx,&qy);
 		r.smul(&lv,ecp::SEXTIC_TWIST);
 		K.frob(&f);
 		K.neg();
@@ -206,14 +222,19 @@ pub fn ate2(P: &ECP2,Q: &ECP,R: &ECP2,S: &ECP) -> FP12 {
 	}	
 
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
-		n.pmul(6); n.dec(2);
+		n.pmul(6); 
+		if ecp::SIGN_OF_X == ecp::POSITIVEX {
+			n.inc(2);
+		} else {
+			n.dec(2);		
+		}
 	} else {n.copy(&x)}
 	
 	n.norm();
-//	P.affine();
-//	Q.affine();
-//	R.affine();
-//	S.affine();
+	let mut n3 = BIG::new_copy(&n);
+	n3.pmul(3);
+	n3.norm();
+
 
 	let qx=FP::new_copy(&Q.getpx());
 	let qy=FP::new_copy(&Q.getpy());
@@ -227,41 +248,51 @@ pub fn ate2(P: &ECP2,Q: &ECP,R: &ECP2,S: &ECP) -> FP12 {
 
 	A.copy(&P);
 	B.copy(&R);
-	let nb=n.nbits();
+
+	let mut NP=ECP2::new();
+	NP.copy(&P);
+	NP.neg();
+	let mut NR=ECP2::new();
+	NR.copy(&R);
+	NR.neg();
+
+	let nb=n3.nbits();
 
 	for i in (1..nb-1).rev() {
+		r.sqr();		
 		let mut lv=linedbl(&mut A,&qx,&qy);
 		r.smul(&lv,ecp::SEXTIC_TWIST);
 		lv=linedbl(&mut B,&sx,&sy);
 		r.smul(&lv,ecp::SEXTIC_TWIST);
-
-		if n.bit(i)==1 {
+		let bt=n3.bit(i)-n.bit(i);		
+		if bt == 1 {
 			lv=lineadd(&mut A,P,&qx,&qy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 			lv=lineadd(&mut B,R,&sx,&sy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}
-		r.sqr();
+		if bt == -1 {
+
+			lv=lineadd(&mut A,&NP,&qx,&qy);
+			r.smul(&lv,ecp::SEXTIC_TWIST);
+			lv=lineadd(&mut B,&NR,&sx,&sy);
+			r.smul(&lv,ecp::SEXTIC_TWIST);
+
+		}
 	}
 
-	let mut lv=linedbl(&mut A,&qx,&qy);
-	r.smul(&lv,ecp::SEXTIC_TWIST);
-	lv=linedbl(&mut B,&sx,&sy);
-	r.smul(&lv,ecp::SEXTIC_TWIST);
-	if n.parity()==1 {
-		lv=lineadd(&mut A,P,&qx,&qy);
-		r.smul(&lv,ecp::SEXTIC_TWIST);
-		lv=lineadd(&mut B,R,&sx,&sy);
-		r.smul(&lv,ecp::SEXTIC_TWIST);
-	}
 
 /* R-ate fixup */
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
-		r.conj();
+		if ecp::SIGN_OF_X == ecp::NEGATIVEX {		
+			r.conj();
+			A.neg();
+			B.neg();
+		}
 		K.copy(&P);
 		K.frob(&f);
-		A.neg();
-		lv=lineadd(&mut A,&K,&qx,&qy);
+		
+		let mut lv=lineadd(&mut A,&K,&qx,&qy);
 		r.smul(&lv,ecp::SEXTIC_TWIST);
 		K.frob(&f);
 		K.neg();
@@ -270,7 +301,7 @@ pub fn ate2(P: &ECP2,Q: &ECP,R: &ECP2,S: &ECP) -> FP12 {
 
 		K.copy(&R);
 		K.frob(&f);
-		B.neg();
+		
 		lv=lineadd(&mut B,&K,&sx,&sy);
 		r.smul(&lv,ecp::SEXTIC_TWIST);
 		K.frob(&f);
@@ -310,15 +341,22 @@ pub fn fexp(m: &FP12) -> FP12 {
 		let mut x1=FP12::new_copy(&r);
 		x1.conj();
 		let mut x4=r.pow(&mut x);
+		if ecp::SIGN_OF_X == ecp::POSITIVEX {
+			x4.conj();
+		}
 
 		let mut x3=FP12::new_copy(&x4);
 		x3.frob(&f);
 
 		let mut x2=x4.pow(&mut x);
-
+		if ecp::SIGN_OF_X == ecp::POSITIVEX {
+			x2.conj();
+		}
 		let mut x5=FP12::new_copy(&x2); x5.conj();
 		lv=x2.pow(&mut x);
-
+		if ecp::SIGN_OF_X == ecp::POSITIVEX {
+			lv.conj();
+		}
 		x2.frob(&f);
 		r.copy(&x2); r.conj();
 
@@ -351,7 +389,14 @@ pub fn fexp(m: &FP12) -> FP12 {
 
 		let mut y0=FP12::new_copy(&r); y0.usqr();
 		let mut y1=y0.pow(&mut x);
-		x.fshr(1); let mut y2=y1.pow(&mut x); x.fshl(1);
+		if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+			y1.conj();
+		}		
+		x.fshr(1); let mut y2=y1.pow(&mut x); 
+		if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+			y2.conj();
+		}	
+		x.fshl(1);
 		let mut y3=FP12::new_copy(&r); y3.conj();
 		y1.mul(&y3);
 
@@ -359,8 +404,13 @@ pub fn fexp(m: &FP12) -> FP12 {
 		y1.mul(&y2);
 
 		y2=y1.pow(&mut x);
-
+		if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+			y2.conj();
+		}	
 		y3=y2.pow(&mut x);
+		if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+			y3.conj();
+		}		
 		y1.conj();
 		y3.mul(&y1);
 
@@ -370,6 +420,9 @@ pub fn fexp(m: &FP12) -> FP12 {
 		y1.mul(&y2);
 
 		y2=y3.pow(&mut x);
+		if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+			y2.conj();
+		}			
 		y2.mul(&y0);
 		y2.mul(&r);
 
@@ -488,6 +541,7 @@ pub fn gs(e: &BIG) -> [BIG;4] {
 			}
 		}
 	} else {
+		let q=BIG::new_ints(&rom::CURVE_ORDER);	
 		let x=BIG::new_ints(&rom::CURVE_BNX);
 		let mut w=BIG::new_copy(&e);
 		for i in 0..3 {
@@ -496,6 +550,13 @@ pub fn gs(e: &BIG) -> [BIG;4] {
 			w.div(&x);
 		}
 		u[3].copy(&w);
+		if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+			let mut t=BIG::new();	
+			t.copy(&BIG::modneg(&mut u[1],&q));
+			u[1].copy(&t);
+			t.copy(&BIG::modneg(&mut u[3],&q));	
+			u[3].copy(&t);	
+		}
 	}
 	return u;
 }	

@@ -18,7 +18,7 @@ or
 
 python3 config64.py
 
-Then select options 1, 17 and 21 (these are fixed for the example 
+Then select options 1, 17 and 22 (these are fixed for the example 
 program provided). Select 0 to exit.
 
 Then copy the library from amcl/target/release/libamcl.rlib to the
@@ -39,8 +39,8 @@ If you wish to test/benchtest other curves:-
 (a) Edit TestALL.rs and BenchtestALL.rs, and change all occurences of 
 ed25519 to nist256
 
-(b) Go throught the process above again from scratch, but this time
-select options 3, 17 and 20
+(b) Go through the process above again from scratch, but this time
+select options 3, 17 and 22
 
 And thats it!
 

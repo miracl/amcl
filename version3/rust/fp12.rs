@@ -518,20 +518,29 @@ impl FP12 {
 
 /* self=self^e */
 	pub fn pow(&self,e: &BIG) -> FP12 {
-		//self.norm();
-		//e.norm();
-		let mut w=FP12::new_copy(self);
-		let mut z=BIG::new_copy(&e);
-		let mut r=FP12::new_int(1);
-		loop {
-			let bt=z.parity();
-			z.fshr(1);
-			if bt==1 {r.mul(&w)};
-			if z.iszilch() {break}
+		let mut r=FP12::new_copy(self);	
+		r.norm();
+		let mut e1=BIG::new_copy(e);
+		e1.norm();
+		let mut e3=BIG::new_copy(&e1);
+		e3.pmul(3);
+		e3.norm();
+		let mut w=FP12::new_copy(&r);
+
+		let nb=e3.nbits();
+		for i in (1..nb-1).rev() {
 			w.usqr();
+			let bt=e3.bit(i)-e1.bit(i);
+			if bt==1 {
+				w.mul(&r);
+			}
+			if bt == -1 {
+				r.conj(); w.mul(&r); r.conj();
+			}
 		}
-		r.reduce();
-		return r;
+
+		w.reduce();
+		return w;
 	}	
 
 /* constant time powering by small integer of max length bts */
