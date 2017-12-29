@@ -133,13 +133,21 @@ final public class PAIR {
             f.norm()
         }
 
-	   if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-		  n.pmul(6); n.dec(2)
-	   } else {n.copy(x)}
+        if ECP.CURVE_PAIRING_TYPE == ECP.BN {
+            n.pmul(6);
+            if ECP.SIGN_OF_X == ECP.NEGATIVEX { 
+                n.dec(2)
+            } else {
+                n.inc(2)
+            }
+        } else {n.copy(x)}
 	
-	   n.norm()
-    //    P.affine()
-    //    Q.affine()
+        n.norm()
+
+        let n3=BIG(n)
+        n3.pmul(3)
+        n3.norm()
+
         let Qx=FP(Q.getx())
         let Qy=FP(Q.gety())
     
@@ -147,42 +155,44 @@ final public class PAIR {
         let r=FP12(1)
     
         A.copy(P)
-        let nb=n.nbits()
+        let nb=n3.nbits()
     
         for i in (1...nb-2).reversed()
         //for var i=nb-2;i>=1;i--
         {
+            r.sqr()            
             lv=line(A,A,Qx,Qy)
             r.smul(lv,ECP.SEXTIC_TWIST)
-    
-            if (n.bit(UInt(i))==1)
-            {
+            let bt=n3.bit(UInt(i))-n.bit(UInt(i))
+            if bt == 1 {
 		      lv=line(A,P,Qx,Qy)
 		      r.smul(lv,ECP.SEXTIC_TWIST)
             }
-            r.sqr()
+            if bt == -1 {
+                P.neg()
+                lv=line(A,P,Qx,Qy)
+                r.smul(lv,ECP.SEXTIC_TWIST)
+                P.neg()
+            }
         }
     
-        lv=line(A,A,Qx,Qy)
-        r.smul(lv,ECP.SEXTIC_TWIST)
-        if n.parity()==1 {
-		  lv=line(A,P,Qx,Qy)
-		  r.smul(lv,ECP.SEXTIC_TWIST)
-	   }
     
     // R-ate fixup required for BN curves
 
 	   if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-	   	   r.conj()
-		  K.copy(P)
-		  K.frob(f)
-		  A.neg()
-		  lv=line(A,K,Qx,Qy)
-		  r.smul(lv,ECP.SEXTIC_TWIST)
-		  K.frob(f)
-		  K.neg()
-		  lv=line(A,K,Qx,Qy)
-		  r.smul(lv,ECP.SEXTIC_TWIST)
+            if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+                r.conj()
+                A.neg()
+            }           
+            K.copy(P)
+            K.frob(f)
+
+            lv=line(A,K,Qx,Qy)
+            r.smul(lv,ECP.SEXTIC_TWIST)
+            K.frob(f)
+            K.neg()
+            lv=line(A,K,Qx,Qy)
+            r.smul(lv,ECP.SEXTIC_TWIST)
         }
         return r
     }
@@ -201,14 +211,18 @@ final public class PAIR {
         }
 
         if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-            n.pmul(6); n.dec(2)
+            n.pmul(6); 
+            if ECP.SIGN_OF_X == ECP.NEGATIVEX { 
+                n.dec(2)
+            } else {
+                n.inc(2)
+            }        
         } else {n.copy(x)}
 	
         n.norm()
-    //    P.affine()
-    //    Q.affine()
-    //    R.affine()
-    //    S.affine()
+        let n3=BIG(n)
+        n3.pmul(3)
+        n3.norm()
     
         let Qx=FP(Q.getx())
         let Qy=FP(Q.gety())
@@ -221,44 +235,47 @@ final public class PAIR {
     
         A.copy(P)
         B.copy(R)
-        let nb=n.nbits()
+        let nb=n3.nbits()
     
         for i in (1...nb-2).reversed()
         //for var i=nb-2;i>=1;i--
         {
+            r.sqr()            
             lv=line(A,A,Qx,Qy)
             r.smul(lv,ECP.SEXTIC_TWIST)
             lv=line(B,B,Sx,Sy)
             r.smul(lv,ECP.SEXTIC_TWIST)
-            if n.bit(UInt(i))==1
-            {
+            let bt=n3.bit(UInt(i))-n.bit(UInt(i))
+
+            if bt == 1 {
                 lv=line(A,P,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
                 lv=line(B,R,Sx,Sy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
             }
-            r.sqr()
-        }
-    
-        lv=line(A,A,Qx,Qy)
-        r.smul(lv,ECP.SEXTIC_TWIST)
-        lv=line(B,B,Sx,Sy)
-        r.smul(lv,ECP.SEXTIC_TWIST)
-        if n.parity()==1 {
-            lv=line(A,P,Qx,Qy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
-            lv=line(B,R,Sx,Sy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+
+            if bt == -1 {
+                P.neg(); R.neg()
+                lv=line(A,P,Qx,Qy)
+                r.smul(lv,ECP.SEXTIC_TWIST)
+                lv=line(B,R,Sx,Sy)
+                r.smul(lv,ECP.SEXTIC_TWIST)
+                P.neg(); R.neg()                
+            }            
+
         }
     
     // R-ate fixup required for BN curves
 
 	   if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-            r.conj()
-    
+            if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+                r.conj()
+                A.neg()                
+                B.neg()
+            }
             K.copy(P)
             K.frob(f)
-            A.neg()
+
             lv=line(A,K,Qx,Qy)
             r.smul(lv,ECP.SEXTIC_TWIST)
             K.frob(f)
@@ -268,7 +285,7 @@ final public class PAIR {
     
             K.copy(R)
             K.frob(f)
-            B.neg()
+
             lv=line(B,K,Sx,Sy)
             r.smul(lv,ECP.SEXTIC_TWIST)
             K.frob(f)
@@ -309,15 +326,21 @@ final public class PAIR {
 		let x1=FP12(r)
 		x1.conj()
 		let x4=r.pow(x)
-
+        if ECP.SIGN_OF_X == ECP.POSITIVEX {
+            x4.conj()
+        }
 		let x3=FP12(x4)
 		x3.frob(f)
     
 		let x2=x4.pow(x)
-    
+        if ECP.SIGN_OF_X == ECP.POSITIVEX {
+            x2.conj()
+        }    
 		let x5=FP12(x2); x5.conj()
 		lv=x2.pow(x)
-    
+        if ECP.SIGN_OF_X == ECP.POSITIVEX {
+            lv.conj()
+        }   
 		x2.frob(f)
 		r.copy(x2); r.conj()
     
@@ -353,6 +376,9 @@ final public class PAIR {
 		x1.mul(lv)
 
 		r.copy(r.pow(x))  //r=r.pow(x);
+        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+            r.conj()
+        }          
 		x3.copy(r); x3.conj(); x1.mul(x3)
 		lv.copy(r); lv.frob(f)
 		x0.mul(lv)
@@ -362,6 +388,9 @@ final public class PAIR {
 		x3.copy(lv); x3.conj(); x0.mul(x3)
 
 		r.copy(r.pow(x))
+        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+            r.conj()
+        }  
 		x0.mul(r)
 		lv.copy(r); lv.frob(f); lv.frob(f)
 		x3.copy(lv); x3.conj(); x0.mul(x3)
@@ -369,17 +398,26 @@ final public class PAIR {
 		x1.mul(lv)
 
 		r.copy(r.pow(x))
+        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+            r.conj()
+        }          
 		lv.copy(r); lv.frob(f)
 		x3.copy(lv); x3.conj(); x0.mul(x3)
 		lv.frob(f)
 		x1.mul(lv)
 
 		r.copy(r.pow(x))
+        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+            r.conj()
+        }          
 		x3.copy(r); x3.conj(); x0.mul(x3)
 		lv.copy(r); lv.frob(f)
 		x1.mul(lv)
 
 		r.copy(r.pow(x))
+        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+            r.conj()
+        }          
 		x1.mul(r)
 
 		x0.usqr()
@@ -439,25 +477,25 @@ final public class PAIR {
     static func gs(_ e:BIG) -> [BIG]
     {
         var u=[BIG]();
-	if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-		let t=BIG(0)
-		let q=BIG(ROM.CURVE_Order)
-		var v=[BIG]();
-		for _ in 0 ..< 4
-		{
-			u.append(BIG(0))
-			v.append(BIG(0))
-		}
+        if ECP.CURVE_PAIRING_TYPE == ECP.BN {
+		  let t=BIG(0)
+		  let q=BIG(ROM.CURVE_Order)
+		  var v=[BIG]();
+		  for _ in 0 ..< 4
+		  {
+			 u.append(BIG(0))
+			 v.append(BIG(0))
+		  }
         
-		for i in 0 ..< 4
-		{
-			t.copy(BIG(ROM.CURVE_WB[i]))
-			let d=BIG.mul(t,e)
-			v[i].copy(d.div(q))
-		}
-		u[0].copy(e);
-		for i in 0 ..< 4
-		{
+		  for i in 0 ..< 4
+		  {
+			 t.copy(BIG(ROM.CURVE_WB[i]))
+			 let d=BIG.mul(t,e)
+			 v[i].copy(d.div(q))
+		  }
+		  u[0].copy(e);
+		  for i in 0 ..< 4
+		  {
 			for j in 0 ..< 4
 			{
 				t.copy(BIG(ROM.CURVE_BB[j][i]))
@@ -466,18 +504,24 @@ final public class PAIR {
 				u[i].sub(t)
 				u[i].mod(q)
 			}
-		}
+
+		  }
 	} else {
-		let x=BIG(ROM.CURVE_Bnx)
-		let w=BIG(e)
-		for i in 0 ..< 3
-		{
-			u.append(BIG(w))
-			u[i].mod(x)
-			w.div(x)
-		}
-		u.append(BIG(w))
-	}
+            let q=BIG(ROM.CURVE_Order)        
+            let x=BIG(ROM.CURVE_Bnx)
+            let w=BIG(e)
+            for i in 0 ..< 3
+            {
+			     u.append(BIG(w))
+			     u[i].mod(x)
+			     w.div(x)
+            }
+            u.append(BIG(w))
+            if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+                u[1].copy(BIG.modneg(u[1],q))
+                u[3].copy(BIG.modneg(u[3],q))                
+            }        
+        }
         return u
     }	
     

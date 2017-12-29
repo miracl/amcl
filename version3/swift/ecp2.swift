@@ -595,7 +595,10 @@ final public class ECP2 {
         x=BIG(ROM.CURVE_Bnx);
     
         if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-            let T=Q.mul(x); T.neg()
+            let T=Q.mul(x); 
+            if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+                T.neg()
+            }
             let K=ECP2(); K.copy(T)
             K.dbl(); K.add(T); //K.affine()
     
@@ -608,6 +611,10 @@ final public class ECP2 {
         if ECP.CURVE_PAIRING_TYPE == ECP.BLS {
             let xQ=Q.mul(x);
             let x2Q=xQ.mul(x);
+
+            if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+                xQ.neg()
+            }
 
             x2Q.sub(xQ)
             x2Q.sub(Q)

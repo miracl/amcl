@@ -515,20 +515,27 @@ final public class FP12
     {
         norm()
         e.norm()
+        let e3=BIG(e)
+        e3.pmul(3)
+        e3.norm();
+
         let w=FP12(self)
-        let z=BIG(e)
-        let r=FP12(1)
-    
-        while (true)
+        let nb=e3.nbits()
+ 
+        for i in (1...nb-2).reversed()
         {
-            let bt=z.parity()
-            z.fshr(1)
-            if bt==1 {r.mul(w)}
-            if z.iszilch() {break}
             w.usqr()
+            let bt=e3.bit(UInt(i))-e.bit(UInt(i))
+            if bt == 1 {
+                w.mul(self)
+            }
+            if bt == -1 {
+                self.conj(); w.mul(self); self.conj()
+            }            
         }
-        r.reduce()
-        return r
+    
+        w.reduce()
+        return w
     }
     /* constant time powering by small integer of max length bts */
     func pinpow(_ e:Int32,_ bts:Int32)

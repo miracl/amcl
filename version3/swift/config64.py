@@ -55,7 +55,7 @@ def rsaset(tb,nb,base,ml) :
 	os.system("rmdir amcl"+slashtext+tb)
 
 
-def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
+def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx) :
 	global deltext,slashtext,copytext
 	global cptr,chosen
 
@@ -90,10 +90,9 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf) :
 	replace(fpath+"ecp.swift","@CT@",ct)
 	replace(fpath+"ecp.swift","@PF@",pf)
 
-	if tc == "fp256bn" :
-		replace(fpath+"ecp.swift","@ST@","M_TYPE")
-	else :
-		replace(fpath+"ecp.swift","@ST@","D_TYPE")
+	replace(fpath+"ecp.rs","@ST@",stw)
+	replace(fpath+"ecp.rs","@SX@",sx)
+
 
 	if pf != "NOT" :
 		os.system(copytext+"ecp2.swift "+fpath+"ecp2.swift")
@@ -143,16 +142,17 @@ print("Pairing-Friendly Elliptic Curves")
 print("17. bn254")
 print("18. bn254CX")
 print("19. bls383")
-print("20. fp256bn\n")
+print("20. fp256BN")
+print("21. fp512BN\n")
 
 print("RSA")
-print("21. rsa2048")
-print("22. rsa3072")
-print("23. rsa4096")
+print("22. rsa2048")
+print("23. rsa3072")
+print("24. rsa4096")
 
 selection=[]
 ptr=0
-max=24
+max=25
 
 curve_selected=False
 pfcurve_selected=False
@@ -186,67 +186,70 @@ while ptr<max:
 
 
 	if x==1:
-		curveset("ed25519","32","56","255","5","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("ed25519","32","56","255","5","PSEUDO_MERSENNE","EDWARDS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==2:
-		curveset("c25519","32","56","255","5","PSEUDO_MERSENNE","MONTGOMERY","NOT")
+		curveset("c25519","32","56","255","5","PSEUDO_MERSENNE","MONTGOMERY","NOT","NOT","NOT")
 		curve_selected=True
 	if x==3:
-		curveset("nist256","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("nist256","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==4:
-		curveset("brainpool","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("brainpool","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==5:
-		curveset("anssi","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("anssi","32","56","256","7","NOT_SPECIAL","WEIERSTRASS","NOT","NOT","NOT")
 		curve_selected=True
 
 	if x==6:
-		curveset("hifive","42","60","336","5","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("hifive","42","60","336","5","PSEUDO_MERSENNE","EDWARDS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==7:
-		curveset("goldilocks","56","58","448","7","GENERALISED_MERSENNE","EDWARDS","NOT")
+		curveset("goldilocks","56","58","448","7","GENERALISED_MERSENNE","EDWARDS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==8:
-		curveset("nist384","48","56","384","7","NOT_SPECIAL","WEIERSTRASS","NOT")
+		curveset("nist384","48","56","384","7","NOT_SPECIAL","WEIERSTRASS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==9:
-		curveset("c41417","52","60","414","7","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("c41417","52","60","414","7","PSEUDO_MERSENNE","EDWARDS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==10:
-		curveset("nist521","66","60","521","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("nist521","66","60","521","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT","NOT","NOT")
 		curve_selected=True
 
 	if x==11:
-		curveset("nums256w","32","56","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("nums256w","32","56","256","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==12:
-		curveset("nums256e","32","56","256","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("nums256e","32","56","256","3","PSEUDO_MERSENNE","EDWARDS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==13:
-		curveset("nums384w","48","58","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("nums384w","48","58","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==14:
-		curveset("nums384e","48","56","384","3","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("nums384e","48","56","384","3","PSEUDO_MERSENNE","EDWARDS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==15:
-		curveset("nums512w","64","60","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT")
+		curveset("nums512w","64","60","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==16:
-		curveset("nums512e","64","60","512","7","PSEUDO_MERSENNE","EDWARDS","NOT")
+		curveset("nums512e","64","60","512","7","PSEUDO_MERSENNE","EDWARDS","NOT","NOT","NOT")
 		curve_selected=True
 
 	if x==17:
-		curveset("bn254","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		curveset("bn254","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX")
 		pfcurve_selected=True
 	if x==18:
-		curveset("bn254CX","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		curveset("bn254CX","32","56","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX")
 		pfcurve_selected=True
 	if x==19:
-		curveset("bls383","48","58","383","3","NOT_SPECIAL","WEIERSTRASS","BLS")
+		curveset("bls383","48","58","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","D_TYPE","POSITIVEX")
 		pfcurve_selected=True
 	if x==20:
-		curveset("fp256bn","32","56","256","3","NOT_SPECIAL","WEIERSTRASS","BN")
+		curveset("fp256bn","32","56","256","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","NEGATIVEX")
+		pfcurve_selected=True
+	if x==21:
+		curveset("fp512bn","64","60","512","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","POSITIVEX")
 		pfcurve_selected=True
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
@@ -254,17 +257,17 @@ while ptr<max:
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==21:
+	if x==22:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("rsa2048","128","58","2")
 		#rsaset("rsa2048","64","60",4")
 		#rsaset("rsa2048","32","56",8")
 		rsa_selected=True
-	if x==22:
+	if x==23:
 		rsaset("rsa3072","48","56","8")
 		rsa_selected=True
-	if x==23:
+	if x==24:
 		#rsaset("rsa4096","32","56",16")
 		rsaset("rsa4096","64","60","8")
 		rsa_selected=True
