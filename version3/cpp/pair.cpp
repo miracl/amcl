@@ -640,7 +640,8 @@ static void ZZZ::gs(BIG u[4],BIG e)
 
 #else
 
-    BIG x,w;
+    BIG x,w,q;
+	BIG_rcopy(q,CURVE_Order);
     BIG_rcopy(x,CURVE_Bnx);
     BIG_copy(w,e);
 

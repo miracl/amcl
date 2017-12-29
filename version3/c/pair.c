@@ -665,7 +665,8 @@ static void gs(BIG_XXX u[4],BIG_XXX e)
 
 #else
 
-    BIG_XXX x,w;
+    BIG_XXX x,w,q;
+	BIG_XXX_rcopy(q,CURVE_Order_ZZZ);
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
     BIG_XXX_copy(w,e);
 
