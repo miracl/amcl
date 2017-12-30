@@ -420,6 +420,13 @@ void FP12_YYY_compow(FP4_YYY *c,FP12_YYY *x,BIG_XXX e,BIG_XXX r)
 
     FP12_YYY_trace(c,&g1);
 
+	if (BIG_XXX_iszilch(b))
+	{
+		FP4_YYY_xtr_pow(c,c,e);
+		return;
+	}
+
+
     FP12_YYY_frob(&g2,&f);
     FP12_YYY_trace(&cp,&g2);
 

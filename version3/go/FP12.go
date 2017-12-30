@@ -557,6 +557,11 @@ func (F *FP12) Compow(e *BIG,r *BIG) *FP4 {
 	g1:=NewFP12copy(F);
 	c:=g1.trace()
 
+	if b.iszilch() {
+		c=c.xtr_pow(e)
+		return c
+	}
+
 	g2:=NewFP12copy(F)
 	g2.frob(f)
 	cp:=g2.trace()
@@ -568,7 +573,7 @@ func (F *FP12) Compow(e *BIG,r *BIG) *FP4 {
 	cpm2:=g2.trace()
 
 	c=c.xtr_pow2(cp,cpm1,cpm2,a,b)
-	return c;
+	return c
 }
 
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */

@@ -573,6 +573,12 @@ final public class FP12
     
         var c=g1.trace()
 
+	if b.iszilch() 
+	{
+		c=c.xtr_pow(e)
+		return c
+	}
+
         g2.frob(f)
         let cp=g2.trace()
         g1.conj()

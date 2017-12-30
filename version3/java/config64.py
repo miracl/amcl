@@ -173,16 +173,17 @@ print("17. BN254")
 print("18. BN254CX")
 print("19. BLS383")
 print("20. FP256BN")
-print("21. FP512BN\n")
+print("21. FP512BN")
+print("22. BLS461\n")
 
 print("RSA")
-print("22. RSA2048")
-print("23. RSA3072")
-print("24. RSA4096")
+print("23. RSA2048")
+print("24. RSA3072")
+print("25. RSA4096")
 
 selection=[]
 ptr=0
-max=25
+max=26
 
 curve_selected=False
 pfcurve_selected=False
@@ -281,25 +282,27 @@ while ptr<max:
 	if x==21:
 		curveset("FP512BN","64","60","512","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","POSITIVEX")
 		pfcurve_selected=True
-
-
+# https://eprint.iacr.org/2017/334.pdf
+	if x==22:
+		curveset("BLS461","58","60","461","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX")
+		pfcurve_selected=True
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
 # The RSA name reflects the modulus size, which is a 2^m multiplier
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==22:
+	if x==23:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("RSA2048","128","58","2")
 		#rsaset("RSA2048","64","60","4")
 		#rsaset("RSA2048","32","56","8")
 		rsa_selected=True
-	if x==23:
+	if x==24:
 		rsaset("RSA3072","48","56","8")
 		rsa_selected=True
-	if x==24:
+	if x==25:
 		#rsaset("RSA4096","32","56","16")
 		rsaset("RSA4096","64","60","8")
 		rsa_selected=True

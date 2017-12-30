@@ -211,6 +211,47 @@ ROM_FIELD_BLS383 = function() {
     return ROM_FIELD_BLS383;
 };
 
+
+
+ROM_FIELD_BLS461 = function() {
+
+    /*
+    	Licensed to the Apache Software Foundation (ASF) under one
+    	or more contributor license agreements.  See the NOTICE file
+    	distributed with this work for additional information
+    	regarding copyright ownership.  The ASF licenses this file
+    	to you under the Apache License, Version 2.0 (the
+    	"License"); you may not use this file except in compliance
+    	with the License.  You may obtain a copy of the License at
+    	
+    	http://www.apache.org/licenses/LICENSE-2.0
+
+    	Unless required by applicable law or agreed to in writing,
+    	software distributed under the License is distributed on an
+    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    	KIND, either express or implied.  See the License for the
+    	specific language governing permissions and limitations
+    	under the License.
+    */
+
+    /* Fixed Data in ROM - Field and Curve parameters */
+
+    var ROM_FIELD_BLS461 = {
+
+        // BLS461 Modulus 
+        // Base Bits= 23
+		Modulus: [0x2AAAAB,0x155,0x2AAAB0,0x2AAA55,0x55,0x80004,0x555FC0,0x135548,0x1CC00F,0x3FF4B8,0x2D0AA3,0x58A424,0x2CCA47,0x465B17,0x6F5BC7,0xA49AF,0x55D694,0x34AAB4,0x155535,0x2AAAAA,0x1],
+		R2modp: [0x621498,0x3B585F,0x41688,0x6F780D,0x17C239,0x158D8A,0x491A92,0x737DF1,0x22A06,0x460263,0x275FF2,0x5496C3,0x6D4AD2,0x3A7B46,0x3A6323,0x1723B1,0x76204B,0x66FD26,0x4E743E,0x1BE66E,0x0],
+		MConst: 0x7FFFFD,
+		Fra: [0x12A3A,0x2F7F37,0x3DC4,0x52CCE2,0x1C6308,0xB7F14,0x4381D4,0x52D328,0x58D45F,0x359C90,0x1DC2CC,0x616582,0x7C61EB,0x6B11C5,0x64341C,0x421B30,0x4DFEFA,0x3CABC4,0x12DFDA,0x172028,0x1],
+		Frb: [0x298071,0x50821E,0x2A6CEB,0x57DD73,0x639D4C,0x7C80EF,0x11DDEB,0x408220,0x43EBAF,0xA5827,0xF47D7,0x773EA2,0x30685B,0x5B4951,0xB27AA,0x482E7F,0x7D799,0x77FEF0,0x2755A,0x138A82,0x0],
+
+    };
+
+    return ROM_FIELD_BLS461;
+};
+
+
 ROM_FIELD_FP256BN = function() {
 
     /*

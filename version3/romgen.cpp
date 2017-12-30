@@ -153,6 +153,7 @@ void help()
 		printf("19. BLS383\n");
 		printf("20. FP256BN\n");
 		printf("21. FP512BN\n");
+		printf("22. BLS461\n");
 
 		printf("\nromgen curve wordlength basebits language\n");
 		printf("where wordlength is 16, 32 or 64\n");
@@ -741,7 +742,7 @@ int main(int argc, char **argv)
 		modtype=NOT_SPECIAL;
 		curve_a=0;
 		mip->IOBASE=16;
-		x=(char *)"11000001000000040";
+		x=(char *)"11000001000000040";              // SIGN_OF_X is POSITIVE
 		p=(pow(x,6)-2*pow(x,5)+2*pow(x,3)+x+1)/3;
 		t=x+1;
 		r=pow(x,4)-x*x+1;
@@ -755,6 +756,37 @@ int main(int argc, char **argv)
 		curve_b=9;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
 		mip->TWIST=MR_SEXTIC_D;
+
+		P.set(gx,gy);
+		P*=cof;
+		P.get(gx,gy);
+	}
+
+
+	if (strcmp(curvename,"BLS461")==0)
+	{
+		curve=22;
+		printf("Curve= BLS461\n");
+		mbits=461;
+		words=(1+((mbits-1)/bb));
+		curvetype=WEIERSTRASS;
+		modtype=NOT_SPECIAL;
+		curve_a=0;
+		mip->IOBASE=16;
+		x=(char *)"1FFFFFFBFFFE00000000";              // SIGN_OF_X is NEGATIVE
+		p=(pow(x,6)+2*pow(x,5)-2*pow(x,3)-x+1)/3;
+		t=-x+1;
+		r=pow(x,4)-x*x+1;
+		cof=(p+1-t)/r;
+
+
+
+//	cout << "cof= " << (p+1-t)/q << endl;
+
+		gx=-2; gy=-1;
+		curve_b=9;
+		ecurve((Big)0,curve_b,p,MR_AFFINE);
+		mip->TWIST=MR_SEXTIC_M;
 
 		P.set(gx,gy);
 		P*=cof;
@@ -1134,4 +1166,81 @@ int main(int argc, char **argv)
 		cout << close;
 		cout << close << term << endl;
 	}
+
+	if (curve==22)
+	{
+		cout << endl;
+		set_frobenius_constant(X);
+		X.get(a,b);
+		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
+
+		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1 ; output(chunk,words,x,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
+	
+		zcru=pow((ZZn)2,(p-1)/3);
+		//zcru*=zcru;   // right cube root of unity
+		cru=(Big)zcru;
+
+		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
+
+		while (!Q.set(randn2())) ;
+
+		TT=t*t-2*p;
+		PP=p*p;
+		FF=sqrt((4*PP-TT*TT)/3);
+		np=PP+1-(-3*FF+TT)/2;  // 2 possibilities...
+
+		Q=(np/r)*Q;
+
+		Q.get(Xa,Ya);
+		Xa.get(a,b);
+		cout << pre1 << toupperit((char *)"CURVE_Pxa",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pxb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+		Ya.get(a,b);
+		cout << pre1 << toupperit((char *)"CURVE_Pya",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pyb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+
+		Q*=r;
+		if (!Q.iszero())
+		{
+			cout << "**** Failed ****" << endl;
+			cout << "\nQ= " << Q << endl << endl;
+		}
+
+		cout << pre3 << "CURVE_W" << post3 << open; output(chunk,words,(Big)0,m);cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
+		cout << pre4 << "CURVE_SB" << post4 << open; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close;cout << ","; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close; cout << close << term << endl;
+
+		cout << pre5 << "CURVE_WB" << post5 << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
+	
+		cout << pre6 << "CURVE_BB" << post6 << open; 
+		cout << open;
+		output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+
+		cout << ","; cout << open;output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+
+		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+		cout << close << term << endl;
+
+	}
+
+
 }

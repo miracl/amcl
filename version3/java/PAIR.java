@@ -292,7 +292,6 @@ public final class PAIR {
 				r.smul(lv,ECP.SEXTIC_TWIST);
 				P.neg(); R.neg();
 			}
-
 		}
 
 

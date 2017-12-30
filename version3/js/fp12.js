@@ -522,6 +522,13 @@ FP12 = function(ctx) {
             g1.copy(this);
 
             var c = g1.trace();
+
+			if (b.iszilch())
+			{
+				c=c.xtr_pow(e);
+				return c;
+			}
+
             g2.copy(g1);
             g2.frob(f);
             var cp = g2.trace();

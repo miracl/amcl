@@ -422,6 +422,12 @@ void YYY::FP12_compow(FP4 *c,FP12 *x,BIG e,BIG r)
 
     FP12_trace(c,&g1);
 
+	if (BIG_iszilch(b))
+	{
+		FP4_xtr_pow(c,c,e);
+		return;
+	}
+
     FP12_frob(&g2,&f);
     FP12_trace(&cp,&g2);
 

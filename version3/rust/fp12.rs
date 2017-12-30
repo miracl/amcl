@@ -576,6 +576,11 @@ impl FP12 {
 
 		let mut c=g1.trace();
 
+		if b.iszilch() {
+			c=c.xtr_pow(&mut a);
+			return c;
+		}
+
 		g2.frob(&f);
 		let cp=g2.trace();
 		g1.conj();

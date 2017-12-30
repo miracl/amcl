@@ -610,6 +610,12 @@ t1.norm();
 
 		FP4 c=g1.trace();
 
+		if (b.iszilch())
+		{
+			c=c.xtr_pow(e);
+			return c;
+		}
+
 		g2.frob(f);
 		FP4 cp=g2.trace();
 		g1.conj();

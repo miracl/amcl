@@ -336,6 +336,21 @@ var CTXLIST = {
 		"@SX": 0
     },
 
+    "BLS461": {
+        "BITS": "464",
+        "FIELD": "BLS461",
+        "CURVE": "BLS461",
+        "@NB": 58,
+        "@BASE": 23,
+        "@NBT": 461,
+        "@M8": 3,
+        "@MT": 0,
+        "@CT": 0,
+        "@PF": 2,
+		"@ST": 1,
+		"@SX": 1
+    },
+
     "RSA2048": {
         "BITS": "1024",
         "TFF": "2048",
@@ -459,6 +474,9 @@ CTX = function(input_parameter) {
                 case "BLS383":
                     this.ROM_CURVE = ROM_CURVE_BLS383();
                     break;
+                case "BLS461":
+                    this.ROM_CURVE = ROM_CURVE_BLS461();
+                    break;
                 default:
                     this.ROM_CURVE = undefined;
             };
@@ -515,6 +533,9 @@ CTX = function(input_parameter) {
                     break;
                 case "BLS383":
                     this.ROM_FIELD = ROM_FIELD_BLS383();
+                    break;
+                case "BLS461":
+                    this.ROM_FIELD = ROM_FIELD_BLS461();
                     break;
                 default:
                     this.ROM_FIELD = undefined;

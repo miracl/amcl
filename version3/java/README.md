@@ -7,7 +7,7 @@ configured library can be built using maven.
 
 Tests will take a while to  run.
 
-As a quick example execute
+As a quick example copy to a working directory and execute
 
 py config64.py
 
@@ -15,11 +15,11 @@ or perhaps
 
 python3 config64.py
 
-Choose options 1, 17 and 22, for example.
+Choose options 1, 17 and 23, for example.
 
 Once the library is configured, you can compile and install with maven:
 
 cd amcl
 mvn clean install
 
-Testing will be carried outd uring the installation process.
+Testing will be carried out during the installation process.

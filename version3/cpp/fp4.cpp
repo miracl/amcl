@@ -447,7 +447,7 @@ void YYY::FP4_xtr_pow2(FP4 *r,FP4 *ck,FP4 *cl,FP4 *ckml,FP4 *ckm2l,BIG a,BIG b)
     FP4 t,cu,cv,cumv,cum2v;
 
     BIG_norm(a);
-    BIG_norm(b);
+	BIG_norm(b);
     BIG_copy(e,a);
     BIG_copy(d,b);
     FP4_copy(&cu,ck);
