@@ -306,15 +306,15 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 
         if (bt==-1)
         {
-			ECP2_ZZZ_neg(P); ECP2_ZZZ_neg(R);
-
+			ECP2_ZZZ_neg(P); 
             PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
             FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+			ECP2_ZZZ_neg(P);
 
+			ECP2_ZZZ_neg(R);
             PAIR_ZZZ_line(&lv,&B,R,&Sx,&Sy);
             FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-
-			ECP2_ZZZ_neg(P); ECP2_ZZZ_neg(R);
+			ECP2_ZZZ_neg(R);
         }
 
         //FP12_YYY_sqr(r,r);

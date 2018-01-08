@@ -247,12 +247,14 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 			r.smul(lv,SEXTIC_TWIST)
 		}
 		if bt==-1 {
-			P.neg(); R.neg()
+			P.neg(); 
 			lv=line(A,P,Qx,Qy)
 			r.smul(lv,SEXTIC_TWIST)
+			P.neg(); 
+			R.neg()
 			lv=line(B,R,Sx,Sy)
 			r.smul(lv,SEXTIC_TWIST)
-			P.neg(); R.neg()
+			R.neg()
 		}
 	}
 

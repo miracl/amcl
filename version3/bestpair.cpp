@@ -5,7 +5,8 @@
 //
 // Further tests may be needed to ensure full satisfaction (e.g. twist security, even x, etc.)
 //
-
+// Note that finding curves that are both GT and G2 Strong, can take a while
+//
 // Some possible rational points on y^2=x^3+b (x^3+b is a perfect square)
 
 // b=1, x=0, -1 or 2
@@ -43,9 +44,9 @@ Miracl precision=200;
 
 int main(int argc, char *argv[])
 {
-	int HW,BITS,S,type;
+	int HW,BITS,S,type,opw;
     int i,j,k,m,jj,bt,ns,hw,twist,notanaf,pb,nb,b,cb[40],oc,ip;
-	BOOL G2,GT,gotH,gotB,gotT;
+	BOOL G2,GT,gotH,gotB,gotT,progress;
     Big set,msb,c,r,limit,m1,n,p,q,t,x,y,w,X,Y,cof,cof2,coft,tau[5];
     Big PP,TT,FF;
 	Big xp[256];
@@ -62,16 +63,17 @@ int main(int argc, char *argv[])
        cout << "bestpair type bits Hamming-weight" << endl;
 	   cout << "where type is the curve (BN, BLS12, BLS24)" << endl;
 	   cout << "where bits is number of bits in curve x parameter (>30 and <200)" << endl;
-       cout << "and hamming-weight is the number of non-zero bits (>2 and <8)" << endl;
+       cout << "and hamming-weight is the number of non-zero bits (>2 and <10)" << endl;
        cout << "e.g. bestpair BLS12 77 3" << endl;
 	   cout << "Use flag /GT for GT-Strong curves" << endl;
 	   cout << "Use flag /G2 for G2-Strong curves" << endl;
+	   cout << "Use flag /P to show progress" << endl;
 
        exit(0);
     }
 
 	ip=0; HW=0; BITS=0; 
-	G2=GT=gotB=gotH=gotT=FALSE;
+	G2=GT=gotB=gotH=gotT=progress=FALSE;
 
 	while (ip<argc)
 	{
@@ -93,16 +95,22 @@ int main(int argc, char *argv[])
 			gotT=TRUE;
 			type=BLS24;
 		}
-		if (strcmp(argv[ip],"/G2")==0)
+		if (!G2 && strcmp(argv[ip],"/G2")==0)
 		{
 			ip++;
 			G2=TRUE;
 			continue;
 		}
-		if (strcmp(argv[ip],"/GT")==0)
+		if (!GT && strcmp(argv[ip],"/GT")==0)
 		{
 			ip++;
 			GT=TRUE;
+			continue;
+		}
+		if (!progress && strcmp(argv[ip],"/P")==0)
+		{
+			ip++;
+			progress=TRUE;
 			continue;
 		}
 		if (!gotB)
@@ -123,7 +131,7 @@ int main(int argc, char *argv[])
         return 0;
 
 	}
-    if (!gotH || !gotB || !gotT || HW>=8 || HW<2 || BITS>=200 || BITS<30)
+    if (!gotH || !gotB || !gotT || HW>9 || HW<2 || BITS>=200 || BITS<30)
     {
         cout << "Error in command line" << endl;
         return 0;
@@ -138,6 +146,7 @@ int main(int argc, char *argv[])
 
 	S=0;
 	oc=0;
+	opw=0;
 	while (set<limit)
 	{
 		c=land(set,2*msb-set);  /* Gosper's hack */
@@ -162,6 +171,12 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		if (progress)
+		{
+			if (opw!=pw[j-2])
+				cout << pw[j-2] << " " << BITS << endl;
+			opw=pw[j-2];
+		}
 		// iterate through all combinations of + and - terms
 		for (i=0;i<(1<<j);i++)
 		{
@@ -278,7 +293,7 @@ int main(int argc, char *argv[])
 			{
 				if (!prime(cof2)) continue;
 			}
-			//cout << "x= " << x << endl;  // to show progress
+
 			if (GT)
 			{
 				if (!prime(coft)) continue;

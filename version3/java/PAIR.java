@@ -285,12 +285,14 @@ public final class PAIR {
 			}
 			if (bt==-1)
 			{
-				P.neg(); R.neg();
+				P.neg(); 
 				lv=line(A,P,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
+				P.neg(); 
+				R.neg();
 				lv=line(B,R,Sx,Sy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				P.neg(); R.neg();
+				R.neg();
 			}
 		}
 

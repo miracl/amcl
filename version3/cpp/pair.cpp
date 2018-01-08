@@ -304,16 +304,15 @@ void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
         }
 		if (bt==-1)
 		{
-			ECP2_neg(P); ECP2_neg(R);
+			ECP2_neg(P); 
             PAIR_line(&lv,&A,P,&Qx,&Qy);
             FP12_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-
+			ECP2_neg(P); 
+			ECP2_neg(R);
             PAIR_line(&lv,&B,R,&Sx,&Sy);
             FP12_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			ECP2_neg(P); ECP2_neg(R);
+			ECP2_neg(R);
 		}
-
-
 	}
 
 

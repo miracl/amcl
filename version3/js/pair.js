@@ -271,12 +271,14 @@ PAIR = function(ctx) {
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 }
                 if (bt == -1) {
-					P.neg(); R.neg();
+					P.neg(); 
                     lv = PAIR.line(A, P, Qx, Qy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
+					P.neg(); 
+					R.neg();
                     lv = PAIR.line(B, R, Sx, Sy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-					P.neg(); R.neg();
+					R.neg();
                 }
             }
 
