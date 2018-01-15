@@ -42,15 +42,69 @@ using namespace std;
 
 Miracl precision=200;
 
+// Number of ways of selecting k items from n
+Big combo(int n,int k)
+{ // calculate n C k
+	int i;
+	Big c,d;
+
+	d=1;
+	for (i=2;i<=k;i++)
+		d*=i;
+
+	c=1;
+	for (i=n;i>n-k;i--)
+		c*=i;
+
+	c/=d;
+	return c;
+}
+
+// Number of candidates to be searched.
+Big count(int b,int h)
+{
+	Big c=combo(b-h+1,h-1)+combo(b-h+1,h-2);
+	c*=pow((Big)2,h);
+	return c;
+}
+
+// Move to next NAF pattern
+int iterate(int *x,int n)
+{
+	int i,j,k,gotone=0;
+	for (i=0;i<n-1;i++)
+	{
+		if (x[i]==1 && x[i+2]==0)
+		{
+			gotone=1;
+			x[i+1]=1;
+			x[i]=0;
+			if (x[0]==1) break;
+			for (k=1;;k++)
+				if (x[k]!=0) break;
+			for (j=0;j<i-k;j+=2)
+			{
+				x[j]=x[j+k];
+				x[j+k]=0;
+			}
+			break;
+		}
+		
+	}
+	return gotone;
+}
+
 int main(int argc, char *argv[])
 {
-	int HW,BITS,S,type,opw;
-    int i,j,k,m,jj,bt,ns,hw,twist,notanaf,pb,nb,b,cb[40],oc,ip;
+	int HW,BITS,S,type,xm8,xm3,xm24,percent,pc;
+	Big cnt,odds,total;
+    int i,j,k,m,jj,bt,hw,twist,pb,nb,b,cb[40],ip;
+	int xb[256];
 	BOOL G2,GT,gotH,gotB,gotT,progress;
-    Big set,msb,c,r,limit,m1,n,p,q,t,x,y,w,X,Y,cof,cof2,coft,tau[5];
+    Big msb,c,r,m1,n,p,q,t,x,y,w,X,Y,cof,cof2,coft,tau[5];
     Big PP,TT,FF;
-	Big xp[256];
-	int pw[256];
+	Big xp[10];
+	int pw[10];
     miracl *mip=&precision;
     ECn P;
 
@@ -63,7 +117,7 @@ int main(int argc, char *argv[])
        cout << "bestpair type bits Hamming-weight" << endl;
 	   cout << "where type is the curve (BN, BLS12, BLS24)" << endl;
 	   cout << "where bits is number of bits in curve x parameter (>30 and <200)" << endl;
-       cout << "and hamming-weight is the number of non-zero bits (>2 and <10)" << endl;
+       cout << "and hamming-weight is the number of non-zero bits (>1 and <10)" << endl;
        cout << "e.g. bestpair BLS12 77 3" << endl;
 	   cout << "Use flag /GT for GT-Strong curves" << endl;
 	   cout << "Use flag /G2 for G2-Strong curves" << endl;
@@ -137,49 +191,81 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-	mip->IOBASE=16;
-
 	hw=HW-1;
 	msb=pow((Big)2,BITS);
-	set=msb+(1<<hw)-1;   
-	limit=msb+(Big)((1<<hw)-1)*pow((Big)2,(BITS-hw));
+
+	for (i=0;i<=BITS;i++)
+		xb[i]=0;
+
+	for (i=0;i<hw;i++)
+		xb[2*i]=1;
 
 	S=0;
-	oc=0;
-	opw=0;
-	while (set<limit)
+
+	total=count(BITS,HW);
+	cout << "search " << total << " candidates" << endl;
+
+// very approximate estimate of odds of success. Assumes primes are not correlated (but they are!)
+	if (type==BN)
 	{
-		c=land(set,2*msb-set);  /* Gosper's hack */
-		if (c==1) oc=0;
-		else oc++;
-		r=set+c;
-		set=lxor(r,set)>>(oc+2);
-		set=lxor(r,set)+land(r,set);
+		odds = (7*(4*BITS+5)/10)*(7*(4*BITS+5)/10);
+		if (G2)
+			odds*=(7*(4*BITS+5)/10);
+		if (GT)
+			odds*=(7*(12*BITS+16)/10);
+	}
+	if (type==BLS12)
+	{
+		odds = ((7*4*BITS)/10)*((7*6*BITS)/10);
+		if (G2)
+			odds*=(7*(8*BITS)/10);
+		if (GT)
+			odds*=(7*(20*BITS)/10);
+	}
+	if (type==BLS24)
+	{
+		odds = ((7*8*BITS)/10)*((7*10*BITS)/10);
+		if (G2)
+			odds*=(7*(32*BITS)/10);
+		if (GT)
+			odds*=(7*(72*BITS)/10);
+	}
+	odds/=8;  // frig factor
+	cout << "one in " << odds << " expected to be OK" << endl;
 
-		x=set;
-
-		w=land(x,2*x);
-		if (w!=0 && w!=msb) continue; // not a NAF
-
-		for (i=j=0;i<=BITS;i++)
+//	gprime(1000);
+	percent=-1;
+	cnt=0;
+	for (;;)
+	{
+		if (cnt>0 && !iterate(xb,BITS)) break;
+		for (i=j=0;i<BITS;i++)
 		{ // assign values to set bits
-			if (bit(x,i)==1)
+			if (xb[i]==1)
 			{
 				xp[j]=pow((Big)2,i);
 				pw[j]=i;
 				j++;
 			}
 		}
+		xp[j]=msb;
+		pw[j]=BITS;
+		j++;
 
-		if (progress)
-		{
-			if (opw!=pw[j-2])
-				cout << pw[j-2] << " " << BITS << endl;
-			opw=pw[j-2];
-		}
 		// iterate through all combinations of + and - terms
 		for (i=0;i<(1<<j);i++)
 		{
+			cnt+=1; 
+			if (progress)
+			{
+				pc=toint((100*cnt)/total);
+
+				if (percent<pc)
+				{
+					percent=pc;
+					cout << pc << "\%" << endl;
+				}
+			}
 			x=0;
 			bt=1;
 			//cout << "x= ";
@@ -192,25 +278,50 @@ int main(int argc, char *argv[])
 
 			if (type==BLS12)
 			{
+				xm24=x%24;
+				if (x<0) xm24+=24;
+				xm24%=24;
+				xm3=xm24%3;
+				if (xm3!=1) continue;   // quick exit for p%3=0
+				xm8=xm24%8;
+				if (xm8!=0 && xm8!=7) continue;  // quick exit for p=3 mod 8 condition
+
 				p=pow(x,6)-2*pow(x,5)+2*pow(x,3)+x+1;
 				t=x+1;
+
 				if (p%3!=0) continue;
 				p/=3;
+
 				n=p+1-t;
 				q=pow(x,4)-x*x+1;
 			}
 			if (type==BLS24)
 			{
+				xm24=x%24;
+				if (x<0) xm24+=24;
+				xm24%=24;
+				xm3=xm24%3;
+				if (xm3!=1) continue;   // quick exit for p%3=0
+				xm8=xm24%8;
+				if (xm8!=0 && xm8!=7) continue;  // quick exit for p=3 mod 8 condition
+
 				p=1+x+x*x-pow(x,4)+2*pow(x,5)-pow(x,6)+pow(x,8)-2*pow(x,9)+pow(x,10);
 				t=x+1;
+
 				if (p%3!=0) continue;
 				p/=3;
+
 				n=p+1-t;
 				q=pow(x,8)-pow(x,4)+1;
 			}
 
 			if (type==BN)
 			{
+				xm8=x%8;
+				if (x<0) xm8+=8;
+				xm8%=8;
+				if (xm8!=3 && xm8!=7) continue;  // quick exit for p=3 mod 8 condition
+
 				p=36*pow(x,4)+36*pow(x,3)+24*x*x+6*x+1;
 				t=6*x*x+1;
 				n=p+1-t;
@@ -394,6 +505,7 @@ int main(int argc, char *argv[])
 			cout << "Solution " << S << endl;
 			x=0;
 			bt=1;
+			mip->IOBASE=16;
 
 			cout << "x= ";
 			for (k=0;k<j;k++)
@@ -403,7 +515,6 @@ int main(int argc, char *argv[])
 				bt<<=1;
 			}
 			cout << " = " << x << endl;
-
 			cout << "Curve is y^2=x^3+" << b << endl;
 			if (m>0)
 			{
@@ -414,10 +525,25 @@ int main(int argc, char *argv[])
 			cout << "\np= " << p << " (" << bits(p) << " bits)";
 			if (twist==MR_SEXTIC_D) cout << " D-Type" << endl;
 			if (twist==MR_SEXTIC_M) cout << " M-Type" << endl;
-		//	mip->IOBASE=10;
+			if (progress) cout << endl;
+			mip->IOBASE=10;
 		//	cout << "twist= " << p+1+t << endl;
-		//	mip->IOBASE=16;
-
 		}
 	}
+
+	cout << endl;
+	cout << cnt << " solutions searched" << endl;
+
+	if (S==0)
+	{
+		cout << "No solutions found" << endl;
+		return 0;
+	}
+	if (S==1)
+	{
+		cout << "One solution found" << endl;
+		return 0;
+	}
+	cout << S << " solutions found" << endl;
+	return 0;
 }
