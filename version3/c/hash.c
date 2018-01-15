@@ -498,7 +498,7 @@ void SHA3_hash(sha3 *sh,char *hash)
 	else
 	{
 		SHA3_process(sh,0x06);   /* 0x06 for SHA-3 */
-		while (sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
+		while ((int)sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
 		SHA3_process(sh,0x80); /* this will force a final transform */
 	}
 	SHA3_squeeze(sh,hash,sh->len);
@@ -511,7 +511,7 @@ void SHA3_shake(sha3 *sh,char *buff,int len)
 	else
 	{
 		SHA3_process(sh,0x1f);   // 0x06 for SHA-3 !!!!
-		while (sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
+		while ((int) sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
 		SHA3_process(sh,0x80); /* this will force a final transform */
 	}
 	SHA3_squeeze(sh,buff,len);

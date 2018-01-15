@@ -361,6 +361,28 @@ int ECP_ZZZ_setx(ECP_ZZZ *P,BIG_XXX x,int s)
     return 1;
 }
 
+/* map BIG to point on curve of correct order */
+/* The BIG should be the output of some hash function */
+
+void ECP_ZZZ_mapit(ECP_ZZZ *P,octet *W)
+{
+    BIG_XXX q,x;
+    BIG_XXX_fromBytes(x,W->val);
+    BIG_XXX_rcopy(q,Modulus_YYY);
+    BIG_XXX_mod(x,q);
+    int k=0;
+
+    while (!ECP_ZZZ_setx(P,x,0))
+	{
+        BIG_XXX_inc(x,1); k++; BIG_XXX_norm(x);
+	}
+#if PAIRING_FRIENDLY_ZZZ == BLS
+    BIG_XXX c;
+    BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
+    ECP_ZZZ_mul(P,c);
+#endif
+}
+
 #endif
 
 /* Convert P to Affine, from (x,y,z) to (x,y) */
@@ -431,7 +453,7 @@ void ECP_ZZZ_outputxyz(ECP_ZZZ *P)
 /* Output point P */
 void ECP_ZZZ_output(ECP_ZZZ *P)
 {
-	BIG_XXX x,y;
+  BIG_XXX x;
     if (ECP_ZZZ_isinf(P))
     {
         printf("Infinity\n");
@@ -439,6 +461,7 @@ void ECP_ZZZ_output(ECP_ZZZ *P)
     }
     ECP_ZZZ_affine(P);
 #if CURVETYPE_ZZZ!=MONTGOMERY
+    BIG_XXX y;
     FP_YYY_redc(x,&(P->x));
     FP_YYY_redc(y,&(P->y));
     printf("(");
@@ -458,7 +481,7 @@ void ECP_ZZZ_output(ECP_ZZZ *P)
 /* Output point P */
 void ECP_ZZZ_rawoutput(ECP_ZZZ *P)
 {
-	BIG_XXX x,y,z;
+     BIG_XXX x,z;
 //   if (ECP_ZZZ_isinf(P))
  //   {
  //       printf("Infinity\n");
@@ -466,6 +489,7 @@ void ECP_ZZZ_rawoutput(ECP_ZZZ *P)
  //   }
 //    ECP_ZZZ_affine(P);
 #if CURVETYPE_ZZZ!=MONTGOMERY
+    BIG_XXX y;
     FP_YYY_redc(x,&(P->x));
     FP_YYY_redc(y,&(P->y));
     FP_YYY_redc(z,&(P->z));
@@ -1320,26 +1344,6 @@ void ECP_ZZZ_mul2(ECP_ZZZ *P,ECP_ZZZ *Q,BIG_XXX e,BIG_XXX f)
 #endif
 
 
-/* map BIG to point on curve of correct order */
-/* The BIG should be the output of some hash function */
-
-void ECP_ZZZ_mapit(ECP_ZZZ *P,octet *W)
-{
-    BIG_XXX q,c,x;
-	BIG_XXX_fromBytes(x,W->val);
-    BIG_XXX_rcopy(q,Modulus_YYY);
-    BIG_XXX_mod(x,q);
-	int k=0;
-
-    while (!ECP_ZZZ_setx(P,x,0))
-	{
-        BIG_XXX_inc(x,1); k++; BIG_XXX_norm(x);
-	}
-#if PAIRING_FRIENDLY_ZZZ == BLS
-    BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
-    ECP_ZZZ_mul(P,c);
-#endif
-}
 
 #ifdef HAS_MAIN
 

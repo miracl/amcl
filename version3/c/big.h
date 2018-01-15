@@ -1,3 +1,29 @@
+/*
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
+*/
+
+/**
+ * @file big.h
+ * @author Mike Scott
+ * @brief BIG Header File
+ *
+ */
+
 #ifndef BIG_XXX_H
 #define BIG_XXX_H
 
@@ -10,9 +36,9 @@
 
 //#define UNWOUND
 
-#define BIGBITS_XXX (8*MODBYTES_XXX)
-#define NLEN_XXX (1+((8*MODBYTES_XXX-1)/BASEBITS_XXX))
-#define DNLEN_XXX 2*NLEN_XXX
+#define BIGBITS_XXX (8*MODBYTES_XXX) /**< Length in bits */
+#define NLEN_XXX (1+((8*MODBYTES_XXX-1)/BASEBITS_XXX)) /**< length in bytes */
+#define DNLEN_XXX 2*NLEN_XXX /**< Double length in bytes */
 #define BMASK_XXX (((chunk)1<<BASEBITS_XXX)-1) /**< Mask = 2^BASEBITS-1 */
 #define NEXCESS_XXX (1<<(CHUNK-BASEBITS_XXX-1))           /**< 2^(CHUNK-BASEBITS-1) - digit cannot be multiplied by more than this before normalisation */
 
@@ -511,17 +537,17 @@ extern void BIG_XXX_mod2m(BIG_XXX x,int m);
 /**	@brief Calculates a*b+c+*d
  *
 	Calculate partial product of a.b, add in carry c, and add total to d
-	@param a multiplier
-	@param b multiplicand
+	@param x multiplier
+	@param y multiplicand
 	@param c carry
-	@param d pointer to accumulated bottom half of result
+	@param r pointer to accumulated bottom half of result
 	@return top half of result
  */
 
 #ifdef dchunk
 
 /* Method required to calculate x*y+c+r, bottom half in r, top half returned */
-inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
+static inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
 {
     dchunk prod=(dchunk)x*y+c+*r;
     *r=(chunk)prod&BMASK_XXX;
@@ -533,7 +559,7 @@ inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
 /* No integer type available that can store double the wordlength */
 /* accumulate partial products */
 
-inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
+static inline chunk muladd_XXX(chunk x,chunk y,chunk c,chunk *r)
 {
     chunk x0,x1,y0,y1;
     chunk bot,top,mid,carry;

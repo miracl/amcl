@@ -1,3 +1,29 @@
+/*
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
+*/
+
+/**
+ * @file fp.h
+ * @author Mike Scott
+ * @brief FP Header File
+ *
+ */
+
 #ifndef FP_YYY_H
 #define FP_YYY_H
 
@@ -22,11 +48,11 @@ extern const BIG_XXX R2modp_YYY;	/**< Montgomery constant */
 extern const chunk MConst_YYY;		/**< Constant associated with Modulus - for Montgomery = 1/p mod 2^BASEBITS */
 
 
-#define MODBITS_YYY MBITS_YYY
-#define TBITS_YYY (MBITS_YYY%BASEBITS_XXX)                    /**< Number of active bits in top word */
-#define TMASK_YYY (((chunk)1<<TBITS_YYY)-1)               /**< Mask for active bits in top word */
-#define FEXCESS_YYY ((sign32)1<<MAXXES_YYY)				/**< 2^(BASEBITS*NLEN-MODBITS) - normalised BIG can be multiplied by more than this before reduction */
-#define OMASK_YYY (-((chunk)(1)<<TBITS_YYY))              /**<  for masking out overflow bits */
+#define MODBITS_YYY MBITS_YYY                        /**< Number of bits in Modulus for selected curve */
+#define TBITS_YYY (MBITS_YYY%BASEBITS_XXX)           /**< Number of active bits in top word */
+#define TMASK_YYY (((chunk)1<<TBITS_YYY)-1)          /**< Mask for active bits in top word */
+#define FEXCESS_YYY ((sign32)1<<MAXXES_YYY)	     /**< 2^(BASEBITS*NLEN-MODBITS) - normalised BIG can be multiplied by more than this before reduction */
+#define OMASK_YYY (-((chunk)(1)<<TBITS_YYY))         /**<  for masking out overflow bits */
 
 //#define FUSED_MODMUL
 //#define DEBUG_REDUCE

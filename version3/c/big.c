@@ -35,9 +35,9 @@ int BIG_XXX_iszilch(BIG_XXX a)
 int BIG_XXX_isunity(BIG_XXX a)
 {
     int i;
-    for (i=1; i<NLEN_XXX; i++)
-        if (a[i]!=0) return 0;
-	if (a[0]!=1) return 0;
+    for(i=1; i<NLEN_XXX; i++)
+      if (a[i]!=0) return 0;
+    if (a[0]!=1) return 0;
     return 1;
 }
 
@@ -603,7 +603,7 @@ void BIG_XXX_mul(DBIG_XXX c,BIG_XXX a,BIG_XXX b)
 /* SU= 80 */
 void BIG_XXX_sqr(DBIG_XXX c,BIG_XXX a)
 {
-    int i,j,last;
+    int i,j;
 #ifdef dchunk
     dchunk t,co;
 #endif

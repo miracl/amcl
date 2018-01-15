@@ -292,7 +292,7 @@ int tdadd=0,rdadd=0,tdneg=0,rdneg=0;
 void FP_YYY_mul(FP_YYY *r,FP_YYY *a,FP_YYY *b)
 {
     DBIG_XXX d;
-    chunk ea,eb;
+//    chunk ea,eb;
 //    BIG_XXX_norm(a);
 //    BIG_XXX_norm(b);
 //    ea=EXCESS_YYY(a->g);
@@ -321,10 +321,6 @@ void FP_YYY_mul(FP_YYY *r,FP_YYY *a,FP_YYY *b)
 /* SU= 136 */
 void FP_YYY_imul(FP_YYY *r,FP_YYY *a,int c)
 {
-    DBIG_XXX d;
-	BIG_XXX k;
-	FP_YYY f;
- 
     int s=0;
    
     if (c<0)
@@ -333,14 +329,16 @@ void FP_YYY_imul(FP_YYY *r,FP_YYY *a,int c)
         s=1;
     }
    
-#if MODTYPE_YYY==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE
-	
+#if MODTYPE_YYY==PSEUDO_MERSENNE || MODTYPE_YYY==GENERALISED_MERSENNE
+        DBIG_XXX d;	
 	BIG_XXX_pxmul(d,a->g,c);
 	FP_YYY_mod(r->g,d);
 	r->XES=2;
 
 #else
 	//Montgomery
+        BIG_XXX k;
+        FP_YYY f;
 	if (a->XES*c<=FEXCESS_YYY)
 	{
 		BIG_XXX_pmul(r->g,a->g,c);

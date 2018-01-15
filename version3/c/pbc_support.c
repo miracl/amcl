@@ -24,7 +24,7 @@ under the License.
 #include <stdlib.h>
 #include <time.h>
 
-#include "mpin_support.h"
+#include "pbc_support.h"
 
 /* general purpose hash function w=hash(p|n|x|y) */
 void mhashit(int sha,int n,octet *x,octet *w)
