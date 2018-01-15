@@ -1,3 +1,29 @@
+/*
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
+*/
+
+/**
+ * @file ecdh_support.h
+ * @author Mike Scott
+ * @brief ECDH Support Header File
+ *
+ */
+
 #ifndef ECC_SUPPORT_H
 #define ECC_SUPPORT_H
 
@@ -5,7 +31,16 @@
 
 /* Auxiliary Functions */
 
-extern void ehashit(int ,octet *,int ,octet *,octet *,int);
+/** @brief general purpose hash function w=hash(p|n|x|y)
+ *
+	@param sha is the hash type
+	@param p first octect involved in the hash
+	@param n integer involved in the hash
+	@param x second octect involved in the h ash
+	@param w output
+	@param pad padding
+ */
+extern void ehashit(int sha,octet *p,int n,octet *x,octet *w,int pad);
 
 /**	@brief hash an octet into another octet
  *

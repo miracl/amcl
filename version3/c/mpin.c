@@ -524,7 +524,6 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
     char h[MODBYTES_XXX];
     octet H= {0,sizeof(h),h};
     ECP_ZZZ P,R;
-	BIG_XXX x;
 
 #ifdef USE_ANONYMOUS
     ECP_ZZZ_mapit(&P,CID);
@@ -746,7 +745,6 @@ int MPIN_ZZZ_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
     ECP2_ZZZ Q;
     FP2_YYY qx,qy;
     FP12_YYY g;
-	BIG_XXX x;
     int res=0;
 
     if (!ECP_ZZZ_fromOctet(&T,TOKEN)) res=MPIN_INVALID_POINT;
@@ -917,7 +915,7 @@ void MPIN_ZZZ_GET_Y(int sha,int TimeValue,octet *xCID,octet *Y)
 int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octet *TOKEN,octet *V,octet *U,octet *UT,octet *TP,octet *MESSAGE,int TimeValue,octet *Y)
 {
     int rtn=0;
-    char m[2*PFS_ZZZ+1];
+    char m[M_SIZE];
     octet M= {0,sizeof(m),m};
 
     octet *pID;
@@ -949,7 +947,7 @@ int MPIN_ZZZ_CLIENT(int sha,int date,octet *ID,csprng *RNG,octet *X,int pin,octe
 int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,octet *U,octet *UT,octet *V,octet *E,octet *F,octet *ID,octet *MESSAGE,int TimeValue, octet *Pa)
 {
     int rtn=0;
-    char m[2*PFS_ZZZ+1];
+    char m[M_SIZE];
     octet M= {0,sizeof(m),m};
 
     octet *pU;

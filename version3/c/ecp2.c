@@ -312,7 +312,7 @@ void ECP2_ZZZ_neg(ECP2_ZZZ *P)
 /* SU= 448 */
 int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
 {
-    FP2_YYY t0,t1,t2,t3,iy,x3,y3;
+    FP2_YYY t0,t1,t2,iy,x3,y3;
     if (P->inf) return -1;
 
 	FP2_YYY_copy(&iy,&(P->y));		//FP2 iy=new FP2(y);
@@ -502,7 +502,6 @@ void ECP2_ZZZ_mul(ECP2_ZZZ *P,BIG_XXX e)
     BIG_XXX mt,t;
     ECP2_ZZZ Q,W[8],C;
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
-    FP2_YYY work[8];
 
     if (ECP2_ZZZ_isinf(P)) return;
     ECP2_ZZZ_affine(P);
@@ -588,7 +587,6 @@ void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ Q[4],BIG_XXX u[4])
     int i,j,a[4],nb;
     ECP2_ZZZ W[8],T,C;
     BIG_XXX mt,t[4];
-    FP2_YYY work[8];
     sign8 w[NLEN_XXX*BASEBITS_XXX+1];
 
     for (i=0; i<4; i++)

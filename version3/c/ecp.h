@@ -1,3 +1,29 @@
+/*
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
+*/
+
+/**
+ * @file ecp.h
+ * @author Mike Scott
+ * @brief ECP Header File
+ *
+ */
+
 #ifndef ECP_ZZZ_H
 #define ECP_ZZZ_H
 
@@ -5,8 +31,8 @@
 #include "config_curve_ZZZ.h"
 
 /* Curve Params - see rom_zzz.c */
-extern const int CURVE_A_ZZZ;     /**< Elliptic curve A parameter */
-extern const int CURVE_B_I_ZZZ;
+extern const int CURVE_A_ZZZ;         /**< Elliptic curve A parameter */
+extern const int CURVE_B_I_ZZZ;       /**< Elliptic curve B_i parameter */
 extern const BIG_XXX CURVE_B_ZZZ;     /**< Elliptic curve B parameter */
 extern const BIG_XXX CURVE_Order_ZZZ; /**< Elliptic curve group order */
 extern const BIG_XXX CURVE_Cof_ZZZ;   /**< Elliptic curve cofactor */
@@ -92,15 +118,6 @@ extern void ECP_ZZZ_inf(ECP_ZZZ *P);
 	@param x BIG n-residue x
  */
 extern void ECP_ZZZ_rhs(FP_YYY *r,FP_YYY *x);
-/**	@brief Set ECP to point(x,y) given just x and sign of y
- *
-	Point P set to infinity if no such point on the curve. If x is on the curve then y is calculated from the curve equation.
-	The correct y value (plus or minus) is selected given its sign s.
-	@param P ECP instance to be set (x,[y])
-	@param x BIG x coordinate of point
-	@param s an integer representing the "sign" of y, in fact its least significant bit.
- */
-extern int ECP_ZZZ_setx(ECP_ZZZ *P,BIG_XXX x,int s);
 
 #if CURVETYPE_ZZZ==MONTGOMERY
 /**	@brief Set ECP to point(x,[y]) given x
@@ -157,6 +174,21 @@ extern void ECP_ZZZ_add(ECP_ZZZ *P,ECP_ZZZ *Q);
 	@param Q ECP instance to be subtracted from P
  */
 extern void ECP_ZZZ_sub(ECP_ZZZ *P,ECP_ZZZ *Q);
+/**	@brief Set ECP to point(x,y) given just x and sign of y
+ *
+	Point P set to infinity if no such point on the curve. If x is on the curve then y is calculated from the curve equation.
+	The correct y value (plus or minus) is selected given its sign s.
+	@param P ECP instance to be set (x,[y])
+	@param x BIG x coordinate of point
+	@param s an integer representing the "sign" of y, in fact its least significant bit.
+ */
+extern int ECP_ZZZ_setx(ECP_ZZZ *P,BIG_XXX x,int s);
+/**	@brief Maps random BIG to curve point of correct order
+ *
+	@param Q ECP instance of correct order
+	@param w OCTET byte array to be mapped
+ */
+extern void ECP_ZZZ_mapit(ECP_ZZZ *Q,octet *w);
 #endif
 /**	@brief Converts an ECP point from Projective (x,y,z) coordinates to affine (x,y) coordinates
  *
@@ -226,11 +258,5 @@ extern void ECP_ZZZ_mul(ECP_ZZZ *P,BIG_XXX b);
  */
 extern void ECP_ZZZ_mul2(ECP_ZZZ *P,ECP_ZZZ *Q,BIG_XXX e,BIG_XXX f);
 
-/**	@brief Maps random BIG to curve point of correct order
- *
-	@param Q ECP instance of correct order
-	@param w OCTET byte array to be mapped
- */
-extern void ECP_ZZZ_mapit(ECP_ZZZ *Q,octet *w);
 
 #endif
