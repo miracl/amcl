@@ -194,7 +194,7 @@ extern void FP2_YYY_div2(FP2_YYY *x,FP2_YYY *y);
 	@param x FP2 instance, on exit = x*(1+sqrt(-1))
  */
 extern void FP2_YYY_mul_ip(FP2_YYY *x);
-/**	@brief Divide an FP2 by (1+sqrt(-1))/2 - 
+/**	@brief Divide an FP2 by (1+sqrt(-1))/2 -
  *
 	Note that (1+sqrt(-1)) is irreducible for FP4
 	@param x FP2 instance, on exit = 2x/(1+sqrt(-1))

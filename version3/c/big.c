@@ -36,7 +36,7 @@ int BIG_XXX_isunity(BIG_XXX a)
 {
     int i;
     for(i=1; i<NLEN_XXX; i++)
-      if (a[i]!=0) return 0;
+        if (a[i]!=0) return 0;
     if (a[0]!=1) return 0;
     return 1;
 }
@@ -163,7 +163,8 @@ void BIG_XXX_fromBytes(BIG_XXX a,char *b)
         //BIG_XXX_inc(a,(int)(unsigned char)b[i]); BIG_XXX_norm(a);
     }
 #ifdef DEBUG_NORM
-	a[MPV_XXX]=1; a[MNV_XXX]=0;
+    a[MPV_XXX]=1;
+    a[MNV_XXX]=0;
 #endif
 }
 
@@ -179,7 +180,8 @@ void BIG_XXX_fromBytesLen(BIG_XXX a,char *b,int s)
         a[0]+=(int)(unsigned char)b[i];
     }
 #ifdef DEBUG_NORM
-	a[MPV_XXX]=1; a[MNV_XXX]=0;
+    a[MPV_XXX]=1;
+    a[MNV_XXX]=0;
 #endif
 }
 
@@ -229,8 +231,8 @@ void BIG_XXX_copy(BIG_XXX b,BIG_XXX a)
     for (i=0; i<NLEN_XXX; i++)
         b[i]=a[i];
 #ifdef DEBUG_NORM
-	b[MPV_XXX]=a[MPV_XXX];
-	b[MNV_XXX]=a[MNV_XXX];
+    b[MPV_XXX]=a[MPV_XXX];
+    b[MNV_XXX]=a[MNV_XXX];
 #endif
 }
 
@@ -241,7 +243,8 @@ void BIG_XXX_rcopy(BIG_XXX b,const BIG_XXX a)
     for (i=0; i<NLEN_XXX; i++)
         b[i]=a[i];
 #ifdef DEBUG_NORM
-	b[MPV_XXX]=1; b[MNV_XXX]=0;
+    b[MPV_XXX]=1;
+    b[MNV_XXX]=0;
 #endif
 }
 
@@ -252,8 +255,8 @@ void BIG_XXX_dcopy(DBIG_XXX b,DBIG_XXX a)
     for (i=0; i<DNLEN_XXX; i++)
         b[i]=a[i];
 #ifdef DEBUG_NORM
-	b[DMPV_XXX]=a[DMPV_XXX];
-	b[DMNV_XXX]=a[DMNV_XXX];
+    b[DMPV_XXX]=a[DMPV_XXX];
+    b[DMNV_XXX]=a[DMNV_XXX];
 #endif
 }
 
@@ -269,8 +272,8 @@ void BIG_XXX_dscopy(DBIG_XXX b,BIG_XXX a)
 
     for (i=NLEN_XXX+1; i<DNLEN_XXX; i++) b[i]=0;
 #ifdef DEBUG_NORM
-	b[DMPV_XXX]=a[MPV_XXX];
-	b[DMNV_XXX]=a[MNV_XXX];
+    b[DMPV_XXX]=a[MPV_XXX];
+    b[DMNV_XXX]=a[MNV_XXX];
 #endif
 }
 
@@ -283,8 +286,8 @@ void BIG_XXX_dsucopy(DBIG_XXX b,BIG_XXX a)
     for (i=NLEN_XXX; i<DNLEN_XXX; i++)
         b[i]=a[i-NLEN_XXX];
 #ifdef DEBUG_NORM
-	b[DMPV_XXX]=a[MPV_XXX];
-	b[DMNV_XXX]=a[MNV_XXX];
+    b[DMPV_XXX]=a[MPV_XXX];
+    b[DMNV_XXX]=a[MNV_XXX];
 #endif
 }
 
@@ -295,8 +298,8 @@ void BIG_XXX_sdcopy(BIG_XXX b,DBIG_XXX a)
     for (i=0; i<NLEN_XXX; i++)
         b[i]=a[i];
 #ifdef DEBUG_NORM
-	b[MPV_XXX]=a[DMPV_XXX];
-	b[MNV_XXX]=a[DMNV_XXX];
+    b[MPV_XXX]=a[DMPV_XXX];
+    b[MNV_XXX]=a[DMNV_XXX];
 #endif
 }
 
@@ -307,8 +310,8 @@ void BIG_XXX_sducopy(BIG_XXX b,DBIG_XXX a)
     for (i=0; i<NLEN_XXX; i++)
         b[i]=a[i+NLEN_XXX];
 #ifdef DEBUG_NORM
-	b[MPV_XXX]=a[DMPV_XXX];
-	b[MNV_XXX]=a[DMNV_XXX];
+    b[MPV_XXX]=a[DMPV_XXX];
+    b[MNV_XXX]=a[DMNV_XXX];
 
 #endif
 }
@@ -320,7 +323,7 @@ void BIG_XXX_zero(BIG_XXX a)
     for (i=0; i<NLEN_XXX; i++)
         a[i]=0;
 #ifdef DEBUG_NORM
-	a[MPV_XXX]=a[MNV_XXX]=0;
+    a[MPV_XXX]=a[MNV_XXX]=0;
 #endif
 }
 
@@ -330,7 +333,7 @@ void BIG_XXX_dzero(DBIG_XXX a)
     for (i=0; i<DNLEN_XXX; i++)
         a[i]=0;
 #ifdef DEBUG_NORM
-	a[DMPV_XXX]=a[DMNV_XXX]=0;
+    a[DMPV_XXX]=a[DMNV_XXX]=0;
 #endif
 }
 
@@ -342,8 +345,8 @@ void BIG_XXX_one(BIG_XXX a)
     for (i=1; i<NLEN_XXX; i++)
         a[i]=0;
 #ifdef DEBUG_NORM
-	a[MPV_XXX]=1;
-	a[MNV_XXX]=0;
+    a[MPV_XXX]=1;
+    a[MNV_XXX]=0;
 #endif
 }
 
@@ -357,10 +360,10 @@ void BIG_XXX_add(BIG_XXX c,BIG_XXX a,BIG_XXX b)
     for (i=0; i<NLEN_XXX; i++)
         c[i]=a[i]+b[i];
 #ifdef DEBUG_NORM
-	c[MPV_XXX]=a[MPV_XXX]+b[MPV_XXX];
-	c[MNV_XXX]=a[MNV_XXX]+b[MNV_XXX];
-	if (c[MPV_XXX]>NEXCESS_XXX)  printf("add problem - positive digit overflow %d\n",c[MPV_XXX]);
-	if (c[MNV_XXX]>NEXCESS_XXX)  printf("add problem - negative digit overflow %d\n",c[MNV_XXX]);
+    c[MPV_XXX]=a[MPV_XXX]+b[MPV_XXX];
+    c[MNV_XXX]=a[MNV_XXX]+b[MNV_XXX];
+    if (c[MPV_XXX]>NEXCESS_XXX)  printf("add problem - positive digit overflow %d\n",c[MPV_XXX]);
+    if (c[MNV_XXX]>NEXCESS_XXX)  printf("add problem - negative digit overflow %d\n",c[MNV_XXX]);
 
 #endif
 }
@@ -371,7 +374,7 @@ void BIG_XXX_inc(BIG_XXX c,int d)
     BIG_XXX_norm(c);
     c[0]+=(chunk)d;
 #ifdef DEBUG_NORM
-	c[MPV_XXX]+=1;
+    c[MPV_XXX]+=1;
 #endif
 }
 
@@ -383,10 +386,10 @@ void BIG_XXX_sub(BIG_XXX c,BIG_XXX a,BIG_XXX b)
     for (i=0; i<NLEN_XXX; i++)
         c[i]=a[i]-b[i];
 #ifdef DEBUG_NORM
-	c[MPV_XXX]=a[MPV_XXX]+b[MNV_XXX];
-	c[MNV_XXX]=a[MNV_XXX]+b[MPV_XXX];
-	if (c[MPV_XXX]>NEXCESS_XXX)  printf("sub problem - positive digit overflow %d\n",c[MPV_XXX]);
-	if (c[MNV_XXX]>NEXCESS_XXX)  printf("sub problem - negative digit overflow %d\n",c[MNV_XXX]);
+    c[MPV_XXX]=a[MPV_XXX]+b[MNV_XXX];
+    c[MNV_XXX]=a[MNV_XXX]+b[MPV_XXX];
+    if (c[MPV_XXX]>NEXCESS_XXX)  printf("sub problem - positive digit overflow %d\n",c[MPV_XXX]);
+    if (c[MNV_XXX]>NEXCESS_XXX)  printf("sub problem - negative digit overflow %d\n",c[MNV_XXX]);
 
 #endif
 }
@@ -399,10 +402,10 @@ void BIG_XXX_dsub(DBIG_XXX c,DBIG_XXX a,DBIG_XXX b)
     for (i=0; i<DNLEN_XXX; i++)
         c[i]=a[i]-b[i];
 #ifdef DEBUG_NORM
-	c[DMPV_XXX]=a[DMPV_XXX]+b[DMNV_XXX];
-	c[DMNV_XXX]=a[DMNV_XXX]+b[DMPV_XXX];
-	if (c[DMPV_XXX]>NEXCESS_XXX)  printf("double sub problem - positive digit overflow %d\n",c[DMPV_XXX]);
-	if (c[DMNV_XXX]>NEXCESS_XXX)  printf("double sub problem - negative digit overflow %d\n",c[DMNV_XXX]);
+    c[DMPV_XXX]=a[DMPV_XXX]+b[DMNV_XXX];
+    c[DMNV_XXX]=a[DMNV_XXX]+b[DMPV_XXX];
+    if (c[DMPV_XXX]>NEXCESS_XXX)  printf("double sub problem - positive digit overflow %d\n",c[DMPV_XXX]);
+    if (c[DMNV_XXX]>NEXCESS_XXX)  printf("double sub problem - negative digit overflow %d\n",c[DMNV_XXX]);
 #endif
 }
 
@@ -412,10 +415,10 @@ void BIG_XXX_dadd(DBIG_XXX c,DBIG_XXX a,DBIG_XXX b)
     for (i=0; i<DNLEN_XXX; i++)
         c[i]=a[i]+b[i];
 #ifdef DEBUG_NORM
-	c[DMPV_XXX]=a[DMPV_XXX]+b[DMNV_XXX];
-	c[DMNV_XXX]=a[DMNV_XXX]+b[DMPV_XXX];
-	if (c[DMPV_XXX]>NEXCESS_XXX)  printf("double add problem - positive digit overflow %d\n",c[DMPV_XXX]);
-	if (c[DMNV_XXX]>NEXCESS_XXX)  printf("double add problem - negative digit overflow %d\n",c[DMNV_XXX]);
+    c[DMPV_XXX]=a[DMPV_XXX]+b[DMNV_XXX];
+    c[DMNV_XXX]=a[DMNV_XXX]+b[DMPV_XXX];
+    if (c[DMPV_XXX]>NEXCESS_XXX)  printf("double add problem - positive digit overflow %d\n",c[DMPV_XXX]);
+    if (c[DMNV_XXX]>NEXCESS_XXX)  printf("double add problem - negative digit overflow %d\n",c[DMNV_XXX]);
 #endif
 }
 
@@ -425,7 +428,7 @@ void BIG_XXX_dec(BIG_XXX c,int d)
     BIG_XXX_norm(c);
     c[0]-=(chunk)d;
 #ifdef DEBUG_NORM
-	c[MNV_XXX]+=1;
+    c[MNV_XXX]+=1;
 #endif
 }
 
@@ -435,10 +438,10 @@ void BIG_XXX_imul(BIG_XXX r,BIG_XXX a,int c)
     int i;
     for (i=0; i<NLEN_XXX; i++) r[i]=a[i]*c;
 #ifdef DEBUG_NORM
-	r[MPV_XXX]=a[MPV_XXX]*c;
-	r[MNV_XXX]=a[MNV_XXX]*c;
-	if (r[MPV_XXX]>NEXCESS_XXX)  printf("int mul problem - positive digit overflow %d\n",r[MPV_XXX]);
-	if (r[MNV_XXX]>NEXCESS_XXX)  printf("int mul problem - negative digit overflow %d\n",r[MNV_XXX]);
+    r[MPV_XXX]=a[MPV_XXX]*c;
+    r[MNV_XXX]=a[MNV_XXX]*c;
+    if (r[MPV_XXX]>NEXCESS_XXX)  printf("int mul problem - positive digit overflow %d\n",r[MPV_XXX]);
+    if (r[MNV_XXX]>NEXCESS_XXX)  printf("int mul problem - negative digit overflow %d\n",r[MNV_XXX]);
 
 #endif
 }
@@ -457,8 +460,8 @@ chunk BIG_XXX_pmul(BIG_XXX r,BIG_XXX a,int c)
         carry=muladd_XXX(ak,(chunk)c,carry,&r[i]);
     }
 #ifdef DEBUG_NORM
-	r[MPV_XXX]=1;
-	r[MNV_XXX]=0;
+    r[MPV_XXX]=1;
+    r[MNV_XXX]=0;
 #endif
     return carry;
 }
@@ -492,8 +495,8 @@ void BIG_XXX_pxmul(DBIG_XXX c,BIG_XXX a,int b)
         carry=muladd_XXX(a[j],(chunk)b,carry,&c[j]);
     c[NLEN_XXX]=carry;
 #ifdef DEBUG_NORM
-	c[DMPV_XXX]=1;
-	c[DMNV_XXX]=0;
+    c[DMPV_XXX]=1;
+    c[DMNV_XXX]=0;
 #endif
 }
 
@@ -517,8 +520,8 @@ void BIG_XXX_smul(BIG_XXX c,BIG_XXX a,BIG_XXX b)
         }
     }
 #ifdef DEBUG_NORM
-	c[MPV_XXX]=1;
-	c[MNV_XXX]=0;
+    c[MPV_XXX]=1;
+    c[MNV_XXX]=0;
 #endif
 
 }
@@ -536,8 +539,8 @@ void BIG_XXX_mul(DBIG_XXX c,BIG_XXX a,BIG_XXX b)
 #endif
 
 #ifdef DEBUG_NORM
-	if ((a[MPV_XXX]!=1 && a[MPV_XXX]!=0) || a[MNV_XXX]!=0) printf("First input to mul not normed\n");
-	if ((b[MPV_XXX]!=1 && b[MPV_XXX]!=0) || b[MNV_XXX]!=0) printf("Second input to mul not normed\n");
+    if ((a[MPV_XXX]!=1 && a[MPV_XXX]!=0) || a[MNV_XXX]!=0) printf("First input to mul not normed\n");
+    if ((b[MPV_XXX]!=1 && b[MPV_XXX]!=0) || b[MNV_XXX]!=0) printf("Second input to mul not normed\n");
 #endif
 
     /* Faster to Combafy it.. Let the compiler unroll the loops! */
@@ -594,8 +597,8 @@ void BIG_XXX_mul(DBIG_XXX c,BIG_XXX a,BIG_XXX b)
 #endif
 
 #ifdef DEBUG_NORM
-	c[DMPV_XXX]=1;
-	c[DMNV_XXX]=0;
+    c[DMPV_XXX]=1;
+    c[DMNV_XXX]=0;
 #endif
 }
 
@@ -609,7 +612,7 @@ void BIG_XXX_sqr(DBIG_XXX c,BIG_XXX a)
 #endif
 
 #ifdef DEBUG_NORM
-	if ((a[MPV_XXX]!=1 && a[MPV_XXX]!=0) || a[MNV_XXX]!=0) printf("Input to sqr not normed\n");
+    if ((a[MPV_XXX]!=1 && a[MPV_XXX]!=0) || a[MNV_XXX]!=0) printf("Input to sqr not normed\n");
 #endif
     /* Note 2*a[i] in loop below and extra addition */
 
@@ -622,50 +625,67 @@ void BIG_XXX_sqr(DBIG_XXX c,BIG_XXX a)
 #else
 
 
-    t=(dchunk)a[0]*a[0]; 
+    t=(dchunk)a[0]*a[0];
     c[0]=(chunk)t&BMASK_XXX;
     co=t>>BASEBITS_XXX;
 
-	for (j=1;j<NLEN_XXX-1; )
-	{
-        t=(dchunk)a[j]*a[0]; 
-        for (i=1; i<(j+1)/2; i++) {t+=(dchunk)a[j-i]*a[i]; }
-        t+=t; t+=co; 
+    for (j=1; j<NLEN_XXX-1; )
+    {
+        t=(dchunk)a[j]*a[0];
+        for (i=1; i<(j+1)/2; i++)
+        {
+            t+=(dchunk)a[j-i]*a[i];
+        }
+        t+=t;
+        t+=co;
         c[j]=(chunk)t&BMASK_XXX;
         co=t>>BASEBITS_XXX;
-		j++;
-        t=(dchunk)a[j]*a[0]; 
-        for (i=1; i<(j+1)/2; i++) {t+=(dchunk)a[j-i]*a[i]; }
-        t+=t; t+=co; 
-        t+=(dchunk)a[j/2]*a[j/2]; 
+        j++;
+        t=(dchunk)a[j]*a[0];
+        for (i=1; i<(j+1)/2; i++)
+        {
+            t+=(dchunk)a[j-i]*a[i];
+        }
+        t+=t;
+        t+=co;
+        t+=(dchunk)a[j/2]*a[j/2];
         c[j]=(chunk)t&BMASK_XXX;
         co=t>>BASEBITS_XXX;
-		j++;
-	}
+        j++;
+    }
 
-	for (j=NLEN_XXX-1+NLEN_XXX%2;j<DNLEN_XXX-3; )
-	{
-        t=(dchunk)a[NLEN_XXX-1]*a[j-NLEN_XXX+1]; 
-        for (i=j-NLEN_XXX+2; i<(j+1)/2; i++) {t+=(dchunk)a[j-i]*a[i];  }
-        t+=t; t+=co; 
+    for (j=NLEN_XXX-1+NLEN_XXX%2; j<DNLEN_XXX-3; )
+    {
+        t=(dchunk)a[NLEN_XXX-1]*a[j-NLEN_XXX+1];
+        for (i=j-NLEN_XXX+2; i<(j+1)/2; i++)
+        {
+            t+=(dchunk)a[j-i]*a[i];
+        }
+        t+=t;
+        t+=co;
         c[j]=(chunk)t&BMASK_XXX;
         co=t>>BASEBITS_XXX;
-		j++;
-        t=(dchunk)a[NLEN_XXX-1]*a[j-NLEN_XXX+1]; 
-        for (i=j-NLEN_XXX+2; i<(j+1)/2; i++) {t+=(dchunk)a[j-i]*a[i];  }
-        t+=t; t+=co; 
-        t+=(dchunk)a[j/2]*a[j/2]; 
+        j++;
+        t=(dchunk)a[NLEN_XXX-1]*a[j-NLEN_XXX+1];
+        for (i=j-NLEN_XXX+2; i<(j+1)/2; i++)
+        {
+            t+=(dchunk)a[j-i]*a[i];
+        }
+        t+=t;
+        t+=co;
+        t+=(dchunk)a[j/2]*a[j/2];
         c[j]=(chunk)t&BMASK_XXX;
         co=t>>BASEBITS_XXX;
-		j++;
-	}
+        j++;
+    }
 
-	t=(dchunk)a[NLEN_XXX-2]*a[NLEN_XXX-1];
-	t+=t; t+=co;
-	c[DNLEN_XXX-3]=(chunk)t&BMASK_XXX;
+    t=(dchunk)a[NLEN_XXX-2]*a[NLEN_XXX-1];
+    t+=t;
+    t+=co;
+    c[DNLEN_XXX-3]=(chunk)t&BMASK_XXX;
     co=t>>BASEBITS_XXX;
-	
-    t=(dchunk)a[NLEN_XXX-1]*a[NLEN_XXX-1]+co; 
+
+    t=(dchunk)a[NLEN_XXX-1]*a[NLEN_XXX-1]+co;
     c[DNLEN_XXX-2]=(chunk)t&BMASK_XXX;
     co=t>>BASEBITS_XXX;
     c[DNLEN_XXX-1]=(chunk)co;
@@ -694,8 +714,8 @@ void BIG_XXX_sqr(DBIG_XXX c,BIG_XXX a)
 
 
 #ifdef DEBUG_NORM
-	c[DMPV_XXX]=1;
-	c[DMNV_XXX]=0;
+    c[DMPV_XXX]=1;
+    c[DMNV_XXX]=0;
 #endif
 
 }
@@ -748,7 +768,8 @@ void BIG_XXX_monty(BIG_XXX a,BIG_XXX md,chunk MC,DBIG_XXX d)
 #endif
 
 #ifdef DEBUG_NORM
-	a[MPV_XXX]=1;  a[MNV_XXX]=0;
+    a[MPV_XXX]=1;
+    a[MNV_XXX]=0;
 #endif
 
 #else
@@ -902,8 +923,10 @@ chunk BIG_XXX_split(BIG_XXX t,BIG_XXX b,DBIG_XXX d,int n)
         }
     }
 #ifdef DEBUG_NORM
-    t[MPV_XXX]=1; t[MNV_XXX]=0;
-    b[MPV_XXX]=1; b[MNV_XXX]=0;
+    t[MPV_XXX]=1;
+    t[MNV_XXX]=0;
+    b[MPV_XXX]=1;
+    b[MNV_XXX]=0;
 #endif
     return carry;
 }
@@ -924,7 +947,8 @@ chunk BIG_XXX_norm(BIG_XXX a)
     a[NLEN_XXX-1]=(a[NLEN_XXX-1]+carry);
 
 #ifdef DEBUG_NORM
-	a[MPV_XXX]=1; a[MNV_XXX]=0;
+    a[MPV_XXX]=1;
+    a[MNV_XXX]=0;
 #endif
     return (a[NLEN_XXX-1]>>((8*MODBYTES_XXX)%BASEBITS_XXX));  /* only used in ff.c */
 }
@@ -941,7 +965,8 @@ void BIG_XXX_dnorm(DBIG_XXX a)
     }
     a[DNLEN_XXX-1]=(a[DNLEN_XXX-1]+carry);
 #ifdef DEBUG_NORM
-	a[DMPV_XXX]=1; a[DMNV_XXX]=0;
+    a[DMPV_XXX]=1;
+    a[DMNV_XXX]=0;
 #endif
 }
 
@@ -1238,7 +1263,8 @@ void BIG_XXX_random(BIG_XXX m,csprng *rng)
     }
 
 #ifdef DEBUG_NORM
-	m[MPV_XXX]=1; m[MNV_XXX]=0;
+    m[MPV_XXX]=1;
+    m[MNV_XXX]=0;
 #endif
 }
 
@@ -1263,7 +1289,8 @@ void BIG_XXX_randomnum(BIG_XXX m,BIG_XXX q,csprng *rng)
     /* reduce modulo a BIG. Removes bias */
     BIG_XXX_dmod(m,d,q);
 #ifdef DEBUG_NORM
-	m[MPV_XXX]=1; m[MNV_XXX]=0;
+    m[MPV_XXX]=1;
+    m[MNV_XXX]=0;
 #endif
 }
 
@@ -1419,7 +1446,7 @@ void BIG_XXX_mod2m(BIG_XXX x,int m)
 {
     int i,wd,bt;
     chunk msk;
-	BIG_XXX_norm(x);
+    BIG_XXX_norm(x);
 //	if (m>=MODBITS) return;
     wd=m/BASEBITS_XXX;
     bt=m%BASEBITS_XXX;
@@ -1441,6 +1468,7 @@ void BIG_XXX_dfromBytesLen(DBIG_XXX a,char *b,int s)
         a[0]+=(int)(unsigned char)b[i];
     }
 #ifdef DEBUG_NORM
-	a[DMPV_XXX]=1; a[DMNV_XXX]=0;
+    a[DMPV_XXX]=1;
+    a[DMNV_XXX]=0;
 #endif
 }

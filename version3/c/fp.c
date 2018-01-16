@@ -37,14 +37,14 @@ under the License.
 /* Converts from BIG integer to residue form mod Modulus */
 void FP_YYY_nres(FP_YYY *y,BIG_XXX x)
 {
-	BIG_XXX_copy(y->g,x);
-	y->XES=1;
+    BIG_XXX_copy(y->g,x);
+    y->XES=1;
 }
 
 /* Converts from residue form back to BIG integer form */
 void FP_YYY_redc(BIG_XXX x,FP_YYY *y)
 {
-	BIG_XXX_copy(x,y->g);
+    BIG_XXX_copy(x,y->g);
 }
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
@@ -61,8 +61,8 @@ void FP_YYY_mod(BIG_XXX r,DBIG_XXX d)
     {
         BIG_XXX_imul(t,t,MConst_YYY);
         BIG_XXX_norm(t);
-		BIG_XXX_add(r,t,b);
-		BIG_XXX_norm(r);
+        BIG_XXX_add(r,t,b);
+        BIG_XXX_norm(r);
         tw=r[NLEN_XXX-1];
         r[NLEN_XXX-1]&=TMASK_YYY;
         r[0]+=MConst_YYY*((tw>>TBITS_YYY));
@@ -70,8 +70,8 @@ void FP_YYY_mod(BIG_XXX r,DBIG_XXX d)
     else
     {
         v=BIG_XXX_pmul(t,t,MConst_YYY);
-		BIG_XXX_add(r,t,b);
-		BIG_XXX_norm(r);
+        BIG_XXX_add(r,t,b);
+        BIG_XXX_norm(r);
         tw=r[NLEN_XXX-1];
         r[NLEN_XXX-1]&=TMASK_YYY;
 #if CHUNK == 16
@@ -89,14 +89,14 @@ void FP_YYY_mod(BIG_XXX r,DBIG_XXX d)
 
 void FP_YYY_nres(FP_YYY *y,BIG_XXX x)
 {
-	BIG_XXX_copy(y->g,x);
-	y->XES=1;
+    BIG_XXX_copy(y->g,x);
+    y->XES=1;
 }
 
 /* Converts from residue form back to BIG integer form */
 void FP_YYY_redc(BIG_XXX x,FP_YYY *y)
 {
-	BIG_XXX_copy(x,y->g);
+    BIG_XXX_copy(x,y->g);
 }
 
 /* reduce a DBIG to a BIG exploiting the special form of the modulus */
@@ -139,9 +139,9 @@ void FP_YYY_nres(FP_YYY *y,BIG_XXX x)
     DBIG_XXX d;
     BIG_XXX r;
     BIG_XXX_rcopy(r,R2modp_YYY);
-	BIG_XXX_mul(d,x,r);
-	FP_YYY_mod(y->g,d);
-	y->XES=2;
+    BIG_XXX_mul(d,x,r);
+    FP_YYY_mod(y->g,d);
+    y->XES=2;
 }
 
 /* convert back to regular form */
@@ -175,9 +175,9 @@ void FP_YYY_nres(FP_YYY *y,BIG_XXX x)
     DBIG_XXX d;
     BIG_XXX r;
     BIG_XXX_rcopy(r,R2modp_YYY);
-	BIG_XXX_mul(d,x,r);
-	FP_YYY_mod(y->g,d);
-	y->XES=2;
+    BIG_XXX_mul(d,x,r);
+    FP_YYY_mod(y->g,d);
+    y->XES=2;
 }
 
 /* convert back to regular form */
@@ -195,9 +195,9 @@ void FP_YYY_redc(BIG_XXX x,FP_YYY *y)
 /* SU= 112 */
 void FP_YYY_mod(BIG_XXX a,DBIG_XXX d)
 {
-	BIG_XXX mdls;
-	BIG_XXX_rcopy(mdls,Modulus_YYY);
-	BIG_XXX_monty(a,mdls,MConst_YYY,d);
+    BIG_XXX mdls;
+    BIG_XXX_rcopy(mdls,Modulus_YYY);
+    BIG_XXX_monty(a,mdls,MConst_YYY,d);
 }
 
 #endif
@@ -214,50 +214,51 @@ int FP_YYY_iszilch(FP_YYY *x)
 
 void FP_YYY_copy(FP_YYY *y,FP_YYY *x)
 {
-	BIG_XXX_copy(y->g,x->g);
-	y->XES=x->XES;
+    BIG_XXX_copy(y->g,x->g);
+    y->XES=x->XES;
 }
 
 void FP_YYY_rcopy(FP_YYY *y, const BIG_XXX c)
 {
-	BIG_XXX b;
-	BIG_XXX_rcopy(b,c);
-	FP_YYY_nres(y,b);
+    BIG_XXX b;
+    BIG_XXX_rcopy(b,c);
+    FP_YYY_nres(y,b);
 }
 
 /* Swap a and b if d=1 */
 void FP_YYY_cswap(FP_YYY *a,FP_YYY *b,int d)
 {
-	sign32 t,c=d;
-	BIG_XXX_cswap(a->g,b->g,d);
+    sign32 t,c=d;
+    BIG_XXX_cswap(a->g,b->g,d);
 
     c=~(c-1);
-	t=c&((a->XES)^(b->XES));
-	a->XES^=t;
-	b->XES^=t;
+    t=c&((a->XES)^(b->XES));
+    a->XES^=t;
+    b->XES^=t;
 
 }
 
 /* Move b to a if d=1 */
 void FP_YYY_cmove(FP_YYY *a,FP_YYY *b,int d)
 {
-	sign32 c=-d;
+    sign32 c=-d;
 
-	BIG_XXX_cmove(a->g,b->g,d);
-	a->XES^=(a->XES^b->XES)&c;
+    BIG_XXX_cmove(a->g,b->g,d);
+    a->XES^=(a->XES^b->XES)&c;
 }
 
 void FP_YYY_zero(FP_YYY *x)
 {
-	BIG_XXX_zero(x->g);
-	x->XES=1;
+    BIG_XXX_zero(x->g);
+    x->XES=1;
 }
 
 int FP_YYY_equals(FP_YYY *x,FP_YYY *y)
 {
-	FP_YYY_reduce(x); FP_YYY_reduce(y);
-	if (BIG_XXX_comp(x->g,y->g)==0) return 1;
-	return 0;
+    FP_YYY_reduce(x);
+    FP_YYY_reduce(y);
+    if (BIG_XXX_comp(x->g,y->g)==0) return 1;
+    return 0;
 }
 
 /* output FP */
@@ -299,21 +300,21 @@ void FP_YYY_mul(FP_YYY *r,FP_YYY *a,FP_YYY *b)
 //    eb=EXCESS_YYY(b->g);
 
 
-	if ((sign64)a->XES*b->XES>(sign64)FEXCESS_YYY)
-	{
+    if ((sign64)a->XES*b->XES>(sign64)FEXCESS_YYY)
+    {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it\n");
 #endif
         FP_YYY_reduce(a);  /* it is sufficient to fully reduce just one of them < p */
-	}
+    }
 
 #ifdef FUSED_MODMUL
-	FP_YYY_modmul(r->g,a->g,b->g);
+    FP_YYY_modmul(r->g,a->g,b->g);
 #else
     BIG_XXX_mul(d,a->g,b->g);
     FP_YYY_mod(r->g,d);
 #endif
-	r->XES=2;
+    r->XES=2;
 }
 
 
@@ -322,58 +323,59 @@ void FP_YYY_mul(FP_YYY *r,FP_YYY *a,FP_YYY *b)
 void FP_YYY_imul(FP_YYY *r,FP_YYY *a,int c)
 {
     int s=0;
-   
+
     if (c<0)
     {
         c=-c;
         s=1;
     }
-   
+
 #if MODTYPE_YYY==PSEUDO_MERSENNE || MODTYPE_YYY==GENERALISED_MERSENNE
-        DBIG_XXX d;	
-	BIG_XXX_pxmul(d,a->g,c);
-	FP_YYY_mod(r->g,d);
-	r->XES=2;
+    DBIG_XXX d;
+    BIG_XXX_pxmul(d,a->g,c);
+    FP_YYY_mod(r->g,d);
+    r->XES=2;
 
 #else
-	//Montgomery
-        BIG_XXX k;
-        FP_YYY f;
-	if (a->XES*c<=FEXCESS_YYY)
-	{
-		BIG_XXX_pmul(r->g,a->g,c);
-		r->XES=a->XES*c;    // careful here - XES jumps!
-	}
-	else
-	{// don't want to do this - only a problem for Montgomery modulus and larger constants
-		BIG_XXX_zero(k);
-		BIG_XXX_inc(k,c);
-		FP_YYY_nres(&f,k);
-		FP_YYY_mul(r,a,&f);
-	}
-#endif
-/*
-    if (c<=NEXCESS_XXX && a->XES*c <= FEXCESS_YYY)
-	{
-        BIG_XXX_imul(r->g,a->g,c);
-		r->XES=a->XES*c;
-		FP_YYY_norm(r);
-	}
+    //Montgomery
+    BIG_XXX k;
+    FP_YYY f;
+    if (a->XES*c<=FEXCESS_YYY)
+    {
+        BIG_XXX_pmul(r->g,a->g,c);
+        r->XES=a->XES*c;    // careful here - XES jumps!
+    }
     else
     {
-            BIG_XXX_pxmul(d,a->g,c);
-
-            BIG_XXX_rcopy(m,Modulus_YYY);
-			BIG_XXX_dmod(r->g,d,m);
-            //FP_YYY_mod(r->g,d);                /// BIG problem here! Too slow for PM, How to do fast for Monty?
-			r->XES=2;
+        // don't want to do this - only a problem for Montgomery modulus and larger constants
+        BIG_XXX_zero(k);
+        BIG_XXX_inc(k,c);
+        FP_YYY_nres(&f,k);
+        FP_YYY_mul(r,a,&f);
     }
-*/
-    if (s) 
-	{
-		FP_YYY_neg(r,r);
-		FP_YYY_norm(r);
-	}
+#endif
+    /*
+        if (c<=NEXCESS_XXX && a->XES*c <= FEXCESS_YYY)
+    	{
+            BIG_XXX_imul(r->g,a->g,c);
+    		r->XES=a->XES*c;
+    		FP_YYY_norm(r);
+    	}
+        else
+        {
+                BIG_XXX_pxmul(d,a->g,c);
+
+                BIG_XXX_rcopy(m,Modulus_YYY);
+    			BIG_XXX_dmod(r->g,d,m);
+                //FP_YYY_mod(r->g,d);                /// BIG problem here! Too slow for PM, How to do fast for Monty?
+    			r->XES=2;
+        }
+    */
+    if (s)
+    {
+        FP_YYY_neg(r,r);
+        FP_YYY_norm(r);
+    }
 }
 
 /* Set r=a^2 mod m */
@@ -386,8 +388,8 @@ void FP_YYY_sqr(FP_YYY *r,FP_YYY *a)
 //    ea=EXCESS_YYY(a->g);
 
 
-	if ((sign64)a->XES*a->XES>(sign64)FEXCESS_YYY)
-	{
+    if ((sign64)a->XES*a->XES>(sign64)FEXCESS_YYY)
+    {
 #ifdef DEBUG_REDUCE
         printf("Product too large - reducing it\n");
 #endif
@@ -396,7 +398,7 @@ void FP_YYY_sqr(FP_YYY *r,FP_YYY *a)
 
     BIG_XXX_sqr(d,a->g);
     FP_YYY_mod(r->g,d);
-	r->XES=2;
+    r->XES=2;
 }
 
 /* SU= 16 */
@@ -404,9 +406,9 @@ void FP_YYY_sqr(FP_YYY *r,FP_YYY *a)
 void FP_YYY_add(FP_YYY *r,FP_YYY *a,FP_YYY *b)
 {
     BIG_XXX_add(r->g,a->g,b->g);
-	r->XES=a->XES+b->XES;
-	if (r->XES>FEXCESS_YYY)
-	{
+    r->XES=a->XES+b->XES;
+    if (r->XES>FEXCESS_YYY)
+    {
 #ifdef DEBUG_REDUCE
         printf("Sum too large - reducing it \n");
 #endif
@@ -432,12 +434,12 @@ void FP_YYY_reduce(FP_YYY *a)
     BIG_XXX m;
     BIG_XXX_rcopy(m,Modulus_YYY);
     BIG_XXX_mod(a->g,m);
-	a->XES=1;
+    a->XES=1;
 }
 
 void FP_YYY_norm(FP_YYY *x)
 {
-	BIG_XXX_norm(x->g);
+    BIG_XXX_norm(x->g);
 }
 
 // https://graphics.stanford.edu/~seander/bithacks.html
@@ -470,7 +472,7 @@ void FP_YYY_neg(FP_YYY *r,FP_YYY *a)
     sb=logb2(a->XES-1);
     BIG_XXX_fshl(m,sb);
     BIG_XXX_sub(r->g,m,a->g);
-	r->XES=((sign32)1<<sb);
+    r->XES=((sign32)1<<sb);
 
     if (r->XES>FEXCESS_YYY)
     {
@@ -478,7 +480,7 @@ void FP_YYY_neg(FP_YYY *r,FP_YYY *a)
         printf("Negation too large -  reducing it \n");
 #endif
         FP_YYY_reduce(r);
-	}
+    }
 
 }
 
@@ -507,7 +509,7 @@ void FP_YYY_div2(FP_YYY *r,FP_YYY *a)
 void FP_YYY_inv(FP_YYY *w,FP_YYY *x)
 {
     BIG_XXX m;
-	BIG_XXX b;
+    BIG_XXX b;
     BIG_XXX_rcopy(m,Modulus_YYY);
     BIG_XXX_copy(w->g,x->g);
     FP_YYY_redc(b,w);
@@ -520,7 +522,7 @@ void FP_YYY_inv(FP_YYY *w,FP_YYY *x)
 /* set n=1 */
 void FP_YYY_one(FP_YYY *n)
 {
-	BIG_XXX b;
+    BIG_XXX b;
     BIG_XXX_one(b);
     FP_YYY_nres(n,b);
 }
@@ -530,7 +532,7 @@ void FP_YYY_one(FP_YYY *n)
 void FP_YYY_pow(FP_YYY *r,FP_YYY *a,BIG_XXX b)
 {
     BIG_XXX z,zilch;
-	FP_YYY w;
+    FP_YYY w;
     int bt;
     BIG_XXX_zero(zilch);
 
@@ -554,7 +556,7 @@ int FP_YYY_qr(FP_YYY *r)
 {
     int j;
     BIG_XXX m;
-	BIG_XXX b;
+    BIG_XXX b;
     BIG_XXX_rcopy(m,Modulus_YYY);
     FP_YYY_redc(b,r);
     j=BIG_XXX_jacobi(b,m);
@@ -568,7 +570,7 @@ int FP_YYY_qr(FP_YYY *r)
 /* SU= 160 */
 void FP_YYY_sqrt(FP_YYY *r,FP_YYY *a)
 {
-	FP_YYY v,i;
+    FP_YYY v,i;
     BIG_XXX b;
     BIG_XXX m;
     BIG_XXX_rcopy(m,Modulus_YYY);

@@ -19,7 +19,7 @@ under the License.
 
 /**
  * @file rsa.h
- * @author Mike Scott 
+ * @author Mike Scott
  * @brief RSA Header file for implementation of RSA protocol
  *
  * declares functions

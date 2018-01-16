@@ -533,7 +533,7 @@ pktype X509_extract_public_key(octet *c,octet *key)
         for (i=0; j<fin; j++)
             key->val[i++]= c->val[j];
 
-		ret.curve=8*len;
+        ret.curve=8*len;
     }
     return ret;
 }
@@ -698,9 +698,9 @@ void print_date(char *des,octet *c,int index)
 
 #ifdef HAS_MAIN
 
-/* This simple driver program is hard-wired to support just one elliptic curve and one 
-   RSA bit length. To change replace the text string NIST256 in the main program to 
-   another curve and 2048 to some other value, where the curve and the RSA bit length 
+/* This simple driver program is hard-wired to support just one elliptic curve and one
+   RSA bit length. To change replace the text string NIST256 in the main program to
+   another curve and 2048 to some other value, where the curve and the RSA bit length
    are suppported by the library. Of course a more elaborate program could support
    muliple curves simultaneously */
 
@@ -928,11 +928,11 @@ int main()
 
     if (ca.type==RSA)
     {
-		if (ca.curve!=2048)
-		{
+        if (ca.curve!=2048)
+        {
             printf("RSA bit size is not supported\n");
             return 0;
-		}
+        }
         PK.e=65537; // assuming this!
         RSA_2048_fromOctet(PK.n,&CAKEY);
 
