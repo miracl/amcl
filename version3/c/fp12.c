@@ -147,14 +147,14 @@ void FP12_YYY_sqr(FP12_YYY *w,FP12_YYY *x)
     FP4_YYY_sqr(&A,&(x->a));
     FP4_YYY_mul(&B,&(x->b),&(x->c));
     FP4_YYY_add(&B,&B,&B);
-FP4_YYY_norm(&B);
+    FP4_YYY_norm(&B);
     FP4_YYY_sqr(&C,&(x->c));
 
     FP4_YYY_mul(&D,&(x->a),&(x->b));
     FP4_YYY_add(&D,&D,&D);
     FP4_YYY_add(&(w->c),&(x->a),&(x->c));
     FP4_YYY_add(&(w->c),&(x->b),&(w->c));
-FP4_YYY_norm(&(w->c));	
+    FP4_YYY_norm(&(w->c));
 
     FP4_YYY_sqr(&(w->c),&(w->c));
 
@@ -193,15 +193,15 @@ void FP12_YYY_mul(FP12_YYY *w,FP12_YYY *y)
     FP4_YYY_add(&t0,&(w->a),&(w->b));
     FP4_YYY_add(&t1,&(y->a),&(y->b));  //
 
-FP4_YYY_norm(&t0);
-FP4_YYY_norm(&t1);
+    FP4_YYY_norm(&t0);
+    FP4_YYY_norm(&t1);
 
     FP4_YYY_mul(&z1,&t0,&t1);
     FP4_YYY_add(&t0,&(w->b),&(w->c));
     FP4_YYY_add(&t1,&(y->b),&(y->c));  //
 
-FP4_YYY_norm(&t0);
-FP4_YYY_norm(&t1);
+    FP4_YYY_norm(&t0);
+    FP4_YYY_norm(&t1);
 
     FP4_YYY_mul(&z3,&t0,&t1);
 
@@ -218,8 +218,8 @@ FP4_YYY_norm(&t1);
     FP4_YYY_add(&t0,&(w->a),&(w->c));
     FP4_YYY_add(&t1,&(y->a),&(y->c));
 
-FP4_YYY_norm(&t0);
-FP4_YYY_norm(&t1);
+    FP4_YYY_norm(&t0);
+    FP4_YYY_norm(&t1);
 
     FP4_YYY_mul(&t0,&t1,&t0);
     FP4_YYY_add(&z2,&z2,&t0);
@@ -231,7 +231,7 @@ FP4_YYY_norm(&t1);
     FP4_YYY_add(&z3,&z3,&t1);
     FP4_YYY_times_i(&t0);
     FP4_YYY_add(&(w->b),&(w->b),&t0);
-FP4_YYY_norm(&z3);
+    FP4_YYY_norm(&z3);
     FP4_YYY_times_i(&z3);
     FP4_YYY_add(&(w->a),&z0,&z3);
 
@@ -245,88 +245,90 @@ void FP12_YYY_smul(FP12_YYY *w,FP12_YYY *y,int type)
 {
     FP4_YYY z0,z1,z2,z3,t0,t1;
 
-	if (type==D_TYPE)
-	{ // y->c is 0
+    if (type==D_TYPE)
+    {
+        // y->c is 0
 
-		FP4_YYY_copy(&z3,&(w->b));
-		FP4_YYY_mul(&z0,&(w->a),&(y->a));
+        FP4_YYY_copy(&z3,&(w->b));
+        FP4_YYY_mul(&z0,&(w->a),&(y->a));
 
-		FP4_YYY_pmul(&z2,&(w->b),&(y->b).a);
-		FP4_YYY_add(&(w->b),&(w->a),&(w->b));
-		FP4_YYY_copy(&t1,&(y->a));
-		FP2_YYY_add(&t1.a,&t1.a,&(y->b).a);
+        FP4_YYY_pmul(&z2,&(w->b),&(y->b).a);
+        FP4_YYY_add(&(w->b),&(w->a),&(w->b));
+        FP4_YYY_copy(&t1,&(y->a));
+        FP2_YYY_add(&t1.a,&t1.a,&(y->b).a);
 
-		FP4_YYY_norm(&t1);
-		FP4_YYY_norm(&(w->b));
+        FP4_YYY_norm(&t1);
+        FP4_YYY_norm(&(w->b));
 
-		FP4_YYY_mul(&(w->b),&(w->b),&t1);
-		FP4_YYY_add(&z3,&z3,&(w->c));
-		FP4_YYY_norm(&z3);
-		FP4_YYY_pmul(&z3,&z3,&(y->b).a);
-		FP4_YYY_neg(&t0,&z0);
-		FP4_YYY_neg(&t1,&z2);
+        FP4_YYY_mul(&(w->b),&(w->b),&t1);
+        FP4_YYY_add(&z3,&z3,&(w->c));
+        FP4_YYY_norm(&z3);
+        FP4_YYY_pmul(&z3,&z3,&(y->b).a);
+        FP4_YYY_neg(&t0,&z0);
+        FP4_YYY_neg(&t1,&z2);
 
-		FP4_YYY_add(&(w->b),&(w->b),&t0);   // z1=z1-z0
+        FP4_YYY_add(&(w->b),&(w->b),&t0);   // z1=z1-z0
 //    FP4_YYY_norm(&(w->b));
-		FP4_YYY_add(&(w->b),&(w->b),&t1);   // z1=z1-z2
+        FP4_YYY_add(&(w->b),&(w->b),&t1);   // z1=z1-z2
 
-		FP4_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
-		FP4_YYY_add(&z2,&z2,&t0);        // z2=z2-z0
+        FP4_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
+        FP4_YYY_add(&z2,&z2,&t0);        // z2=z2-z0
 
-		FP4_YYY_add(&t0,&(w->a),&(w->c));
+        FP4_YYY_add(&t0,&(w->a),&(w->c));
 
-		FP4_YYY_norm(&t0);
-		FP4_YYY_norm(&z3);
+        FP4_YYY_norm(&t0);
+        FP4_YYY_norm(&z3);
 
-		FP4_YYY_mul(&t0,&(y->a),&t0);
-		FP4_YYY_add(&(w->c),&z2,&t0);
+        FP4_YYY_mul(&t0,&(y->a),&t0);
+        FP4_YYY_add(&(w->c),&z2,&t0);
 
-		FP4_YYY_times_i(&z3);
-		FP4_YYY_add(&(w->a),&z0,&z3);
-	}
+        FP4_YYY_times_i(&z3);
+        FP4_YYY_add(&(w->a),&z0,&z3);
+    }
 
-	if (type==M_TYPE)
-	{ // y->b is zero
-		FP4_YYY_mul(&z0,&(w->a),&(y->a));
-		FP4_YYY_add(&t0,&(w->a),&(w->b));
-		FP4_YYY_norm(&t0);
+    if (type==M_TYPE)
+    {
+        // y->b is zero
+        FP4_YYY_mul(&z0,&(w->a),&(y->a));
+        FP4_YYY_add(&t0,&(w->a),&(w->b));
+        FP4_YYY_norm(&t0);
 
-		FP4_YYY_mul(&z1,&t0,&(y->a));
-		FP4_YYY_add(&t0,&(w->b),&(w->c));
-		FP4_YYY_norm(&t0);
+        FP4_YYY_mul(&z1,&t0,&(y->a));
+        FP4_YYY_add(&t0,&(w->b),&(w->c));
+        FP4_YYY_norm(&t0);
 
-		FP4_YYY_pmul(&z3,&t0,&(y->c).b);
-		FP4_YYY_times_i(&z3);
+        FP4_YYY_pmul(&z3,&t0,&(y->c).b);
+        FP4_YYY_times_i(&z3);
 
-		FP4_YYY_neg(&t0,&z0);
-		FP4_YYY_add(&z1,&z1,&t0);   // z1=z1-z0
+        FP4_YYY_neg(&t0,&z0);
+        FP4_YYY_add(&z1,&z1,&t0);   // z1=z1-z0
 
-		FP4_YYY_copy(&(w->b),&z1);
+        FP4_YYY_copy(&(w->b),&z1);
 
-		FP4_YYY_copy(&z2,&t0);
+        FP4_YYY_copy(&z2,&t0);
 
-		FP4_YYY_add(&t0,&(w->a),&(w->c));
-		FP4_YYY_add(&t1,&(y->a),&(y->c));
+        FP4_YYY_add(&t0,&(w->a),&(w->c));
+        FP4_YYY_add(&t1,&(y->a),&(y->c));
 
-		FP4_YYY_norm(&t0);
-		FP4_YYY_norm(&t1);
+        FP4_YYY_norm(&t0);
+        FP4_YYY_norm(&t1);
 
-		FP4_YYY_mul(&t0,&t1,&t0);
-		FP4_YYY_add(&z2,&z2,&t0);
+        FP4_YYY_mul(&t0,&t1,&t0);
+        FP4_YYY_add(&z2,&z2,&t0);
 
-		FP4_YYY_pmul(&t0,&(w->c),&(y->c).b);
-		FP4_YYY_times_i(&t0);
-		FP4_YYY_neg(&t1,&t0);
-		FP4_YYY_times_i(&t0);
+        FP4_YYY_pmul(&t0,&(w->c),&(y->c).b);
+        FP4_YYY_times_i(&t0);
+        FP4_YYY_neg(&t1,&t0);
+        FP4_YYY_times_i(&t0);
 
-		FP4_YYY_add(&(w->c),&z2,&t1);
-		FP4_YYY_add(&z3,&z3,&t1);
+        FP4_YYY_add(&(w->c),&z2,&t1);
+        FP4_YYY_add(&z3,&z3,&t1);
 
-		FP4_YYY_add(&(w->b),&(w->b),&t0);
-		FP4_YYY_norm(&z3);
-		FP4_YYY_times_i(&z3);
-		FP4_YYY_add(&(w->a),&z0,&z3);
-	}
+        FP4_YYY_add(&(w->b),&(w->b),&t0);
+        FP4_YYY_norm(&z3);
+        FP4_YYY_times_i(&z3);
+        FP4_YYY_add(&(w->a),&z0,&z3);
+    }
     FP12_YYY_norm(w);
 }
 
@@ -341,18 +343,18 @@ void FP12_YYY_inv(FP12_YYY *w,FP12_YYY *x)
     FP4_YYY_mul(&f1,&(x->b),&(x->c));
     FP4_YYY_times_i(&f1);
     FP4_YYY_sub(&f0,&f0,&f1);  /* y.a */
-	FP4_YYY_norm(&f0); 		
+    FP4_YYY_norm(&f0);
 
     FP4_YYY_sqr(&f1,&(x->c));
     FP4_YYY_times_i(&f1);
     FP4_YYY_mul(&f2,&(x->a),&(x->b));
     FP4_YYY_sub(&f1,&f1,&f2);  /* y.b */
-	FP4_YYY_norm(&f1); 
+    FP4_YYY_norm(&f1);
 
     FP4_YYY_sqr(&f2,&(x->b));
     FP4_YYY_mul(&f3,&(x->a),&(x->c));
     FP4_YYY_sub(&f2,&f2,&f3);  /* y.c */
-	FP4_YYY_norm(&f2); 
+    FP4_YYY_norm(&f2);
 
     FP4_YYY_mul(&f3,&(x->b),&f2);
     FP4_YYY_times_i(&f3);
@@ -362,8 +364,8 @@ void FP12_YYY_inv(FP12_YYY *w,FP12_YYY *x)
     FP4_YYY_times_i(&(w->c));
 
     FP4_YYY_add(&f3,&(w->c),&f3);
-	FP4_YYY_norm(&f3);
-	
+    FP4_YYY_norm(&f3);
+
     FP4_YYY_inv(&f3,&f3);
 
     FP4_YYY_mul(&(w->a),&f0,&f3);
@@ -396,9 +398,9 @@ void FP12_YYY_pinpow(FP12_YYY *r,int e,int bts)
 void FP12_YYY_compow(FP4_YYY *c,FP12_YYY *x,BIG_XXX e,BIG_XXX r)
 {
     FP12_YYY g1,g2;
-	FP4_YYY cp,cpm1,cpm2;
+    FP4_YYY cp,cpm1,cpm2;
     FP2_YYY f;
-	BIG_XXX q,a,b,m;
+    BIG_XXX q,a,b,m;
 
     BIG_XXX_rcopy(a,Fra_YYY);
     BIG_XXX_rcopy(b,Frb_YYY);
@@ -407,7 +409,7 @@ void FP12_YYY_compow(FP4_YYY *c,FP12_YYY *x,BIG_XXX e,BIG_XXX r)
     BIG_XXX_rcopy(q,Modulus_YYY);
 
     FP12_YYY_copy(&g1,x);
-	FP12_YYY_copy(&g2,x);
+    FP12_YYY_copy(&g2,x);
 
     BIG_XXX_copy(m,q);
     BIG_XXX_mod(m,r);
@@ -420,11 +422,11 @@ void FP12_YYY_compow(FP4_YYY *c,FP12_YYY *x,BIG_XXX e,BIG_XXX r)
 
     FP12_YYY_trace(c,&g1);
 
-	if (BIG_XXX_iszilch(b))
-	{
-		FP4_YYY_xtr_pow(c,c,e);
-		return;
-	}
+    if (BIG_XXX_iszilch(b))
+    {
+        FP4_YYY_xtr_pow(c,c,e);
+        return;
+    }
 
 
     FP12_YYY_frob(&g2,&f);
@@ -451,41 +453,41 @@ void FP12_YYY_pow(FP12_YYY *r,FP12_YYY *a,BIG_XXX b)
     BIG_XXX b3;
     int i,nb,bt;
     BIG_XXX_norm(b);
-	BIG_XXX_pmul(b3,b,3);
-	BIG_XXX_norm(b3);
+    BIG_XXX_pmul(b3,b,3);
+    BIG_XXX_norm(b3);
 
     FP12_YYY_copy(&w,a);
 
-	nb=BIG_XXX_nbits(b3);
-	for (i=nb-2;i>=1;i--)
-	{
-		FP12_YYY_usqr(&w,&w);
-		bt=BIG_XXX_bit(b3,i)-BIG_XXX_bit(b,i);
-		if (bt==1)
-			FP12_YYY_mul(&w,a);
-		if (bt==-1)
-		{
-			FP12_YYY_conj(a,a);
-			FP12_YYY_mul(&w,a);
-			FP12_YYY_conj(a,a);
-		}
-	}
-
-	FP12_YYY_copy(r,&w);
-	FP12_YYY_reduce(r);
-
-/*
-    while(1)
+    nb=BIG_XXX_nbits(b3);
+    for (i=nb-2; i>=1; i--)
     {
-        bt=BIG_XXX_parity(z);
-        BIG_XXX_shr(z,1);
-        if (bt)
-            FP12_YYY_mul(r,&w);
-        if (BIG_XXX_comp(z,zilch)==0) break;
         FP12_YYY_usqr(&w,&w);
+        bt=BIG_XXX_bit(b3,i)-BIG_XXX_bit(b,i);
+        if (bt==1)
+            FP12_YYY_mul(&w,a);
+        if (bt==-1)
+        {
+            FP12_YYY_conj(a,a);
+            FP12_YYY_mul(&w,a);
+            FP12_YYY_conj(a,a);
+        }
     }
 
-    FP12_YYY_reduce(r); */
+    FP12_YYY_copy(r,&w);
+    FP12_YYY_reduce(r);
+
+    /*
+        while(1)
+        {
+            bt=BIG_XXX_parity(z);
+            BIG_XXX_shr(z,1);
+            if (bt)
+                FP12_YYY_mul(r,&w);
+            if (BIG_XXX_comp(z,zilch)==0) break;
+            FP12_YYY_usqr(&w,&w);
+        }
+
+        FP12_YYY_reduce(r); */
 }
 
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
@@ -669,7 +671,7 @@ void FP12_YYY_toOctet(octet *W,FP12_YYY *g)
 /* Restore g from octet string w */
 void FP12_YYY_fromOctet(FP12_YYY *g,octet *W)
 {
-	BIG_XXX b;
+    BIG_XXX b;
     BIG_XXX_fromBytes(b,&W->val[0]);
     FP_YYY_nres(&(g->a.a.a),b);
     BIG_XXX_fromBytes(b,&W->val[MODBYTES_XXX]);

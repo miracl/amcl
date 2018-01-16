@@ -116,21 +116,22 @@ int ECP_ZZZ_PUBLIC_KEY_VALIDATE(octet *W)
 #endif
         if (!valid || ECP_ZZZ_isinf(&WP)) res=ECDH_INVALID_PUBLIC_KEY;
         if (res==0 )
-        {/* Check point is not in wrong group */
-			nb=BIG_XXX_nbits(q);
-			BIG_XXX_one(k);
-			BIG_XXX_shl(k,(nb+4)/2);
-			BIG_XXX_add(k,q,k);
-			BIG_XXX_sdiv(k,r); /* get co-factor */
+        {
+            /* Check point is not in wrong group */
+            nb=BIG_XXX_nbits(q);
+            BIG_XXX_one(k);
+            BIG_XXX_shl(k,(nb+4)/2);
+            BIG_XXX_add(k,q,k);
+            BIG_XXX_sdiv(k,r); /* get co-factor */
 
-			while (BIG_XXX_parity(k)==0)
-			{
-				ECP_ZZZ_dbl(&WP);
-				BIG_XXX_fshr(k,1);
-			}
+            while (BIG_XXX_parity(k)==0)
+            {
+                ECP_ZZZ_dbl(&WP);
+                BIG_XXX_fshr(k,1);
+            }
 
-			if (!BIG_XXX_isunity(k)) ECP_ZZZ_mul(&WP,k);
-			if (ECP_ZZZ_isinf(&WP)) res=ECDH_INVALID_PUBLIC_KEY;
+            if (!BIG_XXX_isunity(k)) ECP_ZZZ_mul(&WP,k);
+            if (ECP_ZZZ_isinf(&WP)) res=ECDH_INVALID_PUBLIC_KEY;
         }
     }
 

@@ -200,26 +200,26 @@ void HASH256_hash(hash256 *sh,char *digest)
 
 static const unsign64 K_512[80]=
 {
-    0x428a2f98d728ae22 ,0x7137449123ef65cd ,0xb5c0fbcfec4d3b2f ,0xe9b5dba58189dbbc ,
-    0x3956c25bf348b538 ,0x59f111f1b605d019 ,0x923f82a4af194f9b ,0xab1c5ed5da6d8118 ,
-    0xd807aa98a3030242 ,0x12835b0145706fbe ,0x243185be4ee4b28c ,0x550c7dc3d5ffb4e2 ,
-    0x72be5d74f27b896f ,0x80deb1fe3b1696b1 ,0x9bdc06a725c71235 ,0xc19bf174cf692694 ,
-    0xe49b69c19ef14ad2 ,0xefbe4786384f25e3 ,0x0fc19dc68b8cd5b5 ,0x240ca1cc77ac9c65 ,
-    0x2de92c6f592b0275 ,0x4a7484aa6ea6e483 ,0x5cb0a9dcbd41fbd4 ,0x76f988da831153b5 ,
-    0x983e5152ee66dfab ,0xa831c66d2db43210 ,0xb00327c898fb213f ,0xbf597fc7beef0ee4 ,
-    0xc6e00bf33da88fc2 ,0xd5a79147930aa725 ,0x06ca6351e003826f ,0x142929670a0e6e70 ,
-    0x27b70a8546d22ffc ,0x2e1b21385c26c926 ,0x4d2c6dfc5ac42aed ,0x53380d139d95b3df ,
-    0x650a73548baf63de ,0x766a0abb3c77b2a8 ,0x81c2c92e47edaee6 ,0x92722c851482353b ,
-    0xa2bfe8a14cf10364 ,0xa81a664bbc423001 ,0xc24b8b70d0f89791 ,0xc76c51a30654be30 ,
-    0xd192e819d6ef5218 ,0xd69906245565a910 ,0xf40e35855771202a ,0x106aa07032bbd1b8 ,
-    0x19a4c116b8d2d0c8 ,0x1e376c085141ab53 ,0x2748774cdf8eeb99 ,0x34b0bcb5e19b48a8 ,
-    0x391c0cb3c5c95a63 ,0x4ed8aa4ae3418acb ,0x5b9cca4f7763e373 ,0x682e6ff3d6b2b8a3 ,
-    0x748f82ee5defb2fc ,0x78a5636f43172f60 ,0x84c87814a1f0ab72 ,0x8cc702081a6439ec ,
-    0x90befffa23631e28 ,0xa4506cebde82bde9 ,0xbef9a3f7b2c67915 ,0xc67178f2e372532b ,
-    0xca273eceea26619c ,0xd186b8c721c0c207 ,0xeada7dd6cde0eb1e ,0xf57d4f7fee6ed178 ,
-    0x06f067aa72176fba ,0x0a637dc5a2c898a6 ,0x113f9804bef90dae ,0x1b710b35131c471b ,
-    0x28db77f523047d84 ,0x32caab7b40c72493 ,0x3c9ebe0a15c9bebc ,0x431d67c49c100d4c ,
-    0x4cc5d4becb3e42b6 ,0x597f299cfc657e2a ,0x5fcb6fab3ad6faec ,0x6c44198c4a475817
+    0x428a2f98d728ae22,0x7137449123ef65cd,0xb5c0fbcfec4d3b2f,0xe9b5dba58189dbbc,
+    0x3956c25bf348b538,0x59f111f1b605d019,0x923f82a4af194f9b,0xab1c5ed5da6d8118,
+    0xd807aa98a3030242,0x12835b0145706fbe,0x243185be4ee4b28c,0x550c7dc3d5ffb4e2,
+    0x72be5d74f27b896f,0x80deb1fe3b1696b1,0x9bdc06a725c71235,0xc19bf174cf692694,
+    0xe49b69c19ef14ad2,0xefbe4786384f25e3,0x0fc19dc68b8cd5b5,0x240ca1cc77ac9c65,
+    0x2de92c6f592b0275,0x4a7484aa6ea6e483,0x5cb0a9dcbd41fbd4,0x76f988da831153b5,
+    0x983e5152ee66dfab,0xa831c66d2db43210,0xb00327c898fb213f,0xbf597fc7beef0ee4,
+    0xc6e00bf33da88fc2,0xd5a79147930aa725,0x06ca6351e003826f,0x142929670a0e6e70,
+    0x27b70a8546d22ffc,0x2e1b21385c26c926,0x4d2c6dfc5ac42aed,0x53380d139d95b3df,
+    0x650a73548baf63de,0x766a0abb3c77b2a8,0x81c2c92e47edaee6,0x92722c851482353b,
+    0xa2bfe8a14cf10364,0xa81a664bbc423001,0xc24b8b70d0f89791,0xc76c51a30654be30,
+    0xd192e819d6ef5218,0xd69906245565a910,0xf40e35855771202a,0x106aa07032bbd1b8,
+    0x19a4c116b8d2d0c8,0x1e376c085141ab53,0x2748774cdf8eeb99,0x34b0bcb5e19b48a8,
+    0x391c0cb3c5c95a63,0x4ed8aa4ae3418acb,0x5b9cca4f7763e373,0x682e6ff3d6b2b8a3,
+    0x748f82ee5defb2fc,0x78a5636f43172f60,0x84c87814a1f0ab72,0x8cc702081a6439ec,
+    0x90befffa23631e28,0xa4506cebde82bde9,0xbef9a3f7b2c67915,0xc67178f2e372532b,
+    0xca273eceea26619c,0xd186b8c721c0c207,0xeada7dd6cde0eb1e,0xf57d4f7fee6ed178,
+    0x06f067aa72176fba,0x0a637dc5a2c898a6,0x113f9804bef90dae,0x1b710b35131c471b,
+    0x28db77f523047d84,0x32caab7b40c72493,0x3c9ebe0a15c9bebc,0x431d67c49c100d4c,
+    0x4cc5d4becb3e42b6,0x597f299cfc657e2a,0x5fcb6fab3ad6faec,0x6c44198c4a475817
 };
 
 
@@ -362,159 +362,168 @@ void HASH512_hash(hash512 *sh,char *hash)
 
 /* round constants */
 
-static const unsign64 RC[24]={
-0x0000000000000001UL,0x0000000000008082UL,0x800000000000808AUL,0x8000000080008000UL,
-0x000000000000808BUL,0x0000000080000001UL,0x8000000080008081UL,0x8000000000008009UL,
-0x000000000000008AUL,0x0000000000000088UL,0x0000000080008009UL,0x000000008000000AUL,
-0x000000008000808BUL,0x800000000000008BUL,0x8000000000008089UL,0x8000000000008003UL,
-0x8000000000008002UL,0x8000000000000080UL,0x000000000000800AUL,0x800000008000000AUL,
-0x8000000080008081UL,0x8000000000008080UL,0x0000000080000001UL,0x8000000080008008UL};
+static const unsign64 RC[24]=
+{
+    0x0000000000000001UL,0x0000000000008082UL,0x800000000000808AUL,0x8000000080008000UL,
+    0x000000000000808BUL,0x0000000080000001UL,0x8000000080008081UL,0x8000000000008009UL,
+    0x000000000000008AUL,0x0000000000000088UL,0x0000000080008009UL,0x000000008000000AUL,
+    0x000000008000808BUL,0x800000000000008BUL,0x8000000000008089UL,0x8000000000008003UL,
+    0x8000000000008002UL,0x8000000000000080UL,0x000000000000800AUL,0x800000008000000AUL,
+    0x8000000080008081UL,0x8000000000008080UL,0x0000000080000001UL,0x8000000080008008UL
+};
 
 /* permutation */
 
 static void SHA3_transform(sha3 *sh)
 {
-	int i,j,k;
-	unsign64 C[5],D[5],B[5][5];
-	
-	for (k=0;k<SHA3_ROUNDS;k++)
-	{
-		C[0]=sh->S[0][0]^sh->S[0][1]^sh->S[0][2]^sh->S[0][3]^sh->S[0][4];
-		C[1]=sh->S[1][0]^sh->S[1][1]^sh->S[1][2]^sh->S[1][3]^sh->S[1][4];
-		C[2]=sh->S[2][0]^sh->S[2][1]^sh->S[2][2]^sh->S[2][3]^sh->S[2][4];
-		C[3]=sh->S[3][0]^sh->S[3][1]^sh->S[3][2]^sh->S[3][3]^sh->S[3][4];
-		C[4]=sh->S[4][0]^sh->S[4][1]^sh->S[4][2]^sh->S[4][3]^sh->S[4][4];
+    int i,j,k;
+    unsign64 C[5],D[5],B[5][5];
 
-		D[0]=C[4]^rotl(C[1],1);
-		D[1]=C[0]^rotl(C[2],1);
-		D[2]=C[1]^rotl(C[3],1);
-		D[3]=C[2]^rotl(C[4],1);
-		D[4]=C[3]^rotl(C[0],1);
+    for (k=0; k<SHA3_ROUNDS; k++)
+    {
+        C[0]=sh->S[0][0]^sh->S[0][1]^sh->S[0][2]^sh->S[0][3]^sh->S[0][4];
+        C[1]=sh->S[1][0]^sh->S[1][1]^sh->S[1][2]^sh->S[1][3]^sh->S[1][4];
+        C[2]=sh->S[2][0]^sh->S[2][1]^sh->S[2][2]^sh->S[2][3]^sh->S[2][4];
+        C[3]=sh->S[3][0]^sh->S[3][1]^sh->S[3][2]^sh->S[3][3]^sh->S[3][4];
+        C[4]=sh->S[4][0]^sh->S[4][1]^sh->S[4][2]^sh->S[4][3]^sh->S[4][4];
 
-		for (i=0;i<5;i++)
-			for (j=0;j<5;j++)
-				sh->S[i][j]^=D[i];  /* let the compiler unroll it! */
+        D[0]=C[4]^rotl(C[1],1);
+        D[1]=C[0]^rotl(C[2],1);
+        D[2]=C[1]^rotl(C[3],1);
+        D[3]=C[2]^rotl(C[4],1);
+        D[4]=C[3]^rotl(C[0],1);
 
-		B[0][0]=sh->S[0][0];
-		B[1][3]=rotl(sh->S[0][1],36);
-		B[2][1]=rotl(sh->S[0][2],3);
-		B[3][4]=rotl(sh->S[0][3],41);
-		B[4][2]=rotl(sh->S[0][4],18);
+        for (i=0; i<5; i++)
+            for (j=0; j<5; j++)
+                sh->S[i][j]^=D[i];  /* let the compiler unroll it! */
 
-		B[0][2]=rotl(sh->S[1][0],1);
-		B[1][0]=rotl(sh->S[1][1],44);
-		B[2][3]=rotl(sh->S[1][2],10);
-		B[3][1]=rotl(sh->S[1][3],45);
-		B[4][4]=rotl(sh->S[1][4],2);
+        B[0][0]=sh->S[0][0];
+        B[1][3]=rotl(sh->S[0][1],36);
+        B[2][1]=rotl(sh->S[0][2],3);
+        B[3][4]=rotl(sh->S[0][3],41);
+        B[4][2]=rotl(sh->S[0][4],18);
 
-		B[0][4]=rotl(sh->S[2][0],62);
-		B[1][2]=rotl(sh->S[2][1],6);
-		B[2][0]=rotl(sh->S[2][2],43);
-		B[3][3]=rotl(sh->S[2][3],15);
-		B[4][1]=rotl(sh->S[2][4],61);
+        B[0][2]=rotl(sh->S[1][0],1);
+        B[1][0]=rotl(sh->S[1][1],44);
+        B[2][3]=rotl(sh->S[1][2],10);
+        B[3][1]=rotl(sh->S[1][3],45);
+        B[4][4]=rotl(sh->S[1][4],2);
 
-		B[0][1]=rotl(sh->S[3][0],28);
-		B[1][4]=rotl(sh->S[3][1],55);
-		B[2][2]=rotl(sh->S[3][2],25);
-		B[3][0]=rotl(sh->S[3][3],21);
-		B[4][3]=rotl(sh->S[3][4],56);
+        B[0][4]=rotl(sh->S[2][0],62);
+        B[1][2]=rotl(sh->S[2][1],6);
+        B[2][0]=rotl(sh->S[2][2],43);
+        B[3][3]=rotl(sh->S[2][3],15);
+        B[4][1]=rotl(sh->S[2][4],61);
 
-		B[0][3]=rotl(sh->S[4][0],27);
-		B[1][1]=rotl(sh->S[4][1],20);
-		B[2][4]=rotl(sh->S[4][2],39);
-		B[3][2]=rotl(sh->S[4][3],8);
-		B[4][0]=rotl(sh->S[4][4],14);
+        B[0][1]=rotl(sh->S[3][0],28);
+        B[1][4]=rotl(sh->S[3][1],55);
+        B[2][2]=rotl(sh->S[3][2],25);
+        B[3][0]=rotl(sh->S[3][3],21);
+        B[4][3]=rotl(sh->S[3][4],56);
 
-		for (i=0;i<5;i++)
-			for (j=0;j<5;j++)
-				sh->S[i][j]=B[i][j]^(~B[(i+1)%5][j]&B[(i+2)%5][j]);
+        B[0][3]=rotl(sh->S[4][0],27);
+        B[1][1]=rotl(sh->S[4][1],20);
+        B[2][4]=rotl(sh->S[4][2],39);
+        B[3][2]=rotl(sh->S[4][3],8);
+        B[4][0]=rotl(sh->S[4][4],14);
 
-		sh->S[0][0]^=RC[k];
-	}
+        for (i=0; i<5; i++)
+            for (j=0; j<5; j++)
+                sh->S[i][j]=B[i][j]^(~B[(i+1)%5][j]&B[(i+2)%5][j]);
+
+        sh->S[0][0]^=RC[k];
+    }
 }
 
-/* Re-Initialize. olen is output length in bytes - 
+/* Re-Initialize. olen is output length in bytes -
    should be 28, 32, 48 or 64 (224, 256, 384, 512 bits resp.) */
 
 void SHA3_init(sha3 *sh,int olen)
-{ 
+{
     int i,j;
-    for (i=0;i<5;i++) 
-		for (j=0;j<5;j++)
-			sh->S[i][j]=0;    /* 5x5x8 bytes = 200 bytes of state */
+    for (i=0; i<5; i++)
+        for (j=0; j<5; j++)
+            sh->S[i][j]=0;    /* 5x5x8 bytes = 200 bytes of state */
     sh->length=0;
-	sh->len=olen;
-	sh->rate=200-2*olen; /* number of bytes consumed in one gulp. Note that some bytes in the 
-	                        state ("capacity") are not touched. Gulps are smaller for larger digests. 
+    sh->len=olen;
+    sh->rate=200-2*olen; /* number of bytes consumed in one gulp. Note that some bytes in the
+	                        state ("capacity") are not touched. Gulps are smaller for larger digests.
 							Important that olen<rate */
 }
 
 /* process a single byte */
 void SHA3_process(sha3 *sh,int byte)
 {
-	int cnt=(int)(sh->length%sh->rate);
-	int i,j,b=cnt%8;
-	cnt/=8;
-	i=cnt%5; j=cnt/5;  /* process by columns! */
-	sh->S[i][j]^=((unsign64)byte<<(8*b));
-	sh->length++;
-	if (sh->length%sh->rate==0) SHA3_transform(sh);
+    int cnt=(int)(sh->length%sh->rate);
+    int i,j,b=cnt%8;
+    cnt/=8;
+    i=cnt%5;
+    j=cnt/5;  /* process by columns! */
+    sh->S[i][j]^=((unsign64)byte<<(8*b));
+    sh->length++;
+    if (sh->length%sh->rate==0) SHA3_transform(sh);
 }
 
 /* squeeze the sponge */
 void SHA3_squeeze(sha3 *sh,char *buff,int len)
 {
-	int done,i,j,k,m=0;
-	unsign64 el;
-/* extract by columns */
-	done=0;
-	for (;;)
-	{
-		for (j=0;j<5;j++)
-		{
-			for (i=0;i<5;i++)
-			{
-				el=sh->S[i][j];
-				for (k=0;k<8;k++)
-				{
-					buff[m++]=(el&0xff);
-					if (m>=len || m%sh->rate==0) {done=1; break;} 
-					el>>=8;
-				}
-				if (done) break;
-			}
-			if (done) break;
-		}
-		if (m>=len) break;
-		done=0;
-		SHA3_transform(sh);
-	}
+    int done,i,j,k,m=0;
+    unsign64 el;
+    /* extract by columns */
+    done=0;
+    for (;;)
+    {
+        for (j=0; j<5; j++)
+        {
+            for (i=0; i<5; i++)
+            {
+                el=sh->S[i][j];
+                for (k=0; k<8; k++)
+                {
+                    buff[m++]=(el&0xff);
+                    if (m>=len || m%sh->rate==0)
+                    {
+                        done=1;
+                        break;
+                    }
+                    el>>=8;
+                }
+                if (done) break;
+            }
+            if (done) break;
+        }
+        if (m>=len) break;
+        done=0;
+        SHA3_transform(sh);
+    }
 }
 
 void SHA3_hash(sha3 *sh,char *hash)
-{ /* generate a SHA3 hash of appropriate size */
-	int q=sh->rate-(sh->length%sh->rate);
-	if (q==1) SHA3_process(sh,0x86); 
-	else
-	{
-		SHA3_process(sh,0x06);   /* 0x06 for SHA-3 */
-		while ((int)sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
-		SHA3_process(sh,0x80); /* this will force a final transform */
-	}
-	SHA3_squeeze(sh,hash,sh->len);
+{
+    /* generate a SHA3 hash of appropriate size */
+    int q=sh->rate-(sh->length%sh->rate);
+    if (q==1) SHA3_process(sh,0x86);
+    else
+    {
+        SHA3_process(sh,0x06);   /* 0x06 for SHA-3 */
+        while ((int)sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
+        SHA3_process(sh,0x80); /* this will force a final transform */
+    }
+    SHA3_squeeze(sh,hash,sh->len);
 }
 
 void SHA3_shake(sha3 *sh,char *buff,int len)
-{ /* SHAKE out a buffer of variable length len */
-	int q=sh->rate-(sh->length%sh->rate);
-	if (q==1) SHA3_process(sh,0x9f); 
-	else
-	{
-		SHA3_process(sh,0x1f);   // 0x06 for SHA-3 !!!!
-		while ((int) sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
-		SHA3_process(sh,0x80); /* this will force a final transform */
-	}
-	SHA3_squeeze(sh,buff,len);
+{
+    /* SHAKE out a buffer of variable length len */
+    int q=sh->rate-(sh->length%sh->rate);
+    if (q==1) SHA3_process(sh,0x9f);
+    else
+    {
+        SHA3_process(sh,0x1f);   // 0x06 for SHA-3 !!!!
+        while ((int) sh->length%sh->rate!=sh->rate-1) SHA3_process(sh,0x00);
+        SHA3_process(sh,0x80); /* this will force a final transform */
+    }
+    SHA3_squeeze(sh,buff,len);
 }
 
 

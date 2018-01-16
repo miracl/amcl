@@ -143,7 +143,7 @@ extern void FP12_YYY_pow(FP12_YYY *r,FP12_YYY *x,BIG_XXX b);
  */
 extern void FP12_YYY_pinpow(FP12_YYY *x,int i,int b);
 
-/**	@brief Raises an FP12 instance x to a BIG power, compressed to FP4 
+/**	@brief Raises an FP12 instance x to a BIG power, compressed to FP4
  *
 	@param c FP4 instance, on exit = x^(e mod r) as FP4
 	@param x FP12 input
