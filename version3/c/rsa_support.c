@@ -119,7 +119,7 @@ int PKCS15(int sha,octet *m,octet *w)
     char h[64];
     octet H= {0,sizeof(h),h};
 
-    if (olen<idlen+hlen+10) return 0;
+    if (olen<idlen+hlen+10) return 1;
     hashit(sha,m,-1,&H);
 
     OCT_empty(w);
@@ -134,7 +134,7 @@ int PKCS15(int sha,octet *m,octet *w)
 
     OCT_joctet(w,&H);
 
-    return 1;
+    return 0;
 }
 
 /* OAEP Message Encoding for Encryption */
@@ -149,8 +149,8 @@ int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
     octet SEED= {0,sizeof(seed),seed};
 
     hlen=seedlen=sha;
-    if (mlen>olen-hlen-seedlen-1) return 0;
-    if (m==f) return 0;  /* must be distinct octets */
+    if (mlen>olen-hlen-seedlen-1) return 1;
+    if (m==f) return 1;  /* must be distinct octets */
 
     hashit(sha,p,-1,f);
 
@@ -175,7 +175,7 @@ int OAEP_ENCODE(int sha,octet *m,csprng *RNG,octet *p,octet *f)
     OCT_clear(&SEED);
     OCT_clear(&DBMASK);
 
-    return 1;
+    return 0;
 }
 
 /* OAEP Message Decoding for Decryption */
@@ -191,8 +191,8 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
     octet CHASH= {0,sizeof(chash),chash};
 
     seedlen=hlen=sha;
-    if (olen<seedlen+hlen+1) return 0;
-    if (!OCT_pad(f,olen+1)) return 0;
+    if (olen<seedlen+hlen+1) return 1;
+    if (!OCT_pad(f,olen+1)) return 1;
     hashit(sha,p,-1,&CHASH);
 
     x=f->val[0];
@@ -217,7 +217,7 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
         if (k>=DBMASK.len)
         {
             OCT_clear(&DBMASK);
-            return 0;
+            return 1;
         }
         if (DBMASK.val[k]!=0) break;
     }
@@ -226,12 +226,12 @@ int OAEP_DECODE(int sha,octet *p,octet *f)
     if (!comp || x!=0 || t!=0x01)
     {
         OCT_clear(&DBMASK);
-        return 0;
+        return 1;
     }
 
     OCT_shl(&DBMASK,k+1);
     OCT_copy(f,&DBMASK);
     OCT_clear(&DBMASK);
 
-    return 1;
+    return 0;
 }
