@@ -15,8 +15,8 @@
 */
 
 #if PAIRING_FRIENDLY_ZZZ != NOT
-#define USE_GLV_ZZZ	  /**< Note this method is patented (GLV), so maybe you want to comment this out */
-#define USE_GS_G2_ZZZ /**< Well we didn't patent it :) But may be covered by GLV patent :( */
+//#define USE_GLV_ZZZ	  /**< Note this method is patented (GLV), so maybe you want to comment this out */
+//#define USE_GS_G2_ZZZ /**< Well we didn't patent it :) But may be covered by GLV patent :( */
 #define USE_GS_GT_ZZZ /**< Not patented, so probably safe to always use this */
 
 #define POSITIVEX 0
