@@ -146,11 +146,14 @@ MPIN = function(ctx) {
             if (R.length == 0) return null;
             var W = [];
 
-            if (sha >= ctx.BIG.MODBYTES)
-                for (var i = 0; i < ctx.BIG.MODBYTES; i++) W[i] = R[i];
+			var len=ctx.BIG.MODBYTES;
+            if (sha >= len)
+                for (var i = 0; i < len; i++) W[i] = R[i];
             else {
-                for (var i = 0; i < sha; i++) W[i] = R[i];
-                for (var i = sha; i < ctx.BIG.MODBYTES; i++) W[i] = 0;
+				for (var i=0;i<sha;i++) W[i+len-sha]=R[i];
+                for (var i=0;i<len-sha;i++) W[i]=0;
+                //for (var i = 0; i < sha; i++) W[i] = R[i];
+                //for (var i = sha; i < len; i++) W[i] = 0;
             }
             return W;
         },

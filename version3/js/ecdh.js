@@ -100,8 +100,10 @@ ECDH = function(ctx) {
             if (pad <= sha) {
                 for (var i = 0; i < pad; i++) W[i] = R[i];
             } else {
-                for (var i = 0; i < sha; i++) W[i] = R[i];
-                for (var i = sha; i < pad; i++) W[i] = 0;
+				for (var i=0;i<sha;i++) W[i+pad-sha]=R[i];
+                for (var i=0;i<pad-sha;i++) W[i]=0;
+                //for (var i = 0; i < sha; i++) W[i] = R[i];
+                //for (var i = sha; i < pad; i++) W[i] = 0;
             }
             return W;
         },
