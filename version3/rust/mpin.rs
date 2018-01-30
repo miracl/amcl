@@ -134,8 +134,12 @@ fn hashit(sha: usize,n: usize,id: &[u8],w: &mut [u8]) -> bool {
 	if sha>rm {
 		for i in 0..rm {w[i]=r[i]}
 	} else {
-		for i in 0..sha {w[i]=r[i]}	
-		for i in sha..rm {w[i]=0}
+		for i in 0..sha {w[i+rm-sha]=r[i]}
+		for i in 0..(rm-sha) {w[i]=0}
+
+
+		//for i in 0..sha {w[i]=r[i]}	
+		//for i in sha..rm {w[i]=0}
 	}
 
 	return true;

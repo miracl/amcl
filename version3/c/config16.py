@@ -338,7 +338,7 @@ if curve_selected :
 if rsa_selected :
 	os.system("gcc -O3 -std=c99 -c rsa_support.c")
 if pfcurve_selected :
-	os.system("gcc -O3 -std=c99 -c mpin_support.c")
+	os.system("gcc -O3 -std=c99 -c pbc_support.c")
 
 os.system("gcc -O3 -std=c99 -c hash.c")
 os.system("gcc -O3 -std=c99 -c rand.c")

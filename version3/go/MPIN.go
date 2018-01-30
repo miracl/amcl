@@ -103,11 +103,15 @@ func mhashit(sha int,n int32,ID []byte) []byte {
 	if R==nil {return nil}
 	const RM int=int(MODBYTES)
 	var W [RM]byte
-	if sha>RM {
+	if sha>=RM {
 		for i:=0;i<RM;i++ {W[i]=R[i]}
 	} else {
-		for i:=0;i<sha;i++ {W[i]=R[i]}	
-		for i:=sha;i<RM;i++ {W[i]=0}
+		for i:=0;i<sha;i++ {W[i+RM-sha]=R[i]}
+		for i:=0;i<RM-sha;i++ {W[i]=0}
+
+
+	//	for i:=0;i<sha;i++ {W[i]=R[i]}	
+	//	for i:=sha;i<RM;i++ {W[i]=0}
 	}
 
 	return W[:]

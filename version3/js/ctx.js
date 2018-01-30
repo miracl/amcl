@@ -146,7 +146,7 @@ var CTXLIST = {
         "FIELD": "C41417",
         "CURVE": "C41417",
         "@NB": 52,
-        "@BASE": 23,
+        "@BASE": 22,
         "@NBT": 414,
         "@M8": 7,
         "@MT": 1,

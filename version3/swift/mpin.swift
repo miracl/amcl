@@ -122,7 +122,9 @@ final public class MPIN
         }
         else
         {
-            for i in 0 ..< sha {W[i]=R[i]}
+	    for i in 0 ..< sha {W[i+RM-sha]=R[i]}
+
+            //for i in 0 ..< sha {W[i]=R[i]}
         }
         return W
     }
