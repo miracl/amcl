@@ -96,8 +96,12 @@ fn hashit(sha: usize, a: &[u8],n: usize,b: Option<&[u8]>,pad: usize,w: &mut [u8]
 		if pad<=sha {
 			for i in 0..pad {w[i]=r[i]}
 		} else {
-			for i in 0..sha {w[i]=r[i]}
-			for i in sha..pad {w[i]=0}
+			for i in 0..sha {w[i+pad-sha]=r[i]}
+			for i in 0..(pad-sha) {w[i]=0}
+ 
+
+			//for i in 0..sha {w[i]=r[i]}
+			//for i in sha..pad {w[i]=0}
 		}
 	}
 }

@@ -109,8 +109,11 @@ void mhashit(int sha,int n,octet *x,octet *w)
         OCT_jbytes(w,hh,w->max);
     else
     {
-        OCT_jbytes(w,hh,hlen);
-        OCT_jbyte(w,0,w->max-hlen);
+		OCT_jbyte(w,0,w->max-hlen);
+		OCT_jbytes(w,hh,hlen);
+
+//        OCT_jbytes(w,hh,hlen);
+//        OCT_jbyte(w,0,w->max-hlen);
     }
 }
 
