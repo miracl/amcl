@@ -1,20 +1,20 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
 /* RSA API Functions */
@@ -35,11 +35,11 @@ RSA = function(ctx) {
         SHA512ID: [0x30, 0x51, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03, 0x05, 0x00, 0x04, 0x40],
 
         bytestohex: function(b) {
-            var s = "";
-            var len = b.length;
-            var ch;
+            var s = "",
+                len = b.length,
+                ch, i;
 
-            for (var i = 0; i < len; i++) {
+            for (i = 0; i < len; i++) {
                 ch = b[i];
                 s += ((ch >>> 4) & 15).toString(16);
                 s += (ch & 15).toString(16);
@@ -49,73 +49,117 @@ RSA = function(ctx) {
         },
 
         bytestostring: function(b) {
-            var s = "";
-            for (var i = 0; i < b.length; i++) {
+            var s = "",
+                i;
+
+            for (i = 0; i < b.length; i++) {
                 s += String.fromCharCode(b[i]);
             }
+
             return s;
         },
 
         stringtobytes: function(s) {
-            var b = [];
-            for (var i = 0; i < s.length; i++)
+            var b = [],
+                i;
+
+            for (i = 0; i < s.length; i++) {
                 b.push(s.charCodeAt(i));
+            }
+
             return b;
         },
 
         hashit: function(sha, A, n) {
-            var R = [];
+            var R = [],
+                H;
+
             if (sha == this.SHA256) {
-                var H = new ctx.HASH256();
-                if (A != null) H.process_array(A);
-                if (n >= 0) H.process_num(n);
+                H = new ctx.HASH256();
+
+                if (A != null) {
+                    H.process_array(A);
+                }
+
+                if (n >= 0) {
+                    H.process_num(n);
+                }
+
                 R = H.hash();
-            }
-            if (sha == this.SHA384) {
+            } else if (sha == this.SHA384) {
                 H = new ctx.HASH384();
-                if (A != null) H.process_array(A);
-                if (n >= 0) H.process_num(n);
+
+                if (A != null) {
+                    H.process_array(A);
+                }
+
+                if (n >= 0) {
+                    H.process_num(n);
+                }
+
                 R = H.hash();
-            }
-            if (sha == this.SHA512) {
+            } else if (sha == this.SHA512) {
                 H = new ctx.HASH512();
-                if (A != null) H.process_array(A);
-                if (n >= 0) H.process_num(n);
+
+                if (A != null) {
+                    H.process_array(A);
+                }
+
+                if (n >= 0) {
+                    H.process_num(n);
+                }
+
                 R = H.hash();
             }
+
             return R;
         },
 
         KEY_PAIR: function(rng, e, PRIV, PUB) { /* IEEE1363 A16.11/A16.12 more or less */
-
-            //	var m,r,bytes,hbytes,words,err,res=0;
-            var n = PUB.n.length >> 1;
-            var t = new ctx.FF(n);
-            var p1 = new ctx.FF(n);
-            var q1 = new ctx.FF(n);
+            var n = PUB.n.length >> 1,
+                t = new ctx.FF(n),
+                p1 = new ctx.FF(n),
+                q1 = new ctx.FF(n);
 
             for (;;) {
-
                 PRIV.p.random(rng);
-                while (PRIV.p.lastbits(2) != 3) PRIV.p.inc(1);
-                while (!ctx.FF.prime(PRIV.p, rng)) PRIV.p.inc(4);
+
+                while (PRIV.p.lastbits(2) != 3) {
+                    PRIV.p.inc(1);
+                }
+
+                while (!ctx.FF.prime(PRIV.p, rng)) {
+                    PRIV.p.inc(4);
+                }
 
                 p1.copy(PRIV.p);
                 p1.dec(1);
 
-                if (p1.cfactor(e)) continue;
+                if (p1.cfactor(e)) {
+                    continue;
+                }
+
                 break;
             }
 
             for (;;) {
                 PRIV.q.random(rng);
-                while (PRIV.q.lastbits(2) != 3) PRIV.q.inc(1);
-                while (!ctx.FF.prime(PRIV.q, rng)) PRIV.q.inc(4);
+
+                while (PRIV.q.lastbits(2) != 3) {
+                    PRIV.q.inc(1);
+                }
+
+                while (!ctx.FF.prime(PRIV.q, rng)) {
+                    PRIV.q.inc(4);
+                }
 
                 q1.copy(PRIV.q);
                 q1.dec(1);
 
-                if (q1.cfactor(e)) continue;
+                if (q1.cfactor(e)) {
+                    continue;
+                }
+
                 break;
             }
 
@@ -126,14 +170,18 @@ RSA = function(ctx) {
             t.shr();
             PRIV.dp.set(e);
             PRIV.dp.invmodp(t);
-            if (PRIV.dp.parity() === 0) PRIV.dp.add(t);
+            if (PRIV.dp.parity() === 0) {
+                PRIV.dp.add(t);
+            }
             PRIV.dp.norm();
 
             t.copy(q1);
             t.shr();
             PRIV.dq.set(e);
             PRIV.dq.invmodp(t);
-            if (PRIV.dq.parity() === 0) PRIV.dq.add(t);
+            if (PRIV.dq.parity() === 0) {
+                PRIV.dq.add(t);
+            }
             PRIV.dq.norm();
 
             PRIV.c.copy(PRIV.p);
@@ -144,166 +192,237 @@ RSA = function(ctx) {
 
         /* Mask Generation Function */
         MGF1: function(sha, Z, olen, K) {
-            var i, hlen = sha;
-            var B = [];
+            var hlen = sha,
+                B = [],
+                k = 0,
+                counter, cthreshold, i;
 
-            var counter, cthreshold, k = 0;
-            for (i = 0; i < K.length; i++) K[i] = 0;
+            for (i = 0; i < K.length; i++) {
+                K[i] = 0;
+            }
 
             cthreshold = Math.floor(olen / hlen);
-            if (olen % hlen !== 0) cthreshold++;
+            if (olen % hlen !== 0) {
+                cthreshold++;
+            }
+
             for (counter = 0; counter < cthreshold; counter++) {
                 B = this.hashit(sha, Z, counter);
-                if (k + hlen > olen)
-                    for (i = 0; i < olen % hlen; i++) K[k++] = B[i];
-                else
-                    for (i = 0; i < hlen; i++) K[k++] = B[i];
+
+                if (k + hlen > olen) {
+                    for (i = 0; i < olen % hlen; i++) {
+                        K[k++] = B[i];
+                    }
+                } else {
+                    for (i = 0; i < hlen; i++) {
+                        K[k++] = B[i];
+                    }
+                }
             }
         },
 
         PKCS15: function(sha, m, w) {
-            var olen = ctx.FF.FF_BITS / 8;
-            var i, hlen = sha;
-            var idlen = 19;
+            var olen = ctx.FF.FF_BITS / 8,
+                hlen = sha,
+                idlen = 19,
+                H, i, j;
 
-            if (olen < idlen + hlen + 10) return false;
-            var H = this.hashit(sha, m, -1);
+            if (olen < idlen + hlen + 10) {
+                return false;
+            }
 
-            for (i = 0; i < w.length; i++) w[i] = 0;
+            H = this.hashit(sha, m, -1);
+
+            for (i = 0; i < w.length; i++) {
+                w[i] = 0;
+            }
+
             i = 0;
             w[i++] = 0;
             w[i++] = 1;
-            for (var j = 0; j < olen - idlen - hlen - 3; j++)
+            for (j = 0; j < olen - idlen - hlen - 3; j++) {
                 w[i++] = 0xFF;
+            }
             w[i++] = 0;
 
+            if (hlen == this.SHA256) {
+                for (j = 0; j < idlen; j++) {
+                    w[i++] = this.SHA256ID[j];
+                }
+            } else if (hlen == this.SHA384) {
+                for (j = 0; j < idlen; j++) {
+                    w[i++] = this.SHA384ID[j];
+                }
+            } else if (hlen == this.SHA512) {
+                for (j = 0; j < idlen; j++) {
+                    w[i++] = this.SHA512ID[j];
+                }
+            }
 
-            if (hlen == this.SHA256)
-                for (var j = 0; j < idlen; j++) w[i++] = this.SHA256ID[j];
-            if (hlen == this.SHA384)
-                for (var j = 0; j < idlen; j++) w[i++] = this.SHA384ID[j];
-            if (hlen == this.SHA512)
-                for (var j = 0; j < idlen; j++) w[i++] = this.SHA512ID[j];
-
-            for (var j = 0; j < hlen; j++)
+            for (j = 0; j < hlen; j++) {
                 w[i++] = H[j];
+            }
 
             return true;
         },
 
         /* OAEP Message Encoding for Encryption */
         OAEP_ENCODE: function(sha, m, rng, p) {
-            var i, slen, olen = RSA.RFS - 1;
-            var mlen = m.length;
-            var hlen, seedlen;
-            var f = [];
+            var olen = RSA.RFS - 1,
+                mlen = m.length,
+                SEED = [],
+                DBMASK = [],
+                f = [],
+                hlen,
+                seedlen,
+                slen,
+                i, d, h;
 
-            hlen = sha;
-            var SEED = [];
-            seedlen = hlen;
+            seedlen = hlen = sha;
 
-            if (mlen > olen - hlen - seedlen - 1) return null;
+            if (mlen > olen - hlen - seedlen - 1) {
+                return null;
+            }
 
-            var DBMASK = [];
-
-            var h = this.hashit(sha, p, -1);
-            for (i = 0; i < hlen; i++) f[i] = h[i];
+            h = this.hashit(sha, p, -1);
+            for (i = 0; i < hlen; i++) {
+                f[i] = h[i];
+            }
 
             slen = olen - mlen - hlen - seedlen - 1;
 
-            for (i = 0; i < slen; i++) f[hlen + i] = 0;
+            for (i = 0; i < slen; i++) {
+                f[hlen + i] = 0;
+            }
             f[hlen + slen] = 1;
-            for (i = 0; i < mlen; i++) f[hlen + slen + 1 + i] = m[i];
+            for (i = 0; i < mlen; i++) {
+                f[hlen + slen + 1 + i] = m[i];
+            }
 
-            for (i = 0; i < seedlen; i++) SEED[i] = rng.getByte();
+            for (i = 0; i < seedlen; i++) {
+                SEED[i] = rng.getByte();
+            }
             this.MGF1(sha, SEED, olen - seedlen, DBMASK);
 
-            for (i = 0; i < olen - seedlen; i++) DBMASK[i] ^= f[i];
+            for (i = 0; i < olen - seedlen; i++) {
+                DBMASK[i] ^= f[i];
+            }
             this.MGF1(sha, DBMASK, seedlen, f);
 
-            for (i = 0; i < seedlen; i++) f[i] ^= SEED[i];
+            for (i = 0; i < seedlen; i++) {
+                f[i] ^= SEED[i];
+            }
 
-            for (i = 0; i < olen - seedlen; i++) f[i + seedlen] = DBMASK[i];
+            for (i = 0; i < olen - seedlen; i++) {
+                f[i + seedlen] = DBMASK[i];
+            }
 
             /* pad to length RFS */
-            var d = 1;
-            for (i = RSA.RFS - 1; i >= d; i--)
+            d = 1;
+            for (i = RSA.RFS - 1; i >= d; i--) {
                 f[i] = f[i - d];
-            for (i = d - 1; i >= 0; i--)
+            }
+            for (i = d - 1; i >= 0; i--) {
                 f[i] = 0;
+            }
 
             return f;
         },
 
         /* OAEP Message Decoding for Decryption */
         OAEP_DECODE: function(sha, p, f) {
-            var x, t;
-            var comp;
-            var i, k, olen = RSA.RFS - 1;
-            var hlen, seedlen;
+            var olen = RSA.RFS - 1,
+                SEED = [],
+                CHASH = [],
+                DBMASK = [],
+                comp,
+                hlen,
+                seedlen,
+                x, t, d, i, k, h, r;
 
-            hlen = sha;
-            var SEED = [];
-            seedlen = hlen;
-            var CHASH = [];
             seedlen = hlen = sha;
 
-            if (olen < seedlen + hlen + 1) return null;
-
-            var DBMASK = [];
-            for (i = 0; i < olen - seedlen; i++) DBMASK[i] = 0;
-
-            if (f.length < RSA.RFS) {
-                var d = RSA.RFS - f.length;
-                for (i = RFS - 1; i >= d; i--)
-                    f[i] = f[i - d];
-                for (i = d - 1; i >= 0; i--)
-                    f[i] = 0;
-
+            if (olen < seedlen + hlen + 1) {
+                return null;
             }
 
-            var h = this.hashit(sha, p, -1);
-            for (i = 0; i < hlen; i++) CHASH[i] = h[i];
+            for (i = 0; i < olen - seedlen; i++) {
+                DBMASK[i] = 0;
+            }
+
+            if (f.length < RSA.RFS) {
+                d = RSA.RFS - f.length;
+                for (i = RSA.RFS - 1; i >= d; i--) {
+                    f[i] = f[i - d];
+                }
+                for (i = d - 1; i >= 0; i--) {
+                    f[i] = 0;
+                }
+            }
+
+            h = this.hashit(sha, p, -1);
+            for (i = 0; i < hlen; i++) {
+                CHASH[i] = h[i];
+            }
 
             x = f[0];
 
-            for (i = seedlen; i < olen; i++)
+            for (i = seedlen; i < olen; i++) {
                 DBMASK[i - seedlen] = f[i + 1];
+            }
 
             this.MGF1(sha, DBMASK, seedlen, SEED);
-            for (i = 0; i < seedlen; i++) SEED[i] ^= f[i + 1];
+            for (i = 0; i < seedlen; i++) {
+                SEED[i] ^= f[i + 1];
+            }
             this.MGF1(sha, SEED, olen - seedlen, f);
-            for (i = 0; i < olen - seedlen; i++) DBMASK[i] ^= f[i];
+            for (i = 0; i < olen - seedlen; i++) {
+                DBMASK[i] ^= f[i];
+            }
 
             comp = true;
             for (i = 0; i < hlen; i++) {
-                if (CHASH[i] != DBMASK[i]) comp = false;
+                if (CHASH[i] != DBMASK[i]) {
+                    comp = false;
+                }
             }
 
-            for (i = 0; i < olen - seedlen - hlen; i++)
+            for (i = 0; i < olen - seedlen - hlen; i++) {
                 DBMASK[i] = DBMASK[i + hlen];
+            }
 
-            for (i = 0; i < hlen; i++)
+            for (i = 0; i < hlen; i++) {
                 SEED[i] = CHASH[i] = 0;
+            }
 
             for (k = 0;; k++) {
-                if (k >= olen - seedlen - hlen) return null;
-                if (DBMASK[k] !== 0) break;
+                if (k >= olen - seedlen - hlen) {
+                    return null;
+                }
+
+                if (DBMASK[k] !== 0) {
+                    break;
+                }
             }
 
             t = DBMASK[k];
 
             if (!comp || x !== 0 || t != 0x01) {
-                for (i = 0; i < olen - seedlen; i++) DBMASK[i] = 0;
+                for (i = 0; i < olen - seedlen; i++) {
+                    DBMASK[i] = 0;
+                }
                 return null;
             }
 
-            var r = [];
+            r = [];
 
-            for (i = 0; i < olen - seedlen - hlen - k - 1; i++)
+            for (i = 0; i < olen - seedlen - hlen - k - 1; i++) {
                 r[i] = DBMASK[i + k + 1];
+            }
 
-            for (i = 0; i < olen - seedlen; i++) DBMASK[i] = 0;
+            for (i = 0; i < olen - seedlen; i++) {
+                DBMASK[i] = 0;
+            }
 
             return r;
         },
@@ -319,8 +438,8 @@ RSA = function(ctx) {
 
         /* RSA encryption with the public key */
         ENCRYPT: function(PUB, F, G) {
-            var n = PUB.n.getlen();
-            var f = new ctx.FF(n);
+            var n = PUB.n.getlen(),
+                f = new ctx.FF(n);
 
             ctx.FF.fromBytes(f, F);
 
@@ -331,12 +450,14 @@ RSA = function(ctx) {
 
         /* RSA decryption with the private key */
         DECRYPT: function(PRIV, G, F) {
-            var n = PRIV.p.getlen();
-            var g = new ctx.FF(2 * n);
+            var n = PRIV.p.getlen(),
+                g = new ctx.FF(2 * n),
+                jp, jq, t;
 
             ctx.FF.fromBytes(g, G);
-            var jp = g.dmod(PRIV.p);
-            var jq = g.dmod(PRIV.q);
+
+            jp = g.dmod(PRIV.p);
+            jq = g.dmod(PRIV.q);
 
             jp.skpow(PRIV.dp, PRIV.p);
             jq.skpow(PRIV.dq, PRIV.q);
@@ -344,11 +465,13 @@ RSA = function(ctx) {
             g.zero();
             g.dscopy(jp);
             jp.mod(PRIV.q);
-            if (ctx.FF.comp(jp, jq) > 0) jq.add(PRIV.q);
+            if (ctx.FF.comp(jp, jq) > 0) {
+                jq.add(PRIV.q);
+            }
             jq.sub(jp);
             jq.norm();
 
-            var t = ctx.FF.mul(PRIV.c, jq);
+            t = ctx.FF.mul(PRIV.c, jq);
             jq = t.dmod(PRIV.q);
 
             t = ctx.FF.mul(jq, PRIV.p);
@@ -357,8 +480,8 @@ RSA = function(ctx) {
 
             g.toBytes(F);
         }
-
     };
+
     return RSA;
 };
 

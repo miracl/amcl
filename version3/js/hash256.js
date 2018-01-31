@@ -1,23 +1,23 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
-HASH256 = function() {
+var HASH256 = function() {
 
     var HASH256 = function() {
         this.length = [];
@@ -27,14 +27,12 @@ HASH256 = function() {
     };
 
     HASH256.prototype = {
-
-        /* functions */
-
         transform: function() { /* basic transformation step */
-            var a, b, c, d, e, f, g, hh, t1, t2;
-            var j;
-            for (j = 16; j < 64; j++)
+            var a, b, c, d, e, f, g, hh, t1, t2, j;
+
+            for (j = 16; j < 64; j++) {
                 this.w[j] = (HASH256.theta1(this.w[j - 2]) + this.w[j - 7] + HASH256.theta0(this.w[j - 15]) + this.w[j - 16]) | 0;
+            }
 
             a = this.h[0];
             b = this.h[1];
@@ -72,7 +70,10 @@ HASH256 = function() {
         /* Initialise Hash function */
         init: function() { /* initialise */
             var i;
-            for (i = 0; i < 64; i++) this.w[i] = 0;
+
+            for (i = 0; i < 64; i++) {
+                this.w[i] = 0;
+            }
             this.length[0] = this.length[1] = 0;
             this.h[0] = HASH256.H[0];
             this.h[1] = HASH256.H[1];
@@ -92,16 +93,22 @@ HASH256 = function() {
             this.w[cnt] <<= 8;
             this.w[cnt] |= (byt & 0xFF);
             this.length[0] += 8;
+
             if ((this.length[0] & 0xffffffff) === 0) {
                 this.length[1]++;
                 this.length[0] = 0;
             }
-            if ((this.length[0] % 512) === 0) this.transform();
+
+            if ((this.length[0] % 512) === 0) {
+                this.transform();
+            }
         },
 
         /* process an array of bytes */
         process_array: function(b) {
-            for (var i = 0; i < b.length; i++) this.process(b[i]);
+            for (var i = 0; i < b.length; i++) {
+                this.process(b[i]);
+            }
         },
 
         /* process a 32-bit integer */
@@ -113,13 +120,16 @@ HASH256 = function() {
         },
 
         hash: function() { /* pad message and finish - supply digest */
-            var i;
-            var digest = [];
-            var len0, len1;
+            var digest = [],
+                len0, len1, i;
+
             len0 = this.length[0];
             len1 = this.length[1];
             this.process(0x80);
-            while ((this.length[0] % 512) != 448) this.process(0);
+
+            while ((this.length[0] % 512) != 448) {
+                this.process(0);
+            }
 
             this.w[14] = len1;
             this.w[15] = len0;
@@ -129,6 +139,7 @@ HASH256 = function() {
                 digest[i] = ((this.h[i >>> 2] >> (8 * (3 - i % 4))) & 0xff);
             }
             this.init();
+
             return digest;
         }
     };
