@@ -1,24 +1,21 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
-
-
-
 
 var CTXLIST = {
     "ED25519": {
@@ -32,8 +29,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "C25519": {
@@ -47,8 +44,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 2,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NIST256": {
@@ -62,8 +59,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NIST384": {
@@ -77,8 +74,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "BRAINPOOL": {
@@ -92,8 +89,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "ANSSI": {
@@ -107,8 +104,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "HIFIVE": {
@@ -122,8 +119,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "GOLDILOCKS": {
@@ -137,8 +134,8 @@ var CTXLIST = {
         "@MT": 2,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "C41417": {
@@ -152,8 +149,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NIST521": {
@@ -167,8 +164,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS256W": {
@@ -182,8 +179,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS256E": {
@@ -197,8 +194,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS384W": {
@@ -212,8 +209,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS384E": {
@@ -227,8 +224,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS512W": {
@@ -242,8 +239,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS512E": {
@@ -257,8 +254,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "FP256BN": {
@@ -272,8 +269,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 1,
-		"@ST": 1,
-		"@SX": 1
+        "@ST": 1,
+        "@SX": 1
     },
 
     "FP512BN": {
@@ -287,8 +284,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 1,
-		"@ST": 1,
-		"@SX": 0
+        "@ST": 1,
+        "@SX": 0
     },
 
     "BN254": {
@@ -302,8 +299,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 1,
-		"@ST": 0,
-		"@SX": 1
+        "@ST": 0,
+        "@SX": 1
     },
 
     "BN254CX": {
@@ -317,8 +314,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 1,
-		"@ST": 0,
-		"@SX": 1
+        "@ST": 0,
+        "@SX": 1
     },
 
     "BLS383": {
@@ -332,8 +329,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 2,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "BLS461": {
@@ -347,8 +344,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 2,
-		"@ST": 1,
-		"@SX": 1
+        "@ST": 1,
+        "@SX": 1
     },
 
     "RSA2048": {
@@ -374,11 +371,10 @@ var CTXLIST = {
         "@BASE": 23,
         "@ML": 8,
     },
-}
-
-
+};
 
 CTX = function(input_parameter) {
+
     this.AES = AES();
     this.GCM = GCM(this);
     this.UInt64 = UInt64();
@@ -559,4 +555,3 @@ CTX = function(input_parameter) {
         };
     };
 };
-

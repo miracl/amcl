@@ -1,24 +1,24 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
 /*
- *   Cryptographic strong random number generator 
+ *   Cryptographic strong random number generator
  *
  *   Unguessable seed -> SHA -> PRNG internal state -> SHA -> random numbers
  *   Slow - but secure
@@ -28,7 +28,7 @@
 
 /* Marsaglia & Zaman Random number generator constants */
 
-RAND = function(ctx) {
+var RAND = function(ctx) {
 
     var RAND = function() {
         /* Cryptographically strong pseudo-random number generator */
@@ -48,35 +48,57 @@ RAND = function(ctx) {
         /* Terminate and clean up */
         clean: function() {
             var i;
-            for (i = 0; i < 32; i++) this.pool[i] = 0;
-            for (i = 0; i < this.NK; i++) this.ira[i] = 0;
+
+            for (i = 0; i < 32; i++) {
+                this.pool[i] = 0;
+            }
+
+            for (i = 0; i < this.NK; i++) {
+                this.ira[i] = 0;
+            }
+
             this.rndptr = 0;
             this.borrow = 0;
             this.pool_ptr = 0;
         },
 
         sbrand: function() { /* Marsaglia & Zaman random number generator */
-            var i, k;
-            var pdiff, t; /* unsigned 32-bit */
+            var i, k, pdiff, t;
 
             this.rndptr++;
-            if (this.rndptr < this.NK) return this.ira[this.rndptr];
+            if (this.rndptr < this.NK) {
+                return this.ira[this.rndptr];
+            }
+
             this.rndptr = 0;
+
             for (i = 0, k = this.NK - this.NJ; i < this.NK; i++, k++) { /* calculate next NK values */
-                if (k == this.NK) k = 0;
+                if (k == this.NK) {
+                    k = 0;
+                }
+
                 t = this.ira[k] >>> 0;
                 pdiff = (t - this.ira[i] - this.borrow) | 0;
                 pdiff >>>= 0; /* This is seriously weird shit. I got to do this to get a proper unsigned comparison... */
-                if (pdiff < t) this.borrow = 0;
-                if (pdiff > t) this.borrow = 1;
+
+                if (pdiff < t) {
+                    this.borrow = 0;
+                }
+
+                if (pdiff > t) {
+                    this.borrow = 1;
+                }
+
                 this.ira[i] = (pdiff | 0);
             }
+
             return this.ira[0];
         },
 
         sirand: function(seed) {
-            var i, inn;
-            var t, m = 1;
+            var m = 1,
+                i, inn, t;
+
             this.borrow = 0;
             this.rndptr = 0;
             seed >>>= 0;
@@ -90,27 +112,42 @@ RAND = function(ctx) {
                 seed = t;
             }
 
-            for (i = 0; i < 10000; i++) this.sbrand(); /* "warm-up" & stir the generator */
+            /* "warm-up" & stir the generator */
+            for (i = 0; i < 10000; i++) {
+                this.sbrand();
+            }
         },
 
         fill_pool: function() {
-            var sh = new ctx.HASH256();
-            for (var i = 0; i < 128; i++) sh.process(this.sbrand());
+            var sh = new ctx.HASH256(),
+                i;
+
+            for (i = 0; i < 128; i++) {
+                sh.process(this.sbrand());
+            }
+
             this.pool = sh.hash();
             this.pool_ptr = 0;
         },
 
         /* Initialize RNG with some real entropy from some external source */
         seed: function(rawlen, raw) { /* initialise from at least 128 byte string of raw random entropy */
-            var i;
-            var digest = [];
-            var b = [];
-            var sh = new ctx.HASH256();
+            var sh = new ctx.HASH256(),
+                digest = [],
+                b = [],
+                i;
+
             this.pool_ptr = 0;
-            for (i = 0; i < this.NK; i++) this.ira[i] = 0;
+
+            for (i = 0; i < this.NK; i++) {
+                this.ira[i] = 0;
+            }
+
             if (rawlen > 0) {
-                for (i = 0; i < rawlen; i++)
+                for (i = 0; i < rawlen; i++) {
                     sh.process(raw[i]);
+                }
+
                 digest = sh.hash();
 
                 /* initialise PRNG from distilled randomness */
@@ -122,13 +159,18 @@ RAND = function(ctx) {
                     this.sirand(RAND.pack(b));
                 }
             }
+
             this.fill_pool();
         },
 
         /* get random byte */
         getByte: function() {
             var r = this.pool[this.pool_ptr++];
-            if (this.pool_ptr >= 32) this.fill_pool();
+
+            if (this.pool_ptr >= 32) {
+                this.fill_pool();
+            }
+
             return (r & 0xff);
         }
     };

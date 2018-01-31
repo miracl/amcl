@@ -1,20 +1,20 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
 /*
@@ -23,10 +23,10 @@
  * Generates a message digest. It should be impossible to come
  * come up with two messages that hash to the same value ("collision free").
  *
- * For use with byte-oriented messages only. 
+ * For use with byte-oriented messages only.
  */
 
-SHA3 = function(ctx) {
+var SHA3 = function(ctx) {
 
     var SHA3 = function(olen) {
         this.length = 0;
@@ -39,10 +39,11 @@ SHA3 = function(ctx) {
     SHA3.prototype = {
 
         transform: function() {
-            var i, j, k;
-            var C = [];
-            var D = [];
-            var B = [];
+            var C = [],
+                D = [],
+                B = [],
+                i, j, k;
+
             for (k = 0; k < SHA3.ROUNDS; k++) {
                 C[0] = new ctx.UInt64(this.S[0][0].top ^ this.S[0][1].top ^ this.S[0][2].top ^ this.S[0][3].top ^ this.S[0][4].top, this.S[0][0].bot ^ this.S[0][1].bot ^ this.S[0][2].bot ^ this.S[0][3].bot ^ this.S[0][4].bot);
                 C[1] = new ctx.UInt64(this.S[1][0].top ^ this.S[1][1].top ^ this.S[1][2].top ^ this.S[1][3].top ^ this.S[1][4].top, this.S[1][0].bot ^ this.S[1][1].bot ^ this.S[1][2].bot ^ this.S[1][3].bot ^ this.S[1][4].bot);
@@ -94,9 +95,11 @@ SHA3 = function(ctx) {
                 B[3][2] = SHA3.rotl(this.S[4][3], 8);
                 B[4][0] = SHA3.rotl(this.S[4][4], 14);
 
-                for (i = 0; i < 5; i++)
-                    for (j = 0; j < 5; j++)
+                for (i = 0; i < 5; i++) {
+                    for (j = 0; j < 5; j++) {
                         this.S[i][j] = SHA3.xor(B[i][j], SHA3.and(SHA3.not(B[(i + 1) % 5][j]), B[(i + 2) % 5][j]));
+                    }
+                }
 
                 this.S[0][0] = SHA3.xor(this.S[0][0], SHA3.RC[k]);
             }
@@ -107,8 +110,9 @@ SHA3 = function(ctx) {
             var i, j;
             for (i = 0; i < 5; i++) {
                 this.S[i] = [];
-                for (j = 0; j < 5; j++)
+                for (j = 0; j < 5; j++) {
                     this.S[i][j] = new ctx.UInt64(0, 0);
+                }
             }
             this.length = 0;
             this.len = olen;
@@ -117,7 +121,7 @@ SHA3 = function(ctx) {
 
         /* process a single byte */
         process: function(byt) { /* process the next message byte */
-            var i, j, k, b, cnt;
+            var i, j, k, b, cnt, el;
 
             cnt = (this.length % this.rate);
             b = cnt % 8;
@@ -125,21 +129,27 @@ SHA3 = function(ctx) {
             i = cnt % 5;
             j = Math.floor(cnt / 5); /* process by columns! */
 
-            var el = new ctx.UInt64(0, byt);
-            for (k = 0; k < b; k++) el.shlb();
+            el = new ctx.UInt64(0, byt);
+            for (k = 0; k < b; k++) {
+                el.shlb();
+            }
             this.S[i][j] = SHA3.xor(this.S[i][j], el);
 
             this.length++;
-            if ((this.length % this.rate) == 0) this.transform();
+            if ((this.length % this.rate) == 0) {
+                this.transform();
+            }
         },
 
         /* squeeze the sponge */
         squeeze: function(buff, olen) {
-            var done;
-            var i, j, k, m = 0;
-            var el;
+            var done,
+                m = 0,
+                i, j, k, el;
+
             /* extract by columns */
             done = false;
+
             for (;;) {
                 for (j = 0; j < 5; j++) {
                     for (i = 0; i < 5; i++) {
@@ -152,11 +162,21 @@ SHA3 = function(ctx) {
                             }
                             el = SHA3.rotl(el, 56);
                         }
-                        if (done) break;
+
+                        if (done) {
+                            break;
+                        }
                     }
-                    if (done) break;
+
+                    if (done) {
+                        break;
+                    }
                 }
-                if (m >= olen) break;
+
+                if (m >= olen) {
+                    break;
+                }
+
                 done = false;
                 this.transform();
             }
@@ -164,10 +184,13 @@ SHA3 = function(ctx) {
 
         hash: function(buff) { /* pad message and finish - supply digest */
             var q = this.rate - (this.length % this.rate);
-            if (q == 1) this.process(0x86);
-            else {
+            if (q == 1) {
+                this.process(0x86);
+            } else {
                 this.process(0x06); /* 0x06 for SHA-3 */
-                while (this.length % this.rate != this.rate - 1) this.process(0x00);
+                while (this.length % this.rate != this.rate - 1) {
+                    this.process(0x00);
+                }
                 this.process(0x80); /* this will force a final transform */
             }
             this.squeeze(buff, this.len);
@@ -175,10 +198,13 @@ SHA3 = function(ctx) {
 
         shake: function(buff, olen) { /* pad message and finish - supply digest */
             var q = this.rate - (this.length % this.rate);
-            if (q == 1) this.process(0x9f);
-            else {
+            if (q == 1) {
+                this.process(0x9f);
+            } else {
                 this.process(0x1f); /* 0x06 for SHA-3 */
-                while (this.length % this.rate != this.rate - 1) this.process(0x00);
+                while (this.length % this.rate != this.rate - 1) {
+                    this.process(0x00);
+                }
                 this.process(0x80); /* this will force a final transform */
             }
             this.squeeze(buff, olen);
@@ -187,12 +213,15 @@ SHA3 = function(ctx) {
 
     /* static functions */
     SHA3.rotl = function(x, n) {
-        if (n == 0) return x;
-        if (n < 32)
-            return new ctx.UInt64((x.top << n) | (x.bot >>> (32 - n)), (x.bot << n) | (x.top >>> (32 - n)));
-        else
-            return new ctx.UInt64((x.bot << (n - 32)) | (x.top >>> (64 - n)), (x.top << (n - 32)) | (x.bot >>> (64 - n)));
+        if (n == 0) {
+            return x;
+        }
 
+        if (n < 32) {
+            return new ctx.UInt64((x.top << n) | (x.bot >>> (32 - n)), (x.bot << n) | (x.top >>> (32 - n)));
+        } else {
+            return new ctx.UInt64((x.bot << (n - 32)) | (x.top >>> (64 - n)), (x.top << (n - 32)) | (x.bot >>> (64 - n)));
+        }
     };
 
     SHA3.xor = function(a, b) {
