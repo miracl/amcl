@@ -24,7 +24,7 @@ under the License.
 #include <stdlib.h>
 #include <time.h>
 
-#include "mpin_support.h"
+#include "pbc_support.h"
 
 using namespace amcl;
 

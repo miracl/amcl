@@ -33,7 +33,7 @@ under the License.
 #define MPIN_ZZZ_H
 
 #include "pair_ZZZ.h"
-#include "mpin_support.h"
+#include "pbc_support.h"
 
 using namespace amcl;
 
