@@ -17,11 +17,8 @@
     under the License.
 */
 
-var BIG,
-    DBIG;
-
 /* AMCL BIG number class */
-BIG = function(ctx) {
+var BIG = function(ctx) {
 
     /* General purpose Constructor */
     var BIG = function(x) {
@@ -1181,7 +1178,7 @@ BIG = function(ctx) {
 };
 
 /* AMCL double length DBIG number class */
-DBIG = function(ctx) {
+var DBIG = function(ctx) {
 
     /* constructor */
     var DBIG = function(x) {

@@ -19,7 +19,7 @@
 
 /* RSA API Functions */
 
-RSA = function(ctx) {
+var RSA = function(ctx) {
 
     var RSA = {
         RFS: ctx.BIG.MODBYTES * ctx.FF.FFLEN,
@@ -485,7 +485,7 @@ RSA = function(ctx) {
     return RSA;
 };
 
-rsa_private_key = function(ctx) {
+var rsa_private_key = function(ctx) {
 
     var rsa_private_key = function(n) {
         this.p = new ctx.FF(n);
@@ -498,7 +498,7 @@ rsa_private_key = function(ctx) {
     return rsa_private_key;
 };
 
-rsa_public_key = function(ctx) {
+var rsa_public_key = function(ctx) {
 
     var rsa_public_key = function(m) {
         this.e = 0;
