@@ -264,7 +264,7 @@ while ptr<max:
 		curveset("NUMS512W","64","60","512","7","PSEUDO_MERSENNE","WEIERSTRASS","NOT","NOT","NOT")
 		curve_selected=True
 	if x==16:
-		curveset("NUMS512E","64","60","512","7","PSEUDO_MERSENNE","EDWARDS","NOT","NOT","NOT")
+		curveset("NUMS512E","64","56","512","7","PSEUDO_MERSENNE","EDWARDS","NOT","NOT","NOT")
 		curve_selected=True
 
 	if x==17:
