@@ -1,23 +1,23 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
-AES = function() {
+var AES = function() {
 
     var AES = function() {
         this.Nk = 0;
@@ -29,7 +29,6 @@ AES = function() {
     };
 
     // AES constants
-
     AES.ECB = 0;
     AES.CBC = 1;
     AES.CFB1 = 2;
@@ -50,36 +49,55 @@ AES = function() {
         /* reset cipher */
         reset: function(m, iv) { /* reset mode, or reset iv */
             var i;
+
             this.mode = m;
-            for (i = 0; i < 16; i++)
+
+            for (i = 0; i < 16; i++) {
                 this.f[i] = 0;
-            if (this.mode != AES.ECB && iv !== null)
-                for (i = 0; i < 16; i++)
+            }
+
+            if (this.mode != AES.ECB && iv !== null) {
+                for (i = 0; i < 16; i++) {
                     this.f[i] = iv[i];
+                }
+            }
         },
 
         getreg: function() {
-            var ir = [];
-            for (var i = 0; i < 16; i++) ir[i] = this.f[i];
+            var ir = [],
+                i;
+
+            for (i = 0; i < 16; i++) {
+                ir[i] = this.f[i];
+            }
+
             return ir;
         },
 
         increment: function() {
-            for (var i = 0; i < 16; i++) {
+            var i;
+
+            for (i = 0; i < 16; i++) {
                 this.f[i]++;
-                if ((this.f[i] & 0xff) != 0) break;
+
+                if ((this.f[i] & 0xff) != 0) {
+                    break;
+                }
             }
         },
 
         /* Initialise cipher */
         init: function(m, nk, key, iv) { /* Key=16 bytes */
             /* Key Scheduler. Create expanded encryption key */
-            var i, j, k, N, nr;
-            var CipherKey = [];
-            var b = [];
+            var CipherKey = [],
+                b = [],
+                i, j, k, N, nr;
+
             nk /= 4;
 
-            if (nk != 4 && nk != 6 && nk != 8) return false;
+            if (nk != 4 && nk != 6 && nk != 8) {
+                return false;
+            }
 
             nr = 6 + nk;
 
@@ -91,36 +109,52 @@ AES = function() {
             N = 4 * (nr + 1);
 
             for (i = j = 0; i < nk; i++, j += 4) {
-                for (k = 0; k < 4; k++) b[k] = key[j + k];
+                for (k = 0; k < 4; k++) {
+                    b[k] = key[j + k];
+                }
                 CipherKey[i] = AES.pack(b);
             }
-            for (i = 0; i < nk; i++) this.fkey[i] = CipherKey[i];
+
+            for (i = 0; i < nk; i++) {
+                this.fkey[i] = CipherKey[i];
+            }
+
             for (j = nk, k = 0; j < N; j += nk, k++) {
                 this.fkey[j] = this.fkey[j - nk] ^ AES.SubByte(AES.ROTL24(this.fkey[j - 1])) ^ (AES.rco[k]) & 0xff;
-                for (i = 1; i < nk && (i + j) < N; i++)
+                for (i = 1; i < nk && (i + j) < N; i++) {
                     this.fkey[i + j] = this.fkey[i + j - nk] ^ this.fkey[i + j - 1];
+                }
             }
 
             /* now for the expanded decrypt key in reverse order */
 
-            for (j = 0; j < 4; j++) this.rkey[j + N - 4] = this.fkey[j];
+            for (j = 0; j < 4; j++) {
+                this.rkey[j + N - 4] = this.fkey[j];
+            }
+
             for (i = 4; i < N - 4; i += 4) {
                 k = N - 4 - i;
-                for (j = 0; j < 4; j++) this.rkey[k + j] = AES.InvMixCol(this.fkey[i + j]);
+                for (j = 0; j < 4; j++) {
+                    this.rkey[k + j] = AES.InvMixCol(this.fkey[i + j]);
+                }
             }
-            for (j = N - 4; j < N; j++) this.rkey[j - N + 4] = this.fkey[j];
+
+            for (j = N - 4; j < N; j++) {
+                this.rkey[j - N + 4] = this.fkey[j];
+            }
         },
 
         /* Encrypt a single block */
         ecb_encrypt: function(buff) {
-            var i, j, k;
-            var t;
-            var b = [];
-            var p = [];
-            var q = [];
+            var b = [],
+                p = [],
+                q = [],
+                t, i, j, k;
 
             for (i = j = 0; i < 4; i++, j += 4) {
-                for (k = 0; k < 4; k++) b[k] = buff[j + k];
+                for (k = 0; k < 4; k++) {
+                    b[k] = buff[j + k];
+                }
                 p[i] = AES.pack(b);
                 p[i] ^= this.fkey[i];
             }
@@ -178,20 +212,23 @@ AES = function() {
 
             for (i = j = 0; i < 4; i++, j += 4) {
                 b = AES.unpack(q[i]);
-                for (k = 0; k < 4; k++) buff[j + k] = b[k];
+                for (k = 0; k < 4; k++) {
+                    buff[j + k] = b[k];
+                }
             }
         },
 
         /* Decrypt a single block */
         ecb_decrypt: function(buff) {
-            var i, j, k;
-            var t;
-            var b = [];
-            var p = [];
-            var q = [];
+            var b = [],
+                p = [],
+                q = [],
+                t, i, j, k;
 
             for (i = j = 0; i < 4; i++, j += 4) {
-                for (k = 0; k < 4; k++) b[k] = buff[j + k];
+                for (k = 0; k < 4; k++) {
+                    b[k] = buff[j + k];
+                }
                 p[i] = AES.pack(b);
                 p[i] ^= this.rkey[i];
             }
@@ -218,6 +255,7 @@ AES = function() {
                     AES.ROTL24(AES.rtable[(p[0] >>> 24) & 0xff]);
 
                 k += 4;
+
                 for (j = 0; j < 4; j++) {
                     t = p[j];
                     p[j] = q[j];
@@ -246,18 +284,19 @@ AES = function() {
 
             for (i = j = 0; i < 4; i++, j += 4) {
                 b = AES.unpack(q[i]);
-                for (k = 0; k < 4; k++) buff[j + k] = b[k];
+                for (k = 0; k < 4; k++) {
+                    buff[j + k] = b[k];
+                }
             }
 
         },
 
         /* Encrypt using selected mode of operation */
         encrypt: function(buff) {
-            var j, bytes;
-            var st = [];
-            var fell_off;
+            var st = [],
+                bytes, fell_off, j;
 
-            // Supported Modes of Operation 
+            // Supported Modes of Operation
 
             fell_off = 0;
 
@@ -265,19 +304,30 @@ AES = function() {
                 case AES.ECB:
                     this.ecb_encrypt(buff);
                     return 0;
+
                 case AES.CBC:
-                    for (j = 0; j < 16; j++) buff[j] ^= this.f[j];
+                    for (j = 0; j < 16; j++) {
+                        buff[j] ^= this.f[j];
+                    }
                     this.ecb_encrypt(buff);
-                    for (j = 0; j < 16; j++) this.f[j] = buff[j];
+                    for (j = 0; j < 16; j++) {
+                        this.f[j] = buff[j];
+                    }
                     return 0;
 
                 case AES.CFB1:
                 case AES.CFB2:
                 case AES.CFB4:
                     bytes = this.mode - AES.CFB1 + 1;
-                    for (j = 0; j < bytes; j++) fell_off = (fell_off << 8) | this.f[j];
-                    for (j = 0; j < 16; j++) st[j] = this.f[j];
-                    for (j = bytes; j < 16; j++) this.f[j - bytes] = this.f[j];
+                    for (j = 0; j < bytes; j++) {
+                        fell_off = (fell_off << 8) | this.f[j];
+                    }
+                    for (j = 0; j < 16; j++) {
+                        st[j] = this.f[j];
+                    }
+                    for (j = bytes; j < 16; j++) {
+                        this.f[j - bytes] = this.f[j];
+                    }
                     this.ecb_encrypt(st);
                     for (j = 0; j < bytes; j++) {
                         buff[j] ^= st[j];
@@ -290,10 +340,11 @@ AES = function() {
                 case AES.OFB4:
                 case AES.OFB8:
                 case AES.OFB16:
-
                     bytes = this.mode - AES.OFB1 + 1;
                     this.ecb_encrypt(this.f);
-                    for (j = 0; j < bytes; j++) buff[j] ^= this.f[j];
+                    for (j = 0; j < bytes; j++) {
+                        buff[j] ^= this.f[j];
+                    }
                     return 0;
 
                 case AES.CTR1:
@@ -301,12 +352,16 @@ AES = function() {
                 case AES.CTR4:
                 case AES.CTR8:
                 case AES.CTR16:
-
                     bytes = this.mode - AES.CTR1 + 1;
-                    for (j = 0; j < 16; j++) st[j] = this.f[j];
+                    for (j = 0; j < 16; j++) {
+                        st[j] = this.f[j];
+                    }
                     this.ecb_encrypt(st);
-                    for (j = 0; j < bytes; j++) buff[j] ^= st[j];
+                    for (j = 0; j < bytes; j++) {
+                        buff[j] ^= st[j];
+                    }
                     this.increment();
+                    return 0;
 
                 default:
                     return 0;
@@ -315,16 +370,16 @@ AES = function() {
 
         /* Decrypt using selected mode of operation */
         decrypt: function(buff) {
-            var j, bytes;
-            var st = [];
-            var fell_off;
+            var st = [],
+                bytes,fell_off, j;
 
-            // Supported modes of operation 
+            // Supported modes of operation
             fell_off = 0;
             switch (this.mode) {
                 case AES.ECB:
                     this.ecb_decrypt(buff);
                     return 0;
+
                 case AES.CBC:
                     for (j = 0; j < 16; j++) {
                         st[j] = this.f[j];
@@ -336,19 +391,27 @@ AES = function() {
                         st[j] = 0;
                     }
                     return 0;
+
                 case AES.CFB1:
                 case AES.CFB2:
                 case AES.CFB4:
                     bytes = this.mode - AES.CFB1 + 1;
-                    for (j = 0; j < bytes; j++) fell_off = (fell_off << 8) | this.f[j];
-                    for (j = 0; j < 16; j++) st[j] = this.f[j];
-                    for (j = bytes; j < 16; j++) this.f[j - bytes] = this.f[j];
+                    for (j = 0; j < bytes; j++) {
+                        fell_off = (fell_off << 8) | this.f[j];
+                    }
+                    for (j = 0; j < 16; j++) {
+                        st[j] = this.f[j];
+                    }
+                    for (j = bytes; j < 16; j++) {
+                        this.f[j - bytes] = this.f[j];
+                    }
                     this.ecb_encrypt(st);
                     for (j = 0; j < bytes; j++) {
                         this.f[16 - bytes + j] = buff[j];
                         buff[j] ^= st[j];
                     }
                     return fell_off;
+
                 case AES.OFB1:
                 case AES.OFB2:
                 case AES.OFB4:
@@ -356,7 +419,9 @@ AES = function() {
                 case AES.OFB16:
                     bytes = this.mode - AES.OFB1 + 1;
                     this.ecb_encrypt(this.f);
-                    for (j = 0; j < bytes; j++) buff[j] ^= this.f[j];
+                    for (j = 0; j < bytes; j++) {
+                        buff[j] ^= this.f[j];
+                    }
                     return 0;
 
                 case AES.CTR1:
@@ -365,24 +430,33 @@ AES = function() {
                 case AES.CTR8:
                 case AES.CTR16:
                     bytes = this.mode - AES.CTR1 + 1;
-                    for (j = 0; j < 16; j++) st[j] = this.f[j];
+                    for (j = 0; j < 16; j++) {
+                        st[j] = this.f[j];
+                    }
                     this.ecb_encrypt(st);
-                    for (j = 0; j < bytes; j++) buff[j] ^= st[j];
+                    for (j = 0; j < bytes; j++) {
+                        buff[j] ^= st[j];
+                    }
                     this.increment();
+                    return 0;
+
                 default:
                     return 0;
             }
         },
 
         /* Clean up and delete left-overs */
-        end: function() { // clean up 
+        end: function() { // clean up
             var i;
-            for (i = 0; i < 4 * (this.Nr + 1); i++)
-                this.fkey[i] = this.rkey[i] = 0;
-            for (i = 0; i < 16; i++)
-                this.f[i] = 0;
-        }
 
+            for (i = 0; i < 4 * (this.Nr + 1); i++) {
+                this.fkey[i] = this.rkey[i] = 0;
+            }
+
+            for (i = 0; i < 16; i++) {
+                this.f[i] = 0;
+            }
+        }
     };
 
     /* static functions */
@@ -413,16 +487,19 @@ AES = function() {
     };
 
     AES.bmul = function(x, y) { /* x.y= AntiLog(Log(x) + Log(y)) */
+        var ix = (x & 0xff),
+            iy = (y & 0xff),
+            lx = (AES.ltab[ix]) & 0xff,
+            ly = (AES.ltab[iy]) & 0xff;
 
-        var ix = (x & 0xff);
-        var iy = (y & 0xff);
-        var lx = (AES.ltab[ix]) & 0xff;
-        var ly = (AES.ltab[iy]) & 0xff;
-        if (x !== 0 && y !== 0) return AES.ptab[(lx + ly) % 255];
-        else return 0;
+        if (x !== 0 && y !== 0) {
+            return AES.ptab[(lx + ly) % 255];
+        } else {
+            return 0;
+        }
     };
 
-    //  if (x && y) 
+    //  if (x && y)
 
     AES.SubByte = function(a) {
         var b = AES.unpack(a);
@@ -434,14 +511,16 @@ AES = function() {
     };
 
     AES.product = function(x, y) { /* dot product of two 4-byte arrays */
-        var xb = AES.unpack(x);
-        var yb = AES.unpack(y);
+        var xb = AES.unpack(x),
+            yb = AES.unpack(y);
+
         return (AES.bmul(xb[0], yb[0]) ^ AES.bmul(xb[1], yb[1]) ^ AES.bmul(xb[2], yb[2]) ^ AES.bmul(xb[3], yb[3])) & 0xff;
     };
 
     AES.InvMixCol = function(x) { /* matrix Multiplication */
-        var y, m;
-        var b = [];
+        var b = [],
+            y, m;
+
         m = AES.pack(AES.InCo);
         b[3] = AES.product(m, x);
         m = AES.ROTL24(m);
@@ -451,6 +530,7 @@ AES = function() {
         m = AES.ROTL24(m);
         b[0] = AES.product(m, x);
         y = AES.pack(b);
+
         return y;
     };
 
@@ -619,7 +699,6 @@ AES = function() {
         0x8b493c28, 0x41950dff, 0x7101a839, 0xdeb30c08, 0x9ce4b4d8, 0x90c15664,
         0x6184cb7b, 0x70b632d5, 0x745c6c48, 0x4257b8d0
     ];
-
 
     return AES;
 };

@@ -21,12 +21,8 @@ under the License.
 
 /**
  * @file x509.h
- * @author Mike Scott and Kealan McCusker
- * @date 19th May 2015
+ * @author Mike Scott
  * @brief X509 function Header File
- *
- * defines structures
- * declares functions
  *
  */
 

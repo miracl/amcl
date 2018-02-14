@@ -26,6 +26,13 @@
 #include <inttypes.h>
 #include "arch.h"
 
+#ifdef CMAKE
+#define AMCL_VERSION_MAJOR @AMCL_VERSION_MAJOR@ /**< Major version of the library */
+#define AMCL_VERSION_MINOR @AMCL_VERSION_MINOR@ /**< Minor version of the library */
+#define AMCL_VERSION_PATCH @AMCL_VERSION_PATCH@ /**< Patch version of the library */
+#define OS "@OS@"                               /**< Build OS */
+#endif
+
 /* modulus types */
 
 #define NOT_SPECIAL 0	       /**< Modulus of no exploitable form */
@@ -75,10 +82,12 @@ typedef hash512 hash384;
 
 /**
  * @brief SHA3 hash function instance */
-typedef struct {
-	unsign64 length;
-	unsign64 S[5][5];
-	int rate,len;
+typedef struct
+{
+    unsign64 length;   /**< 64-bit input length */
+    unsign64 S[5][5];  /**< Internal state */
+    int rate;          /**< TODO */
+    int len;           /**< Hash length in bytes */
 } sha3;
 
 #define SHA256 32 /**< SHA-256 hashing */

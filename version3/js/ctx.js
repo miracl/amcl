@@ -1,24 +1,21 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
-
-
-
 
 var CTXLIST = {
     "ED25519": {
@@ -32,8 +29,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "C25519": {
@@ -47,8 +44,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 2,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NIST256": {
@@ -62,8 +59,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NIST384": {
@@ -77,8 +74,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "BRAINPOOL": {
@@ -92,8 +89,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "ANSSI": {
@@ -107,8 +104,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "HIFIVE": {
@@ -122,8 +119,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "GOLDILOCKS": {
@@ -137,8 +134,8 @@ var CTXLIST = {
         "@MT": 2,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "C41417": {
@@ -146,14 +143,14 @@ var CTXLIST = {
         "FIELD": "C41417",
         "CURVE": "C41417",
         "@NB": 52,
-        "@BASE": 23,
+        "@BASE": 22,
         "@NBT": 414,
         "@M8": 7,
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NIST521": {
@@ -167,8 +164,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS256W": {
@@ -182,8 +179,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS256E": {
@@ -197,8 +194,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS384W": {
@@ -212,8 +209,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS384E": {
@@ -227,8 +224,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS512W": {
@@ -242,8 +239,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 0,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "NUMS512E": {
@@ -257,8 +254,8 @@ var CTXLIST = {
         "@MT": 1,
         "@CT": 1,
         "@PF": 0,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "FP256BN": {
@@ -272,8 +269,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 1,
-		"@ST": 1,
-		"@SX": 1
+        "@ST": 1,
+        "@SX": 1
     },
 
     "FP512BN": {
@@ -287,8 +284,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 1,
-		"@ST": 1,
-		"@SX": 0
+        "@ST": 1,
+        "@SX": 0
     },
 
     "BN254": {
@@ -302,8 +299,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 1,
-		"@ST": 0,
-		"@SX": 1
+        "@ST": 0,
+        "@SX": 1
     },
 
     "BN254CX": {
@@ -317,8 +314,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 1,
-		"@ST": 0,
-		"@SX": 1
+        "@ST": 0,
+        "@SX": 1
     },
 
     "BLS383": {
@@ -332,8 +329,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 2,
-		"@ST": 0,
-		"@SX": 0
+        "@ST": 0,
+        "@SX": 0
     },
 
     "BLS461": {
@@ -347,8 +344,8 @@ var CTXLIST = {
         "@MT": 0,
         "@CT": 0,
         "@PF": 2,
-		"@ST": 1,
-		"@SX": 1
+        "@ST": 1,
+        "@SX": 1
     },
 
     "RSA2048": {
@@ -374,11 +371,10 @@ var CTXLIST = {
         "@BASE": 23,
         "@ML": 8,
     },
-}
+};
 
+var CTX = function(input_parameter) {
 
-
-CTX = function(input_parameter) {
     this.AES = AES();
     this.GCM = GCM(this);
     this.UInt64 = UInt64();
@@ -390,173 +386,173 @@ CTX = function(input_parameter) {
     this.NewHope = NewHope();
     this.NHS = NHS(this);
 
-    if (input_parameter === undefined)
+    if (input_parameter === undefined) {
         return;
-    else {
+    }
 
-        this.config = CTXLIST[input_parameter];
+    this.config = CTXLIST[input_parameter];
 
-        // Set RSA parameters
-        if (this.config['TFF'] !== undefined) {
-            this.BIG = BIG(this);
-            this.DBIG = DBIG(this);
-            this.FF = FF(this);
-            this.RSA = RSA(this);
-            this.rsa_public_key = rsa_public_key(this);
-            this.rsa_private_key = rsa_private_key(this);
-            return;
-        };
+    // Set BIG parameters
+    this.BIG = BIG(this);
+    this.DBIG = DBIG(this);
 
-        // Set Elliptic Curve parameters
-        if (this.config['CURVE'] !== undefined) {
+    // Set RSA parameters
+    if (this.config['TFF'] !== undefined) {
+        this.FF = FF(this);
+        this.RSA = RSA(this);
+        this.rsa_public_key = rsa_public_key(this);
+        this.rsa_private_key = rsa_private_key(this);
+        return;
+    }
 
-            switch (this.config['CURVE']) {
-                case "ED25519":
-                    this.ROM_CURVE = ROM_CURVE_ED25519();
-                    break;
-                case "C25519":
-                    this.ROM_CURVE = ROM_CURVE_C25519();
-                    break;
-                case "NIST256":
-                    this.ROM_CURVE = ROM_CURVE_NIST256();
-                    break;
-                case "NIST384":
-                    this.ROM_CURVE = ROM_CURVE_NIST384();
-                    break;
-                case "BRAINPOOL":
-                    this.ROM_CURVE = ROM_CURVE_BRAINPOOL();
-                    break;
-                case "ANSSI":
-                    this.ROM_CURVE = ROM_CURVE_ANSSI();
-                    break;
-                case "HIFIVE":
-                    this.ROM_CURVE = ROM_CURVE_HIFIVE();
-                    break;
-                case "GOLDILOCKS":
-                    this.ROM_CURVE = ROM_CURVE_GOLDILOCKS();
-                    break;
-                case "C41417":
-                    this.ROM_CURVE = ROM_CURVE_C41417();
-                    break;
-                case "NIST521":
-                    this.ROM_CURVE = ROM_CURVE_NIST521();
-                    break;
-                case "NUMS256W":
-                    this.ROM_CURVE = ROM_CURVE_NUMS256W();
-                    break;
-                case "NUMS256E":
-                    this.ROM_CURVE = ROM_CURVE_NUMS256E();
-                    break;
-                case "NUMS384W":
-                    this.ROM_CURVE = ROM_CURVE_NUMS384W();
-                    break;
-                case "NUMS384E":
-                    this.ROM_CURVE = ROM_CURVE_NUMS384E();
-                    break;
-                case "NUMS512W":
-                    this.ROM_CURVE = ROM_CURVE_NUMS512W();
-                    break;
-                case "NUMS512E":
-                    this.ROM_CURVE = ROM_CURVE_NUMS512E();
-                    break;
-                case "FP256BN":
-                    this.ROM_CURVE = ROM_CURVE_FP256BN();
-                    break;
-                case "FP512BN":
-                    this.ROM_CURVE = ROM_CURVE_FP512BN();
-                    break;
-                case "BN254":
-                    this.ROM_CURVE = ROM_CURVE_BN254();
-                    break;
-                case "BN254CX":
-                    this.ROM_CURVE = ROM_CURVE_BN254CX();
-                    break;
-                case "BLS383":
-                    this.ROM_CURVE = ROM_CURVE_BLS383();
-                    break;
-                case "BLS461":
-                    this.ROM_CURVE = ROM_CURVE_BLS461();
-                    break;
-                default:
-                    this.ROM_CURVE = undefined;
-            };
+    // Set Elliptic Curve parameters
+    if (this.config['CURVE'] !== undefined) {
+
+        switch (this.config['CURVE']) {
+            case "ED25519":
+                this.ROM_CURVE = ROM_CURVE_ED25519();
+                break;
+            case "C25519":
+                this.ROM_CURVE = ROM_CURVE_C25519();
+                break;
+            case "NIST256":
+                this.ROM_CURVE = ROM_CURVE_NIST256();
+                break;
+            case "NIST384":
+                this.ROM_CURVE = ROM_CURVE_NIST384();
+                break;
+            case "BRAINPOOL":
+                this.ROM_CURVE = ROM_CURVE_BRAINPOOL();
+                break;
+            case "ANSSI":
+                this.ROM_CURVE = ROM_CURVE_ANSSI();
+                break;
+            case "HIFIVE":
+                this.ROM_CURVE = ROM_CURVE_HIFIVE();
+                break;
+            case "GOLDILOCKS":
+                this.ROM_CURVE = ROM_CURVE_GOLDILOCKS();
+                break;
+            case "C41417":
+                this.ROM_CURVE = ROM_CURVE_C41417();
+                break;
+            case "NIST521":
+                this.ROM_CURVE = ROM_CURVE_NIST521();
+                break;
+            case "NUMS256W":
+                this.ROM_CURVE = ROM_CURVE_NUMS256W();
+                break;
+            case "NUMS256E":
+                this.ROM_CURVE = ROM_CURVE_NUMS256E();
+                break;
+            case "NUMS384W":
+                this.ROM_CURVE = ROM_CURVE_NUMS384W();
+                break;
+            case "NUMS384E":
+                this.ROM_CURVE = ROM_CURVE_NUMS384E();
+                break;
+            case "NUMS512W":
+                this.ROM_CURVE = ROM_CURVE_NUMS512W();
+                break;
+            case "NUMS512E":
+                this.ROM_CURVE = ROM_CURVE_NUMS512E();
+                break;
+            case "FP256BN":
+                this.ROM_CURVE = ROM_CURVE_FP256BN();
+                break;
+            case "FP512BN":
+                this.ROM_CURVE = ROM_CURVE_FP512BN();
+                break;
+            case "BN254":
+                this.ROM_CURVE = ROM_CURVE_BN254();
+                break;
+            case "BN254CX":
+                this.ROM_CURVE = ROM_CURVE_BN254CX();
+                break;
+            case "BLS383":
+                this.ROM_CURVE = ROM_CURVE_BLS383();
+                break;
+            case "BLS461":
+                this.ROM_CURVE = ROM_CURVE_BLS461();
+                break;
+            default:
+                this.ROM_CURVE = undefined;
+        }
 
 
-            switch (this.config['FIELD']) {
-                case "25519":
-                    this.ROM_FIELD = ROM_FIELD_25519();
-                    break;
-                case "NIST256":
-                    this.ROM_FIELD = ROM_FIELD_NIST256();
-                    break;
-                case "NIST384":
-                    this.ROM_FIELD = ROM_FIELD_NIST384();
-                    break;
-                case "BRAINPOOL":
-                    this.ROM_FIELD = ROM_FIELD_BRAINPOOL();
-                    break;
-                case "ANSSI":
-                    this.ROM_FIELD = ROM_FIELD_ANSSI();
-                    break;
-                case "HIFIVE":
-                    this.ROM_FIELD = ROM_FIELD_HIFIVE();
-                    break;
-                case "GOLDILOCKS":
-                    this.ROM_FIELD = ROM_FIELD_GOLDILOCKS();
-                    break;
-                case "C41417":
-                    this.ROM_FIELD = ROM_FIELD_C41417();
-                    break;
-                case "NIST521":
-                    this.ROM_FIELD = ROM_FIELD_NIST521();
-                    break;
-                case "256PM":
-                    this.ROM_FIELD = ROM_FIELD_256PM();
-                    break;
-                case "384PM":
-                    this.ROM_FIELD = ROM_FIELD_384PM();
-                    break;
-                case "512PM":
-                    this.ROM_FIELD = ROM_FIELD_512PM();
-                    break;
-                case "FP256BN":
-                    this.ROM_FIELD = ROM_FIELD_FP256BN();
-                    break;
-                case "FP512BN":
-                    this.ROM_FIELD = ROM_FIELD_FP512BN();
-                    break;
-                case "BN254":
-                    this.ROM_FIELD = ROM_FIELD_BN254();
-                    break;
-                case "BN254CX":
-                    this.ROM_FIELD = ROM_FIELD_BN254CX();
-                    break;
-                case "BLS383":
-                    this.ROM_FIELD = ROM_FIELD_BLS383();
-                    break;
-                case "BLS461":
-                    this.ROM_FIELD = ROM_FIELD_BLS461();
-                    break;
-                default:
-                    this.ROM_FIELD = undefined;
-            }
+        switch (this.config['FIELD']) {
+            case "25519":
+                this.ROM_FIELD = ROM_FIELD_25519();
+                break;
+            case "NIST256":
+                this.ROM_FIELD = ROM_FIELD_NIST256();
+                break;
+            case "NIST384":
+                this.ROM_FIELD = ROM_FIELD_NIST384();
+                break;
+            case "BRAINPOOL":
+                this.ROM_FIELD = ROM_FIELD_BRAINPOOL();
+                break;
+            case "ANSSI":
+                this.ROM_FIELD = ROM_FIELD_ANSSI();
+                break;
+            case "HIFIVE":
+                this.ROM_FIELD = ROM_FIELD_HIFIVE();
+                break;
+            case "GOLDILOCKS":
+                this.ROM_FIELD = ROM_FIELD_GOLDILOCKS();
+                break;
+            case "C41417":
+                this.ROM_FIELD = ROM_FIELD_C41417();
+                break;
+            case "NIST521":
+                this.ROM_FIELD = ROM_FIELD_NIST521();
+                break;
+            case "256PM":
+                this.ROM_FIELD = ROM_FIELD_256PM();
+                break;
+            case "384PM":
+                this.ROM_FIELD = ROM_FIELD_384PM();
+                break;
+            case "512PM":
+                this.ROM_FIELD = ROM_FIELD_512PM();
+                break;
+            case "FP256BN":
+                this.ROM_FIELD = ROM_FIELD_FP256BN();
+                break;
+            case "FP512BN":
+                this.ROM_FIELD = ROM_FIELD_FP512BN();
+                break;
+            case "BN254":
+                this.ROM_FIELD = ROM_FIELD_BN254();
+                break;
+            case "BN254CX":
+                this.ROM_FIELD = ROM_FIELD_BN254CX();
+                break;
+            case "BLS383":
+                this.ROM_FIELD = ROM_FIELD_BLS383();
+                break;
+            case "BLS461":
+                this.ROM_FIELD = ROM_FIELD_BLS461();
+                break;
+            default:
+                this.ROM_FIELD = undefined;
+        }
 
-            this.BIG = BIG(this);
-            this.DBIG = DBIG(this);
-            this.FP = FP(this);
-            this.ECP = ECP(this);
-            this.ECDH = ECDH(this);
+        this.FP = FP(this);
+        this.ECP = ECP(this);
+        this.ECDH = ECDH(this);
 
-            if (this.config['@PF'] != 0) {
-                this.FP2 = FP2(this);
-                this.FP4 = FP4(this);
-                this.FP12 = FP12(this);
-                this.ECP2 = ECP2(this);
-                this.PAIR = PAIR(this);
-                this.MPIN = MPIN(this);
-            };
-            return;
-        };
-    };
+        if (this.config['@PF'] != 0) {
+            this.FP2 = FP2(this);
+            this.FP4 = FP4(this);
+            this.FP12 = FP12(this);
+            this.ECP2 = ECP2(this);
+            this.PAIR = PAIR(this);
+            this.MPIN = MPIN(this);
+        }
+
+        return;
+    }
+
 };
-

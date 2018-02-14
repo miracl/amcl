@@ -112,7 +112,7 @@ void RSA_WWW_PRIVATE_KEY_KILL(rsa_private_key_WWW *PRIV)
 
 void RSA_WWW_fromOctet(BIG_XXX x[],octet *w)
 {
-	FF_WWW_fromOctet(x,w,FFLEN_WWW);
+    FF_WWW_fromOctet(x,w,FFLEN_WWW);
 }
 
 /* RSA encryption with the public key */

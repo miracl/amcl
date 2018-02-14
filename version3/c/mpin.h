@@ -19,13 +19,9 @@ under the License.
 
 /**
  * @file mpin.h
- * @author Mike Scott and Kealan McCusker
- * @date 2nd June 2015
+ * @author Mike Scott
  * @brief M-Pin Header file
  *
- * Allows some user configuration
- * defines structures
- * declares functions
  *
  */
 
@@ -33,28 +29,39 @@ under the License.
 #define MPIN_ZZZ_H
 
 #include "pair_ZZZ.h"
-#include "mpin_support.h"
+#include "pbc_support.h"
 
 /* Field size is assumed to be greater than or equal to group size */
 
 #define PGS_ZZZ MODBYTES_XXX  /**< MPIN Group Size */
 #define PFS_ZZZ MODBYTES_XXX  /**< MPIN Field Size */
-#define PAS_ZZZ 16        /**< MPIN Symmetric Key Size */
+#define PAS_ZZZ 16            /**< MPIN Symmetric Key Size */
 
 #define MPIN_OK             0   /**< Function completed without error */
 #define MPIN_INVALID_POINT  -14	/**< Point is NOT on the curve */
 #define MPIN_BAD_PIN        -19 /**< Bad PIN number entered */
 
+#define MPIN_PAS 16          /**< MPIN Symmetric Key Size */
 #define MAXPIN 10000         /**< max PIN */
 #define PBLEN 14             /**< max length of PIN in bits */
 
 #define HASH_TYPE_MPIN_ZZZ SHA256   /**< Choose Hash function */
+
+#define MESSAGE_SIZE 256        /**< Signature message size  */
+#define M_SIZE (MESSAGE_SIZE+2*PFS_ZZZ+1)   /**< Signature message size and G1 size */
 
 /* MPIN support functions */
 
 /* MPIN primitives */
 
 
+/**	@brief Generate Y=H(s,O), where s is epoch time, O is an octet, and H(.) is a hash function
+ *
+  	@param h is the hash type
+	@param t is epoch time in seconds
+	@param O is an input octet
+	@param Y is the output octet
+*/
 void MPIN_ZZZ_GET_Y(int h,int t,octet *O,octet *Y);
 
 /**	@brief Extract a PIN number from a client secret

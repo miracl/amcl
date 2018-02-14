@@ -426,7 +426,7 @@ if curve_selected :
 if rsa_selected :
 	os.system("g++ -O3 -c rsa_support.cpp")
 if pfcurve_selected :
-	os.system("g++ -O3 -c mpin_support.cpp")
+	os.system("g++ -O3 -c pbc_support.cpp")
 
 os.system("g++ -O3 -c hash.cpp")
 os.system("g++ -O3 -c rand.cpp")

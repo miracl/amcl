@@ -127,8 +127,11 @@ void ehashit(int sha,octet *p,int n,octet *x,octet *w,int pad)
             OCT_jbytes(w,hh,pad);
         else
         {
-            OCT_jbytes(w,hh,hlen);
             OCT_jbyte(w,0,pad-hlen);
+            OCT_jbytes(w,hh,hlen);
+
+//            OCT_jbytes(w,hh,hlen);
+//            OCT_jbyte(w,0,pad-hlen);
         }
     }
     return;

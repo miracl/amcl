@@ -1,23 +1,23 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
-HASH384 = function(ctx) {
+var HASH384 = function(ctx) {
 
     var HASH384 = function() {
         this.length = [];
@@ -27,14 +27,12 @@ HASH384 = function(ctx) {
     };
 
     HASH384.prototype = {
-        /* constants */
-
-
         transform: function() { /* basic transformation step */
-            var a, b, c, d, e, ee, zz, f, g, hh, t1, t2;
-            var j, r;
-            for (j = 16; j < 80; j++)
+            var a, b, c, d, e, f, g, hh, t1, t2, j;
+
+            for (j = 16; j < 80; j++) {
                 this.w[j] = HASH384.theta1(this.w[j - 2]).add(this.w[j - 7]).add(HASH384.theta0(this.w[j - 15])).add(this.w[j - 16]);
+            }
 
             a = this.h[0].copy();
             b = this.h[1].copy();
@@ -77,7 +75,10 @@ HASH384 = function(ctx) {
         /* Initialise Hash function */
         init: function() { /* initialise */
             var i;
-            for (i = 0; i < 80; i++) this.w[i] = new ctx.UInt64(0, 0);
+
+            for (i = 0; i < 80; i++) {
+                this.w[i] = new ctx.UInt64(0, 0);
+            }
             this.length[0] = new ctx.UInt64(0, 0);
             this.length[1] = new ctx.UInt64(0, 0);
             this.h[0] = HASH384.H[0].copy();
@@ -92,23 +93,30 @@ HASH384 = function(ctx) {
 
         /* process a single byte */
         process: function(byt) { /* process the next message byte */
-            var cnt;
+            var cnt, e;
+
             cnt = (this.length[0].bot >>> 6) % 16;
             this.w[cnt].shlb();
             this.w[cnt].bot |= (byt & 0xFF);
 
-            var e = new ctx.UInt64(0, 8);
+            e = new ctx.UInt64(0, 8);
             this.length[0].add(e);
+
             if (this.length[0].top === 0 && this.length[0].bot == 0) {
                 e = new ctx.UInt64(0, 1);
                 this.length[1].add(e);
             }
-            if ((this.length[0].bot % 1024) === 0) this.transform();
+
+            if ((this.length[0].bot % 1024) === 0) {
+                this.transform();
+            }
         },
 
         /* process an array of bytes */
         process_array: function(b) {
-            for (var i = 0; i < b.length; i++) this.process(b[i]);
+            for (var i = 0; i < b.length; i++) {
+                this.process(b[i]);
+            }
         },
 
         /* process a 32-bit integer */
@@ -120,13 +128,16 @@ HASH384 = function(ctx) {
         },
 
         hash: function() { /* pad message and finish - supply digest */
-            var i;
-            var digest = [];
-            var len0, len1;
+            var digest = [],
+                len0, len1,
+                i;
+
             len0 = this.length[0].copy();
             len1 = this.length[1].copy();
             this.process(0x80);
-            while ((this.length[0].bot % 1024) != 896) this.process(0);
+            while ((this.length[0].bot % 1024) != 896) {
+                this.process(0);
+            }
 
             this.w[14] = len1;
             this.w[15] = len0;
@@ -137,6 +148,7 @@ HASH384 = function(ctx) {
             }
 
             this.init();
+
             return digest;
         }
     };
@@ -144,20 +156,28 @@ HASH384 = function(ctx) {
 
     /* static  functions */
     HASH384.S = function(n, x) {
-        if (n == 0) return x;
-        if (n < 32)
+        if (n == 0) {
+            return x;
+        }
+
+        if (n < 32) {
             return new ctx.UInt64((x.top >>> n) | (x.bot << (32 - n)), (x.bot >>> n) | (x.top << (32 - n)));
-        else
+        } else {
             return new ctx.UInt64((x.bot >>> (n - 32)) | (x.top << (64 - n)), (x.top >>> (n - 32)) | (x.bot << (64 - n)));
+        }
 
     };
 
     HASH384.R = function(n, x) {
-        if (n == 0) return x;
-        if (n < 32)
+        if (n == 0) {
+            return x;
+        }
+
+        if (n < 32) {
             return new ctx.UInt64((x.top >>> n), (x.bot >>> n | (x.top << (32 - n))));
-        else
+        } else {
             return new ctx.UInt64(0, x.top >>> (n - 32));
+        }
     };
 
     HASH384.Ch = function(x, y, z) {
@@ -169,30 +189,34 @@ HASH384 = function(ctx) {
     };
 
     HASH384.Sig0 = function(x) {
-        var r1 = HASH384.S(28, x);
-        var r2 = HASH384.S(34, x);
-        var r3 = HASH384.S(39, x);
+        var r1 = HASH384.S(28, x),
+            r2 = HASH384.S(34, x),
+            r3 = HASH384.S(39, x);
+
         return new ctx.UInt64(r1.top ^ r2.top ^ r3.top, r1.bot ^ r2.bot ^ r3.bot);
     };
 
     HASH384.Sig1 = function(x) {
-        var r1 = HASH384.S(14, x);
-        var r2 = HASH384.S(18, x);
-        var r3 = HASH384.S(41, x);
+        var r1 = HASH384.S(14, x),
+            r2 = HASH384.S(18, x),
+            r3 = HASH384.S(41, x);
+
         return new ctx.UInt64(r1.top ^ r2.top ^ r3.top, r1.bot ^ r2.bot ^ r3.bot);
     };
 
     HASH384.theta0 = function(x) {
-        var r1 = HASH384.S(1, x);
-        var r2 = HASH384.S(8, x);
-        var r3 = HASH384.R(7, x);
+        var r1 = HASH384.S(1, x),
+            r2 = HASH384.S(8, x),
+            r3 = HASH384.R(7, x);
+
         return new ctx.UInt64(r1.top ^ r2.top ^ r3.top, r1.bot ^ r2.bot ^ r3.bot);
     };
 
     HASH384.theta1 = function(x) {
-        var r1 = HASH384.S(19, x);
-        var r2 = HASH384.S(61, x);
-        var r3 = HASH384.R(6, x);
+        var r1 = HASH384.S(19, x),
+            r2 = HASH384.S(61, x),
+            r3 = HASH384.R(6, x);
+
         return new ctx.UInt64(r1.top ^ r2.top ^ r3.top, r1.bot ^ r2.bot ^ r3.bot);
     };
 
@@ -245,5 +269,6 @@ HASH384 = function(ctx) {
         new ctx.UInt64(0x4cc5d4be, 0xcb3e42b6), new ctx.UInt64(0x597f299c, 0xfc657e2a),
         new ctx.UInt64(0x5fcb6fab, 0x3ad6faec), new ctx.UInt64(0x6c44198c, 0x4a475817)
     ];
+
     return HASH384;
 };

@@ -24,10 +24,12 @@ under the License.
 #include <stdlib.h>
 #include <time.h>
 
-#include "mpin_support.h"
+#include "pbc_support.h"
+
+using namespace amcl;
 
 /* general purpose hash function w=hash(p|n|x|y) */
-void mhashit(int sha,int n,octet *x,octet *w)
+void amcl::mhashit(int sha,int n,octet *x,octet *w)
 {
     int i,c[4],hlen;
     hash256 sha256;
@@ -109,12 +111,12 @@ void mhashit(int sha,int n,octet *x,octet *w)
         OCT_jbytes(w,hh,w->max);
     else
     {
-        OCT_jbytes(w,hh,hlen);
         OCT_jbyte(w,0,w->max-hlen);
+        OCT_jbytes(w,hh,hlen);
     }
 }
 
-unsign32 today(void)
+unsign32 amcl::today(void)
 {
     /* return time in slots since epoch */
     unsign32 ti=(unsign32)time(NULL);
@@ -123,7 +125,7 @@ unsign32 today(void)
 
 /* Hash the M-Pin transcript - new */
 
-void HASH_ALL(int sha,octet *HID,octet *xID,octet *xCID,octet *SEC,octet *Y,octet *R,octet *W,octet *H)
+void amcl::HASH_ALL(int sha,octet *HID,octet *xID,octet *xCID,octet *SEC,octet *Y,octet *R,octet *W,octet *H)
 {
     char t[1284];   // assumes max modulus of 1024-bits
     octet T= {0,sizeof(t),t};
@@ -139,19 +141,19 @@ void HASH_ALL(int sha,octet *HID,octet *xID,octet *xCID,octet *SEC,octet *Y,octe
     mhashit(sha,0,&T,H);
 }
 
-void HASH_ID(int sha,octet *ID,octet *HID)
+void amcl::HASH_ID(int sha,octet *ID,octet *HID)
 {
     mhashit(sha,0,ID,HID);
 }
 
-unsign32 GET_TIME(void)
+unsign32 amcl::GET_TIME(void)
 {
     return (unsign32)time(NULL);
 }
 
 /* AES-GCM Encryption of octets, K is key, H is header,
    P is plaintext, C is ciphertext, T is authentication tag */
-void AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
+void amcl::AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 {
     gcm g;
     GCM_init(&g,K->len,K->val,IV->len,IV->val);
@@ -164,7 +166,7 @@ void AES_GCM_ENCRYPT(octet *K,octet *IV,octet *H,octet *P,octet *C,octet *T)
 
 /* AES-GCM Decryption of octets, K is key, H is header,
    P is plaintext, C is ciphertext, T is authentication tag */
-void AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
+void amcl::AES_GCM_DECRYPT(octet *K,octet *IV,octet *H,octet *C,octet *P,octet *T)
 {
     gcm g;
     GCM_init(&g,K->len,K->val,IV->len,IV->val);

@@ -80,8 +80,12 @@ func ehashit(sha int,A []byte,n int,B []byte,pad int) []byte {
 	if pad<=sha {
 		for i:=0;i<pad;i++ {W[i]=R[i]}
 	} else {
-		for i:=0;i<sha;i++ {W[i]=R[i]}
-		for i:=sha;i<pad;i++ {W[i]=0}
+		for i:=0;i<sha;i++ {W[i+pad-sha]=R[i]}
+		for i:=0;i<pad-sha;i++ {W[i]=0}
+ 
+
+		//for i:=0;i<sha;i++ {W[i]=R[i]}
+		//for i:=sha;i<pad;i++ {W[i]=0}
 	}
 	return W
 }

@@ -97,8 +97,11 @@ public final class ECDH {
 		}
 		else
 		{
-			for (int i=0;i<sha;i++) W[i]=R[i];
-			for (int i=sha;i<pad;i++) W[i]=0;
+			for (int i=0;i<sha;i++) W[i+pad-sha]=R[i];
+            for (int i=0;i<pad-sha;i++) W[i]=0;
+ 
+			//for (int i=0;i<sha;i++) W[i]=R[i];
+			//for (int i=sha;i<pad;i++) W[i]=0;
 		}
 		return W;
 	}

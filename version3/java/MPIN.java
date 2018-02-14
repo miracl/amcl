@@ -89,8 +89,11 @@ public class MPIN
 			for (int i=0;i<len;i++) W[i]=R[i];
 		else
 		{
-			for (int i=0;i<sha;i++) W[i]=R[i];
-			for (int i=sha;i<len;i++) W[i]=0;
+			for (int i=0;i<sha;i++) W[i+len-sha]=R[i];
+            for (int i=0;i<len-sha;i++) W[i]=0;
+
+			//for (int i=0;i<sha;i++) W[i]=R[i];
+			//for (int i=sha;i<len;i++) W[i]=0;
 		}
 		return W;
 	}
