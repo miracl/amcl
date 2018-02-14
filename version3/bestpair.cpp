@@ -1,14 +1,18 @@
 //
-// Program to generate "best" BN, BLS12, BLS24 curves (with modulus p=3 mod 8)
+// Program to generate "best" BN, BLS12, BLS24 and BLS48 curves (with modulus p=3 mod 8)
 //
-// g++ -O2 bestpair.cpp zzn4.cpp zzn2.cpp zzn.cpp ecn4.cpp ecn2.cpp ecn.cpp big.cpp miracl.a -o bestpair.exe
+// g++ -O2 bestpair.cpp zzn8.cpp zzn4.cpp zzn2.cpp zzn.cpp ecn8.cpp ecn4.cpp ecn2.cpp ecn.cpp big.cpp miracl.a -o bestpair.exe
 //
 // Further tests may be needed to ensure full satisfaction (e.g. twist security, even x, etc.)
 //
 // Note that finding curves that are both GT and G2 Strong, can take a while
 //
-// Some possible rational points on y^2=x^3+b (x^3+b is a perfect square)
+// SUggestions:-
+// For AES-128 security: bestpair BLS12 64 3
+// For AES-192 security: bestpair BLS24 48 4
+// FOr AES-256 security: bestpair BLS48 32 4
 
+// Some possible rational points on y^2=x^3+b (x^3+b is a perfect square)
 // b=1, x=0, -1 or 2
 // b=2, x=-1
 // b=3, x=1
@@ -33,14 +37,16 @@
 #include "ecn.h"
 #include "ecn2.h"
 #include "ecn4.h"
+#include "ecn8.h"
 
 #define BN 0
 #define BLS12 1
 #define BLS24 2
+#define BLS48 3
 
 using namespace std;
 
-Miracl precision=200;
+Miracl precision=500;
 
 // Number of ways of selecting k items from n
 Big combo(int n,int k)
@@ -101,7 +107,7 @@ int main(int argc, char *argv[])
     int i,j,k,m,jj,bt,hw,twist,pb,nb,b,cb[40],ip;
 	int xb[256];
 	BOOL G2,GT,gotH,gotB,gotT,progress;
-    Big msb,c,r,m1,n,p,q,t,x,y,w,X,Y,cof,cof2,coft,tau[5];
+    Big msb,c,r,m1,n,p,q,t,x,y,w,X,Y,cof,cof2,coft,tau[9];
     Big PP,TT,FF;
 	Big xp[10];
 	int pw[10];
@@ -115,7 +121,7 @@ int main(int argc, char *argv[])
        cout << "Missing arguments" << endl;
 	   cout << "Program to find best pairing-friendly curves" << endl;
        cout << "bestpair type bits Hamming-weight" << endl;
-	   cout << "where type is the curve (BN, BLS12, BLS24)" << endl;
+	   cout << "where type is the curve (BN, BLS12, BLS24, BLS48)" << endl;
 	   cout << "where bits is number of bits in curve x parameter (>30 and <200)" << endl;
        cout << "and hamming-weight is the number of non-zero bits (>1 and <10)" << endl;
        cout << "e.g. bestpair BLS12 77 3" << endl;
@@ -148,6 +154,12 @@ int main(int argc, char *argv[])
 			ip++;
 			gotT=TRUE;
 			type=BLS24;
+		}
+		if (!gotT && strcmp(argv[ip],"BLS48")==0)
+		{
+			ip++;
+			gotT=TRUE;
+			type=BLS48;
 		}
 		if (!G2 && strcmp(argv[ip],"/G2")==0)
 		{
@@ -230,6 +242,15 @@ int main(int argc, char *argv[])
 		if (GT)
 			odds*=(7*(72*BITS)/10);
 	}
+	if (type==BLS48)
+	{
+		odds = ((7*16*BITS)/10)*((7*18*BITS)/10);
+		if (G2)
+			odds*=(7*(128*BITS)/10);
+		if (GT)
+			odds*=(7*(272*BITS)/10);
+	}
+
 	odds/=8;  // frig factor
 	cout << "one in " << odds << " expected to be OK" << endl;
 
@@ -286,14 +307,12 @@ int main(int argc, char *argv[])
 				xm8=xm24%8;
 				if (xm8!=0 && xm8!=7) continue;  // quick exit for p=3 mod 8 condition
 
-				p=pow(x,6)-2*pow(x,5)+2*pow(x,3)+x+1;
-				t=x+1;
-
-				if (p%3!=0) continue;
-				p/=3;
-
-				n=p+1-t;
 				q=pow(x,4)-x*x+1;
+				p=q*(((x-1)*(x-1))/3)+x;
+
+				t=x+1;
+				n=p+1-t;
+
 			}
 			if (type==BLS24)
 			{
@@ -305,14 +324,30 @@ int main(int argc, char *argv[])
 				xm8=xm24%8;
 				if (xm8!=0 && xm8!=7) continue;  // quick exit for p=3 mod 8 condition
 
-				p=1+x+x*x-pow(x,4)+2*pow(x,5)-pow(x,6)+pow(x,8)-2*pow(x,9)+pow(x,10);
-				t=x+1;
-
-				if (p%3!=0) continue;
-				p/=3;
-
-				n=p+1-t;
 				q=pow(x,8)-pow(x,4)+1;
+				p=q*(((x-1)*(x-1))/3)+x;
+
+				t=x+1;
+				n=p+1-t;
+				
+			}
+
+			if (type==BLS48)
+			{
+				xm24=x%24;
+				if (x<0) xm24+=24;
+				xm24%=24;
+				xm3=xm24%3;
+				if (xm3!=1) continue;   // quick exit for p%3=0
+				xm8=xm24%8;
+				if (xm8!=0 && xm8!=7) continue;  // quick exit for p=3 mod 8 condition
+
+				q=pow(x,16)-pow(x,8)+1;
+				p=q*(((x-1)*(x-1))/3)+x;
+		
+				t=x+1;
+				n=p+1-t;
+				
 			}
 
 			if (type==BN)
@@ -340,9 +375,14 @@ int main(int argc, char *argv[])
 				coft=(pow(p,8)-pow(p,4)+1)/q;
 			}
 
+			if (type==BLS48)
+			{
+				coft=(pow(p,16)-pow(p,8)+1)/q;
+			}
+
 			if (type==BLS12 || type==BN)
 			{
-				coft=(p*p*p*p-p*p+1)/q;
+				coft=(pow(p,4)-p*p+1)/q;
 			}
 
 			if (GT)
@@ -360,17 +400,23 @@ int main(int argc, char *argv[])
 
 			if (type==BLS24)
 			{
-				tau[0]=2;  // count points on twist over extension p^4
-				tau[1]=t;
-				for (jj=1;jj<4;jj++ ) tau[jj+1]=t*tau[jj]-p*tau[jj-1];
-
-				TT=tau[4];
-				PP=p*p*p*p;
-
+				TT=t*t*t*t-4*p*t*t+2*p*p;
+				PP=pow(p,4);
 				FF=sqrt((4*PP-TT*TT)/3);
 				m1=PP+1-(3*FF+TT)/2;
 			}
+			if (type==BLS48)
+			{
+				tau[0]=2;  // count points on twist over extension p^8
+				tau[1]=t;
+				for (jj=1;jj<8;jj++ ) tau[jj+1]=t*tau[jj]-p*tau[jj-1];
 
+				TT=tau[8];
+
+				PP=pow(p,8);
+				FF=sqrt((4*PP-TT*TT)/3);
+				m1=PP+1-(3*FF+TT)/2;  //?
+			}
 			if (type==BN)
 			{
 				TT=t*t-2*p;
@@ -500,6 +546,33 @@ int main(int argc, char *argv[])
 					}
 				}
 			}
+			if (type==BLS48)
+			{
+				ECn8 Q;
+				ZZn8 rr;
+				do
+				{
+					rr=randn8();
+				} while (!Q.set(rr));
+
+				Q*=cof2;
+				if (!(n*Q).iszero()) 
+				{
+					twist=MR_SEXTIC_M;
+					mip->TWIST=MR_SEXTIC_M;
+					do
+					{
+						rr=randn8();
+					} while (!Q.set(rr));
+        
+					Q*=cof2;
+					if (!(n*Q).iszero()) 
+					{
+						cout << "Never Happens" << endl;
+						continue;
+					}
+				}
+			}
 			S++;
 			cout << endl;
 			cout << "Solution " << S << endl;
@@ -515,13 +588,14 @@ int main(int argc, char *argv[])
 				bt<<=1;
 			}
 			cout << " = " << x << endl;
-			cout << "Curve is y^2=x^3+" << b << endl;
+			cout << "Curve is y^2=x^3+" << b;
 			if (m>0)
 			{
-				cout << "(or) ";
+				cout << " (or) ";
 				for (jj=0;jj<m;jj++)
 					cout << cb[jj] << " ";
 			}
+			else cout << endl;
 			cout << "\np= " << p << " (" << bits(p) << " bits)";
 			if (twist==MR_SEXTIC_D) cout << " D-Type" << endl;
 			if (twist==MR_SEXTIC_M) cout << " M-Type" << endl;
@@ -532,7 +606,7 @@ int main(int argc, char *argv[])
 	}
 
 	cout << endl;
-	cout << cnt << " solutions searched" << endl;
+	cout << cnt << " candidates searched" << endl;
 
 	if (S==0)
 	{
