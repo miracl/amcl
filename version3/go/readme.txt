@@ -15,6 +15,8 @@ Then clone the AMCL repository by executing
 
 go get github.com/milagro-crypto/amcl
 
+Ignore the warning message about "no Go files"
+
 This assumes that Git is installed on your machine - see 
 https://git-scm.com/download/
 

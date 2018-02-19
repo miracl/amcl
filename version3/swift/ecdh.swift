@@ -93,7 +93,7 @@ final public class ECDH
         }
         else
         {
-	    for i in 0..< sha {W[i+pad-sha]=R[i]}
+	    for i in 0 ..< sha {W[i+pad-sha]=R[i]}
 
             //for i in 0 ..< sha {W[i]=R[i]}
         }
