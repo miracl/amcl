@@ -4,6 +4,10 @@ import sys
 deltext=""
 slashtext=""
 copytext=""
+if sys.platform.startswith("darwin")  :
+	copytext="cp "
+	deltext="rm "
+	slashtext="/"
 if sys.platform.startswith("linux")  :
 	copytext="cp "
 	deltext="rm "
@@ -178,12 +182,12 @@ while ptr<max:
 			break
 	if already:
 		continue
-	
+
 	selection.append(x)
 	ptr=ptr+1
 
 # curveset(curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly)
-# where "curve" is the common name for the elliptic curve   
+# where "curve" is the common name for the elliptic curve
 # big_length_bytes is the modulus size rounded up to a number of bytes
 # bits_in_base gives the number base used for 32 bit architectures, as n where the base is 2^n
 # modulus_bits is the actual bit length of the modulus.
