@@ -185,12 +185,16 @@ pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
 		}
 	}
 
+	if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+		r.conj();			
+	}
+
 
 /* R-ate fixup required for BN curves */
 
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
 		if ecp::SIGN_OF_X == ecp::NEGATIVEX {
-			r.conj();
+			//r.conj();
 			A.neg();			
 		}
 

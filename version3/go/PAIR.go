@@ -170,12 +170,16 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 		}		
 	}
 
+	if SIGN_OF_X==NEGATIVEX {
+		r.conj()
+	}
+
 
 /* R-ate fixup required for BN curves */
 
 	if CURVE_PAIRING_TYPE == BN {
 		if SIGN_OF_X==NEGATIVEX {
-			r.conj()
+			//r.conj()
 			A.neg()
 		}
 
@@ -187,7 +191,7 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 		K.neg()
 		lv=line(A,K,Qx,Qy)
 		r.smul(lv,SEXTIC_TWIST)
-	}
+	} 
 
 	return r
 }

@@ -176,12 +176,15 @@ final public class PAIR {
             }
         }
     
-    
+        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+            r.conj()
+         }     
+
     // R-ate fixup required for BN curves
 
 	   if ECP.CURVE_PAIRING_TYPE == ECP.BN {
             if ECP.SIGN_OF_X == ECP.NEGATIVEX {
-                r.conj()
+                //r.conj()
                 A.neg()
             }           
             K.copy(P)

@@ -337,10 +337,15 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
     // }
 
     /* R-ate fixup required for BN curves */
+
+#if SIGN_OF_X_ZZZ==NEGATIVEX
+	FP12_YYY_conj(r,r);
+#endif
+
 #if PAIRING_FRIENDLY_ZZZ==BN
 
 #if SIGN_OF_X_ZZZ==NEGATIVEX
-    FP12_YYY_conj(r,r);
+    //FP12_YYY_conj(r,r);
     ECP2_ZZZ_neg(&A);
     ECP2_ZZZ_neg(&B);
 #endif
@@ -364,6 +369,7 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
     ECP2_ZZZ_neg(&K);
     PAIR_ZZZ_line(&lv,&B,&K,&Sx,&Sy);
     FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
+
 #endif
 }
 

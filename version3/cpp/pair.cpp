@@ -216,14 +216,16 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
 
     }
 
-
+#if SIGN_OF_X_ZZZ==NEGATIVEX
+    FP12_conj(r,r);
+#endif
     /* R-ate fixup required for BN curves */
 #if PAIRING_FRIENDLY_ZZZ==BN
     ECP2_copy(&KA,P);
     ECP2_frob(&KA,&X);
 #if SIGN_OF_X_ZZZ==NEGATIVEX
     ECP2_neg(&A);
-    FP12_conj(r,r);
+    //FP12_conj(r,r);
 #endif
     PAIR_line(&lv,&A,&KA,&Qx,&Qy);
     FP12_smul(r,&lv,SEXTIC_TWIST_ZZZ);
