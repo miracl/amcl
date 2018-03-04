@@ -333,6 +333,21 @@ var CTXLIST = {
         "@SX": 0
     },
 
+    "BLS381": {
+        "BITS": "381",
+        "FIELD": "BLS381",
+        "CURVE": "BLS381",
+        "@NB": 48,
+        "@BASE": 23,
+        "@NBT": 381,
+        "@M8": 3,
+        "@MT": 0,
+        "@CT": 0,
+        "@PF": 2,
+        "@ST": 1,
+        "@SX": 1
+    },
+
     "BLS461": {
         "BITS": "464",
         "FIELD": "BLS461",
@@ -472,6 +487,9 @@ var CTX = function(input_parameter) {
             case "BLS383":
                 this.ROM_CURVE = ROM_CURVE_BLS383();
                 break;
+            case "BLS381":
+                this.ROM_CURVE = ROM_CURVE_BLS381();
+                break;
             case "BLS461":
                 this.ROM_CURVE = ROM_CURVE_BLS461();
                 break;
@@ -531,6 +549,9 @@ var CTX = function(input_parameter) {
                 break;
             case "BLS383":
                 this.ROM_FIELD = ROM_FIELD_BLS383();
+                break;
+            case "BLS381":
+                this.ROM_FIELD = ROM_FIELD_BLS381();
                 break;
             case "BLS461":
                 this.ROM_FIELD = ROM_FIELD_BLS461();

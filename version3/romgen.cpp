@@ -151,9 +151,10 @@ void help()
 		printf("17. BN254\n");
 		printf("18. BN254CX\n");
 		printf("19. BLS383\n");
-		printf("20. FP256BN\n");
-		printf("21. FP512BN\n");
-		printf("22. BLS461\n");
+		printf("20. BLS381\n");
+		printf("21. FP256BN\n");
+		printf("22. FP512BN\n");
+		printf("23. BLS461\n");
 
 		printf("\nromgen curve wordlength basebits language\n");
 		printf("where wordlength is 16, 32 or 64\n");
@@ -211,7 +212,7 @@ int main(int argc, char **argv)
 		curvename[i]=toupper(curvename[i]);
 	}
 
-	cout << "curvename= " << curvename << " " << strlen(curvename) << endl;
+	//cout << "curvename= " << curvename << " " << strlen(curvename) << endl;
 
 	curve=0; ip++;
 	chunk=atoi(argv[ip++]);
@@ -695,7 +696,7 @@ int main(int argc, char **argv)
 		modtype=NOT_SPECIAL;
 		curve_a=0;
 		mip->IOBASE=16;
-		x=(char *)"4080000000000001";    // Fast but not not GT_STRONG parameter
+		x=(char *)"4080000000000001";    // Fast but not GT_STRONG parameter
 
 		p=36*pow(x,4)-36*pow(x,3)+24*x*x-6*x+1;
 		t=6*x*x+1;
@@ -763,9 +764,42 @@ int main(int argc, char **argv)
 	}
 
 
+
+	if (strcmp(curvename,"BLS381")==0)
+	{
+		curve=20;
+		printf("Curve= BLS381\n");
+		mbits=381;
+		words=(1+((mbits-1)/bb));
+		curvetype=WEIERSTRASS;
+		modtype=NOT_SPECIAL;
+		curve_a=0;
+		mip->IOBASE=16;
+		x=(char *)"d201000000010000";              // SIGN_OF_X is NEGATIVE
+		p=(pow(x,6)+2*pow(x,5)-2*pow(x,3)-x+1)/3;
+		t=-x+1;
+		r=pow(x,4)-x*x+1;
+		cof=(p+1-t)/r;
+
+//	cout << "cof= " << (p+1-t)/q << endl;
+
+		curve_b=4;
+		ecurve((Big)0,curve_b,p,MR_AFFINE);
+		mip->TWIST=MR_SEXTIC_M;
+
+		gx=1;
+		while (!P.set(gx))
+		{
+			gx=gx+1;
+		}
+		P*=cof;
+		P.get(gx,gy);
+	}
+
+
 	if (strcmp(curvename,"BLS461")==0)
 	{
-		curve=22;
+		curve=23;
 		printf("Curve= BLS461\n");
 		mbits=461;
 		words=(1+((mbits-1)/bb));
@@ -778,8 +812,6 @@ int main(int argc, char **argv)
 		t=-x+1;
 		r=pow(x,4)-x*x+1;
 		cof=(p+1-t)/r;
-
-
 
 //	cout << "cof= " << (p+1-t)/q << endl;
 
@@ -795,7 +827,7 @@ int main(int argc, char **argv)
 
 	if (strcmp(curvename,"FP256BN")==0)
 	{
-		curve=20;
+		curve=21;
 		printf("Curve= FP256BN\n");
 		mbits=256;
 		words=(1+((mbits-1)/bb));
@@ -818,7 +850,7 @@ int main(int argc, char **argv)
 
 	if (strcmp(curvename,"FP512BN")==0)
 	{
-		curve=21;
+		curve=22;
 		printf("Curve= FP512BN\n");
 		mbits=512;
 		words=(1+((mbits-1)/bb));
@@ -1036,6 +1068,90 @@ int main(int argc, char **argv)
 		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
 
+		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1 ; output(chunk,words,x,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
+	
+		zcru=pow((ZZn)2,(p-1)/3);
+		//zcru*=zcru;   // right cube root of unity ?? if x>0 do this??
+		cru=(Big)zcru;
+
+		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
+
+		TT=t*t-2*p;
+		PP=p*p;
+		FF=sqrt((4*PP-TT*TT)/3);
+		np=PP+1-(-3*FF+TT)/2;  // 2 possibilities... ??
+
+		mip->IOBASE=10;
+		a= (char *)"352701069587466618187139116011060144890029952792775240219908644239793785735715026873347600343865175952761926303160";
+		b= (char *)"3059144344244213709971259814753781636986470325476647558659373206291635324768958432433509563104347017837885763365758";
+		mip->IOBASE=16;
+
+		Xa.set(a,b);
+
+		cout << pre1 << toupperit((char *)"CURVE_Pxa",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pxb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+		
+		mip->IOBASE=10;
+		a= (char *)"1985150602287291935568054521177171638300868978215655730859378665066344726373823718423869104263333984641494340347905";
+		b= (char *)"927553665492332455747201965776037880757740193453592970025027978793976877002675564980949289727957565575433344219582";
+		mip->IOBASE=16;
+
+		Ya.set(a,b);
+
+		cout << pre1 << toupperit((char *)"CURVE_Pya",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pyb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+
+		Q.set(Xa,Ya);
+		//cout << "Q= " << Q << endl;
+		Q*=r;
+		if (!Q.iszero())
+		{
+			cout << "**** Failed ****" << endl;
+			cout << "\nQ= " << Q << endl << endl;
+		}
+
+		cout << pre3 << "CURVE_W" << post3 << open; output(chunk,words,(Big)0,m);cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
+		cout << pre4 << "CURVE_SB" << post4 << open; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close;cout << ","; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close; cout << close << term << endl;
+
+		cout << pre5 << "CURVE_WB" << post5 << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
+	
+		cout << pre6 << "CURVE_BB" << post6 << open; 
+		cout << open;
+		output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+
+		cout << ","; cout << open;output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+
+		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+		cout << close << term << endl;
+	}
+
+	if (curve==21)
+	{
+		cout << endl;
+		set_frobenius_constant(X);
+		X.get(a,b);
+		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
+
 		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1; output(chunk,words,x,m); cout << term << endl;
 
 		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
@@ -1098,7 +1214,7 @@ int main(int argc, char **argv)
 
 	}
 
-	if (curve==21)
+	if (curve==22)
 	{
 		cout << endl;
 		set_frobenius_constant(X);
@@ -1167,7 +1283,7 @@ int main(int argc, char **argv)
 		cout << close << term << endl;
 	}
 
-	if (curve==22)
+	if (curve==23)
 	{
 		cout << endl;
 		set_frobenius_constant(X);

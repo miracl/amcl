@@ -168,19 +168,20 @@ print("Pairing-Friendly Elliptic Curves")
 print("17. bn254")
 print("18. bn254CX")
 print("19. bls383")
-print("20. fp256BN")
-print("21. fp512BN")
-print("22. bls461\n")
+print("20. bls381")
+print("21. fp256BN")
+print("22. fp512BN")
+print("23. bls461\n")
 
 
 print("RSA")
-print("23. rsa2048")
-print("24. rsa3072")
-print("25. rsa4096")
+print("24. rsa2048")
+print("25. rsa3072")
+print("26. rsa4096")
 
 selection=[]
 ptr=0
-max=26
+max=27
 
 curve_selected=False
 pfcurve_selected=False
@@ -275,14 +276,19 @@ while ptr<max:
 	if x==19:
 		curveset("bls383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","D_TYPE","POSITIVEX")
 		pfcurve_selected=True
+
 	if x==20:
+		curveset("bls381","48","29","381","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX")
+		pfcurve_selected=True
+
+	if x==21:
 		curveset("fp256bn","32","28","256","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","NEGATIVEX")
 		pfcurve_selected=True
-	if x==21:
+	if x==22:
 		curveset("fp512bn","64","29","512","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","POSITIVEX")
 		pfcurve_selected=True
 # https://eprint.iacr.org/2017/334.pdf
-	if x==22:
+	if x==23:
 		curveset("bls461","58","28","461","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX")
 		pfcurve_selected=True
 
@@ -293,17 +299,17 @@ while ptr<max:
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==23:
+	if x==24:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("rsa2048","128","28","2")
 		#rsaset("RSA2048","64","29","4")
 		#rsaset("RSA2048","32","29","8")
 		rsa_selected=True
-	if x==24:
+	if x==25:
 		rsaset("rsa3072","48","28","8")
 		rsa_selected=True
-	if x==25:
+	if x==26:
 		#rsaset("RSA4096","32","29","16")
 		rsaset("rsa4096","64","29","8")
 		rsa_selected=True
