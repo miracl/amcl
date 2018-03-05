@@ -906,7 +906,7 @@ impl BIG {
         return c;
     } 
 
-/* return a^2 as DBIG */
+// return a^2 as DBIG 
 #[cfg(D64)]
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();

@@ -707,6 +707,13 @@ int main(int argc, char **argv)
 		cof=1;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
 		mip->TWIST=MR_SEXTIC_D;
+
+		Xa.set((ZZn)0,(ZZn)-1);
+		Ya.set((ZZn)1,ZZn(0));
+		Q.set(Xa,Ya);
+
+		Q=(p-1+t)*Q;
+		cru=(18*pow(x,3)-18*x*x+9*x-2);
 	}
 
 
@@ -731,6 +738,13 @@ int main(int argc, char **argv)
 		cof=1;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
 		mip->TWIST=MR_SEXTIC_D;
+
+		Xa.set((ZZn)0,(ZZn)-1);
+		Ya.set((ZZn)1,ZZn(0));
+		Q.set(Xa,Ya);
+
+		cofactor(Q,X,x);
+		cru=(18*pow(x,3)-18*x*x+9*x-2);
 	}
 
 	if (strcmp(curvename,"BLS383")==0)
@@ -749,8 +763,6 @@ int main(int argc, char **argv)
 		r=pow(x,4)-x*x+1;
 		cof=(p+1-t)/r;
 
-
-
 //	cout << "cof= " << (p+1-t)/q << endl;
 
 		gx=-2; gy=-1;
@@ -761,9 +773,20 @@ int main(int argc, char **argv)
 		P.set(gx,gy);
 		P*=cof;
 		P.get(gx,gy);
+
+		while (!Q.set(randn2())) ; // probably not best way to decide this
+
+		TT=t*t-2*p;
+		PP=p*p;
+		FF=sqrt((4*PP-TT*TT)/3);
+		np=PP+1-(-3*FF+TT)/2;  // 2 possibilities...
+
+		Q=(np/r)*Q;
+
+		zcru=pow((ZZn)2,(p-1)/3);
+		zcru*=zcru;   // right cube root of unity
+		cru=(Big)zcru;
 	}
-
-
 
 	if (strcmp(curvename,"BLS381")==0)
 	{
@@ -794,6 +817,26 @@ int main(int argc, char **argv)
 		}
 		P*=cof;
 		P.get(gx,gy);
+
+		Xa=1;
+		while (!Q.set(Xa))
+		{
+			Xa=Xa+(ZZn2)1;
+		}
+		Q.get(Xa,Ya);
+		Ya=-Ya;
+		Q.set(Xa,Ya);
+
+		TT=t*t-2*p;
+		PP=p*p;
+		FF=sqrt((4*PP-TT*TT)/3);
+		np=PP+1-(-3*FF+TT)/2;  // 2 possibilities...
+
+		Q=(np/r)*Q;
+
+		zcru=pow((ZZn)2,(p-1)/3);
+		//zcru*=zcru;   // right cube root of unity ?? if x>0 do this??
+		cru=(Big)zcru;
 	}
 
 
@@ -823,6 +866,20 @@ int main(int argc, char **argv)
 		P.set(gx,gy);
 		P*=cof;
 		P.get(gx,gy);
+
+		while (!Q.set(randn2())) ;  // probably not best way to decide this
+
+		TT=t*t-2*p;
+		PP=p*p;
+		FF=sqrt((4*PP-TT*TT)/3);
+		np=PP+1-(-3*FF+TT)/2;  // 2 possibilities...
+
+		Q=(np/r)*Q;
+
+		zcru=pow((ZZn)2,(p-1)/3);
+		//zcru*=zcru;   // right cube root of unity
+		cru=(Big)zcru;
+
 	}
 
 	if (strcmp(curvename,"FP256BN")==0)
@@ -846,6 +903,15 @@ int main(int argc, char **argv)
 		cof=1;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
 		mip->TWIST=MR_SEXTIC_M;
+
+
+		Q.set((ZZn2)1);
+		//while (!Q.set(randn2())) ;
+		Q=(p-1+t)*Q;
+
+		cru=(18*pow(x,3)-18*x*x+9*x-2);
+		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
+
 	}
 
 	if (strcmp(curvename,"FP512BN")==0)
@@ -869,6 +935,12 @@ int main(int argc, char **argv)
 		cof=1;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
 		mip->TWIST=MR_SEXTIC_M;
+
+		Q.set((ZZn2)1);
+		//while (!Q.set(randn2())) ;
+		Q=(p-1+t)*Q;
+
+		cru=p-(18*pow(x,3)+18*x*x+9*x+2);
 	}
 
 	if (curve==0) {help(); return 0;}
@@ -915,33 +987,17 @@ int main(int argc, char **argv)
 	cout << pre1 << toupperit((char *)"CURVE_Gx",lang) << post1; output(chunk,words,gx,m); cout << term << endl;
 	cout << pre1 << toupperit((char *)"CURVE_Gy",lang) << post1; output(chunk,words,gy,m); cout << term << endl;
 	
-
-	if (curve>16 && curve<19)
+// BN curves
+	if (curve==17 || curve==18 || curve==21 || curve==22)
 	{
 		cout << endl;
 		set_frobenius_constant(X);
 		X.get(a,b);
 		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
-
 		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1; output(chunk,words,x,m); cout << term << endl;
-
 		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
-		
-
-		cru=(18*pow(x,3)-18*x*x+9*x-2);
 		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
-
-		Xa.set((ZZn)0,(ZZn)-1);
-		Ya.set((ZZn)1,ZZn(0));
-		Q.set(Xa,Ya);
-
-		if (curve==18)
-			cofactor(Q,X,x);
-		else
-			Q=(p-1+t)*Q;
-
-		//cout << "r*Q= " << r*Q << endl;
 
 		Q.get(Xa,Ya);
 		Xa.get(a,b);
@@ -985,329 +1041,17 @@ int main(int argc, char **argv)
 
 	}
 
-	if (curve==19)
+//BLS curves
+	if (curve==19 || curve==20 || curve==23)
 	{
 		cout << endl;
 		set_frobenius_constant(X);
 		X.get(a,b);
 		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
-
 		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1 ; output(chunk,words,x,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
-	
-		zcru=pow((ZZn)2,(p-1)/3);
-		zcru*=zcru;   // right cube root of unity
-		cru=(Big)zcru;
-
 		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
-
-		while (!Q.set(randn2())) ;
-
-		TT=t*t-2*p;
-		PP=p*p;
-		FF=sqrt((4*PP-TT*TT)/3);
-		np=PP+1-(-3*FF+TT)/2;  // 2 possibilities...
-
-		Q=(np/r)*Q;
-
-		Q.get(Xa,Ya);
-		Xa.get(a,b);
-		cout << pre1 << toupperit((char *)"CURVE_Pxa",lang) << post1; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Pxb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
-		Ya.get(a,b);
-		cout << pre1 << toupperit((char *)"CURVE_Pya",lang) << post1; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Pyb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
-
-		Q*=r;
-		if (!Q.iszero())
-		{
-			cout << "**** Failed ****" << endl;
-			cout << "\nQ= " << Q << endl << endl;
-		}
-
-		cout << pre3 << "CURVE_W" << post3 << open; output(chunk,words,(Big)0,m);cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
-		cout << pre4 << "CURVE_SB" << post4 << open; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close;cout << ","; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close; cout << close << term << endl;
-
-		cout << pre5 << "CURVE_WB" << post5 << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
-	
-		cout << pre6 << "CURVE_BB" << post6 << open; 
-		cout << open;
-		output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << close;
-
-		cout << ","; cout << open;output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << close;
-		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << close;
-
-		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << close;
-		cout << close << term << endl;
-
-	}
-
-	if (curve==20)
-	{
-		cout << endl;
-		set_frobenius_constant(X);
-		X.get(a,b);
-		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
-
-		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1 ; output(chunk,words,x,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
-	
-		zcru=pow((ZZn)2,(p-1)/3);
-		//zcru*=zcru;   // right cube root of unity ?? if x>0 do this??
-		cru=(Big)zcru;
-
-		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
-
-		TT=t*t-2*p;
-		PP=p*p;
-		FF=sqrt((4*PP-TT*TT)/3);
-		np=PP+1-(-3*FF+TT)/2;  // 2 possibilities... ??
-
-		mip->IOBASE=10;
-		a= (char *)"352701069587466618187139116011060144890029952792775240219908644239793785735715026873347600343865175952761926303160";
-		b= (char *)"3059144344244213709971259814753781636986470325476647558659373206291635324768958432433509563104347017837885763365758";
-		mip->IOBASE=16;
-
-		Xa.set(a,b);
-
-		cout << pre1 << toupperit((char *)"CURVE_Pxa",lang) << post1; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Pxb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
-		
-		mip->IOBASE=10;
-		a= (char *)"1985150602287291935568054521177171638300868978215655730859378665066344726373823718423869104263333984641494340347905";
-		b= (char *)"927553665492332455747201965776037880757740193453592970025027978793976877002675564980949289727957565575433344219582";
-		mip->IOBASE=16;
-
-		Ya.set(a,b);
-
-		cout << pre1 << toupperit((char *)"CURVE_Pya",lang) << post1; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Pyb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
-
-		Q.set(Xa,Ya);
-		//cout << "Q= " << Q << endl;
-		Q*=r;
-		if (!Q.iszero())
-		{
-			cout << "**** Failed ****" << endl;
-			cout << "\nQ= " << Q << endl << endl;
-		}
-
-		cout << pre3 << "CURVE_W" << post3 << open; output(chunk,words,(Big)0,m);cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
-		cout << pre4 << "CURVE_SB" << post4 << open; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close;cout << ","; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close; cout << close << term << endl;
-
-		cout << pre5 << "CURVE_WB" << post5 << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
-	
-		cout << pre6 << "CURVE_BB" << post6 << open; 
-		cout << open;
-		output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << close;
-
-		cout << ","; cout << open;output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << close;
-		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << close;
-
-		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << ","; output(chunk,words,(Big)0,m); 
-		cout << close;
-		cout << close << term << endl;
-	}
-
-	if (curve==21)
-	{
-		cout << endl;
-		set_frobenius_constant(X);
-		X.get(a,b);
-		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
-
-		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1; output(chunk,words,x,m); cout << term << endl;
-
-		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
-		
-
-		cru=(18*pow(x,3)-18*x*x+9*x-2);
-		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
-
-		Q.set((ZZn2)1);
-		//while (!Q.set(randn2())) ;
-		Q=(p-1+t)*Q;
-
-		Q.get(Xa,Ya);
-		Xa.get(a,b);
-		cout << pre1 << toupperit((char *)"CURVE_Pxa",lang) << post1; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Pxb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
-		Ya.get(a,b);
-		cout << pre1 << toupperit((char *)"CURVE_Pya",lang) << post1; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Pyb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
-
-
-		Q*=r;
-		if (!Q.iszero())
-		{
-			cout << "**** Failed ****" << endl;
-			cout << "\nQ= " << Q << endl << endl;
-		}
-
-		cout << pre3 << "CURVE_W"  << post3 << open; output(chunk,words,6*x*x-4*x+1,m);cout << ","; output(chunk,words,(2*x-1),m); cout << close << term << endl;
-		cout << pre4 << "CURVE_SB" << post4 << open; cout << open; output(chunk,words,6*x*x-2*x,m); cout << ","; output(chunk,words,(2*x-1),m); cout << close;cout << ","; cout << open; output(chunk,words,(2*x-1),m); cout << ","; output(chunk,words,r-(6*x*x-4*x+1),m); cout << close; cout << close << term  << endl;
-
-		cout << pre5 << "CURVE_WB" << post5 << open; output(chunk,words,2*x*x-3*x+1,m); cout << ","; output(chunk,words,12*x*x*x-8*x*x+x,m); 
-		cout << ","; output(chunk,words,6*x*x*x-4*x*x+x,m); cout << ","; output(chunk,words,2*x*x-x,m); cout << close << term << endl;
-	
-		cout << pre6 << "CURVE_BB" << post6 << open; 
-		cout << open;
-		output(chunk,words,r-x+1,m); 
-		cout << ","; output(chunk,words,r-x,m); 
-		cout << ","; output(chunk,words,r-x,m); 
-		cout << ","; output(chunk,words,2*x,m); 
-		cout << close;
-
-		cout << ","; cout << open;output(chunk,words,2*x-1,m); 
-		cout << ","; output(chunk,words,r-x,m); 
-		cout << ","; output(chunk,words,r-x+1,m); 
-		cout << ","; output(chunk,words,r-x,m); 
-		cout << close;
-		cout << ","; cout << open; output(chunk,words,2*x,m); 
-		cout << ","; output(chunk,words,2*x-1,m); 
-		cout << ","; output(chunk,words,2*x-1,m); 
-		cout << ","; output(chunk,words,2*x-1,m); 
-		cout << close;
-
-		cout << ","; cout << open; output(chunk,words,x+1,m); 
-		cout << ","; output(chunk,words,4*x-2,m); 
-		cout << ","; output(chunk,words,r-2*x-1,m); 
-		cout << ","; output(chunk,words,x+1,m); 
-		cout << close;
-		cout << close << term << endl;
-
-	}
-
-	if (curve==22)
-	{
-		cout << endl;
-		set_frobenius_constant(X);
-		X.get(a,b);
-		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
-
-		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1; output(chunk,words,x,m); cout << term << endl;
-
-		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
-		
-
-		cru=p-(18*pow(x,3)+18*x*x+9*x+2);
-		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
-
-		Q.set((ZZn2)1);
-		//while (!Q.set(randn2())) ;
-		Q=(p-1+t)*Q;
-
-		Q.get(Xa,Ya);
-		Xa.get(a,b);
-		cout << pre1 << toupperit((char *)"CURVE_Pxa",lang) << post1; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Pxb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
-		Ya.get(a,b);
-		cout << pre1 << toupperit((char *)"CURVE_Pya",lang) << post1; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Pyb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
-
-
-		Q*=r;
-		if (!Q.iszero())
-		{
-			cout << "**** Failed ****" << endl;
-			cout << "\nQ= " << Q << endl << endl;
-		}
-
-		cout << pre3 << "CURVE_W"  << post3 << open; output(chunk,words,6*x*x+4*x+1,m);cout << ","; output(chunk,words,(2*x+1),m); cout << close << term << endl;
-		cout << pre4 << "CURVE_SB" << post4 << open; cout << open; output(chunk,words,6*x*x+2*x,m); cout << ","; output(chunk,words,r-(2*x+1),m); cout << close;cout << ","; cout << open; output(chunk,words,(2*x+1),m); cout << ","; output(chunk,words,(6*x*x+4*x+1),m); cout << close; cout << close << term  << endl;
-
-		cout << pre5 << "CURVE_WB" << post5 << open; output(chunk,words,2*x*x+3*x+1,m); cout << ","; output(chunk,words,12*x*x*x+8*x*x+x,m); 
-		cout << ","; output(chunk,words,6*x*x*x+4*x*x+x,m); cout << ","; output(chunk,words,2*x*x+x,m); cout << close << term << endl;
-	
-		cout << pre6 << "CURVE_BB" << post6 << open; 
-		cout << open;
-		output(chunk,words,x+1,m); 
-		cout << ","; output(chunk,words,x,m); 
-		cout << ","; output(chunk,words,x,m); 
-		cout << ","; output(chunk,words,r-2*x,m); 
-		cout << close;
-
-		cout << ","; cout << open;output(chunk,words,2*x+1,m); 
-		cout << ","; output(chunk,words,r-x,m); 
-		cout << ","; output(chunk,words,r-(x+1),m); 
-		cout << ","; output(chunk,words,r-x,m); 
-		cout << close;
-		cout << ","; cout << open; output(chunk,words,2*x,m); 
-		cout << ","; output(chunk,words,2*x+1,m); 
-		cout << ","; output(chunk,words,2*x+1,m); 
-		cout << ","; output(chunk,words,2*x+1,m); 
-		cout << close;
-
-		cout << ","; cout << open; output(chunk,words,r-(x-1),m); 
-		cout << ","; output(chunk,words,r-(4*x+2),m); 
-		cout << ","; output(chunk,words,2*x-1,m); 
-		cout << ","; output(chunk,words,r-(x-1),m); 
-		cout << close;
-		cout << close << term << endl;
-	}
-
-	if (curve==23)
-	{
-		cout << endl;
-		set_frobenius_constant(X);
-		X.get(a,b);
-		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
-
-		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1 ; output(chunk,words,x,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
-	
-		zcru=pow((ZZn)2,(p-1)/3);
-		//zcru*=zcru;   // right cube root of unity
-		cru=(Big)zcru;
-
-		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
-
-		while (!Q.set(randn2())) ;
-
-		TT=t*t-2*p;
-		PP=p*p;
-		FF=sqrt((4*PP-TT*TT)/3);
-		np=PP+1-(-3*FF+TT)/2;  // 2 possibilities...
-
-		Q=(np/r)*Q;
 
 		Q.get(Xa,Ya);
 		Xa.get(a,b);
