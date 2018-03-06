@@ -159,7 +159,7 @@ void help()
 		printf("\nromgen curve wordlength basebits language\n");
 		printf("where wordlength is 16, 32 or 64\n");
 		printf("basebits is less than wordlength\n\n");
-		printf("language is c, java, javascript, go, rust or swift\n\n");
+		printf("language is c, cpp, java, javascript, go, rust or swift\n\n");
 }
 
 char* toupperit(char *s,int lang)
@@ -173,6 +173,7 @@ char* toupperit(char *s,int lang)
 		if (t[i]==0) break;
 		t[i]=toupper(t[i]);
 	}
+
 	return t;
 }
 
@@ -182,8 +183,8 @@ int main(int argc, char **argv)
 	Big p,R,B,mc,curve_b,cru,cof;
 	Big m,x,y,w,t,c,n,r,a,b,gx,gy,r2modp;
 	Big np,PP,TT,FF;
-	int i,A,curve,bb,chunk,words,mbits,ip=0;
-	int modtype,curvetype,curve_a,curve_b_i,lang;
+	int i,A,curve,bb,chunk,words,mbits,bytes,ip=0;
+	int modtype,curvetype,curve_a,curve_b_i,lang=0;
 	ZZn2 X;
 	ECn P;
 	ECn2 Q;
@@ -191,9 +192,11 @@ int main(int argc, char **argv)
 	ZZn zcru;
 	char pre0[50],pre1[50],pre2[50],pre3[50],pre4[50],pre5[50],pre6[50];
 	char post0[50],post1[50],post2[50],post3[50],post4[50],post5[50],post6[50];
-	char pre7[50],post7[50];
+	char pre7[50],post7[50],lg[50];
+
+	char xxx[20],yyy[20],zzz[20];
 	
-	char curvename[30];
+	char curvename[30],fieldname[30];
 
 	argv++; argc--;
 
@@ -218,180 +221,18 @@ int main(int argc, char **argv)
 	chunk=atoi(argv[ip++]);
 	bb=atoi(argv[ip++]);
 
-	lang=0;
-	if (strcmp(argv[ip],"c")==0)
-	{
-		open='{';
-		close='}';
-		term=';';
-		lang=1;
-		if (chunk==64) el='L';
+	strcpy(lg,argv[ip]);
 
-		strcpy(pre0,"const int ");
-		strcpy(pre1,"const BIG_XXX ");
-		strcpy(pre2,"const chunk ");
-		strcpy(pre3,"const BIG_XXX ");
-		strcpy(pre4,"const BIG_XXX ");
-		strcpy(pre5,"const BIG_XXX ");
-		strcpy(pre6,"const BIG_XXX ");
-		strcpy(pre7,"const BIG_XXX ");
-
-		strcpy(post0,"_ZZZ= ");
-		strcpy(post1,"_ZZZ= ");
-		strcpy(post2,"_YYY= ");
-		strcpy(post3,"_ZZZ[2]= ");
-		strcpy(post4,"_ZZZ[2][2]= ");
-		strcpy(post5,"_ZZZ[4]= ");
-		strcpy(post6,"_ZZZ[4][4]= ");
-		strcpy(post7,"_YYY= ");
-
-	}
-
-	if (strcmp(argv[ip],"java")==0)
-	{
-		open='{';
-		close='}';
-		term=';';
-		lang=2;
-		if (chunk==64) 
-		{	
-			el='L';
-			strcpy(pre0,"public static final int ");
-			strcpy(pre1,"public static final long[] ");
-			strcpy(pre2,"public static final long ");
-			strcpy(pre3,"public static final long[][] ");
-			strcpy(pre4,"public static final long[][][] ");
-			strcpy(pre5,"public static final long[][] ");
-			strcpy(pre6,"public static final long[][][] ");
-			strcpy(pre7,"public static final long[] ");
-		}
-		else
-		{
-			strcpy(pre0,"public static final int ");
-			strcpy(pre1,"public static final int[] ");
-			strcpy(pre2,"public static final int ");
-			strcpy(pre3,"public static final int[][] ");
-			strcpy(pre4,"public static final int[][][] ");
-			strcpy(pre5,"public static final int[][] ");
-			strcpy(pre6,"public static final int[][][] ");
-			strcpy(pre7,"public static final int[] ");
-
-		}
-		strcpy(post0,"= ");
-		strcpy(post1,"= ");
-		strcpy(post2,"= ");
-		strcpy(post3,"= ");
-		strcpy(post4,"= ");
-		strcpy(post5,"= ");
-		strcpy(post6,"= ");
-	}
-
-	if (strcmp(argv[ip],"javascript")==0)
-	{
-		open='[';
-		close=']';
-		term=',';
-		lang=3;
-		strcpy(pre0,"");
-		strcpy(pre1,"");
-		strcpy(pre2,"");
-		strcpy(pre3,"");
-		strcpy(pre4,"");
-		strcpy(pre5,"");
-		strcpy(pre6,"");
-		strcpy(pre7,"");
-		strcpy(post0,": ");
-		strcpy(post1,": ");
-		strcpy(post2,": ");
-		strcpy(post3,": ");
-		strcpy(post4,": ");
-		strcpy(post5,": ");
-		strcpy(post6,": ");
-		strcpy(post7,": ");
-	}
-
-	if (strcmp(argv[ip],"go")==0)
-	{
-		open='{';
-		close='}';
-		term=' ';
-		lang=4;
-		strcpy(pre0,"const ");
-		strcpy(pre1,"var ");
-		strcpy(pre2,"const ");
-		strcpy(pre3,"var ");
-		strcpy(pre4,"var ");
-		strcpy(pre5,"var ");
-		strcpy(pre6,"var ");
-		strcpy(pre7,"var ");
-		strcpy(post0," int= ");
-		strcpy(post1,"= [...]Chunk ");
-		strcpy(post2," Chunk=");
-		strcpy(post3,"=[2][]Chunk ");
-		strcpy(post4,"=[2][2][]Chunk ");
-		strcpy(post5,"=[4][]Chunk ");
-		strcpy(post6,"=[4][4][]Chunk ");
-		strcpy(post7,"= [...]Chunk ");
-	}
-
-	if (strcmp(argv[ip],"rust")==0)
-	{
-		open='[';
-		close=']';
-		term=';';
-		lang=5;
-		strcpy(pre0,"pub const ");
-		strcpy(pre1,"pub const ");
-		strcpy(pre2,"pub const ");
-		strcpy(pre3,"pub const ");
-		strcpy(pre4,"pub const ");
-		strcpy(pre5,"pub const ");
-		strcpy(pre6,"pub const ");
-		strcpy(pre7,"pub const ");
-		strcpy(post0,":isize = ");
-		strcpy(post1,":[Chunk;NLEN]=");
-		strcpy(post2,":Chunk=");
-		strcpy(post3,":[[Chunk;NLEN];2]=");
-		strcpy(post4,":[[[Chunk;NLEN];2];2]=");
-		strcpy(post5,":[[Chunk;NLEN];4]=");
-		strcpy(post6,":[[[Chunk;NLEN];4];4]=");
-		strcpy(post7,":[Chunk;NLEN]=");
-
-	}
-
-	if (strcmp(argv[ip],"swift")==0)
-	{
-		open='[';
-		close=']';
-		term=' ';
-		lang=6;
-		strcpy(pre0,"static let ");
-		strcpy(pre1,"static public let ");
-		strcpy(pre2,"static let ");
-		strcpy(pre3,"static let ");
-		strcpy(pre4,"static let ");
-		strcpy(pre5,"static let ");
-		strcpy(pre6,"static let ");
-		strcpy(pre7,"static let ");
-		strcpy(post0,":Int = ");
-		strcpy(post1,":[Chunk] = ");
-		strcpy(post2,":Chunk = ");
-		strcpy(post3,":[[Chunk]] = ");
-		strcpy(post4,":[[[Chunk]]] = ");
-		strcpy(post5,":[[Chunk]] = ");
-		strcpy(post6,":[[[Chunk]]] = ");
-		strcpy(post7,":[Chunk] = ");
-	}
 
 
 	if (chunk !=16 && chunk!=32 && chunk!=64) {help(); return 0;}
 	if (bb<0 || bb>=chunk) {help(); return 0;}
-	if (lang==0) {help(); return 0;}
 
 	if (strcmp(curvename,"ED25519")==0)
 	{ // ED25519
 		curve=1;
 		printf("Curve= ED25519\n");
+		strcpy(fieldname,"25519");
 		mbits=255;
 		words=(1+((mbits-1)/bb));
 		curvetype=EDWARDS;
@@ -409,6 +250,7 @@ int main(int argc, char **argv)
 	{
 		curve=2;
 		printf("Curve= C25519\n");
+		strcpy(fieldname,"25519");
 		mbits=255;
 		words=(1+((mbits-1)/bb));
 		curvetype=MONTGOMERY;
@@ -427,6 +269,7 @@ int main(int argc, char **argv)
 	{
 		curve=3;
 		printf("Curve= NIST256\n");
+		strcpy(fieldname,curvename);
 		mbits=256;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -444,6 +287,7 @@ int main(int argc, char **argv)
 	{
 		curve=4;
 		printf("Curve= BRAINPOOL\n");
+		strcpy(fieldname,curvename);
 		mbits=256;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -464,6 +308,7 @@ int main(int argc, char **argv)
 	{
 		curve=5;
 		printf("Curve= ANSSI\n");
+		strcpy(fieldname,curvename);
 		mbits=256;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -484,6 +329,7 @@ int main(int argc, char **argv)
 	{
 		curve=6;
 		printf("Curve= HIFIVE\n");
+		strcpy(fieldname,curvename);
 		mbits=336;
 		words=(1+((mbits-1)/bb));
 		curvetype=EDWARDS;
@@ -504,6 +350,7 @@ int main(int argc, char **argv)
 	{
 		curve=7;
 		printf("Curve= GOLDILOCKS\n");
+		strcpy(fieldname,curvename);
 		mbits=448;
 		words=(1+((mbits-1)/bb));
 		curvetype=EDWARDS;
@@ -524,6 +371,7 @@ int main(int argc, char **argv)
 	{
 		curve=8;
 		printf("Curve= NIST384\n");
+		strcpy(fieldname,curvename);
 		mbits=384;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -543,6 +391,7 @@ int main(int argc, char **argv)
 	{
 		curve=9;
 		printf("Curve= C41417\n");
+		strcpy(fieldname,curvename);
 		mbits=414;
 		words=(1+((mbits-1)/bb));
 		curvetype=EDWARDS;
@@ -562,6 +411,7 @@ int main(int argc, char **argv)
 	{
 		curve=10;
 		printf("Curve= NIST521\n");
+		strcpy(fieldname,curvename);
 		mbits=521;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -581,6 +431,7 @@ int main(int argc, char **argv)
 	{
 		curve=11;
 		printf("Curve= NUMS256W\n");
+		strcpy(fieldname,"256PMW");
 		mbits=256;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -599,6 +450,7 @@ int main(int argc, char **argv)
 	{
 		curve=12;
 		printf("Curve= NUMS256E\n");
+		strcpy(fieldname,"256PME");
 		mbits=256;
 		words=(1+((mbits-1)/bb));
 		curvetype=EDWARDS;
@@ -618,6 +470,7 @@ int main(int argc, char **argv)
 	{
 		curve=13;
 		printf("Curve= NUMS384W\n");
+		strcpy(fieldname,"384PM");
 		mbits=384;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -636,6 +489,7 @@ int main(int argc, char **argv)
 	{
 		curve=14;
 		printf("Curve= NUMS384E\n");
+		strcpy(fieldname,"384PM");
 		mbits=384;
 		words=(1+((mbits-1)/bb));
 		curvetype=EDWARDS;
@@ -654,6 +508,7 @@ int main(int argc, char **argv)
 	{
 		curve=15;
 		printf("Curve= NUMS512W\n");
+		strcpy(fieldname,"512PM");
 		mbits=512;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -672,6 +527,7 @@ int main(int argc, char **argv)
 	{
 		curve=16;
 		printf("Curve= NUMS512E\n");
+		strcpy(fieldname,"512PM");
 		mbits=512;
 		words=(1+((mbits-1)/bb));
 		curvetype=EDWARDS;
@@ -690,6 +546,7 @@ int main(int argc, char **argv)
 	{
 		curve=17;
 		printf("Curve= BN254\n");
+		strcpy(fieldname,curvename);
 		mbits=254;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -721,6 +578,7 @@ int main(int argc, char **argv)
 	{
 		curve=18;
 		printf("Curve= BN254CX\n");
+		strcpy(fieldname,curvename);
 		mbits=254;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -751,6 +609,7 @@ int main(int argc, char **argv)
 	{
 		curve=19;
 		printf("Curve= BLS383\n");
+		strcpy(fieldname,curvename);
 		mbits=383;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -792,6 +651,7 @@ int main(int argc, char **argv)
 	{
 		curve=20;
 		printf("Curve= BLS381\n");
+		strcpy(fieldname,curvename);
 		mbits=381;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -844,6 +704,7 @@ int main(int argc, char **argv)
 	{
 		curve=23;
 		printf("Curve= BLS461\n");
+		strcpy(fieldname,curvename);
 		mbits=461;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -886,6 +747,7 @@ int main(int argc, char **argv)
 	{
 		curve=21;
 		printf("Curve= FP256BN\n");
+		strcpy(fieldname,curvename);
 		mbits=256;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -918,6 +780,7 @@ int main(int argc, char **argv)
 	{
 		curve=22;
 		printf("Curve= FP512BN\n");
+		strcpy(fieldname,curvename);
 		mbits=512;
 		words=(1+((mbits-1)/bb));
 		curvetype=WEIERSTRASS;
@@ -945,10 +808,219 @@ int main(int argc, char **argv)
 
 	if (curve==0) {help(); return 0;}
 
-	cout << "\nMOD8 = " << p%8 << endl;
+	bytes=mbits/8;
+	if (mbits%8!=0) bytes++;
+	bytes*=8;
+
+
+	lang=0;
+	if (strcmp(lg,"c")==0)
+	{
+		open='{';
+		close='}';
+		term=';';
+		lang=1;
+		if (chunk==64) el='L';
+
+		sprintf(xxx,"_%d_%d ",bytes,bb);
+
+		sprintf(pre0,"const int ");
+		sprintf(pre1,"const BIG_%s",xxx);
+		sprintf(pre2,"const chunk ");
+		sprintf(pre3,"const BIG%s",xxx);
+		sprintf(pre4,"const BIG%s",xxx);
+		sprintf(pre5,"const BIG%s",xxx);
+		sprintf(pre6,"const BIG%s",xxx);
+		sprintf(pre7,"const BIG%s",xxx);
+
+		sprintf(zzz,"_%s",curvename);
+		sprintf(yyy,"_%s",fieldname);
+
+		sprintf(post0,"%s= ",zzz);
+		sprintf(post1,"%s= ",zzz);
+		sprintf(post2,"%s= ",yyy);
+		sprintf(post3,"%s[2]= ",zzz);
+		sprintf(post4,"%s[2][2]= ",zzz);
+		sprintf(post5,"%s[4]= ",zzz);
+		sprintf(post6,"%s[4][4]= ",zzz);
+		sprintf(post7,"%s= ",yyy);
+
+	}
+
+	if (strcmp(lg,"cpp")==0)
+	{
+		open='{';
+		close='}';
+		term=';';
+		lang=7;
+		if (chunk==64) el='L';
+
+		strcpy(pre0,"const int ");
+		strcpy(pre1,"const BIG ");
+		strcpy(pre2,"const chunk ");
+		strcpy(pre3,"const BIG ");
+		strcpy(pre4,"const BIG ");
+		strcpy(pre5,"const BIG ");
+		strcpy(pre6,"const BIG ");
+		strcpy(pre7,"const BIG ");
+
+		strcpy(post0,"= ");
+		strcpy(post1,"= ");
+		strcpy(post2,"= ");
+		strcpy(post3,"[2]= ");
+		strcpy(post4,"[2][2]= ");
+		strcpy(post5,"[4]= ");
+		strcpy(post6,"[4][4]= ");
+		strcpy(post7,"= ");
+
+	}
+
+	if (strcmp(lg,"java")==0)
+	{
+		open='{';
+		close='}';
+		term=';';
+		lang=2;
+		if (chunk==64) 
+		{	
+			el='L';
+			strcpy(pre0,"public static final int ");
+			strcpy(pre1,"public static final long[] ");
+			strcpy(pre2,"public static final long ");
+			strcpy(pre3,"public static final long[][] ");
+			strcpy(pre4,"public static final long[][][] ");
+			strcpy(pre5,"public static final long[][] ");
+			strcpy(pre6,"public static final long[][][] ");
+			strcpy(pre7,"public static final long[] ");
+		}
+		else
+		{
+			strcpy(pre0,"public static final int ");
+			strcpy(pre1,"public static final int[] ");
+			strcpy(pre2,"public static final int ");
+			strcpy(pre3,"public static final int[][] ");
+			strcpy(pre4,"public static final int[][][] ");
+			strcpy(pre5,"public static final int[][] ");
+			strcpy(pre6,"public static final int[][][] ");
+			strcpy(pre7,"public static final int[] ");
+
+		}
+		strcpy(post0,"= ");
+		strcpy(post1,"= ");
+		strcpy(post2,"= ");
+		strcpy(post3,"= ");
+		strcpy(post4,"= ");
+		strcpy(post5,"= ");
+		strcpy(post6,"= ");
+		strcpy(post7,"= ");
+
+	}
+
+	if (strcmp(lg,"javascript")==0)
+	{
+		open='[';
+		close=']';
+		term=',';
+		lang=3;
+		strcpy(pre0,"");
+		strcpy(pre1,"");
+		strcpy(pre2,"");
+		strcpy(pre3,"");
+		strcpy(pre4,"");
+		strcpy(pre5,"");
+		strcpy(pre6,"");
+		strcpy(pre7,"");
+		strcpy(post0,": ");
+		strcpy(post1,": ");
+		strcpy(post2,": ");
+		strcpy(post3,": ");
+		strcpy(post4,": ");
+		strcpy(post5,": ");
+		strcpy(post6,": ");
+		strcpy(post7,": ");
+	}
+
+	if (strcmp(lg,"go")==0)
+	{
+		open='{';
+		close='}';
+		term=' ';
+		lang=4;
+		strcpy(pre0,"const ");
+		strcpy(pre1,"var ");
+		strcpy(pre2,"const ");
+		strcpy(pre3,"var ");
+		strcpy(pre4,"var ");
+		strcpy(pre5,"var ");
+		strcpy(pre6,"var ");
+		strcpy(pre7,"var ");
+		strcpy(post0," int= ");
+		strcpy(post1,"= [...]Chunk ");
+		strcpy(post2," Chunk=");
+		sprintf(post3,"=[2][%d]Chunk ",words);
+		sprintf(post4,"=[2][2][%d]Chunk ",words);
+		sprintf(post5,"=[4][%d]Chunk ",words);
+		sprintf(post6,"=[4][4][%d]Chunk ",words);
+		strcpy(post7,"= [...]Chunk ");
+	}
+
+	if (strcmp(lg,"rust")==0)
+	{
+		open='[';
+		close=']';
+		term=';';
+		lang=5;
+		strcpy(pre0,"pub const ");
+		strcpy(pre1,"pub const ");
+		strcpy(pre2,"pub const ");
+		strcpy(pre3,"pub const ");
+		strcpy(pre4,"pub const ");
+		strcpy(pre5,"pub const ");
+		strcpy(pre6,"pub const ");
+		strcpy(pre7,"pub const ");
+		strcpy(post0,":isize = ");
+		strcpy(post1,":[Chunk;NLEN]=");
+		strcpy(post2,":Chunk=");
+		strcpy(post3,":[[Chunk;NLEN];2]=");
+		strcpy(post4,":[[[Chunk;NLEN];2];2]=");
+		strcpy(post5,":[[Chunk;NLEN];4]=");
+		strcpy(post6,":[[[Chunk;NLEN];4];4]=");
+		strcpy(post7,":[Chunk;NLEN]=");
+
+	}
+
+	if (strcmp(lg,"swift")==0)
+	{
+		open='[';
+		close=']';
+		term=' ';
+		lang=6;
+		strcpy(pre0,"static let ");
+		strcpy(pre1,"static public let ");
+		strcpy(pre2,"static let ");
+		strcpy(pre3,"static let ");
+		strcpy(pre4,"static let ");
+		strcpy(pre5,"static let ");
+		strcpy(pre6,"static let ");
+		strcpy(pre7,"static let ");
+		strcpy(post0,":Int = ");
+		strcpy(post1,":[Chunk] = ");
+		strcpy(post2,":Chunk = ");
+		strcpy(post3,":[[Chunk]] = ");
+		strcpy(post4,":[[[Chunk]]] = ");
+		strcpy(post5,":[[Chunk]] = ");
+		strcpy(post6,":[[[Chunk]]] = ");
+		strcpy(post7,":[Chunk] = ");
+	}
+
+
+	if (lang==0) {help(); return 0;}
+
+	//cout << "\nMOD8 = " << p%8 << endl;
 
 	m=pow((Big)2,bb);
 
+	cout << "*** rom field parameters*****" << endl;
 	cout << "// Base Bits= " << bb << endl; 
 
 	cout << pre7 << toupperit((char *)"Modulus",lang) << post7; mc=output(chunk,words,p,m); cout << term << endl;
@@ -972,6 +1044,19 @@ int main(int argc, char **argv)
 	if (el!=0) cout << "L;" << endl;
 	else cout << term << endl;
 
+
+	if (curve>16)
+	{
+		set_frobenius_constant(X);
+		X.get(a,b);
+		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
+
+	}
+
+	cout << endl;
+	cout << "*** rom curve parameters *****" << endl;
+	cout << "// Base Bits= " << bb << endl; 
 	cout << "\n" << pre0 << "CURVE_A"  << post0 << curve_a << term << endl;
 	curve_b_i=toint(curve_b);
 	if (curve_b_i==MR_TOOBIG) 
@@ -991,10 +1076,10 @@ int main(int argc, char **argv)
 	if (curve==17 || curve==18 || curve==21 || curve==22)
 	{
 		cout << endl;
-		set_frobenius_constant(X);
-		X.get(a,b);
-		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
+		//set_frobenius_constant(X);
+		//X.get(a,b);
+		//cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
+		//cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1; output(chunk,words,x,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
@@ -1045,10 +1130,10 @@ int main(int argc, char **argv)
 	if (curve==19 || curve==20 || curve==23)
 	{
 		cout << endl;
-		set_frobenius_constant(X);
-		X.get(a,b);
-		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
-		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
+		//set_frobenius_constant(X);
+		//X.get(a,b);
+		//cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
+		//cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1 ; output(chunk,words,x,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
