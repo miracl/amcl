@@ -36,3 +36,7 @@ and
 swift -I. -L. -led25519 -lbn254 -lrsa2048 BenchtestALL.swift 
 
 
+For example to test the bls381 pairing-friendly curve, select
+1, 20 and 24 instead, and replace bn254 by bls381 above and in
+TestALL.swift and BenchtestALL.swift.
+
