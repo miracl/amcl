@@ -111,6 +111,10 @@ final public class BIG{
 
     static func muladd(_ a: Chunk,_ b: Chunk,_ c: Chunk,_ r: Chunk) -> (Chunk,Chunk)
     {
+	let (tp,bt)=a.multipliedFullWidth(by: b)
+	var bot = Chunk(bt)&BIG.BMASK
+	var top = (tp << Chunk(64-BIG.BASEBITS)) | Chunk(bt >> BIG.BASEBITS)
+/*
         let x0=a&BIG.HMASK;
         let x1=(a>>Chunk(BIG.HBITS))
         let y0=b&BIG.HMASK;
@@ -121,8 +125,9 @@ final public class BIG{
         let u0=mid&BIG.HMASK
         let u1=(mid>>Chunk(BIG.HBITS))
         bot=bot+(u0<<Chunk(BIG.HBITS))
+	top+=u1
+*/
         bot+=c; bot+=r
-        top+=u1
         let carry=bot>>Chunk(BIG.BASEBITS)
         bot &= BIG.BMASK
         top+=carry
