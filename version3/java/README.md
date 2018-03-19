@@ -23,3 +23,5 @@ cd amcl
 mvn clean install
 
 Testing will be carried out during the installation process.
+
+*New* This library is now available directly on maven central
