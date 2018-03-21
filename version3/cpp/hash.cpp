@@ -137,15 +137,15 @@ void amcl::HASH256_init(hash256 *sh)
 }
 
 /* process a single byte */
-void amcl::HASH256_process(hash256 *sh,int byte)
+void amcl::HASH256_process(hash256 *sh,int byt)
 {
     /* process the next message byte */
     int cnt;
-//printf("byt= %x\n",byte);
+//printf("byt= %x\n",byt);
     cnt=(int)((sh->length[0]/32)%16);
 
     sh->w[cnt]<<=8;
-    sh->w[cnt]|=(unsign32)(byte&0xFF);
+    sh->w[cnt]|=(unsign32)(byt&0xFF);
 
     sh->length[0]+=8;
     if (sh->length[0]==0L)
@@ -284,10 +284,10 @@ void amcl::HASH384_init(hash384 *sh)
 
 }
 
-void amcl::HASH384_process(hash384 *sh,int byte)
+void amcl::HASH384_process(hash384 *sh,int byt)
 {
     /* process the next message byte */
-    HASH512_process(sh,byte);
+    HASH512_process(sh,byt);
 }
 
 void amcl::HASH384_hash(hash384 *sh,char *hash)
@@ -315,7 +315,7 @@ void amcl::HASH512_init(hash512 *sh)
     sh->hlen=64;
 }
 
-void amcl::HASH512_process(hash512 *sh,int byte)
+void amcl::HASH512_process(hash512 *sh,int byt)
 {
     /* process the next message byte */
     int cnt;
@@ -323,7 +323,7 @@ void amcl::HASH512_process(hash512 *sh,int byte)
     cnt=(int)((sh->length[0]/64)%16);
 
     sh->w[cnt]<<=8;
-    sh->w[cnt]|=(unsign64)(byte&0xFF);
+    sh->w[cnt]|=(unsign64)(byt&0xFF);
 
     sh->length[0]+=8;
     if (sh->length[0]==0L)
@@ -451,13 +451,13 @@ void amcl::SHA3_init(sha3 *sh,int olen)
 }
 
 /* process a single byte */
-void amcl::SHA3_process(sha3 *sh,int byte)
+void amcl::SHA3_process(sha3 *sh,int byt)
 {
 	int cnt=(int)(sh->length%sh->rate);
 	int i,j,b=cnt%8;
 	cnt/=8;
 	i=cnt%5; j=cnt/5;  /* process by columns! */
-	sh->S[i][j]^=((unsign64)byte<<(8*b));
+	sh->S[i][j]^=((unsign64)byt<<(8*b));
 	sh->length++;
 	if (sh->length%sh->rate==0) SHA3_transform(sh);
 }
