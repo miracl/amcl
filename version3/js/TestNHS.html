@@ -25,6 +25,11 @@
 // Test NewHope Simple 
 // See https://eprint.iacr.org/2016/1157 (Alkim, Ducas, Popplemann and Schwabe)
 
+
+// IMPORTANT - to inter-operate with other language versions, transmitted values must be converted out of Montgomery format via redc() 
+// and then converted back into Montgomery format on reception via nres(). The reason being that JS uses a different Montgomery R value 
+// of 2^26 and not 2^32
+
 	var ctx = new CTX();
 
 	var RAW=[];
@@ -49,7 +54,7 @@
 	ctx.NHS.SERVER_2(S,UC,KEYA);
 
 	window.document.write("Alice Key= 0x"+ctx.NHS.bytestostring(KEYA)+ "<br>");
-	window.document.write("Bob's Key= 0x"+ctx.NHS.bytestostring(KEYA)+ "<br>");
+	window.document.write("Bob's Key= 0x"+ctx.NHS.bytestostring(KEYB)+ "<br>");
 
 
 </script>

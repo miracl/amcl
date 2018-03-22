@@ -200,7 +200,8 @@ func parse(seed []byte,poly []int32) {
 		n+=int32(hash[j+1]); n<<=8
 		n+=int32(hash[j+2]); n<<=8
 		n+=int32(hash[j+3]); j+=4
-		poly[i]=modmul(n,NHS_ONE) // reduce 31-bit random number mod q
+		poly[i]=nres(n)
+		//poly[i]=modmul(n,NHS_ONE) // reduce 31-bit random number mod q
 	}
 } 
 

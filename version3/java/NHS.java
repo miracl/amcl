@@ -216,7 +216,8 @@ public final class NHS {
 			n+=(int)hash[j+1]&0xff; n<<=8;
 			n+=(int)hash[j+2]&0xff; n<<=8;
 			n+=(int)hash[j+3]&0xff; j+=4;
-			poly[i]=modmul(n,RLWE_ONE); // reduce 31-bit random number mod q
+			poly[i]=nres(n);
+			//poly[i]=modmul(n,RLWE_ONE); // reduce 31-bit random number mod q
 		}
 	} 
 

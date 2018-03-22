@@ -186,7 +186,8 @@ fn parse(seed: &[u8],poly: &mut[i32]) {
 		n+=(hash[j+1]) as i32; n<<=8;
 		n+=(hash[j+2]) as i32; n<<=8;
 		n+=(hash[j+3]) as i32; j+=4;
-		poly[i]=modmul(n,ONE); // reduce 31-bit random number mod q
+		poly[i]=nres(n);
+		//poly[i]=modmul(n,ONE); // reduce 31-bit random number mod q
 	}
 } 
 

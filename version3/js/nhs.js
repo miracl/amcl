@@ -195,7 +195,8 @@ var NHS = function(ctx) {
                 n <<= 8;
                 n += hash[j + 3] & 0xff;
                 j += 4;
-                poly[i] = NHS.modmul(n, NHS.ONE); // reduce 31-bit random number mod q
+				poly[i]=NHS.nres(n);
+                //poly[i] = NHS.modmul(n, NHS.ONE); // reduce 31-bit random number mod q
             }
         },
 

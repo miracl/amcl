@@ -203,7 +203,8 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 			n+=Int32(hash[j+1]); n<<=8
 			n+=Int32(hash[j+2]); n<<=8
 			n+=Int32(hash[j+3]); j+=4
-			poly[i]=modmul(n,ONE); // reduce 31-bit random number mod q
+			poly[i]=nres(n)
+			//poly[i]=modmul(n,ONE); // reduce 31-bit random number mod q
 		}
 	} 
 /* Compress 14 bits polynomial coefficients into byte array */
