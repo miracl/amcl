@@ -288,7 +288,7 @@ func error(rng *RAND,poly []int32) {
 
 func redc_it(p []int32) {
 	for i:=0;i<NHS_DEGREE;i++ {
-		p[i]=redc(uint32(p[i]))
+		p[i]=redc(uint64(p[i]))
 	}	
 }
 
