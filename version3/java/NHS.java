@@ -319,6 +319,20 @@ public final class NHS {
 		}
 	}
 
+	static void redc_it(int[] p)
+	{
+		int i;
+		for (i=0;i<DEGREE;i++)
+			p[i]=redc(p[i]);
+	}
+
+	static void nres_it(int[] p)
+	{
+		int i;
+		for (i=0;i<DEGREE;i++)
+			p[i]=nres(p[i]);
+	}
+
 	static void poly_mul(int[] p1,int[] p2,int[] p3)
 	{
 		int i;
@@ -391,6 +405,7 @@ public final class NHS {
 		poly_add(b,b,e);
 		poly_hard_reduce(b);
 
+		redc_it(b);
 		pack(b,array);
 		
 		for (i=0;i<32;i++)
@@ -451,6 +466,7 @@ public final class NHS {
 		Encode(key,k);
 
 		unpack(array,c);
+		nres_it(c);
 
 		poly_mul(c,c,sd);
 		intt(c);
@@ -468,6 +484,7 @@ public final class NHS {
 		for (i=0;i<32;i++)
 			KEY[i]=key[i];
 
+		redc_it(u);
 		pack(u,array);
 
 		for (i=0;i<1792;i++)
@@ -494,6 +511,7 @@ public final class NHS {
 			array[i]=UC[i];
 
 		unpack(array,k);
+		nres_it(k);
 
 		for (i=0;i<384;i++)
 			cc[i]=UC[i+1792];

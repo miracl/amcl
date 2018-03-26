@@ -286,6 +286,18 @@ func error(rng *RAND,poly []int32) {
 	}
 }
 
+func redc_it(p []int32) {
+	for i:=0;i<NHS_DEGREE;i++ {
+		p[i]=redc(uint32(p[i]))
+	}	
+}
+
+func nres_it(p []int32) {
+	for i:=0;i<NHS_DEGREE;i++ {
+		p[i]=nres(p[i])
+	}	
+}
+
 func poly_mul(p1 []int32,p2 [] int32,p3 []int32) {
 	for i:=0;i<NHS_DEGREE;i++ {
 		p1[i]=modmul(p2[i],p3[i])
@@ -345,6 +357,7 @@ func NHS_SERVER_1(rng *RAND,SB []byte,S []byte) {
 	poly_add(b[:],b[:],e[:])
 	poly_hard_reduce(b[:])
 
+	redc_it(b[:])
 	nhs_pack(b[:],array[:])
 
 	for i:=0;i<32;i++ {
@@ -409,6 +422,7 @@ func NHS_CLIENT(rng *RAND,SB []byte,UC []byte,KEY []byte) {
 	encode(key[:],k[:])
 
 	nhs_unpack(array[:],c[:])
+	nres_it(c[:])
 
 	poly_mul(c[:],c[:],sd[:])
 	intt(c[:])
@@ -428,6 +442,7 @@ func NHS_CLIENT(rng *RAND,SB []byte,UC []byte,KEY []byte) {
 		KEY[i]=key[i]
 	}
 
+	redc_it(u[:])
 	nhs_pack(u[:],array[:])
 
 	for i:=0;i<1792;i++ {
@@ -455,6 +470,7 @@ func NHS_SERVER_2(S []byte,UC []byte,KEY []byte) {
 	}
 
 	nhs_unpack(array[:],k[:])
+	nres_it(k[:])
 
 	for i:=0;i<384;i++ {
 		cc[i]=UC[i+1792]

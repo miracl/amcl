@@ -163,7 +163,7 @@ void XXX::BIG_fromBytes(BIG a,char *b)
         //BIG_inc(a,(int)(unsigned char)b[i]); BIG_norm(a);
     }
 #ifdef DEBUG_NORM
-	a[MPV]=1; a[MNV]=0;
+	a[MPV_XXX]=1; a[MNV_XXX]=0;
 #endif
 }
 
@@ -179,7 +179,7 @@ void XXX::BIG_fromBytesLen(BIG a,char *b,int s)
         a[0]+=(int)(unsigned char)b[i];
     }
 #ifdef DEBUG_NORM
-	a[MPV]=1; a[MNV]=0;
+	a[MPV_XXX]=1; a[MNV_XXX]=0;
 #endif
 }
 
@@ -229,8 +229,8 @@ void XXX::BIG_copy(BIG b,BIG a)
     for (i=0; i<NLEN_XXX; i++)
         b[i]=a[i];
 #ifdef DEBUG_NORM
-	b[MPV]=a[MPV];
-	b[MNV]=a[MNV];
+	b[MPV_XXX]=a[MPV_XXX];
+	b[MNV_XXX]=a[MNV_XXX];
 #endif
 }
 
@@ -241,7 +241,7 @@ void XXX::BIG_rcopy(BIG b,const BIG a)
     for (i=0; i<NLEN_XXX; i++)
         b[i]=a[i];
 #ifdef DEBUG_NORM
-	b[MPV]=1; b[MNV]=0;
+	b[MPV_XXX]=1; b[MNV_XXX]=0;
 #endif
 }
 
@@ -252,8 +252,8 @@ void XXX::BIG_dcopy(DBIG b,DBIG a)
     for (i=0; i<DNLEN_XXX; i++)
         b[i]=a[i];
 #ifdef DEBUG_NORM
-	b[DMPV]=a[DMPV];
-	b[DMNV]=a[DMNV];
+	b[DMPV_XXX]=a[DMPV_XXX];
+	b[DMNV_XXX]=a[DMNV_XXX];
 #endif
 }
 
@@ -269,8 +269,8 @@ void XXX::BIG_dscopy(DBIG b,BIG a)
 
     for (i=NLEN_XXX+1; i<DNLEN_XXX; i++) b[i]=0;
 #ifdef DEBUG_NORM
-	b[DMPV]=a[MPV];
-	b[DMNV]=a[MNV];
+	b[DMPV_XXX]=a[MPV_XXX];
+	b[DMNV_XXX]=a[MNV_XXX];
 #endif
 }
 
@@ -283,8 +283,8 @@ void XXX::BIG_dsucopy(DBIG b,BIG a)
     for (i=NLEN_XXX; i<DNLEN_XXX; i++)
         b[i]=a[i-NLEN_XXX];
 #ifdef DEBUG_NORM
-	b[DMPV]=a[MPV];
-	b[DMNV]=a[MNV];
+	b[DMPV_XXX]=a[MPV_XXX];
+	b[DMNV_XXX]=a[MNV_XXX];
 #endif
 }
 
@@ -295,8 +295,8 @@ void XXX::BIG_sdcopy(BIG b,DBIG a)
     for (i=0; i<NLEN_XXX; i++)
         b[i]=a[i];
 #ifdef DEBUG_NORM
-	b[MPV]=a[DMPV];
-	b[MNV]=a[DMNV];
+	b[MPV_XXX]=a[DMPV_XXX];
+	b[MNV_XXX]=a[DMNV_XXX];
 #endif
 }
 
@@ -307,8 +307,8 @@ void XXX::BIG_sducopy(BIG b,DBIG a)
     for (i=0; i<NLEN_XXX; i++)
         b[i]=a[i+NLEN_XXX];
 #ifdef DEBUG_NORM
-	b[MPV]=a[DMPV];
-	b[MNV]=a[DMNV];
+	b[MPV_XXX]=a[DMPV_XXX];
+	b[MNV_XXX]=a[DMNV_XXX];
 
 #endif
 }
@@ -320,7 +320,7 @@ void XXX::BIG_zero(BIG a)
     for (i=0; i<NLEN_XXX; i++)
         a[i]=0;
 #ifdef DEBUG_NORM
-	a[MPV]=a[MNV]=0;
+	a[MPV_XXX]=a[MNV_XXX]=0;
 #endif
 }
 
@@ -330,7 +330,7 @@ void XXX::BIG_dzero(DBIG a)
     for (i=0; i<DNLEN_XXX; i++)
         a[i]=0;
 #ifdef DEBUG_NORM
-	a[DMPV]=a[DMNV]=0;
+	a[DMPV_XXX]=a[DMNV_XXX]=0;
 #endif
 }
 
@@ -342,8 +342,8 @@ void XXX::BIG_one(BIG a)
     for (i=1; i<NLEN_XXX; i++)
         a[i]=0;
 #ifdef DEBUG_NORM
-	a[MPV]=1;
-	a[MNV]=0;
+	a[MPV_XXX]=1;
+	a[MNV_XXX]=0;
 #endif
 }
 
@@ -357,10 +357,10 @@ void XXX::BIG_add(BIG c,BIG a,BIG b)
     for (i=0; i<NLEN_XXX; i++)
         c[i]=a[i]+b[i];
 #ifdef DEBUG_NORM
-	c[MPV]=a[MPV]+b[MPV];
-	c[MNV]=a[MNV]+b[MNV];
-	if (c[MPV]>NEXCESS)  printf("add problem - positive digit overflow %d\n",c[MPV]);
-	if (c[MNV]>NEXCESS)  printf("add problem - negative digit overflow %d\n",c[MNV]);
+	c[MPV_XXX]=a[MPV_XXX]+b[MPV_XXX];
+	c[MNV_XXX]=a[MNV_XXX]+b[MNV_XXX];
+	if (c[MPV_XXX]>NEXCESS_XXX)  printf("add problem - positive digit overflow %d\n",c[MPV_XXX]);
+	if (c[MNV_XXX]>NEXCESS_XXX)  printf("add problem - negative digit overflow %d\n",c[MNV_XXX]);
 
 #endif
 }
@@ -371,7 +371,7 @@ void XXX::BIG_inc(BIG c,int d)
     BIG_norm(c);
     c[0]+=(chunk)d;
 #ifdef DEBUG_NORM
-	c[MPV]+=1;
+	c[MPV_XXX]+=1;
 #endif
 }
 
@@ -383,10 +383,10 @@ void XXX::BIG_sub(BIG c,BIG a,BIG b)
     for (i=0; i<NLEN_XXX; i++)
         c[i]=a[i]-b[i];
 #ifdef DEBUG_NORM
-	c[MPV]=a[MPV]+b[MNV];
-	c[MNV]=a[MNV]+b[MPV];
-	if (c[MPV]>NEXCESS)  printf("sub problem - positive digit overflow %d\n",c[MPV]);
-	if (c[MNV]>NEXCESS)  printf("sub problem - negative digit overflow %d\n",c[MNV]);
+	c[MPV_XXX]=a[MPV_XXX]+b[MNV_XXX];
+	c[MNV_XXX]=a[MNV_XXX]+b[MPV_XXX];
+	if (c[MPV_XXX]>NEXCESS_XXX)  printf("sub problem - positive digit overflow %d\n",c[MPV_XXX]);
+	if (c[MNV_XXX]>NEXCESS_XXX)  printf("sub problem - negative digit overflow %d\n",c[MNV_XXX]);
 
 #endif
 }
@@ -399,10 +399,10 @@ void XXX::BIG_dsub(DBIG c,DBIG a,DBIG b)
     for (i=0; i<DNLEN_XXX; i++)
         c[i]=a[i]-b[i];
 #ifdef DEBUG_NORM
-	c[DMPV]=a[DMPV]+b[DMNV];
-	c[DMNV]=a[DMNV]+b[DMPV];
-	if (c[DMPV]>NEXCESS)  printf("double sub problem - positive digit overflow %d\n",c[DMPV]);
-	if (c[DMNV]>NEXCESS)  printf("double sub problem - negative digit overflow %d\n",c[DMNV]);
+	c[DMPV_XXX]=a[DMPV_XXX]+b[DMNV_XXX];
+	c[DMNV_XXX]=a[DMNV_XXX]+b[DMPV_XXX];
+	if (c[DMPV_XXX]>NEXCESS_XXX)  printf("double sub problem - positive digit overflow %d\n",c[DMPV_XXX]);
+	if (c[DMNV_XXX]>NEXCESS_XXX)  printf("double sub problem - negative digit overflow %d\n",c[DMNV_XXX]);
 #endif
 }
 
@@ -412,10 +412,10 @@ void XXX::BIG_dadd(DBIG c,DBIG a,DBIG b)
     for (i=0; i<DNLEN_XXX; i++)
         c[i]=a[i]+b[i];
 #ifdef DEBUG_NORM
-	c[DMPV]=a[DMPV]+b[DMNV];
-	c[DMNV]=a[DMNV]+b[DMPV];
-	if (c[DMPV]>NEXCESS)  printf("double add problem - positive digit overflow %d\n",c[DMPV]);
-	if (c[DMNV]>NEXCESS)  printf("double add problem - negative digit overflow %d\n",c[DMNV]);
+	c[DMPV_XXX]=a[DMPV_XXX]+b[DMNV_XXX];
+	c[DMNV_XXX]=a[DMNV_XXX]+b[DMPV_XXX];
+	if (c[DMPV_XXX]>NEXCESS_XXX)  printf("double add problem - positive digit overflow %d\n",c[DMPV_XXX]);
+	if (c[DMNV_XXX]>NEXCESS_XXX)  printf("double add problem - negative digit overflow %d\n",c[DMNV_XXX]);
 #endif
 }
 
@@ -425,20 +425,20 @@ void XXX::BIG_dec(BIG c,int d)
     BIG_norm(c);
     c[0]-=(chunk)d;
 #ifdef DEBUG_NORM
-	c[MNV]+=1;
+	c[MNV_XXX]+=1;
 #endif
 }
 
-/* multiplication r=a*c by c<=NEXCESS */
+/* multiplication r=a*c by c<=NEXCESS_XXX */
 void XXX::BIG_imul(BIG r,BIG a,int c)
 {
     int i;
     for (i=0; i<NLEN_XXX; i++) r[i]=a[i]*c;
 #ifdef DEBUG_NORM
-	r[MPV]=a[MPV]*c;
-	r[MNV]=a[MNV]*c;
-	if (r[MPV]>NEXCESS)  printf("int mul problem - positive digit overflow %d\n",r[MPV]);
-	if (r[MNV]>NEXCESS)  printf("int mul problem - negative digit overflow %d\n",r[MNV]);
+	r[MPV_XXX]=a[MPV_XXX]*c;
+	r[MNV_XXX]=a[MNV_XXX]*c;
+	if (r[MPV_XXX]>NEXCESS_XXX)  printf("int mul problem - positive digit overflow %d\n",r[MPV_XXX]);
+	if (r[MNV_XXX]>NEXCESS_XXX)  printf("int mul problem - negative digit overflow %d\n",r[MNV_XXX]);
 
 #endif
 }
@@ -457,8 +457,8 @@ chunk XXX::BIG_pmul(BIG r,BIG a,int c)
         carry=muladd(ak,(chunk)c,carry,&r[i]);
     }
 #ifdef DEBUG_NORM
-	r[MPV]=1;
-	r[MNV]=0;
+	r[MPV_XXX]=1;
+	r[MNV_XXX]=0;
 #endif
     return carry;
 }
@@ -492,8 +492,8 @@ void XXX::BIG_pxmul(DBIG c,BIG a,int b)
         carry=muladd(a[j],(chunk)b,carry,&c[j]);
     c[NLEN_XXX]=carry;
 #ifdef DEBUG_NORM
-	c[DMPV]=1;
-	c[DMNV]=0;
+	c[DMPV_XXX]=1;
+	c[DMNV_XXX]=0;
 #endif
 }
 
@@ -517,8 +517,8 @@ void XXX::BIG_smul(BIG c,BIG a,BIG b)
         }
     }
 #ifdef DEBUG_NORM
-	c[MPV]=1;
-	c[MNV]=0;
+	c[MPV_XXX]=1;
+	c[MNV_XXX]=0;
 #endif
 
 }
@@ -536,8 +536,8 @@ void XXX::BIG_mul(DBIG c,BIG a,BIG b)
 #endif
 
 #ifdef DEBUG_NORM
-	if ((a[MPV]!=1 && a[MPV]!=0) || a[MNV]!=0) printf("First input to mul not normed\n");
-	if ((b[MPV]!=1 && b[MPV]!=0) || b[MNV]!=0) printf("Second input to mul not normed\n");
+	if ((a[MPV_XXX]!=1 && a[MPV_XXX]!=0) || a[MNV_XXX]!=0) printf("First input to mul not normed\n");
+	if ((b[MPV_XXX]!=1 && b[MPV_XXX]!=0) || b[MNV_XXX]!=0) printf("Second input to mul not normed\n");
 #endif
 
     /* Faster to Combafy it.. Let the compiler unroll the loops! */
@@ -594,8 +594,8 @@ void XXX::BIG_mul(DBIG c,BIG a,BIG b)
 #endif
 
 #ifdef DEBUG_NORM
-	c[DMPV]=1;
-	c[DMNV]=0;
+	c[DMPV_XXX]=1;
+	c[DMNV_XXX]=0;
 #endif
 }
 
@@ -609,7 +609,7 @@ void XXX::BIG_sqr(DBIG c,BIG a)
 #endif
 
 #ifdef DEBUG_NORM
-	if ((a[MPV]!=1 && a[MPV]!=0) || a[MNV]!=0) printf("Input to sqr not normed\n");
+	if ((a[MPV_XXX]!=1 && a[MPV_XXX]!=0) || a[MNV_XXX]!=0) printf("Input to sqr not normed\n");
 #endif
     /* Note 2*a[i] in loop below and extra addition */
 
@@ -694,8 +694,8 @@ void XXX::BIG_sqr(DBIG c,BIG a)
 
 
 #ifdef DEBUG_NORM
-	c[DMPV]=1;
-	c[DMNV]=0;
+	c[DMPV_XXX]=1;
+	c[DMNV_XXX]=0;
 #endif
 
 }
@@ -748,7 +748,7 @@ void XXX::BIG_monty(BIG a,BIG md,chunk MC,DBIG d)
 #endif
 
 #ifdef DEBUG_NORM
-	a[MPV]=1;  a[MNV]=0;
+	a[MPV_XXX]=1;  a[MNV_XXX]=0;
 #endif
 
 #else
@@ -902,8 +902,8 @@ chunk XXX::BIG_split(BIG t,BIG b,DBIG d,int n)
         }
     }
 #ifdef DEBUG_NORM
-    t[MPV]=1; t[MNV]=0;
-    b[MPV]=1; b[MNV]=0;
+    t[MPV_XXX]=1; t[MNV_XXX]=0;
+    b[MPV_XXX]=1; b[MNV_XXX]=0;
 #endif
     return carry;
 }
@@ -924,7 +924,7 @@ chunk XXX::BIG_norm(BIG a)
     a[NLEN_XXX-1]=(a[NLEN_XXX-1]+carry);
 
 #ifdef DEBUG_NORM
-	a[MPV]=1; a[MNV]=0;
+	a[MPV_XXX]=1; a[MNV_XXX]=0;
 #endif
     return (a[NLEN_XXX-1]>>((8*MODBYTES_XXX)%BASEBITS_XXX));  /* only used in ff.c */
 }
@@ -941,7 +941,7 @@ void XXX::BIG_dnorm(DBIG a)
     }
     a[DNLEN_XXX-1]=(a[DNLEN_XXX-1]+carry);
 #ifdef DEBUG_NORM
-	a[DMPV]=1; a[DMNV]=0;
+	a[DMPV_XXX]=1; a[DMNV_XXX]=0;
 #endif
 }
 
@@ -1238,7 +1238,7 @@ void XXX::BIG_random(BIG m,csprng *rng)
     }
 
 #ifdef DEBUG_NORM
-	m[MPV]=1; m[MNV]=0;
+	m[MPV_XXX]=1; m[MNV_XXX]=0;
 #endif
 }
 
@@ -1263,7 +1263,7 @@ void XXX::BIG_randomnum(BIG m,BIG q,csprng *rng)
     /* reduce modulo a BIG. Removes bias */
     BIG_dmod(m,d,q);
 #ifdef DEBUG_NORM
-	m[MPV]=1; m[MNV]=0;
+	m[MPV_XXX]=1; m[MNV_XXX]=0;
 #endif
 }
 
@@ -1441,6 +1441,6 @@ void XXX::BIG_dfromBytesLen(DBIG a,char *b,int s)
         a[0]+=(int)(unsigned char)b[i];
     }
 #ifdef DEBUG_NORM
-	a[DMPV]=1; a[DMNV]=0;
+	a[DMPV_XXX]=1; a[DMNV_XXX]=0;
 #endif
 }

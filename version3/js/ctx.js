@@ -398,7 +398,7 @@ var CTX = function(input_parameter) {
     this.HASH512 = HASH512(this);
     this.SHA3 = SHA3(this);
     this.RAND = RAND(this);
-    this.NewHope = NewHope();
+    //this.NewHope = NewHope();
     this.NHS = NHS(this);
 
     if (input_parameter === undefined) {

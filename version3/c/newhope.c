@@ -314,6 +314,20 @@ static void NHSError(csprng *RNG,sign32 *poly)
 	}
 }
 
+static void redc_it(sign32 *p)
+{
+	int i;
+	for (i=0;i<DEGREE;i++)
+		p[i]=redc(p[i]);
+}
+
+static void nres_it(sign32 *p)
+{
+	int i;
+	for (i=0;i<DEGREE;i++)
+		p[i]=nres(p[i]);
+}
+
 static void poly_mul(sign32 *p1,sign32 *p2,sign32 *p3)
 {
 	int i;
@@ -382,7 +396,9 @@ void NHS_SERVER_1(csprng *RNG,octet *SB,octet *S)
 	poly_add(b,b,e);
 	poly_hard_reduce(b);
 
+	redc_it(b);
 	NHSpack(b,array);
+
 	OCT_empty(SB);
 	OCT_jbytes(SB,(char *)seed,32);
 	OCT_jbytes(SB,(char *)array,1792);
@@ -430,6 +446,7 @@ void NHS_CLIENT(csprng *RNG,octet *SB,octet *UC,octet *KEY)
 	NHSEncode(key,k);
 
 	NHSunpack(array,c);
+	nres_it(c);
 
 	poly_mul(c,c,sd);
 	intt(c);
@@ -447,6 +464,7 @@ void NHS_CLIENT(csprng *RNG,octet *SB,octet *UC,octet *KEY)
 	OCT_empty(KEY);
 	OCT_jbytes(KEY,(char *)key,32);
 
+	redc_it(u);
 	NHSpack(u,array);
 
 	OCT_empty(UC);
@@ -465,6 +483,7 @@ void NHS_SERVER_2(octet *S,octet *UC,octet *KEY)
 		array[i]=UC->val[i];
 
 	NHSunpack(array,k);
+	nres_it(k);
 
 	for (i=0;i<384;i++)
 		cc[i]=UC->val[i+1792];

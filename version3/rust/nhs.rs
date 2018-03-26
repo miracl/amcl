@@ -273,6 +273,19 @@ fn error(rng: &mut RAND,poly: &mut [i32]) {
 	}
 }
 
+
+fn redc_it(p: &mut [i32]) {
+	for i in 0..DEGREE {
+		p[i]=redc(p[i] as u64);
+	}
+}
+
+fn nres_it(p: &mut [i32]) {
+	for i in 0..DEGREE {
+		p[i]=nres(p[i]);
+	}
+}
+
 fn poly_mul(p1: &mut [i32],p3: &[i32]) {
 	for i in 0..DEGREE {
 		p1[i]=modmul(p1[i],p3[i]);
@@ -332,6 +345,7 @@ pub fn server_1(mut rng: &mut RAND,sb: &mut [u8],ss: &mut [u8]) {
 	poly_add(&mut b,&e);
 	poly_hard_reduce(&mut b);
 
+	redc_it(&mut b);
 	nhs_pack(&b,&mut array);
 
 	for i in 0..32 {
@@ -396,6 +410,7 @@ pub fn client(mut rng: &mut RAND,sb: &[u8],uc: &mut [u8],okey: &mut [u8]) {
 	encode(&key,&mut k);
 
 	nhs_unpack(&array,&mut c);
+	nres_it(&mut c);
 
 	poly_mul(&mut c,&sd);
 	intt(&mut c);
@@ -415,6 +430,7 @@ pub fn client(mut rng: &mut RAND,sb: &[u8],uc: &mut [u8],okey: &mut [u8]) {
 		okey[i]=key[i];
 	}
 
+	redc_it(&mut u);
 	nhs_pack(&u,&mut array);
 
 	for i in 0..1792 {
@@ -442,6 +458,7 @@ pub fn server_2(ss: &[u8],uc: &[u8],okey: &mut [u8]) {
 	}
 
 	nhs_unpack(&array,&mut k);
+	nres_it(&mut k);
 
 	for i in 0..384 {
 		cc[i]=uc[i+1792];

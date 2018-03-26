@@ -290,6 +290,20 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 		}
 	}
 
+	private static func redc_it(_ p:inout [Int32]) {
+		for i in 0..<DEGREE {
+			p[i]=redc(UInt64(p[i]))
+		}
+		
+	}
+
+	private static func nres_it(_ p:inout [Int32]) {
+		for i in 0..<DEGREE {
+			p[i]=nres(p[i])
+		}
+		
+	}
+
 	private static func poly_mul(_ p1:inout [Int32],_ p2: [Int32],_ p3: [Int32]) {
 		for i in 0..<DEGREE {
 			p1[i]=modmul(p2[i],p3[i])
@@ -347,6 +361,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 		poly_add(&b,b,e)
 		poly_hard_reduce(&b)
 
+		redc_it(&b)
 		nhs_pack(b,&array)
 
 		for i in 0..<32 {
@@ -410,6 +425,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 		encode(key,&k)
 
 		nhs_unpack(array,&c)
+		nres_it(&c)
 
 		poly_mul(&c,c,sd)
 		intt(&c)
@@ -429,6 +445,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 			KEY[i]=key[i]
 		}
 
+		redc_it(&u)
 		nhs_pack(u,&array)
 
 		for i in 0..<1792 {
@@ -456,6 +473,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 		}
 
 		nhs_unpack(array,&k)
+		nres_it(&k)
 
 		for i in 0..<384 {
 			cc[i]=UC[i+1792]
