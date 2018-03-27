@@ -285,11 +285,14 @@ pub fn ate2(P: &ECP2,Q: &ECP,R: &ECP2,S: &ECP) -> FP12 {
 		}
 	}
 
+	if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+		r.conj();			
+	}
 
 /* R-ate fixup */
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
 		if ecp::SIGN_OF_X == ecp::NEGATIVEX {		
-			r.conj();
+			//r.conj();
 			A.neg();
 			B.neg();
 		}

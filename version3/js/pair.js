@@ -194,7 +194,7 @@ var PAIR = function(ctx) {
                 }
             }
 
-			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			if (ctx.ECP.SIGN_OF_X == ctx.ECP.NEGATIVEX)
 			{
 				r.conj();
 			}
@@ -300,10 +300,16 @@ var PAIR = function(ctx) {
                 }
             }
 
+			if (ctx.ECP.SIGN_OF_X == ctx.ECP.NEGATIVEX)
+			{
+				r.conj();
+			}
+
+
             /* R-ate fixup required for BN curves */
             if (ctx.ECP.CURVE_PAIRING_TYPE == ctx.ECP.BN) {
                 if (ctx.ECP.SIGN_OF_X == ctx.ECP.NEGATIVEX) {
-                    r.conj();
+              //      r.conj();
                     A.neg();
                     B.neg();
                 }

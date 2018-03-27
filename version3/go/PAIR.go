@@ -262,11 +262,14 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 		}
 	}
 
+	if SIGN_OF_X==NEGATIVEX {
+		r.conj()
+	}
 
 /* R-ate fixup */
 	if CURVE_PAIRING_TYPE == BN {
 		if SIGN_OF_X==NEGATIVEX {
-			r.conj()
+		//	r.conj()
 			A.neg()
 			B.neg()
 		}

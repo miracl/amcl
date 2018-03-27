@@ -317,12 +317,14 @@ void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
 		}
 	}
 
-
+#if SIGN_OF_X_ZZZ==NEGATIVEX
+    FP12_conj(r,r);
+#endif
     /* R-ate fixup required for BN curves */
 #if PAIRING_FRIENDLY_ZZZ==BN
 
 #if SIGN_OF_X_ZZZ==NEGATIVEX
-    FP12_conj(r,r);
+//   FP12_conj(r,r);
     ECP2_neg(&A);
     ECP2_neg(&B);
 #endif
