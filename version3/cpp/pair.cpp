@@ -597,7 +597,7 @@ static void ZZZ::glv(BIG u[2],BIG e)
 
     BIG x,x2,q;
     BIG_rcopy(x,CURVE_Bnx);
-    BIG_mul(x2,x,x);
+    BIG_smul(x2,x,x);
     BIG_copy(u[0],e);
     BIG_mod(u[0],x2);
     BIG_copy(u[1],e);

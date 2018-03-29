@@ -629,7 +629,7 @@ static void glv(BIG_XXX u[2],BIG_XXX e)
 
     BIG_XXX x,x2,q;
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
-    BIG_XXX_mul(x2,x,x);
+    BIG_XXX_smul(x2,x,x);
     BIG_XXX_copy(u[0],e);
     BIG_XXX_mod(u[0],x2);
     BIG_XXX_copy(u[1],e);
