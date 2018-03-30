@@ -137,7 +137,7 @@ static void PAIR_ZZZ_line(FP12_YYY *v,ECP2_ZZZ *A,ECP2_ZZZ *B,FP_YYY *Qx,FP_YYY 
 /* Optimal R-ate pairing r=e(P,Q) */
 void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 {
-    FP2_YYY X;
+
     BIG_XXX x,n,n3;
     FP_YYY Qx,Qy;
     int i,nb,bt;
@@ -145,7 +145,7 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
     FP12_YYY lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
     ECP2_ZZZ KA;
-#endif
+    FP2_YYY X;
 
     FP_YYY_rcopy(&Qx,Fra_YYY);
     FP_YYY_rcopy(&Qy,Frb_YYY);
@@ -154,6 +154,7 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 #if SEXTIC_TWIST_ZZZ==M_TYPE
     FP2_YYY_inv(&X,&X);
     FP2_YYY_norm(&X);
+#endif
 #endif
 
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
@@ -241,15 +242,15 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
 void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ *S)
 {
-    FP2_YYY X;
     BIG_XXX x,n,n3;
     FP_YYY Qx,Qy,Sx,Sy;
     int i,nb,bt;
     ECP2_ZZZ A,B;
     FP12_YYY lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
+    FP2_YYY X;
     ECP2_ZZZ K;
-#endif
+
     FP_YYY_rcopy(&Qx,Fra_YYY);
     FP_YYY_rcopy(&Qy,Frb_YYY);
     FP2_YYY_from_FPs(&X,&Qx,&Qy);
@@ -257,6 +258,7 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 #if SEXTIC_TWIST_ZZZ==M_TYPE
     FP2_YYY_inv(&X,&X);
     FP2_YYY_norm(&X);
+#endif
 #endif
 
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);

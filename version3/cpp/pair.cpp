@@ -146,7 +146,6 @@ static void ZZZ::PAIR_line(FP12 *v,ECP2 *A,ECP2 *B,FP *Qx,FP *Qy)
 /* Optimal R-ate pairing r=e(P,Q) */
 void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
 {
-    FP2 X;
     BIG x,n,n3;
 	FP Qx,Qy;
     int i,nb,bt;
@@ -154,7 +153,7 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
     FP12 lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
     ECP2 KA;
-#endif
+    FP2 X;
 
     FP_rcopy(&Qx,Fra);
     FP_rcopy(&Qy,Frb);
@@ -163,6 +162,8 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
 #if SEXTIC_TWIST_ZZZ==M_TYPE
 	FP2_inv(&X,&X);
 	FP2_norm(&X);
+#endif
+
 #endif
 
     BIG_rcopy(x,CURVE_Bnx);
@@ -239,7 +240,7 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
 void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
 {
-    FP2 X;
+
     BIG x,n,n3;
 	FP Qx,Qy,Sx,Sy;
     int i,nb,bt;
@@ -247,7 +248,8 @@ void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
     FP12 lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
     ECP2 K;
-#endif
+    FP2 X;
+
     FP_rcopy(&Qx,Fra);
     FP_rcopy(&Qy,Frb);
     FP2_from_FPs(&X,&Qx,&Qy);
@@ -257,6 +259,7 @@ void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
 	FP2_norm(&X);
 #endif
 
+#endif
     BIG_rcopy(x,CURVE_Bnx);
 
 #if PAIRING_FRIENDLY_ZZZ==BN

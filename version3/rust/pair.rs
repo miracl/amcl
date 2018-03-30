@@ -133,12 +133,11 @@ pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
 	let mut n = BIG::new_copy(&x);
 	let mut K = ECP2::new();
 
-	if ecp::SEXTIC_TWIST==ecp::M_TYPE {
-		f.inverse();
-		f.norm();
-	}	
-
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
+		if ecp::SEXTIC_TWIST==ecp::M_TYPE {
+			f.inverse();
+			f.norm();
+		}
 		n.pmul(6); 
 		if ecp::SIGN_OF_X == ecp::POSITIVEX {
 			n.inc(2);
@@ -153,8 +152,6 @@ pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
 	n3.pmul(3);
 	n3.norm();
 
-//	P.affine();
-//	Q.affine();
 	let qx=FP::new_copy(&Q.getpx());
 	let qy=FP::new_copy(&Q.getpy());
 
@@ -220,12 +217,11 @@ pub fn ate2(P: &ECP2,Q: &ECP,R: &ECP2,S: &ECP) -> FP12 {
 	let mut n = BIG::new_copy(&x);
 	let mut K = ECP2::new();
 
-	if ecp::SEXTIC_TWIST==ecp::M_TYPE {
-		f.inverse();
-		f.norm();
-	}	
-
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
+		if ecp::SEXTIC_TWIST==ecp::M_TYPE {
+			f.inverse();
+			f.norm();
+		}
 		n.pmul(6); 
 		if ecp::SIGN_OF_X == ecp::POSITIVEX {
 			n.inc(2);

@@ -128,12 +128,13 @@ final public class PAIR {
         let K=ECP2()
         
         var lv:FP12
-        if ECP.SEXTIC_TWIST == ECP.M_TYPE {  
-            f.inverse()
-            f.norm()
-        }
+
 
         if ECP.CURVE_PAIRING_TYPE == ECP.BN {
+		if ECP.SEXTIC_TWIST == ECP.M_TYPE {  
+			f.inverse()
+			f.norm()
+		}
             n.pmul(6);
             if ECP.SIGN_OF_X == ECP.NEGATIVEX { 
                 n.dec(2)
@@ -208,12 +209,11 @@ final public class PAIR {
         let K=ECP2()
         var lv:FP12
 
-        if ECP.SEXTIC_TWIST == ECP.M_TYPE {  
-            f.inverse()
-            f.norm()
-        }
-
         if ECP.CURVE_PAIRING_TYPE == ECP.BN {
+		if ECP.SEXTIC_TWIST == ECP.M_TYPE {  
+			f.inverse()
+			f.norm()
+		}
             n.pmul(6); 
             if ECP.SIGN_OF_X == ECP.NEGATIVEX { 
                 n.dec(2)

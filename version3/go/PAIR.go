@@ -124,12 +124,11 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 	K:=NewECP2()
 	var lv *FP12
 	
-	if SEXTIC_TWIST==M_TYPE {
-		f.inverse();
-		f.norm();
-	}
-
 	if CURVE_PAIRING_TYPE == BN {
+		if SEXTIC_TWIST==M_TYPE {
+			f.inverse();
+			f.norm();
+		}
 		n.pmul(6)
 		if SIGN_OF_X==POSITIVEX {
 			n.inc(2)
@@ -204,12 +203,11 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 	K:=NewECP2()
 	var lv *FP12
 
-	if SEXTIC_TWIST==M_TYPE {
-		f.inverse();
-		f.norm();
-	}
-
 	if CURVE_PAIRING_TYPE == BN {
+		if SEXTIC_TWIST==M_TYPE {
+			f.inverse();
+			f.norm();
+		}
 		n.pmul(6); 
 		if SIGN_OF_X==POSITIVEX {
 			n.inc(2)

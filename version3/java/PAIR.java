@@ -136,21 +136,21 @@ public final class PAIR {
 /* Optimal R-ate pairing */
 	public static FP12 ate(ECP2 P,ECP Q)
 	{
-		FP2 f=new FP2(new BIG(ROM.Fra),new BIG(ROM.Frb));
+		FP2 f;
 		BIG x=new BIG(ROM.CURVE_Bnx);
 		BIG n=new BIG(x);
 		ECP2 K=new ECP2();
 		FP12 lv;
 		int bt;
 
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
-		{
-			f.inverse();
-			f.norm();
-		}
-
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
+			f=new FP2(new BIG(ROM.Fra),new BIG(ROM.Frb));
+			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			{
+				f.inverse();
+				f.norm();
+			}
 			n.pmul(6);
 			if (ECP.SIGN_OF_X==ECP.POSITIVEX)
 			{
@@ -225,21 +225,21 @@ public final class PAIR {
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
 	public static FP12 ate2(ECP2 P,ECP Q,ECP2 R,ECP S)
 	{
-		FP2 f=new FP2(new BIG(ROM.Fra),new BIG(ROM.Frb));
+		FP2 f;
 		BIG x=new BIG(ROM.CURVE_Bnx);
 		BIG n=new BIG(x);
 		ECP2 K=new ECP2();
 		FP12 lv;
 		int bt;
 
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
-		{
-			f.inverse();
-			f.norm();
-		}
-
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
+			f=new FP2(new BIG(ROM.Fra),new BIG(ROM.Frb));
+			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			{
+				f.inverse();
+				f.norm();
+			}
 			n.pmul(6); 
 			if (ECP.SIGN_OF_X==ECP.POSITIVEX)
 			{
