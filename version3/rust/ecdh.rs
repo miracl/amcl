@@ -315,16 +315,7 @@ pub fn cbc_iv0_decrypt(k: &[u8],c: &[u8]) -> Option<Vec<u8>> { /* padding is rem
 pub fn key_pair_generate(rng: Option<&mut RAND>,s: &mut [u8],w: &mut [u8]) -> isize {
 	let res=0;
 	let mut sc:BIG;
-	let G:ECP;
-
-	let gx=BIG::new_ints(&rom::CURVE_GX);
-	
-	if ecp::CURVETYPE!=ecp::MONTGOMERY {
-		let gy=BIG::new_ints(&rom::CURVE_GY);
-		G=ECP::new_bigs(&gx,&gy);
-	} else {
-		G=ECP::new_big(&gx);
-	}
+	let G=ECP::generator();
 
 	let r=BIG::new_ints(&rom::CURVE_ORDER);
 
@@ -409,10 +400,9 @@ pub fn ecpsp_dsa(sha: usize,rng: &mut RAND,s: &[u8],f: &[u8],c: &mut [u8],d: &mu
 
 	hashit(sha,f,0,None,big::MODBYTES as usize,&mut b);
 
-	let gx=BIG::new_ints(&rom::CURVE_GX);
-	let gy=BIG::new_ints(&rom::CURVE_GY);
+	let G=ECP::generator();
 
-	let G=ECP::new_bigs(&gx,&gy);
+
 	let r=BIG::new_ints(&rom::CURVE_ORDER);
 
 	let mut sc=BIG::frombytes(s);  /* s or &s? */
@@ -466,10 +456,8 @@ pub fn ecpvp_dsa(sha: usize,w: &[u8],f: &[u8],c: &[u8],d: &[u8]) -> isize {
 
 	hashit(sha,f,0,None,big::MODBYTES as usize,&mut b);
 
-	let gx=BIG::new_ints(&rom::CURVE_GX);
-	let gy=BIG::new_ints(&rom::CURVE_GY);
+	let mut G=ECP::generator();
 
-	let mut G=ECP::new_bigs(&gx,&gy);
 	let r=BIG::new_ints(&rom::CURVE_ORDER);
 
 	let mut cb=BIG::frombytes(c);  /* c or &c ? */

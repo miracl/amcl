@@ -565,6 +565,25 @@ var ECP2 = function(ctx) {
         }
     };
 
+	// set to group generator
+	ECP2.generator = function() {
+		var G=new ECP2();
+        var A = new ctx.BIG(0),
+                B = new ctx.BIG(0),
+                QX, QY;
+
+        A.rcopy(ctx.ROM_CURVE.CURVE_Pxa);
+        B.rcopy(ctx.ROM_CURVE.CURVE_Pxb);
+        QX = new ctx.FP2(0);
+        QX.bset(A, B);
+        A.rcopy(ctx.ROM_CURVE.CURVE_Pya);
+        B.rcopy(ctx.ROM_CURVE.CURVE_Pyb);
+        QY = new ctx.FP2(0);
+        QY.bset(A, B);
+        G.setxy(QX, QY);
+		return G;
+	}
+
     /* convert from byte array to point */
     ECP2.fromBytes = function(b) {
         var t = [],

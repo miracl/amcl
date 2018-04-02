@@ -211,4 +211,10 @@ extern void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ *Q,BIG_XXX *b);
  */
 extern void ECP2_ZZZ_mapit(ECP2_ZZZ *P,octet *w);
 
+/**	@brief Get Group Generator from ROM
+ *
+	@param G ECP2 instance
+ */
+extern void ECP2_ZZZ_generator(ECP2_ZZZ *G);
+
 #endif

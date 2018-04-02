@@ -324,20 +324,12 @@ public final class ECDH {
  * otherwise it is generated randomly internally */
 	public static int KEY_PAIR_GENERATE(RAND RNG,byte[] S,byte[] W)
 	{
-		BIG r,gx,gy,s,wx,wy;
+		BIG r,s;
 		ECP G,WP;
 		int res=0;
 	//	byte[] T=new byte[EFS];
 
-		gx=new BIG(ROM.CURVE_Gx);
-
-		if (ECP.CURVETYPE!=ECP.MONTGOMERY)
-		{
-			gy=new BIG(ROM.CURVE_Gy);
-			G=new ECP(gx,gy);
-		}
-		else
-			G=new ECP(gx);
+		G=ECP.generator();
 
 		r=new BIG(ROM.CURVE_Order);
 
@@ -429,14 +421,11 @@ public final class ECDH {
 	public static int SP_DSA(int sha,RAND RNG,byte[] S,byte[] F,byte[] C,byte[] D)
 	{
 		byte[] T=new byte[EFS];
-		BIG gx,gy,r,s,f,c,d,u,vx,w;
+		BIG r,s,f,c,d,u,vx,w;
 		ECP G,V;
 		byte[] B=hashit(sha,F,0,null,BIG.MODBYTES);
 
-		gx=new BIG(ROM.CURVE_Gx);
-		gy=new BIG(ROM.CURVE_Gy);
-
-		G=new ECP(gx,gy);
+		G=ECP.generator();
 		r=new BIG(ROM.CURVE_Order);
 
 		s=BIG.fromBytes(S);
@@ -481,17 +470,14 @@ public final class ECDH {
 /* IEEE1363 ECDSA Signature Verification. Signature C and D on F is verified using public key W */
 	public static int VP_DSA(int sha,byte[] W,byte[] F, byte[] C,byte[] D)
 	{
-		BIG r,gx,gy,f,c,d,h2;
+		BIG r,f,c,d,h2;
 		int res=0;
 		ECP G,WP,P;
 		int valid; 
 
 		byte[] B=hashit(sha,F,0,null,BIG.MODBYTES);
 
-		gx=new BIG(ROM.CURVE_Gx);
-		gy=new BIG(ROM.CURVE_Gy);
-
-		G=new ECP(gx,gy);
+		G=ECP.generator();
 		r=new BIG(ROM.CURVE_Order);
 
 		c=BIG.fromBytes(C);

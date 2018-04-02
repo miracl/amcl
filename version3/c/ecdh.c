@@ -33,19 +33,11 @@ under the License.
  * otherwise it is generated randomly internally */
 int ECP_ZZZ_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 {
-    BIG_XXX r,gx,s;
+    BIG_XXX r,gx,gy,s;
     ECP_ZZZ G;
     int res=0;
-    BIG_XXX_rcopy(gx,CURVE_Gx_ZZZ);
 
-#if CURVETYPE_ZZZ!=MONTGOMERY
-    BIG_XXX gy;
-    BIG_XXX_rcopy(gy,CURVE_Gy_ZZZ);
-    ECP_ZZZ_set(&G,gx,gy);
-
-#else
-    ECP_ZZZ_set(&G,gx);
-#endif
+	ECP_ZZZ_generator(&G);
 
     BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
     if (RNG!=NULL)
@@ -190,8 +182,9 @@ int ECP_ZZZ_SP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet
     ECP_ZZZ G,V;
 
     ehashit(sha,F,-1,NULL,&H,sha);
-    BIG_XXX_rcopy(gx,CURVE_Gx_ZZZ);
-    BIG_XXX_rcopy(gy,CURVE_Gy_ZZZ);
+
+	ECP_ZZZ_generator(&G);
+
     BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
 
     BIG_XXX_fromBytes(s,S->val);
@@ -199,8 +192,6 @@ int ECP_ZZZ_SP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet
     int hlen=H.len;
     if (H.len>MODBYTES_XXX) hlen=MODBYTES_XXX;
     BIG_XXX_fromBytesLen(f,H.val,hlen);
-
-    ECP_ZZZ_set(&G,gx,gy);
 
     do
     {
@@ -265,8 +256,9 @@ int ECP_ZZZ_VP_DSA(int sha,octet *W,octet *F, octet *C,octet *D)
     int valid;
 
     ehashit(sha,F,-1,NULL,&H,sha);
-    BIG_XXX_rcopy(gx,CURVE_Gx_ZZZ);
-    BIG_XXX_rcopy(gy,CURVE_Gy_ZZZ);
+
+	ECP_ZZZ_generator(&G);
+
     BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
 
     OCT_shl(C,C->len-MODBYTES_XXX);
@@ -290,8 +282,6 @@ int ECP_ZZZ_VP_DSA(int sha,octet *W,octet *F, octet *C,octet *D)
         BIG_XXX_invmodp(d,d,r);
         BIG_XXX_modmul(f,f,d,r);
         BIG_XXX_modmul(h2,c,d,r);
-
-        ECP_ZZZ_set(&G,gx,gy);
 
         BIG_XXX_fromBytes(wx,&(W->val[1]));
         BIG_XXX_fromBytes(wy,&(W->val[EFS_ZZZ+1]));

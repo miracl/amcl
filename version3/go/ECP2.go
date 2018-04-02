@@ -604,3 +604,9 @@ func ECP2_mapit(h []byte) *ECP2 {
 	Q.Affine()
 	return Q
 }
+
+func ECP2_generator() *ECP2 {
+	var G *ECP2
+	G=NewECP2fp2s(NewFP2bigs(NewBIGints(CURVE_Pxa),NewBIGints(CURVE_Pxb)),NewFP2bigs(NewBIGints(CURVE_Pya),NewBIGints(CURVE_Pyb)))
+	return G
+}

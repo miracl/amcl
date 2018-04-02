@@ -633,4 +633,9 @@ final public class ECP2 {
         return Q
     }   
     
+    static public func generator() -> ECP2
+    {
+        return ECP2(FP2(BIG(ROM.CURVE_Pxa),BIG(ROM.CURVE_Pxb)),FP2(BIG(ROM.CURVE_Pya),BIG(ROM.CURVE_Pyb)))
+    }
+
 }

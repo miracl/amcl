@@ -77,16 +77,8 @@ func main() {
 	fmt.Printf("%d bit build\n",ED25519.CHUNK)
 
 	var es *ED25519.BIG
-	var EG *ED25519.ECP
 
-	gx:=ED25519.NewBIGints(ED25519.CURVE_Gx)
-	if ED25519.CURVETYPE!=ED25519.MONTGOMERY {
-		gy:=ED25519.NewBIGints(ED25519.CURVE_Gy)
-		EG=ED25519.NewECPbigs(gx,gy)
-	} else {
-		EG=ED25519.NewECPbig(gx)
-	}
-
+	EG:=ED25519.ECP_generator();
 	er:=ED25519.NewBIGints(ED25519.CURVE_Order)
 	es=ED25519.Randomnum(er,rng)
 
@@ -122,7 +114,7 @@ func main() {
 	fmt.Printf("Modulus size %d bits\n",BN254.MODBITS)
 	fmt.Printf("%d bit build\n",BN254.CHUNK)
 
-	G:=BN254.NewECPbigs(BN254.NewBIGints(BN254.CURVE_Gx),BN254.NewBIGints(BN254.CURVE_Gy))
+	G:=BN254.ECP_generator();
 	r:=BN254.NewBIGints(BN254.CURVE_Order)
 	s:=BN254.Randomnum(r,rng)
 
@@ -145,7 +137,7 @@ func main() {
 	fmt.Printf("G1 mul              - %8d iterations  ",iterations)
 	fmt.Printf(" %8.2f ms per iteration\n",dur)
 
-	Q:=BN254.NewECP2fp2s(BN254.NewFP2bigs(BN254.NewBIGints(BN254.CURVE_Pxa),BN254.NewBIGints(BN254.CURVE_Pxb)),BN254.NewFP2bigs(BN254.NewBIGints(BN254.CURVE_Pya),BN254.NewBIGints(BN254.CURVE_Pyb)))
+	Q:=BN254.ECP2_generator();
 	W:=BN254.G2mul(Q,r)
 
 	if !W.Is_infinity() {

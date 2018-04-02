@@ -1344,6 +1344,18 @@ void ZZZ::ECP_mapit(ECP *P,octet *W)
 #endif
 }
 
+void ZZZ::ECP_generator(ECP *G)
+{
+	BIG x,y;
+	BIG_rcopy(x,CURVE_Gx);
+#if CURVETYPE_ZZZ!=MONTGOMERY
+	BIG_rcopy(y,CURVE_Gy);
+    ECP_set(G,x,y);
+#else
+    ECP_set(G,x);
+#endif
+}
+
 #ifdef HAS_MAIN
 
 using namespace ZZZ;

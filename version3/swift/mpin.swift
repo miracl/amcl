@@ -422,7 +422,7 @@ final public class MPIN
     // Extract Server Secret SST=S*Q where Q is fixed generator in G2 and S is master secret
     static public func GET_SERVER_SECRET(_ S:[UInt8],_ SST:inout [UInt8]) -> Int
     {
-        var Q=ECP2(FP2(BIG(ROM.CURVE_Pxa),BIG(ROM.CURVE_Pxb)),FP2(BIG(ROM.CURVE_Pya),BIG(ROM.CURVE_Pyb)))
+        var Q=ECP2.generator();
     
         let s=BIG.fromBytes(S)
         Q=PAIR.G2mul(Q,s)
@@ -503,7 +503,7 @@ final public class MPIN
     static public func SERVER_2(_ date:Int32,_ HID:[UInt8]?,_ HTID:[UInt8]?,_ Y:[UInt8],_ SST:[UInt8],_ xID:[UInt8]?,_ xCID:[UInt8]?,_ mSEC:[UInt8],_ E:inout [UInt8]?,_ F:inout [UInt8]?) -> Int
     { 
       //  _=BIG(ROM.Modulus);
-        let Q=ECP2(FP2(BIG(ROM.CURVE_Pxa),BIG(ROM.CURVE_Pxb)),FP2(BIG(ROM.CURVE_Pya),BIG(ROM.CURVE_Pyb)))
+        let Q=ECP2.generator();
         let sQ=ECP2.fromBytes(SST)
         if sQ.is_infinity() {return INVALID_POINT}
         var R:ECP
@@ -619,7 +619,7 @@ final public class MPIN
     
         let P=ECP.mapit(CID)
     
-        let Q=ECP2(FP2(BIG(ROM.CURVE_Pxa),BIG(ROM.CURVE_Pxb)),FP2(BIG(ROM.CURVE_Pya),BIG(ROM.CURVE_Pyb)))
+        let Q=ECP2.generator();
     
         var g=PAIR.ate(Q,T)
         g=PAIR.fexp(g)

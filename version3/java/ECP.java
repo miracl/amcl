@@ -991,6 +991,22 @@ public final class ECP {
 		return P;
 	}
 
+	public static ECP generator()
+	{
+		ECP G;
+		BIG gx,gy;
+		gx=new BIG(ROM.CURVE_Gx);
+
+		if (ECP.CURVETYPE!=ECP.MONTGOMERY)
+		{
+			gy=new BIG(ROM.CURVE_Gy);
+			G=new ECP(gx,gy);
+		}
+		else
+			G=new ECP(gx);
+		return G;
+	}
+
 /*
 	public static void main(String[] args) {
 

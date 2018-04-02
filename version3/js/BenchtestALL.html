@@ -87,16 +87,7 @@
 		var G,WP;
 		var res=0;
 
-		G=new ctx1.ECP(0);
-
-		gx=new ctx1.BIG(0); gx.rcopy(ctx1.ROM_CURVE.CURVE_Gx);
-
-		if (ctx1.ECP.CURVETYPE!=ctx1.ECP.MOMTGOMERY)
-		{
-			gy=new ctx1.BIG(0); gy.rcopy(ctx1.ROM_CURVE.CURVE_Gy);
-			G.setxy(gx,gy);
-		}
-		else G.setx(gx);
+		G=ctx1.ECP.generator();
 
 		r=new ctx1.BIG(0); r.rcopy(ctx1.ROM_CURVE.CURVE_Order);
 		s=ctx1.BIG.randomnum(r,rng);
@@ -128,8 +119,8 @@
 		var result;
 		var MIN_ITERS=5;
 		var MIN_TIME=5;
-		var G=new ctx2.ECP(0);
-		var Q=new ctx2.ECP2(0);
+		var G;
+		var Q;
 
 
 		if (ctx2.ECP.CURVE_PAIRING_TYPE==ctx2.ECP.BN_CURVE)
@@ -143,9 +134,7 @@
 
 		window.document.write("Modulus size " + ctx2.FP.MODBITS + " bits"+ "<br>"); 
 
-		var gx=new ctx2.BIG(0); gx.rcopy(ctx2.ROM_CURVE.CURVE_Gx);	
-		var gy=new ctx2.BIG(0); gy.rcopy(ctx2.ROM_CURVE.CURVE_Gy);
-		G.setxy(gx,gy);			
+		G=ctx2.ECP.generator();
 
 		r=new ctx2.BIG(0); r.rcopy(ctx2.ROM_CURVE.CURVE_Order);
 		s=ctx2.BIG.randomnum(r,rng);
@@ -170,14 +159,7 @@
 		window.document.write("G1 mul -                " + iterations + " iterations  ");
 		window.document.write(dur.toFixed(2) + " ms per iteration"+ "<br>");
 
-		var A=new ctx2.BIG(0);
-		var B=new ctx2.BIG(0);
-		A.rcopy(ctx2.ROM_CURVE.CURVE_Pxa); B.rcopy(ctx2.ROM_CURVE.CURVE_Pxb);
-		var QX=new ctx2.FP2(0); QX.bset(A,B);
-		A.rcopy(ctx2.ROM_CURVE.CURVE_Pya); B.rcopy(ctx2.ROM_CURVE.CURVE_Pyb);
-		var QY=new ctx2.FP2(0); QY.bset(A,B);
-		Q.setxy(QX,QY);
-
+		Q=ctx2.ECP2.generator();
 		W=ctx2.PAIR.G2mul(Q,r);
 
 		if (!W.is_infinity())

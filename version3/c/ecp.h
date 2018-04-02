@@ -257,6 +257,11 @@ extern void ECP_ZZZ_mul(ECP_ZZZ *P,BIG_XXX b);
 	@param f BIG number multiplier
  */
 extern void ECP_ZZZ_mul2(ECP_ZZZ *P,ECP_ZZZ *Q,BIG_XXX e,BIG_XXX f);
+/**	@brief Get Group Generator from ROM
+ *
+	@param G ECP instance
+ */
+extern void ECP_ZZZ_generator(ECP_ZZZ *G);
 
 
 #endif

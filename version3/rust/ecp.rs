@@ -950,6 +950,20 @@ impl ECP {
 		return P;
 	}
 
+	pub fn generator() -> ECP {
+		let G:ECP;
+
+		let gx=BIG::new_ints(&rom::CURVE_GX);
+	
+		if CURVETYPE!=MONTGOMERY {
+			let gy=BIG::new_ints(&rom::CURVE_GY);
+			G=ECP::new_bigs(&gx,&gy);
+		} else {
+			G=ECP::new_big(&gx);
+		}
+		return G;		
+	}
+
 }
 /*
 fn main()

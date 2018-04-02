@@ -28,13 +28,13 @@ int ED_25519(csprng *RNG)
 	BIG s,r,x,y;
 	printf("Testing/Timing ED25519 ECC\n");
 
-#if CURVETYPE==WEIERSTRASS
+#if CURVETYPE_ED25519==WEIERSTRASS
 	printf("Weierstrass parameterization\n");
 #endif
-#if CURVETYPE==EDWARDS
+#if CURVETYPE_ED25519==EDWARDS
 	printf("Edwards parameterization\n");
 #endif
-#if CURVETYPE==MONTGOMERY
+#if CURVETYPE_ED25519==MONTGOMERY
 	printf("Montgomery parameterization\n");
 #endif
 
@@ -48,15 +48,8 @@ int ED_25519(csprng *RNG)
 	printf("64-bit Build\n");
 #endif
 
+	ECP_generator(&EG);
 
-	BIG_rcopy(x,CURVE_Gx);
-#if CURVETYPE!=MONTGOMERY
-	BIG_rcopy(y,CURVE_Gy);
-    ECP_set(&EG,x,y);
-#else
-    ECP_set(&EG,x);
-#endif
-	
 	BIG_rcopy(r,CURVE_Order);
 	BIG_randomnum(s,r,RNG);
 	ECP_copy(&EP,&EG);
@@ -103,11 +96,7 @@ int BN_254(csprng *RNG)
 	BIG s,r,x,y;
 	printf("\nTesting/Timing BN254 Pairings\n");
 
-	BIG_rcopy(x,CURVE_Gx);
-
-	BIG_rcopy(y,CURVE_Gy);
-    ECP_set(&G,x,y);
-
+	ECP_generator(&G);
 	
 	BIG_rcopy(r,CURVE_Order);
 	BIG_randomnum(s,r,RNG);
@@ -133,12 +122,7 @@ int BN_254(csprng *RNG)
     printf("G1 mul              - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
-    
-    FP_rcopy(&(wx.a),CURVE_Pxa); 
-    FP_rcopy(&(wx.b),CURVE_Pxb); 
-    FP_rcopy(&(wy.a),CURVE_Pya); 
-    FP_rcopy(&(wy.b),CURVE_Pyb);     
-	ECP2_set(&W,&wx,&wy);
+    ECP2_generator(&W);
 
 	ECP2_copy(&Q,&W);
     ECP2_mul(&Q,r);

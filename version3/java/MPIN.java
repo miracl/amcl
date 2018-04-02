@@ -438,8 +438,7 @@ public class MPIN
 /* Extract Server Secret SST=S*Q where Q is fixed generator in G2 and S is master secret */
 	public static int GET_SERVER_SECRET(byte[] S,byte[] SST)
 	{
-		ECP2 Q=new ECP2(new FP2(new BIG(ROM.CURVE_Pxa),new BIG(ROM.CURVE_Pxb)),new FP2(new BIG(ROM.CURVE_Pya),new BIG(ROM.CURVE_Pyb)));
-
+		ECP2 Q=ECP2.generator();
 		BIG s=BIG.fromBytes(S);
 		Q=PAIR.G2mul(Q,s);
 		Q.toBytes(SST);
@@ -524,7 +523,7 @@ public class MPIN
 	public static int SERVER_2(int date,byte[] HID,byte[] HTID,byte[] Y,byte[] SST,byte[] xID,byte[] xCID,byte[] mSEC,byte[] E,byte[] F)
 	{
 		BIG q=new BIG(ROM.Modulus);
-		ECP2 Q=new ECP2(new FP2(new BIG(ROM.CURVE_Pxa),new BIG(ROM.CURVE_Pxb)),new FP2(new BIG(ROM.CURVE_Pya),new BIG(ROM.CURVE_Pyb)));
+		ECP2 Q=ECP2.generator();
 
 		ECP2 sQ=ECP2.fromBytes(SST);
 		if (sQ.is_infinity()) return INVALID_POINT;	
@@ -649,7 +648,7 @@ public class MPIN
 
 		P=ECP.mapit(CID);
 
-		ECP2 Q=new ECP2(new FP2(new BIG(ROM.CURVE_Pxa),new BIG(ROM.CURVE_Pxb)),new FP2(new BIG(ROM.CURVE_Pya),new BIG(ROM.CURVE_Pyb)));
+		ECP2 Q=ECP2.generator();
 
 		g=PAIR.ate(Q,T);
 		g=PAIR.fexp(g);

@@ -466,17 +466,12 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
 int MPIN_ZZZ_GET_SERVER_SECRET(octet *S,octet *SST)
 {
     BIG_XXX r,s;
-    FP2_YYY qx,qy;
     ECP2_ZZZ Q;
     int res=0;
 
     BIG_XXX_rcopy(r,CURVE_Order_ZZZ);
-    FP_YYY_rcopy(&(qx.a),CURVE_Pxa_ZZZ);
-    FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
-    FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
-    FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
 
-    ECP2_ZZZ_set(&Q,&qx,&qy);
+	ECP2_ZZZ_generator(&Q);
 
     if (res==0)
     {
@@ -556,16 +551,12 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F,octet *Pa)
 {
     BIG_XXX px,py,y;
-    FP2_YYY qx,qy;
     FP12_YYY g;
     ECP2_ZZZ Q,sQ;
     ECP_ZZZ P,R;
     int res=0;
 
-    FP_YYY_rcopy(&(qx.a),CURVE_Pxa_ZZZ);
-    FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
-    FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
-    FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
+	ECP2_ZZZ_generator(&Q);
 
     // key-escrow less scheme: use Pa instead of Q in pairing computation
     // Q left for backward compatiblity
@@ -573,7 +564,6 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     {
         if (!ECP2_ZZZ_fromOctet(&Q, Pa)) res=MPIN_INVALID_POINT;
     }
-    else if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
 
     if (res==0)
     {
@@ -745,7 +735,6 @@ int MPIN_ZZZ_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
 {
     ECP_ZZZ P,T;
     ECP2_ZZZ Q;
-    FP2_YYY qx,qy;
     FP12_YYY g;
     int res=0;
 
@@ -760,11 +749,7 @@ int MPIN_ZZZ_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
         }
         else
         {
-            FP_YYY_rcopy(&(qx.a),CURVE_Pxa_ZZZ);
-            FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
-            FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
-            FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
-            if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+			ECP2_ZZZ_generator(&Q);
         }
     }
     if (res==0)
@@ -978,7 +963,6 @@ int MPIN_ZZZ_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,o
 int MPIN_ZZZ_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa)
 {
     BIG_XXX z,r;
-    FP2_YYY qx,qy;
     ECP2_ZZZ Q;
     int res=0;
 
@@ -995,11 +979,7 @@ int MPIN_ZZZ_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa)
 
     BIG_XXX_invmodp(z,z,r);
 
-    FP_YYY_rcopy(&(qx.a),CURVE_Pxa_ZZZ);
-    FP_YYY_rcopy(&(qx.b),CURVE_Pxb_ZZZ);
-    FP_YYY_rcopy(&(qy.a),CURVE_Pya_ZZZ);
-    FP_YYY_rcopy(&(qy.b),CURVE_Pyb_ZZZ);
-    if (!ECP2_ZZZ_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+	ECP2_ZZZ_generator(&Q);
 
     if (res==0)
     {

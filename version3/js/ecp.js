@@ -1193,6 +1193,22 @@ var ECP = function(ctx) {
         }
     };
 
+	// set to group generator
+	ECP.generator = function() {
+		var G=new ECP();
+		var gx = new ctx.BIG(0);
+           gx.rcopy(ctx.ROM_CURVE.CURVE_Gx);
+
+           if (ctx.ECP.CURVETYPE != ctx.ECP.MONTGOMERY) {
+               var gy = new ctx.BIG(0);
+               gy.rcopy(ctx.ROM_CURVE.CURVE_Gy);
+               G.setxy(gx, gy);
+           } else {
+               G.setx(gx);
+        }
+		return G;
+	}
+
     /* return 1 if b==c, no branching */
     ECP.teq = function(b, c) {
         var x = b ^ c;

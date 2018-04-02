@@ -292,7 +292,7 @@ pub fn random_generate(rng: &mut RAND,s: &mut [u8]) -> isize {
 #[allow(non_snake_case)]
 pub fn get_server_secret(s: &[u8],sst: &mut [u8]) -> isize {
 
-	let mut Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
+	let mut Q=ECP2::generator();
 
 	let mut sc=BIG::frombytes(s);
 	Q=pair::g2mul(&mut Q,&mut sc);
@@ -413,7 +413,7 @@ pub fn precompute(token: &[u8],cid: &[u8],g1: &mut [u8],g2: &mut [u8]) -> isize 
 
 	let P=ECP::mapit(&cid);
 
-	let Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
+	let Q=ECP2::generator();
 
 	let mut g=pair::ate(&Q,&T);
 	g=pair::fexp(&g);
@@ -561,7 +561,7 @@ pub fn get_y(sha: usize,timevalue: usize,xcid: &[u8],y: &mut [u8]) {
 #[allow(non_snake_case)]
 pub fn server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],xid: Option<&[u8]>,xcid: Option<&[u8]>,msec: &[u8],e: Option<&mut [u8]>,f: Option<&mut [u8]>) -> isize {
 //	q:=NewBIGints(Modulus)
-	let Q=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
+	let Q=ECP2::generator();
 
 	let sQ=ECP2::frombytes(&sst);
 	if sQ.is_infinity() {return INVALID_POINT}	

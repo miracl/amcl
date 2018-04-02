@@ -237,6 +237,12 @@ extern void ECP_mul2(ECP *P,ECP *Q,XXX::BIG e,XXX::BIG f);
  */
 extern void ECP_mapit(ECP *Q,octet *w);
 
+/**	@brief Get Group Generator from ROM
+ *
+	@param G ECP instance
+ */
+extern void ECP_generator(ECP *G);
+
 }
 
 #endif

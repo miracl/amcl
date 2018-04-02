@@ -325,23 +325,17 @@ final public class ECDH
     {
         let res=0;
      //   var T=[UInt8](count:ECDH.EFS,repeatedValue:0)
-        let gx=BIG(ROM.CURVE_Gx);
         var s:BIG
         var G:ECP
-        if ECP.CURVETYPE != ECP.MONTGOMERY
-        {
-            let gy=BIG(ROM.CURVE_Gy)
-            G=ECP(gx,gy)
-        }
-        else
-            {G=ECP(gx)}
+
+        G=ECP.generator();
     
         let r=BIG(ROM.CURVE_Order)
     
         if (RNG==nil)
         {
             s=BIG.fromBytes(S)
-	    s.mod(r)
+            s.mod(r)
         }
         else
         {
@@ -355,7 +349,7 @@ final public class ECDH
 	//{
 	//    s.mod2m(2*ROM.AES_S)
 	//}
-	s.toBytes(&S)
+        s.toBytes(&S)
 
         let WP=G.mul(s)
         WP.toBytes(&W)
@@ -426,10 +420,7 @@ final public class ECDH
         var T=[UInt8](repeating: 0,count: ECDH.EFS)
         let B=hashit(sha,F,0,nil,Int(BIG.MODBYTES))
     
-        let gx=BIG(ROM.CURVE_Gx)
-        let gy=BIG(ROM.CURVE_Gy)
-    
-        let G=ECP(gx,gy)
+        let G=ECP.generator();  
         let r=BIG(ROM.CURVE_Order)
     
         let s=BIG.fromBytes(S)
@@ -473,10 +464,7 @@ final public class ECDH
         var res=0
         let B=hashit(sha,F,0,nil,Int(BIG.MODBYTES))
     
-        let gx=BIG(ROM.CURVE_Gx)
-        let gy=BIG(ROM.CURVE_Gy)
-    
-        let G=ECP(gx,gy)
+        let G=ECP.generator();
         let r=BIG(ROM.CURVE_Order)
     
         let c=BIG.fromBytes(C)

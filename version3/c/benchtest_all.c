@@ -75,16 +75,9 @@ int ED_25519(csprng *RNG)
 #if CHUNK==64
 	printf("64-bit Build\n");
 #endif
-
-
-	BIG_ED_rcopy(x,CURVE_Gx_ED25519);
-#if CURVETYPE_ED25519!=MONTGOMERY
-	BIG_ED_rcopy(y,CURVE_Gy_ED25519);
-    ECP_ED25519_set(&EG,x,y);
-#else
-    ECP_ED25519_set(&EG,x);
-#endif
 	
+	ECP_ED25519_generator(&EG);
+
 	BIG_ED_rcopy(r,CURVE_Order_ED25519);
 	BIG_ED_randomnum(s,r,RNG);
 	ECP_ED25519_copy(&EP,&EG);
@@ -127,10 +120,7 @@ int BN_254(csprng *RNG)
 	BIG_BN s,r,x,y;
 	printf("\nTesting/Timing BN254 Pairings\n");
 
-	BIG_BN_rcopy(x,CURVE_Gx_BN254);
-
-	BIG_BN_rcopy(y,CURVE_Gy_BN254);
-    ECP_BN254_set(&G,x,y);
+	ECP_BN254_generator(&G);
 
 	
 	BIG_BN_rcopy(r,CURVE_Order_BN254);
@@ -157,12 +147,7 @@ int BN_254(csprng *RNG)
     printf("G1 mul              - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
-    
-    FP_BN254_rcopy(&(wx.a),CURVE_Pxa_BN254); 
-    FP_BN254_rcopy(&(wx.b),CURVE_Pxb_BN254); 
-    FP_BN254_rcopy(&(wy.a),CURVE_Pya_BN254); 
-    FP_BN254_rcopy(&(wy.b),CURVE_Pyb_BN254);     
-	ECP2_BN254_set(&W,&wx,&wy);
+	ECP2_BN254_generator(&W);
 
 	ECP2_BN254_copy(&Q,&W);
     ECP2_BN254_mul(&Q,r);

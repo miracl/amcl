@@ -350,6 +350,7 @@ void FP_YYY_imul(FP_YYY *r,FP_YYY *a,int c)
         // don't want to do this - only a problem for Montgomery modulus and larger constants
         BIG_XXX_zero(k);
         BIG_XXX_inc(k,c);
+		BIG_XXX_norm(k);
         FP_YYY_nres(&f,k);
         FP_YYY_mul(r,a,&f);
     }

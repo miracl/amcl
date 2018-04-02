@@ -193,7 +193,11 @@ extern void ECP2_mul4(ECP2 *P,ECP2 *Q,XXX::BIG *b);
 	@param W OCTET byte array to be mapped
  */
 extern void ECP2_mapit(ECP2 *P,octet *w);
-
+/**	@brief Get Group Generator from ROM
+ *
+	@param G ECP2 instance
+ */
+extern void ECP2_generator(ECP2 *G);
 }
 
 #endif

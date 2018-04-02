@@ -473,17 +473,12 @@ int ZZZ::MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,in
 int ZZZ::MPIN_GET_SERVER_SECRET(octet *S,octet *SST)
 {
     BIG r,s;
-    FP2 qx,qy;
     ECP2 Q;
     int res=0;
 
     BIG_rcopy(r,CURVE_Order);
-    FP_rcopy(&(qx.a),CURVE_Pxa);
-    FP_rcopy(&(qx.b),CURVE_Pxb);
-    FP_rcopy(&(qy.a),CURVE_Pya);
-    FP_rcopy(&(qy.b),CURVE_Pyb);
 
-    ECP2_set(&Q,&qx,&qy);
+	ECP2_generator(&Q);
 
     if (res==0)
     {
@@ -564,16 +559,12 @@ void ZZZ::MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 int ZZZ::MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F,octet *Pa)
 {
     BIG px,py,y;
-    FP2 qx,qy;
     FP12 g;
     ECP2 Q,sQ;
     ECP P,R;
     int res=0;
 
-    FP_rcopy(&(qx.a),CURVE_Pxa);
-    FP_rcopy(&(qx.b),CURVE_Pxb);
-    FP_rcopy(&(qy.a),CURVE_Pya);
-    FP_rcopy(&(qy.b),CURVE_Pyb);
+	ECP2_generator(&Q);
 
     // key-escrow less scheme: use Pa instead of Q in pairing computation
     // Q left for backward compatiblity
@@ -581,7 +572,6 @@ int ZZZ::MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet
     {
         if (!ECP2_fromOctet(&Q, Pa)) res=MPIN_INVALID_POINT;
     }
-    else if (!ECP2_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
 
     if (res==0)
     {
@@ -753,7 +743,6 @@ int ZZZ::MPIN_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
 {
     ECP P,T;
     ECP2 Q;
-    FP2 qx,qy;
     FP12 g;
 	BIG x;
     int res=0;
@@ -769,11 +758,7 @@ int ZZZ::MPIN_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
         }
         else
         {
-            FP_rcopy(&(qx.a),CURVE_Pxa);
-            FP_rcopy(&(qx.b),CURVE_Pxb);
-            FP_rcopy(&(qy.a),CURVE_Pya);
-            FP_rcopy(&(qy.b),CURVE_Pyb);
-            if (!ECP2_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+			ECP2_generator(&Q);
         }
     }
     if (res==0)
@@ -987,7 +972,6 @@ int ZZZ::MPIN_SERVER(int sha,int date,octet *HID,octet *HTID,octet *Y,octet *sQ,
 int ZZZ::MPIN_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa)
 {
     BIG z,r;
-    FP2 qx,qy;
     ECP2 Q;
     int res=0;
 
@@ -1004,11 +988,7 @@ int ZZZ::MPIN_GET_DVS_KEYPAIR(csprng *R,octet *Z,octet *Pa)
 
     BIG_invmodp(z,z,r);
 
-    FP_rcopy(&(qx.a),CURVE_Pxa);
-    FP_rcopy(&(qx.b),CURVE_Pxb);
-    FP_rcopy(&(qy.a),CURVE_Pya);
-    FP_rcopy(&(qy.b),CURVE_Pyb);
-    if (!ECP2_set(&Q,&qx,&qy)) res=MPIN_INVALID_POINT;
+	ECP2_generator(&Q);
 
     if (res==0)
     {

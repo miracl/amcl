@@ -435,18 +435,8 @@ var ECDH = function(ctx) {
                 r, gx, gy, s,
                 G, WP;
             //      var T=[];
-            G = new ctx.ECP(0);
 
-            gx = new ctx.BIG(0);
-            gx.rcopy(ctx.ROM_CURVE.CURVE_Gx);
-
-            if (ctx.ECP.CURVETYPE != ctx.ECP.MONTGOMERY) {
-                gy = new ctx.BIG(0);
-                gy.rcopy(ctx.ROM_CURVE.CURVE_Gy);
-                G.setxy(gx, gy);
-            } else {
-                G.setx(gx);
-            }
+			G = ctx.ECP.generator();
 
             r = new ctx.BIG(0);
             r.rcopy(ctx.ROM_CURVE.CURVE_Order);
@@ -550,13 +540,8 @@ var ECDH = function(ctx) {
 
             B = this.hashit(sha, F, 0, null, ctx.BIG.MODBYTES);
 
-            gx = new ctx.BIG(0);
-            gx.rcopy(ctx.ROM_CURVE.CURVE_Gx);
-            gy = new ctx.BIG(0);
-            gy.rcopy(ctx.ROM_CURVE.CURVE_Gy);
+			G = ctx.ECP.generator();
 
-            G = new ctx.ECP(0);
-            G.setxy(gx, gy);
             r = new ctx.BIG(0);
             r.rcopy(ctx.ROM_CURVE.CURVE_Order);
 
@@ -610,13 +595,8 @@ var ECDH = function(ctx) {
 
             B = this.hashit(sha, F, 0, null, ctx.BIG.MODBYTES);
 
-            gx = new ctx.BIG(0);
-            gx.rcopy(ctx.ROM_CURVE.CURVE_Gx);
-            gy = new ctx.BIG(0);
-            gy.rcopy(ctx.ROM_CURVE.CURVE_Gy);
+ 			G = ctx.ECP.generator();
 
-            G = new ctx.ECP(0);
-            G.setxy(gx, gy);
             r = new ctx.BIG(0);
             r.rcopy(ctx.ROM_CURVE.CURVE_Order);
 

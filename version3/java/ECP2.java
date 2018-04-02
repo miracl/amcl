@@ -659,6 +659,10 @@ public final class ECP2 {
 		return Q;
 	}
 
+	public static ECP2 generator()
+	{
+		return new ECP2(new FP2(new BIG(ROM.CURVE_Pxa),new BIG(ROM.CURVE_Pxb)),new FP2(new BIG(ROM.CURVE_Pya),new BIG(ROM.CURVE_Pyb)));
+	}
 
 /*
 	public static void main(String[] args) {

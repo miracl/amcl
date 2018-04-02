@@ -36,19 +36,11 @@ using namespace YYY;
  * otherwise it is generated randomly internally */
 int ZZZ::ECP_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 {
-    BIG r,gx,s;
+    BIG r,gx,gy,s;
     ECP G;
     int res=0;
-    BIG_rcopy(gx,CURVE_Gx);
 
-#if CURVETYPE_ZZZ!=MONTGOMERY
-    BIG gy;
-    BIG_rcopy(gy,CURVE_Gy);
-    ECP_set(&G,gx,gy);
-
-#else
-    ECP_set(&G,gx);
-#endif
+	ECP_generator(&G);
 
     BIG_rcopy(r,CURVE_Order);
     if (RNG!=NULL)
@@ -188,21 +180,20 @@ int ZZZ::ECP_SP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octe
     char h[128];
     octet H= {0,sizeof(h),h};
 
-    BIG gx,gy,r,s,f,c,d,u,vx,w;
+    BIG r,s,f,c,d,u,vx,w;
     ECP G,V;
 
     ehashit(sha,F,-1,NULL,&H,sha);
-    BIG_rcopy(gx,CURVE_Gx);
-    BIG_rcopy(gy,CURVE_Gy);
-    BIG_rcopy(r,CURVE_Order);
+
+	ECP_generator(&G);
+
+	BIG_rcopy(r,CURVE_Order);
 
     BIG_fromBytes(s,S->val);
 
     int hlen=H.len;
     if (H.len>MODBYTES_XXX) hlen=MODBYTES_XXX;
     BIG_fromBytesLen(f,H.val,hlen);
-
-    ECP_set(&G,gx,gy);
 
     do
     {
@@ -261,14 +252,15 @@ int ZZZ::ECP_VP_DSA(int sha,octet *W,octet *F, octet *C,octet *D)
     char h[128];
     octet H= {0,sizeof(h),h};
 
-    BIG r,gx,gy,wx,wy,f,c,d,h2;
+    BIG r,wx,wy,f,c,d,h2;
     int res=0;
     ECP G,WP;
     int valid;
 
     ehashit(sha,F,-1,NULL,&H,sha);
-    BIG_rcopy(gx,CURVE_Gx);
-    BIG_rcopy(gy,CURVE_Gy);
+
+	ECP_generator(&G);
+
     BIG_rcopy(r,CURVE_Order);
 
     OCT_shl(C,C->len-MODBYTES_XXX);
@@ -292,8 +284,6 @@ int ZZZ::ECP_VP_DSA(int sha,octet *W,octet *F, octet *C,octet *D)
         BIG_invmodp(d,d,r);
         BIG_modmul(f,f,d,r);
         BIG_modmul(h2,c,d,r);
-
-        ECP_set(&G,gx,gy);
 
         BIG_fromBytes(wx,&(W->val[1]));
         BIG_fromBytes(wy,&(W->val[EFS_ZZZ+1]));

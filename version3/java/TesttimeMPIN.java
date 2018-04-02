@@ -61,7 +61,7 @@ public class TesttimeMPIN extends TestCase
 		System.out.format("Modulus size %d bits\n",FP.MODBITS); 
 		System.out.format("%d bit build\n",BIG.CHUNK); 
 
-		ECP G=new ECP(new BIG(ROM.CURVE_Gx),new BIG(ROM.CURVE_Gy));
+		ECP G=ECP.generator();
 
 		BIG r=new BIG(ROM.CURVE_Order);
 		BIG s=BIG.randomnum(r,rng);
@@ -84,7 +84,7 @@ public class TesttimeMPIN extends TestCase
 		System.out.format("G1 mul              - %8d iterations  ",iterations);
 		System.out.format(" %8.2f ms per iteration\n",dur);
 	
-		ECP2 Q=new ECP2(new FP2(new BIG(ROM.CURVE_Pxa),new BIG(ROM.CURVE_Pxb)),new FP2(new BIG(ROM.CURVE_Pya),new BIG(ROM.CURVE_Pyb)));
+		ECP2 Q=ECP2.generator();
 		ECP2 W=PAIR.G2mul(Q,r);
 
 		if (!W.is_infinity())

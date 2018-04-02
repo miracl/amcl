@@ -83,16 +83,7 @@ fn main()
 	println!("Modulus size {:} bits",ed25519::fp::MODBITS); 
 	println!("{:} bit build",arch::CHUNK); 
 
-	let mut G:ed25519::ecp::ECP;
-
-	let gx=ed25519::big::BIG::new_ints(&ed25519::rom::CURVE_GX);
-	
-	if ed25519::ecp::CURVETYPE!=ed25519::ecp::MONTGOMERY {
-		let gy=ed25519::big::BIG::new_ints(&ed25519::rom::CURVE_GY);
-		G=ed25519::ecp::ECP::new_bigs(&gx,&gy);
-	} else {
-		G=ed25519::ecp::ECP::new_big(&gx);
-	}
+	let mut G=ed25519::ecp::ECP::generator();
 
 	let mut r=ed25519::big::BIG::new_ints(&ed25519::rom::CURVE_ORDER);
 	let mut s=ed25519::big::BIG::randomnum(&r,&mut rng);
@@ -129,12 +120,7 @@ fn main()
 	println!("Modulus size {:} bits",bn254::fp::MODBITS); 
 	println!("{:} bit build",arch::CHUNK); 
 
-	let mut G:bn254::ecp::ECP;
-
-	let gx=bn254::big::BIG::new_ints(&bn254::rom::CURVE_GX);
-	
-	let gy=bn254::big::BIG::new_ints(&bn254::rom::CURVE_GY);
-	G=bn254::ecp::ECP::new_bigs(&gx,&gy);
+	let mut G =bn254::ecp::ECP::generator();
 
 	let mut r=bn254::big::BIG::new_ints(&bn254::rom::CURVE_ORDER);
 	let mut s=bn254::big::BIG::randomnum(&r,&mut rng);
@@ -159,8 +145,7 @@ fn main()
 	print!("G1  mul              - {:} iterations  ",iterations);
 	println!(" {:0.2} ms per iteration",duration);
 
-	let mut Q=ECP2::new_fp2s(&FP2::new_bigs(&bn254::big::BIG::new_ints(&bn254::rom::CURVE_PXA),&bn254::big::BIG::new_ints(&bn254::rom::CURVE_PXB)),&FP2::new_bigs(&bn254::big::BIG::new_ints(&bn254::rom::CURVE_PYA),&bn254::big::BIG::new_ints(&bn254::rom::CURVE_PYB)));
-
+	let mut Q=ECP2::generator();
 	let mut W=pair::g2mul(&mut Q,&mut r);
 
 	if !W.is_infinity() {

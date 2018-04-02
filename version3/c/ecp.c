@@ -1347,7 +1347,17 @@ void ECP_ZZZ_mul2(ECP_ZZZ *P,ECP_ZZZ *Q,BIG_XXX e,BIG_XXX f)
 
 #endif
 
-
+void ECP_ZZZ_generator(ECP_ZZZ *G)
+{
+	BIG_XXX x,y;
+	BIG_XXX_rcopy(x,CURVE_Gx_ZZZ);
+#if CURVETYPE_ZZZ!=MONTGOMERY
+	BIG_XXX_rcopy(y,CURVE_Gy_ZZZ);
+    ECP_ZZZ_set(G,x,y);
+#else
+	ECP_ZZZ_set(G,x);
+#endif
+}
 
 #ifdef HAS_MAIN
 

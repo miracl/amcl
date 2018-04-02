@@ -74,17 +74,10 @@ public class TesttimeECDH extends TestCase
 
 		System.out.format("Modulus size %d bits\n",FP.MODBITS); 
 		System.out.format("%d bit build\n",BIG.CHUNK); 
-		BIG r,gx,gy,s,wx,wy;
+		BIG r,s,wx,wy;
 		ECP G,WP;
 
-		gx=new BIG(ROM.CURVE_Gx);
-		if (ECP.CURVETYPE!=ECP.MONTGOMERY)
-		{
-			gy=new BIG(ROM.CURVE_Gy);
-			G=new ECP(gx,gy);
-		}
-		else
-			G=new ECP(gx);
+		G=ECP.generator();
 
 		r=new BIG(ROM.CURVE_Order);
 		s=BIG.randomnum(r,rng);

@@ -617,6 +617,10 @@ impl ECP2 {
 		return Q;
 	}
 
+	pub fn generator() -> ECP2 {
+		return ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
+	}
+
 }
 /*
 fn main()

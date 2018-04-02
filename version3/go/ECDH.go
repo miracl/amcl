@@ -307,13 +307,7 @@ func ECDH_KEY_PAIR_GENERATE(RNG *amcl.RAND,S []byte,W []byte) int {
 	var s *BIG
 	var G *ECP
 
-	gx:=NewBIGints(CURVE_Gx)
-	if CURVETYPE!=MONTGOMERY {
-		gy:=NewBIGints(CURVE_Gy)
-		G=NewECPbigs(gx,gy)
-	} else {
-		G=NewECPbig(gx)
-	}
+	G=ECP_generator();
 
 	r:=NewBIGints(CURVE_Order)
 
@@ -398,11 +392,8 @@ func ECDH_ECPSP_DSA(sha int,RNG *amcl.RAND,S []byte,F []byte,C []byte,D []byte) 
 	var T [EFS]byte
 
 	B:=ehashit(sha,F,0,nil,int(MODBYTES));
+	G:=ECP_generator();
 
-	gx:=NewBIGints(CURVE_Gx)
-	gy:=NewBIGints(CURVE_Gy)
-
-	G:=NewECPbigs(gx,gy)
 	r:=NewBIGints(CURVE_Order)
 
 	s:=FromBytes(S)
@@ -445,10 +436,7 @@ func ECDH_ECPVP_DSA(sha int,W []byte,F []byte,C []byte,D []byte) int {
 
 	B:=ehashit(sha,F,0,nil,int(MODBYTES));
 
-	gx:=NewBIGints(CURVE_Gx)
-	gy:=NewBIGints(CURVE_Gy)
-
-	G:=NewECPbigs(gx,gy)
+	G:=ECP_generator(); 
 	r:=NewBIGints(CURVE_Order)
 
 	c:=FromBytes(C)

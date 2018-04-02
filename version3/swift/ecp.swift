@@ -998,5 +998,18 @@ final public class ECP {
         return P
     }    
    
+    static public func generator() -> ECP
+    {
+        let gx=BIG(ROM.CURVE_Gx);
+        var G:ECP
+        if ECP.CURVETYPE != ECP.MONTGOMERY
+        {
+            let gy=BIG(ROM.CURVE_Gy)
+            G=ECP(gx,gy)
+        }
+        else
+            {G=ECP(gx)}   
+        return G     
+    }
     
 }

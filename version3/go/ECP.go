@@ -932,6 +932,19 @@ func ECP_mapit(h []byte) *ECP {
 	return P
 }
 
+func ECP_generator() *ECP {
+	var G *ECP
+
+	gx:=NewBIGints(CURVE_Gx)
+	if CURVETYPE!=MONTGOMERY {
+		gy:=NewBIGints(CURVE_Gy)
+		G=NewECPbigs(gx,gy)
+	} else {
+		G=NewECPbig(gx)
+	}
+	return G
+}
+
 /*
 func main() {
 	Gx:=NewBIGints(CURVE_Gx);

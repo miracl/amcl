@@ -133,16 +133,9 @@ public func TimeECDH(_ rng: RAND)
     print("Modulus size \(ed25519.FP.MODBITS) bits")
     print("\(ed25519.BIG.CHUNK) bit build")
     
-    let gx=ed25519.BIG(ed25519.ROM.CURVE_Gx);
+
     var s:ed25519.BIG
-    var G:ed25519.ECP
-    if ed25519.ECP.CURVETYPE != ed25519.ECP.MONTGOMERY
-    {
-        let gy=ed25519.BIG(ed25519.ROM.CURVE_Gy)
-        G=ed25519.ECP(gx,gy)
-    }
-    else
-        {G=ed25519.ECP(gx)}
+    var G=ed25519.ECP.generator();
     
     let r=ed25519.BIG(ed25519.ROM.CURVE_Order)
     s=ed25519.BIG.randomnum(r,rng)
@@ -186,10 +179,7 @@ public func TimeMPIN(_ rng: RAND)
     print("Modulus size \(bn254.FP.MODBITS) bits")
     print("\(bn254.BIG.CHUNK) bit build")
     
-    let gx=bn254.BIG(bn254.ROM.CURVE_Gx);
-
-    let gy=bn254.BIG(bn254.ROM.CURVE_Gy)
-    let G=bn254.ECP(gx,gy)
+    let G=bn254.ECP.generator();
     
     let r=bn254.BIG(bn254.ROM.CURVE_Order)
     let s=bn254.BIG.randomnum(r,rng)
@@ -213,7 +203,7 @@ public func TimeMPIN(_ rng: RAND)
     print(String(format: "G1  mul              - %d iterations",iterations),terminator: "");
     print(String(format: " %.2f ms per iteration",elapsed))
     
-    var Q=ECP2(FP2(bn254.BIG(bn254.ROM.CURVE_Pxa),bn254.BIG(bn254.ROM.CURVE_Pxb)),FP2(bn254.BIG(ROM.CURVE_Pya),bn254.BIG(bn254.ROM.CURVE_Pyb)))
+    var Q=ECP2.generator();
     
     var W=PAIR.G2mul(Q,r)
     

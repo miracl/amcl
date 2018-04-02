@@ -757,6 +757,17 @@ void ECP2_ZZZ_mapit(ECP2_ZZZ *Q,octet *W)
 #endif
 }
 
+void ECP2_ZZZ_generator(ECP2_ZZZ *G)
+{
+	FP2_YYY wx,wy;
+
+    FP_YYY_rcopy(&(wx.a),CURVE_Pxa_ZZZ); 
+    FP_YYY_rcopy(&(wx.b),CURVE_Pxb_ZZZ); 
+    FP_YYY_rcopy(&(wy.a),CURVE_Pya_ZZZ); 
+    FP_YYY_rcopy(&(wy.b),CURVE_Pyb_ZZZ);     
+	ECP2_ZZZ_set(G,&wx,&wy);
+}
+
 /*
 
 int main()

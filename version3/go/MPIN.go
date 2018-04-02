@@ -378,7 +378,7 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *amcl.RAND,X []byte,pin
 
 /* Extract Server Secret SST=S*Q where Q is fixed generator in G2 and S is master secret */
 func MPIN_GET_SERVER_SECRET(S []byte,SST []byte) int {
-	Q:=NewECP2fp2s(NewFP2bigs(NewBIGints(CURVE_Pxa),NewBIGints(CURVE_Pxb)),NewFP2bigs(NewBIGints(CURVE_Pya),NewBIGints(CURVE_Pyb)))
+	Q:=ECP2_generator(); 
 
 	s:=FromBytes(S)
 	Q=G2mul(Q,s)
@@ -448,7 +448,7 @@ func MPIN_SERVER_1(sha int,date int,CID []byte,HID []byte,HTID []byte) {
 /* Implement step 2 of MPin protocol on server side */
 func MPIN_SERVER_2(date int,HID []byte,HTID []byte,Y []byte,SST []byte,xID []byte,xCID []byte,mSEC []byte,E []byte,F []byte) int {
 //	q:=NewBIGints(Modulus)
-	Q:=NewECP2fp2s(NewFP2bigs(NewBIGints(CURVE_Pxa),NewBIGints(CURVE_Pxb)),NewFP2bigs(NewBIGints(CURVE_Pya),NewBIGints(CURVE_Pyb)))
+	Q:=ECP2_generator(); 
 
 	sQ:=ECP2_fromBytes(SST)
 	if sQ.Is_infinity() {return INVALID_POINT}	
@@ -565,7 +565,7 @@ func MPIN_PRECOMPUTE(TOKEN []byte,CID []byte,G1 []byte,G2 []byte) int {
 
 	P=ECP_mapit(CID)
 
-	Q:=NewECP2fp2s(NewFP2bigs(NewBIGints(CURVE_Pxa),NewBIGints(CURVE_Pxb)),NewFP2bigs(NewBIGints(CURVE_Pya),NewBIGints(CURVE_Pyb)))
+	Q:=ECP2_generator(); 
 
 	g=Ate(Q,T)
 	g=Fexp(g)
