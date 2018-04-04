@@ -49,9 +49,8 @@ public class TestMPIN extends TestCase //
 		int EFS=MPIN.EFS;
 		int G1S=2*EFS+1; /* Group 1 Size */
 		int G2S=4*EFS; /* Group 2 Size */
-		int EAS=16;
 
-		int sha=MPIN.HASH_TYPE;
+		int sha=ECP.HASH_TYPE;
 
 		byte[] S = new byte[EGS];
 		byte[] SST = new byte[G2S];
@@ -73,8 +72,8 @@ public class TestMPIN extends TestCase //
 		byte[] Z=new byte[G1S];
 		byte[] W=new byte[EGS];
 		byte[] T=new byte[G1S];
-		byte[] CK=new byte[EAS];
-		byte[] SK=new byte[EAS];
+		byte[] CK=new byte[ECP.AESKEY];
+		byte[] SK=new byte[ECP.AESKEY];
 
 		byte[] HSID=null;
 		byte[] RAW=new byte[100];

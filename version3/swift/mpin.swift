@@ -31,7 +31,7 @@ final public class MPIN
 {
     static public let EFS=Int(BIG.MODBYTES)
     static public let EGS=Int(BIG.MODBYTES)
-    static public let PAS:Int=16
+    //static public let PAS:Int=16
     static let INVALID_POINT:Int = -14
     static let BAD_PARAMS:Int = -11
     static let WRONG_ORDER:Int = -18
@@ -47,7 +47,7 @@ final public class MPIN
     static let TS:Int = 10         // 10 for 4 digit PIN, 14 for 6-digit PIN - 2^TS/TS approx = sqrt(MAXPIN)
     static let TRAP:Int = 200      // 200 for 4 digit PIN, 2000 for 6-digit PIN  - approx 2*sqrt(MAXPIN)
 
-    static public let HASH_TYPE=SHA256
+    //static public let HASH_TYPE=SHA256
     
     private static func mpin_hash(_ sha:Int,_ c: FP4,_ U: ECP) -> [UInt8]
     {
@@ -82,8 +82,8 @@ final public class MPIN
             h=H.hash()
         }
         if h.isEmpty {return h}
-        var R=[UInt8](repeating: 0,count: PAS)
-        for i in 0 ..< PAS {R[i]=h[i]}
+        var R=[UInt8](repeating: 0,count: ECP.AESKEY)
+        for i in 0 ..< ECP.AESKEY {R[i]=h[i]}
         return R
     }
     
@@ -710,7 +710,7 @@ final public class MPIN
  */     
         let t=mpin_hash(sha,c,W)
 
-        for i in 0 ..< PAS {CK[i]=t[i]}
+        for i in 0 ..< ECP.AESKEY {CK[i]=t[i]}
     
         return 0
     }
@@ -749,7 +749,7 @@ final public class MPIN
         
         let t=mpin_hash(sha,c,U)
  
-        for i in 0 ..< PAS {SK[i]=t[i]}
+        for i in 0 ..< ECP.AESKEY {SK[i]=t[i]}
     
         return 0
     }

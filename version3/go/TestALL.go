@@ -49,7 +49,7 @@ func ecdh_ED25519(rng *amcl.RAND) {
 	pp:="M0ng00se"
 	res:=0
 
-	var sha=ED25519.ECDH_HASH_TYPE
+	var sha=ED25519.HASH_TYPE
 
 	var S1 [ED25519.EGS]byte
 	var W0 [2*ED25519.EFS+1]byte
@@ -121,7 +121,7 @@ func ecdh_ED25519(rng *amcl.RAND) {
 		return
 	}
 
-	KEY:=ED25519.ECDH_KDF2(sha,Z0[:],nil,ED25519.EAS);
+	KEY:=ED25519.ECDH_KDF2(sha,Z0[:],nil,ED25519.AESKEY);
 
 	fmt.Printf("Alice's DH Key=  0x"); printBinary(KEY)
 	fmt.Printf("Servers DH Key=  0x"); printBinary(KEY)
@@ -177,13 +177,12 @@ const SINGLE_PASS bool=false
 
 func mpin_BN254(rng *amcl.RAND) {
 
-	var sha=BN254.MPIN_HASH_TYPE
+	var sha=BN254.HASH_TYPE
 
 	const MGS=BN254.MGS
 	const MFS=BN254.MFS
 	const G1S=2*MFS+1 /* Group 1 Size */
 	const G2S=4*MFS; /* Group 2 Size */
-	const EAS int=16
 
 	var S [MGS]byte
 	var SST [G2S]byte
@@ -205,8 +204,8 @@ func mpin_BN254(rng *amcl.RAND) {
 	var Z [G1S]byte
 	var W [MGS]byte
 	var T [G1S]byte
-	var CK [EAS]byte
-	var SK [EAS]byte
+	var CK [BN254.AESKEY]byte
+	var SK [BN254.AESKEY]byte
 
 	var HSID []byte
 

@@ -28,7 +28,7 @@ import "github.com/milagro-crypto/amcl/version3/go/amcl"
 
 const MFS int=int(MODBYTES)
 const MGS int=int(MODBYTES)
-const PAS int=16
+//const PAS int=16
 const BAD_PARAMS int=-11
 const INVALID_POINT int=-14
 const WRONG_ORDER int=-18
@@ -42,7 +42,7 @@ const PBLEN int32=14      /* Number of bits in PIN */
 const TS int=10         /* 10 for 4 digit PIN, 14 for 6-digit PIN - 2^TS/TS approx = sqrt(MAXPIN) */
 const TRAP int=200      /* 200 for 4 digit PIN, 2000 for 6-digit PIN  - approx 2*sqrt(MAXPIN) */
 
-const MPIN_HASH_TYPE int=amcl.SHA256
+//const MPIN_HASH_TYPE int=amcl.SHA256
 
 func mpin_hash(sha int,c *FP4,U *ECP) []byte {
 	var w [MFS]byte
@@ -73,8 +73,8 @@ func mpin_hash(sha int,c *FP4,U *ECP) []byte {
 		h=H.Hash()
 	}
 	if h==nil {return nil}
-	R:=make([]byte,PAS)
-	for i:=0;i<PAS;i++ {R[i]=h[i]}
+	R:=make([]byte,AESKEY)
+	for i:=0;i<AESKEY;i++ {R[i]=h[i]}
 	return R
 }
 
@@ -656,7 +656,7 @@ func MPIN_CLIENT_KEY(sha int,G1 []byte,G2 []byte,pin int,R []byte,X []byte,H []b
 */
 	t:=mpin_hash(sha,c,W);
 
-	for i:=0;i<PAS;i++ {CK[i]=t[i]}
+	for i:=0;i<AESKEY;i++ {CK[i]=t[i]}
 
 	return 0
 }
@@ -692,7 +692,7 @@ func MPIN_SERVER_KEY(sha int,Z []byte,SST []byte,W []byte,H []byte,HID []byte,xI
 
 	t:=mpin_hash(sha,c,U)
 
-	for i:=0;i<PAS;i++ {SK[i]=t[i]}
+	for i:=0;i<AESKEY;i++ {SK[i]=t[i]}
 
 	return 0
 }

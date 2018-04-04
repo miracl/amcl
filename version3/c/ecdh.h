@@ -34,8 +34,8 @@ under the License.
 
 /*** START OF USER CONFIGURABLE SECTION -  ***/
 
-#define EAS_ZZZ 16 /**< Symmetric Key size - 128 bits */
-#define HASH_TYPE_ECC_ZZZ SHA512  /**< Hash type */
+//#define EAS_ZZZ 16 /**< Symmetric Key size - 128 bits */
+//#define HASH_TYPE_ECC_ZZZ SHA512  /**< Hash type */
 
 /*** END OF USER CONFIGURABLE SECTION ***/
 

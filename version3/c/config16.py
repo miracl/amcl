@@ -72,7 +72,7 @@ def rsaset(tb,tff,nb,base,ml) :
 	replace(fnameh,"XXX",bd)
 	os.system("gcc -O3 -std=c99 -c "+fnamec)
 
-def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx) :
+def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	bd=tb+"_"+base
 	fnameh="config_big_"+bd+".h"
 	os.system(copytext+" config_big.h "+fnameh)
@@ -106,6 +106,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx) :
 
 	replace(fnameh,"@ST@",stw)
 	replace(fnameh,"@SX@",sx)
+	replace(fnameh,"@CS@",cs)
 
 	fnamec="big_"+bd+".c"
 	fnameh="big_"+bd+".h"
@@ -180,8 +181,10 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx) :
 		os.system(copytext+" fp4.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
+		replace(fnamec,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
+		replace(fnameh,"ZZZ",tc)
 		os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 		fnamec="fp12_"+tf+".c"
@@ -284,18 +287,18 @@ while ptr<max:
 # if pairing friendly. M or D type twist, and sign of the family parameter x
 
 	if x==1:
-		curveset("256","25519","ED25519","32","13","255","5","PSEUDO_MERSENNE","EDWARDS","NOT","","")
+		curveset("256","25519","ED25519","32","13","255","5","PSEUDO_MERSENNE","EDWARDS","NOT","","","128")
 		curve_selected=True
 	if x==2:
-		curveset("256","256PME","NUMS256E","32","13","256","3","PSEUDO_MERSENNE","EDWARDS","NOT","","")
+		curveset("256","256PME","NUMS256E","32","13","256","3","PSEUDO_MERSENNE","EDWARDS","NOT","","","128")
 		curve_selected=True
 
 
 	if x==3:
-		curveset("256","BN254","BN254","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX")
+		curveset("256","BN254","BN254","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 	if x==4:
-		curveset("256","BN254CX","BN254CX","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX")
+		curveset("256","BN254CX","BN254CX","32","13","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 
 # rsaset(big,ring,big_length_bytes,bits_in_base,multiplier)

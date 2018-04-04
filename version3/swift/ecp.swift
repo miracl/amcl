@@ -42,6 +42,9 @@ final public class ECP {
     static public let SEXTIC_TWIST = @ST@
     static public let SIGN_OF_X = @SX@
 
+    static public let HASH_TYPE = @HT@
+    static public let AESKEY = @AK@
+
     private var x:FP
     private var y:FP
     private var z:FP

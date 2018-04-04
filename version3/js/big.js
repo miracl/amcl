@@ -708,21 +708,21 @@ var BIG = function(ctx) {
 
             while (BIG.comp(u, one) !== 0 && BIG.comp(v, one) !== 0) {
                 while (u.parity() === 0) {
-                    u.shr(1);
+                    u.fshr(1);
                     if (x1.parity() !== 0) {
                         x1.add(p);
                         x1.norm();
                     }
-                    x1.shr(1);
+                    x1.fshr(1);
                 }
 
                 while (v.parity() === 0) {
-                    v.shr(1);
+                    v.fshr(1);
                     if (x2.parity() !== 0) {
                         x2.add(p);
                         x2.norm();
                     }
-                    x2.shr(1);
+                    x2.fshr(1);
                 }
 
                 if (BIG.comp(u, v) >= 0) {

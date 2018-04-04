@@ -29,11 +29,11 @@ const ERROR int=-3
 const INVALID int=-4
 const EFS int=int(MODBYTES)
 const EGS int=int(MODBYTES)
-const EAS int=16
-const EBS int=16
+//const EAS int=16
+//const EBS int=16
 
 
-const ECDH_HASH_TYPE int=amcl.SHA512
+//const ECDH_HASH_TYPE int=amcl.SHA512
 
 /* Convert Integer to n-byte array */
 func inttoBytes(n int,len int) []byte {
@@ -479,8 +479,8 @@ func ECDH_ECPVP_DSA(sha int,W []byte,F []byte,C []byte,D []byte) int {
 func ECDH_ECIES_ENCRYPT(sha int,P1 []byte,P2 []byte,RNG *amcl.RAND,W []byte,M []byte,V []byte,T []byte) []byte { 
 	var Z [EFS]byte
 	var VZ [3*EFS+1]byte
-	var K1 [EAS]byte
-	var K2 [EAS]byte
+	var K1 [AESKEY]byte
+	var K2 [AESKEY]byte
 	var U [EGS]byte
 
 	if ECDH_KEY_PAIR_GENERATE(RNG,U[:],V)!=0 {return nil}
@@ -490,9 +490,9 @@ func ECDH_ECIES_ENCRYPT(sha int,P1 []byte,P2 []byte,RNG *amcl.RAND,W []byte,M []
 	for i:=0;i<EFS;i++ {VZ[2*EFS+1+i]=Z[i]}
 
 
-	K:=ECDH_KDF2(sha,VZ[:],P1,EFS)
+	K:=ECDH_KDF2(sha,VZ[:],P1,2*AESKEY)
 
-	for i:=0;i<EAS;i++ {K1[i]=K[i]; K2[i]=K[EAS+i]} 
+	for i:=0;i<AESKEY;i++ {K1[i]=K[i]; K2[i]=K[AESKEY+i]} 
 
 	C:=AES_CBC_IV0_ENCRYPT(K1[:],M)
 
@@ -513,8 +513,8 @@ func ECDH_ECIES_ENCRYPT(sha int,P1 []byte,P2 []byte,RNG *amcl.RAND,W []byte,M []
 func ECDH_ECIES_DECRYPT(sha int,P1 []byte,P2 []byte,V []byte,C []byte,T []byte,U []byte) []byte { 
 	var Z [EFS]byte
 	var VZ [3*EFS+1]byte
-	var K1 [EAS]byte
-	var K2 [EAS]byte
+	var K1 [AESKEY]byte
+	var K2 [AESKEY]byte
 
 	var TAG []byte =T[:]  
 
@@ -523,9 +523,9 @@ func ECDH_ECIES_DECRYPT(sha int,P1 []byte,P2 []byte,V []byte,C []byte,T []byte,U
 	for i:=0;i<2*EFS+1;i++ {VZ[i]=V[i]}
 	for i:=0;i<EFS;i++ {VZ[2*EFS+1+i]=Z[i]}
 
-	K:=ECDH_KDF2(sha,VZ[:],P1,EFS)
+	K:=ECDH_KDF2(sha,VZ[:],P1,2*AESKEY)
 
-	for i:=0;i<EAS;i++ {K1[i]=K[i]; K2[i]=K[EAS+i]} 
+	for i:=0;i<AESKEY;i++ {K1[i]=K[i]; K2[i]=K[AESKEY+i]} 
 
 	M:=AES_CBC_IV0_DECRYPT(K1[:],C)
 

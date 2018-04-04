@@ -36,6 +36,9 @@ const CURVE_PAIRING_TYPE int=@PF@
 const SEXTIC_TWIST int=@ST@
 const SIGN_OF_X int=@SX@
 
+const HASH_TYPE int=@HT@
+const AESKEY int=@AK@
+
 /* Elliptic Curve Point Structure */
 
 type ECP struct {

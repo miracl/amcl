@@ -37,13 +37,13 @@ final public class ECDH
     static let INVALID:Int = -4
     static public let EFS=Int(BIG.MODBYTES);
     static public let EGS=Int(BIG.MODBYTES);
-    static public let EAS=16;
-    static public let EBS=16;
+    //static public let EAS=16;
+    //static public let EBS=16;
     static public let SHA256=32
     static public let SHA384=48
     static public let SHA512=64
     
-    static public let HASH_TYPE=SHA512
+    //static public let HASH_TYPE=SHA512
 
     /* Convert Integer to n-byte array */
     private static func inttoBytes(_ n: Int,_ len:Int) -> [UInt8]
@@ -505,8 +505,8 @@ final public class ECDH
     {
         var Z=[UInt8](repeating: 0,count: ECDH.EFS)
         var VZ=[UInt8](repeating: 0,count: 3*ECDH.EFS+1)
-        var K1=[UInt8](repeating: 0,count: ECDH.EAS)
-        var K2=[UInt8](repeating: 0,count: ECDH.EAS)
+        var K1=[UInt8](repeating: 0,count: ECP.AESKEY)
+        var K2=[UInt8](repeating: 0,count: ECP.AESKEY)
         var U=[UInt8](repeating: 0,count: ECDH.EGS)
     
         if ECDH.KEY_PAIR_GENERATE(RNG,&U,&V) != 0 {return [UInt8]()}
@@ -516,9 +516,9 @@ final public class ECDH
         for i in 0 ..< ECDH.EFS {VZ[2*ECDH.EFS+1+i]=Z[i]}
     
     
-        var K=KDF2(sha,VZ,P1,ECDH.EFS)
+        var K=KDF2(sha,VZ,P1,2*ECP.AESKEY)
     
-        for i in 0 ..< ECDH.EAS {K1[i]=K[i]; K2[i]=K[EAS+i];}
+        for i in 0 ..< ECP.AESKEY {K1[i]=K[i]; K2[i]=K[ECP.AESKEY+i];}
     
         var C=AES_CBC_IV0_ENCRYPT(K1,M)
     
@@ -540,8 +540,8 @@ final public class ECDH
     {
         var Z=[UInt8](repeating: 0,count: ECDH.EFS)
         var VZ=[UInt8](repeating: 0,count: 3*ECDH.EFS+1)
-        var K1=[UInt8](repeating: 0,count: ECDH.EAS)
-        var K2=[UInt8](repeating: 0,count: ECDH.EAS)
+        var K1=[UInt8](repeating: 0,count: ECP.AESKEY)
+        var K2=[UInt8](repeating: 0,count: ECP.AESKEY)
 
         var TAG=[UInt8](repeating: 0,count: T.count)
     
@@ -550,9 +550,9 @@ final public class ECDH
         for i in 0 ..< 2*ECDH.EFS+1 {VZ[i]=V[i]}
         for i in 0 ..< ECDH.EFS {VZ[2*EFS+1+i]=Z[i]}
     
-        var K=KDF2(sha,VZ,P1,ECDH.EFS)
+        var K=KDF2(sha,VZ,P1,2*ECP.AESKEY)
     
-        for i in 0 ..< ECDH.EAS {K1[i]=K[i]; K2[i]=K[ECDH.EAS+i]}
+        for i in 0 ..< ECP.AESKEY {K1[i]=K[i]; K2[i]=K[ECP.AESKEY+i]}
     
         let M=ECDH.AES_CBC_IV0_DECRYPT(K1,C)
     

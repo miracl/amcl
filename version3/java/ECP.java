@@ -39,6 +39,13 @@ public final class ECP {
 	public static final int SEXTIC_TWIST=@ST@;
 	public static final int SIGN_OF_X=@SX@;
 
+	public static final int SHA256=32;
+	public static final int SHA384=48;
+	public static final int SHA512=64;
+
+	public static final int HASH_TYPE=@HT@;
+	public static final int AESKEY=@AK@;
+
 	private FP x;
 	private FP y;
 	private FP z;

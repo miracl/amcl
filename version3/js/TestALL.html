@@ -43,8 +43,8 @@
 
 	var EGS=ctx1.ECDH.EGS;
 	var EFS=ctx1.ECDH.EFS;
-	var EAS=16;
-	var sha=ctx1.ECDH.HASH_TYPE;
+	var EAS=ctx1.ECP.AESKEY;
+	var sha=ctx1.ECP.HASH_TYPE;
 
 	var S1=[];
 	var W0=[];
@@ -109,7 +109,7 @@
 	if (!same)
 		alert("*** ECPSVDP-DH Failed");
 
-	var KEY=ctx1.ECDH.KDF2(sha,Z0,null,ctx1.ECDH.EAS);
+	var KEY=ctx1.ECDH.KDF2(sha,Z0,null,ctx1.ECP.AESKEY);
 
 	window.document.write("Alice's ECDH Key=  0x"+ctx1.ECDH.bytestostring(KEY)+ "<br>");
 	window.document.write("Servers ECDH Key=  0x"+ctx1.ECDH.bytestostring(KEY)+ "<br>");
@@ -250,9 +250,9 @@
 
 	var EGS=ctx3.MPIN.EGS;
 	var EFS=ctx3.MPIN.EFS;
-	var EAS=16;
+	var EAS=ctx3.ECP.AESKEY;
 
-	var sha=ctx3.MPIN.HASH_TYPE;
+	var sha=ctx3.ECP.HASH_TYPE;
 
 	var G1S=2*EFS+1; /* Group 1 Size */
 	var G2S=4*EFS; /* Group 2 Size */

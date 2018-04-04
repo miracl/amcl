@@ -33,15 +33,15 @@ public final class ECDH {
 	public static final int INVALID=-4;
 	public static final int EFS=BIG.MODBYTES;
 	public static final int EGS=BIG.MODBYTES;
-	public static final int EAS=16;
-	public static final int EBS=16;
+//	public static final int EAS=16;
+//	public static final int EBS=16;
 
-	public static final int SHA256=32;
-	public static final int SHA384=48;
-	public static final int SHA512=64;
+//	public static final int SHA256=32;
+//	public static final int SHA384=48;
+//	public static final int SHA512=64;
 
 
-	public static final int HASH_TYPE=SHA512;
+//	public static final int HASH_TYPE=SHA512;
 
 
 /* Convert Integer to n-byte array */
@@ -65,21 +65,21 @@ public final class ECDH {
 	{
 		byte[] R=null;
 
-		if (sha==SHA256)
+		if (sha==ECP.SHA256)
 		{
 			HASH256 H=new HASH256();
 			H.process_array(A); if (n>0) H.process_num(n);
 			if (B!=null) H.process_array(B);
 			R=H.hash();
 		}
-		if (sha==SHA384)
+		if (sha==ECP.SHA384)
 		{
 			HASH384 H=new HASH384();
 			H.process_array(A); if (n>0) H.process_num(n);
 			if (B!=null) H.process_array(B);
 			R=H.hash();
 		}
-		if (sha==SHA512)
+		if (sha==ECP.SHA512)
 		{
 			HASH512 H=new HASH512();
 			H.process_array(A); if (n>0) H.process_num(n);
@@ -520,8 +520,8 @@ public final class ECDH {
 
 		byte[] Z=new byte[EFS];
 		byte[] VZ=new byte[3*EFS+1];
-		byte[] K1=new byte[EAS];
-		byte[] K2=new byte[EAS];
+		byte[] K1=new byte[ECP.AESKEY];
+		byte[] K2=new byte[ECP.AESKEY];
 		byte[] U=new byte[EGS];
 
 		if (KEY_PAIR_GENERATE(RNG,U,V)!=0) return new byte[0];  
@@ -531,9 +531,9 @@ public final class ECDH {
 		for (i=0;i<EFS;i++) VZ[2*EFS+1+i]=Z[i];
 
 
-		byte[] K=KDF2(sha,VZ,P1,EFS);
+		byte[] K=KDF2(sha,VZ,P1,2*ECP.AESKEY);
 
-		for (i=0;i<EAS;i++) {K1[i]=K[i]; K2[i]=K[EAS+i];} 
+		for (i=0;i<ECP.AESKEY;i++) {K1[i]=K[i]; K2[i]=K[ECP.AESKEY+i];} 
 
 		byte[] C=AES_CBC_IV0_ENCRYPT(K1,M);
 
@@ -557,8 +557,8 @@ public final class ECDH {
 
 		byte[] Z=new byte[EFS];
 		byte[] VZ=new byte[3*EFS+1];
-		byte[] K1=new byte[EAS];
-		byte[] K2=new byte[EAS];
+		byte[] K1=new byte[ECP.AESKEY];
+		byte[] K2=new byte[ECP.AESKEY];
 		byte[] TAG=new byte[T.length];
 
 		if (SVDP_DH(U,V,Z)!=0) return new byte[0];  
@@ -566,9 +566,9 @@ public final class ECDH {
 		for (i=0;i<2*EFS+1;i++) VZ[i]=V[i];
 		for (i=0;i<EFS;i++) VZ[2*EFS+1+i]=Z[i];
 
-		byte[] K=KDF2(sha,VZ,P1,EFS);
+		byte[] K=KDF2(sha,VZ,P1,2*ECP.AESKEY);
 
-		for (i=0;i<EAS;i++) {K1[i]=K[i]; K2[i]=K[EAS+i];} 
+		for (i=0;i<ECP.AESKEY;i++) {K1[i]=K[i]; K2[i]=K[ECP.AESKEY+i];} 
 
 		byte[] M=AES_CBC_IV0_DECRYPT(K1,C); 
 

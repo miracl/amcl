@@ -45,6 +45,9 @@ var ECP = function(ctx) {
     ECP.SEXTIC_TWIST = ctx.config["@ST"];
     ECP.SIGN_OF_X = ctx.config["@SX"];
 
+	ECP.HASH_TYPE = ctx.config["@HT"];
+	ECP.AESKEY = ctx.config["@AK"];
+
     ECP.prototype = {
         /* test this=O point-at-infinity */
         is_infinity: function() {

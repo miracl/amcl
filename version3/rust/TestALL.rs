@@ -41,9 +41,9 @@ fn ecdh_ed25519(mut rng: &mut RAND)
 	let pp:&[u8] = b"M0ng00se";
 	const EFS:usize=ed25519::ecdh::EFS;	
 	const EGS:usize=ed25519::ecdh::EGS;
-	const EAS:usize=ed25519::ecdh::EAS;
+	const EAS:usize=ed25519::ecp::AESKEY;
 
-	let sha=ed25519::ecdh::HASH_TYPE;
+	let sha=ed25519::ecp::HASH_TYPE;
 	let mut salt:[u8;8]=[0;8];
 	let mut s1:[u8;EGS]=[0;EGS];
 	let mut w0:[u8;2*EFS+1]=[0;2*EFS+1];
@@ -187,7 +187,7 @@ fn mpin_bn254(mut rng: &mut RAND)
 
 	const G1S:usize=2*EFS+1; /* Group 1 Size */
 	const G2S:usize=4*EFS; /* Group 2 Size */
-	const EAS:usize=16;
+	const EAS:usize=bn254::ecp::AESKEY;
 
 	let mut sst:[u8;G2S]=[0;G2S];
 	let mut token: [u8;G1S]=[0;G1S];	
@@ -213,7 +213,7 @@ fn mpin_bn254(mut rng: &mut RAND)
 	let mut sk: [u8;EAS]=[0;EAS];	
 
 
-	let sha=bn254::mpin::HASH_TYPE;
+	let sha=bn254::ecp::HASH_TYPE;
 
 	println!("\nTesting MPIN - PIN is 1234");
 /* Trusted Authority set-up */

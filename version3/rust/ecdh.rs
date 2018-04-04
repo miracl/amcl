@@ -36,13 +36,13 @@ pub const ERROR:  isize=-3;
 pub const INVALID: isize=-4;
 pub const EFS: usize=big::MODBYTES as usize;
 pub const EGS: usize=big::MODBYTES as usize;
-pub const EAS: usize=16;
-pub const EBS: usize=16;
+//pub const EAS: usize=16;
+//pub const EBS: usize=16;
 pub const SHA256: usize=32;
 pub const SHA384: usize=48;
 pub const SHA512: usize=64;
 
-pub const HASH_TYPE: usize=SHA512;
+//pub const HASH_TYPE: usize=SHA512;
 
 #[allow(non_snake_case)]
 
@@ -502,8 +502,8 @@ pub fn ecpvp_dsa(sha: usize,w: &[u8],f: &[u8],c: &[u8],d: &[u8]) -> isize {
 #[allow(non_snake_case)]
 pub fn ecies_encrypt(sha: usize,p1: &[u8],p2: &[u8],rng: &mut RAND,w: &[u8],m: &[u8],v: &mut [u8],t: &mut [u8]) -> Option<Vec<u8>> { 
 	let mut z:[u8;EFS]=[0;EFS];
-	let mut k1:[u8;EAS]=[0;EAS];
-	let mut k2:[u8;EAS]=[0;EAS];
+	let mut k1:[u8;ecp::AESKEY]=[0;ecp::AESKEY];
+	let mut k2:[u8;ecp::AESKEY]=[0;ecp::AESKEY];
 	let mut u:[u8;EGS]=[0;EGS];
 	let mut vz:[u8;3*EFS+1]=[0;3*EFS+1];	
 	let mut k:[u8;EFS]=[0;EFS];
@@ -515,9 +515,9 @@ pub fn ecies_encrypt(sha: usize,p1: &[u8],p2: &[u8],rng: &mut RAND,w: &[u8],m: &
 	for i in 0..EFS {vz[2*EFS+1+i]=z[i]}
 
 
-	kdf2(sha,&vz,Some(p1),EFS,&mut k);
+	kdf2(sha,&vz,Some(p1),2*ecp::AESKEY,&mut k);
 
-	for i in 0..EAS {k1[i]=k[i]; k2[i]=k[EAS+i]} 
+	for i in 0..ecp::AESKEY {k1[i]=k[i]; k2[i]=k[ecp::AESKEY+i]} 
 
 	let mut c=cbc_iv0_encrypt(&k1,m);
 
@@ -544,8 +544,8 @@ pub fn ecies_encrypt(sha: usize,p1: &[u8],p2: &[u8],rng: &mut RAND,w: &[u8],m: &
 #[allow(non_snake_case)]
 pub fn ecies_decrypt(sha: usize,p1: &[u8],p2: &[u8],v: &[u8],c: &mut Vec<u8>,t: &[u8],u: &[u8]) -> Option<Vec<u8>>  { 
 	let mut z:[u8;EFS]=[0;EFS];
-	let mut k1:[u8;EAS]=[0;EAS];
-	let mut k2:[u8;EAS]=[0;EAS];
+	let mut k1:[u8;ecp::AESKEY]=[0;ecp::AESKEY];
+	let mut k2:[u8;ecp::AESKEY]=[0;ecp::AESKEY];
 	let mut vz:[u8;3*EFS+1]=[0;3*EFS+1];	
 	let mut k:[u8;EFS]=[0;EFS];
 
@@ -558,9 +558,9 @@ pub fn ecies_decrypt(sha: usize,p1: &[u8],p2: &[u8],v: &[u8],c: &mut Vec<u8>,t: 
 	for i in 0..2*EFS+1 {vz[i]=v[i]}
 	for i in 0..EFS {vz[2*EFS+1+i]=z[i]}
 
-	kdf2(sha,&vz,Some(p1),EFS,&mut k);
+	kdf2(sha,&vz,Some(p1),2*ecp::AESKEY,&mut k);
 
-	for i in 0..EAS {k1[i]=k[i]; k2[i]=k[EAS+i]} 
+	for i in 0..ecp::AESKEY {k1[i]=k[i]; k2[i]=k[ecp::AESKEY+i]} 
 
 	let m=cbc_iv0_decrypt(&k1,&c);
 

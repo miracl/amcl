@@ -45,6 +45,9 @@ pub const CURVE_PAIRING_TYPE:usize=@PF@;
 pub const SEXTIC_TWIST:usize=@ST@;
 pub const SIGN_OF_X:usize=@SX@;
 
+pub const HASH_TYPE:usize=@HT@;
+pub const AESKEY:usize=@AK@;
+
 #[allow(non_snake_case)]
 impl ECP {
 

@@ -23,7 +23,7 @@ A bit rough-and-ready - the output might need minor syntactical corrections
 
 (MINGW build)
 
-g++ -O3 romgen.cpp big.cpp zzn.cpp ecn.cpp zzn2.cpp ecn2.cpp miracl.a -o romgen.exe
+g++ -O3 romgen.cpp big.cpp zzn.cpp ecn.cpp zzn2.cpp ecn2.cpp zzn4.cpp ecn4.cpp miracl.a -o romgen.exe
 
 
 */
@@ -33,10 +33,11 @@ g++ -O3 romgen.cpp big.cpp zzn.cpp ecn.cpp zzn2.cpp ecn2.cpp miracl.a -o romgen.
 #include "ecn.h"
 #include "zzn2.h"
 #include "ecn2.h"
+#include "ecn4.h"
 
 using namespace std;
 
-Miracl precision(20,0);
+Miracl precision(40,0);
 
 char open,close,term,el=0;
 
@@ -69,7 +70,8 @@ Big output(int chunk,int w,Big t,Big m)
 #define EDWARDS 1
 #define MONTGOMERY 2
 
-void set_frobenius_constant(ZZn2 &X)
+// set Frobenius constant - depends on embedding degree
+void set_frobenius_constant(ZZn2 &X, int ed)
 {
     Big p=get_modulus();
     switch (get_mip()->pmod8)
@@ -84,7 +86,8 @@ void set_frobenius_constant(ZZn2 &X)
          X.set((Big)2,(Big)1); // = (2+sqrt(-1))^(p-1)/2
     default: break;
     }
-    X=pow(X,(p-1)/6);
+	if (ed==12) X=pow(X,(p-1)/6);
+	if (ed==24) X=pow(X,(p-7)/12);
 }
 
 void q_power_frobenius(ECn2 &A,ZZn2 &F)
@@ -156,6 +159,8 @@ void help()
 		printf("22. FP512BN\n");
 		printf("23. BLS461\n");
 
+		printf("24. BLS24\n");
+
 		printf("\nromgen curve wordlength basebits language\n");
 		printf("where wordlength is 16, 32 or 64\n");
 		printf("basebits is less than wordlength\n\n");
@@ -188,6 +193,9 @@ int main(int argc, char **argv)
 	ZZn2 X;
 	ECn P;
 	ECn2 Q;
+	ECn4 QQ;
+	ZZn4 XA,YA;
+	ZZn2 Aa,Ab,Ba,Bb;
 	ZZn2 Xa,Ya;
 	ZZn zcru;
 	char pre0[50],pre1[50],pre2[50],pre3[50],pre4[50],pre5[50],pre6[50];
@@ -223,26 +231,26 @@ int main(int argc, char **argv)
 
 	strcpy(lg,argv[ip]);
 
-
-
 	if (chunk !=16 && chunk!=32 && chunk!=64) {help(); return 0;}
 	if (bb<0 || bb>=chunk) {help(); return 0;}
+
+// Specify curve constants
 
 	if (strcmp(curvename,"ED25519")==0)
 	{ // ED25519
 		curve=1;
 		printf("Curve= ED25519\n");
 		strcpy(fieldname,"25519");
-		mbits=255;
-		words=(1+((mbits-1)/bb));
+		mbits=255;                 // bits in modulus
+		words=(1+((mbits-1)/bb));  // words per Big
 		curvetype=EDWARDS;
 		modtype=PSEUDO_MERSENNE;
-		curve_a=-1;
-		p=pow((Big)2,mbits)-19;
-		r=pow((Big)2,252)+(char *)"27742317777372353535851937790883648493";
+		curve_a=-1;			     // Curve A parameter
+		p=pow((Big)2,mbits)-19;  // Modulus
+		r=pow((Big)2,252)+(char *)"27742317777372353535851937790883648493";   // group order
 		mip->IOBASE=16;
-		curve_b=(char *)"52036CEE2B6FFE738CC740797779E89800700A4D4141D8AB75EB4DCA135978A3";
-		gx=(char *)"216936D3CD6E53FEC0A4E231FDD6DC5C692CC7609525A7B2C9562D608F25D51A";
+		curve_b=(char *)"52036CEE2B6FFE738CC740797779E89800700A4D4141D8AB75EB4DCA135978A3";  // curve B parameter
+		gx=(char *)"216936D3CD6E53FEC0A4E231FDD6DC5C692CC7609525A7B2C9562D608F25D51A";       // generator point
 		gy=(char *)"6666666666666666666666666666666666666666666666666666666666666658";
 	}
 
@@ -555,22 +563,22 @@ int main(int argc, char **argv)
 		mip->IOBASE=16;
 		x=(char *)"4080000000000001";    // Fast but not GT_STRONG parameter
 
-		p=36*pow(x,4)-36*pow(x,3)+24*x*x-6*x+1;
+		p=36*pow(x,4)-36*pow(x,3)+24*x*x-6*x+1;  // Modulus
 		t=6*x*x+1;
-		r=p+1-t;
+		r=p+1-t;                       // Group order
 		curve_b=2;
-		gx=p-1;
+		gx=p-1;                        // generator point in G1
 		gy=1;
 		cof=1;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
-		mip->TWIST=MR_SEXTIC_D;
+		mip->TWIST=MR_SEXTIC_D;        // twist type
 
 		Xa.set((ZZn)0,(ZZn)-1);
 		Ya.set((ZZn)1,ZZn(0));
 		Q.set(Xa,Ya);
 
-		Q=(p-1+t)*Q;
-		cru=(18*pow(x,3)-18*x*x+9*x-2);
+		Q=(p-1+t)*Q;                   // generator point in G2
+		cru=(18*pow(x,3)-18*x*x+9*x-2); // cube root of unity for GLV method
 	}
 
 
@@ -622,8 +630,6 @@ int main(int argc, char **argv)
 		r=pow(x,4)-x*x+1;
 		cof=(p+1-t)/r;
 
-//	cout << "cof= " << (p+1-t)/q << endl;
-
 		gx=-2; gy=-1;
 		curve_b=9;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
@@ -633,7 +639,7 @@ int main(int argc, char **argv)
 		P*=cof;
 		P.get(gx,gy);
 
-		while (!Q.set(randn2())) ; // probably not best way to decide this
+		while (!Q.set(randn2())) ; // probably not best way to choose this
 
 		TT=t*t-2*p;
 		PP=p*p;
@@ -663,8 +669,6 @@ int main(int argc, char **argv)
 		t=-x+1;
 		r=pow(x,4)-x*x+1;
 		cof=(p+1-t)/r;
-
-//	cout << "cof= " << (p+1-t)/q << endl;
 
 		curve_b=4;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
@@ -717,8 +721,6 @@ int main(int argc, char **argv)
 		r=pow(x,4)-x*x+1;
 		cof=(p+1-t)/r;
 
-//	cout << "cof= " << (p+1-t)/q << endl;
-
 		gx=-2; gy=-1;
 		curve_b=9;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
@@ -728,7 +730,7 @@ int main(int argc, char **argv)
 		P*=cof;
 		P.get(gx,gy);
 
-		while (!Q.set(randn2())) ;  // probably not best way to decide this
+		while (!Q.set(randn2())) ;  // probably not best way to choose this
 
 		TT=t*t-2*p;
 		PP=p*p;
@@ -804,6 +806,73 @@ int main(int argc, char **argv)
 		Q=(p-1+t)*Q;
 
 		cru=p-(18*pow(x,3)+18*x*x+9*x+2);
+	}
+	if (strcmp(curvename,"BLS24")==0)
+	{
+		curve=24;
+		printf("Curve= BLS24\n");
+		strcpy(fieldname,curvename);
+
+		mbits=479;
+
+		words=(1+((mbits-1)/bb));
+		curvetype=WEIERSTRASS;
+		modtype=NOT_SPECIAL;
+		curve_a=0;
+		mip->IOBASE=16;
+
+// Note - this is GT-Strong curve
+
+		x=(char *)"100020011FF80";				// SIGN_OF_X is POSITIVE
+
+		//x=-x;
+
+		p=(1+x+x*x-pow(x,4)+2*pow(x,5)-pow(x,6)+pow(x,8)-2*pow(x,9)+pow(x,10))/3;
+		t=x+1;
+		r=pow(x,8)-pow(x,4)+1;
+		cof=(p+1-t)/r;
+
+		//x=-x;
+
+		gx=5; gy=12;
+		curve_b=19;
+		ecurve((Big)0,curve_b,p,MR_AFFINE);
+
+		mip->TWIST=MR_SEXTIC_M;
+
+		P.set(gx,gy);
+		P*=cof;
+
+		P.get(gx,gy);
+
+		Big x0=0;
+	
+		forever
+		{
+			ZZn4 X;
+			ZZn2 t;
+
+			x0+=1;
+			t.set((ZZn)0,(ZZn)x0);
+			X.set(t,(ZZn2)0);
+			if (!QQ.set(X)) continue;
+			break;
+		}
+
+		TT=t*t*t*t-4*p*t*t+2*p*p;
+		PP=pow(p,4);
+		FF=sqrt((4*PP-TT*TT)/3);
+		np=PP+1-(3*FF+TT)/2;
+
+		QQ=(np/r)*QQ;
+
+//cout << "QQ= " << QQ << endl;
+//cout << "2*QQ= " << QQ+QQ << endl;
+//cout << "3*QQ= " << (QQ+QQ)+QQ << endl;
+
+		zcru=pow((ZZn)2,(p-1)/3);
+		//zcru*=zcru;   // right cube root of unity -  not for M-TYPE
+		cru=(Big)zcru;
 	}
 
 	if (curve==0) {help(); return 0;}
@@ -1046,8 +1115,12 @@ int main(int argc, char **argv)
 
 
 	if (curve>16)
-	{
-		set_frobenius_constant(X);
+	{ // Frobenius constants -  depend on embedding degree
+		if (curve<24)
+			set_frobenius_constant(X,12);
+		else
+			set_frobenius_constant(X,24);
+
 		X.get(a,b);
 		cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
@@ -1076,10 +1149,7 @@ int main(int argc, char **argv)
 	if (curve==17 || curve==18 || curve==21 || curve==22)
 	{
 		cout << endl;
-		//set_frobenius_constant(X);
-		//X.get(a,b);
-		//cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
-		//cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
+
 		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1; output(chunk,words,x,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
@@ -1130,10 +1200,7 @@ int main(int argc, char **argv)
 	if (curve==19 || curve==20 || curve==23)
 	{
 		cout << endl;
-		//set_frobenius_constant(X);
-		//X.get(a,b);
-		//cout << pre1 << toupperit((char *)"Fra",lang) << post7; output(chunk,words,a,m); cout << term << endl;
-		//cout << pre1 << toupperit((char *)"Frb",lang) << post7; output(chunk,words,b,m); cout << term << endl;
+
 		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1 ; output(chunk,words,x,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
 		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
@@ -1186,6 +1253,77 @@ int main(int argc, char **argv)
 		cout << close << term << endl;
 
 	}
+
+
+
+	if (curve==24)
+	{
+		cout << endl;
+
+		cout << pre1 << toupperit((char *)"CURVE_Bnx",lang) << post1 ; output(chunk,words,x,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Cof",lang) << post1; output(chunk,words,cof,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Cru",lang) << post1; output(chunk,words,cru,m); cout << term << endl;
+
+		QQ.get(XA,YA);
+		XA.get(Aa,Bb);
+		Aa.get(a,b);
+		cout << pre1 << toupperit((char *)"CURVE_Pxaa",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pxab",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+		Bb.get(a,b);
+		cout << pre1 << toupperit((char *)"CURVE_Pxba",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pxbb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+
+		YA.get(Aa,Bb);
+		Aa.get(a,b);
+		cout << pre1 << toupperit((char *)"CURVE_Pyaa",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pyab",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+		Bb.get(a,b);
+		cout << pre1 << toupperit((char *)"CURVE_Pyba",lang) << post1; output(chunk,words,a,m); cout << term << endl;
+		cout << pre1 << toupperit((char *)"CURVE_Pybb",lang) << post1; output(chunk,words,b,m); cout << term << endl;
+		
+
+		QQ*=r;
+		if (!Q.iszero())
+		{
+			cout << "**** Failed ****" << endl;
+			cout << "\nQQ= " << QQ << endl << endl;
+		}
+
+		cout << pre3 << "CURVE_W" << post3 << open; output(chunk,words,(Big)0,m);cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
+		cout << pre4 << "CURVE_SB" << post4 << open; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close;cout << ","; cout << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close; cout << close << term << endl;
+
+		cout << pre5 << "CURVE_WB" << post5 << open; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); cout << ","; output(chunk,words,(Big)0,m); cout << close << term << endl;
+	
+		cout << pre6 << "CURVE_BB" << post6 << open; 
+		cout << open;
+		output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+
+		cout << ","; cout << open;output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+
+		cout << ","; cout << open; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << ","; output(chunk,words,(Big)0,m); 
+		cout << close;
+		cout << close << term << endl;
+
+	}
+
+
 
 
 }

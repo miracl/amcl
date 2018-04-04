@@ -107,8 +107,8 @@ public func TestECDH(_ rng: RAND)
     
     let EGS=ed25519.ECDH.EGS
     let EFS=ed25519.ECDH.EFS
-    let EAS=16
-    let sha=ed25519.ECDH.HASH_TYPE
+    let EAS=ed25519.ECP.AESKEY
+    let sha=ed25519.ECP.HASH_TYPE
     
     var S1=[UInt8](repeating: 0,count: EGS)
     var W0=[UInt8](repeating: 0,count: 2*EFS+1)
@@ -247,9 +247,9 @@ public func TestMPIN(_ rng: RAND)
     let EFS=bn254.MPIN.EGS
     let G1S=2*EFS+1    // Group 1 Size
     let G2S=4*EFS;     // Group 2 Size
-    let EAS=bn254.MPIN.PAS
+    let EAS=bn254.ECP.AESKEY
     
-    let sha=bn254.MPIN.HASH_TYPE
+    let sha=bn254.ECP.HASH_TYPE
     
     var S=[UInt8](repeating: 0,count: EGS)
     var SST=[UInt8](repeating: 0,count: G2S)

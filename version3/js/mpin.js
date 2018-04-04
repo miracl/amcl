@@ -37,13 +37,13 @@ var MPIN = function(ctx) {
         /* 200 for 4 digit PIN, 2000 for 6-digit PIN  - approx 2*sqrt(MAXPIN) */
         EFS: ctx.BIG.MODBYTES,
         EGS: ctx.BIG.MODBYTES,
-        PAS: 16,
+        //PAS: 16,
 
         SHA256: 32,
         SHA384: 48,
         SHA512: 64,
 
-        HASH_TYPE: 32,
+        //HASH_TYPE: 32,
 
         /* return time in slots since epoch */
         today: function() {
@@ -139,7 +139,7 @@ var MPIN = function(ctx) {
             }
 
             R = [];
-            for (i = 0; i < this.PAS; i++) {
+            for (i = 0; i < ctx.ECP.AESKEY; i++) {
                 R[i] = h[i];
             }
 
@@ -965,7 +965,7 @@ var MPIN = function(ctx) {
 
             t = this.mpin_hash(sha, c, W);
 
-            for (i = 0; i < this.PAS; i++) {
+            for (i = 0; i < ctx.ECP.AESKEY; i++) {
                 CK[i] = t[i];
             }
 
@@ -1018,7 +1018,7 @@ var MPIN = function(ctx) {
 
             t = this.mpin_hash(sha, c, U);
 
-            for (i = 0; i < this.PAS; i++) {
+            for (i = 0; i < ctx.ECP.AESKEY; i++) {
                 SK[i] = t[i];
             }
 

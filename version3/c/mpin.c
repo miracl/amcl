@@ -73,7 +73,7 @@ static void mpin_hash(int sha,FP4_YYY *f, ECP_ZZZ *P,octet *w)
         break;
     }
 
-    OCT_jbytes(w,h,PAS_ZZZ);
+    OCT_jbytes(w,h,AESKEY_ZZZ);
     for (i=0; i<hlen; i++) h[i]=0;
 }
 

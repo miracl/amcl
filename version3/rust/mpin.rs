@@ -20,6 +20,7 @@ under the License.
 use std::time::{SystemTime};
 use std::time::UNIX_EPOCH;
 
+use xxx::ecp;
 use xxx::ecp::ECP;
 use xxx::fp2::FP2;
 use xxx::ecp2::ECP2;
@@ -42,7 +43,7 @@ use hash512::HASH512;
 
 pub const EFS: usize=big::MODBYTES as usize;
 pub const EGS: usize=big::MODBYTES as usize;
-pub const PAS: usize=16;
+//pub const PAS: usize=16;
 pub const BAD_PARAMS: isize=-11;
 pub const INVALID_POINT: isize=-14;
 pub const WRONG_ORDER: isize=-18;
@@ -58,7 +59,7 @@ pub const PBLEN: i32=14;      /* Number of bits in PIN */
 pub const TS: usize=10;         /* 10 for 4 digit PIN, 14 for 6-digit PIN - 2^TS/TS approx = sqrt(MAXPIN) */
 pub const TRAP:usize=200;      /* 200 for 4 digit PIN, 2000 for 6-digit PIN  - approx 2*sqrt(MAXPIN) */
 
-pub const HASH_TYPE: usize=SHA256;
+//pub const HASH_TYPE: usize=SHA256;
 
 #[allow(non_snake_case)]
 fn hash(sha: usize,c: &mut FP4,U: &mut ECP,r: &mut [u8]) -> bool {
@@ -77,21 +78,21 @@ fn hash(sha: usize,c: &mut FP4,U: &mut ECP,r: &mut [u8]) -> bool {
 		let mut h=HASH256::new();
 		h.process_array(&t);
 		let sh=h.hash();
-		for i in 0..PAS {r[i]=sh[i]}	
+		for i in 0..ecp::AESKEY {r[i]=sh[i]}	
 		return true;	
 	}
 	if sha==SHA384 {
 		let mut h=HASH384::new();
 		h.process_array(&t);
 		let sh=h.hash();
-		for i in 0..PAS {r[i]=sh[i]}		
+		for i in 0..ecp::AESKEY {r[i]=sh[i]}		
 		return true;
 	}
 	if sha==SHA512 {
 		let mut h=HASH512::new();
 		h.process_array(&t);
 		let sh=h.hash();
-		for i in 0..PAS {r[i]=sh[i]}
+		for i in 0..ecp::AESKEY {r[i]=sh[i]}
 		return true;		
 	}
 	return false;

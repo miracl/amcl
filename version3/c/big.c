@@ -1392,23 +1392,23 @@ void BIG_XXX_invmodp(BIG_XXX r,BIG_XXX a,BIG_XXX p)
     {
         while (BIG_XXX_parity(u)==0)
         {
-            BIG_XXX_shr(u,1);
+            BIG_XXX_fshr(u,1);
             if (BIG_XXX_parity(x1)!=0)
             {
                 BIG_XXX_add(x1,p,x1);
                 BIG_XXX_norm(x1);
             }
-            BIG_XXX_shr(x1,1);
+            BIG_XXX_fshr(x1,1);
         }
         while (BIG_XXX_parity(v)==0)
         {
-            BIG_XXX_shr(v,1);
+            BIG_XXX_fshr(v,1);
             if (BIG_XXX_parity(x2)!=0)
             {
                 BIG_XXX_add(x2,p,x2);
                 BIG_XXX_norm(x2);
             }
-            BIG_XXX_shr(x2,1);
+            BIG_XXX_fshr(x2,1);
         }
         if (BIG_XXX_comp(u,v)>=0)
         {

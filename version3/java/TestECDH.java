@@ -53,7 +53,7 @@ public class TestECDH extends TestCase   //
 		int EGS=ECDH.EGS;
 		int EFS=ECDH.EFS;
 		int EAS=AES.KS;
-		int sha=ECDH.HASH_TYPE;
+		int sha=ECP.HASH_TYPE;
 
 		byte[] S1=new byte[EGS];
 		byte[] W0=new byte[2*EFS+1];
