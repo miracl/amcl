@@ -2,6 +2,7 @@
 #define FP4_YYY_H
 
 #include "fp2_YYY.h"
+#include "config_curve_ZZZ.h"
 
 using namespace amcl;
 
@@ -225,6 +226,34 @@ extern void FP4_xtr_pow(FP4 *r,FP4 *x,XXX::BIG b);
 	@param b BIG number
  */
 extern void FP4_xtr_pow2(FP4 *r,FP4 *c,FP4 *d,FP4 *e,FP4 *f,XXX::BIG a,XXX::BIG b);
+
+
+/**	@brief Calculate square root of an FP4
+ *
+	Square root
+	@param r FP4 instance, on exit = sqrt(x)
+	@param x FP4 instance
+	@return 1 x is a QR, otherwise 0
+ */
+extern int  FP4_sqrt(FP4 *r,FP4 *x);
+
+
+/**	@brief Conditional copy of FP4 number
+ *
+	Conditionally copies second parameter to the first (without branching)
+	@param x FP4 instance, set to y if s!=0
+	@param y another FP4 instance
+	@param s copy only takes place if not equal to 0
+ */
+extern void FP4_cmove(FP4 *x,FP4 *y,int s);
+
+
+/**	@brief Divide FP4 number by QNR
+ *
+	Divide FP4 by the QNR
+	@param x FP4 instance
+ */
+extern void FP4_div_i(FP4 *x);
 
 }
 

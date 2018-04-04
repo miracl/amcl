@@ -28,6 +28,19 @@ extern const XXX::BIG CURVE_Pxb; /**< imaginary part of x-coordinate of generato
 extern const XXX::BIG CURVE_Pya; /**< real part of y-coordinate of generator point in group G2 */
 extern const XXX::BIG CURVE_Pyb; /**< imaginary part of y-coordinate of generator point in group G2 */
 
+/*** needed for BLS24 curves ***/
+
+extern const XXX::BIG CURVE_Pxaa; /**< real part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxab; /**< imaginary part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxba; /**< real part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxbb; /**< imaginary part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pyaa; /**< real part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pyab; /**< imaginary part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pyba; /**< real part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pybb; /**< imaginary part of y-coordinate of generator point in group G2 */
+
+
+
 extern const XXX::BIG CURVE_Bnx; /**< BN curve x parameter */
 
 extern const XXX::BIG CURVE_Cru; /**< BN curve Cube Root of Unity */

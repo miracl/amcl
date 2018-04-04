@@ -313,7 +313,7 @@ void ZZZ::ECP_ECIES_ENCRYPT(int sha,octet *P1,octet *P2,csprng *RNG,octet *W,oct
 {
 
     int i,len;
-    char z[EFS_ZZZ],vz[3*EFS_ZZZ+1],k[2*EAS_ZZZ],k1[EAS_ZZZ],k2[EAS_ZZZ],l2[8],u[EFS_ZZZ];
+    char z[EFS_ZZZ],vz[3*EFS_ZZZ+1],k[2*AESKEY_ZZZ],k1[AESKEY_ZZZ],k2[AESKEY_ZZZ],l2[8],u[EFS_ZZZ];
     octet Z= {0,sizeof(z),z};
     octet VZ= {0,sizeof(vz),vz};
     octet K= {0,sizeof(k),k};
@@ -328,13 +328,13 @@ void ZZZ::ECP_ECIES_ENCRYPT(int sha,octet *P1,octet *P2,csprng *RNG,octet *W,oct
     OCT_copy(&VZ,V);
     OCT_joctet(&VZ,&Z);
 
-    KDF2(sha,&VZ,P1,2*EAS_ZZZ,&K);
+    KDF2(sha,&VZ,P1,2*AESKEY_ZZZ,&K);
 
-    K1.len=K2.len=EAS_ZZZ;
-    for (i=0; i<EAS_ZZZ; i++)
+    K1.len=K2.len=AESKEY_ZZZ;
+    for (i=0; i<AESKEY_ZZZ; i++)
     {
         K1.val[i]=K.val[i];
-        K2.val[i]=K.val[EAS_ZZZ+i];
+        K2.val[i]=K.val[AESKEY_ZZZ+i];
     }
 
     AES_CBC_IV0_ENCRYPT(&K1,M,C);
@@ -353,7 +353,7 @@ int ZZZ::ECP_ECIES_DECRYPT(int sha,octet *P1,octet *P2,octet *V,octet *C,octet *
 {
 
     int i,len;
-    char z[EFS_ZZZ],vz[3*EFS_ZZZ+1],k[2*EAS_ZZZ],k1[EAS_ZZZ],k2[EAS_ZZZ],l2[8],tag[32];
+    char z[EFS_ZZZ],vz[3*EFS_ZZZ+1],k[2*AESKEY_ZZZ],k1[AESKEY_ZZZ],k2[AESKEY_ZZZ],l2[8],tag[32];
     octet Z= {0,sizeof(z),z};
     octet VZ= {0,sizeof(vz),vz};
     octet K= {0,sizeof(k),k};
@@ -367,13 +367,13 @@ int ZZZ::ECP_ECIES_DECRYPT(int sha,octet *P1,octet *P2,octet *V,octet *C,octet *
     OCT_copy(&VZ,V);
     OCT_joctet(&VZ,&Z);
 
-    KDF2(sha,&VZ,P1,EFS_ZZZ,&K);
+    KDF2(sha,&VZ,P1,2*AESKEY_ZZZ,&K);
 
-    K1.len=K2.len=EAS_ZZZ;
-    for (i=0; i<EAS_ZZZ; i++)
+    K1.len=K2.len=AESKEY_ZZZ;
+    for (i=0; i<AESKEY_ZZZ; i++)
     {
         K1.val[i]=K.val[i];
-        K2.val[i]=K.val[EAS_ZZZ+i];
+        K2.val[i]=K.val[AESKEY_ZZZ+i];
     }
 
     if (!AES_CBC_IV0_DECRYPT(&K1,C,M)) return 0;

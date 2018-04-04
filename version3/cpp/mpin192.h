@@ -32,7 +32,7 @@ under the License.
 #ifndef MPIN_ZZZ_H
 #define MPIN_ZZZ_H
 
-#include "pair_ZZZ.h"
+#include "pair192_ZZZ.h"
 #include "pbc_support.h"
 
 using namespace amcl;
@@ -52,8 +52,8 @@ namespace ZZZ {
 #define MAXPIN 10000         /**< max PIN */
 #define PBLEN 14             /**< max length of PIN in bits */
 
-//#define PAS_ZZZ 16        /**< MPIN Symmetric Key Size 128 bits */
-//#define HASH_TYPE_MPIN_ZZZ SHA256   /**< Choose Hash function */
+//#define PAS_ZZZ 24        /**< MPIN Symmetric Key Size 192 bits  */
+//#define HASH_TYPE_MPIN_ZZZ SHA384   /**< Choose Hash function */
 
 /* MPIN support functions */
 

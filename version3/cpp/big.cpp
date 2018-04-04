@@ -1365,23 +1365,23 @@ void XXX::BIG_invmodp(BIG r,BIG a,BIG p)
     {
         while (BIG_parity(u)==0)
         {
-            BIG_shr(u,1);
+            BIG_fshr(u,1);
             if (BIG_parity(x1)!=0)
             {
                 BIG_add(x1,p,x1);
                 BIG_norm(x1);
             }
-            BIG_shr(x1,1);
+            BIG_fshr(x1,1);
         }
         while (BIG_parity(v)==0)
         {
-            BIG_shr(v,1);
+            BIG_fshr(v,1);
             if (BIG_parity(x2)!=0)
             {
                 BIG_add(x2,p,x2);
                 BIG_norm(x2);
             }
-            BIG_shr(x2,1);
+            BIG_fshr(x2,1);
         }
         if (BIG_comp(u,v)>=0)
         {
