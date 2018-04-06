@@ -143,10 +143,12 @@ extern void FP24_pow8(FP24 *r,FP24 *x,XXX::BIG *b);
 
 /**	@brief Raises an FP24 to the power of the internal modulus p, using the Frobenius
  *
-	@param x FP24 instance, on exit = x^p
+	@param x FP24 instance, on exit = x^p^n
 	@param f FP2 precalculated Frobenius constant
+	@param n power of p
  */
-extern void FP24_frob(FP24 *x,FP2 *f);
+extern void FP24_frob(FP24 *x,FP2 *f,int n);
+
 /**	@brief Reduces all components of possibly unreduced FP24 mod Modulus
  *
 	@param x FP24 instance, on exit reduced mod Modulus

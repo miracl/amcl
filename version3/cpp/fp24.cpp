@@ -431,7 +431,7 @@ void YYY::FP24_compow(FP8 *c,FP24 *x,BIG e,BIG r)
 		return;
 	}
 
-    FP24_frob(&g2,&f);
+    FP24_frob(&g2,&f,1);
     FP24_trace(&cp,&g2);
     FP24_conj(&g1,&g1);
     FP24_mul(&g2,&g1);
@@ -474,8 +474,6 @@ void YYY::FP24_pow(FP24 *r,FP24 *a,BIG b)
 
 	FP24_copy(r,&w);
 	FP24_reduce(r);
-
-
 }
 
 
@@ -513,7 +511,7 @@ void YYY::FP24_ppow(FP24 *r,FP24 *a,BIG b)
     FP24_reduce(r);
 }  */
 
-/* p=q0^u0.q1^u1.q2^u2.q3^u3 */
+/* p=q0^u0.q1^u1.q2^u2.q3^u3... */
 /* Timing attack secure, but not cache attack secure */
 
 void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
@@ -523,6 +521,12 @@ void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
     BIG t[8],mt;
     sign8 w[NLEN_XXX*BASEBITS_XXX+1];
     sign8 z[NLEN_XXX*BASEBITS_XXX+1];
+    FP fx,fy;
+	FP2 X;
+
+    FP_rcopy(&fx,Fra);
+    FP_rcopy(&fy,Frb);
+    FP2_from_FPs(&X,&fx,&fy);
 
     for (i=0; i<8; i++)
         BIG_copy(t[i],u[i]);
@@ -555,34 +559,14 @@ void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
     FP24_mul(&g[4],&s[0]);
     FP24_mul(&g[7],&s[1]);
 
+// Use Frobenius
 
-    FP24_copy(&f[0],&q[4]);
-    FP24_conj(&s[0],&q[5]);
-    FP24_mul(&f[0],&s[0]);  /* P/Q */
-    FP24_copy(&f[1],&f[0]);
-    FP24_copy(&f[2],&f[0]);
-    FP24_copy(&f[3],&f[0]);
-    FP24_copy(&f[4],&q[4]);
-    FP24_mul(&f[4],&q[5]);  /* P*Q */
-    FP24_copy(&f[5],&f[4]);
-    FP24_copy(&f[6],&f[4]);
-    FP24_copy(&f[7],&f[4]);
+	for (i=0;i<8;i++)
+	{
+		FP24_copy(&f[i],&g[i]);
+		FP24_frob(&f[i],&X,4);
+	}
 
-    FP24_copy(&s[1],&q[6]);
-    FP24_conj(&s[0],&q[7]);
-    FP24_mul(&s[1],&s[0]);       /* R/S */
-    FP24_conj(&s[0],&s[1]);
-    FP24_mul(&f[1],&s[0]);
-    FP24_mul(&f[2],&s[1]);
-    FP24_mul(&f[5],&s[0]);
-    FP24_mul(&f[6],&s[1]);
-    FP24_copy(&s[1],&q[6]);
-    FP24_mul(&s[1],&q[7]);      /* R*S */
-    FP24_conj(&s[0],&s[1]);
-    FP24_mul(&f[0],&s[0]);
-    FP24_mul(&f[3],&s[1]);
-    FP24_mul(&f[4],&s[0]);
-    FP24_mul(&f[7],&s[1]);
 
     /* if power is even add 1 to power, and add q to correction */
     FP24_one(&c);
@@ -660,30 +644,32 @@ void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
 
 /* Set w=w^p using Frobenius */
 /* SU= 160 */
-void YYY::FP24_frob(FP24 *w,FP2 *f)
+void YYY::FP24_frob(FP24 *w,FP2 *f,int n)
 {
-	FP4 X;
-    FP2 f2,f3;
-    FP2_sqr(&f2,f);     /* f2=f^2 */
-    FP2_mul(&f3,&f2,f); /* f3=f^3 */
+	int i;
+	FP4 X2,X4;
+    FP2 f3;				// f=(1+i)^(p-7)/12
+    FP2_sqr(&f3,f);     // 
+    FP2_mul(&f3,&f3,f); // f3=f^3=(1+i)^(p-7)/4
 
-	FP2_mul_ip(&f3);
+	FP4_from_FP2(&X2,f);
+	FP4_times_i(&X2);	// (1+i)^6/12.(1+i)^(p-7)/12 = (1+i)^(p-1)/12
+	FP4_sqr(&X4,&X2);  // (1+i)^(p-1)/6
+
+	FP2_mul_ip(&f3);    // f3 = (1+i).f3 = (1+i)^(p-3)/4 
 	FP2_norm(&f3);
-//printf("In here 1\n");
-    FP8_frob(&(w->a),&f3);
-    FP8_frob(&(w->b),&f3);
-    FP8_frob(&(w->c),&f3);
-//printf("In here 2\n");
-	FP4_from_FP2(&X,f);
-    FP8_pmul(&(w->b),&(w->b),&X);
 
-	FP8_times_i2(&(w->b));
-    
-	FP4_from_FP2(&X,&f2);
-	FP8_pmul(&(w->c),&(w->c),&X);
+	for (i=0;i<n;i++)
+	{
 	
-	FP8_times_i2(&(w->c));
-	FP8_times_i2(&(w->c));
+		FP8_frob(&(w->a),&f3);   // a=a^p
+		FP8_frob(&(w->b),&f3);   // b=b^p
+		FP8_frob(&(w->c),&f3);   // c=c^p
+  
+		FP8_pmul(&(w->b),&(w->b),&X2);  //b=(1+i)^(p-1)/12.b^p
+		FP8_pmul(&(w->c),&(w->c),&X4);  //c=(1+i)^(p-1)/6.b^p
+
+	}
 }
 
 

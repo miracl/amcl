@@ -497,13 +497,13 @@ void ZZZ::ECP4_frob(ECP4 *P,FP2 *F,int n)
     if (P->inf) return;
 
 	ECP4_get(&X,&Y,P);		// F=(1+i)^(p-7)/12
-	FP2_sqr(&FF,F);			// FF=F^2=(1+i)^(p-7)/6
-	FP2_sqr(&W,&FF);		// W=F^4
-	FP2_mul(&W,&W,&FF);		// W=F^6 = (1+i)^(p-7)/2 
+
+	FP2_sqr(&FF,F);		// FF=F^2=(1+i)^(p-7)/6
+	FP2_copy(&W,&FF);
+	FP2_mul_ip(&W);		// W=(1+i)^6/6.(1+i)^(p-7)/6 = (1+i)^(p-1)/6
 	FP2_norm(&W);
-	FP2_mul_ip(&W); FP2_norm(&W); // W=W*(1+i)
-	FP2_mul_ip(&W); FP2_norm(&W);
-	FP2_mul_ip(&W); FP2_norm(&W); // W=W*(1+i)^3  = (1+i)^{(p-7)/2+6/2|} = (1+i)^(p-1)/2
+	FP2_sqr(&FFF,&W);
+	FP2_mul(&W,&W,&FFF);  // W=(1+i)^(p-1)/2
 
 	FP2_copy(&FFF,F);
 
@@ -513,24 +513,20 @@ void ZZZ::ECP4_frob(ECP4 *P,FP2 *F,int n)
 	FP2_sqr(&FF,&FFF);
 #endif
 
-	FP2_mul(&FFF,&FFF,&FF);
+
+	FP2_mul_ip(&FF);		// FF=(1+i)^(p-7)/6.(1+i) = (1+i)^(p-1)/6
+	FP2_norm(&FF);
+	FP2_mul(&FFF,&FFF,&FF);  // FFF = (1+i)^(p-7)/12 . (1+i)^(p-1)/6 = (1+i)^(p-3)/4
+
 
 	for (i=0;i<n;i++)
 	{
 		FP4_frob(&X,&W);		// X^p
-		FP4_pmul(&X,&X,&FF);	// X^p.(1+i)^(p-7)/6
-		//FP4_norm(&X);
-		FP4_times_i(&X); 
-		FP4_times_i(&X);		// X^p.(1+i)^(p-7)/6.(1+i) = X^p.(1+i)^(p-1)/6
+		FP4_pmul(&X,&X,&FF);	// X^p.(1+i)^(p-1)/6
 		
 		FP4_frob(&Y,&W);		// Y^p
-		FP4_pmul(&Y,&Y,&FFF);	
-		//FP4_pmul(&Y,&Y,&FFF);		// Y^p.(1+i)^(p-7)/4
-		//FP4_norm(&Y);
-		FP4_times_i(&Y);		
-		FP4_times_i(&Y); 
-		FP4_times_i(&Y);		// Y.p.(1+i)^(p-7)/4.(1+i)^(6/4) = Y^p.(1+i)^(p-1)/4
-		
+		FP4_pmul(&Y,&Y,&FFF);
+		FP4_times_i(&Y);		// Y.p.(1+i)^(p-3)/4.(1+i)^(2/4) = Y^p.(1+i)^(p-1)/4
 	}
 
 	ECP4_set(P,&X,&Y);
@@ -543,6 +539,12 @@ void ZZZ::ECP4_mul8(ECP4 *P,ECP4 Q[8],BIG u[8])
     BIG mt,t[8];
     sign8 w[NLEN_XXX*BASEBITS_XXX+1];
     sign8 z[NLEN_XXX*BASEBITS_XXX+1];
+    FP fx,fy;
+	FP2 X;
+
+    FP_rcopy(&fx,Fra);
+    FP_rcopy(&fy,Frb);
+    FP2_from_FPs(&X,&fx,&fy);
 
 
     for (i=0; i<8; i++)
@@ -577,32 +579,13 @@ void ZZZ::ECP4_mul8(ECP4 *P,ECP4 Q[8],BIG u[8])
     ECP4_add(&W[7],&T);
 
 
-/* 12 add/subs */
+/* 12 Use Frobenius */
 
-    ECP4_copy(&Z[0],&Q[4]);
-    ECP4_sub(&Z[0],&Q[5]);  /* P-Q */
-    ECP4_copy(&Z[1],&Z[0]);
-    ECP4_copy(&Z[2],&Z[0]);
-    ECP4_copy(&Z[3],&Z[0]);
-    ECP4_copy(&Z[4],&Q[4]);
-    ECP4_add(&Z[4],&Q[5]);  /* P+Q */
-    ECP4_copy(&Z[5],&Z[4]);
-    ECP4_copy(&Z[6],&Z[4]);
-    ECP4_copy(&Z[7],&Z[4]);
-
-    ECP4_copy(&T,&Q[6]);
-    ECP4_sub(&T,&Q[7]);       /* R-S */
-    ECP4_sub(&Z[1],&T);
-    ECP4_add(&Z[2],&T);
-    ECP4_sub(&Z[5],&T);
-    ECP4_add(&Z[6],&T);
-    ECP4_copy(&T,&Q[6]);
-    ECP4_add(&T,&Q[7]);      /* R+S */
-    ECP4_sub(&Z[0],&T);
-    ECP4_add(&Z[3],&T);
-    ECP4_sub(&Z[4],&T);
-    ECP4_add(&Z[7],&T);
-
+	for (i=0;i<8;i++)
+	{
+		ECP4_copy(&Z[i],&W[i]);
+		ECP4_frob(&Z[i],&X,4);
+	}
 
     /* if multiplier is even add 1 to multiplier, and add P to correction */
     ECP4_inf(&C);

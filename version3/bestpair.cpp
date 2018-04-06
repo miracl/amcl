@@ -7,7 +7,7 @@
 //
 // Note that finding curves that are both GT and G2 Strong, can take a while
 //
-// SUggestions:-
+// Suggestions:-
 // For AES-128 security: bestpair BLS12 64 3
 // For AES-192 security: bestpair BLS24 48 4
 // FOr AES-256 security: bestpair BLS48 32 4
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 
 	argc--; argv++;
 
-    if (argc<1)
+    if (argc<2)
     {
        cout << "Missing arguments" << endl;
 	   cout << "Program to find best pairing-friendly curves" << endl;
