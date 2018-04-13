@@ -661,14 +661,12 @@ void YYY::FP24_frob(FP24 *w,FP2 *f,int n)
 
 	for (i=0;i<n;i++)
 	{
-	
 		FP8_frob(&(w->a),&f3);   // a=a^p
 		FP8_frob(&(w->b),&f3);   // b=b^p
 		FP8_frob(&(w->c),&f3);   // c=c^p
   
 		FP8_pmul(&(w->b),&(w->b),&X2);  //b=(1+i)^(p-1)/12.b^p
 		FP8_pmul(&(w->c),&(w->c),&X4);  //c=(1+i)^(p-1)/6.b^p
-
 	}
 }
 

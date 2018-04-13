@@ -93,7 +93,6 @@ static void ECP4_select(ZZZ::ECP4 *P,ZZZ::ECP4 W[],sign32 b)
 /* SU= 312 */
 int ZZZ::ECP4_equals(ECP4 *P,ECP4 *Q)
 {
-    FP2 a,b;
     if (ECP4_isinf(P) && ECP4_isinf(Q)) return 1;
     if (ECP4_isinf(P) || ECP4_isinf(Q)) return 0;
 
@@ -264,8 +263,6 @@ int ZZZ::ECP4_setx(ECP4 *P,FP4 *x)
 {
     FP4 y;
     ECP4_rhs(&y,x);
-
-printf("Finding sqrt\n");
 
     if (!FP4_sqrt(&y,&y))
     {
@@ -508,25 +505,24 @@ void ZZZ::ECP4_frob(ECP4 *P,FP2 *F,int n)
 	FP2_copy(&FFF,F);
 
 #if SEXTIC_TWIST_ZZZ == M_TYPE	
-	FP2_mul_ip(&FFF);
-	FP2_inv(&FFF,&FFF);
-	FP2_sqr(&FF,&FFF);
+	FP2_mul_ip(&FFF);		// (1+i)^12/12.(1+i)^(p-7)/12 = (1+i)^(p+5)/12
+	FP2_inv(&FFF,&FFF);		// (1+i)^-(p+5)/12
+	FP2_sqr(&FF,&FFF);		// (1+i)^-(p+5)/6
 #endif
 
 
-	FP2_mul_ip(&FF);		// FF=(1+i)^(p-7)/6.(1+i) = (1+i)^(p-1)/6
+	FP2_mul_ip(&FF);		// FF=(1+i)^(p-7)/6.(1+i) = (1+i)^(p-1)/6					// (1+i)^6/6.(1+i)^-(p+5)/6 = (1+i)^-(p-1)/6
 	FP2_norm(&FF);
-	FP2_mul(&FFF,&FFF,&FF);  // FFF = (1+i)^(p-7)/12 . (1+i)^(p-1)/6 = (1+i)^(p-3)/4
-
+	FP2_mul(&FFF,&FFF,&FF);  // FFF = (1+i)^(p-7)/12 . (1+i)^(p-1)/6 = (1+i)^(p-3)/4	// (1+i)^-(p+5)/12 . (1+i)^-(p-1)/6 = (1+i)^-(p+1)/4
 
 	for (i=0;i<n;i++)
 	{
 		FP4_frob(&X,&W);		// X^p
-		FP4_pmul(&X,&X,&FF);	// X^p.(1+i)^(p-1)/6
+		FP4_pmul(&X,&X,&FF);	// X^p.(1+i)^(p-1)/6									// X^p.(1+i)^-(p-1)/6
 		
 		FP4_frob(&Y,&W);		// Y^p
 		FP4_pmul(&Y,&Y,&FFF);
-		FP4_times_i(&Y);		// Y.p.(1+i)^(p-3)/4.(1+i)^(2/4) = Y^p.(1+i)^(p-1)/4
+		FP4_times_i(&Y);		// Y.p.(1+i)^(p-3)/4.(1+i)^(2/4) = Y^p.(1+i)^(p-1)/4	// (1+i)^-(p+1)/4 .(1+i)^2/4 = Y^p.(1+i)^-(p-1)/4
 	}
 
 	ECP4_set(P,&X,&Y);
@@ -664,9 +660,9 @@ void ZZZ::ECP4_mapit(ECP4 *Q,octet *W)
     BIG_one(one);
     BIG_mod(hv,q);
 
-	printf("hv= ");
-	BIG_output(hv);
-	printf("\n");
+	//printf("hv= ");
+	//BIG_output(hv);
+	//printf("\n");
 
     for (;;)
     {
