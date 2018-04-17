@@ -26,8 +26,8 @@ or
 
 python3 config32.py
 
-Then select options 1, 3, 7, 17 and 24, which are fixed for the example 
-program. (For a 16-bit build select 1,3 and 5). Select 0 then to exit.
+Then select options 1, 3, 7, 17, 19, 24, 25 and 26, which are fixed for the example 
+program. (For a 16-bit build select 1,4 and 6). Select 0 then to exit.
 
 Then compile
 

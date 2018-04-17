@@ -39,6 +39,26 @@ extern const XXX::BIG CURVE_Pyab; /**< imaginary part of y-coordinate of generat
 extern const XXX::BIG CURVE_Pyba; /**< real part of y-coordinate of generator point in group G2 */
 extern const XXX::BIG CURVE_Pybb; /**< imaginary part of y-coordinate of generator point in group G2 */
 
+/*** needed for BLS48 curves ***/
+
+extern const XXX::BIG CURVE_Pxaaa; /**< real part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxaab; /**< imaginary part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxaba; /**< real part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxabb; /**< imaginary part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxbaa; /**< real part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxbab; /**< imaginary part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxbba; /**< real part of x-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pxbbb; /**< imaginary part of x-coordinate of generator point in group G2 */
+
+extern const XXX::BIG CURVE_Pyaaa; /**< real part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pyaab; /**< imaginary part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pyaba; /**< real part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pyabb; /**< imaginary part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pybaa; /**< real part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pybab; /**< imaginary part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pybba; /**< real part of y-coordinate of generator point in group G2 */
+extern const XXX::BIG CURVE_Pybbb; /**< imaginary part of y-coordinate of generator point in group G2 */
+
 
 
 extern const XXX::BIG CURVE_Bnx; /**< BN curve x parameter */

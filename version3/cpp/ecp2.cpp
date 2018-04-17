@@ -626,7 +626,7 @@ void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
     ECP2_sub(&W[4],&T);
     ECP2_add(&W[7],&T);
 
-    /* if multiplier is even add 1 to multiplier, and add P to correction */
+    /* if a multiplier u[i] is even add 1 to multiplier, and add Q[i] to correction */
     ECP2_inf(&C);
 
     BIG_zero(mt);

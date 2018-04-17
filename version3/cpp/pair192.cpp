@@ -220,10 +220,7 @@ void ZZZ::PAIR_fexp(FP24 *r)
     FP24_mul(r,&t0);
     FP24_copy(&t0,r);
 
-    FP24_frob(r,&X);
-    FP24_frob(r,&X);
-    FP24_frob(r,&X);
-    FP24_frob(r,&X);
+    FP24_frob(r,&X,4);
 
     FP24_mul(r,&t0);
 
@@ -254,8 +251,8 @@ void ZZZ::PAIR_fexp(FP24 *r)
 	FP24_conj(&t5,&t5);
 #endif
 
-	FP24_frob(&t3,&X); FP24_frob(&t3,&X); FP24_frob(&t3,&X); FP24_frob(&t3,&X); FP24_frob(&t3,&X); FP24_frob(&t3,&X); 
-	FP24_frob(&t4,&X); FP24_frob(&t4,&X); FP24_frob(&t4,&X); FP24_frob(&t4,&X); FP24_frob(&t4,&X); 
+	FP24_frob(&t3,&X,6);
+	FP24_frob(&t4,&X,5);
 
 	FP24_mul(&t3,&t4);		// t3=t3.t4
 
@@ -266,7 +263,7 @@ void ZZZ::PAIR_fexp(FP24 *r)
 #endif
 
 
-	FP24_frob(&t5,&X); FP24_frob(&t5,&X); FP24_frob(&t5,&X); FP24_frob(&t5,&X); // ??
+	FP24_frob(&t5,&X,4); 
 	FP24_mul(&t3,&t5); // ??
 
 
@@ -274,7 +271,7 @@ void ZZZ::PAIR_fexp(FP24 *r)
 	FP24_mul(&t6,&t0);		// t6=t6*t0
 
 	FP24_copy(&t5,&t6);
-	FP24_frob(&t5,&X); FP24_frob(&t5,&X); FP24_frob(&t5,&X); 
+	FP24_frob(&t5,&X,3); 
 
 	FP24_mul(&t3,&t5);		// t3=t3*t5
 	FP24_pow(&t5,&t6,x);	// t5=t6^x
@@ -285,10 +282,10 @@ void ZZZ::PAIR_fexp(FP24 *r)
 #endif
 
 	FP24_copy(&t0,&t5);	
-	FP24_frob(&t0,&X); FP24_frob(&t0,&X);  
+	FP24_frob(&t0,&X,2); 
 	FP24_mul(&t3,&t0);		// t3=t3*t0
 	FP24_copy(&t0,&t6);     // 
-	FP24_frob(&t0,&X);
+	FP24_frob(&t0,&X,1);
 
 	FP24_mul(&t3,&t0);		// t3=t3*t0
 	FP24_pow(&t5,&t6,x);    // t5=t6*x
@@ -297,7 +294,7 @@ void ZZZ::PAIR_fexp(FP24 *r)
 	FP24_conj(&t5,&t5);
 #endif
 
-	FP24_frob(&t2,&X); FP24_frob(&t2,&X); FP24_frob(&t2,&X); FP24_frob(&t2,&X); FP24_frob(&t2,&X); FP24_frob(&t2,&X); FP24_frob(&t2,&X); 
+	FP24_frob(&t2,&X,7); 
 
 	FP24_mul(&t5,&t7);		// t5=t5*t7
 	FP24_mul(&t3,&t2);		// t3=t3*t2
@@ -463,7 +460,7 @@ void ZZZ::PAIR_G2mul(ECP4 *P,BIG e)
     ECP4_mul8(P,Q,u);
 
 #else
-    ECP4_mu8(P,e);
+    ECP4_mul(P,e);
 #endif
 }
 
@@ -489,7 +486,7 @@ void ZZZ::PAIR_GTpow(FP24 *f,BIG e)
     for (i=1; i<8; i++)
     {
         FP24_copy(&g[i],&g[i-1]);
-        FP24_frob(&g[i],&X);
+        FP24_frob(&g[i],&X,1);
     }
 
     for (i=0; i<8; i++)

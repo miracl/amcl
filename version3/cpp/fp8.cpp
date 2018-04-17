@@ -170,6 +170,14 @@ void YYY::FP8_pmul(FP8 *w,FP8 *x,FP4 *s)
     FP4_mul(&(w->b),&(x->b),s);
 }
 
+/* Set w=s*x, where s is FP2 */
+void YYY::FP8_qmul(FP8 *w,FP8 *x,FP2 *s)
+{
+    FP4_pmul(&(w->a),&(x->a),s);
+    FP4_pmul(&(w->b),&(x->b),s);
+}
+
+
 /* Set w=s*x, where s is int */
 void YYY::FP8_imul(FP8 *w,FP8 *x,int s)
 {
@@ -297,17 +305,17 @@ void YYY::FP8_times_i2(FP8 *w)
 
 /* Set w=w^p using Frobenius */
 void YYY::FP8_frob(FP8 *w,FP2 *f)
-{
+{ // f=(i+1)^(p-3)/4
 	FP2 ff;
-	FP2_sqr(&ff,f);
-	FP2_mul_ip(&ff);
+	FP2_sqr(&ff,f);  // (i+1)^(p-3)/2
+	FP2_mul_ip(&ff); // (i+1)^(p-1)/2
 	FP2_norm(&ff);
 //printf("in in here 1\n");
 	FP4_frob(&(w->a),&ff);
 	FP4_frob(&(w->b),&ff);
 //printf("in in here 2\n");
-	FP4_pmul(&(w->b),&(w->b),f);
-	FP4_times_i(&(w->b));
+	FP4_pmul(&(w->b),&(w->b),f);  // times (1+i)^(p-3)/4
+	FP4_times_i(&(w->b));		// (i+1)^(p-1)/4
 }
 
 /* Set r=a^b mod m */
@@ -555,6 +563,100 @@ void YYY::FP8_xtr_pow2(FP8 *r,FP8 *ck,FP8 *cl,FP8 *ckml,FP8 *ckm2l,BIG a,BIG b)
     FP8_xtr_A(r,&cu,&cv,&cumv,&cum2v);
     for (i=0; i<f2; i++)	FP8_xtr_D(r,r);
     FP8_xtr_pow(r,r,d);
+}
+
+#endif
+
+
+/* New stuff for ECp8 support */
+
+#if CURVE_SECURITY_ZZZ == 256
+
+/* sqrt(a+xb) = sqrt((a+sqrt(a*a-n*b*b))/2)+x.b/(2*sqrt((a+sqrt(a*a-n*b*b))/2)) */
+/* returns true if x is QR */
+int YYY::FP8_sqrt(FP8 *r,FP8* x)
+{
+	FP4 a,s,t;
+
+	FP8_copy(r,x);
+	if (FP8_iszilch(x))
+		return 1;
+	
+	FP4_copy(&a,&(x->a));
+	FP4_copy(&s,&(x->b));
+
+	if (FP4_iszilch(&s))
+	{
+		if (FP4_sqrt(&t,&a))
+		{
+			FP8_from_FP4(r,&t);
+		}
+		else
+		{
+			FP4_div_i(&a);
+			FP4_sqrt(&t,&a);
+			FP8_from_FP4H(r,&t);
+		}
+		return 1;
+	}
+
+	FP4_sqr(&s,&s);  // s*=s
+	FP4_sqr(&a,&a);  // a*=a
+	FP4_times_i(&s);
+	FP4_norm(&s);
+	FP4_sub(&a,&a,&s); // a-=txx(s)
+
+	if (!FP4_sqrt(&s,&a)) return 0;
+
+	FP4_sqr(&t,&s);
+
+
+	FP4_copy(&t,&(x->a));
+	FP4_add(&a,&t,&s);
+	FP4_norm(&a);
+	FP4_div2(&a,&a);
+
+	if (!FP4_sqrt(&a,&a))
+	{
+		FP4_sub(&a,&t,&s);
+		FP4_norm(&a);
+		FP4_div2(&a,&a);
+		if (!FP4_sqrt(&a,&a)) return 0;
+	}
+
+	FP4_copy(&t,&(x->b));
+	FP4_add(&s,&a,&a);
+	FP4_inv(&s,&s);
+
+	FP4_mul(&t,&t,&s);
+	FP8_from_FP4s(r,&a,&t);
+
+	return 1;
+
+}
+
+
+/* Move b to a if d=1 */
+void YYY::FP8_cmove(FP8 *f,FP8 *g,int d)
+{
+    FP4_cmove(&(f->a),&(g->a),d);
+    FP4_cmove(&(f->b),&(g->b),d);
+}
+
+void YYY::FP8_div_i(FP8 *f)
+{
+	FP4 u,v;
+	FP4_copy(&u,&(f->a));
+	FP4_copy(&v,&(f->b));
+	FP4_div_i(&u);
+	FP4_copy(&(f->a),&v);
+	FP4_copy(&(f->b),&u);
+}
+
+void YYY::FP8_div_i2(FP8 *f)
+{
+	FP4_div_i(&(f->a));
+	FP4_div_i(&(f->b));
 }
 
 #endif

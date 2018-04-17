@@ -648,14 +648,15 @@ void YYY::FP24_frob(FP24 *w,FP2 *f,int n)
 {
 	int i;
 	FP4 X2,X4;
-    FP2 f3;				// f=(1+i)^(p-7)/12
-    FP2_sqr(&f3,f);     // 
-    FP2_mul(&f3,&f3,f); // f3=f^3=(1+i)^(p-7)/4
+    FP2 f3,f2;				// f=(1+i)^(p-7)/12
+    FP2_sqr(&f2,f);     // 
+    FP2_mul(&f3,&f2,f); // f3=f^3=(1+i)^(p-7)/4
 
+/*
 	FP4_from_FP2(&X2,f);
 	FP4_times_i(&X2);	// (1+i)^6/12.(1+i)^(p-7)/12 = (1+i)^(p-1)/12
 	FP4_sqr(&X4,&X2);  // (1+i)^(p-1)/6
-
+*/
 	FP2_mul_ip(&f3);    // f3 = (1+i).f3 = (1+i)^(p-3)/4 
 	FP2_norm(&f3);
 
@@ -665,8 +666,10 @@ void YYY::FP24_frob(FP24 *w,FP2 *f,int n)
 		FP8_frob(&(w->b),&f3);   // b=b^p
 		FP8_frob(&(w->c),&f3);   // c=c^p
   
-		FP8_pmul(&(w->b),&(w->b),&X2);  //b=(1+i)^(p-1)/12.b^p
-		FP8_pmul(&(w->c),&(w->c),&X4);  //c=(1+i)^(p-1)/6.b^p
+		FP8_qmul(&(w->b),&(w->b),f); FP8_times_i2(&(w->b));
+		FP8_qmul(&(w->c),&(w->c),&f2); FP8_times_i2(&(w->c)); FP8_times_i2(&(w->c));
+		//FP8_pmul(&(w->b),&(w->b),&X2);  //b=(1+i)^(p-1)/12.b^p
+		//FP8_pmul(&(w->c),&(w->c),&X4);  //c=(1+i)^(p-1)/6.b^p
 	}
 }
 

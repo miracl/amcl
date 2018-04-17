@@ -152,6 +152,15 @@ extern void FP4_mul(FP4 *x,FP4 *y,FP4 *z);
 	@param y FP4 instance
  */
 extern void FP4_inv(FP4 *x,FP4 *y);
+
+/**	@brief Divide an FP4 by 2
+ *
+	@param x FP4 instance, on exit = y/2
+	@param y FP4 instance
+ */
+extern void FP4_div2(FP4 *x,FP4 *y);
+
+
 /**	@brief Formats and outputs an FP4 to the console
  *
 	@param x FP4 instance to be printed

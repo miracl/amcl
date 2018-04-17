@@ -14,6 +14,7 @@
 #include "pair_BN254.h"
 #include "pair_BLS383.h"
 #include "pair192_BLS24.h"
+#include "pair256_BLS48.h"
 
 #define MIN_TIME 10.0
 #define MIN_ITERS 10 
@@ -700,6 +701,173 @@ int BLS_24(csprng *RNG)
 }
 
 
+
+int BLS_48(csprng *RNG)
+{
+	using namespace BLS48;
+	using namespace BLS48_FP;
+	using namespace BLS48_BIG;
+
+    int i,iterations;
+    clock_t start;
+    double elapsed;
+
+	ECP P,G;
+	ECP8 Q,W;
+	FP48 g,w;
+
+	FP16 cm;
+	BIG a,b,s,r;
+
+	printf("\nTesting/Timing BLS48 Pairings\n");
+
+	ECP_generator(&G);
+	
+	BIG_rcopy(r,CURVE_Order);
+	BIG_randomnum(s,r,RNG);
+	ECP_copy(&P,&G);
+    PAIR_G1mul(&P,r);
+
+	if (!ECP_isinf(&P))
+	{
+		printf("FAILURE - rG!=O\n");
+		return 0;
+	}
+	
+	iterations=0;
+    start=clock();
+    do {
+		ECP_copy(&P,&G);
+		PAIR_G1mul(&P,s);
+
+		iterations++;
+		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
+    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    elapsed=1000.0*elapsed/iterations;
+    printf("G1 mul              - %8d iterations  ",iterations);
+    printf(" %8.2lf ms per iteration\n",elapsed);
+
+	ECP8_generator(&W);
+
+	ECP8_copy(&Q,&W);
+    ECP8_mul(&Q,r);
+
+	if (!ECP8_isinf(&Q))
+	{
+		printf("FAILURE - rQ!=O\n");
+		return 0;
+	}
+
+	iterations=0;
+    start=clock();
+    do {
+		ECP8_copy(&Q,&W);
+		PAIR_G2mul(&Q,s);
+
+		iterations++;
+		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
+    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    elapsed=1000.0*elapsed/iterations;
+    printf("G2 mul              - %8d iterations  ",iterations);
+    printf(" %8.2lf ms per iteration\n",elapsed);
+
+	PAIR_ate(&w,&Q,&P);
+	PAIR_fexp(&w);
+
+	FP48_copy(&g,&w);
+
+	PAIR_GTpow(&g,r);
+
+	if (!FP48_isunity(&g))
+	{
+		printf("FAILURE - g^r!=1\n");
+		return 0;
+	}
+
+	iterations=0;
+    start=clock();
+    do {
+		FP48_copy(&g,&w);
+		PAIR_GTpow(&g,s);
+
+		iterations++;
+		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
+    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    elapsed=1000.0*elapsed/iterations;
+    printf("GT pow              - %8d iterations  ",iterations);
+    printf(" %8.2lf ms per iteration\n",elapsed);
+
+	FP48_copy(&g,&w);
+
+	iterations=0;
+    start=clock();
+    do {
+		FP48_compow(&cm,&g,s,r);
+		iterations++;
+		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
+    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    elapsed=1000.0*elapsed/iterations;
+    printf("GT pow (compressed) - %8d iterations  ",iterations);
+    printf(" %8.2lf ms per iteration\n",elapsed);
+
+	iterations=0;
+    start=clock();
+    do {
+		PAIR_ate(&w,&Q,&P);
+		iterations++;
+		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
+    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    elapsed=1000.0*elapsed/iterations;
+    printf("PAIRing ATE         - %8d iterations  ",iterations);
+    printf(" %8.2lf ms per iteration\n",elapsed);
+
+	iterations=0;
+    start=clock();
+    do {
+		FP48_copy(&g,&w);
+		PAIR_fexp(&g);
+		iterations++;
+		elapsed=(clock()-start)/(double)CLOCKS_PER_SEC;
+    } while (elapsed<MIN_TIME || iterations<MIN_ITERS);
+    elapsed=1000.0*elapsed/iterations;
+    printf("PAIRing FEXP        - %8d iterations  ",iterations);
+    printf(" %8.2lf ms per iteration\n",elapsed);
+
+	ECP_copy(&P,&G);	
+	ECP8_copy(&Q,&W);
+
+	PAIR_G1mul(&P,s);
+	PAIR_ate(&g,&Q,&P);
+	PAIR_fexp(&g);
+
+	ECP_copy(&P,&G);
+
+	PAIR_G2mul(&Q,s);
+	PAIR_ate(&w,&Q,&P);
+	PAIR_fexp(&w);
+
+	if (!FP48_equals(&g,&w))
+	{
+		printf("FAILURE - e(sQ,p)!=e(Q,sP) \n");
+		return 0;
+	}
+
+	ECP8_copy(&Q,&W);
+	PAIR_ate(&g,&Q,&P);
+	PAIR_fexp(&g);
+
+	PAIR_GTpow(&g,s);
+
+	if (!FP48_equals(&g,&w))
+	{
+		printf("FAILURE - e(sQ,p)!=e(Q,P)^s \n");
+		return 0;
+	}
+	return 0;
+}
+
+
+
 int RSA_2048(csprng *RNG)
 {
 	using namespace RSA2048;
@@ -786,12 +954,16 @@ int main()
 	for (i=4;i<10;i++) pr[i]=i;
     RAND_seed(&RNG,10,pr);
 
+
 	ED_25519(&RNG);
 	NIST_256(&RNG);
 	GOLDI_LOCKS(&RNG);
 	BN_254(&RNG);
 	BLS_383(&RNG);
 	BLS_24(&RNG);
+	BLS_48(&RNG);
+
+
 	RSA_2048(&RNG);
 	
 }

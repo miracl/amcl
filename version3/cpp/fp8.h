@@ -126,6 +126,15 @@ extern void FP8_sub(FP8 *x,FP8 *y,FP8 *z);
 	@param a FP4 multiplier
  */
 extern void FP8_pmul(FP8 *x,FP8 *y,FP4 *a);
+
+/**	@brief Multiplication of an FP8 by an FP2
+ *
+	@param x FP8 instance, on exit = y*a
+	@param y FP8 instance
+	@param a FP2 multiplier
+ */
+extern void FP8_qmul(FP8 *x,FP8 *y,FP2 *a);
+
 /**	@brief Multiplication of an FP8 by a small integer
  *
 	@param x FP8 instance, on exit = y*i
@@ -232,6 +241,42 @@ extern void FP8_xtr_pow(FP8 *r,FP8 *x,XXX::BIG b);
 	@param b BIG number
  */
 extern void FP8_xtr_pow2(FP8 *r,FP8 *c,FP8 *d,FP8 *e,FP8 *f,XXX::BIG a,XXX::BIG b);
+
+
+/**	@brief Calculate square root of an FP8
+ *
+	Square root
+	@param r FP8 instance, on exit = sqrt(x)
+	@param x FP8 instance
+	@return 1 x is a QR, otherwise 0
+ */
+extern int  FP8_sqrt(FP8 *r,FP8 *x);
+
+
+/**	@brief Conditional copy of FP8 number
+ *
+	Conditionally copies second parameter to the first (without branching)
+	@param x FP8 instance, set to y if s!=0
+	@param y another FP8 instance
+	@param s copy only takes place if not equal to 0
+ */
+extern void FP8_cmove(FP8 *x,FP8 *y,int s);
+
+
+/**	@brief Divide FP8 number by QNR
+ *
+	Divide FP8 by the QNR
+	@param x FP8 instance
+ */
+extern void FP8_div_i(FP8 *x);
+
+/**	@brief Divide FP8 number by QNR twice
+ *
+	Divide FP8 by the QNR twice
+	@param x FP8 instance
+ */
+extern void FP8_div_i2(FP8 *x);
+
 
 }
 

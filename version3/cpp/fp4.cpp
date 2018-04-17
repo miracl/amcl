@@ -577,7 +577,15 @@ void YYY::FP4_xtr_pow2(FP4 *r,FP4 *ck,FP4 *cl,FP4 *ckml,FP4 *ckm2l,BIG a,BIG b)
 
 /* New stuff for ECp4 support */
 
-#if CURVE_SECURITY_ZZZ == 192
+/* Set w=x/2 */
+void YYY::FP4_div2(FP4 *w,FP4 *x)
+{
+    FP2_div2(&(w->a),&(x->a));
+    FP2_div2(&(w->b),&(x->b));
+}
+
+
+#if CURVE_SECURITY_ZZZ >= 192
 
 /* sqrt(a+xb) = sqrt((a+sqrt(a*a-n*b*b))/2)+x.b/(2*sqrt((a+sqrt(a*a-n*b*b))/2)) */
 /* returns true if x is QR */
