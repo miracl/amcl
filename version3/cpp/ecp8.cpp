@@ -545,17 +545,52 @@ void ZZZ::ECP8_mul(ECP8 *P,BIG e)
 	ECP8_reduce(P);
 }
 
+void ZZZ::ECP8_frob_constants(FP2 F[3])
+{
+    FP fx,fy;
+	FP2 X;
+
+    FP_rcopy(&fx,Fra);
+    FP_rcopy(&fy,Frb);
+    FP2_from_FPs(&X,&fx,&fy);
+
+
+	FP2_sqr(&F[0],&X);			// FF=F^2=(1+i)^(p-19)/12
+	FP2_copy(&F[2],&F[0]);
+	FP2_mul_ip(&F[2]);			// W=(1+i)^12/12.(1+i)^(p-19)/12 = (1+i)^(p-7)/12
+	FP2_norm(&F[2]);
+	FP2_sqr(&F[1],&F[2]);
+	FP2_mul(&F[2],&F[2],&F[1]);	// W=(1+i)^(p-7)/4
+
+	FP2_mul_ip(&F[2]);			// W=(1+i)^4/4.W=(1+i)^(p-7)/4 = (1+i)^(p-3)/4
+	FP2_norm(&F[2]);
+
+	FP2_copy(&F[1],&X);
+
+#if SEXTIC_TWIST_ZZZ == M_TYPE	
+	FP2_mul_ip(&F[1]);		// (1+i)^24/24.(1+i)^(p-19)/24 = (1+i)^(p+5)/24
+	FP2_inv(&F[1],&F[1]);		// (1+i)^-(p+5)/24
+	FP2_sqr(&F[0],&F[1]);		// (1+i)^-(p+5)/12
+#endif
+
+
+	FP2_mul_ip(&F[0]);		// FF=(1+i)^(p-19)/12.(1+i)^12/12 = (1+i)^(p-7)/12					// FF=(1+i)^12/12.(1+i)^-(p+5)/12 = (1+i)^-(p-7)/12
+	FP2_norm(&F[0]);
+
+	FP2_mul(&F[1],&F[1],&F[0]);  // (1+i)^(p-7)/12 . (1+i)^(p-19)/24 = (1+i)^(p-11)/8				// (1+i)^-(p-7)/12 . (1+i)^-(p+5)/24 = (1+i)^-(p-3)/8
+
+}
+
 /* Calculates q^n.P using Frobenius constant X */
-void ZZZ::ECP8_frob(ECP8 *P,FP2 *F,int n)
+void ZZZ::ECP8_frob(ECP8 *P,FP2 F[3],int n)
 {
 	int i;
 	FP8 X,Y;
-	//FP4 F4,F8;
-    FP2 FFF,FF,W;
+
     if (P->inf) return;
 
 	ECP8_get(&X,&Y,P);		// F=(1+i)^(p-19)/24
-
+/*
 	FP2_sqr(&FF,F);			// FF=F^2=(1+i)^(p-19)/12
 	FP2_copy(&W,&FF);
 	FP2_mul_ip(&W);			// W=(1+i)^12/12.(1+i)^(p-19)/12 = (1+i)^(p-7)/12
@@ -579,11 +614,11 @@ void ZZZ::ECP8_frob(ECP8 *P,FP2 *F,int n)
 	FP2_norm(&FF);
 
 	FP2_mul(&FFF,&FFF,&FF);  // (1+i)^(p-7)/12 . (1+i)^(p-19)/24 = (1+i)^(p-11)/8				// (1+i)^-(p-7)/12 . (1+i)^-(p+5)/24 = (1+i)^-(p-3)/8
-
+*/
 	for (i=0;i<n;i++)
 	{
-		FP8_frob(&X,&W);		// X^p		
-		FP8_qmul(&X,&X,&FF); 
+		FP8_frob(&X,&F[2]);		// X^p		
+		FP8_qmul(&X,&X,&F[0]); 
 #if SEXTIC_TWIST_ZZZ == M_TYPE			
 		FP8_div_i2(&X);			// X^p.(1+i)^-(p-1)/12
 #endif
@@ -591,8 +626,8 @@ void ZZZ::ECP8_frob(ECP8 *P,FP2 *F,int n)
 		FP8_times_i2(&X);		// X^p.(1+i)^(p-1)/12
 #endif
 
-		FP8_frob(&Y,&W);		// Y^p
-		FP8_qmul(&Y,&Y,&FFF); 
+		FP8_frob(&Y,&F[2]);		// Y^p
+		FP8_qmul(&Y,&Y,&F[1]); 
 #if SEXTIC_TWIST_ZZZ == M_TYPE		
 		FP8_div_i(&Y);			// Y^p.(1+i)^-(p-1)/8
 #endif
@@ -622,12 +657,9 @@ void ZZZ::ECP8_mul16(ECP8 *P,ECP8 Q[16],BIG u[16])
     sign8 s3[NLEN_XXX*BASEBITS_XXX+1];
     sign8 w4[NLEN_XXX*BASEBITS_XXX+1];
     sign8 s4[NLEN_XXX*BASEBITS_XXX+1];	
-    FP fx,fy;
-	FP2 X;
 
-    FP_rcopy(&fx,Fra);
-    FP_rcopy(&fy,Frb);
-    FP2_from_FPs(&X,&fx,&fy);
+	FP2 X[3];
+	ECP8_frob_constants(X);
 
     for (i=0; i<16; i++)
         BIG_copy(t[i],u[i]);
@@ -654,13 +686,13 @@ void ZZZ::ECP8_mul16(ECP8 *P,ECP8 Q[16],BIG u[16])
 	for (i=0;i<8;i++)
 	{
 		ECP8_copy(&T2[i],&T1[i]);
-		ECP8_frob(&T2[i],&X,4);
+		ECP8_frob(&T2[i],X,4);
 
 		ECP8_copy(&T3[i],&T2[i]);
-		ECP8_frob(&T3[i],&X,4);
+		ECP8_frob(&T3[i],X,4);
 
 		ECP8_copy(&T4[i],&T3[i]);
-		ECP8_frob(&T4[i],&X,4);
+		ECP8_frob(&T4[i],X,4);
 	}
 
 // Make them odd
@@ -975,7 +1007,7 @@ void ZZZ::ECP8_mapit(ECP8 *Q,octet *W)
 {
     BIG q,one,x,hv;
 	FP Fx,Fy;
-    FP2 X;
+    FP2 T,X[3];
 	FP4 X4;
 	FP8 X8;
 
@@ -988,34 +1020,14 @@ void ZZZ::ECP8_mapit(ECP8 *Q,octet *W)
 
     for (;;)
     {
-        FP2_from_BIGs(&X,one,hv);  /*******/
-		FP4_from_FP2(&X4,&X);
+        FP2_from_BIGs(&T,one,hv);  /*******/
+		FP4_from_FP2(&X4,&T);
 		FP8_from_FP4(&X8,&X4);
         if (ECP8_setx(Q,&X8)) break;
         BIG_inc(hv,1);
     }
 
-//printf("X4= ");
-//FP8_output(&X4);
-//printf("\n");
-
-//	ECP8_get(&X4,&Y4,Q);
-
-//printf("X4= ");
-//FP8_output(&X4);
-//printf("\n");
-
-//printf("Y4= ");
-//FP8_output(&Y4);
-//printf("\n");
-
-
-//	ECP8_set(Q,&X4,&Y4);
-
-
-    FP_rcopy(&Fx,Fra);
-    FP_rcopy(&Fy,Frb);
-    FP2_from_FPs(&X,&Fx,&Fy);
+	ECP8_frob_constants(X);
 
     BIG_rcopy(x,CURVE_Bnx);
 
@@ -1029,6 +1041,7 @@ void ZZZ::ECP8_mapit(ECP8 *Q,octet *W)
 	ECP8_copy(&x3Q,&x2Q);
 	ECP8_mul(&x3Q,x);
 	ECP8_copy(&x4Q,&x3Q);
+
 	ECP8_mul(&x4Q,x);
 	ECP8_copy(&x5Q,&x4Q);
 	ECP8_mul(&x5Q,x);
@@ -1038,8 +1051,6 @@ void ZZZ::ECP8_mapit(ECP8 *Q,octet *W)
 	ECP8_mul(&x7Q,x);
 	ECP8_copy(&x8Q,&x7Q);
 	ECP8_mul(&x8Q,x);
-
-
 
 #if SIGN_OF_X_ZZZ==NEGATIVEX
 	ECP8_neg(&xQ);
@@ -1052,28 +1063,28 @@ void ZZZ::ECP8_mapit(ECP8 *Q,octet *W)
 	ECP8_sub(&x8Q,Q);
 
 	ECP8_sub(&x7Q,&x6Q);
-	ECP8_frob(&x7Q,&X,1);
+	ECP8_frob(&x7Q,X,1);
 
 	ECP8_sub(&x6Q,&x5Q);
-	ECP8_frob(&x6Q,&X,2);
+	ECP8_frob(&x6Q,X,2);
 	
 	ECP8_sub(&x5Q,&x4Q);
-	ECP8_frob(&x5Q,&X,3);
+	ECP8_frob(&x5Q,X,3);
 	
 	ECP8_sub(&x4Q,&x3Q);
-	ECP8_frob(&x4Q,&X,4);
+	ECP8_frob(&x4Q,X,4);
 
 	ECP8_sub(&x3Q,&x2Q);
-	ECP8_frob(&x3Q,&X,5);
+	ECP8_frob(&x3Q,X,5);
 
 	ECP8_sub(&x2Q,&xQ);
-	ECP8_frob(&x2Q,&X,6);
+	ECP8_frob(&x2Q,X,6);
 
 	ECP8_sub(&xQ,Q);
-	ECP8_frob(&xQ,&X,7);
+	ECP8_frob(&xQ,X,7);
 
 	ECP8_dbl(Q);
-	ECP8_frob(Q,&X,8);
+	ECP8_frob(Q,X,8);
 
 
 	ECP8_add(Q,&x8Q);

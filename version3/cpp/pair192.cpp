@@ -409,37 +409,21 @@ void ZZZ::PAIR_G2mul(ECP4 *P,BIG e)
 #ifdef USE_GS_G2_ZZZ   /* Well I didn't patent it :) */
     int i,np,nn;
     ECP4 Q[8];
-    FP2 X;
-    FP fx,fy;
+    FP2 X[3];
     BIG x,y,u[8];
 
-    FP_rcopy(&fx,Fra);
-    FP_rcopy(&fy,Frb);
-    FP2_from_FPs(&X,&fx,&fy);
-
-//#if SEXTIC_TWIST_ZZZ==M_TYPE
-//	FP2_inv(&X,&X);
-//	FP2_norm(&X);
-//#endif
+	ECP4_frob_constants(X);
 
     BIG_rcopy(y,CURVE_Order);
     gs(u,e);
-
-
-//    ECP4_affine(P);
-
-//printf("PPz= "); FP2_output(&(P->z)); printf("\n");
-
-//printf("f= "); FP2_output(&X); printf("\n");
 
     ECP4_copy(&Q[0],P);
     for (i=1; i<8; i++)
     {
         ECP4_copy(&Q[i],&Q[i-1]);
-        ECP4_frob(&Q[i],&X,1);
+        ECP4_frob(&Q[i],X,1);
     }
-//printf("Q[0]= "); ECP4_output(&Q[0]); printf("\n");
-//printf("Q[1]= "); ECP4_output(&Q[1]); printf("\n");
+
     for (i=0; i<8; i++)
     {
         np=BIG_nbits(u[i]);
@@ -451,11 +435,6 @@ void ZZZ::PAIR_G2mul(ECP4 *P,BIG e)
             ECP4_neg(&Q[i]);
         }
     }
-
-
-//printf("Q[2]= "); ECP4_output(&Q[2]); printf("\n");
-//printf("Q[3]= "); ECP4_output(&Q[3]); printf("\n");
-//exit(0);
 
     ECP4_mul8(P,Q,u);
 

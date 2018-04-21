@@ -521,13 +521,10 @@ void ZZZ::PAIR_G2mul(ECP8 *P,BIG e)
 #ifdef USE_GS_G2_ZZZ   /* Well I didn't patent it :) */
     int i,np,nn;
     ECP8 Q[16];
-    FP2 X;
-    FP fx,fy;
+    FP2 X[3];
     BIG x,y,u[16];
 
-    FP_rcopy(&fx,Fra);
-    FP_rcopy(&fy,Frb);
-    FP2_from_FPs(&X,&fx,&fy);
+	ECP8_frob_constants(X);
 
     BIG_rcopy(y,CURVE_Order);
     gs(u,e);
@@ -536,7 +533,7 @@ void ZZZ::PAIR_G2mul(ECP8 *P,BIG e)
     for (i=1; i<16; i++)
     {
         ECP8_copy(&Q[i],&Q[i-1]);
-        ECP8_frob(&Q[i],&X,1);
+        ECP8_frob(&Q[i],X,1);
     }
 
     for (i=0; i<16; i++)

@@ -937,13 +937,7 @@ void YYY::FP48_frob(FP48 *w,FP2 *f,int n)
     FP2 f3,f2;				// f=(1+i)^(p-19)/24
     FP2_sqr(&f2,f);     // 
     FP2_mul(&f3,&f2,f); // f3=f^3=(1+i)^(p-19)/8
-/*
-	FP4_from_FP2(&F,f);
-	FP4_times_i(&F);	// (1+i)^12/24.(1+i)^(p-19)/24 =  (1+i)^(p-7)/24     
-	FP8_from_FP4(&X2,&F);
-	FP8_times_i(&X2);	//(1+i)^(p-7)/24 . (1+i)^6/24 = (1+i)^(p-1)/24
-	FP8_sqr(&X4,&X2);	// (1+i)^(p-1)/12
-*/
+
 	FP2_mul_ip(&f3);
 	FP2_norm(&f3);
 	FP2_mul_ip(&f3);    // f3 = (1+i)^16/8.(1+i)^(p-19)/8 = (1+i)^(p-3)/8 
@@ -958,8 +952,6 @@ void YYY::FP48_frob(FP48 *w,FP2 *f,int n)
 		FP16_qmul(&(w->b),&(w->b),f); FP16_times_i4(&(w->b)); FP16_times_i2(&(w->b)); 
 		FP16_qmul(&(w->c),&(w->c),&f2); FP16_times_i4(&(w->c)); FP16_times_i4(&(w->c)); FP16_times_i4(&(w->c)); 
 
-		//FP16_pmul(&(w->b),&(w->b),&X2);  //b=(1+i)^(p-1)/24.b^p
-		//FP16_pmul(&(w->c),&(w->c),&X4);  //c=(1+i)^(p-1)/12.b^p
 	}
 }
 

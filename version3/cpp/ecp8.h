@@ -198,14 +198,25 @@ extern void ECP8_sub(ECP8 *P,ECP8 *Q);
 
  */
 extern void ECP8_mul(ECP8 *P,XXX::BIG b);
-/**	@brief Multiplies an ECP8 instance P by the internal modulus p, using precalculated Frobenius constant f
+
+/**	@brief Calculates required Frobenius constants
  *
-	Fast point multiplication using Frobenius
-	@param P ECP8 instance, on exit = p*P
-	@param f FP2 precalculated Frobenius constant
+	Calculate Frobenius constants
+	@param F array of FP2 precalculated constants
 
  */
-extern void ECP8_frob(ECP8 *P,YYY::FP2 *f,int n);
+extern void ECP8_frob_constants(YYY::FP2 F[3]);
+
+/**	@brief Multiplies an ECP8 instance P by the internal modulus p^n, using precalculated Frobenius constants
+ *
+	Fast point multiplication using Frobenius
+	@param P ECP8 instance, on exit = p^n*P
+	@param F array of FP2 precalculated Frobenius constant
+	@param n power of prime
+
+ */
+extern void ECP8_frob(ECP8 *P,YYY::FP2 F[3],int n);
+
 /**	@brief Calculates P=Sigma b[i]*Q[i] for i=0 to 7
  *
 	@param P ECP8 instance, on exit = Sigma b[i]*Q[i] for i=0 to 7

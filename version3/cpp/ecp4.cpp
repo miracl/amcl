@@ -485,43 +485,53 @@ void ZZZ::ECP4_mul(ECP4 *P,BIG e)
 	ECP4_reduce(P);
 }
 
-/* Calculates q^n.P using Frobenius constant X */
-void ZZZ::ECP4_frob(ECP4 *P,FP2 *F,int n)
+// calculate frobenius constants 
+void ZZZ::ECP4_frob_constants(FP2 F[3])
+{
+    FP fx,fy;
+	FP2 X;
+
+    FP_rcopy(&fx,Fra);
+    FP_rcopy(&fy,Frb);
+    FP2_from_FPs(&X,&fx,&fy);
+
+	FP2_sqr(&F[0],&X);		// FF=F^2=(1+i)^(p-7)/6
+	FP2_copy(&F[2],&F[0]);
+	FP2_mul_ip(&F[2]);		// W=(1+i)^6/6.(1+i)^(p-7)/6 = (1+i)^(p-1)/6
+	FP2_norm(&F[2]);
+	FP2_sqr(&F[1],&F[2]);
+	FP2_mul(&F[2],&F[2],&F[1]);  // W=(1+i)^(p-1)/2
+
+	FP2_copy(&F[1],&X);
+
+#if SEXTIC_TWIST_ZZZ == M_TYPE	
+	FP2_mul_ip(&F[1]);		// (1+i)^12/12.(1+i)^(p-7)/12 = (1+i)^(p+5)/12
+	FP2_inv(&F[1],&F[1]);		// (1+i)^-(p+5)/12
+	FP2_sqr(&F[0],&F[1]);		// (1+i)^-(p+5)/6
+#endif
+
+	FP2_mul_ip(&F[0]);		// FF=(1+i)^(p-7)/6.(1+i) = (1+i)^(p-1)/6					// (1+i)^6/6.(1+i)^-(p+5)/6 = (1+i)^-(p-1)/6
+	FP2_norm(&F[0]);
+	FP2_mul(&F[1],&F[1],&F[0]);  // FFF = (1+i)^(p-7)/12 . (1+i)^(p-1)/6 = (1+i)^(p-3)/4	// (1+i)^-(p+5)/12 . (1+i)^-(p-1)/6 = (1+i)^-(p+1)/4
+
+}
+
+/* Calculates q^n.P using Frobenius constants */
+void ZZZ::ECP4_frob(ECP4 *P,FP2 F[3],int n)
 {
 	int i;
 	FP4 X,Y;
-    FP2 FFF,FF,W;
     if (P->inf) return;
 
 	ECP4_get(&X,&Y,P);		// F=(1+i)^(p-7)/12
 
-	FP2_sqr(&FF,F);		// FF=F^2=(1+i)^(p-7)/6
-	FP2_copy(&W,&FF);
-	FP2_mul_ip(&W);		// W=(1+i)^6/6.(1+i)^(p-7)/6 = (1+i)^(p-1)/6
-	FP2_norm(&W);
-	FP2_sqr(&FFF,&W);
-	FP2_mul(&W,&W,&FFF);  // W=(1+i)^(p-1)/2
-
-	FP2_copy(&FFF,F);
-
-#if SEXTIC_TWIST_ZZZ == M_TYPE	
-	FP2_mul_ip(&FFF);		// (1+i)^12/12.(1+i)^(p-7)/12 = (1+i)^(p+5)/12
-	FP2_inv(&FFF,&FFF);		// (1+i)^-(p+5)/12
-	FP2_sqr(&FF,&FFF);		// (1+i)^-(p+5)/6
-#endif
-
-
-	FP2_mul_ip(&FF);		// FF=(1+i)^(p-7)/6.(1+i) = (1+i)^(p-1)/6					// (1+i)^6/6.(1+i)^-(p+5)/6 = (1+i)^-(p-1)/6
-	FP2_norm(&FF);
-	FP2_mul(&FFF,&FFF,&FF);  // FFF = (1+i)^(p-7)/12 . (1+i)^(p-1)/6 = (1+i)^(p-3)/4	// (1+i)^-(p+5)/12 . (1+i)^-(p-1)/6 = (1+i)^-(p+1)/4
-
 	for (i=0;i<n;i++)
 	{
-		FP4_frob(&X,&W);		// X^p
-		FP4_pmul(&X,&X,&FF);	// X^p.(1+i)^(p-1)/6									// X^p.(1+i)^-(p-1)/6
+		FP4_frob(&X,&F[2]);		// X^p
+		FP4_pmul(&X,&X,&F[0]);	// X^p.(1+i)^(p-1)/6									// X^p.(1+i)^-(p-1)/6
 		
-		FP4_frob(&Y,&W);		// Y^p
-		FP4_pmul(&Y,&Y,&FFF);
+		FP4_frob(&Y,&F[2]);		// Y^p
+		FP4_pmul(&Y,&Y,&F[1]);
 		FP4_times_i(&Y);		// Y.p.(1+i)^(p-3)/4.(1+i)^(2/4) = Y^p.(1+i)^(p-1)/4	// (1+i)^-(p+1)/4 .(1+i)^2/4 = Y^p.(1+i)^-(p-1)/4
 	}
 
@@ -541,12 +551,9 @@ void ZZZ::ECP4_mul8(ECP4 *P,ECP4 Q[8],BIG u[8])
     sign8 s1[NLEN_XXX*BASEBITS_XXX+1];
     sign8 w2[NLEN_XXX*BASEBITS_XXX+1];
     sign8 s2[NLEN_XXX*BASEBITS_XXX+1];	
-    FP fx,fy;
-	FP2 X;
+	FP2 X[3];
 
-    FP_rcopy(&fx,Fra);
-    FP_rcopy(&fy,Frb);
-    FP2_from_FPs(&X,&fx,&fy);
+	ECP4_frob_constants(X);
 
     for (i=0; i<8; i++)
         BIG_copy(t[i],u[i]);
@@ -573,7 +580,7 @@ void ZZZ::ECP4_mul8(ECP4 *P,ECP4 Q[8],BIG u[8])
 	for (i=0;i<8;i++)
 	{
 		ECP4_copy(&T2[i],&T1[i]);
-		ECP4_frob(&T2[i],&X,4);
+		ECP4_frob(&T2[i],X,4);
 	}
 
 // Make them odd
@@ -780,8 +787,7 @@ void ZZZ::ECP4_mul8(ECP4 *P,ECP4 Q[8],BIG u[8])
 void ZZZ::ECP4_mapit(ECP4 *Q,octet *W)
 {
     BIG q,one,x,hv;
-	FP Fx,Fy;
-    FP2 X;
+    FP2 X[3],T;
 	FP4 X4,Y4;
 
     ECP4 xQ, x2Q, x3Q, x4Q;
@@ -791,44 +797,15 @@ void ZZZ::ECP4_mapit(ECP4 *Q,octet *W)
     BIG_one(one);
     BIG_mod(hv,q);
 
-	//printf("hv= ");
-	//BIG_output(hv);
-	//printf("\n");
-
     for (;;)
     {
-        FP2_from_BIGs(&X,one,hv);  /*******/
-		FP4_from_FP2(&X4,&X);
+        FP2_from_BIGs(&T,one,hv);  /*******/
+		FP4_from_FP2(&X4,&T);
         if (ECP4_setx(Q,&X4)) break;
         BIG_inc(hv,1);
     }
 
-//printf("X4= ");
-//FP4_output(&X4);
-//printf("\n");
-
-//	ECP4_get(&X4,&Y4,Q);
-
-//printf("X4= ");
-//FP4_output(&X4);
-//printf("\n");
-
-//printf("Y4= ");
-//FP4_output(&Y4);
-//printf("\n");
-
-
-//	ECP4_set(Q,&X4,&Y4);
-
-
-    FP_rcopy(&Fx,Fra);
-    FP_rcopy(&Fy,Frb);
-    FP2_from_FPs(&X,&Fx,&Fy);
-
-//#if SEXTIC_TWIST_ZZZ==M_TYPE
-//	FP2_inv(&X,&X);
-//	FP2_norm(&X);
-//#endif
+	ECP4_frob_constants(X);
 
     BIG_rcopy(x,CURVE_Bnx);
 
@@ -853,16 +830,16 @@ void ZZZ::ECP4_mapit(ECP4 *Q,octet *W)
 	ECP4_sub(&x4Q,Q);
 
 	ECP4_sub(&x3Q,&x2Q);
-	ECP4_frob(&x3Q,&X,1);
+	ECP4_frob(&x3Q,X,1);
 
 	ECP4_sub(&x2Q,&xQ);
-	ECP4_frob(&x2Q,&X,2);
+	ECP4_frob(&x2Q,X,2);
 
 	ECP4_sub(&xQ,Q);
-	ECP4_frob(&xQ,&X,3);
+	ECP4_frob(&xQ,X,3);
 
 	ECP4_dbl(Q);
-	ECP4_frob(Q,&X,4);
+	ECP4_frob(Q,X,4);
 
 	ECP4_add(Q,&x4Q);
 	ECP4_add(Q,&x3Q);
