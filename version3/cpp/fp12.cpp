@@ -25,6 +25,38 @@ under the License.
 
 using namespace XXX;
 
+/* return 1 if b==c, no branching */
+static int teq(sign32 b,sign32 c)
+{
+    sign32 x=b^c;
+    x-=1;  // if x=0, x now -1
+    return (int)((x>>31)&1);
+}
+
+
+/* Constant time select from pre-computed table */
+static void FP12_select(YYY::FP12 *f,YYY::FP12 g[],sign32 b)
+{
+    YYY::FP12 invf;
+    sign32 m=b>>31;
+    sign32 babs=(b^m)-m;
+
+    babs=(babs-1)/2;
+
+    FP12_cmove(f,&g[0],teq(babs,0));  // conditional move
+    FP12_cmove(f,&g[1],teq(babs,1));
+    FP12_cmove(f,&g[2],teq(babs,2));
+    FP12_cmove(f,&g[3],teq(babs,3));
+    FP12_cmove(f,&g[4],teq(babs,4));
+    FP12_cmove(f,&g[5],teq(babs,5));
+    FP12_cmove(f,&g[6],teq(babs,6));
+    FP12_cmove(f,&g[7],teq(babs,7));
+
+    FP12_copy(&invf,f);
+    FP12_conj(&invf,&invf);  // 1/f
+    FP12_cmove(f,&invf,(int)(m&1));
+}
+
 /* test x==0 ? */
 /* SU= 8 */
 int YYY::FP12_iszilch(FP12 *x)
@@ -441,8 +473,8 @@ void YYY::FP12_compow(FP4 *c,FP12 *x,BIG e,BIG r)
 
 }
 
-
 /* Note this is simple square and multiply, so not side-channel safe */
+/* But fast for final exponentiation where exponent is not a secret */
 
 void YYY::FP12_pow(FP12 *r,FP12 *a,BIG b)
 {
@@ -505,13 +537,103 @@ void YYY::FP12_pow(FP12 *r,FP12 *a,BIG b)
     FP12_reduce(r);
 }  */
 
+
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
-/* Timing attack secure, but not cache attack secure */
+/* Side channel attack secure */
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
 
 void YYY::FP12_pow4(FP12 *p,FP12 *q,BIG u[4])
 {
-    int i,j,a[4],nb,m;
-    FP12 g[8],c,s[2];
+    int i,j,k,nb,pb,bt;
+	FP12 g[8],r;
+	BIG t[4],mt;
+    sign8 w[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 s[NLEN_XXX*BASEBITS_XXX+1];
+
+    for (i=0; i<4; i++)
+        BIG_copy(t[i],u[i]);
+
+
+// Precomputed table
+    FP12_copy(&g[0],&q[0]); // q[0]
+    FP12_copy(&g[1],&g[0]);
+	FP12_mul(&g[1],&q[1]);	// q[0].q[1]
+    FP12_copy(&g[2],&g[0]);
+	FP12_mul(&g[2],&q[2]);	// q[0].q[2]
+	FP12_copy(&g[3],&g[1]);
+	FP12_mul(&g[3],&q[2]);	// q[0].q[1].q[2]
+	FP12_copy(&g[4],&g[0]);
+	FP12_mul(&g[4],&q[3]);  // q[0].q[3]
+	FP12_copy(&g[5],&g[1]);
+	FP12_mul(&g[5],&q[3]);	// q[0].q[1].q[3]
+	FP12_copy(&g[6],&g[2]);
+	FP12_mul(&g[6],&q[3]);	// q[0].q[2].q[3]
+	FP12_copy(&g[7],&g[3]);
+	FP12_mul(&g[7],&q[3]);	// q[0].q[1].q[2].q[3]
+
+// Make it odd
+	pb=1-BIG_parity(t[0]);
+	BIG_inc(t[0],pb);
+	BIG_norm(t[0]);
+
+// Number of bits
+    BIG_zero(mt);
+    for (i=0; i<4; i++)
+    {
+        BIG_add(mt,mt,t[i]);
+        BIG_norm(mt);
+    }
+    nb=1+BIG_nbits(mt);
+
+// Sign pivot 
+	s[nb-1]=1;
+	for (i=0;i<nb-1;i++)
+	{
+        BIG_fshr(t[0],1);
+		s[i]=2*BIG_parity(t[0])-1;
+	}
+
+// Recoded exponent
+    for (i=0; i<nb; i++)
+    {
+		w[i]=0;
+		k=1;
+		for (j=1; j<4; j++)
+		{
+			bt=s[i]*BIG_parity(t[j]);
+			BIG_fshr(t[j],1);
+
+			BIG_dec(t[j],(bt>>1));
+			BIG_norm(t[j]);
+			w[i]+=bt*k;
+			k*=2;
+        }
+    }		
+
+// Main loop
+	FP12_select(p,g,2*w[nb-1]+1);
+    for (i=nb-2; i>=0; i--)
+    {
+        FP12_select(&r,g,2*w[i]+s[i]);
+		FP12_usqr(p,p);
+        FP12_mul(p,&r);
+    }
+// apply correction
+	FP12_conj(&r,&q[0]);   
+	FP12_mul(&r,p);
+	FP12_cmove(p,&r,pb);
+
+	FP12_reduce(p);
+}
+
+/* p=q0^u0.q1^u1.q2^u2.q3^u3 */
+/* Side channel attack secure */
+/*
+void YYY::FP12_pow4(FP12 *p,FP12 *q,BIG u[4])
+{
+    int i,j,a[4],nb,m,pb;
+    FP12 g[8],c,r,v;
     BIG t[4],mt;
     sign8 w[NLEN_XXX*BASEBITS_XXX+1];
 
@@ -519,45 +641,47 @@ void YYY::FP12_pow4(FP12 *p,FP12 *q,BIG u[4])
         BIG_copy(t[i],u[i]);
 
     FP12_copy(&g[0],&q[0]);
-    FP12_conj(&s[0],&q[1]);
-    FP12_mul(&g[0],&s[0]);  /* P/Q */
+    FP12_conj(&r,&q[1]);
+    FP12_mul(&g[0],&r);  // P/Q 
     FP12_copy(&g[1],&g[0]);
     FP12_copy(&g[2],&g[0]);
     FP12_copy(&g[3],&g[0]);
     FP12_copy(&g[4],&q[0]);
-    FP12_mul(&g[4],&q[1]);  /* P*Q */
+    FP12_mul(&g[4],&q[1]);  // P*Q 
     FP12_copy(&g[5],&g[4]);
     FP12_copy(&g[6],&g[4]);
     FP12_copy(&g[7],&g[4]);
 
-    FP12_copy(&s[1],&q[2]);
-    FP12_conj(&s[0],&q[3]);
-    FP12_mul(&s[1],&s[0]);       /* R/S */
-    FP12_conj(&s[0],&s[1]);
-    FP12_mul(&g[1],&s[0]);
-    FP12_mul(&g[2],&s[1]);
-    FP12_mul(&g[5],&s[0]);
-    FP12_mul(&g[6],&s[1]);
-    FP12_copy(&s[1],&q[2]);
-    FP12_mul(&s[1],&q[3]);      /* R*S */
-    FP12_conj(&s[0],&s[1]);
-    FP12_mul(&g[0],&s[0]);
-    FP12_mul(&g[3],&s[1]);
-    FP12_mul(&g[4],&s[0]);
-    FP12_mul(&g[7],&s[1]);
+    FP12_copy(&v,&q[2]);
+    FP12_conj(&r,&q[3]);
+    FP12_mul(&v,&r);       // R/S 
+    FP12_conj(&r,&v);
+    FP12_mul(&g[1],&r);
+    FP12_mul(&g[2],&v);
+    FP12_mul(&g[5],&r);
+    FP12_mul(&g[6],&v);
+    FP12_copy(&v,&q[2]);
+    FP12_mul(&v,&q[3]);      // R*S 
+    FP12_conj(&r,&v);
+    FP12_mul(&g[0],&r);
+    FP12_mul(&g[3],&v);
+    FP12_mul(&g[4],&r);
+    FP12_mul(&g[7],&v);
 
-    /* if power is even add 1 to power, and add q to correction */
+    // if power is even add 1 to power, and add q to correction 
     FP12_one(&c);
 
     BIG_zero(mt);
     for (i=0; i<4; i++)
     {
-        if (BIG_parity(t[i])==0)
-        {
-            BIG_inc(t[i],1);
-            BIG_norm(t[i]);
-            FP12_mul(&c,&q[i]);
-        }
+
+		pb=BIG_parity(t[i]);
+		BIG_inc(t[i],1-pb);
+		BIG_norm(t[i]);
+		FP12_copy(&r,&c);
+		FP12_mul(&r,&q[i]);
+		FP12_cmove(&c,&r,1-pb);
+
         BIG_add(mt,mt,t[i]);
         BIG_norm(mt);
     }
@@ -565,7 +689,7 @@ void YYY::FP12_pow4(FP12 *p,FP12 *q,BIG u[4])
     FP12_conj(&c,&c);
     nb=1+BIG_nbits(mt);
 
-    /* convert exponent to signed 1-bit window */
+    // convert exponent to signed 1-bit window 
     for (j=0; j<nb; j++)
     {
         for (i=0; i<4; i++)
@@ -582,17 +706,14 @@ void YYY::FP12_pow4(FP12 *p,FP12 *q,BIG u[4])
 
     for (i=nb-1; i>=0; i--)
     {
-        m=w[i]>>7;
-        j=(w[i]^m)-m;  /* j=abs(w[i]) */
-        j=(j-1)/2;
-        FP12_copy(&s[0],&g[j]);
-        FP12_conj(&s[1],&g[j]);
-        FP12_usqr(p,p);
-        FP12_mul(p,&s[m&1]);
+		FP12_select(&r,g,w[i]);
+		FP12_usqr(p,p);
+        FP12_mul(p,&r);
     }
-    FP12_mul(p,&c); /* apply correction */
+    FP12_mul(p,&c); // apply correction 
     FP12_reduce(p);
 }
+*/
 
 /* Set w=w^p using Frobenius */
 /* SU= 160 */
@@ -712,6 +833,16 @@ void YYY::FP12_fromOctet(FP12 *g,octet *W)
     BIG_fromBytes(b,&W->val[11*MODBYTES_XXX]);
     FP_nres(&(g->c.b.b),b);
 }
+
+/* Move b to a if d=1 */
+void YYY::FP12_cmove(FP12 *f,FP12 *g,int d)
+{
+    FP4_cmove(&(f->a),&(g->a),d);
+    FP4_cmove(&(f->b),&(g->b),d);
+    FP4_cmove(&(f->c),&(g->c),d);
+}
+
+
 
 /*
 int main(){

@@ -505,7 +505,6 @@ void ZZZ::ECP2_mul(ECP2 *P,BIG e)
     BIG mt,t;
     ECP2 Q,W[8],C;
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
-    FP2 work[8];
 
     if (ECP2_isinf(P)) return;
     ECP2_affine(P);
@@ -568,9 +567,9 @@ void ZZZ::ECP2_frob(ECP2 *P,FP2 *X)
 {
     FP2 X2;
     if (P->inf) return;
-//printf("X= "); FP2_output(X); printf("\n");
+
     FP2_sqr(&X2,X);
-//printf("X2= "); FP2_output(&X2); printf("\n");
+
     FP2_conj(&(P->x),&(P->x));
     FP2_conj(&(P->y),&(P->y));
     FP2_conj(&(P->z),&(P->z));
@@ -580,18 +579,106 @@ void ZZZ::ECP2_frob(ECP2 *P,FP2 *X)
     FP2_mul(&(P->y),&X2,&(P->y));
     FP2_mul(&(P->y),X,&(P->y));
 
-
-//printf("Px= "); FP2_output(&(P->x)); printf("\n");
-//printf("Py= "); FP2_output(&(P->y)); printf("\n");
-//printf("Pz= "); FP2_output(&(P->z)); printf("\n");
 }
+
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+// Side channel attack secure 
 
 void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
 {
-    int i,j,a[4],nb;
+    int i,j,k,nb,pb,bt;
+	ECP2 T[8],W;
+    BIG t[4],mt;
+	sign8 w[NLEN_XXX*BASEBITS_XXX+1];
+	sign8 s[NLEN_XXX*BASEBITS_XXX+1];
+
+    for (i=0; i<4; i++)
+    {
+        BIG_copy(t[i],u[i]);
+        ECP2_affine(&Q[i]);
+    }
+
+// Precomputed table
+    ECP2_copy(&T[0],&Q[0]); // Q[0]
+    ECP2_copy(&T[1],&T[0]);
+	ECP2_add(&T[1],&Q[1]);	// Q[0]+Q[1]
+    ECP2_copy(&T[2],&T[0]);
+	ECP2_add(&T[2],&Q[2]);	// Q[0]+Q[2]
+	ECP2_copy(&T[3],&T[1]);
+	ECP2_add(&T[3],&Q[2]);	// Q[0]+Q[1]+Q[2]
+	ECP2_copy(&T[4],&T[0]);
+	ECP2_add(&T[4],&Q[3]);  // Q[0]+Q[3]
+	ECP2_copy(&T[5],&T[1]);
+	ECP2_add(&T[5],&Q[3]);	// Q[0]+Q[1]+Q[3]
+	ECP2_copy(&T[6],&T[2]);
+	ECP2_add(&T[6],&Q[3]);	// Q[0]+Q[2]+Q[3]
+	ECP2_copy(&T[7],&T[3]);
+	ECP2_add(&T[7],&Q[3]);	// Q[0]+Q[1]+Q[2]+Q[3]
+
+// Make it odd
+	pb=1-BIG_parity(t[0]);
+	BIG_inc(t[0],pb);
+	BIG_norm(t[0]);
+
+// Number of bits
+    BIG_zero(mt);
+    for (i=0; i<4; i++)
+    {
+        BIG_add(mt,mt,t[i]);
+        BIG_norm(mt);
+    }
+    nb=1+BIG_nbits(mt);
+
+// Sign pivot 
+	s[nb-1]=1;
+	for (i=0;i<nb-1;i++)
+	{
+        BIG_fshr(t[0],1);
+		s[i]=2*BIG_parity(t[0])-1;
+	}
+
+// Recoded exponent
+    for (i=0; i<nb; i++)
+    {
+		w[i]=0;
+		k=1;
+		for (j=1; j<4; j++)
+		{
+			bt=s[i]*BIG_parity(t[j]);
+			BIG_fshr(t[j],1);
+
+			BIG_dec(t[j],(bt>>1));
+			BIG_norm(t[j]);
+			w[i]+=bt*k;
+			k*=2;
+        }
+    }		
+
+// Main loop
+	ECP2_select(P,T,2*w[nb-1]+1);
+    for (i=nb-2; i>=0; i--)
+    {
+        ECP2_select(&W,T,2*w[i]+s[i]);
+        ECP2_dbl(P);
+        ECP2_add(P,&W);
+    }
+
+// apply correction
+	ECP2_copy(&W,P);   
+	ECP2_sub(&W,&Q[0]);
+	ECP2_cmove(P,&W,pb);
+
+    ECP2_affine(P);
+}
+
+/*
+void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
+{
+    int i,j,a[4],nb,pb;
     ECP2 W[8],T,C;
     BIG mt,t[4];
-    FP2 work[8];
+  
     sign8 w[NLEN_XXX*BASEBITS_XXX+1];
 
     for (i=0; i<4; i++)
@@ -600,51 +687,53 @@ void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
         ECP2_affine(&Q[i]);
     }
 
-    /* precompute table */
+    // precompute table 
 
     ECP2_copy(&W[0],&Q[0]);
-    ECP2_sub(&W[0],&Q[1]);  /* P-Q */
+    ECP2_sub(&W[0],&Q[1]);  // P-Q 
     ECP2_copy(&W[1],&W[0]);
     ECP2_copy(&W[2],&W[0]);
     ECP2_copy(&W[3],&W[0]);
     ECP2_copy(&W[4],&Q[0]);
-    ECP2_add(&W[4],&Q[1]);  /* P+Q */
+    ECP2_add(&W[4],&Q[1]);  // P+Q 
     ECP2_copy(&W[5],&W[4]);
     ECP2_copy(&W[6],&W[4]);
     ECP2_copy(&W[7],&W[4]);
 
     ECP2_copy(&T,&Q[2]);
-    ECP2_sub(&T,&Q[3]);       /* R-S */
+    ECP2_sub(&T,&Q[3]);       // R-S 
     ECP2_sub(&W[1],&T);
     ECP2_add(&W[2],&T);
     ECP2_sub(&W[5],&T);
     ECP2_add(&W[6],&T);
     ECP2_copy(&T,&Q[2]);
-    ECP2_add(&T,&Q[3]);      /* R+S */
+    ECP2_add(&T,&Q[3]);      // R+S 
     ECP2_sub(&W[0],&T);
     ECP2_add(&W[3],&T);
     ECP2_sub(&W[4],&T);
     ECP2_add(&W[7],&T);
 
-    /* if a multiplier u[i] is even add 1 to multiplier, and add Q[i] to correction */
+    // if a multiplier u[i] is even add 1 to multiplier, and add Q[i] to correction 
     ECP2_inf(&C);
 
     BIG_zero(mt);
     for (i=0; i<4; i++)
     {
-        if (BIG_parity(t[i])==0)
-        {
-            BIG_inc(t[i],1);
-            BIG_norm(t[i]);
-            ECP2_add(&C,&Q[i]);
-        }
+
+		pb=BIG_parity(t[i]);
+		BIG_inc(t[i],1-pb);
+		BIG_norm(t[i]);
+		ECP2_copy(&T,&C);
+		ECP2_add(&T,&Q[i]);
+		ECP2_cmove(&C,&T,1-pb);
+
         BIG_add(mt,mt,t[i]);
         BIG_norm(mt);
     }
 
     nb=1+BIG_nbits(mt);
 
-    /* convert exponent to signed 1-bit window */
+    // convert exponent to signed 1-bit window 
     for (j=0; j<nb; j++)
     {
         for (i=0; i<4; i++)
@@ -665,11 +754,12 @@ void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
         ECP2_dbl(P);
         ECP2_add(P,&T);
     }
-    ECP2_sub(P,&C); /* apply correction */
+    ECP2_sub(P,&C); // apply correction 
 
     ECP2_affine(P);
 }
 
+*/
 
 /* Map to hash value to point on G2 from random BIG */
 

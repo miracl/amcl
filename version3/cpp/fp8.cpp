@@ -570,6 +570,13 @@ void YYY::FP8_xtr_pow2(FP8 *r,FP8 *ck,FP8 *cl,FP8 *ckml,FP8 *ckm2l,BIG a,BIG b)
 
 /* New stuff for ECp8 support */
 
+/* Move b to a if d=1 */
+void YYY::FP8_cmove(FP8 *f,FP8 *g,int d)
+{
+    FP4_cmove(&(f->a),&(g->a),d);
+    FP4_cmove(&(f->b),&(g->b),d);
+}
+
 #if CURVE_SECURITY_ZZZ == 256
 
 /* sqrt(a+xb) = sqrt((a+sqrt(a*a-n*b*b))/2)+x.b/(2*sqrt((a+sqrt(a*a-n*b*b))/2)) */
@@ -635,13 +642,6 @@ int YYY::FP8_sqrt(FP8 *r,FP8* x)
 
 }
 
-
-/* Move b to a if d=1 */
-void YYY::FP8_cmove(FP8 *f,FP8 *g,int d)
-{
-    FP4_cmove(&(f->a),&(g->a),d);
-    FP4_cmove(&(f->b),&(g->b),d);
-}
 
 void YYY::FP8_div_i(FP8 *f)
 {

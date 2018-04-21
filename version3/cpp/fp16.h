@@ -249,6 +249,15 @@ extern void FP16_xtr_pow(FP16 *r,FP16 *x,XXX::BIG b);
  */
 extern void FP16_xtr_pow2(FP16 *r,FP16 *c,FP16 *d,FP16 *e,FP16 *f,XXX::BIG a,XXX::BIG b);
 
+/**	@brief Conditional copy of FP16 number
+ *
+	Conditionally copies second parameter to the first (without branching)
+	@param x FP16 instance, set to y if s!=0
+	@param y another FP16 instance
+	@param s copy only takes place if not equal to 0
+ */
+extern void FP16_cmove(FP16 *x,FP16 *y,int s);
+
 }
 
 #endif

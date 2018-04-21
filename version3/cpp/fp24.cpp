@@ -25,6 +25,38 @@ under the License.
 
 using namespace XXX;
 
+/* return 1 if b==c, no branching */
+static int teq(sign32 b,sign32 c)
+{
+    sign32 x=b^c;
+    x-=1;  // if x=0, x now -1
+    return (int)((x>>31)&1);
+}
+
+
+/* Constant time select from pre-computed table */
+static void FP24_select(YYY::FP24 *f,YYY::FP24 g[],sign32 b)
+{
+    YYY::FP24 invf;
+    sign32 m=b>>31;
+    sign32 babs=(b^m)-m;
+
+    babs=(babs-1)/2;
+
+    FP24_cmove(f,&g[0],teq(babs,0));  // conditional move
+    FP24_cmove(f,&g[1],teq(babs,1));
+    FP24_cmove(f,&g[2],teq(babs,2));
+    FP24_cmove(f,&g[3],teq(babs,3));
+    FP24_cmove(f,&g[4],teq(babs,4));
+    FP24_cmove(f,&g[5],teq(babs,5));
+    FP24_cmove(f,&g[6],teq(babs,6));
+    FP24_cmove(f,&g[7],teq(babs,7));
+
+    FP24_copy(&invf,f);
+    FP24_conj(&invf,&invf);  // 1/f
+    FP24_cmove(f,&invf,(int)(m&1));
+}
+
 /* test x==0 ? */
 /* SU= 8 */
 int YYY::FP24_iszilch(FP24 *x)
@@ -511,9 +543,140 @@ void YYY::FP24_ppow(FP24 *r,FP24 *a,BIG b)
     FP24_reduce(r);
 }  */
 
-/* p=q0^u0.q1^u1.q2^u2.q3^u3... */
-/* Timing attack secure, but not cache attack secure */
 
+/* p=q0^u0.q1^u1.q2^u2.q3^u3... */
+/* Side channel attack secure */
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+
+void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
+{
+    int i,j,k,nb,pb1,pb2,bt;
+	FP24 g1[8],g2[8],r;
+	BIG t[8],mt;
+    sign8 w1[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 s1[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 w2[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 s2[NLEN_XXX*BASEBITS_XXX+1];
+    FP fx,fy;
+	FP2 X;
+
+    FP_rcopy(&fx,Fra);
+    FP_rcopy(&fy,Frb);
+    FP2_from_FPs(&X,&fx,&fy);
+
+    for (i=0; i<8; i++)
+        BIG_copy(t[i],u[i]);
+
+// Precomputed table
+    FP24_copy(&g1[0],&q[0]); // q[0]
+    FP24_copy(&g1[1],&g1[0]);
+	FP24_mul(&g1[1],&q[1]);	// q[0].q[1]
+    FP24_copy(&g1[2],&g1[0]);
+	FP24_mul(&g1[2],&q[2]);	// q[0].q[2]
+	FP24_copy(&g1[3],&g1[1]);
+	FP24_mul(&g1[3],&q[2]);	// q[0].q[1].q[2]
+	FP24_copy(&g1[4],&g1[0]);
+	FP24_mul(&g1[4],&q[3]);  // q[0].q[3]
+	FP24_copy(&g1[5],&g1[1]);
+	FP24_mul(&g1[5],&q[3]);	// q[0].q[1].q[3]
+	FP24_copy(&g1[6],&g1[2]);
+	FP24_mul(&g1[6],&q[3]);	// q[0].q[2].q[3]
+	FP24_copy(&g1[7],&g1[3]);
+	FP24_mul(&g1[7],&q[3]);	// q[0].q[1].q[2].q[3]
+
+// Use Frobenius
+
+	for (i=0;i<8;i++)
+	{
+		FP24_copy(&g2[i],&g1[i]);
+		FP24_frob(&g2[i],&X,4);
+	}
+
+// Make it odd
+	pb1=1-BIG_parity(t[0]);
+	BIG_inc(t[0],pb1);
+	BIG_norm(t[0]);
+
+	pb2=1-BIG_parity(t[4]);
+	BIG_inc(t[4],pb2);
+	BIG_norm(t[4]);
+
+// Number of bits
+    BIG_zero(mt);
+    for (i=0; i<8; i++)
+    {
+        BIG_add(mt,mt,t[i]);
+        BIG_norm(mt);
+    }
+    nb=1+BIG_nbits(mt);
+
+// Sign pivot 
+	s1[nb-1]=1;
+	s2[nb-1]=1;
+	for (i=0;i<nb-1;i++)
+	{
+        BIG_fshr(t[0],1);
+		s1[i]=2*BIG_parity(t[0])-1;
+        BIG_fshr(t[4],1);
+		s2[i]=2*BIG_parity(t[4])-1;
+	}
+
+// Recoded exponents
+    for (i=0; i<nb; i++)
+    {
+		w1[i]=0;
+		k=1;
+		for (j=1; j<4; j++)
+		{
+			bt=s1[i]*BIG_parity(t[j]);
+			BIG_fshr(t[j],1);
+
+			BIG_dec(t[j],(bt>>1));
+			BIG_norm(t[j]);
+			w1[i]+=bt*k;
+			k*=2;
+        }
+
+		w2[i]=0;
+		k=1;
+		for (j=5; j<8; j++)
+		{
+			bt=s2[i]*BIG_parity(t[j]);
+			BIG_fshr(t[j],1);
+
+			BIG_dec(t[j],(bt>>1));
+			BIG_norm(t[j]);
+			w2[i]+=bt*k;
+			k*=2;
+        }
+    }	
+
+// Main loop
+	FP24_select(p,g1,2*w1[nb-1]+1);
+	FP24_select(&r,g2,2*w2[nb-1]+1);
+	FP24_mul(p,&r);
+    for (i=nb-2; i>=0; i--)
+    {
+		FP24_usqr(p,p);
+        FP24_select(&r,g1,2*w1[i]+s1[i]);
+        FP24_mul(p,&r);
+        FP24_select(&r,g2,2*w2[i]+s2[i]);
+        FP24_mul(p,&r);
+    }
+
+// apply correction
+	FP24_conj(&r,&q[0]);   
+	FP24_mul(&r,p);
+	FP24_cmove(p,&r,pb1);
+	FP24_conj(&r,&q[4]);   
+	FP24_mul(&r,p);
+	FP24_cmove(p,&r,pb2);
+
+	FP24_reduce(p);
+}
+
+/*
 void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
 {
     int i,j,a[4],nb,m;
@@ -533,26 +696,26 @@ void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
 
     FP24_copy(&g[0],&q[0]);
     FP24_conj(&s[0],&q[1]);
-    FP24_mul(&g[0],&s[0]);  /* P/Q */
+    FP24_mul(&g[0],&s[0]);  // P/Q 
     FP24_copy(&g[1],&g[0]);
     FP24_copy(&g[2],&g[0]);
     FP24_copy(&g[3],&g[0]);
     FP24_copy(&g[4],&q[0]);
-    FP24_mul(&g[4],&q[1]);  /* P*Q */
+    FP24_mul(&g[4],&q[1]);  // P*Q 
     FP24_copy(&g[5],&g[4]);
     FP24_copy(&g[6],&g[4]);
     FP24_copy(&g[7],&g[4]);
 
     FP24_copy(&s[1],&q[2]);
     FP24_conj(&s[0],&q[3]);
-    FP24_mul(&s[1],&s[0]);       /* R/S */
+    FP24_mul(&s[1],&s[0]);       // R/S 
     FP24_conj(&s[0],&s[1]);
     FP24_mul(&g[1],&s[0]);
     FP24_mul(&g[2],&s[1]);
     FP24_mul(&g[5],&s[0]);
     FP24_mul(&g[6],&s[1]);
     FP24_copy(&s[1],&q[2]);
-    FP24_mul(&s[1],&q[3]);      /* R*S */
+    FP24_mul(&s[1],&q[3]);      // R*S 
     FP24_conj(&s[0],&s[1]);
     FP24_mul(&g[0],&s[0]);
     FP24_mul(&g[3],&s[1]);
@@ -568,7 +731,7 @@ void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
 	}
 
 
-    /* if power is even add 1 to power, and add q to correction */
+    // if power is even add 1 to power, and add q to correction 
     FP24_one(&c);
 
     BIG_zero(mt);
@@ -587,7 +750,7 @@ void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
     FP24_conj(&c,&c);
     nb=1+BIG_nbits(mt);
 
-    /* convert exponents to signed 1-bit windows */
+    // convert exponents to signed 1-bit windows 
     for (j=0; j<nb; j++)
     {
         for (i=0; i<4; i++)
@@ -623,24 +786,24 @@ void YYY::FP24_pow8(FP24 *p,FP24 *q,BIG u[8])
 		FP24_usqr(p,p);
 
         m=w[i]>>7;
-        j=(w[i]^m)-m;  /* j=abs(w[i]) */
+        j=(w[i]^m)-m;  // j=abs(w[i]) 
         j=(j-1)/2;
         FP24_copy(&s[0],&g[j]);
         FP24_conj(&s[1],&g[j]);
         FP24_mul(p,&s[m&1]);
 
         m=z[i]>>7;
-        j=(z[i]^m)-m;  /* j=abs(w[i]) */
+        j=(z[i]^m)-m;  // j=abs(w[i]) 
         j=(j-1)/2;
         FP24_copy(&s[0],&f[j]);
         FP24_conj(&s[1],&f[j]);
         FP24_mul(p,&s[m&1]);
 
     }
-    FP24_mul(p,&c); /* apply correction */
+    FP24_mul(p,&c); // apply correction 
     FP24_reduce(p);
 }
-
+*/
 
 /* Set w=w^p using Frobenius */
 /* SU= 160 */
@@ -828,6 +991,14 @@ void YYY::FP24_fromOctet(FP24 *g,octet *W)
     FP_nres(&(g->c.b.b.a),b);
     BIG_fromBytes(b,&W->val[23*MODBYTES_XXX]);
     FP_nres(&(g->c.b.b.b),b);
+}
+
+/* Move b to a if d=1 */
+void YYY::FP24_cmove(FP24 *f,FP24 *g,int d)
+{
+    FP8_cmove(&(f->a),&(g->a),d);
+    FP8_cmove(&(f->b),&(g->b),d);
+    FP8_cmove(&(f->c),&(g->c),d);
 }
 
 /*

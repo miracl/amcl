@@ -179,5 +179,16 @@ extern void FP12_fromOctet(FP12 *x,octet *S);
 
  */
 extern void FP12_trace(FP4 *t,FP12 *x);
+
+/**	@brief Conditional copy of FP12 number
+ *
+	Conditionally copies second parameter to the first (without branching)
+	@param x FP12 instance, set to y if s!=0
+	@param y another FP12 instance
+	@param s copy only takes place if not equal to 0
+ */
+extern void FP12_cmove(FP12 *x,FP12 *y,int s);
+
+
 }
 #endif

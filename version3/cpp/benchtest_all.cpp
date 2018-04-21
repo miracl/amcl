@@ -945,7 +945,6 @@ int main()
 	char pr[10];
 	unsigned long ran;
 
-
 	time((time_t *)&ran);
 	pr[0]=ran;
 	pr[1]=ran>>8;
@@ -954,7 +953,6 @@ int main()
 	for (i=4;i<10;i++) pr[i]=i;
     RAND_seed(&RNG,10,pr);
 
-
 	ED_25519(&RNG);
 	NIST_256(&RNG);
 	GOLDI_LOCKS(&RNG);
@@ -962,7 +960,6 @@ int main()
 	BLS_383(&RNG);
 	BLS_24(&RNG);
 	BLS_48(&RNG);
-
 
 	RSA_2048(&RNG);
 	

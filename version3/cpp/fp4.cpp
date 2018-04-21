@@ -584,6 +584,12 @@ void YYY::FP4_div2(FP4 *w,FP4 *x)
     FP2_div2(&(w->b),&(x->b));
 }
 
+/* Move b to a if d=1 */
+void YYY::FP4_cmove(FP4 *f,FP4 *g,int d)
+{
+    FP2_cmove(&(f->a),&(g->a),d);
+    FP2_cmove(&(f->b),&(g->b),d);
+}
 
 #if CURVE_SECURITY_ZZZ >= 192
 
@@ -648,14 +654,6 @@ int YYY::FP4_sqrt(FP4 *r,FP4* x)
 
 	return 1;
 
-}
-
-
-/* Move b to a if d=1 */
-void YYY::FP4_cmove(FP4 *f,FP4 *g,int d)
-{
-    FP2_cmove(&(f->a),&(g->a),d);
-    FP2_cmove(&(f->b),&(g->b),d);
 }
 
 void YYY::FP4_div_i(FP4 *f)

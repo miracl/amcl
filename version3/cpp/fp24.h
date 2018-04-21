@@ -186,5 +186,15 @@ extern void FP24_fromOctet(FP24 *x,octet *S);
 
  */
 extern void FP24_trace(FP8 *t,FP24 *x);
+
+/**	@brief Conditional copy of FP24 number
+ *
+	Conditionally copies second parameter to the first (without branching)
+	@param x FP24 instance, set to y if s!=0
+	@param y another FP24 instance
+	@param s copy only takes place if not equal to 0
+ */
+extern void FP24_cmove(FP24 *x,FP24 *y,int s);
+
 }
 #endif

@@ -344,6 +344,13 @@ void YYY::FP16_pow(FP16 *r,FP16* a,BIG b)
     FP16_reduce(r);
 }
 
+/* Move b to a if d=1 */
+void YYY::FP16_cmove(FP16 *f,FP16 *g,int d)
+{
+    FP8_cmove(&(f->a),&(g->a),d);
+    FP8_cmove(&(f->b),&(g->b),d);
+}
+
 #if CURVE_SECURITY_ZZZ == 256
 
 /* XTR xtr_a function */

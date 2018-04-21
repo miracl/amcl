@@ -605,9 +605,207 @@ void ZZZ::ECP8_frob(ECP8 *P,FP2 *F,int n)
 	ECP8_set(P,&X,&Y);
 }
 
+/* Side channel attack secure */
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+
 void ZZZ::ECP8_mul16(ECP8 *P,ECP8 Q[16],BIG u[16])
 {
-    int i,j,a[4],nb;
+    int i,j,k,nb,pb1,pb2,pb3,pb4,bt;
+	ECP8 T1[8],T2[8],T3[8],T4[8],W;
+    BIG mt,t[16];
+    sign8 w1[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 s1[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 w2[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 s2[NLEN_XXX*BASEBITS_XXX+1];	
+    sign8 w3[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 s3[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 w4[NLEN_XXX*BASEBITS_XXX+1];
+    sign8 s4[NLEN_XXX*BASEBITS_XXX+1];	
+    FP fx,fy;
+	FP2 X;
+
+    FP_rcopy(&fx,Fra);
+    FP_rcopy(&fy,Frb);
+    FP2_from_FPs(&X,&fx,&fy);
+
+    for (i=0; i<16; i++)
+        BIG_copy(t[i],u[i]);
+
+// Precomputed table
+    ECP8_copy(&T1[0],&Q[0]); // Q[0]
+    ECP8_copy(&T1[1],&T1[0]);
+	ECP8_add(&T1[1],&Q[1]);	// Q[0]+Q[1]
+    ECP8_copy(&T1[2],&T1[0]);
+	ECP8_add(&T1[2],&Q[2]);	// Q[0]+Q[2]
+	ECP8_copy(&T1[3],&T1[1]);
+	ECP8_add(&T1[3],&Q[2]);	// Q[0]+Q[1]+Q[2]
+	ECP8_copy(&T1[4],&T1[0]);
+	ECP8_add(&T1[4],&Q[3]);  // Q[0]+Q[3]
+	ECP8_copy(&T1[5],&T1[1]);
+	ECP8_add(&T1[5],&Q[3]);	// Q[0]+Q[1]+Q[3]
+	ECP8_copy(&T1[6],&T1[2]);
+	ECP8_add(&T1[6],&Q[3]);	// Q[0]+Q[2]+Q[3]
+	ECP8_copy(&T1[7],&T1[3]);
+	ECP8_add(&T1[7],&Q[3]);	// Q[0]+Q[1]+Q[2]+Q[3]
+
+//  Use Frobenius 
+
+	for (i=0;i<8;i++)
+	{
+		ECP8_copy(&T2[i],&T1[i]);
+		ECP8_frob(&T2[i],&X,4);
+
+		ECP8_copy(&T3[i],&T2[i]);
+		ECP8_frob(&T3[i],&X,4);
+
+		ECP8_copy(&T4[i],&T3[i]);
+		ECP8_frob(&T4[i],&X,4);
+	}
+
+// Make them odd
+	pb1=1-BIG_parity(t[0]);
+	BIG_inc(t[0],pb1);
+	BIG_norm(t[0]);
+
+	pb2=1-BIG_parity(t[4]);
+	BIG_inc(t[4],pb2);
+	BIG_norm(t[4]);
+
+	pb3=1-BIG_parity(t[8]);
+	BIG_inc(t[8],pb3);
+	BIG_norm(t[8]);
+
+	pb4=1-BIG_parity(t[12]);
+	BIG_inc(t[12],pb4);
+	BIG_norm(t[12]);
+
+// Number of bits
+    BIG_zero(mt);
+    for (i=0; i<16; i++)
+    {
+        BIG_add(mt,mt,t[i]);
+        BIG_norm(mt);
+    }
+    nb=1+BIG_nbits(mt);
+
+// Sign pivot 
+	s1[nb-1]=1;
+	s2[nb-1]=1;
+	s3[nb-1]=1;
+	s4[nb-1]=1;
+	for (i=0;i<nb-1;i++)
+	{
+        BIG_fshr(t[0],1);
+		s1[i]=2*BIG_parity(t[0])-1;
+        BIG_fshr(t[4],1);
+		s2[i]=2*BIG_parity(t[4])-1;
+        BIG_fshr(t[8],1);
+		s3[i]=2*BIG_parity(t[8])-1;
+        BIG_fshr(t[12],1);
+		s4[i]=2*BIG_parity(t[12])-1;
+	}
+
+
+// Recoded exponents
+    for (i=0; i<nb; i++)
+    {
+		w1[i]=0;
+		k=1;
+		for (j=1; j<4; j++)
+		{
+			bt=s1[i]*BIG_parity(t[j]);
+			BIG_fshr(t[j],1);
+
+			BIG_dec(t[j],(bt>>1));
+			BIG_norm(t[j]);
+			w1[i]+=bt*k;
+			k*=2;
+        }
+
+		w2[i]=0;
+		k=1;
+		for (j=5; j<8; j++)
+		{
+			bt=s2[i]*BIG_parity(t[j]);
+			BIG_fshr(t[j],1);
+
+			BIG_dec(t[j],(bt>>1));
+			BIG_norm(t[j]);
+			w2[i]+=bt*k;
+			k*=2;
+        }
+
+		w3[i]=0;
+		k=1;
+		for (j=9; j<12; j++)
+		{
+			bt=s3[i]*BIG_parity(t[j]);
+			BIG_fshr(t[j],1);
+
+			BIG_dec(t[j],(bt>>1));
+			BIG_norm(t[j]);
+			w3[i]+=bt*k;
+			k*=2;
+        }
+
+		w4[i]=0;
+		k=1;
+		for (j=13; j<16; j++)
+		{
+			bt=s4[i]*BIG_parity(t[j]);
+			BIG_fshr(t[j],1);
+
+			BIG_dec(t[j],(bt>>1));
+			BIG_norm(t[j]);
+			w4[i]+=bt*k;
+			k*=2;
+        }
+    }	
+
+// Main loop
+	ECP8_select(P,T1,2*w1[nb-1]+1);
+	ECP8_select(&W,T2,2*w2[nb-1]+1);
+	ECP8_add(P,&W);
+	ECP8_select(&W,T3,2*w3[nb-1]+1);
+	ECP8_add(P,&W);
+	ECP8_select(&W,T4,2*w4[nb-1]+1);
+	ECP8_add(P,&W);
+
+    for (i=nb-2; i>=0; i--)
+    {
+        ECP8_dbl(P);
+        ECP8_select(&W,T1,2*w1[i]+s1[i]);
+        ECP8_add(P,&W);
+        ECP8_select(&W,T2,2*w2[i]+s2[i]);
+        ECP8_add(P,&W);
+        ECP8_select(&W,T3,2*w3[i]+s3[i]);
+        ECP8_add(P,&W);
+        ECP8_select(&W,T4,2*w4[i]+s4[i]);
+        ECP8_add(P,&W);
+    }
+
+// apply corrections
+	ECP8_copy(&W,P);   
+	ECP8_sub(&W,&Q[0]);
+	ECP8_cmove(P,&W,pb1);
+	ECP8_copy(&W,P);   
+	ECP8_sub(&W,&Q[4]);
+	ECP8_cmove(P,&W,pb2);
+
+	ECP8_copy(&W,P);   
+	ECP8_sub(&W,&Q[8]);
+	ECP8_cmove(P,&W,pb3);
+	ECP8_copy(&W,P);   
+	ECP8_sub(&W,&Q[12]);
+	ECP8_cmove(P,&W,pb4);
+
+}
+
+/*
+void ZZZ::ECP8_mul16(ECP8 *P,ECP8 Q[16],BIG u[16])
+{
+    int i,j,a[4],nb,pb;
     ECP8 W[8],Z[8],WW[8],ZZ[8],T,C;
     BIG mt,t[16];
     sign8 w[NLEN_XXX*BASEBITS_XXX+1];
@@ -626,36 +824,36 @@ void ZZZ::ECP8_mul16(ECP8 *P,ECP8 Q[16],BIG u[16])
     for (i=0; i<16; i++)
         BIG_copy(t[i],u[i]);
 
-    /* precompute tables */
+    // precompute tables 
 
-/* 12 add/subs */
+// 12 add/subs 
 
     ECP8_copy(&W[0],&Q[0]);
-    ECP8_sub(&W[0],&Q[1]);  /* P-Q */
+    ECP8_sub(&W[0],&Q[1]);  // P-Q
     ECP8_copy(&W[1],&W[0]);
     ECP8_copy(&W[2],&W[0]);
     ECP8_copy(&W[3],&W[0]);
     ECP8_copy(&W[4],&Q[0]);
-    ECP8_add(&W[4],&Q[1]);  /* P+Q */
+    ECP8_add(&W[4],&Q[1]);  // P+Q 
     ECP8_copy(&W[5],&W[4]);
     ECP8_copy(&W[6],&W[4]);
     ECP8_copy(&W[7],&W[4]);
 
     ECP8_copy(&T,&Q[2]);
-    ECP8_sub(&T,&Q[3]);       /* R-S */
+    ECP8_sub(&T,&Q[3]);       // R-S 
     ECP8_sub(&W[1],&T);
     ECP8_add(&W[2],&T);
     ECP8_sub(&W[5],&T);
     ECP8_add(&W[6],&T);
     ECP8_copy(&T,&Q[2]);
-    ECP8_add(&T,&Q[3]);      /* R+S */
+    ECP8_add(&T,&Q[3]);      // R+S 
     ECP8_sub(&W[0],&T);
     ECP8_add(&W[3],&T);
     ECP8_sub(&W[4],&T);
     ECP8_add(&W[7],&T);
 
 
-/* Use Frobenius */
+// Use Frobenius 
 
 	for (i=0;i<8;i++)
 	{
@@ -675,25 +873,27 @@ void ZZZ::ECP8_mul16(ECP8 *P,ECP8 Q[16],BIG u[16])
 		ECP8_frob(&ZZ[i],&X,4);
 	}
 
-    /* if multiplier is even add 1 to multiplier, and add P to correction */
+    // if multiplier is even add 1 to multiplier, and add P to correction 
     ECP8_inf(&C);
 
     BIG_zero(mt);
     for (i=0; i<16; i++)
     {
-        if (BIG_parity(t[i])==0)
-        {
-            BIG_inc(t[i],1);
-            BIG_norm(t[i]);
-            ECP8_add(&C,&Q[i]);
-        }
+		pb=BIG_parity(t[i]);
+		BIG_inc(t[i],1-pb);
+		BIG_norm(t[i]);
+		ECP8_copy(&T,&C);
+		ECP8_add(&T,&Q[i]);
+		ECP8_cmove(&C,&T,1-pb);
+
+
         BIG_add(mt,mt,t[i]);
         BIG_norm(mt);
     }
 
     nb=1+BIG_nbits(mt);
 
-    /* convert exponents to signed 1-bit windows */
+    // convert exponents to signed 1-bit windows 
     for (j=0; j<nb; j++)
     {
         for (i=0; i<4; i++)
@@ -735,7 +935,6 @@ void ZZZ::ECP8_mul16(ECP8 *P,ECP8 Q[16],BIG u[16])
     }
     ww[nb]=8*BIG_lastbits(t[8],2)+4*BIG_lastbits(t[9],2)+2*BIG_lastbits(t[10],2)+BIG_lastbits(t[11],2);
 
-
     for (j=0; j<nb; j++)
     {
         for (i=0; i<4; i++)
@@ -766,10 +965,10 @@ void ZZZ::ECP8_mul16(ECP8 *P,ECP8 Q[16],BIG u[16])
         ECP8_add(P,&T);
 
     }
-    ECP8_sub(P,&C); /* apply correction */
+    ECP8_sub(P,&C); // apply correction 
 	ECP8_reduce(P);
 }
-
+*/
 /* Map to hash value to point on G2 from random BIG */
 
 void ZZZ::ECP8_mapit(ECP8 *Q,octet *W)

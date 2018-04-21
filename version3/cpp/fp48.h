@@ -186,5 +186,14 @@ extern void FP48_fromOctet(FP48 *x,octet *S);
 
  */
 extern void FP48_trace(FP16 *t,FP48 *x);
+
+/**	@brief Conditional copy of FP48 number
+ *
+	Conditionally copies second parameter to the first (without branching)
+	@param x FP48 instance, set to y if s!=0
+	@param y another FP48 instance
+	@param s copy only takes place if not equal to 0
+ */
+extern void FP48_cmove(FP48 *x,FP48 *y,int s);
 }
 #endif
