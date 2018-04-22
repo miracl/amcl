@@ -248,6 +248,14 @@ extern void FP4_YYY_xtr_pow(FP4_YYY *r,FP4_YYY *x,BIG_XXX b);
  */
 extern void FP4_YYY_xtr_pow2(FP4_YYY *r,FP4_YYY *c,FP4_YYY *d,FP4_YYY *e,FP4_YYY *f,BIG_XXX a,BIG_XXX b);
 
+/**	@brief Conditional copy of FP4 number
+ *
+	Conditionally copies second parameter to the first (without branching)
+	@param x FP4 instance, set to y if s!=0
+	@param y another FP4 instance
+	@param s copy only takes place if not equal to 0
+ */
+extern void FP4_YYY_cmove(FP4_YYY *x,FP4_YYY *y,int s);
 
 
 #endif

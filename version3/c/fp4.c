@@ -568,6 +568,14 @@ void FP4_YYY_xtr_pow2(FP4_YYY *r,FP4_YYY *ck,FP4_YYY *cl,FP4_YYY *ckml,FP4_YYY *
     for (i=0; i<f2; i++)	FP4_YYY_xtr_D(r,r);
     FP4_YYY_xtr_pow(r,r,d);
 }
+
+/* Move b to a if d=1 */
+void FP4_YYY_cmove(FP4_YYY *f,FP4_YYY *g,int d)
+{
+    FP2_YYY_cmove(&(f->a),&(g->a),d);
+    FP2_YYY_cmove(&(f->b),&(g->b),d);
+}
+
 /*
 int main(){
 		FP2_YYY w0,w1,f;

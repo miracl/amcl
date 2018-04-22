@@ -205,9 +205,7 @@ void ECP_ZZZ_rhs(FP_YYY *v,FP_YYY *x)
 
 #if CURVETYPE_ZZZ==EDWARDS
     /* (Ax^2-1)/(Bx^2-1) */
-    BIG_XXX m,b,c;
     FP_YYY t,one;
-    BIG_XXX_rcopy(m,Modulus_YYY);
     FP_YYY_sqr(v,x);
     FP_YYY_one(&one);
     FP_YYY_rcopy(&t,CURVE_B_ZZZ);
@@ -222,10 +220,9 @@ void ECP_ZZZ_rhs(FP_YYY *v,FP_YYY *x)
         FP_YYY_norm(v);
         FP_YYY_neg(v,v);
     }
-    FP_YYY_redc(b,v);
-    FP_YYY_redc(c,&t);
-    BIG_XXX_moddiv(b,b,c,m);
-    FP_YYY_nres(v,b);
+	FP_YYY_inv(&t,&t);
+	FP_YYY_mul(v,v,&t);
+	FP_YYY_reduce(v);
 #endif
 
 #if CURVETYPE_ZZZ==MONTGOMERY
@@ -393,17 +390,12 @@ void ECP_ZZZ_mapit(ECP_ZZZ *P,octet *W)
 void ECP_ZZZ_affine(ECP_ZZZ *P)
 {
     FP_YYY one,iz;
-    BIG_XXX m,b;
+    BIG_XXX b;
     if (ECP_ZZZ_isinf(P)) return;
     FP_YYY_one(&one);
     if (FP_YYY_equals(&(P->z),&one)) return;
 
-    BIG_XXX_rcopy(m,Modulus_YYY);
-
-    FP_YYY_redc(b,&(P->z));
-    BIG_XXX_invmodp(b,b,m);
-    FP_YYY_nres(&iz,b);
-
+	FP_YYY_inv(&iz,&(P->z));
     FP_YYY_mul(&(P->x),&(P->x),&iz);
 
 #if CURVETYPE_ZZZ==EDWARDS || CURVETYPE_ZZZ==WEIERSTRASS

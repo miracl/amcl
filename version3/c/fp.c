@@ -509,12 +509,9 @@ void FP_YYY_div2(FP_YYY *r,FP_YYY *a)
 /* set w=1/x */
 void FP_YYY_inv(FP_YYY *w,FP_YYY *x)
 {
-    BIG_XXX m;
-    BIG_XXX b;
+    BIG_XXX m,b;
     BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_copy(w->g,x->g);
-    FP_YYY_redc(b,w);
-
+    FP_YYY_redc(b,x);
     BIG_XXX_invmodp(b,b,m);
     FP_YYY_nres(w,b);
 }
