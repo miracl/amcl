@@ -481,6 +481,7 @@ void ZZZ::PAIR_GTpow(FP24 *f,BIG e)
             BIG_copy(u[i],t);
             FP24_conj(&g[i],&g[i]);
         }
+        BIG_norm(u[i]);        
     }
     FP24_pow8(f,g,u);
 

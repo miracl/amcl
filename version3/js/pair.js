@@ -709,6 +709,7 @@ var PAIR = function(ctx) {
                     u[i].copy(t);
                     g[i].conj();
                 }
+                u[i].norm();                
             }
 
             r = ctx.FP12.pow4(g, u);

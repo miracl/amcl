@@ -846,6 +846,7 @@ void PAIR_ZZZ_GTpow(FP12_YYY *f,BIG_XXX e)
             BIG_XXX_copy(u[i],t);
             FP12_YYY_conj(&g[i],&g[i]);
         }
+        BIG_XXX_norm(u[i]);
     }
     FP12_YYY_pow4(f,g,u);
 

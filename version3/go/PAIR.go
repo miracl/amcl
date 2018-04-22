@@ -654,6 +654,7 @@ func GTpow(d *FP12,e *BIG) *FP12 {
 				u[i].copy(t)
 				g[i].conj()
 			}
+			u[i].norm()			
 		}
 		r=pow4(g,u)
 	} else {

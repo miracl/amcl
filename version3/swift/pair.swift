@@ -655,6 +655,7 @@ final public class PAIR {
                     u[i].copy(t)
                     g[i].conj()
 				}
+                u[i].norm()                
             }
             r=FP12.pow4(g,u)
         }

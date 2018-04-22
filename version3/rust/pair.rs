@@ -672,6 +672,7 @@ pub fn gtpow(d: &FP12,e: &BIG) -> FP12 {
 				u[i].copy(&t);
 				g[i].conj();
 			}
+			u[i].norm();			
 		}
 		r.copy(&FP12::pow4(&mut g,&u));
 	} else {

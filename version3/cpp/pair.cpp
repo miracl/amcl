@@ -812,6 +812,7 @@ void ZZZ::PAIR_GTpow(FP12 *f,BIG e)
             BIG_copy(u[i],t);
             FP12_conj(&g[i],&g[i]);
         }
+        BIG_norm(u[i]);        
     }
     FP12_pow4(f,g,u);
 
