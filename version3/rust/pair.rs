@@ -593,7 +593,8 @@ pub fn g1mul(P: &ECP,e: &mut BIG) -> ECP {
 			u[1].copy(&t);
 			Q.neg();
 		}
-
+		u[0].norm();
+		u[1].norm();
 		R=R.mul2(&u[0],&mut Q,&u[1]);
 			
 	} else {
@@ -634,6 +635,7 @@ pub fn g2mul(P: &ECP2,e: &BIG) -> ECP2 {
 				u[i].copy(&t);
 				Q[i].neg();
 			}
+			u[i].norm();
 		}
 
 		R.copy(&ECP2::mul4(&mut Q,&u));

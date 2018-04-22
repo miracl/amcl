@@ -568,7 +568,8 @@ final public class PAIR {
 				u[1].copy(t)
 				Q.neg()
             }
-    
+            u[0].norm()
+            u[1].norm()
             R=R.mul2(u[0],Q,u[1])
         }
         else
@@ -594,7 +595,7 @@ final public class PAIR {
                 f.norm()
             }
 
-            let t=BIG(0);
+            let t=BIG(0)
             P.affine()
             Q.append(ECP2())
             Q[0].copy(P);
@@ -605,21 +606,22 @@ final public class PAIR {
             }
             for i in 0 ..< 4
             {
-				let np=u[i].nbits();
-				t.copy(BIG.modneg(u[i],q));
-				let nn=t.nbits();
+				let np=u[i].nbits()
+				t.copy(BIG.modneg(u[i],q))
+				let nn=t.nbits()
 				if (nn<np)
 				{
-                    u[i].copy(t);
-                    Q[i].neg();
+                    u[i].copy(t)
+                    Q[i].neg()
 				}
+                u[i].norm()
             }
     
-            R=ECP2.mul4(Q,u);
+            R=ECP2.mul4(Q,u)
         }
         else
         {
-            R=P.mul(e);
+            R=P.mul(e)
         }
         return R;
     }

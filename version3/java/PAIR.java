@@ -599,7 +599,8 @@ public final class PAIR {
 				u[1].copy(t);
 				Q.neg();
 			}
-
+			u[0].norm();
+			u[1].norm();
 			R=R.mul2(u[0],Q,u[1]);
 			
 		}
@@ -648,6 +649,7 @@ public final class PAIR {
 					u[i].copy(t);
 					Q[i].neg();
 				}
+				u[i].norm();	
 			}
 
 			R=ECP2.mul4(Q,u);

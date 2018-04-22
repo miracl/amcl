@@ -577,7 +577,8 @@ func G1mul(P *ECP,e *BIG) *ECP {
 			u[1].copy(t)
 			Q.neg()
 		}
-
+		u[0].norm()
+		u[1].norm()
 		R=R.Mul2(u[0],Q,u[1])
 			
 	} else {
@@ -616,6 +617,7 @@ func G2mul(P *ECP2,e *BIG) *ECP2 {
 				u[i].copy(t)
 				Q[i].neg()
 			}
+			u[i].norm()
 		}
 
 		R=mul4(Q,u)

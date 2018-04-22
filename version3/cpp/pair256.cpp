@@ -508,6 +508,8 @@ void ZZZ::PAIR_G1mul(ECP *P,BIG e)
         BIG_copy(u[1],t);
         ECP_neg(&Q);
     }
+    BIG_norm(u[0]);
+    BIG_norm(u[1]);    
     ECP_mul2(P,&Q,u[0],u[1]);
 
 #else
@@ -546,6 +548,7 @@ void ZZZ::PAIR_G2mul(ECP8 *P,BIG e)
             BIG_copy(u[i],x);
             ECP8_neg(&Q[i]);
         }
+        BIG_norm(u[i]);            
     }
 
     ECP8_mul16(P,Q,u);
