@@ -77,6 +77,12 @@ func (F *FP4) iszilch() bool {
 	return F.a.iszilch() && F.b.iszilch()
 }
 
+/* Conditional move */
+func (F *FP4) cmove(g *FP4,d int) {
+	F.a.cmove(g.a,d)
+	F.b.cmove(g.b,d)
+}
+
 /* test this==1 ? */
 func (F *FP4) isunity() bool {
 	one:=NewFP2int(1)

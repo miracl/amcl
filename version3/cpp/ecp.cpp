@@ -207,9 +207,7 @@ void ZZZ::ECP_rhs(FP *v,FP *x)
 
 #if CURVETYPE_ZZZ==EDWARDS
     /* (Ax^2-1)/(Bx^2-1) */
-    BIG m,b,c;
 	FP t,one;
-    BIG_rcopy(m,Modulus);
     FP_sqr(v,x);
     FP_one(&one);
     FP_rcopy(&t,CURVE_B);
@@ -224,10 +222,9 @@ void ZZZ::ECP_rhs(FP *v,FP *x)
 		FP_norm(v);
         FP_neg(v,v);
     }
-    FP_redc(b,v);
-    FP_redc(c,&t);
-    BIG_moddiv(b,b,c,m);
-    FP_nres(v,b);
+	FP_inv(&t,&t);
+	FP_mul(v,v,&t);
+	FP_reduce(v);
 #endif
 
 #if CURVETYPE_ZZZ==MONTGOMERY
@@ -371,17 +368,12 @@ int ZZZ::ECP_setx(ECP *P,BIG x,int s)
 void ZZZ::ECP_affine(ECP *P)
 {
     FP one,iz;
-	BIG m,b;
+	BIG b;
     if (ECP_isinf(P)) return;
     FP_one(&one);
     if (FP_equals(&(P->z),&one)) return;
 
-    BIG_rcopy(m,Modulus);
-
-    FP_redc(b,&(P->z));
-    BIG_invmodp(b,b,m);
-    FP_nres(&iz,b);
-
+	FP_inv(&iz,&(P->z));
     FP_mul(&(P->x),&(P->x),&iz);
 
 #if CURVETYPE_ZZZ==EDWARDS || CURVETYPE_ZZZ==WEIERSTRASS

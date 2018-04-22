@@ -282,17 +282,16 @@ void YYY::FP2_rawoutput(FP2 *w)
 /* SU= 128 */
 void YYY::FP2_inv(FP2 *w,FP2 *x)
 {
-    BIG m,b;
+    BIG b;
 	FP w1,w2;
-    BIG_rcopy(m,Modulus);
+
     FP2_norm(x);
     FP_sqr(&w1,&(x->a));
     FP_sqr(&w2,&(x->b));
     FP_add(&w1,&w1,&w2);
 
-    FP_redc(b,&w1);
-    BIG_invmodp(b,b,m);
-    FP_nres(&w1,b);
+	FP_inv(&w1,&w1);
+
     FP_mul(&(w->a),&(x->a),&w1);
     FP_neg(&w1,&w1);
 	FP_norm(&w1);
@@ -389,12 +388,10 @@ void YYY::FP2_pow(FP2 *r,FP2* a,BIG b)
 
 int YYY::FP2_sqrt(FP2 *w,FP2 *u)
 {
-    BIG b,q;
+    BIG b;
 	FP w1,w2;
     FP2_copy(w,u);
     if (FP2_iszilch(w)) return 1;
-
-    BIG_rcopy(q,Modulus);
 
     FP_sqr(&w1,&(w->b));
     FP_sqr(&w2,&(w->a));
@@ -422,9 +419,9 @@ int YYY::FP2_sqrt(FP2 *w,FP2 *u)
     FP_sqrt(&w2,&w2);
     FP_copy(&(w->a),&w2);
     FP_add(&w2,&w2,&w2);
-    FP_redc(b,&w2);
-    BIG_invmodp(b,b,q);
-    FP_nres(&w2,b);
+
+	FP_inv(&w2,&w2);
+
     FP_mul(&(w->b),&(w->b),&w2);
     return 1;
 }

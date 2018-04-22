@@ -511,12 +511,16 @@ void YYY::FP_div2(FP *r,FP *a)
 /* set w=1/x */
 void YYY::FP_inv(FP *w,FP *x)
 {
-    BIG m;
-	BIG b;
-    BIG_rcopy(m,Modulus);
-    BIG_copy(w->g,x->g);
-    FP_redc(b,w);
+/* 
+	BIG m2;
+	BIG_rcopy(m2,Modulus);
+	BIG_dec(m2,2);
+	FP_pow(w,x,m2);
+*/
 
+    BIG m,b;
+    BIG_rcopy(m,Modulus);
+    FP_redc(b,x);
     BIG_invmodp(b,b,m);
     FP_nres(w,b);
 }

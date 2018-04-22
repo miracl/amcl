@@ -461,6 +461,85 @@ func (E *ECP2) Mul(e *BIG) *ECP2 {
 }
 
 /* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+// Side channel attack secure 
+func mul4(Q []*ECP2,u []*BIG) *ECP2 {
+	W:=NewECP2()
+	P:=NewECP2()
+	var T [] *ECP2
+	mt:=NewBIG()
+	var t [] *BIG
+
+	var w [NLEN*int(BASEBITS)+1]int8	
+	var s [NLEN*int(BASEBITS)+1]int8	
+
+	for i:=0;i<4;i++ {
+		t=append(t,NewBIGcopy(u[i]));
+		Q[i].Affine();
+	}
+
+	T=append(T,NewECP2()); T[0].Copy(Q[0])	// Q[0]
+	T=append(T,NewECP2()); T[1].Copy(T[0]); T[1].Add(Q[1])	// Q[0]+Q[1]
+	T=append(T,NewECP2()); T[2].Copy(T[0]); T[2].Add(Q[2])	// Q[0]+Q[2]
+	T=append(T,NewECP2()); T[3].Copy(T[1]); T[3].Add(Q[2])	// Q[0]+Q[1]+Q[2]
+	T=append(T,NewECP2()); T[4].Copy(T[0]); T[4].Add(Q[3])	// Q[0]+Q[3]
+	T=append(T,NewECP2()); T[5].Copy(T[1]); T[5].Add(Q[3])	// Q[0]+Q[1]+Q[3]
+	T=append(T,NewECP2()); T[6].Copy(T[2]); T[6].Add(Q[3])	// Q[0]+Q[2]+Q[3]
+	T=append(T,NewECP2()); T[7].Copy(T[3]); T[7].Add(Q[3])	// Q[0]+Q[1]+Q[2]+Q[3]
+	
+// Make it odd
+	pb:=1-t[0].parity()
+	t[0].inc(pb)
+	t[0].norm();
+
+// Number of bits
+	mt.zero()
+	for i:=0;i<4;i++ {
+		mt.add(t[i]); mt.norm()
+	}
+
+	nb:=1+mt.nbits();
+
+// Sign pivot 
+	s[nb-1]=1
+	for i:=0;i<nb-1;i++ {
+		t[0].fshr(1)
+		s[i]=2*int8(t[0].parity())-1
+	}
+
+// Recoded exponent
+	for i:=0; i<nb; i++ {
+		w[i]=0
+		k:=1
+		for j:=1; j<4; j++ {
+			bt:=s[i]*int8(t[j].parity())
+			t[j].fshr(1)
+			t[j].dec(int(bt)>>1)
+			t[j].norm()
+			w[i]+=bt*int8(k)
+			k*=2
+		}
+	}	
+	
+// Main loop
+	P.selector(T,int32(2*w[nb-1]+1))  
+	for i:=nb-2;i>=0;i-- {
+		P.dbl()
+		W.selector(T,int32(2*w[i]+s[i]))
+		P.Add(W)
+	}
+
+// apply correction
+	W.Copy(P)   
+	W.Sub(Q[0])
+	P.cmove(W,pb)
+
+	P.Affine()
+	return P
+}
+
+/*
 func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 	var a [4]int8
 	T:=NewECP2()
@@ -479,7 +558,7 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 		Q[i].Affine();
 	}
 
-/* precompute table */
+// precompute table 
 
 	W=append(W,NewECP2()); W[0].Copy(Q[0]); W[0].Sub(Q[1])
 	W=append(W,NewECP2()); W[1].Copy(W[0])
@@ -501,7 +580,7 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 	W[4].Sub(T)
 	W[7].Add(T)
 
-/* if multiplier is even add 1 to multiplier, and add P to correction */
+// if multiplier is even add 1 to multiplier, and add P to correction 
 	mt.zero(); C.inf()
 	for i:=0;i<4;i++ {
 		if t[i].parity()==0 {
@@ -513,7 +592,7 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 
 	nb:=1+mt.nbits();
 
-/* convert exponent to signed 1-bit window */
+// convert exponent to signed 1-bit window 
 	for j:=0;j<nb;j++ {
 		for i:=0;i<4;i++ {
 			a[i]=int8(t[i].lastbits(2)-2)
@@ -530,11 +609,12 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 		P.dbl()
 		P.Add(T)
 	}
-	P.Sub(C) /* apply correction */
+	P.Sub(C) // apply correction 
 
 	P.Affine()
 	return P
 }
+*/
 
 /* needed for SOK */
 func ECP2_mapit(h []byte) *ECP2 {
