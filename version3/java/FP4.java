@@ -43,6 +43,13 @@ public final class FP4 {
 		reduce();
 		return (a.iszilch() && b.iszilch());
 	}
+
+	public void cmove(FP4 g,int d)
+	{
+		a.cmove(g.a,d);
+		b.cmove(g.b,d);
+	}
+
 /* test this==1 ? */
 	public boolean isunity() {
 		FP2 one=new FP2(1);

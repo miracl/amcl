@@ -768,7 +768,7 @@ var FP12 = function(ctx) {
                 t[j].dec(bt>>1);
                 t[j].norm();
                 w[i]+=bt*k;
-                k*=2
+                k*=2;
             }
         }   
 
@@ -783,7 +783,7 @@ var FP12 = function(ctx) {
     // apply correction
         r.copy(q[0]); r.conj();   
         r.mul(p);
-        p.cmove(r,pb)
+        p.cmove(r,pb);
 
         p.reduce();
         return p;

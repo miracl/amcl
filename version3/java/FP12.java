@@ -45,6 +45,46 @@ public final class FP12 {
 		reduce();
 		return (a.iszilch() && b.iszilch() && c.iszilch());
 	}
+
+	public void cmove(FP12 g,int d)
+	{
+		a.cmove(g.a,d);
+		b.cmove(g.b,d);
+		c.cmove(g.c,d);		
+	}
+
+
+/* return 1 if b==c, no branching */
+	public static int teq(int b,int c)
+	{
+		int x=b^c;
+		x-=1;  // if x=0, x now -1
+		return ((x>>31)&1);
+	}
+
+/* Constant time select from pre-computed table */
+	public void select(FP12 g[],int b)
+	{
+		int m=b>>31;
+		int babs=(b^m)-m;
+
+		babs=(babs-1)/2;
+
+		cmove(g[0],teq(babs,0));  // conditional move
+		cmove(g[1],teq(babs,1));
+		cmove(g[2],teq(babs,2));
+		cmove(g[3],teq(babs,3));
+		cmove(g[4],teq(babs,4));
+		cmove(g[5],teq(babs,5));
+		cmove(g[6],teq(babs,6));
+		cmove(g[7],teq(babs,7));
+ 
+		FP12 invf=new FP12(this); 
+		invf.conj();
+		cmove(invf,(int)(m&1));
+	}
+
+
 /* test x==1 ? */
 	public boolean isunity() {
 		FP4 one=new FP4(1);
@@ -630,8 +670,86 @@ t1.norm();
 	}
 
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
-/* Timing attack secure, but not cache attack secure */
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+// Side channel attack secure 
 
+	public static FP12 pow4(FP12[] q,BIG[] u)
+	{
+		int i,j,nb,pb;
+		FP12 [] g=new FP12[8];
+		FP12 r=new FP12(1);
+		FP12 p=new FP12(0);
+		BIG [] t=new BIG[4];
+		BIG mt=new BIG(0);
+		byte[] w=new byte[BIG.NLEN*BIG.BASEBITS+1];
+		byte[] s=new byte[BIG.NLEN*BIG.BASEBITS+1];
+
+		for (i=0;i<4;i++)
+			t[i]=new BIG(u[i]);
+
+		g[0]=new FP12(q[0]);  // q[0]
+		g[1]=new FP12(g[0]); g[1].mul(q[1]); // q[0].q[1]
+		g[2]=new FP12(g[0]); g[2].mul(q[2]); // q[0].q[2]
+		g[3]=new FP12(g[1]); g[3].mul(q[2]); // q[0].q[1].q[2]
+		g[4]=new FP12(q[0]); g[4].mul(q[3]); // q[0].q[3]
+		g[5]=new FP12(g[1]); g[5].mul(q[3]); // q[0].q[1].q[3]
+		g[6]=new FP12(g[2]); g[6].mul(q[3]); // q[0].q[2].q[3]
+		g[7]=new FP12(g[3]); g[7].mul(q[3]); // q[0].q[1].q[2].q[3]
+
+    // Make it odd
+        pb=1-t[0].parity();
+        t[0].inc(pb);
+        t[0].norm();
+
+    // Number of bits
+        mt.zero();
+        for (i=0;i<4;i++) {
+            mt.add(t[i]); mt.norm();
+        }
+        nb=1+mt.nbits();
+
+    // Sign pivot 
+        s[nb-1]=1;
+        for (i=0;i<nb-1;i++) {
+            t[0].fshr(1);
+            s[i]=(byte)(2*t[0].parity()-1);
+        }
+
+    // Recoded exponent
+        for (i=0; i<nb; i++) {
+            w[i]=0;
+            int k=1;
+            for (j=1; j<4; j++) {
+                byte bt=(byte)(s[i]*t[j].parity());
+                t[j].fshr(1);
+                t[j].dec((int)(bt)>>1);
+                t[j].norm();
+                w[i]+=bt*(byte)k;
+                k*=2;
+            }
+        } 
+
+     // Main loop
+        p.select(g,(int)(2*w[nb-1]+1)); 
+        for (i=nb-2;i>=0;i--) {
+            p.usqr();
+            r.select(g,(int)(2*w[i]+s[i]));
+            p.mul(r);
+        }
+
+    // apply correction
+        r.copy(q[0]); r.conj();   
+        r.mul(p);
+        p.cmove(r,pb);
+
+ 		p.reduce();
+		return p;
+	}              
+
+/* p=q0^u0.q1^u1.q2^u2.q3^u3 */
+/* Timing attack secure, but not cache attack secure */
+/*
 	public static FP12 pow4(FP12[] q,BIG[] u)
 	{
 		int i,j,nb,m;
@@ -670,7 +788,7 @@ t1.norm();
 		g[4].mul(s[0]);
 		g[7].mul(s[1]);
 
-/* if power is even add 1 to power, and add q to correction */
+// if power is even add 1 to power, and add q to correction 
 
 		for (i=0;i<4;i++)
 		{
@@ -684,7 +802,7 @@ t1.norm();
 		c.conj();
 		nb=1+mt.nbits();
 
-/* convert exponent to signed 1-bit window */
+// convert exponent to signed 1-bit window 
 		for (j=0;j<nb;j++)
 		{
 			for (i=0;i<4;i++)
@@ -701,17 +819,17 @@ t1.norm();
 		for (i=nb-1;i>=0;i--)
 		{
 			m=w[i]>>7;
-			j=(w[i]^m)-m;  /* j=abs(w[i]) */
+			j=(w[i]^m)-m;  // j=abs(w[i]) 
 			j=(j-1)/2;
 			s[0].copy(g[j]); s[1].copy(g[j]); s[1].conj();
 			p.usqr();
 			p.mul(s[m&1]);
 		}
-		p.mul(c);  /* apply correction */
+		p.mul(c);  // apply correction 
 		p.reduce();
 		return p;
 	}
-
+*/
 /*
 	public static void main(String[] args) {
 		BIG p=new BIG(ROM.Modulus);
