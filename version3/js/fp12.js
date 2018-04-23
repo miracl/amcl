@@ -63,6 +63,37 @@ var FP12 = function(ctx) {
             return (this.a.equals(one) && this.b.iszilch() && this.b.iszilch());
         },
 
+
+        /* conditional copy of g to this depending on d */
+        cmove: function(g, d) {
+            this.a.cmove(g.a, d);
+            this.b.cmove(g.b, d);
+            this.c.cmove(g.c, d);
+        },
+
+
+        /* Constant time select from pre-computed table */
+        select: function(g, b) {
+            var invf = new FP12(0),
+            m = b >> 31,
+            babs = (b ^ m) - m;
+
+            babs = (babs - 1) / 2;
+
+            this.cmove(g[0], FP12.teq(babs, 0)); // conditional move
+            this.cmove(g[1], FP12.teq(babs, 1));
+            this.cmove(g[2], FP12.teq(babs, 2));
+            this.cmove(g[3], FP12.teq(babs, 3));
+            this.cmove(g[4], FP12.teq(babs, 4));
+            this.cmove(g[5], FP12.teq(babs, 5));
+            this.cmove(g[6], FP12.teq(babs, 6));
+            this.cmove(g[7], FP12.teq(babs, 7));
+
+            invf.copy(this);
+            invf.conj();
+            this.cmove(invf, (m & 1));
+        },
+
         /* extract a from this */
         geta: function() {
             return this.a;
@@ -671,9 +702,97 @@ var FP12 = function(ctx) {
         return r;
     };
 
+
+    /* return 1 if b==c, no branching */
+    FP12.teq = function(b, c) {
+        var x = b ^ c;
+        x -= 1; // if x=0, x now -1
+        return ((x >> 31) & 1);
+    };
+
+    /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+// Side channel attack secure 
+
+    FP12.pow4 = function(q, u) {
+        var g = [],
+            r = new FP12(0),
+            p = new FP12(0),
+            t = [],
+            mt = new ctx.BIG(0),
+            w = [],
+            s = [], 
+            i, j, nb, pb;
+
+        for (i = 0; i < 4; i++) {
+            t[i] = new ctx.BIG(u[i]);
+        }
+
+        g[0] = new FP12(q[0]);  // q[0]
+        g[1] = new FP12(g[0]); g[1].mul(q[1])   // q[0].q[1]
+        g[2] = new FP12(g[0]); g[2].mul(q[2])   // q[0].q[2]
+        g[3] = new FP12(g[1]); g[3].mul(q[2])   // q[0].q[1].q[2]
+        g[4] = new FP12(g[0]); g[4].mul(q[3])   // q[0].q[3]
+        g[5] = new FP12(g[1]); g[5].mul(q[3])   // q[0].q[1].q[3]
+        g[6] = new FP12(g[2]); g[6].mul(q[3])   // q[0].q[2].q[3]
+        g[7] = new FP12(g[3]); g[7].mul(q[3])   // q[0].q[1].q[2].q[3]
+
+    // Make it odd
+        pb=1-t[0].parity();
+        t[0].inc(pb);
+        t[0].norm();
+
+    // Number of bits
+        mt.zero();
+        for (i=0;i<4;i++) {
+            mt.add(t[i]); mt.norm();
+        }
+
+        nb=1+mt.nbits();
+
+    // Sign pivot 
+        s[nb-1]=1;
+        for (i=0;i<nb-1;i++) {
+            t[0].fshr(1);
+            s[i]=2*t[0].parity()-1;
+        }
+
+    // Recoded exponent
+        for (i=0; i<nb; i++) {
+            w[i]=0;
+            var k=1;
+            for (j=1; j<4; j++) {
+                var bt=s[i]*t[j].parity();
+                t[j].fshr(1);
+                t[j].dec(bt>>1);
+                t[j].norm();
+                w[i]+=bt*k;
+                k*=2
+            }
+        }   
+
+    // Main loop
+        p.select(g,2*w[nb-1]+1); 
+        for (i=nb-2;i>=0;i--) {
+            p.usqr();
+            r.select(g,2*w[i]+s[i]);
+            p.mul(r);
+        }
+
+    // apply correction
+        r.copy(q[0]); r.conj();   
+        r.mul(p);
+        p.cmove(r,pb)
+
+        p.reduce();
+        return p;
+    };
+
+
     /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
     /* Timing attack secure, but not cache attack secure */
-
+/*
     FP12.pow4 = function(q, u) {
         var a = [],
             g = [],
@@ -724,7 +843,7 @@ var FP12 = function(ctx) {
         g[4].mul(s[0]);
         g[7].mul(s[1]);
 
-        /* if power is even add 1 to power, and add q to correction */
+        // if power is even add 1 to power, and add q to correction 
 
         for (i = 0; i < 4; i++) {
             if (t[i].parity() == 0) {
@@ -738,7 +857,7 @@ var FP12 = function(ctx) {
         c.conj();
         nb = 1 + mt.nbits();
 
-        /* convert exponent to signed 1-bit window */
+        // convert exponent to signed 1-bit window 
         for (j = 0; j < nb; j++) {
             for (i = 0; i < 4; i++) {
                 a[i] = (t[i].lastbits(2) - 2);
@@ -753,7 +872,7 @@ var FP12 = function(ctx) {
 
         for (i = nb - 1; i >= 0; i--) {
             m = w[i] >> 31;
-            j = (w[i] ^ m) - m; /* j=abs(w[i]) */
+            j = (w[i] ^ m) - m; // j=abs(w[i]) 
             j = (j - 1) / 2;
             s[0].copy(g[j]);
             s[1].copy(g[j]);
@@ -761,11 +880,11 @@ var FP12 = function(ctx) {
             p.usqr();
             p.mul(s[m & 1]);
         }
-        p.mul(c); /* apply correction */
+        p.mul(c); // apply correction 
         p.reduce();
 
         return p;
     };
-
+*/
     return FP12;
 };

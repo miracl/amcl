@@ -646,7 +646,87 @@ var ECP2 = function(ctx) {
         return r;
     };
 
+/* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+// Side channel attack secure 
+
+    ECP2.mul4 = function(Q, u) {
+        var W = new ECP2(),
+            P = new ECP2(),
+            T = [],
+            mt = new ctx.BIG(),
+            t = [],
+            w = [],
+            s = [],
+            i, j, nb, pb;
+
+        for (i = 0; i < 4; i++) {
+            t[i] = new ctx.BIG(u[i]);
+            Q[i].affine();
+        }
+
+        T[0] = new ECP2(); T[0].copy(Q[0])  // Q[0]
+        T[1] = new ECP2(); T[1].copy(T[0]); T[1].add(Q[1])  // Q[0]+Q[1]
+        T[2] = new ECP2(); T[2].copy(T[0]); T[2].add(Q[2])  // Q[0]+Q[2]
+        T[3] = new ECP2(); T[3].copy(T[1]); T[3].add(Q[2])  // Q[0]+Q[1]+Q[2]
+        T[4] = new ECP2(); T[4].copy(T[0]); T[4].add(Q[3])  // Q[0]+Q[3]
+        T[5] = new ECP2(); T[5].copy(T[1]); T[5].add(Q[3])  // Q[0]+Q[1]+Q[3]
+        T[6] = new ECP2(); T[6].copy(T[2]); T[6].add(Q[3])  // Q[0]+Q[2]+Q[3]
+        T[7] = new ECP2(); T[7].copy(T[3]); T[7].add(Q[3])  // Q[0]+Q[1]+Q[2]+Q[3]
+
+    // Make it odd
+        pb=1-t[0].parity();
+        t[0].inc(pb);
+        t[0].norm();
+
+    // Number of bits
+        mt.zero();
+        for (i=0;i<4;i++) {
+            mt.add(t[i]); mt.norm();
+        }
+
+        nb=1+mt.nbits();
+
+    // Sign pivot 
+        s[nb-1]=1;
+        for (i=0;i<nb-1;i++) {
+            t[0].fshr(1);
+            s[i]=2*t[0].parity()-1;
+        }
+
+    // Recoded exponent
+        for (i=0; i<nb; i++) {
+            w[i]=0;
+            var k=1;
+            for (j=1; j<4; j++) {
+                var bt=s[i]*t[j].parity();
+                t[j].fshr(1);
+                t[j].dec(bt>>1);
+                t[j].norm();
+                w[i]+=bt*k;
+                k*=2
+            }
+        }   
+
+    // Main loop
+        P.select(T,2*w[nb-1]+1);  
+        for (i=nb-2;i>=0;i--) {
+            P.dbl();
+            W.select(T,2*w[i]+s[i]);
+            P.add(W);
+        }
+
+    // apply correction
+        W.copy(P);   
+        W.sub(Q[0]);
+        P.cmove(W,pb);        
+        P.affine();
+        return P;
+    };
+
     /* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
+/*    
     ECP2.mul4 = function(Q, u) {
         var a = [],
             T = new ECP2(),
@@ -663,7 +743,7 @@ var ECP2 = function(ctx) {
             Q[i].affine();
         }
 
-        /* precompute table */
+        // precompute table 
 
         W[0] = new ECP2();
         W[0].copy(Q[0]);
@@ -696,7 +776,7 @@ var ECP2 = function(ctx) {
         W[4].sub(T);
         W[7].add(T);
 
-        /* if multiplier is even add 1 to multiplier, and add P to correction */
+        // if multiplier is even add 1 to multiplier, and add P to correction 
         mt.zero();
         C.inf();
 
@@ -712,7 +792,7 @@ var ECP2 = function(ctx) {
 
         nb = 1 + mt.nbits();
 
-        /* convert exponent to signed 1-bit window */
+        // convert exponent to signed 1-bit window 
         for (j = 0; j < nb; j++) {
             for (i = 0; i < 4; i++) {
                 a[i] = (t[i].lastbits(2) - 2);
@@ -731,13 +811,13 @@ var ECP2 = function(ctx) {
             P.dbl();
             P.add(T);
         }
-        P.sub(C); /* apply correction */
+        P.sub(C); // apply correction 
 
         P.affine();
 
         return P;
     };
-
+*/
     /* return 1 if b==c, no branching */
     ECP2.teq = function(b, c) {
         var x = b ^ c;

@@ -59,6 +59,12 @@ var FP4 = function(ctx) {
             return (this.a.equals(one) && this.b.iszilch());
         },
 
+        /* conditional copy of g to this depending on d */
+        cmove: function(g, d) {
+            this.a.cmove(g.a, d);
+            this.b.cmove(g.b, d);
+        },
+
         /* test is w real? That is in a+ib test b is zero */
         isreal: function() {
             return this.b.iszilch();
