@@ -477,7 +477,95 @@ impl ECP2 {
 		return P;
 	}
 
+
 /* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+// Side channel attack secure 
+
+	pub fn mul4(Q: &mut [ECP2],u: &[BIG]) -> ECP2 {
+		let mut W=ECP2::new();
+		let mut P=ECP2::new();
+
+		let mut T:[ECP2;8]=[ECP2::new(),ECP2::new(),ECP2::new(),ECP2::new(),ECP2::new(),ECP2::new(),ECP2::new(),ECP2::new()];
+
+		let mut mt=BIG::new();
+
+		let mut t:[BIG;4]=[BIG::new_copy(&u[0]),BIG::new_copy(&u[1]),BIG::new_copy(&u[2]),BIG::new_copy(&u[3])];
+
+		const CT:usize=1+big::NLEN*(big::BASEBITS as usize);
+		let mut w:[i8;CT]=[0;CT];
+		let mut s:[i8;CT]=[0;CT];
+
+		for i in 0..4 {
+			Q[i].affine();
+		}
+
+		T[0].copy(&Q[0]); W.copy(&T[0]);
+		T[1].copy(&W); T[1].add(&mut Q[1]);  // Q[0]+Q[1]
+		T[2].copy(&W); T[2].add(&mut Q[2]); W.copy(&T[1]); // Q[0]+Q[2]
+		T[3].copy(&W); T[3].add(&mut Q[2]);	W.copy(&T[0]); // Q[0]+Q[1]+Q[2]
+		T[4].copy(&W); T[4].add(&mut Q[3]); W.copy(&T[1]); // Q[0]+Q[3]
+		T[5].copy(&W); T[5].add(&mut Q[3]); W.copy(&T[2]); // Q[0]+Q[1]+Q[3]
+		T[6].copy(&W); T[6].add(&mut Q[3]); W.copy(&T[3]); // Q[0]+Q[2]+Q[3]
+		T[7].copy(&W); T[7].add(&mut Q[3]); // Q[0]+Q[1]+Q[2]+Q[3]
+
+// Make it odd
+		let pb=1-t[0].parity();
+		t[0].inc(pb);
+		t[0].norm();	
+
+// Number of bits
+		mt.zero();
+		for i in 0..4 {
+			mt.add(&t[i]); mt.norm();
+		}
+
+		let nb=1+mt.nbits();
+
+// Sign pivot 
+
+		s[nb-1]=1;
+		for i in 0..nb-1 {
+			t[0].fshr(1);
+			s[i]=(2*t[0].parity()-1) as i8;
+			//println!("s={}",s[i]);	
+		}
+
+// Recoded exponent
+		for i in 0..nb {
+			w[i]=0;
+			let mut k=1;
+			for j in 1..4 {
+				let bt=s[i]*(t[j].parity() as i8);
+				t[j].fshr(1);
+				t[j].dec((bt>>1) as isize);
+				t[j].norm();
+				w[i]+=bt*(k as i8);
+				k=2*k;
+			}
+		}	
+
+// Main loop
+		P.selector(&T,(2*w[nb-1]+1) as i32);
+		for i in (0..nb-1).rev() {
+
+			P.dbl();
+			W.selector(&T,(2*w[i]+s[i]) as i32);
+			P.add(&mut W);
+		}		
+
+// apply correction
+		W.copy(&P);   
+		W.sub(&mut Q[0]);
+		P.cmove(&W,pb);	
+		P.affine();
+
+		return P;
+	}
+
+// P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 
+/*
 	pub fn mul4(Q: &mut [ECP2],u: &[BIG]) -> ECP2 {
 		let mut a:[i8;4]=[0;4];
 		let mut T=ECP2::new();
@@ -497,7 +585,7 @@ impl ECP2 {
 			Q[i].affine();
 		}
 
-/* precompute table */
+// precompute table 
 
 		W[0].copy(&Q[0]); W[0].sub(&mut Q[1]);
 		C.copy(&W[0]); W[1].copy(&C);
@@ -519,7 +607,7 @@ impl ECP2 {
 		W[4].sub(&mut T);
 		W[7].add(&mut T);
 
-/* if multiplier is even add 1 to multiplier, and add P to correction */
+// if multiplier is even add 1 to multiplier, and add P to correction 
 		mt.zero(); C.inf();
 		for i in 0..4 {
 			if t[i].parity()==0 {
@@ -531,7 +619,7 @@ impl ECP2 {
 
 		let nb=1+mt.nbits();
 
-/* convert exponent to signed 1-bit window */
+// convert exponent to signed 1-bit window 
 		for j in 0..nb {
 			for i in 0..4 {
 				a[i]=(t[i].lastbits(2)-2) as i8;
@@ -548,12 +636,12 @@ impl ECP2 {
 			P.dbl();
 			P.add(&mut T);
 		}
-		P.sub(&mut C); /* apply correction */
+		P.sub(&mut C); // apply correction 
 
 		P.affine();
 		return P;
 	}
-
+*/
 
 #[allow(non_snake_case)]
 	pub fn mapit(h: &[u8]) -> ECP2 {

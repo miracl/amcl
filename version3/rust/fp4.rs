@@ -75,6 +75,11 @@ impl FP4 {
 		self.b.norm();
 	}	
 
+	pub fn cmove(&mut self,g:&FP4,d: isize) {
+		self.a.cmove(&g.a,d);
+		self.b.cmove(&g.b,d);
+	}	
+
 /* test self=0 ? */
 	pub fn iszilch(&mut self) -> bool {
 		self.reduce();

@@ -93,6 +93,42 @@ impl FP12 {
 		return self.a.iszilch() && self.b.iszilch() && self.c.iszilch();
 	}	
 
+/* Conditional move of g to self dependant on d */
+	pub fn cmove(&mut self,g:&FP12,d: isize) {
+		self.a.cmove(&g.a,d);
+		self.b.cmove(&g.b,d);
+		self.c.cmove(&g.c,d);
+	}	
+
+/* return 1 if b==c, no branching */
+	fn teq(b: i32,c: i32) -> isize {
+		let mut x=b^c;
+		x-=1;  // if x=0, x now -1
+		return ((x>>31)&1) as isize;
+	}
+
+/* Constant time select from pre-computed table */
+	pub fn selector(&mut self,g: &[FP12],b: i32) {
+		let m=b>>31;
+		let mut babs=(b^m)-m;
+
+		babs=(babs-1)/2;
+
+		self.cmove(&g[0],FP12::teq(babs,0));  // conditional move
+		self.cmove(&g[1],FP12::teq(babs,1));
+		self.cmove(&g[2],FP12::teq(babs,2));
+		self.cmove(&g[3],FP12::teq(babs,3));
+		self.cmove(&g[4],FP12::teq(babs,4));
+		self.cmove(&g[5],FP12::teq(babs,5));
+		self.cmove(&g[6],FP12::teq(babs,6));
+		self.cmove(&g[7],FP12::teq(babs,7));
+ 
+ 		let mut invf=FP12::new_copy(self);
+		invf.conj();
+		self.cmove(&invf,(m&1) as isize);
+	}		
+
+
 /* test self=1 ? */
 	pub fn isunity(&mut self) -> bool {
 		let mut one=FP4::new_int(1);
@@ -595,8 +631,86 @@ impl FP12 {
 	}
 
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
-/* Timing attack secure, but not cache attack secure */
+// Bos & Costello https://eprint.iacr.org/2013/458.pdf
+// Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+// Side channel attack secure 
+ 	pub fn pow4(q:&[FP12],u:&[BIG]) -> FP12 {
+		let mut g:[FP12;8]=[FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new()];
 
+		let mut r=FP12::new();
+		let mut p=FP12::new();
+		const CT:usize=1+big::NLEN*(big::BASEBITS as usize);		
+		let mut w:[i8;CT]=[0;CT];
+		let mut s:[i8;CT]=[0;CT];
+
+		let mut mt=BIG::new();
+		let mut t:[BIG;4]=[BIG::new_copy(&u[0]),BIG::new_copy(&u[1]),BIG::new_copy(&u[2]),BIG::new_copy(&u[3])];
+
+// precomputation
+		g[0].copy(&q[0]); r.copy(&g[0]);
+		g[1].copy(&r); g[1].mul(&q[1]);  // q[0].q[1]
+		g[2].copy(&r); g[2].mul(&q[2]); r.copy(&g[1]); // q[0].q[2]
+		g[3].copy(&r); g[3].mul(&q[2]);	r.copy(&g[0]); // q[0].q[1].q[2]
+		g[4].copy(&r); g[4].mul(&q[3]); r.copy(&g[1]); // q[0].q[3]
+		g[5].copy(&r); g[5].mul(&q[3]); r.copy(&g[2]); // q[0].q[1].q[3]
+		g[6].copy(&r); g[6].mul(&q[3]); r.copy(&g[3]); // q[0].q[2].q[3]
+		g[7].copy(&r); g[7].mul(&q[3]); // q[0].q[1].q[2].q[3]
+
+
+// Make it odd
+		let pb=1-t[0].parity();
+		t[0].inc(pb);
+		t[0].norm();	
+
+// Number of bits
+		mt.zero();
+		for i in 0..4 {
+			mt.add(&t[i]); mt.norm();
+		}
+
+		let nb=1+mt.nbits();
+
+// Sign pivot 
+		s[nb-1]=1;
+		for i in 0..nb-1 {
+			t[0].fshr(1);
+			s[i]=(2*t[0].parity()-1) as i8;
+			//println!("s={}",s[i]);	
+		}
+
+// Recoded exponent
+		for i in 0..nb {
+			w[i]=0;
+			let mut k=1;
+			for j in 1..4 {
+				let bt=s[i]*(t[j].parity() as i8);
+				t[j].fshr(1);
+				t[j].dec((bt>>1) as isize);
+				t[j].norm();
+				w[i]+=bt*(k as i8);
+				k=2*k;
+			}
+		}
+
+// Main loop
+		p.selector(&g,(2*w[nb-1]+1) as i32);
+		for i in (0..nb-1).rev() {
+			p.usqr();
+			r.selector(&g,(2*w[i]+s[i]) as i32);
+			p.mul(&r);
+		}
+
+// apply correction
+		r.copy(&q[0]); r.conj();   
+		r.mul(&p);
+		p.cmove(&r,pb);
+		p.reduce();
+		return p;
+	}
+
+/* p=q0^u0.q1^u1.q2^u2.q3^u3 */
+/* Timing attack secure, but not cache attack secure */
+/*
  	pub fn pow4(q:&[FP12],u:&[BIG]) -> FP12 {
 		let mut a:[i8;4]=[0;4];
 		let mut s:[FP12;2]=[FP12::new(),FP12::new()];
@@ -633,7 +747,7 @@ impl FP12 {
 		g[4].mul(&s[0]);
 		g[7].mul(&s[1]);
 
-/* if power is even add 1 to power, and add q to correction */
+// if power is even add 1 to power, and add q to correction 
 
 		for i in 0..4 {
 			if t[i].parity()==0 {
@@ -645,7 +759,7 @@ impl FP12 {
 		c.conj();
 		let nb=1+mt.nbits();
 
-/* convert exponent to signed 1-bit window */
+// convert exponent to signed 1-bit window 
 		for j in 0..nb {
 			for i in 0..4 {
 				a[i]=(t[i].lastbits(2)-2) as i8;
@@ -659,17 +773,17 @@ impl FP12 {
 
 		for i in (0..nb).rev() {
 			let m=w[i]>>7;
-			let mut j=((w[i]^m)-m) as usize;  /* j=abs(w[i]) */
+			let mut j=((w[i]^m)-m) as usize;  // j=abs(w[i]) 
 			j=(j-1)/2;
 			s[0].copy(&g[j]); s[1].copy(&g[j]); s[1].conj();
 			p.usqr();
 			p.mul(&s[(m&1) as usize]);
 		}
-		p.mul(&c);  /* apply correction */
+		p.mul(&c);  // apply correction 
 		p.reduce();
 		return p;
 	}
-
+*/
 
 }
 /*
