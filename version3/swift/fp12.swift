@@ -81,6 +81,44 @@ final public class FP12
         reduce();
         return a.iszilch() && b.iszilch() && c.iszilch()
     }
+
+    func cmove(_ g:FP12,_ d:Int)
+    {
+        a.cmove(g.a,d)
+        b.cmove(g.b,d)
+        c.cmove(g.c,d)
+    }
+
+    /* return 1 if b==c, no branching */
+    private static func teq(_ b:Int32,_ c:Int32) -> Int
+    {
+        var x=b^c
+        x-=1  // if x=0, x now -1
+        return Int((x>>31)&1)
+    }
+    /* Constant time select from pre-computed table */
+    func select(_ g:[FP12],_ b:Int32)
+    {
+
+        let m=b>>31
+        var babs=(b^m)-m
+        
+        babs=(babs-1)/2
+    
+        cmove(g[0],FP12.teq(babs,0)) // conditional move
+        cmove(g[1],FP12.teq(babs,1))
+        cmove(g[2],FP12.teq(babs,2))
+        cmove(g[3],FP12.teq(babs,3))
+        cmove(g[4],FP12.teq(babs,4))
+        cmove(g[5],FP12.teq(babs,5))
+        cmove(g[6],FP12.teq(babs,6))
+        cmove(g[7],FP12.teq(babs,7))
+    
+        let invf=FP12(self)
+        invf.conj()
+        cmove(invf,Int(m&1))
+    }
+
     /* test x==1 ? */
     public func isunity() -> Bool
     {
@@ -592,9 +630,93 @@ final public class FP12
         return c
     }
     
+
+    /* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
+    // Bos & Costello https://eprint.iacr.org/2013/458.pdf
+    // Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+    // Side channel attack secure 
+
+    static func pow4(_ q:[FP12],_ u:[BIG]) -> FP12
+    {
+        var g=[FP12]();
+        
+        for _ in 0 ..< 8 {g.append(FP12(0))}
+        
+        let r=FP12(0)
+        let p=FP12(0)
+        
+        var t=[BIG]()
+        for i in 0 ..< 4
+            {t.append(BIG(u[i]))}
+
+        let mt=BIG(0);
+        var w=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)           
+        var s=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)   
+
+// precompute table 
+        g[0].copy(q[0])   // q[0]
+        g[1].copy(g[0]); g[1].mul(q[1])   // q[0].q[1]
+        g[2].copy(g[0]); g[2].mul(q[2])   // q[0].q[2]
+        g[3].copy(g[1]); g[3].mul(q[2])   // q[0].q[1].q[2]
+        g[4].copy(g[0]); g[4].mul(q[3])   // q[0].q[3]
+        g[5].copy(g[1]); g[5].mul(q[3])   // q[0].q[1].q[3]
+        g[6].copy(g[2]); g[6].mul(q[3])   // q[0].q[2].q[3]
+        g[7].copy(g[3]); g[7].mul(q[3])   // q[0].q[1].q[2].q[3]
+
+// Make it odd
+        let pb=1-t[0].parity()
+        t[0].inc(pb)
+        t[0].norm()  
+
+// Number of bits
+        mt.zero();
+        for i in 0 ..< 4 {
+            mt.add(t[i]); mt.norm()
+        }
+
+        let nb=1+mt.nbits()
+
+// Sign pivot 
+
+        s[nb-1]=1
+        for i in 0 ..< nb-1 {
+            t[0].fshr(1)
+            s[i]=2*Int8(t[0].parity())-1
+        }
+
+// Recoded exponent
+        for i in 0 ..< nb {
+            w[i]=0
+            var k=1
+            for j in 1 ..< 4 {
+                let bt=s[i]*Int8(t[j].parity())
+                t[j].fshr(1)
+                t[j].dec(Int(bt>>1))
+                t[j].norm()
+                w[i]+=bt*Int8(k)
+                k=2*k
+            }
+        }   
+
+// Main loop
+        p.select(g,Int32(2*w[nb-1]+1))
+        for i in (0 ..< nb-1).reversed() {
+            p.usqr()
+            r.select(g,Int32(2*w[i]+s[i]))
+            p.mul(r)
+        }      
+
+// apply correction
+        r.copy(q[0]); r.conj()   
+        r.mul(p)
+        p.cmove(r,pb)
+        p.reduce()
+        return p
+    }
+
     /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
     /* Timing attack secure, but not cache attack secure */
-    
+/*    
     static func pow4(_ q:[FP12],_ u:[BIG]) -> FP12
     {
         var a=[Int32](repeating: 0,count: 4)
@@ -634,7 +756,7 @@ final public class FP12
         g[4].mul(s[0])
         g[7].mul(s[1])
 
-    /* if power is even add 1 to power, and add q to correction */
+    // if power is even add 1 to power, and add q to correction 
     
         for i in 0 ..< 4
         {
@@ -648,7 +770,7 @@ final public class FP12
         c.conj();
         let nb=1+mt.nbits();
     
-    /* convert exponent to signed 1-bit window */
+    // convert exponent to signed 1-bit window 
         for j in 0 ..< nb
         {
             	for i in 0 ..< 4
@@ -669,18 +791,18 @@ final public class FP12
         for i in (0...nb-1).reversed()
         {
             let m=w[i]>>7
-            let j=(w[i]^m)-m  /* j=abs(w[i]) */
+            let j=(w[i]^m)-m  // j=abs(w[i]) 
             let k=Int((j-1)/2)
             s[0].copy(g[k]); s[1].copy(g[k]); s[1].conj()
             p.usqr()
             p.mul(s[Int(m&1)])
         }
-        p.mul(c)  /* apply correction */
+        p.mul(c)  // apply correction 
         p.reduce()
         return p
     }
     
-    
+*/    
     
     
 

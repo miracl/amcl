@@ -74,6 +74,14 @@ final public class FP4 {
         reduce()
         return a.iszilch() && b.iszilch()
     }
+
+    func cmove(_ g:FP4,_ d:Int)
+    {
+        a.cmove(g.a,d)
+        b.cmove(g.b,d)
+    }
+
+
     /* test this==1 ? */
     func isunity() -> Bool
     {

@@ -483,6 +483,93 @@ final public class ECP2 {
     }
     
     /* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
+    // Bos & Costello https://eprint.iacr.org/2013/458.pdf
+    // Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
+    // Side channel attack secure 
+
+    static func mul4(_ Q:[ECP2],_ u:[BIG]) -> ECP2
+    {
+        let W=ECP2()
+        let P=ECP2()
+        
+        var T=[ECP2]();
+        for _ in 0 ..< 8 {T.append(ECP2())}
+    
+        let mt=BIG()
+        var t=[BIG]()
+    
+        var w=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)
+        var s=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)
+    
+        for i in 0 ..< 4
+        {
+            t.append(BIG(u[i]))
+            Q[i].affine()
+        }
+
+    // precompute table 
+
+        T[0].copy(Q[0])  // Q[0]
+        T[1].copy(T[0]); T[1].add(Q[1])  // Q[0]+Q[1]
+        T[2].copy(T[0]); T[2].add(Q[2])  // Q[0]+Q[2]
+        T[3].copy(T[1]); T[3].add(Q[2])  // Q[0]+Q[1]+Q[2]
+        T[4].copy(T[0]); T[4].add(Q[3])  // Q[0]+Q[3]
+        T[5].copy(T[1]); T[5].add(Q[3])  // Q[0]+Q[1]+Q[3]
+        T[6].copy(T[2]); T[6].add(Q[3])  // Q[0]+Q[2]+Q[3]
+        T[7].copy(T[3]); T[7].add(Q[3])  // Q[0]+Q[1]+Q[2]+Q[3]
+
+// Make it odd
+        let pb=1-t[0].parity()
+        t[0].inc(pb)
+        t[0].norm()  
+
+// Number of bits
+        mt.zero();
+        for i in 0 ..< 4 {
+            mt.add(t[i]); mt.norm()
+        }
+
+        let nb=1+mt.nbits()
+
+// Sign pivot 
+
+        s[nb-1]=1
+        for i in 0 ..< nb-1 {
+            t[0].fshr(1)
+            s[i]=2*Int8(t[0].parity())-1
+        }
+
+// Recoded exponent
+        for i in 0 ..< nb {
+            w[i]=0
+            var k=1
+            for j in 1 ..< 4 {
+                let bt=s[i]*Int8(t[j].parity())
+                t[j].fshr(1)
+                t[j].dec(Int(bt>>1))
+                t[j].norm()
+                w[i]+=bt*Int8(k)
+                k=2*k
+            }
+        }   
+
+// Main loop
+        P.select(T,Int32(2*w[nb-1]+1));
+        for i in (0 ..< nb-1).reversed() {
+            P.dbl()
+            W.select(T,Int32(2*w[i]+s[i]))
+            P.add(W)
+        }    
+
+        W.copy(P)  
+        W.sub(Q[0])
+        P.cmove(W,pb) 
+        P.affine()
+        return P
+    }
+
+    /* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
+/*    
     static func mul4(_ Q:[ECP2],_ u:[BIG]) -> ECP2
     {
         var a=[Int32](repeating: 0,count: 4)
@@ -504,7 +591,7 @@ final public class ECP2 {
             Q[i].affine()
         }
     
-    /* precompute table */
+    // precompute table 
     
         W[0].copy(Q[0]); W[0].sub(Q[1])
         W[1].copy(W[0])
@@ -525,7 +612,7 @@ final public class ECP2 {
         W[4].sub(T)
         W[7].add(T)
     
-    /* if multiplier is even add 1 to multiplier, and add P to correction */
+    // if multiplier is even add 1 to multiplier, and add P to correction 
         mt.zero(); C.inf()
         for i in 0 ..< 4
         {
@@ -539,7 +626,7 @@ final public class ECP2 {
     
         let nb=1+mt.nbits();
     
-    /* convert exponent to signed 1-bit window */
+    // convert exponent to signed 1-bit window 
         for j in 0 ..< nb
         {
             	for i in 0 ..< 4 {
@@ -563,12 +650,12 @@ final public class ECP2 {
             P.dbl()
             P.add(T)
         }
-        P.sub(C) /* apply correction */
+        P.sub(C) // apply correction 
     
         P.affine()
         return P
     }
-    
+*/    
      // needed for SOK
     static func mapit(_ h:[UInt8]) -> ECP2
     {
