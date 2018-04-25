@@ -25,13 +25,17 @@ under the License.
 #include <time.h>
 #include "ecdh_ED25519.h"
 #include "mpin_BN254.h"
+
+#if CHUNK==32 || CHUNK==64
 #include "mpin_BLS383.h"
 #include "mpin192_BLS24.h"
 #include "mpin256_BLS48.h"
+#endif
+
 #include "rsa_RSA2048.h"
 #include "randapi.h"
 
-#if CHUNK!=16
+#if CHUNK==32 || CHUNK==64
 #include "ecdh_NIST256.h"
 #include "ecdh_GOLDILOCKS.h"
 #endif
@@ -195,7 +199,7 @@ int ecdh_ED25519(csprng *RNG)
     return 0;
 }
 
-#if CHUNK!=16
+#if CHUNK==32 || CHUNK==64
 int ecdh_NIST256(csprng *RNG)
 {
 	using namespace NIST256;
@@ -770,6 +774,7 @@ int mpin_BN254(csprng *RNG)
     return 0;
 }
 
+#if CHUNK==32 || CHUNK==64
 
 int mpin_BLS383(csprng *RNG)
 {
@@ -1531,7 +1536,7 @@ int mpin256_BLS48(csprng *RNG)
 #endif
     return 0;
 }
-
+#endif
 
 int rsa_2048(csprng *RNG)
 {

@@ -8,13 +8,16 @@
 #include <time.h>
 
 #include "rsa_RSA2048.h"
-#include "ecp_NIST256.h"
-#include "ecp_GOLDILOCKS.h"
 #include "ecp_ED25519.h"
 #include "pair_BN254.h"
+
+#if CHUNK==32 || CHUNK==64
+#include "ecp_NIST256.h"
+#include "ecp_GOLDILOCKS.h"
 #include "pair_BLS383.h"
 #include "pair192_BLS24.h"
 #include "pair256_BLS48.h"
+#endif
 
 #define MIN_TIME 10.0
 #define MIN_ITERS 10 
@@ -82,7 +85,7 @@ int ED_25519(csprng *RNG)
 	return 0;
 }
 
-
+#if CHUNK==32 || CHUNK==64
 int NIST_256(csprng *RNG)
 {
 	using namespace NIST256;
@@ -204,8 +207,7 @@ int GOLDI_LOCKS(csprng *RNG)
 
 	return 0;
 }
-
-
+#endif
 
 int BN_254(csprng *RNG)
 {
@@ -371,7 +373,7 @@ int BN_254(csprng *RNG)
 	return 0;
 }
 
-
+#if CHUNK==32 || CHUNK==64
 int BLS_383(csprng *RNG)
 {
 	using namespace BLS383;
@@ -865,7 +867,7 @@ int BLS_48(csprng *RNG)
 	}
 	return 0;
 }
-
+#endif
 
 
 int RSA_2048(csprng *RNG)
@@ -954,13 +956,16 @@ int main()
     RAND_seed(&RNG,10,pr);
 
 	ED_25519(&RNG);
+#if CHUNK==32 || CHUNK==64	
 	NIST_256(&RNG);
 	GOLDI_LOCKS(&RNG);
+#endif	
 	BN_254(&RNG);
+#if CHUNK==32 || CHUNK==64	
 	BLS_383(&RNG);
 	BLS_24(&RNG);
 	BLS_48(&RNG);
-
+#endif
 	RSA_2048(&RNG);
 	
 }
