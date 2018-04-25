@@ -430,6 +430,22 @@ int FP2_YYY_sqrt(FP2_YYY *w,FP2_YYY *u)
     return 1;
 }
 
+/* New stuff for ECp4 support */
+
+/* Input MUST be normed */
+void FP2_YYY_times_i(FP2_YYY *w)
+{
+    FP_YYY z;
+
+ //   FP2_norm(w);
+
+    FP_YYY_copy(&z,&(w->a));
+    FP_YYY_neg(&(w->a),&(w->b));
+    FP_YYY_copy(&(w->b),&z);
+
+//    Output NOT normed, so use with care
+}
+
 /*
 int main()
 {

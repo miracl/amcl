@@ -576,6 +576,93 @@ void FP4_YYY_cmove(FP4_YYY *f,FP4_YYY *g,int d)
     FP2_YYY_cmove(&(f->b),&(g->b),d);
 }
 
+/* New stuff for ECp4 support */
+
+/* Set w=x/2 */
+void FP4_YYY_div2(FP4_YYY *w,FP4_YYY *x)
+{
+    FP2_YYY_div2(&(w->a),&(x->a));
+    FP2_YYY_div2(&(w->b),&(x->b));
+}
+
+#if CURVE_SECURITY_ZZZ >= 192
+
+/* sqrt(a+xb) = sqrt((a+sqrt(a*a-n*b*b))/2)+x.b/(2*sqrt((a+sqrt(a*a-n*b*b))/2)) */
+/* returns true if x is QR */
+int FP4_YYY_sqrt(FP4_YYY *r,FP4_YYY* x)
+{
+    FP2_YYY a,s,t;
+
+    FP4_YYY_copy(r,x);
+    if (FP4_YYY_iszilch(x))
+        return 1;
+    
+    FP2_YYY_copy(&a,&(x->a));
+    FP2_YYY_copy(&s,&(x->b));
+
+    if (FP2_YYY_iszilch(&s))
+    {
+        if (FP2_YYY_sqrt(&t,&a))
+        {
+            FP4_YYY_from_FP2(r,&t);
+        }
+        else
+        {
+            FP2_YYY_div_ip(&a);
+            FP2_YYY_sqrt(&t,&a);
+            FP4_YYY_from_FP2H(r,&t);
+        }
+        return 1;
+    }
+
+    FP2_YYY_sqr(&s,&s);  // s*=s
+    FP2_YYY_sqr(&a,&a);  // a*=a
+    FP2_YYY_mul_ip(&s);
+    FP2_YYY_norm(&s);
+    FP2_YYY_sub(&a,&a,&s); // a-=txx(s)
+
+    if (!FP2_YYY_sqrt(&s,&a)) return 0;
+
+    FP2_YYY_sqr(&t,&s);
+
+
+    FP2_YYY_copy(&t,&(x->a));
+    FP2_YYY_add(&a,&t,&s);
+    FP2_YYY_norm(&a);
+    FP2_YYY_div2(&a,&a);
+
+    if (!FP2_YYY_sqrt(&a,&a))
+    {
+        FP2_YYY_sub(&a,&t,&s);
+        FP2_YYY_norm(&a);
+        FP2_YYY_div2(&a,&a);
+        if (!FP2_YYY_sqrt(&a,&a)) return 0;
+    }
+
+    FP2_YYY_copy(&t,&(x->b));
+    FP2_YYY_add(&s,&a,&a);
+    FP2_YYY_inv(&s,&s);
+
+    FP2_YYY_mul(&t,&t,&s);
+    FP4_YYY_from_FP2s(r,&a,&t);
+
+    return 1;
+
+}
+
+void FP4_YYY_div_i(FP4_YYY *f)
+{
+    FP2_YYY u,v;
+    FP2_YYY_copy(&u,&(f->a));
+    FP2_YYY_copy(&v,&(f->b));
+    FP2_YYY_div_ip(&u);
+    FP2_YYY_copy(&(f->a),&v);
+    FP2_YYY_copy(&(f->b),&u);
+}
+
+#endif
+
+
 /*
 int main(){
 		FP2_YYY w0,w1,f;

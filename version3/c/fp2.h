@@ -230,4 +230,11 @@ extern void FP2_YYY_pow(FP2_YYY *x,FP2_YYY *y,BIG_XXX b);
  */
 extern int FP2_YYY_sqrt(FP2_YYY *x,FP2_YYY *y);
 
+/**	@brief Multiply an FP2 by sqrt(-1)
+ *
+	Note that -1 is QNR
+	@param x FP2 instance, on exit = x*sqrt(-1)
+ */
+extern void FP2_YYY_times_i(FP2_YYY *x);
+
 #endif

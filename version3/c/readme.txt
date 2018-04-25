@@ -25,9 +25,12 @@ that you wish to support. Note that support for 16-bit builds is currently
 somewhat limited - see config16.py. A library is built automatically 
 including all of the modules that you will need.
 
-The configuration files assume the gcc compliler. For clang edit the
+The configuration files assume the gcc compiler. For clang edit the
 config32.py and config64.py files and substitute "clang" for "gcc".
 Note that clang is about 10-15% faster.*
+
+NOTE: In the file config_curve.h a couple of methods with possible IP issues 
+are commented out. For faster pairing code, edit this file.
 
 As a quick example execute
 
@@ -37,7 +40,7 @@ or
 
 python3 config32.py
 
-Then select options 1, 3, 7, 17 and 24, which are fixed for the example 
+Then select options 1, 3, 7, 17, 19, 24, 25 and 26, which are fixed for the example 
 program. (For a 16-bit build select 1,3 and 5). Select 0 then to exit.
 
 Then compile

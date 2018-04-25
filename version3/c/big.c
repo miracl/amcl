@@ -1322,7 +1322,7 @@ void BIG_XXX_modneg(BIG_XXX r,BIG_XXX a,BIG_XXX m)
 {
     BIG_XXX_mod(a,m);
     BIG_XXX_sub(r,m,a);
-    BIG_XXX_mod(r,m);
+//    BIG_XXX_mod(r,m);
 }
 
 /* Set a=a/b mod m */

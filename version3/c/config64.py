@@ -187,55 +187,203 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 		replace(fnameh,"ZZZ",tc)
 		os.system("gcc -O3 -std=c99 -c "+fnamec)
 
-		fnamec="fp12_"+tf+".c"
-		fnameh="fp12_"+tf+".h"
+		if cs == "128" :
+			fnamec="fp12_"+tf+".c"
+			fnameh="fp12_"+tf+".h"
 
-		os.system(copytext+" fp12.c "+fnamec)
-		os.system(copytext+" fp12.h "+fnameh)
-		replace(fnamec,"YYY",tf)
-		replace(fnamec,"XXX",bd)
-		replace(fnameh,"YYY",tf)
-		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -std=c99 -c "+fnamec)
+			os.system(copytext+" fp12.c "+fnamec)
+			os.system(copytext+" fp12.h "+fnameh)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
 
-		fnamec="ecp2_"+tc+".c"
-		fnameh="ecp2_"+tc+".h"
+			fnamec="ecp2_"+tc+".c"
+			fnameh="ecp2_"+tc+".h"
 
-		os.system(copytext+" ecp2.c "+fnamec)
-		os.system(copytext+" ecp2.h "+fnameh)
-		replace(fnamec,"ZZZ",tc)
-		replace(fnamec,"YYY",tf)
-		replace(fnamec,"XXX",bd)
-		replace(fnameh,"ZZZ",tc)
-		replace(fnameh,"YYY",tf)
-		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -std=c99 -c "+fnamec)
+			os.system(copytext+" ecp2.c "+fnamec)
+			os.system(copytext+" ecp2.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
 
-		fnamec="pair_"+tc+".c"
-		fnameh="pair_"+tc+".h"
+			fnamec="pair_"+tc+".c"
+			fnameh="pair_"+tc+".h"
 
-		os.system(copytext+" pair.c "+fnamec)
-		os.system(copytext+" pair.h "+fnameh)
-		replace(fnamec,"ZZZ",tc)
-		replace(fnamec,"YYY",tf)
-		replace(fnamec,"XXX",bd)
-		replace(fnameh,"ZZZ",tc)
-		replace(fnameh,"YYY",tf)
-		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -std=c99 -c "+fnamec)
+			os.system(copytext+" pair.c "+fnamec)
+			os.system(copytext+" pair.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
 
-		fnamec="mpin_"+tc+".c"
-		fnameh="mpin_"+tc+".h"
+			fnamec="mpin_"+tc+".c"
+			fnameh="mpin_"+tc+".h"
 
-		os.system(copytext+" mpin.c "+fnamec)
-		os.system(copytext+" mpin.h "+fnameh)
-		replace(fnamec,"ZZZ",tc)
-		replace(fnamec,"YYY",tf)
-		replace(fnamec,"XXX",bd)
-		replace(fnameh,"ZZZ",tc)
-		replace(fnameh,"YYY",tf)
-		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -std=c99 -c "+fnamec)
+			os.system(copytext+" mpin.c "+fnamec)
+			os.system(copytext+" mpin.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+		if cs == "192" :
+			fnamec="fp8_"+tf+".c"
+			fnameh="fp8_"+tf+".h"
+
+			os.system(copytext+" fp8.c "+fnamec)
+			os.system(copytext+" fp8.h "+fnameh)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+
+			fnamec="fp24_"+tf+".c"
+			fnameh="fp24_"+tf+".h"
+
+			os.system(copytext+" fp24.c "+fnamec)
+			os.system(copytext+" fp24.h "+fnameh)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+			fnamec="ecp4_"+tc+".c"
+			fnameh="ecp4_"+tc+".h"
+
+			os.system(copytext+" ecp4.c "+fnamec)
+			os.system(copytext+" ecp4.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+			fnamec="pair192_"+tc+".c"
+			fnameh="pair192_"+tc+".h"
+
+			os.system(copytext+" pair192.c "+fnamec)
+			os.system(copytext+" pair192.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+			fnamec="mpin192_"+tc+".c"
+			fnameh="mpin192_"+tc+".h"
+
+			os.system(copytext+" mpin192.c "+fnamec)
+			os.system(copytext+" mpin192.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+		if cs == "256" :
+
+			fnamec="fp8_"+tf+".c"
+			fnameh="fp8_"+tf+".h"
+
+			os.system(copytext+" fp8.c "+fnamec)
+			os.system(copytext+" fp8.h "+fnameh)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+
+			fnamec="ecp8_"+tc+".c"
+			fnameh="ecp8_"+tc+".h"
+
+			os.system(copytext+" ecp8.c "+fnamec)
+			os.system(copytext+" ecp8.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+
+			fnamec="fp16_"+tf+".c"
+			fnameh="fp16_"+tf+".h"
+
+			os.system(copytext+" fp16.c "+fnamec)
+			os.system(copytext+" fp16.h "+fnameh)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+
+			fnamec="fp48_"+tf+".c"
+			fnameh="fp48_"+tf+".h"
+
+			os.system(copytext+" fp48.c "+fnamec)
+			os.system(copytext+" fp48.h "+fnameh)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+
+			fnamec="pair256_"+tc+".c"
+			fnameh="pair256_"+tc+".h"
+
+			os.system(copytext+" pair256.c "+fnamec)
+			os.system(copytext+" pair256.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
+			fnamec="mpin256_"+tc+".c"
+			fnameh="mpin256_"+tc+".h"
+
+			os.system(copytext+" mpin256.c "+fnamec)
+			os.system(copytext+" mpin256.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 replace("arch.h","@WL@","64")
 print("Elliptic Curves")
@@ -265,15 +413,16 @@ print("20. BLS381")
 print("21. FP256BN")
 print("22. FP512BN")
 print("23. BLS461\n")
+print("24. BLS24")
+print("25. BLS48\n")
 
 print("RSA")
-print("24. RSA2048")
-print("25. RSA3072")
-print("26. RSA4096")
-
+print("26. RSA2048")
+print("27. RSA3072")
+print("28. RSA4096")
 selection=[]
 ptr=0
-max=27
+max=29
 
 curve_selected=False
 pfcurve_selected=False
@@ -386,6 +535,14 @@ while ptr<max:
 		curveset("464","BLS461","BLS461","58","60","461","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 
+	if x==24:
+		curveset("480","BLS24","BLS24","60","56","479","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","192")
+		pfcurve_selected=True
+
+	if x==25:
+		curveset("560","BLS48","BLS48","70","58","556","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","256")
+		pfcurve_selected=True
+
 
 # rsaset(big,ring,big_length_bytes,bits_in_base,multiplier)
 # for each choice give distinct names for "big" and "ring".
@@ -396,17 +553,17 @@ while ptr<max:
 # multiplier is 2^m (see above)
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==24:
+	if x==26:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("1024","2048","128","58","2")
 		#rsaset("512","2048","64","60","4")
 		#rsaset("256","2048","32","56","8")
 		rsa_selected=True
-	if x==25:
+	if x==27:
 		rsaset("384","3072","48","56","8")
 		rsa_selected=True
-	if x==26:
+	if x==28:
 		#rsaset("256","4096","32","56","16")
 		rsaset("512","4096","64","60","8")
 		rsa_selected=True
@@ -424,10 +581,25 @@ os.system(deltext+" config_curve.h")
 os.system(deltext+" config_ff.h")
 os.system(deltext+" fp2.*")
 os.system(deltext+" fp4.*")
+os.system(deltext+" fp8.*")
+os.system(deltext+" fp16.*")
+
 os.system(deltext+" fp12.*")
+os.system(deltext+" fp24.*")
+os.system(deltext+" fp48.*")
+
 os.system(deltext+" ecp2.*")
+os.system(deltext+" ecp4.*")
+os.system(deltext+" ecp8.*")
+
 os.system(deltext+" pair.*")
 os.system(deltext+" mpin.*")
+
+os.system(deltext+" pair192.*")
+os.system(deltext+" mpin192.*")
+
+os.system(deltext+" pair256.*")
+os.system(deltext+" mpin256.*")
 
 # create library
 os.system("gcc -O3 -std=c99 -c randapi.c")

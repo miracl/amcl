@@ -28,6 +28,7 @@
 #define FP4_YYY_H
 
 #include "fp2_YYY.h"
+#include "config_curve_ZZZ.h"
 
 /**
 	@brief FP4 Structure - towered over two FP2
@@ -257,6 +258,30 @@ extern void FP4_YYY_xtr_pow2(FP4_YYY *r,FP4_YYY *c,FP4_YYY *d,FP4_YYY *e,FP4_YYY
  */
 extern void FP4_YYY_cmove(FP4_YYY *x,FP4_YYY *y,int s);
 
+
+/**	@brief Calculate square root of an FP4
+ *
+	Square root
+	@param r FP4 instance, on exit = sqrt(x)
+	@param x FP4 instance
+	@return 1 x is a QR, otherwise 0
+ */
+extern int  FP4_YYY_sqrt(FP4_YYY *r,FP4_YYY *x);
+
+
+/**	@brief Divide FP4 number by QNR
+ *
+	Divide FP4 by the QNR
+	@param x FP4 instance
+ */
+extern void FP4_YYY_div_i(FP4_YYY *x);
+
+/**	@brief Divide an FP4 by 2
+ *
+	@param x FP4 instance, on exit = y/2
+	@param y FP4 instance
+ */
+extern void FP4_YYY_div2(FP4_YYY *x,FP4_YYY *y);
 
 #endif
 
