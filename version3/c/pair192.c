@@ -49,8 +49,8 @@ static void PAIR_ZZZ_line(FP24_YYY *v,ECP4_ZZZ *A,ECP4_ZZZ *B,FP_YYY *Qx,FP_YYY 
 	FP8_YYY_from_FP4s(&a,&T,&Y); // (-Qy,Y-lam*X)
 	FP8_YYY_norm(&a);
 
-	FP2_YYY_from_FP(&t,Qx);		// t=Qx
-	FP4_YYY_pmul(&T,&lam,&t);	// T=lam*Qx
+	//FP2_YYY_from_FP(&t,Qx);		// t=Qx
+	FP4_YYY_qmul(&T,&lam,Qx);	// T=lam*Qx
 	
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP8_YYY_from_FP4(&b,&T);	// (lam*Qx,0)

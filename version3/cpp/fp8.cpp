@@ -642,7 +642,6 @@ int YYY::FP8_sqrt(FP8 *r,FP8* x)
 
 }
 
-
 void YYY::FP8_div_i(FP8 *f)
 {
 	FP4 u,v;

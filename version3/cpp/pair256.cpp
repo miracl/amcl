@@ -60,8 +60,8 @@ static void ZZZ::PAIR_line(FP48 *v,ECP8 *A,ECP8 *B,FP *Qx,FP *Qy)
 	FP16_norm(&a);
 
 	FP2_from_FP(&t,Qx);		// t=Qx
-	FP4_from_FP2(&t4,&t);
-	FP8_pmul(&T,&lam,&t4);	// T=lam*Qx
+	//FP4_from_FP2(&t4,&t);
+	FP8_qmul(&T,&lam,&t);	// T=lam*Qx
 	
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP16_from_FP8(&b,&T);	// (lam*Qx,0)

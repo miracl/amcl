@@ -148,6 +148,15 @@ extern void FP4_YYY_sub(FP4_YYY *x,FP4_YYY *y,FP4_YYY *z);
 	@param a FP2 multiplier
  */
 extern void FP4_YYY_pmul(FP4_YYY *x,FP4_YYY *y,FP2_YYY *a);
+
+/**	@brief Multiplication of an FP4 by an FP
+ *
+	@param x FP4 instance, on exit = y*a
+	@param y FP4 instance
+	@param a FP multiplier
+ */
+extern void FP4_YYY_qmul(FP4_YYY *x,FP4_YYY *y,FP_YYY *a);
+
 /**	@brief Multiplication of an FP4 by a small integer
  *
 	@param x FP4 instance, on exit = y*i

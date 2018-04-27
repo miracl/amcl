@@ -831,7 +831,7 @@ void ZZZ::ECP8_mul16(ECP8 *P,ECP8 Q[16],BIG u[16])
 	ECP8_copy(&W,P);   
 	ECP8_sub(&W,&Q[12]);
 	ECP8_cmove(P,&W,pb4);
-
+	ECP8_reduce(P);
 }
 
 /*
@@ -1024,7 +1024,7 @@ void ZZZ::ECP8_mapit(ECP8 *Q,octet *W)
 		FP4_from_FP2(&X4,&T);
 		FP8_from_FP4(&X8,&X4);
         if (ECP8_setx(Q,&X8)) break;
-        BIG_inc(hv,1);
+        BIG_inc(hv,1); BIG_norm(hv);
     }
 
 	ECP8_frob_constants(X);

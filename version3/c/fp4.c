@@ -181,6 +181,13 @@ void FP4_YYY_pmul(FP4_YYY *w,FP4_YYY *x,FP2_YYY *s)
     FP2_YYY_mul(&(w->b),&(x->b),s);
 }
 
+/* Set w=s*x, where s is FP */
+void FP4_YYY_qmul(FP4_YYY *w,FP4_YYY *x,FP_YYY *s)
+{
+    FP2_YYY_pmul(&(w->a),&(x->a),s);
+    FP2_YYY_pmul(&(w->b),&(x->b),s);
+}
+
 /* SU= 16 */
 /* Set w=s*x, where s is int */
 void FP4_YYY_imul(FP4_YYY *w,FP4_YYY *x,int s)
@@ -623,7 +630,7 @@ int FP4_YYY_sqrt(FP4_YYY *r,FP4_YYY* x)
 
     if (!FP2_YYY_sqrt(&s,&a)) return 0;
 
-    FP2_YYY_sqr(&t,&s);
+    //FP2_YYY_sqr(&t,&s);
 
 
     FP2_YYY_copy(&t,&(x->a));

@@ -658,6 +658,8 @@ void ECP4_ZZZ_mul8(ECP4_ZZZ *P,ECP4_ZZZ Q[8],BIG_XXX u[8])
 	ECP4_ZZZ_copy(&W,P);   
 	ECP4_ZZZ_sub(&W,&Q[4]);
 	ECP4_ZZZ_cmove(P,&W,pb2);
+
+	ECP4_ZZZ_reduce(P);
 }
 /*
 void ECP4_ZZZ_mul8(ECP4_ZZZ *P,ECP4_ZZZ Q[8],BIG_XXX u[8])
@@ -797,7 +799,7 @@ void ECP4_ZZZ_mapit(ECP4_ZZZ *Q,octet *W)
         FP2_YYY_from_BIGs(&T,one,hv);  /*******/
 		FP4_YYY_from_FP2(&X4,&T);
         if (ECP4_ZZZ_setx(Q,&X4)) break;
-        BIG_XXX_inc(hv,1);
+        BIG_XXX_inc(hv,1); BIG_XXX_norm(hv);
     }
 
 	ECP4_ZZZ_frob_constants(X);
