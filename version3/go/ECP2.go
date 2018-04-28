@@ -77,7 +77,7 @@ func (E *ECP2) cmove(Q *ECP2,d int) {
 	if (d==0) {
 		bd=false
 	} else {bd=true}
-	E.INF=(E.INF!=(E.INF!=Q.INF)&&bd)
+	E.INF=(E.INF!=((E.INF!=Q.INF)&&bd))
 }
 
 /* Constant time select from pre-computed table */

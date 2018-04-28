@@ -404,7 +404,6 @@ int ECP8_ZZZ_sdbl(ECP8_ZZZ *P,FP8_YYY *lam)
 int ECP8_ZZZ_sadd(ECP8_ZZZ *P,ECP8_ZZZ *Q,FP8_YYY *lam)
 {
     FP8_YYY t,t2;
-	int b3=3*CURVE_B_I_ZZZ;
     if (Q->inf) return 0;
     if (P->inf)
     {

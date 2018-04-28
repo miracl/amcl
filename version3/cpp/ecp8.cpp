@@ -407,7 +407,6 @@ int ZZZ::ECP8_sdbl(ECP8 *P,FP8 *lam)
 int ZZZ::ECP8_sadd(ECP8 *P,ECP8 *Q,FP8 *lam)
 {
     FP8 t,t2;
-	int b3=3*CURVE_B_I;
     if (Q->inf) return 0;
     if (P->inf)
     {

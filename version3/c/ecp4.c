@@ -342,7 +342,6 @@ int ECP4_ZZZ_sdbl(ECP4_ZZZ *P,FP4_YYY *lam)
 int ECP4_ZZZ_sadd(ECP4_ZZZ *P,ECP4_ZZZ *Q,FP4_YYY *lam)
 {
     FP4_YYY t,t2;
-	int b3=3*CURVE_B_I_ZZZ;
     if (Q->inf) return 0;
     if (P->inf)
     {
