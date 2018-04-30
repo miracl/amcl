@@ -1330,7 +1330,7 @@ void ZZZ::ECP_mapit(ECP *P,octet *W)
 	{
         BIG_inc(x,1); k++; BIG_norm(x);
 	}
-#if PAIRING_FRIENDLY == BLS
+#if PAIRING_FRIENDLY_ZZZ == BLS
     BIG_rcopy(c,CURVE_Cof);
     ECP_mul(P,c);
 #endif

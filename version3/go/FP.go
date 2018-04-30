@@ -67,6 +67,7 @@ func NewFPcopy(a *FP) *FP {
 }
 
 func (F *FP) toString() string {
+	F.reduce()
 	return F.redc().toString()
 }
 

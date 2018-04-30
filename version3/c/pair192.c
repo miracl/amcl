@@ -70,7 +70,7 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q)
 {
     BIG_XXX x,n,n3;
 	FP_YYY Qx,Qy;
-    int i,j,nb,bt;
+    int i,nb,bt;
     ECP4_ZZZ A;
     FP24_YYY lv;
 
@@ -89,11 +89,11 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q)
     FP24_YYY_one(r);
     nb=BIG_XXX_nbits(n3);  // n3
 
-	j=0;
+//	j=0;
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)
     {
-		j++;
+//		j++;
 		FP24_YYY_sqr(r,r);
         PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
         FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);

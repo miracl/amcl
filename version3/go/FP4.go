@@ -128,6 +128,7 @@ func (F *FP4) one() {
 
 /* set this=-this */
 func (F *FP4) neg() {
+	F.norm()
 	m:=NewFP2copy(F.a);
 	t:=NewFP2int(0)
 	m.add(F.b)

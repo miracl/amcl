@@ -146,6 +146,7 @@ impl ECP {
 			let one=FP::new_int(1);
 			b.mul(&r);
 			b.sub(&one);
+			b.norm();
 			if rom::CURVE_A==-1 {r.neg()}
 			r.sub(&one); r.norm();
 			b.inverse();

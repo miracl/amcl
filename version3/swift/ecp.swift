@@ -214,7 +214,7 @@ final public class ECP {
     
             let one=FP(1);
             b.mul(r);
-            b.sub(one);
+            b.sub(one); b.norm()
             if ROM.CURVE_A == -1 {r.neg()}
             r.sub(one); r.norm()
             b.inverse()

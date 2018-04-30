@@ -78,7 +78,7 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P,ECP *Q)
 {
     BIG x,n,n3;
 	FP Qx,Qy;
-    int i,j,nb,bt;
+    int i,nb,bt;
     ECP4 A;
     FP24 lv;
 
@@ -97,11 +97,11 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P,ECP *Q)
     FP24_one(r);
     nb=BIG_nbits(n3);  // n3
 
-	j=0;
+//	j=0;
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)
     {
-		j++;
+//		j++;
 		FP24_sqr(r,r);
         PAIR_line(&lv,&A,&A,&Qx,&Qy);
         FP24_smul(r,&lv,SEXTIC_TWIST_ZZZ);

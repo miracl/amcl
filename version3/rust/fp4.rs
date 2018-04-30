@@ -136,7 +136,7 @@ impl FP4 {
 
 /* negate self mod Modulus */
 	pub fn neg(&mut self) {
-	//	self.norm();
+		self.norm();
 		let mut m=FP2::new_copy(&self.a);
 		let mut t=FP2::new();
 

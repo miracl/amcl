@@ -126,6 +126,7 @@ public final class FP4 {
 /* set this=-this */
 	public void neg()
 	{
+		norm();
 		FP2 m=new FP2(a);
 		FP2 t=new FP2(0);
 		m.add(b);

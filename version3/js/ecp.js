@@ -1285,7 +1285,8 @@ var ECP = function(ctx) {
 
             one = new ctx.FP(1);
             b.mul(r);
-            b.sub(one);
+            b.sub(one); 
+			b.norm();
             if (ctx.ROM_CURVE.CURVE_A == -1) {
                 r.neg();
             }

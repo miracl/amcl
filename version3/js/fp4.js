@@ -121,6 +121,7 @@ var FP4 = function(ctx) {
 
         /* this=-this */
         neg: function() {
+			this.norm();
             var m = new ctx.FP2(this.a), //m.copy(this.a);
                 t = new ctx.FP2(0);
 

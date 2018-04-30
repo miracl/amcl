@@ -212,6 +212,7 @@ public final class ECP {
 			FP one=new FP(1);
 			b.mul(r);
 			b.sub(one);
+			b.norm();
 			if (ROM.CURVE_A==-1) r.neg();
 			r.sub(one); r.norm();
 			b.inverse();

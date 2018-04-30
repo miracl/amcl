@@ -135,6 +135,7 @@ final public class FP4 {
     /* set self=-self */
     func neg()
     {
+	norm()
         let m=FP2(a)
         let t=FP2(0)
         m.add(b)

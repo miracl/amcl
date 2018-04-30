@@ -254,6 +254,7 @@ func RHS(x *FP) *FP {
 		one:=NewFPint(1)
 		b.mul(r)
 		b.sub(one)
+		b.norm()
 		if CURVE_A==-1 {r.neg()}
 		r.sub(one); r.norm()
 		b.inverse()
