@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-/* Finite Field arithmetic  Fp^4 functions */
+/* Finite Field arithmetic  Fp^16 functions */
 
 /* FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1)) */
 
@@ -25,112 +25,113 @@ package XXX
 
 //import "fmt"
 
-type FP4 struct {
-	a *FP2
-	b *FP2
+type FP16 struct {
+	a *FP8
+	b *FP8
 }
 
 /* Constructors */
-func NewFP4int(a int) *FP4 {
-	F:=new(FP4)
-	F.a=NewFP2int(a)
-	F.b=NewFP2int(0)
+func NewFP16int(a int) *FP16 {
+	F:=new(FP16)
+	F.a=NewFP8int(a)
+	F.b=NewFP8int(0)
 	return F
 }
 
-func NewFP4copy(x *FP4) *FP4 {
-	F:=new(FP4)
-	F.a=NewFP2copy(x.a)
-	F.b=NewFP2copy(x.b)
+func NewFP16copy(x *FP16) *FP16 {
+	F:=new(FP16)
+	F.a=NewFP8copy(x.a)
+	F.b=NewFP8copy(x.b)
 	return F
 }
 
-func NewFP4fp2s(c *FP2,d *FP2) *FP4 {
-	F:=new(FP4)
-	F.a=NewFP2copy(c)
-	F.b=NewFP2copy(d)
+func NewFP16fp8s(c *FP8,d *FP8) *FP16 {
+	F:=new(FP16)
+	F.a=NewFP8copy(c)
+	F.b=NewFP8copy(d)
 	return F
 }
 
-func NewFP4fp2(c *FP2) *FP4 {
-	F:=new(FP4)
-	F.a=NewFP2copy(c)
-	F.b=NewFP2int(0)
+func NewFP16fp8(c *FP8) *FP16 {
+	F:=new(FP16)
+	F.a=NewFP8copy(c)
+	F.b=NewFP8int(0)
 	return F
 }
 
 /* reduce all components of this mod Modulus */
-func (F *FP4) reduce() {
+func (F *FP16) reduce() {
 	F.a.reduce()
 	F.b.reduce()
 }
 
 /* normalise all components of this mod Modulus */
-func (F *FP4) norm() {
+func (F *FP16) norm() {
 	F.a.norm()
 	F.b.norm()
 }
 
 /* test this==0 ? */
-func (F *FP4) iszilch() bool {
+func (F *FP16) iszilch() bool {
 	F.reduce()
 	return F.a.iszilch() && F.b.iszilch()
 }
 
 /* Conditional move */
-func (F *FP4) cmove(g *FP4,d int) {
+func (F *FP16) cmove(g *FP16,d int) {
 	F.a.cmove(g.a,d)
 	F.b.cmove(g.b,d)
 }
 
 /* test this==1 ? */
-func (F *FP4) isunity() bool {
-	one:=NewFP2int(1)
+func (F *FP16) isunity() bool {
+	one:=NewFP8int(1)
 	return F.a.Equals(one) && F.b.iszilch()
 }
 
 /* test is w real? That is in a+ib test b is zero */
-func (F *FP4) isreal() bool {
+func (F *FP16) isreal() bool {
 	return F.b.iszilch()
 }
 /* extract real part a */
-func (F *FP4) real() *FP2 {
+func (F *FP16) real() *FP8 {
 	return F.a
 }
 
-func (F *FP4) geta() *FP2 {
+func (F *FP16) geta() *FP8 {
 	return F.a
 }
 /* extract imaginary part b */
-func (F *FP4) getb() *FP2 {
+func (F *FP16) getb() *FP8 {
 	return F.b
 }
 /* test this=x? */
-func (F *FP4) Equals(x *FP4) bool {
+func (F *FP16) Equals(x *FP16) bool {
 	return (F.a.Equals(x.a) && F.b.Equals(x.b))
 }
 
 /* copy this=x */
-func (F *FP4) copy(x *FP4) {
+func (F *FP16) copy(x *FP16) {
 	F.a.copy(x.a)
 	F.b.copy(x.b)
 }
+
 /* set this=0 */
-func (F *FP4) zero() {
+func (F *FP16) zero() {
 	F.a.zero()
 	F.b.zero()
-	}
+}
 /* set this=1 */
-func (F *FP4) one() {
+func (F *FP16) one() {
 	F.a.one()
 	F.b.zero()
 }
 
 /* set this=-this */
-func (F *FP4) neg() {
+func (F *FP16) neg() {
 	F.norm()
-	m:=NewFP2copy(F.a);
-	t:=NewFP2int(0)
+	m:=NewFP8copy(F.a);
+	t:=NewFP8int(0)
 	m.add(F.b)
 	m.neg()
 	//m.norm()
@@ -142,73 +143,72 @@ func (F *FP4) neg() {
 }
 
 /* this=conjugate(this) */
-func (F *FP4) conj() {
+func (F *FP16) conj() {
 	F.b.neg(); F.norm()
 }
 
 /* this=-conjugate(this) */
-func (F *FP4) nconj() {
+func (F *FP16) nconj() {
 	F.a.neg(); F.norm()
 }
 
 /* this+=x */
-func (F *FP4) add(x *FP4) {
+func (F *FP16) add(x *FP16) {
 	F.a.add(x.a)
 	F.b.add(x.b)
 }
 /* this-=x */
-func (F *FP4) sub(x *FP4) {
-	m:=NewFP4copy(x)
+func (F *FP16) sub(x *FP16) {
+	m:=NewFP16copy(x)
 	m.neg()
 	F.add(m)
 }
 
 /* this-=x */
-func (F *FP4) rsub(x *FP4) {
+func (F *FP16) rsub(x *FP16) {
 	F.neg()
 	F.add(x)
 }
 
-/* this*=s where s is FP2 */
-func (F *FP4) pmul(s *FP2) {
+/* this*=s where s is FP8 */
+func (F *FP16) pmul(s *FP8) {
 	F.a.mul(s)
 	F.b.mul(s)
 }
 
-/* this*=s where s is FP2 */
-func (F *FP4) qmul(s *FP) {
-	F.a.pmul(s)
-	F.b.pmul(s)
+/* this*=s where s is FP4 */
+func (F *FP16) qmul(s *FP2) {
+	F.a.qmul(s)
+	F.b.qmul(s)
 }
 
 /* this*=c where c is int */
-func (F *FP4) imul(c int) {
+func (F *FP16) imul(c int) {
 	F.a.imul(c)
 	F.b.imul(c)
 }
 
 /* this*=this */	
-func (F *FP4) sqr() {
+func (F *FP16) sqr() {
 //	F.norm()
 
-	t1:=NewFP2copy(F.a)
-	t2:=NewFP2copy(F.b)
-	t3:=NewFP2copy(F.a)
+	t1:=NewFP8copy(F.a)
+	t2:=NewFP8copy(F.b)
+	t3:=NewFP8copy(F.a)
 
 	t3.mul(F.b)
 	t1.add(F.b)
-	t2.mul_ip()
+	t2.times_i()
 
 	t2.add(F.a)
 
 	t1.norm(); t2.norm()
 
 	F.a.copy(t1)
-
 	F.a.mul(t2)
 
 	t2.copy(t3)
-	t2.mul_ip()
+	t2.times_i()
 	t2.add(t3); t2.norm()
 	t2.neg()
 	F.a.add(t2)
@@ -220,13 +220,13 @@ func (F *FP4) sqr() {
 }
 
 /* this*=y */
-func (F *FP4) mul(y *FP4) {
+func (F *FP16) mul(y *FP16) {
 //	F.norm()
 
-	t1:=NewFP2copy(F.a)
-	t2:=NewFP2copy(F.b)
-	t3:=NewFP2int(0)
-	t4:=NewFP2copy(F.b)
+	t1:=NewFP8copy(F.a)
+	t2:=NewFP8copy(F.b)
+	t3:=NewFP8int(0)
+	t4:=NewFP8copy(F.b)
 
 	t1.mul(y.a)
 	t2.mul(y.b)
@@ -248,7 +248,7 @@ func (F *FP4) mul(y *FP4) {
 	F.b.copy(t4)
 	F.b.add(t3)
 
-	t2.mul_ip()
+	t2.times_i()
 	F.a.copy(t2)
 	F.a.add(t1)
 
@@ -256,54 +256,66 @@ func (F *FP4) mul(y *FP4) {
 }
 
 /* convert this to hex string */
-func (F *FP4) toString() string {
+func (F *FP16) toString() string {
 	return ("["+F.a.toString()+","+F.b.toString()+"]")
 }
 
 /* this=1/this */
-func (F *FP4) inverse() {
+func (F *FP16) inverse() {
 //	F.norm()
 
-	t1:=NewFP2copy(F.a)
-	t2:=NewFP2copy(F.b)
+	t1:=NewFP8copy(F.a)
+	t2:=NewFP8copy(F.b)
 
 	t1.sqr()
 	t2.sqr()
-	t2.mul_ip(); t2.norm()
-	t1.sub(t2)
+	t2.times_i(); t2.norm()
+	t1.sub(t2); t1.norm()
 	t1.inverse()
 	F.a.mul(t1)
 	t1.neg(); t1.norm()
 	F.b.mul(t1)
 }
 
-/* this*=i where i = sqrt(-1+sqrt(-1)) */
-func (F *FP4) times_i() {
+/* this*=i where i = sqrt(sqrt(-1+sqrt(-1))) */
+func (F *FP16) times_i() {
 //	F.norm()
-	s:=NewFP2copy(F.b)
-	t:=NewFP2copy(F.b)
+	s:=NewFP8copy(F.b)
+	t:=NewFP8copy(F.a)
 	s.times_i()
-	t.add(s)
-//	t.norm();
-	F.b.copy(F.a)
-	F.a.copy(t)
+	F.a.copy(s)
+	F.b.copy(t)
 	F.norm()
+}
+
+func (F *FP16) times_i2() {
+	F.a.times_i()
+	F.b.times_i()
+}
+
+func (F *FP16) times_i4() {
+	F.a.times_i2()
+	F.b.times_i2()
 }
 
 /* this=this^p using Frobenius */
-func (F *FP4) frob(f *FP2) {
-	F.a.conj()
-	F.b.conj()
-	F.b.mul(f)
+func (F *FP16) frob(f *FP2) {
+	ff:=NewFP2copy(f); ff.sqr(); ff.norm()
+
+	F.a.frob(ff)
+	F.b.frob(ff)
+	F.b.qmul(f)
+	F.b.times_i()
+
 }
 
 /* this=this^e */
-func (F *FP4) pow(e *BIG) *FP4 {
+func (F *FP16) pow(e *BIG) *FP16 {
 	F.norm()
 	e.norm()
-	w:=NewFP4copy(F)
+	w:=NewFP16copy(F)
 	z:=NewBIGcopy(e)
-	r:=NewFP4int(1)
+	r:=NewFP16int(1)
 	for true {
 		bt:=z.parity()
 		z.fshr(1)
@@ -316,9 +328,9 @@ func (F *FP4) pow(e *BIG) *FP4 {
 }
 
 /* XTR xtr_a function */
-func (F *FP4) xtr_A(w *FP4,y *FP4,z *FP4) {
-	r:=NewFP4copy(w)
-	t:=NewFP4copy(w)
+func (F *FP16) xtr_A(w *FP16,y *FP16,z *FP16) {
+	r:=NewFP16copy(w)
+	t:=NewFP16copy(w)
 	//y.norm()
 	r.sub(y); r.norm()
 	r.pmul(F.a)
@@ -334,8 +346,8 @@ func (F *FP4) xtr_A(w *FP4,y *FP4,z *FP4) {
 }
 
 /* XTR xtr_d function */
-func (F *FP4) xtr_D() {
-	w:=NewFP4copy(F)
+func (F *FP16) xtr_D() {
+	w:=NewFP16copy(F)
 	F.sqr(); w.conj()
 	w.add(w); w.norm()
 	F.sub(w)
@@ -343,13 +355,13 @@ func (F *FP4) xtr_D() {
 }
 
 /* r=x^n using XTR method on traces of FP12s */
-func (F *FP4) xtr_pow(n *BIG) *FP4 {
-	a:=NewFP4int(3)
-	b:=NewFP4copy(F)
-	c:=NewFP4copy(b)
+func (F *FP16) xtr_pow(n *BIG) *FP16 {
+	a:=NewFP16int(3)
+	b:=NewFP16copy(F)
+	c:=NewFP16copy(b)
 	c.xtr_D()
-	t:=NewFP4int(0)
-	r:=NewFP4int(0)
+	t:=NewFP16int(0)
+	r:=NewFP16int(0)
 
 	n.norm()
 	par:=n.parity()
@@ -383,18 +395,18 @@ func (F *FP4) xtr_pow(n *BIG) *FP4 {
 }
 
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
-func (F *FP4) xtr_pow2(ck *FP4,ckml *FP4,ckm2l *FP4,a *BIG,b *BIG) *FP4 {
+func (F *FP16) xtr_pow2(ck *FP16,ckml *FP16,ckm2l *FP16,a *BIG,b *BIG) *FP16 {
 	a.norm(); b.norm()
 	e:=NewBIGcopy(a)
 	d:=NewBIGcopy(b)
 	w:=NewBIGint(0)
 
-	cu:=NewFP4copy(ck)  // can probably be passed in w/o copying
-	cv:=NewFP4copy(F);
-	cumv:=NewFP4copy(ckml)
-	cum2v:=NewFP4copy(ckm2l)
-	r:=NewFP4int(0)
-	t:=NewFP4int(0)
+	cu:=NewFP16copy(ck)  // can probably be passed in w/o copying
+	cv:=NewFP16copy(F);
+	cumv:=NewFP16copy(ckml)
+	cum2v:=NewFP16copy(ckm2l)
+	r:=NewFP16int(0)
+	t:=NewFP16int(0)
 
 	f2:=0
 	for (d.parity()==0 && e.parity()==0) {
@@ -510,78 +522,4 @@ func (F *FP4) xtr_pow2(ck *FP4,ckml *FP4,ckm2l *FP4,a *BIG,b *BIG) *FP4 {
 	for i:=0;i<f2;i++ {r.xtr_D()}
 	r=r.xtr_pow(d)
 	return r
-}
-
-/* this/=2 */
-func (F *FP4) div2() {
-	F.a.div2()
-	F.b.div2()
-}
-
-func (F *FP4) div_i() {
-	u:=NewFP2copy(F.a)
-	v:=NewFP2copy(F.b)
-	u.div_ip()
-	F.a.copy(v)
-	F.b.copy(u)
-}	
-
-func (F *FP4) div_2i() {
-	u:=NewFP2copy(F.a)
-	v:=NewFP2copy(F.b)
-	u.div_ip2()
-	v.add(v)
-	F.a.copy(v)
-	F.b.copy(u)
-}
-
-/* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */
-/* returns true if this is QR */
-func (F *FP4) sqrt() bool {
-	if F.iszilch() {return true}
-
-	a:=NewFP2copy(F.a)
-	s:=NewFP2copy(F.b)
-	t:=NewFP2copy(F.a)
-
-	if s.iszilch() {
-		if t.sqrt() {
-			F.a.copy(t)
-			F.b.zero()
-		} else {
-			t.div_ip()
-			t.sqrt()
-			F.b.copy(t)
-			F.a.zero()
-		}
-		return true
-	}
-	s.sqr()
-	a.sqr()
-	s.mul_ip()
-	s.norm()
-	a.sub(s)
-
-	s.copy(a)
-	if !s.sqrt() {
-		return false
-	}
-
-	a.copy(t); a.add(s); a.norm(); a.div2()
-
-	if !a.sqrt() {
-		a.copy(t); a.sub(s); a.norm(); a.div2()
-		if !a.sqrt() {
-			return false
-		}
-	}
-	t.copy(F.b)
-	s.copy(a); s.add(a)
-	s.inverse()
-
-	t.mul(s)
-	F.a.copy(a)
-	F.b.copy(t)
-
-	return true
 }

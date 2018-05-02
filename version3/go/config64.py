@@ -117,19 +117,53 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 		replace(fpath+"ECP.go","@AK@","32")
 
 	if pf != "NOT" :
-		os.system(copytext+"ECP2.go "+fpath+"ECP2.go")
+
 		os.system(copytext+"FP2.go "+fpath+"FP2.go")
 		os.system(copytext+"FP4.go "+fpath+"FP4.go")
-		os.system(copytext+"FP12.go "+fpath+"FP12.go")
-		os.system(copytext+"PAIR.go "+fpath+"PAIR.go")
-		os.system(copytext+"MPIN.go "+fpath+"MPIN.go")
 
 		replace(fpath+"FP2.go","XXX",tc)
 		replace(fpath+"FP4.go","XXX",tc)
-		replace(fpath+"FP12.go","XXX",tc)
-		replace(fpath+"ECP2.go","XXX",tc)
-		replace(fpath+"PAIR.go","XXX",tc)
-		replace(fpath+"MPIN.go","XXX",tc)
+		
+		if cs == "128" :
+
+			os.system(copytext+"ECP2.go "+fpath+"ECP2.go")
+			os.system(copytext+"FP12.go "+fpath+"FP12.go")
+			os.system(copytext+"PAIR.go "+fpath+"PAIR.go")
+			os.system(copytext+"MPIN.go "+fpath+"MPIN.go")
+
+			replace(fpath+"FP12.go","XXX",tc)
+			replace(fpath+"ECP2.go","XXX",tc)
+			replace(fpath+"PAIR.go","XXX",tc)
+			replace(fpath+"MPIN.go","XXX",tc)
+
+		if cs == "192" :
+			os.system(copytext+"FP24.go "+fpath+"FP24.go")
+			os.system(copytext+"FP8.go "+fpath+"FP8.go")
+			os.system(copytext+"ECP4.go "+fpath+"ECP4.go")
+			os.system(copytext+"PAIR192.go "+fpath+"PAIR192.go")
+			os.system(copytext+"MPIN192.go "+fpath+"MPIN192.go")
+
+			replace(fpath+"FP24.go","XXX",tc)
+			replace(fpath+"FP8.go","XXX",tc)
+			replace(fpath+"ECP4.go","XXX",tc)
+			replace(fpath+"PAIR192.go","XXX",tc)
+			replace(fpath+"MPIN192.go","XXX",tc)
+
+		if cs == "256" :
+			os.system(copytext+"FP48.go "+fpath+"FP48.go")
+			os.system(copytext+"FP16.go "+fpath+"FP16.go")
+			os.system(copytext+"FP8.go "+fpath+"FP8.go")
+			os.system(copytext+"ECP8.go "+fpath+"ECP8.go")
+			os.system(copytext+"PAIR256.go "+fpath+"PAIR256.go")
+			os.system(copytext+"MPIN256.go "+fpath+"MPIN256.go")
+
+			replace(fpath+"FP48.go","XXX",tc)
+			replace(fpath+"FP16.go","XXX",tc)
+			replace(fpath+"FP8.go","XXX",tc)
+			replace(fpath+"ECP8.go","XXX",tc)
+			replace(fpath+"PAIR256.go","XXX",tc)
+			replace(fpath+"MPIN256.go","XXX",tc)
+
 
 os.system("mkdir amcl")
 os.system(copytext+ "HASH*.go amcl"+slashtext+".")
@@ -166,16 +200,18 @@ print("20. BLS381")
 print("21. FP256BN")
 print("22. FP512BN")
 print("23. BLS461\n")
+print("24. BLS24")
+print("25. BLS48\n")
 
 
 print("RSA")
-print("24. RSA2048")
-print("25. RSA3072")
-print("26. RSA4096")
+print("26. RSA2048")
+print("27. RSA3072")
+print("28. RSA4096")
 
 selection=[]
 ptr=0
-max=27
+max=29
 
 curve_selected=False
 pfcurve_selected=False
@@ -286,23 +322,31 @@ while ptr<max:
 		curveset("BLS461","58","60","461","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 
+	if x==24:
+		curveset("BLS24","60","56","479","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","192")
+		pfcurve_selected=True
+
+	if x==25:
+		curveset("BLS48","70","58","556","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","256")
+		pfcurve_selected=True
+
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
 # The RSA name reflects the modulus size, which is a 2^m multiplier
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==24:
+	if x==26:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("RSA2048","128","58","2")
 		#rsaset("RSA2048","64","60","4")
 		#rsaset("RSA2048","32","56","8")
 		rsa_selected=True
-	if x==25:
+	if x==27:
 		rsaset("RSA3072","48","56","8")
 		rsa_selected=True
-	if x==26:
+	if x==28:
 		#rsaset("RSA4096","32","56","16")
 		rsaset("RSA4096","64","60","8")
 		rsa_selected=True

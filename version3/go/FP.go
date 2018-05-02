@@ -305,11 +305,18 @@ func (F *FP) div2() {
 
 /* this=1/this mod Modulus */
 func (F *FP) inverse() {
+/*
 	p:=NewBIGints(Modulus);
 	r:=F.redc()
 	r.Invmodp(p)
 	F.x.copy(r)
 	F.nres()
+*/
+
+	m2:=NewBIGints(Modulus);
+	m2.dec(2); m2.norm()
+	F.copy(F.pow(m2))
+
 }
 
 /* return TRUE if this==a */
@@ -321,22 +328,58 @@ func (F *FP) Equals(a *FP) bool {
 }
 
 /* return this^e mod Modulus */
+/*
 func (F *FP) pow(e *BIG) *FP {
 	r:=NewFPint(1)
 	e.norm()
-	F.x.norm()
+	F.norm()
 	m:=NewFPcopy(F)
 	for true {
-		bt:=e.parity();
-		e.fshr(1);
+		bt:=e.parity()
+		e.fshr(1)
 		if bt==1 {r.mul(m)}
 		if e.iszilch() {break}
-		m.sqr();
+		m.sqr()
 	}
-	p:=NewBIGints(Modulus);
-	r.x.Mod(p);
-	return r;
+	r.reduce()
+	return r
 }
+*/
+
+
+func (F *FP) pow(e *BIG) *FP {
+	var tb []*FP
+	var w [1+(NLEN*int(BASEBITS)+3)/4]int8	
+	F.norm()
+	t:=NewBIGcopy(e)
+	t.norm()
+	nb:=1+(t.nbits()+3)/4
+
+	for i:=0;i<nb;i++ {
+		lsbs:=t.lastbits(4)
+		t.dec(lsbs)
+		t.norm()
+		w[i]=int8(lsbs)
+		t.fshr(4);
+	}
+	tb=append(tb,NewFPint(1))
+	tb=append(tb,NewFPcopy(F))
+	for i:=2;i<16;i++ {
+		tb=append(tb,NewFPcopy(tb[i-1]))
+		tb[i].mul(F);
+	}
+	r:=NewFPcopy(tb[w[nb-1]])
+	for i:=nb-2;i>=0;i-- {
+		r.sqr()
+		r.sqr()
+		r.sqr()
+		r.sqr()
+		r.mul(tb[w[i]])
+	}
+	r.reduce()
+	return r
+}
+
 
 /* return sqrt(this) mod Modulus */
 func (F *FP) sqrt() *FP {

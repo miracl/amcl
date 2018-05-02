@@ -25,8 +25,13 @@ import "fmt"
 
 import "github.com/milagro-crypto/amcl/version3/go/amcl"
 import "github.com/milagro-crypto/amcl/version3/go/amcl/ED25519"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/NIST256"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/GOLDILOCKS"
 import "github.com/milagro-crypto/amcl/version3/go/amcl/BN254"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/BLS383"
 import "github.com/milagro-crypto/amcl/version3/go/amcl/RSA2048"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/BLS24"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/BLS48"
 
 //import "amcl"
 //import "amcl/BN254"
@@ -38,16 +43,7 @@ import "time"
 const MIN_TIME int=10
 const MIN_ITERS int=10
 
-func main() {
-	var RAW [100]byte
-
-	rng:=amcl.NewRAND()
-
-	rng.Clean();
-	for i:=0;i<100;i++ {RAW[i]=byte(i)}
-
-	rng.Seed(100,RAW[:])
-
+func ED_25519(rng *amcl.RAND) {
 	fmt.Printf("Testing/Timing ED25519 ECC\n")
 
 	if ED25519.CURVETYPE==ED25519.WEIERSTRASS {
@@ -100,7 +96,120 @@ func main() {
 	fmt.Printf("EC  mul - %8d iterations  ",iterations)
 	fmt.Printf(" %8.2f ms per iteration\n",dur)
 
+}
 
+
+func NIST_256(rng *amcl.RAND) {
+	fmt.Printf("Testing/Timing NIST256 ECC\n")
+
+	if NIST256.CURVETYPE==NIST256.WEIERSTRASS {
+		fmt.Printf("Weierstrass parameterization\n")
+	}		
+	if NIST256.CURVETYPE==NIST256.EDWARDS {
+		fmt.Printf("Edwards parameterization\n")
+	}
+	if NIST256.CURVETYPE==NIST256.MONTGOMERY {
+		fmt.Printf("Montgomery parameterization\n")
+	}
+
+	if NIST256.MODTYPE==NIST256.PSEUDO_MERSENNE {
+		fmt.Printf("Pseudo-Mersenne Modulus\n")
+	}
+	if NIST256.MODTYPE==NIST256.MONTGOMERY_FRIENDLY {
+		fmt.Printf("Montgomery friendly Modulus\n")
+	}
+	if NIST256.MODTYPE==NIST256.GENERALISED_MERSENNE {
+		fmt.Printf("Generalised-Mersenne Modulus\n")
+	}
+	if NIST256.MODTYPE==NIST256.NOT_SPECIAL {
+		fmt.Printf("Not special Modulus\n")
+	}
+
+	fmt.Printf("Modulus size %d bits\n",NIST256.MODBITS)
+	fmt.Printf("%d bit build\n",NIST256.CHUNK)
+
+	var es *NIST256.BIG
+
+	EG:=NIST256.ECP_generator();
+	er:=NIST256.NewBIGints(NIST256.CURVE_Order)
+	es=NIST256.Randomnum(er,rng)
+
+	WP:=EG.Mul(er)
+	if !WP.Is_infinity() {
+		fmt.Printf("FAILURE - rG!=O\n")
+		return
+	}
+
+	start := time.Now()
+	iterations:=0
+	elapsed:=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		WP=EG.Mul(es)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur:=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("EC  mul - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+}
+
+func GOLDI_LOCKS(rng *amcl.RAND) {
+	fmt.Printf("Testing/Timing GOLDILOCKS ECC\n")
+
+	if GOLDILOCKS.CURVETYPE==GOLDILOCKS.WEIERSTRASS {
+		fmt.Printf("Weierstrass parameterization\n")
+	}		
+	if GOLDILOCKS.CURVETYPE==GOLDILOCKS.EDWARDS {
+		fmt.Printf("Edwards parameterization\n")
+	}
+	if GOLDILOCKS.CURVETYPE==GOLDILOCKS.MONTGOMERY {
+		fmt.Printf("Montgomery parameterization\n")
+	}
+
+	if GOLDILOCKS.MODTYPE==GOLDILOCKS.PSEUDO_MERSENNE {
+		fmt.Printf("Pseudo-Mersenne Modulus\n")
+	}
+	if GOLDILOCKS.MODTYPE==GOLDILOCKS.MONTGOMERY_FRIENDLY {
+		fmt.Printf("Montgomery friendly Modulus\n")
+	}
+	if GOLDILOCKS.MODTYPE==GOLDILOCKS.GENERALISED_MERSENNE {
+		fmt.Printf("Generalised-Mersenne Modulus\n")
+	}
+	if GOLDILOCKS.MODTYPE==GOLDILOCKS.NOT_SPECIAL {
+		fmt.Printf("Not special Modulus\n")
+	}
+
+	fmt.Printf("Modulus size %d bits\n",GOLDILOCKS.MODBITS)
+	fmt.Printf("%d bit build\n",GOLDILOCKS.CHUNK)
+
+	var es *GOLDILOCKS.BIG
+
+	EG:=GOLDILOCKS.ECP_generator();
+	er:=GOLDILOCKS.NewBIGints(GOLDILOCKS.CURVE_Order)
+	es=GOLDILOCKS.Randomnum(er,rng)
+
+	WP:=EG.Mul(er)
+	if !WP.Is_infinity() {
+		fmt.Printf("FAILURE - rG!=O\n")
+		return
+	}
+
+	start := time.Now()
+	iterations:=0
+	elapsed:=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		WP=EG.Mul(es)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur:=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("EC  mul - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+}
+
+func BN_254(rng *amcl.RAND) {
 
 	fmt.Printf("\nTesting/Timing BN254 Pairings\n")
 
@@ -125,15 +234,15 @@ func main() {
 		return;
 	}
 
-	start = time.Now()
-	iterations=0
-	elapsed=time.Since(start)
+	start:= time.Now()
+	iterations:=0
+	elapsed:=time.Since(start)
 	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
 		P=BN254.G1mul(G,s)
 		iterations++
 		elapsed=time.Since(start)
 	} 
-	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	dur:=float64(elapsed/time.Millisecond)/float64(iterations)
 	fmt.Printf("G1 mul              - %8d iterations  ",iterations)
 	fmt.Printf(" %8.2f ms per iteration\n",dur)
 
@@ -244,7 +353,450 @@ func main() {
 		return
 	}
 
+}
 
+func BLS_383(rng *amcl.RAND) {
+
+	fmt.Printf("\nTesting/Timing BLS383 Pairings\n")
+
+	if BLS383.CURVE_PAIRING_TYPE==BLS383.BN {
+		fmt.Printf("BN Pairing-Friendly Curve\n")
+	}
+	if BLS383.CURVE_PAIRING_TYPE==BLS383.BLS {
+		fmt.Printf("BLS Pairing-Friendly Curve\n")
+	}
+
+	fmt.Printf("Modulus size %d bits\n",BLS383.MODBITS)
+	fmt.Printf("%d bit build\n",BLS383.CHUNK)
+
+	G:=BLS383.ECP_generator();
+	r:=BLS383.NewBIGints(BLS383.CURVE_Order)
+	s:=BLS383.Randomnum(r,rng)
+
+	P:=BLS383.G1mul(G,r)
+
+	if !P.Is_infinity() {
+		fmt.Printf("FAILURE - rP!=O\n");
+		return;
+	}
+
+	start:= time.Now()
+	iterations:=0
+	elapsed:=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		P=BLS383.G1mul(G,s)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur:=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("G1 mul              - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	Q:=BLS383.ECP2_generator();
+	W:=BLS383.G2mul(Q,r)
+
+	if !W.Is_infinity() {
+		fmt.Printf("FAILURE - rQ!=O\n");
+		return;
+	}
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		W=BLS383.G2mul(Q,s)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("G2 mul              - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	w:=BLS383.Ate(Q,P)
+	w=BLS383.Fexp(w)
+
+	g:=BLS383.GTpow(w,r)
+
+	if !g.Isunity() {
+		fmt.Printf("FAILURE - g^r!=1\n");
+		return;
+	}
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		g=BLS383.GTpow(w,s)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("GT pow              - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		_=w.Compow(s,r)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("GT pow (compressed) - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		w=BLS383.Ate(Q,P)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("PAIRing ATE         - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		g=BLS383.Fexp(w)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("PAIRing FEXP        - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	P.Copy(G)
+	Q.Copy(W)
+
+	P=BLS383.G1mul(P,s)
+
+	g=BLS383.Ate(Q,P)
+	g=BLS383.Fexp(g)
+
+	P.Copy(G)
+	Q=BLS383.G2mul(Q,s)
+
+	w=BLS383.Ate(Q,P)
+	w=BLS383.Fexp(w)
+
+	if !g.Equals(w) {
+		fmt.Printf("FAILURE - e(sQ,p)!=e(Q,sP) \n")
+		return
+	}
+
+	Q.Copy(W);
+	g=BLS383.Ate(Q,P)
+	g=BLS383.Fexp(g)
+	g=BLS383.GTpow(g,s)
+
+	if !g.Equals(w) {
+		fmt.Printf("FAILURE - e(sQ,p)!=e(Q,P)^s \n")
+		return
+	}
+
+}
+
+
+func BLS_24(rng *amcl.RAND) {
+
+	fmt.Printf("\nTesting/Timing BLS24 Pairings\n")
+
+	if BLS24.CURVE_PAIRING_TYPE==BLS24.BN {
+		fmt.Printf("BN Pairing-Friendly Curve\n")
+	}
+	if BLS24.CURVE_PAIRING_TYPE==BLS24.BLS {
+		fmt.Printf("BLS Pairing-Friendly Curve\n")
+	}
+
+	fmt.Printf("Modulus size %d bits\n",BLS24.MODBITS)
+	fmt.Printf("%d bit build\n",BLS24.CHUNK)
+
+	G:=BLS24.ECP_generator();
+	r:=BLS24.NewBIGints(BLS24.CURVE_Order)
+	s:=BLS24.Randomnum(r,rng)
+
+	P:=BLS24.G1mul(G,r)
+
+	if !P.Is_infinity() {
+		fmt.Printf("FAILURE - rP!=O\n");
+		return;
+	}
+
+	start := time.Now()
+	iterations:=0
+	elapsed:=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		P=BLS24.G1mul(G,s)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur:=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("G1 mul              - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	Q:=BLS24.ECP4_generator();
+
+	W:=BLS24.G2mul(Q,r)
+
+	if !W.Is_infinity() {
+		fmt.Printf("FAILURE - rQ!=O\n");
+		return;
+	}
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		W=BLS24.G2mul(Q,s)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("G2 mul              - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	w:=BLS24.Ate(Q,P)
+	w=BLS24.Fexp(w)
+
+	g:=BLS24.GTpow(w,r)
+
+	if !g.Isunity() {
+		fmt.Printf("FAILURE - g^r!=1\n");
+		return;
+	}
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		g=BLS24.GTpow(w,s)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("GT pow              - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		_=w.Compow(s,r)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("GT pow (compressed) - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		w=BLS24.Ate(Q,P)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("PAIRing ATE         - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		g=BLS24.Fexp(w)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("PAIRing FEXP        - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	P.Copy(G)
+	Q.Copy(W)
+
+	P=BLS24.G1mul(P,s)
+
+	g=BLS24.Ate(Q,P)
+	g=BLS24.Fexp(g)
+
+	P.Copy(G)
+	Q=BLS24.G2mul(Q,s)
+
+	w=BLS24.Ate(Q,P)
+	w=BLS24.Fexp(w)
+
+	if !g.Equals(w) {
+		fmt.Printf("FAILURE - e(sQ,p)!=e(Q,sP) \n")
+		return
+	}
+
+	Q.Copy(W);
+	g=BLS24.Ate(Q,P)
+	g=BLS24.Fexp(g)
+	g=BLS24.GTpow(g,s)
+
+	if !g.Equals(w) {
+		fmt.Printf("FAILURE - e(sQ,p)!=e(Q,P)^s \n")
+		return
+	}
+
+}
+
+func BLS_48(rng *amcl.RAND) {
+
+	fmt.Printf("\nTesting/Timing BLS48 Pairings\n")
+
+	if BLS48.CURVE_PAIRING_TYPE==BLS48.BN {
+		fmt.Printf("BN Pairing-Friendly Curve\n")
+	}
+	if BLS48.CURVE_PAIRING_TYPE==BLS48.BLS {
+		fmt.Printf("BLS Pairing-Friendly Curve\n")
+	}
+
+	fmt.Printf("Modulus size %d bits\n",BLS48.MODBITS)
+	fmt.Printf("%d bit build\n",BLS48.CHUNK)
+
+	G:=BLS48.ECP_generator();
+	r:=BLS48.NewBIGints(BLS48.CURVE_Order)
+	s:=BLS48.Randomnum(r,rng)
+
+	P:=BLS48.G1mul(G,r)
+
+	if !P.Is_infinity() {
+		fmt.Printf("FAILURE - rP!=O\n");
+		return;
+	}
+
+	start := time.Now()
+	iterations:=0
+	elapsed:=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		P=BLS48.G1mul(G,s)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur:=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("G1 mul              - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	Q:=BLS48.ECP8_generator();
+
+	W:=BLS48.G2mul(Q,r)
+
+	if !W.Is_infinity() {
+		fmt.Printf("FAILURE - rQ!=O\n");
+		return;
+	}
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		W=BLS48.G2mul(Q,s)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("G2 mul              - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	w:=BLS48.Ate(Q,P)
+	w=BLS48.Fexp(w)
+
+	g:=BLS48.GTpow(w,r)
+
+	if !g.Isunity() {
+		fmt.Printf("FAILURE - g^r!=1\n");
+		return;
+	}
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		g=BLS48.GTpow(w,s)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("GT pow              - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		_=w.Compow(s,r)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("GT pow (compressed) - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		w=BLS48.Ate(Q,P)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("PAIRing ATE         - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	start = time.Now()
+	iterations=0
+	elapsed=time.Since(start)
+	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
+		g=BLS48.Fexp(w)
+		iterations++
+		elapsed=time.Since(start)
+	} 
+	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	fmt.Printf("PAIRing FEXP        - %8d iterations  ",iterations)
+	fmt.Printf(" %8.2f ms per iteration\n",dur)
+
+	P.Copy(G)
+	Q.Copy(W)
+
+	P=BLS48.G1mul(P,s)
+
+	g=BLS48.Ate(Q,P)
+	g=BLS48.Fexp(g)
+
+	P.Copy(G)
+	Q=BLS48.G2mul(Q,s)
+
+	w=BLS48.Ate(Q,P)
+	w=BLS48.Fexp(w)
+
+	if !g.Equals(w) {
+		fmt.Printf("FAILURE - e(sQ,p)!=e(Q,sP) \n")
+		return
+	}
+
+	Q.Copy(W);
+	g=BLS48.Ate(Q,P)
+	g=BLS48.Fexp(g)
+	g=BLS48.GTpow(g,s)
+
+	if !g.Equals(w) {
+		fmt.Printf("FAILURE - e(sQ,p)!=e(Q,P)^s \n")
+		return
+	}
+
+}
+
+func RSA_2048(rng *amcl.RAND) {
 
 	fmt.Printf("\nTesting/Timing 2048-bit RSA\n")
 
@@ -257,15 +809,15 @@ func main() {
 
 	fmt.Printf("Generating 2048-bit RSA public/private key pair\n");
 
-	start = time.Now()
-	iterations=0
-	elapsed=time.Since(start)
+	start:= time.Now()
+	iterations:=0
+	elapsed:=time.Since(start)
 	for (int(elapsed/time.Second))<MIN_TIME || iterations<MIN_ITERS {
 		RSA2048.RSA_KEY_PAIR(rng,65537,priv,pub)
 		iterations++
 		elapsed=time.Since(start)
 	} 
-	dur=float64(elapsed/time.Millisecond)/float64(iterations)
+	dur:=float64(elapsed/time.Millisecond)/float64(iterations)
 	fmt.Printf("RSA gen - %8d iterations  ",iterations)
 	fmt.Printf(" %8.2f ms per iteration\n",dur)
 
@@ -304,3 +856,26 @@ func main() {
 
 	fmt.Printf("All tests pass\n") 
 }
+
+func main() {
+	var RAW [100]byte
+
+	rng:=amcl.NewRAND()
+
+	rng.Clean();
+	for i:=0;i<100;i++ {RAW[i]=byte(i)}
+
+	rng.Seed(100,RAW[:])
+	
+	ED_25519(rng)
+	NIST_256(rng)
+	GOLDI_LOCKS(rng)
+	BN_254(rng)
+	BLS_383(rng)
+	BLS_24(rng)
+	BLS_48(rng)
+	RSA_2048(rng)
+
+}
+
+

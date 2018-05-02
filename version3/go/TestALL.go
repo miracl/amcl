@@ -26,7 +26,12 @@ import "fmt"
 
 import "github.com/milagro-crypto/amcl/version3/go/amcl"
 import "github.com/milagro-crypto/amcl/version3/go/amcl/ED25519"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/NIST256"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/GOLDILOCKS"
 import "github.com/milagro-crypto/amcl/version3/go/amcl/BN254"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/BLS383"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/BLS24"
+import "github.com/milagro-crypto/amcl/version3/go/amcl/BLS48"
 import "github.com/milagro-crypto/amcl/version3/go/amcl/RSA2048"
 
 
@@ -167,6 +172,255 @@ func ecdh_ED25519(rng *amcl.RAND) {
 	}
 }
 
+
+func ecdh_NIST256(rng *amcl.RAND) {
+//	j:=0
+	pp:="M0ng00se"
+	res:=0
+
+	var sha=NIST256.HASH_TYPE
+
+	var S1 [NIST256.EGS]byte
+	var W0 [2*NIST256.EFS+1]byte
+	var W1 [2*NIST256.EFS+1]byte
+	var Z0 [NIST256.EFS]byte
+	var Z1 [NIST256.EFS]byte
+	var SALT [8]byte
+	var P1 [3]byte
+	var P2 [4]byte
+	var V [2*NIST256.EFS+1]byte
+	var M [17]byte
+	var T [12]byte
+	var CS [NIST256.EGS]byte
+	var DS [NIST256.EGS]byte
+
+	for i:=0;i<8;i++ {SALT[i]=byte(i+1)}  // set Salt
+
+	fmt.Printf("\nTesting ECDH/ECDSA/ECIES\n")
+	fmt.Printf("Alice's Passphrase= "+pp)
+	fmt.Printf("\n");
+	PW:=[]byte(pp)
+
+/* private key S0 of size MGS bytes derived from Password and Salt */
+
+	S0:=NIST256.ECDH_PBKDF2(sha,PW,SALT[:],1000,NIST256.EGS)
+
+	fmt.Printf("Alice's private key= 0x")
+	printBinary(S0)
+
+/* Generate Key pair S/W */
+	NIST256.ECDH_KEY_PAIR_GENERATE(nil,S0,W0[:])
+
+	fmt.Printf("Alice's public key= 0x")
+	printBinary(W0[:]);
+
+	res=NIST256.ECDH_PUBLIC_KEY_VALIDATE(W0[:])
+	if res!=0 {
+		fmt.Printf("ECP Public Key is invalid!\n")
+		return
+	}
+
+/* Random private key for other party */
+	NIST256.ECDH_KEY_PAIR_GENERATE(rng,S1[:],W1[:])
+
+	fmt.Printf("Servers private key= 0x");
+	printBinary(S1[:])
+
+	fmt.Printf("Servers public key= 0x")
+	printBinary(W1[:])
+
+
+	res=NIST256.ECDH_PUBLIC_KEY_VALIDATE(W1[:])
+	if res!=0 {
+		fmt.Printf("ECP Public Key is invalid!\n")
+		return
+	}
+/* Calculate common key using DH - IEEE 1363 method */
+
+	NIST256.ECDH_ECPSVDP_DH(S0,W1[:],Z0[:])
+	NIST256.ECDH_ECPSVDP_DH(S1[:],W0[:],Z1[:])
+
+	same:=true
+	for i:=0;i<NIST256.EFS;i++ {
+		if Z0[i]!=Z1[i] {same=false}
+	}
+
+	if !same {
+		fmt.Printf("*** ECPSVDP-DH Failed\n");
+		return
+	}
+
+	KEY:=NIST256.ECDH_KDF2(sha,Z0[:],nil,NIST256.AESKEY);
+
+	fmt.Printf("Alice's DH Key=  0x"); printBinary(KEY)
+	fmt.Printf("Servers DH Key=  0x"); printBinary(KEY)
+	
+	if NIST256.CURVETYPE!=NIST256.MONTGOMERY {
+		fmt.Printf("Testing ECIES\n");
+
+		P1[0]=0x0; P1[1]=0x1; P1[2]=0x2
+		P2[0]=0x0; P2[1]=0x1; P2[2]=0x2; P2[3]=0x3
+
+		for i:=0;i<=16;i++ {M[i]=byte(i)} 
+
+		C:=NIST256.ECDH_ECIES_ENCRYPT(sha,P1[:],P2[:],rng,W1[:],M[:],V[:],T[:])
+
+		fmt.Printf("Ciphertext= \n")
+		fmt.Printf("V= 0x"); printBinary(V[:])
+		fmt.Printf("C= 0x"); printBinary(C)
+		fmt.Printf("T= 0x"); printBinary(T[:])
+
+
+		RM:=NIST256.ECDH_ECIES_DECRYPT(sha,P1[:],P2[:],V[:],C,T[:],S1[:])
+		if RM==nil {
+			fmt.Printf("*** ECIES Decryption Failed\n")
+			return
+		} else {fmt.Printf("Decryption succeeded\n")}
+
+		fmt.Printf("Message is 0x"); printBinary(RM)
+
+		fmt.Printf("Testing ECDSA\n");
+
+		if NIST256.ECDH_ECPSP_DSA(sha,rng,S0,M[:],CS[:],DS[:])!=0 {
+			fmt.Printf("***ECDSA Signature Failed\n")
+			return
+		}
+		fmt.Printf("Signature= \n")
+		fmt.Printf("C= 0x"); printBinary(CS[:])
+		fmt.Printf("D= 0x"); printBinary(DS[:])
+
+		if NIST256.ECDH_ECPVP_DSA(sha,W0[:],M[:],CS[:],DS[:])!=0 {
+			fmt.Printf("***ECDSA Verification Failed\n")
+			return
+		} else {fmt.Printf("ECDSA Signature/Verification succeeded \n")}
+	}
+}
+
+
+func ecdh_GOLDILOCKS(rng *amcl.RAND) {
+//	j:=0
+	pp:="M0ng00se"
+	res:=0
+
+	var sha=GOLDILOCKS.HASH_TYPE
+
+	var S1 [GOLDILOCKS.EGS]byte
+	var W0 [2*GOLDILOCKS.EFS+1]byte
+	var W1 [2*GOLDILOCKS.EFS+1]byte
+	var Z0 [GOLDILOCKS.EFS]byte
+	var Z1 [GOLDILOCKS.EFS]byte
+	var SALT [8]byte
+	var P1 [3]byte
+	var P2 [4]byte
+	var V [2*GOLDILOCKS.EFS+1]byte
+	var M [17]byte
+	var T [12]byte
+	var CS [GOLDILOCKS.EGS]byte
+	var DS [GOLDILOCKS.EGS]byte
+
+	for i:=0;i<8;i++ {SALT[i]=byte(i+1)}  // set Salt
+
+	fmt.Printf("\nTesting ECDH/ECDSA/ECIES\n")
+	fmt.Printf("Alice's Passphrase= "+pp)
+	fmt.Printf("\n");
+	PW:=[]byte(pp)
+
+/* private key S0 of size MGS bytes derived from Password and Salt */
+
+	S0:=GOLDILOCKS.ECDH_PBKDF2(sha,PW,SALT[:],1000,GOLDILOCKS.EGS)
+
+	fmt.Printf("Alice's private key= 0x")
+	printBinary(S0)
+
+/* Generate Key pair S/W */
+	GOLDILOCKS.ECDH_KEY_PAIR_GENERATE(nil,S0,W0[:])
+
+	fmt.Printf("Alice's public key= 0x")
+	printBinary(W0[:]);
+
+	res=GOLDILOCKS.ECDH_PUBLIC_KEY_VALIDATE(W0[:])
+	if res!=0 {
+		fmt.Printf("ECP Public Key is invalid!\n")
+		return
+	}
+
+/* Random private key for other party */
+	GOLDILOCKS.ECDH_KEY_PAIR_GENERATE(rng,S1[:],W1[:])
+
+	fmt.Printf("Servers private key= 0x");
+	printBinary(S1[:])
+
+	fmt.Printf("Servers public key= 0x")
+	printBinary(W1[:])
+
+
+	res=GOLDILOCKS.ECDH_PUBLIC_KEY_VALIDATE(W1[:])
+	if res!=0 {
+		fmt.Printf("ECP Public Key is invalid!\n")
+		return
+	}
+/* Calculate common key using DH - IEEE 1363 method */
+
+	GOLDILOCKS.ECDH_ECPSVDP_DH(S0,W1[:],Z0[:])
+	GOLDILOCKS.ECDH_ECPSVDP_DH(S1[:],W0[:],Z1[:])
+
+	same:=true
+	for i:=0;i<GOLDILOCKS.EFS;i++ {
+		if Z0[i]!=Z1[i] {same=false}
+	}
+
+	if !same {
+		fmt.Printf("*** ECPSVDP-DH Failed\n");
+		return
+	}
+
+	KEY:=GOLDILOCKS.ECDH_KDF2(sha,Z0[:],nil,GOLDILOCKS.AESKEY);
+
+	fmt.Printf("Alice's DH Key=  0x"); printBinary(KEY)
+	fmt.Printf("Servers DH Key=  0x"); printBinary(KEY)
+	
+	if GOLDILOCKS.CURVETYPE!=GOLDILOCKS.MONTGOMERY {
+		fmt.Printf("Testing ECIES\n");
+
+		P1[0]=0x0; P1[1]=0x1; P1[2]=0x2
+		P2[0]=0x0; P2[1]=0x1; P2[2]=0x2; P2[3]=0x3
+
+		for i:=0;i<=16;i++ {M[i]=byte(i)} 
+
+		C:=GOLDILOCKS.ECDH_ECIES_ENCRYPT(sha,P1[:],P2[:],rng,W1[:],M[:],V[:],T[:])
+
+		fmt.Printf("Ciphertext= \n")
+		fmt.Printf("V= 0x"); printBinary(V[:])
+		fmt.Printf("C= 0x"); printBinary(C)
+		fmt.Printf("T= 0x"); printBinary(T[:])
+
+
+		RM:=GOLDILOCKS.ECDH_ECIES_DECRYPT(sha,P1[:],P2[:],V[:],C,T[:],S1[:])
+		if RM==nil {
+			fmt.Printf("*** ECIES Decryption Failed\n")
+			return
+		} else {fmt.Printf("Decryption succeeded\n")}
+
+		fmt.Printf("Message is 0x"); printBinary(RM)
+
+		fmt.Printf("Testing ECDSA\n");
+
+		if GOLDILOCKS.ECDH_ECPSP_DSA(sha,rng,S0,M[:],CS[:],DS[:])!=0 {
+			fmt.Printf("***ECDSA Signature Failed\n")
+			return
+		}
+		fmt.Printf("Signature= \n")
+		fmt.Printf("C= 0x"); printBinary(CS[:])
+		fmt.Printf("D= 0x"); printBinary(DS[:])
+
+		if GOLDILOCKS.ECDH_ECPVP_DSA(sha,W0[:],M[:],CS[:],DS[:])!=0 {
+			fmt.Printf("***ECDSA Verification Failed\n")
+			return
+		} else {fmt.Printf("ECDSA Signature/Verification succeeded \n")}
+	}
+}
+
+
 /* Configure mode of operation */
 
 const PERMITS bool=true
@@ -265,7 +519,7 @@ func mpin_BN254(rng *amcl.RAND) {
 	}
 	pin=0
 	fmt.Printf("\nPIN= ")
-	fmt.Scanf("%d",&pin)
+	fmt.Scanf("%d ",&pin)
 
 	pxID:=xID[:]
 	pxCID:=xCID[:]
@@ -378,6 +632,617 @@ func mpin_BN254(rng *amcl.RAND) {
 	}
 }
 
+
+func mpin_BLS383(rng *amcl.RAND) {
+
+	var sha=BLS383.HASH_TYPE
+
+	const MGS=BLS383.MGS
+	const MFS=BLS383.MFS
+	const G1S=2*MFS+1 /* Group 1 Size */
+	const G2S=4*MFS; /* Group 2 Size */
+
+	var S [MGS]byte
+	var SST [G2S]byte
+	var TOKEN [G1S]byte
+	var PERMIT [G1S]byte
+	var SEC [G1S]byte
+	var xID [G1S]byte
+	var xCID [G1S]byte
+	var X [MGS]byte
+	var Y [MGS]byte
+	var E [12*MFS]byte
+	var F [12*MFS]byte
+	var HID [G1S]byte
+	var HTID [G1S]byte
+
+	var G1 [12*MFS]byte
+	var G2 [12*MFS]byte
+	var R [MGS]byte
+	var Z [G1S]byte
+	var W [MGS]byte
+	var T [G1S]byte
+	var CK [BLS383.AESKEY]byte
+	var SK [BLS383.AESKEY]byte
+
+	var HSID []byte
+
+
+/* Trusted Authority set-up */
+
+	fmt.Printf("\nTesting MPIN\n")
+	BLS383.MPIN_RANDOM_GENERATE(rng,S[:])
+	fmt.Printf("Master Secret s: 0x");  printBinary(S[:])
+
+ /* Create Client Identity */
+ 	IDstr:= "testUser@miracl.com"
+	CLIENT_ID:=[]byte(IDstr)
+
+	HCID:=BLS383.MPIN_HASH_ID(sha,CLIENT_ID)  /* Either Client or TA calculates Hash(ID) - you decide! */
+		
+	fmt.Printf("Client ID= "); printBinary(CLIENT_ID)
+	fmt.Printf("\n")
+
+/* Client and Server are issued secrets by DTA */
+	BLS383.MPIN_GET_SERVER_SECRET(S[:],SST[:])
+	fmt.Printf("Server Secret SS: 0x");  printBinary(SST[:])
+
+	BLS383.MPIN_GET_CLIENT_SECRET(S[:],HCID,TOKEN[:])
+	fmt.Printf("Client Secret CS: 0x");        
+	printBinary(TOKEN[:])
+
+/* Client extracts PIN from secret to create Token */
+	pin:=1234
+	fmt.Printf("Client extracts PIN= %d",pin)
+	fmt.Printf("\n")
+	rtn:=BLS383.MPIN_EXTRACT_PIN(sha,CLIENT_ID,pin,TOKEN[:])
+	if rtn != 0 {
+		fmt.Printf("FAILURE: EXTRACT_PIN rtn: %d",rtn);
+		fmt.Printf("\n")
+	}
+
+	fmt.Printf("Client Token TK: 0x")       
+	printBinary(TOKEN[:]); 
+
+	if FULL {
+		BLS383.MPIN_PRECOMPUTE(TOKEN[:],HCID,G1[:],G2[:])
+	}
+
+	date:=0
+	if PERMITS {
+		date=BLS383.Today()
+/* Client gets "Time Token" permit from DTA */ 
+		BLS383.MPIN_GET_CLIENT_PERMIT(sha,date,S[:],HCID,PERMIT[:])
+		fmt.Printf("Time Permit TP: 0x");  printBinary(PERMIT[:])
+
+/* This encoding makes Time permit look random - Elligator squared */
+		BLS383.MPIN_ENCODING(rng,PERMIT[:])
+		fmt.Printf("Encoded Time Permit TP: 0x");  printBinary(PERMIT[:])
+		BLS383.MPIN_DECODING(PERMIT[:])
+		fmt.Printf("Decoded Time Permit TP: 0x");  printBinary(PERMIT[:])
+	}
+	pin=0
+	fmt.Printf("\nPIN= ")
+	fmt.Scanf("%d ",&pin)
+
+	pxID:=xID[:]
+	pxCID:=xCID[:]
+	pHID:=HID[:]
+	pHTID:=HTID[:]
+	pE:=E[:]
+	pF:=F[:]
+	pPERMIT:=PERMIT[:]
+	var prHID []byte
+
+	if date!=0 {
+		prHID=pHTID;
+		if !PINERROR {
+			pxID=nil
+			// pHID=nil
+		}
+	} else {
+		prHID=pHID
+		pPERMIT=nil
+		pxCID=nil
+		pHTID=nil
+	}
+	if !PINERROR {
+		pE=nil
+		pF=nil
+	}
+
+	if SINGLE_PASS {
+		fmt.Printf("MPIN Single Pass\n")
+		timeValue:= BLS383.MPIN_GET_TIME()
+		rtn=BLS383.MPIN_CLIENT(sha,date,CLIENT_ID,rng,X[:],pin,TOKEN[:],SEC[:],pxID,pxCID,pPERMIT,timeValue,Y[:])
+		if rtn != 0 {
+			fmt.Printf("FAILURE: CLIENT rtn: %d\n",rtn)
+		}
+
+		if FULL {
+			HCID=BLS383.MPIN_HASH_ID(sha,CLIENT_ID)
+			BLS383.MPIN_GET_G1_MULTIPLE(rng,1,R[:],HCID,Z[:])  /* Also Send Z=r.ID to Server, remember random r */
+		}
+
+		rtn=BLS383.MPIN_SERVER(sha,date,pHID,pHTID,Y[:],SST[:],pxID,pxCID,SEC[:],pE,pF,CLIENT_ID,timeValue)
+		if rtn != 0 {
+  		    fmt.Printf("FAILURE: SERVER rtn: %d\n",rtn)
+		}
+
+		if FULL {
+			HSID=BLS383.MPIN_HASH_ID(sha,CLIENT_ID);
+			BLS383.MPIN_GET_G1_MULTIPLE(rng,0,W[:],prHID,T[:]);  /* Also send T=w.ID to client, remember random w  */
+		}
+	} else {
+		fmt.Printf("MPIN Multi Pass\n")
+        /* Send U=x.ID to server, and recreate secret from token and pin */
+		rtn=BLS383.MPIN_CLIENT_1(sha,date,CLIENT_ID,rng,X[:],pin,TOKEN[:],SEC[:],pxID,pxCID,pPERMIT);
+		if rtn != 0 {
+			fmt.Printf("FAILURE: CLIENT_1 rtn: %d\n",rtn)
+		}
+  
+		if FULL {
+			HCID=BLS383.MPIN_HASH_ID(sha,CLIENT_ID)
+			BLS383.MPIN_GET_G1_MULTIPLE(rng,1,R[:],HCID,Z[:])  /* Also Send Z=r.ID to Server, remember random r */
+		}
+  
+        /* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
+		BLS383.MPIN_SERVER_1(sha,date,CLIENT_ID,pHID,pHTID)
+  
+        /* Server generates Random number Y and sends it to Client */
+		BLS383.MPIN_RANDOM_GENERATE(rng,Y[:]);
+  
+		if FULL {
+			HSID=BLS383.MPIN_HASH_ID(sha,CLIENT_ID);
+			BLS383.MPIN_GET_G1_MULTIPLE(rng,0,W[:],prHID,T[:])  /* Also send T=w.ID to client, remember random w  */
+		}
+  
+       /* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
+		rtn=BLS383.MPIN_CLIENT_2(X[:],Y[:],SEC[:])
+		if rtn != 0 {
+			fmt.Printf("FAILURE: CLIENT_2 rtn: %d\n",rtn)
+		}
+  
+       /* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
+       /* If PIN error not required, set E and F = null */
+  
+		rtn=BLS383.MPIN_SERVER_2(date,pHID,pHTID,Y[:],SST[:],pxID,pxCID,SEC[:],pE,pF)
+  
+		if rtn!=0 {
+			fmt.Printf("FAILURE: SERVER_1 rtn: %d\n",rtn)
+		}
+  
+		if rtn == BLS383.BAD_PIN {
+			fmt.Printf("Server says - Bad Pin. I don't know you. Feck off.\n")
+			if PINERROR {
+				err:=BLS383.MPIN_KANGAROO(E[:],F[:])
+				if err!=0 {fmt.Printf("(Client PIN is out by %d)\n",err)}
+			}
+			return
+		} else {
+			fmt.Printf("Server says - PIN is good! You really are "+IDstr)
+			fmt.Printf("\n")
+		}
+
+		if  FULL {
+			H:=BLS383.MPIN_HASH_ALL(sha,HCID[:],pxID,pxCID,SEC[:],Y[:],Z[:],T[:]);
+			BLS383.MPIN_CLIENT_KEY(sha,G1[:],G2[:],pin,R[:],X[:],H[:],T[:],CK[:])
+			fmt.Printf("Client Key =  0x");  printBinary(CK[:])
+
+			H=BLS383.MPIN_HASH_ALL(sha,HSID[:],pxID,pxCID,SEC[:],Y[:],Z[:],T[:]);			
+			BLS383.MPIN_SERVER_KEY(sha,Z[:],SST[:],W[:],H[:],pHID,pxID,pxCID,SK[:])
+			fmt.Printf("Server Key =  0x");  printBinary(SK[:])
+		}
+	}
+}
+
+
+func mpin_BLS24(rng *amcl.RAND) {
+
+	var sha=BLS24.HASH_TYPE
+
+	const MGS=BLS24.MGS
+	const MFS=BLS24.MFS
+	const G1S=2*MFS+1 /* Group 1 Size */
+	const G2S=8*MFS; /* Group 2 Size */
+
+	var S [MGS]byte
+	var SST [G2S]byte
+	var TOKEN [G1S]byte
+	var PERMIT [G1S]byte
+	var SEC [G1S]byte
+	var xID [G1S]byte
+	var xCID [G1S]byte
+	var X [MGS]byte
+	var Y [MGS]byte
+	var E [24*MFS]byte
+	var F [24*MFS]byte
+	var HID [G1S]byte
+	var HTID [G1S]byte
+
+	var G1 [24*MFS]byte
+	var G2 [24*MFS]byte
+	var R [MGS]byte
+	var Z [G1S]byte
+	var W [MGS]byte
+	var T [G1S]byte
+	var CK [BLS24.AESKEY]byte
+	var SK [BLS24.AESKEY]byte
+
+	var HSID []byte
+
+
+/* Trusted Authority set-up */
+
+	fmt.Printf("\nTesting MPIN\n")
+	BLS24.MPIN_RANDOM_GENERATE(rng,S[:])
+	fmt.Printf("Master Secret s: 0x");  printBinary(S[:])
+
+ /* Create Client Identity */
+ 	IDstr:= "testUser@miracl.com"
+	CLIENT_ID:=[]byte(IDstr)
+
+	HCID:=BLS24.MPIN_HASH_ID(sha,CLIENT_ID)  /* Either Client or TA calculates Hash(ID) - you decide! */
+		
+	fmt.Printf("Client ID= "); printBinary(CLIENT_ID)
+	fmt.Printf("\n")
+
+/* Client and Server are issued secrets by DTA */
+	BLS24.MPIN_GET_SERVER_SECRET(S[:],SST[:])
+	fmt.Printf("Server Secret SS: 0x");  printBinary(SST[:])
+
+	BLS24.MPIN_GET_CLIENT_SECRET(S[:],HCID,TOKEN[:])
+	fmt.Printf("Client Secret CS: 0x");        
+	printBinary(TOKEN[:])
+
+/* Client extracts PIN from secret to create Token */
+	pin:=1234
+	fmt.Printf("Client extracts PIN= %d",pin)
+	fmt.Printf("\n")
+	rtn:=BLS24.MPIN_EXTRACT_PIN(sha,CLIENT_ID,pin,TOKEN[:])
+	if rtn != 0 {
+		fmt.Printf("FAILURE: EXTRACT_PIN rtn: %d",rtn);
+		fmt.Printf("\n")
+	}
+
+	fmt.Printf("Client Token TK: 0x")       
+	printBinary(TOKEN[:]); 
+
+	if FULL {
+		BLS24.MPIN_PRECOMPUTE(TOKEN[:],HCID,G1[:],G2[:])
+	}
+
+	date:=0
+	if PERMITS {
+		date=BLS24.Today()
+/* Client gets "Time Token" permit from DTA */ 
+		BLS24.MPIN_GET_CLIENT_PERMIT(sha,date,S[:],HCID,PERMIT[:])
+		fmt.Printf("Time Permit TP: 0x");  printBinary(PERMIT[:])
+
+/* This encoding makes Time permit look random - Elligator squared */
+		BLS24.MPIN_ENCODING(rng,PERMIT[:])
+		fmt.Printf("Encoded Time Permit TP: 0x");  printBinary(PERMIT[:])
+		BLS24.MPIN_DECODING(PERMIT[:])
+		fmt.Printf("Decoded Time Permit TP: 0x");  printBinary(PERMIT[:])
+	}
+	pin=0
+	fmt.Printf("\nPIN= ")
+	fmt.Scanf("%d ",&pin)
+
+	pxID:=xID[:]
+	pxCID:=xCID[:]
+	pHID:=HID[:]
+	pHTID:=HTID[:]
+	pE:=E[:]
+	pF:=F[:]
+	pPERMIT:=PERMIT[:]
+	var prHID []byte
+
+	if date!=0 {
+		prHID=pHTID;
+		if !PINERROR {
+			pxID=nil
+			// pHID=nil
+		}
+	} else {
+		prHID=pHID
+		pPERMIT=nil
+		pxCID=nil
+		pHTID=nil
+	}
+	if !PINERROR {
+		pE=nil
+		pF=nil
+	}
+
+	if SINGLE_PASS {
+		fmt.Printf("MPIN Single Pass\n")
+		timeValue:= BLS24.MPIN_GET_TIME()
+		rtn=BLS24.MPIN_CLIENT(sha,date,CLIENT_ID,rng,X[:],pin,TOKEN[:],SEC[:],pxID,pxCID,pPERMIT,timeValue,Y[:])
+		if rtn != 0 {
+			fmt.Printf("FAILURE: CLIENT rtn: %d\n",rtn)
+		}
+
+		if FULL {
+			HCID=BLS24.MPIN_HASH_ID(sha,CLIENT_ID)
+			BLS24.MPIN_GET_G1_MULTIPLE(rng,1,R[:],HCID,Z[:])  /* Also Send Z=r.ID to Server, remember random r */
+		}
+
+		rtn=BLS24.MPIN_SERVER(sha,date,pHID,pHTID,Y[:],SST[:],pxID,pxCID,SEC[:],pE,pF,CLIENT_ID,timeValue)
+		if rtn != 0 {
+  		    fmt.Printf("FAILURE: SERVER rtn: %d\n",rtn)
+		}
+
+		if FULL {
+			HSID=BLS24.MPIN_HASH_ID(sha,CLIENT_ID);
+			BLS24.MPIN_GET_G1_MULTIPLE(rng,0,W[:],prHID,T[:]);  /* Also send T=w.ID to client, remember random w  */
+		}
+	} else {
+		fmt.Printf("MPIN Multi Pass\n")
+        /* Send U=x.ID to server, and recreate secret from token and pin */
+		rtn=BLS24.MPIN_CLIENT_1(sha,date,CLIENT_ID,rng,X[:],pin,TOKEN[:],SEC[:],pxID,pxCID,pPERMIT);
+		if rtn != 0 {
+			fmt.Printf("FAILURE: CLIENT_1 rtn: %d\n",rtn)
+		}
+  
+		if FULL {
+			HCID=BLS24.MPIN_HASH_ID(sha,CLIENT_ID)
+			BLS24.MPIN_GET_G1_MULTIPLE(rng,1,R[:],HCID,Z[:])  /* Also Send Z=r.ID to Server, remember random r */
+		}
+  
+        /* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
+		BLS24.MPIN_SERVER_1(sha,date,CLIENT_ID,pHID,pHTID)
+  
+        /* Server generates Random number Y and sends it to Client */
+		BLS24.MPIN_RANDOM_GENERATE(rng,Y[:]);
+  
+		if FULL {
+			HSID=BLS24.MPIN_HASH_ID(sha,CLIENT_ID);
+			BLS24.MPIN_GET_G1_MULTIPLE(rng,0,W[:],prHID,T[:])  /* Also send T=w.ID to client, remember random w  */
+		}
+  
+       /* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
+		rtn=BLS24.MPIN_CLIENT_2(X[:],Y[:],SEC[:])
+		if rtn != 0 {
+			fmt.Printf("FAILURE: CLIENT_2 rtn: %d\n",rtn)
+		}
+  
+       /* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
+       /* If PIN error not required, set E and F = null */
+  
+		rtn=BLS24.MPIN_SERVER_2(date,pHID,pHTID,Y[:],SST[:],pxID,pxCID,SEC[:],pE,pF)
+  
+		if rtn!=0 {
+			fmt.Printf("FAILURE: SERVER_1 rtn: %d\n",rtn)
+		}
+  
+		if rtn == BLS24.BAD_PIN {
+			fmt.Printf("Server says - Bad Pin. I don't know you. Feck off.\n")
+			if PINERROR {
+				err:=BLS24.MPIN_KANGAROO(E[:],F[:])
+				if err!=0 {fmt.Printf("(Client PIN is out by %d)\n",err)}
+			}
+			return
+		} else {
+			fmt.Printf("Server says - PIN is good! You really are "+IDstr)
+			fmt.Printf("\n")
+		}
+
+		if  FULL {
+			H:=BLS24.MPIN_HASH_ALL(sha,HCID[:],pxID,pxCID,SEC[:],Y[:],Z[:],T[:]);
+			BLS24.MPIN_CLIENT_KEY(sha,G1[:],G2[:],pin,R[:],X[:],H[:],T[:],CK[:])
+			fmt.Printf("Client Key =  0x");  printBinary(CK[:])
+
+			H=BLS24.MPIN_HASH_ALL(sha,HSID[:],pxID,pxCID,SEC[:],Y[:],Z[:],T[:]);			
+			BLS24.MPIN_SERVER_KEY(sha,Z[:],SST[:],W[:],H[:],pHID,pxID,pxCID,SK[:])
+			fmt.Printf("Server Key =  0x");  printBinary(SK[:])
+		}
+	}
+}
+
+func mpin_BLS48(rng *amcl.RAND) {
+
+	var sha=BLS48.HASH_TYPE
+
+	const MGS=BLS48.MGS
+	const MFS=BLS48.MFS
+	const G1S=2*MFS+1 /* Group 1 Size */
+	const G2S=16*MFS; /* Group 2 Size */
+
+	var S [MGS]byte
+	var SST [G2S]byte
+	var TOKEN [G1S]byte
+	var PERMIT [G1S]byte
+	var SEC [G1S]byte
+	var xID [G1S]byte
+	var xCID [G1S]byte
+	var X [MGS]byte
+	var Y [MGS]byte
+	var E [48*MFS]byte
+	var F [48*MFS]byte
+	var HID [G1S]byte
+	var HTID [G1S]byte
+
+	var G1 [48*MFS]byte
+	var G2 [48*MFS]byte
+	var R [MGS]byte
+	var Z [G1S]byte
+	var W [MGS]byte
+	var T [G1S]byte
+	var CK [BLS48.AESKEY]byte
+	var SK [BLS48.AESKEY]byte
+
+	var HSID []byte
+
+
+/* Trusted Authority set-up */
+
+	fmt.Printf("\nTesting MPIN\n")
+	BLS48.MPIN_RANDOM_GENERATE(rng,S[:])
+	fmt.Printf("Master Secret s: 0x");  printBinary(S[:])
+
+ /* Create Client Identity */
+ 	IDstr:= "testUser@miracl.com"
+	CLIENT_ID:=[]byte(IDstr)
+
+	HCID:=BLS48.MPIN_HASH_ID(sha,CLIENT_ID)  /* Either Client or TA calculates Hash(ID) - you decide! */
+		
+	fmt.Printf("Client ID= "); printBinary(CLIENT_ID)
+	fmt.Printf("\n")
+
+/* Client and Server are issued secrets by DTA */
+	BLS48.MPIN_GET_SERVER_SECRET(S[:],SST[:])
+	fmt.Printf("Server Secret SS: 0x");  printBinary(SST[:])
+
+	BLS48.MPIN_GET_CLIENT_SECRET(S[:],HCID,TOKEN[:])
+	fmt.Printf("Client Secret CS: 0x");        
+	printBinary(TOKEN[:])
+
+/* Client extracts PIN from secret to create Token */
+	pin:=1234
+	fmt.Printf("Client extracts PIN= %d",pin)
+	fmt.Printf("\n")
+	rtn:=BLS48.MPIN_EXTRACT_PIN(sha,CLIENT_ID,pin,TOKEN[:])
+	if rtn != 0 {
+		fmt.Printf("FAILURE: EXTRACT_PIN rtn: %d",rtn);
+		fmt.Printf("\n")
+	}
+
+	fmt.Printf("Client Token TK: 0x")       
+	printBinary(TOKEN[:]); 
+
+	if FULL {
+		BLS48.MPIN_PRECOMPUTE(TOKEN[:],HCID,G1[:],G2[:])
+	}
+
+	date:=0
+	if PERMITS {
+		date=BLS48.Today()
+/* Client gets "Time Token" permit from DTA */ 
+		BLS48.MPIN_GET_CLIENT_PERMIT(sha,date,S[:],HCID,PERMIT[:])
+		fmt.Printf("Time Permit TP: 0x");  printBinary(PERMIT[:])
+
+/* This encoding makes Time permit look random - Elligator squared */
+		BLS48.MPIN_ENCODING(rng,PERMIT[:])
+		fmt.Printf("Encoded Time Permit TP: 0x");  printBinary(PERMIT[:])
+		BLS48.MPIN_DECODING(PERMIT[:])
+		fmt.Printf("Decoded Time Permit TP: 0x");  printBinary(PERMIT[:])
+	}
+	pin=0
+	fmt.Printf("\nPIN= ")
+	fmt.Scanf("%d ",&pin)
+
+	pxID:=xID[:]
+	pxCID:=xCID[:]
+	pHID:=HID[:]
+	pHTID:=HTID[:]
+	pE:=E[:]
+	pF:=F[:]
+	pPERMIT:=PERMIT[:]
+	var prHID []byte
+
+	if date!=0 {
+		prHID=pHTID;
+		if !PINERROR {
+			pxID=nil
+			// pHID=nil
+		}
+	} else {
+		prHID=pHID
+		pPERMIT=nil
+		pxCID=nil
+		pHTID=nil
+	}
+	if !PINERROR {
+		pE=nil
+		pF=nil
+	}
+
+	if SINGLE_PASS {
+		fmt.Printf("MPIN Single Pass\n")
+		timeValue:= BLS48.MPIN_GET_TIME()
+		rtn=BLS48.MPIN_CLIENT(sha,date,CLIENT_ID,rng,X[:],pin,TOKEN[:],SEC[:],pxID,pxCID,pPERMIT,timeValue,Y[:])
+		if rtn != 0 {
+			fmt.Printf("FAILURE: CLIENT rtn: %d\n",rtn)
+		}
+
+		if FULL {
+			HCID=BLS48.MPIN_HASH_ID(sha,CLIENT_ID)
+			BLS48.MPIN_GET_G1_MULTIPLE(rng,1,R[:],HCID,Z[:])  /* Also Send Z=r.ID to Server, remember random r */
+		}
+
+		rtn=BLS48.MPIN_SERVER(sha,date,pHID,pHTID,Y[:],SST[:],pxID,pxCID,SEC[:],pE,pF,CLIENT_ID,timeValue)
+		if rtn != 0 {
+  		    fmt.Printf("FAILURE: SERVER rtn: %d\n",rtn)
+		}
+
+		if FULL {
+			HSID=BLS48.MPIN_HASH_ID(sha,CLIENT_ID);
+			BLS48.MPIN_GET_G1_MULTIPLE(rng,0,W[:],prHID,T[:]);  /* Also send T=w.ID to client, remember random w  */
+		}
+	} else {
+		fmt.Printf("MPIN Multi Pass\n")
+        /* Send U=x.ID to server, and recreate secret from token and pin */
+		rtn=BLS48.MPIN_CLIENT_1(sha,date,CLIENT_ID,rng,X[:],pin,TOKEN[:],SEC[:],pxID,pxCID,pPERMIT);
+		if rtn != 0 {
+			fmt.Printf("FAILURE: CLIENT_1 rtn: %d\n",rtn)
+		}
+  
+		if FULL {
+			HCID=BLS48.MPIN_HASH_ID(sha,CLIENT_ID)
+			BLS48.MPIN_GET_G1_MULTIPLE(rng,1,R[:],HCID,Z[:])  /* Also Send Z=r.ID to Server, remember random r */
+		}
+  
+        /* Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp. */
+		BLS48.MPIN_SERVER_1(sha,date,CLIENT_ID,pHID,pHTID)
+  
+        /* Server generates Random number Y and sends it to Client */
+		BLS48.MPIN_RANDOM_GENERATE(rng,Y[:]);
+  
+		if FULL {
+			HSID=BLS48.MPIN_HASH_ID(sha,CLIENT_ID);
+			BLS48.MPIN_GET_G1_MULTIPLE(rng,0,W[:],prHID,T[:])  /* Also send T=w.ID to client, remember random w  */
+		}
+  
+       /* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
+		rtn=BLS48.MPIN_CLIENT_2(X[:],Y[:],SEC[:])
+		if rtn != 0 {
+			fmt.Printf("FAILURE: CLIENT_2 rtn: %d\n",rtn)
+		}
+  
+       /* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
+       /* If PIN error not required, set E and F = null */
+  
+		rtn=BLS48.MPIN_SERVER_2(date,pHID,pHTID,Y[:],SST[:],pxID,pxCID,SEC[:],pE,pF)
+  
+		if rtn!=0 {
+			fmt.Printf("FAILURE: SERVER_1 rtn: %d\n",rtn)
+		}
+  
+		if rtn == BLS48.BAD_PIN {
+			fmt.Printf("Server says - Bad Pin. I don't know you. Feck off.\n")
+			if PINERROR {
+				err:=BLS48.MPIN_KANGAROO(E[:],F[:])
+				if err!=0 {fmt.Printf("(Client PIN is out by %d)\n",err)}
+			}
+			return
+		} else {
+			fmt.Printf("Server says - PIN is good! You really are "+IDstr)
+			fmt.Printf("\n")
+		}
+
+		if  FULL {
+			H:=BLS48.MPIN_HASH_ALL(sha,HCID[:],pxID,pxCID,SEC[:],Y[:],Z[:],T[:]);
+			BLS48.MPIN_CLIENT_KEY(sha,G1[:],G2[:],pin,R[:],X[:],H[:],T[:],CK[:])
+			fmt.Printf("Client Key =  0x");  printBinary(CK[:])
+
+			H=BLS48.MPIN_HASH_ALL(sha,HSID[:],pxID,pxCID,SEC[:],Y[:],Z[:],T[:]);			
+			BLS48.MPIN_SERVER_KEY(sha,Z[:],SST[:],W[:],H[:],pHID,pxID,pxCID,SK[:])
+			fmt.Printf("Server Key =  0x");  printBinary(SK[:])
+		}
+	}
+}
+
 func rsa_2048(rng *amcl.RAND) {
 	var sha=RSA2048.RSA_HASH_TYPE
 	message:="Hello World\n"
@@ -440,6 +1305,11 @@ func main() {
 	rng.Seed(100,raw[:])
 
 	mpin_BN254(rng)
+	mpin_BLS383(rng)
+	mpin_BLS24(rng)
+	mpin_BLS48(rng)
 	ecdh_ED25519(rng)
+	ecdh_NIST256(rng)
+	ecdh_GOLDILOCKS(rng)
 	rsa_2048(rng)
 }

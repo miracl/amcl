@@ -316,9 +316,10 @@ func (F *FP2) mul_ip() {
 
 func (F *FP2) div_ip2() {
 	t:=NewFP2int(0)
+	F.norm()
 	t.a.copy(F.a); t.a.add(F.b)
 	t.b.copy(F.b); t.b.sub(F.a);
-	F.copy(t);
+	F.copy(t); F.norm()
 }
 
 /* w/=(1+sqrt(-1)) */

@@ -35,19 +35,19 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 		ZZ:=NewFP2copy(A.getz())  //Z
 		YZ:=NewFP2copy(YY)        //Y 
 		YZ.mul(ZZ)                //YZ
-		XX.sqr()	               //X^2
-		YY.sqr()	               //Y^2
-		ZZ.sqr()			       //Z^2
+		XX.sqr()			//X^2
+		YY.sqr()			//Y^2
+		ZZ.sqr()			//Z^2
 			
 		YZ.imul(4)
-		YZ.neg(); YZ.norm()       //-2YZ
-		YZ.pmul(Qy);               //-2YZ.Ys
+		YZ.neg(); YZ.norm()       //-4YZ
+		YZ.pmul(Qy);               //-4YZ.Ys
 
-		XX.imul(6)                //3X^2
-		XX.pmul(Qx);               //3X^2.Xs
+		XX.imul(6)                //6X^2
+		XX.pmul(Qx);              //6X^2.Xs
 
 		sb:=3*CURVE_B_I
-		ZZ.imul(sb); 	
+		ZZ.imul(sb); 			// 3bZ^2
 		if SEXTIC_TWIST == D_TYPE {	
 			ZZ.div_ip2();
 		}
@@ -60,9 +60,9 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 		ZZ.norm() // 3b.Z^2 
 
 		YY.add(YY)
-		ZZ.sub(YY); ZZ.norm()     // 3b.Z^2-Y^2
+		ZZ.sub(YY); ZZ.norm()     // 3b.Z^2-2Y^2
 
-		a=NewFP4fp2s(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
+		a=NewFP4fp2s(YZ,ZZ);          // -4YZ.Ys | 3b.Z^2-2Y^2 | 6X^2.Xs 
 		if SEXTIC_TWIST == D_TYPE {	
 
 			b=NewFP4fp2(XX)             // L(0,1) | L(0,0) | L(1,0)
@@ -113,6 +113,8 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 		}
 		A.Add(B);
 	}
+
+
 	return NewFP12fp4s(a,b,c)
 }
 
