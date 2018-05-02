@@ -334,9 +334,11 @@ public final class FP2 {
 	public void div_ip2()
 	{
 		FP2 t=new FP2(0);
+		norm();
 		t.a.copy(a); t.a.add(b);
 		t.b.copy(b); t.b.sub(a);
 		copy(t);
+		norm();
 	}
 
 /* w/=(1+sqrt(-1)) */

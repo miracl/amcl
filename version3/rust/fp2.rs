@@ -328,9 +328,10 @@ impl FP2 {
 
 	pub fn div_ip2(&mut self) {
 		let mut t=FP2::new();
+		self.norm();
 		t.a.copy(&self.a); t.a.add(&self.b);
 		t.b.copy(&self.b); t.b.sub(&self.a);
-		self.copy(&t); 
+		t.norm(); self.copy(&t); 
 	}
 
 /* w/=(1+sqrt(-1)) */

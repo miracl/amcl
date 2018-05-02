@@ -350,9 +350,10 @@ final public class FP2
     func div_ip2()
     {
         let t=FP2(0)
+	norm()
         t.a.copy(a); t.a.add(b)
         t.b.copy(b); t.b.sub(a)
-        copy(t); 
+        copy(t); norm()
     }
 
 }
