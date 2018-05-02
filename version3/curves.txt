@@ -26,9 +26,10 @@ security and above.
 22. FP512BN - An ISO standard 512-bit BN curve, as recomended for use by FIDO - https://tools.ietf.org/pdf/draft-kasamatsu-bncurves-02.pdf
 23. BLS461 - A 461 bit BLS12 curve suggested by Barbulescu and Duquesne https://eprint.iacr.org/2017/334
 
-24. BLS24 - An experimental BLS24 GT-Strong curve *
+24. BLS24 - An experimental (AES-192 bit security) BLS24 GT-Strong curve *
+25. BLS48 - An experimental (AES-256 bit security) BLS48 GT-Strong curve
 
 Note that it is quite possible to add new curves, and some programs are supplied to assist in the process.
 Let us know if you have a particular request - mike.scott@miracl.com
 
-* Only currently supported in C++
+* Only currently supported in C++, C and Go
