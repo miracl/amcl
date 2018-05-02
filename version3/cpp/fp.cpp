@@ -511,18 +511,20 @@ void YYY::FP_div2(FP *r,FP *a)
 /* set w=1/x */
 void YYY::FP_inv(FP *w,FP *x)
 {
-/* 
+ 
 	BIG m2;
 	BIG_rcopy(m2,Modulus);
 	BIG_dec(m2,2);
+	BIG_norm(m2);
 	FP_pow(w,x,m2);
-*/
 
+/*
     BIG m,b;
     BIG_rcopy(m,Modulus);
     FP_redc(b,x);
     BIG_invmodp(b,b,m);
     FP_nres(w,b);
+*/
 }
 
 /* SU=8 */
@@ -536,6 +538,7 @@ void YYY::FP_one(FP *n)
 
 /* Set r=a^b mod Modulus */
 /* SU= 136 */
+/*
 void YYY::FP_pow(FP *r,FP *a,BIG b)
 {
     BIG z,zilch;
@@ -543,6 +546,7 @@ void YYY::FP_pow(FP *r,FP *a,BIG b)
     int bt;
     BIG_zero(zilch);
 
+	FP_norm(a);
     BIG_norm(b);
     BIG_copy(z,b);
     FP_copy(&w,a);
@@ -555,6 +559,44 @@ void YYY::FP_pow(FP *r,FP *a,BIG b)
         if (BIG_comp(z,zilch)==0) break;
         FP_sqr(&w,&w);
     }
+    FP_reduce(r);
+}
+*/
+
+void YYY::FP_pow(FP *r,FP *a,BIG b)
+{
+	sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
+	FP tb[16];
+	BIG t;
+	int i,nb;
+
+	FP_norm(a);
+    BIG_norm(b);
+	BIG_copy(t,b);
+	nb=1+(BIG_nbits(t)+3)/4;
+    // convert exponent to 4-bit window 
+    for (i=0; i<nb; i++)
+    {
+        w[i]=BIG_lastbits(t,4);
+        BIG_dec(t,w[i]);
+        BIG_norm(t);
+        BIG_fshr(t,4);
+    }	
+
+	FP_one(&tb[0]);
+	FP_copy(&tb[1],a);
+	for (i=2;i<16;i++)
+		FP_mul(&tb[i],&tb[i-1],a);
+	
+	FP_copy(r,&tb[w[nb-1]]);
+    for (i=nb-2; i>=0; i--)
+    {
+		FP_sqr(r,r);
+		FP_sqr(r,r);
+		FP_sqr(r,r);
+		FP_sqr(r,r);
+		FP_mul(r,r,&tb[w[i]]);
+	}
     FP_reduce(r);
 }
 

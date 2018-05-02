@@ -24,6 +24,7 @@ typedef struct
     int inf; /**< Infinity Flag */
     YYY::FP4 x;   /**< x-coordinate of point */
     YYY::FP4 y;   /**< y-coordinate of point */
+    YYY::FP4 z;   /**< z-coordinate of point */
 } ECP4;
 
 
@@ -77,6 +78,13 @@ extern void ECP4_inf(ECP4 *P);
 	@return 1 if P=Q, else returns 0
  */
 extern int ECP4_equals(ECP4 *P,ECP4 *Q);
+
+/**	@brief Converts an ECP4 point from Projective (x,y,z) coordinates to affine (x,y) coordinates
+ *
+	@param P ECP4 instance to be converted to affine form
+ */
+extern void ECP4_affine(ECP4 *P);
+
 
 /**	@brief Extract x and y coordinates of an ECP4 point P
  *
@@ -153,14 +161,14 @@ extern void ECP4_reduce(ECP4 *P);
 	@param P ECP4 instance, on exit =2*P
 	@param lam FP4 instance, slope of line
  */
-extern int ECP4_sdbl(ECP4 *P,FP4 *lam);
+//extern int ECP4_sdbl(ECP4 *P,FP4 *lam);
 /**	@brief Adds ECP4 instance Q to ECP4 instance P and returns slope
  *
 	@param P ECP4 instance, on exit =P+Q
 	@param Q ECP4 instance to be added to P
 	@param lam FP4 instance, slope of line
  */
-extern int ECP4_sadd(ECP4 *P,ECP4 *Q,FP4 *lam);
+//extern int ECP4_sadd(ECP4 *P,ECP4 *Q,FP4 *lam);
 
 
 /**	@brief Doubles an ECP4 instance P

@@ -273,6 +273,13 @@ extern void FP4_cmove(FP4 *x,FP4 *y,int s);
  */
 extern void FP4_div_i(FP4 *x);
 
+/**	@brief Divide an FP4 by QNR/2
+ *
+	Divide FP4 by the QNR/2
+	@param x FP4 instance
+ */
+extern void FP4_div_2i(FP4 *x);
+
 }
 
 #endif

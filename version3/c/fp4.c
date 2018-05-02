@@ -110,7 +110,7 @@ void FP4_YYY_neg(FP4_YYY *w,FP4_YYY *x)
 {
     /* Just one field neg */
     FP2_YYY m,t;
-
+	FP4_YYY_norm(x);
     FP2_YYY_add(&m,&(x->a),&(x->b));
 //	FP2_YYY_norm(&m);
     FP2_YYY_neg(&m,&m);
@@ -665,6 +665,18 @@ void FP4_YYY_div_i(FP4_YYY *f)
     FP2_YYY_div_ip(&u);
     FP2_YYY_copy(&(f->a),&v);
     FP2_YYY_copy(&(f->b),&u);
+}
+
+void FP4_YYY_div_2i(FP4_YYY *f)
+{
+	FP2_YYY u,v;
+	FP2_YYY_copy(&u,&(f->a));
+	FP2_YYY_copy(&v,&(f->b));
+	FP2_YYY_div_ip2(&u);
+	FP2_YYY_add(&v,&v,&v);
+	FP2_YYY_norm(&v);
+	FP2_YYY_copy(&(f->a),&v);
+	FP2_YYY_copy(&(f->b),&u);
 }
 
 #endif

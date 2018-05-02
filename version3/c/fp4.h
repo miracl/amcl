@@ -285,6 +285,15 @@ extern int  FP4_YYY_sqrt(FP4_YYY *r,FP4_YYY *x);
  */
 extern void FP4_YYY_div_i(FP4_YYY *x);
 
+/**	@brief Divide an FP4 by QNR/2
+ *
+	Divide FP4 by the QNR/2
+	@param x FP4 instance
+ */
+extern void FP4_YYY_div_2i(FP4_YYY *x);
+
+
+
 /**	@brief Divide an FP4 by 2
  *
 	@param x FP4 instance, on exit = y/2

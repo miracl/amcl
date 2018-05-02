@@ -509,11 +509,19 @@ void FP_YYY_div2(FP_YYY *r,FP_YYY *a)
 /* set w=1/x */
 void FP_YYY_inv(FP_YYY *w,FP_YYY *x)
 {
+
+	BIG_XXX m2;
+	BIG_XXX_rcopy(m2,Modulus_YYY);
+	BIG_XXX_dec(m2,2);
+	BIG_XXX_norm(m2);
+	FP_YYY_pow(w,x,m2);
+
+/*
     BIG_XXX m,b;
     BIG_XXX_rcopy(m,Modulus_YYY);
     FP_YYY_redc(b,x);
     BIG_XXX_invmodp(b,b,m);
-    FP_YYY_nres(w,b);
+    FP_YYY_nres(w,b); */
 }
 
 /* SU=8 */
@@ -527,6 +535,7 @@ void FP_YYY_one(FP_YYY *n)
 
 /* Set r=a^b mod Modulus */
 /* SU= 136 */
+/*
 void FP_YYY_pow(FP_YYY *r,FP_YYY *a,BIG_XXX b)
 {
     BIG_XXX z,zilch;
@@ -546,6 +555,44 @@ void FP_YYY_pow(FP_YYY *r,FP_YYY *a,BIG_XXX b)
         if (BIG_XXX_comp(z,zilch)==0) break;
         FP_YYY_sqr(&w,&w);
     }
+    FP_YYY_reduce(r);
+}
+*/
+
+void FP_YYY_pow(FP_YYY *r,FP_YYY *a,BIG_XXX b)
+{
+	sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
+	FP_YYY tb[16];
+	BIG_XXX t;
+	int i,nb;
+
+	FP_YYY_norm(a);
+    BIG_XXX_norm(b);
+	BIG_XXX_copy(t,b);
+	nb=1+(BIG_XXX_nbits(t)+3)/4;
+    /* convert exponent to 4-bit window */
+    for (i=0; i<nb; i++)
+    {
+        w[i]=BIG_XXX_lastbits(t,4);
+        BIG_XXX_dec(t,w[i]);
+        BIG_XXX_norm(t);
+        BIG_XXX_fshr(t,4);
+    }	
+
+	FP_YYY_one(&tb[0]);
+	FP_YYY_copy(&tb[1],a);
+	for (i=2;i<16;i++)
+		FP_YYY_mul(&tb[i],&tb[i-1],a);
+	
+	FP_YYY_copy(r,&tb[w[nb-1]]);
+    for (i=nb-2; i>=0; i--)
+    {
+		FP_YYY_sqr(r,r);
+		FP_YYY_sqr(r,r);
+		FP_YYY_sqr(r,r);
+		FP_YYY_sqr(r,r);
+		FP_YYY_mul(r,r,&tb[w[i]]);
+	}
     FP_YYY_reduce(r);
 }
 

@@ -101,6 +101,7 @@ void YYY::FP8_neg(FP8 *w,FP8 *x)
 {
     /* Just one field neg */
     FP4 m,t;
+	FP8_norm(x);
 //printf("Into neg 1\n");
     FP4_add(&m,&(x->a),&(x->b));
 	FP4_norm(&m);
@@ -177,6 +178,12 @@ void YYY::FP8_qmul(FP8 *w,FP8 *x,FP2 *s)
     FP4_pmul(&(w->b),&(x->b),s);
 }
 
+/* Set w=s*x, where s is FP2 */
+void YYY::FP8_tmul(FP8 *w,FP8 *x,FP *s)
+{
+    FP4_qmul(&(w->a),&(x->a),s);
+    FP4_qmul(&(w->b),&(x->b),s);
+}
 
 /* Set w=s*x, where s is int */
 void YYY::FP8_imul(FP8 *w,FP8 *x,int s)
@@ -615,7 +622,7 @@ int YYY::FP8_sqrt(FP8 *r,FP8* x)
 
 	if (!FP4_sqrt(&s,&a)) return 0;
 
-	FP4_sqr(&t,&s);
+	//FP4_sqr(&t,&s);
 
 
 	FP4_copy(&t,&(x->a));
@@ -657,6 +664,20 @@ void YYY::FP8_div_i2(FP8 *f)
 	FP4_div_i(&(f->a));
 	FP4_div_i(&(f->b));
 }
+
+void YYY::FP8_div_2i(FP8 *f)
+{
+	FP4 u,v;
+	FP4_copy(&u,&(f->a));
+	FP4_copy(&v,&(f->b));
+	FP4_div_2i(&u);
+	FP4_add(&v,&v,&v);
+	FP4_norm(&v);
+	FP4_copy(&(f->a),&v);
+	FP4_copy(&(f->b),&u);
+}
+
+
 
 #endif
 

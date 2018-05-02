@@ -100,6 +100,7 @@ void FP16_YYY_neg(FP16_YYY *w,FP16_YYY *x)
 {
     /* Just one field neg */
     FP8_YYY m,t;
+	FP16_YYY_norm(x);
     FP8_YYY_add(&m,&(x->a),&(x->b));
 	FP8_YYY_norm(&m);
     FP8_YYY_neg(&m,&m);

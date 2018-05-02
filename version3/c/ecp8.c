@@ -26,7 +26,7 @@ under the License.
 int ECP8_ZZZ_isinf(ECP8_ZZZ *P)
 {
 	if (P->inf) return 1;
-	P->inf=FP8_YYY_iszilch(&(P->x));
+	P->inf=FP8_YYY_iszilch(&(P->x)) & FP8_YYY_iszilch(&(P->z));
     return P->inf;
 }
 
@@ -36,6 +36,7 @@ void ECP8_ZZZ_copy(ECP8_ZZZ *P,ECP8_ZZZ *Q)
     P->inf=Q->inf;
     FP8_YYY_copy(&(P->x),&(Q->x));
     FP8_YYY_copy(&(P->y),&(Q->y));
+    FP8_YYY_copy(&(P->z),&(Q->z));
 }
 
 /* set P to Infinity */
@@ -44,6 +45,7 @@ void ECP8_ZZZ_inf(ECP8_ZZZ *P)
     P->inf=1;
     FP8_YYY_zero(&(P->x));
     FP8_YYY_one(&(P->y));
+	FP8_YYY_zero(&(P->z));
 }
 
 /* Conditional move Q to P dependant on d */
@@ -51,6 +53,7 @@ static void ECP8_ZZZ_cmove(ECP8_ZZZ *P,ECP8_ZZZ *Q,int d)
 {
     FP8_YYY_cmove(&(P->x),&(Q->x),d);
     FP8_YYY_cmove(&(P->y),&(Q->y),d);
+    FP8_YYY_cmove(&(P->z),&(Q->z),d);
     d=~(d-1);
     P->inf^=(P->inf^Q->inf)&d;
 }
@@ -86,15 +89,44 @@ static void ECP8_ZZZ_select(ECP8_ZZZ *P,ECP8_ZZZ W[],sign32 b)
     ECP8_ZZZ_cmove(P,&MP,(int)(m&1));
 }
 
+/* Make P affine (so z=1) */
+void ECP8_ZZZ_affine(ECP8_ZZZ *P)
+{
+    FP8_YYY one,iz;
+    if (ECP8_ZZZ_isinf(P)) return;
+
+    FP8_YYY_one(&one);
+    if (FP8_YYY_isunity(&(P->z)))
+    {
+        FP8_YYY_reduce(&(P->x));
+        FP8_YYY_reduce(&(P->y));
+        return;
+    }
+
+    FP8_YYY_inv(&iz,&(P->z));
+    FP8_YYY_mul(&(P->x),&(P->x),&iz);
+    FP8_YYY_mul(&(P->y),&(P->y),&iz);
+
+    FP8_YYY_reduce(&(P->x));
+    FP8_YYY_reduce(&(P->y));
+    FP8_YYY_copy(&(P->z),&one);
+}
+
 /* return 1 if P==Q, else 0 */
 /* SU= 312 */
 int ECP8_ZZZ_equals(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 {
+    FP8_YYY a,b;
     if (ECP8_ZZZ_isinf(P) && ECP8_ZZZ_isinf(Q)) return 1;
     if (ECP8_ZZZ_isinf(P) || ECP8_ZZZ_isinf(Q)) return 0;
 
-    if (!FP8_YYY_equals(&(P->x),&(Q->x))) return 0;
-    if (!FP8_YYY_equals(&(P->y),&(Q->y))) return 0;
+    FP8_YYY_mul(&a,&(P->x),&(Q->z));
+    FP8_YYY_mul(&b,&(Q->x),&(P->z));
+    if (!FP8_YYY_equals(&a,&b)) return 0;
+
+    FP8_YYY_mul(&a,&(P->y),&(Q->z));
+    FP8_YYY_mul(&b,&(Q->y),&(P->z));
+    if (!FP8_YYY_equals(&a,&b)) return 0;
     return 1;
 }
 
@@ -102,6 +134,7 @@ int ECP8_ZZZ_equals(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 int ECP8_ZZZ_get(FP8_YYY *x,FP8_YYY *y,ECP8_ZZZ *P)
 {
     if (P->inf) return -1;
+	ECP8_ZZZ_affine(P);
     FP8_YYY_copy(y,&(P->y));
     FP8_YYY_copy(x,&(P->x));
     return 0;
@@ -311,6 +344,8 @@ int ECP8_ZZZ_set(ECP8_ZZZ *P,FP8_YYY *x,FP8_YYY *y)
     P->inf=0;
     FP8_YYY_copy(&(P->x),x);
     FP8_YYY_copy(&(P->y),y);
+
+    FP8_YYY_one(&(P->z));
     return 1;
 }
 
@@ -330,7 +365,7 @@ int ECP8_ZZZ_setx(ECP8_ZZZ *P,FP8_YYY *x)
     P->inf=0;
     FP8_YYY_copy(&(P->x),x);
     FP8_YYY_copy(&(P->y),&y);
-
+    FP8_YYY_one(&(P->z));
     return 1;
 }
 
@@ -345,119 +380,165 @@ void ECP8_ZZZ_neg(ECP8_ZZZ *P)
 }
 
 
-int ECP8_ZZZ_dbl(ECP8_ZZZ *P)
-{
-	FP8_YYY lam;
-	return ECP8_ZZZ_sdbl(P,&lam);
-}
-
-int ECP8_ZZZ_add(ECP8_ZZZ *P,ECP8_ZZZ *Q)
-{
-	FP8_YYY lam;
-	return ECP8_ZZZ_sadd(P,Q,&lam);
-}
 
 /* R+=R */
 /* return -1 for Infinity, 0 for addition, 1 for doubling */
-int ECP8_ZZZ_sdbl(ECP8_ZZZ *P,FP8_YYY *lam)
+int ECP8_ZZZ_dbl(ECP8_ZZZ *P)
 {
-    FP8_YYY t,t2;
+    FP8_YYY t0,t1,t2,t3,iy,x3,y3;
     if (P->inf) return -1;
-	if (FP8_YYY_iszilch(&(P->y)))
-	{
-		FP8_YYY_zero(&(P->x));
-		P->inf=1;
-		return -1;
-	}
 
-	FP8_YYY_sqr(lam,&(P->x));
-	FP8_YYY_imul(lam,lam,3);
+	FP8_YYY_copy(&iy,&(P->y));		//FP8_YYY iy=new FP8_YYY(y);
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP8_YYY_times_i(&iy);			//iy.mul_ip(); 
+	FP8_YYY_norm(&iy);				//iy.norm();
+#endif
 
-	FP8_YYY_add(&t,&(P->y),&(P->y));
-	FP8_YYY_norm(&t);
+	FP8_YYY_sqr(&t0,&(P->y));			//t0.sqr();   
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP8_YYY_times_i(&t0);			//t0.mul_ip(); 
+#endif
 
-	FP8_YYY_inv(&t,&t);
-	FP8_YYY_mul(lam,lam,&t);
+	FP8_YYY_mul(&t1,&iy,&(P->z));	//t1.mul(z);
+	FP8_YYY_sqr(&t2,&(P->z));				//t2.sqr();
 
-	FP8_YYY_copy(&t,&(P->x));
-	FP8_YYY_add(&t2,&(P->x),&(P->x));
-	FP8_YYY_sqr(&(P->x),lam);
+	FP8_YYY_add(&(P->z),&t0,&t0);	//z.add(t0); 
+	FP8_YYY_norm(&(P->z));				//z.norm(); 
+	FP8_YYY_add(&(P->z),&(P->z),&(P->z));	//z.add(z); 
+	FP8_YYY_add(&(P->z),&(P->z),&(P->z));	//z.add(z); 
+	FP8_YYY_norm(&(P->z));			//z.norm();  
 
+	FP8_YYY_imul(&t2,&t2,3*CURVE_B_I_ZZZ);	//t2.imul(3*ROM.CURVE_B_I); 
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP8_YYY_times_i(&t2);
 	FP8_YYY_norm(&t2);
-	FP8_YYY_sub(&(P->x),&(P->x),&t2);
+#endif
 
-	FP8_YYY_norm(&(P->x));	
-	FP8_YYY_sub(&t,&t,&(P->x));
-	FP8_YYY_norm(&t);
+	FP8_YYY_mul(&x3,&t2,&(P->z));	//x3.mul(z); 
 
-	FP8_YYY_mul(&t,&t,lam);
-	FP8_YYY_sub(&t,&t,&(P->y));
-	FP8_YYY_copy(&(P->y),&t);
+	FP8_YYY_add(&y3,&t0,&t2);		//y3.add(t2); 
+	FP8_YYY_norm(&y3);				//y3.norm();
+	FP8_YYY_mul(&(P->z),&(P->z),&t1);	//z.mul(t1);
 
-	FP8_YYY_norm(&(P->y));	
+	FP8_YYY_add(&t1,&t2,&t2);		//t1.add(t2); 
+	FP8_YYY_add(&t2,&t2,&t1);		//t2.add(t1); 
+	FP8_YYY_norm(&t2);				//t2.norm();  
+	FP8_YYY_sub(&t0,&t0,&t2);		//t0.sub(t2); 
+	FP8_YYY_norm(&t0);				//t0.norm();                           //y^2-9bz^2
+	FP8_YYY_mul(&y3,&y3,&t0);		//y3.mul(t0); 
+	FP8_YYY_add(&(P->y),&y3,&x3);		//y3.add(x3);                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+
+	FP8_YYY_mul(&t1,&(P->x),&iy);		//t1.mul(iy);						//
+
+	FP8_YYY_norm(&t0);			//x.norm(); 
+	FP8_YYY_mul(&(P->x),&t0,&t1);	//x.mul(t1); 
+	FP8_YYY_add(&(P->x),&(P->x),&(P->x));	//x.add(x);       //(y^2-9bz^2)xy2
+
+	FP8_YYY_norm(&(P->x));			//x.norm(); 
+
+	FP8_YYY_norm(&(P->y));			//y.norm();
 
     return 1;
 }
 
 /* Set P+=Q */
 
-int ECP8_ZZZ_sadd(ECP8_ZZZ *P,ECP8_ZZZ *Q,FP8_YYY *lam)
+int ECP8_ZZZ_add(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 {
-    FP8_YYY t,t2;
+    FP8_YYY t0,t1,t2,t3,t4,x3,y3,z3;
+	int b3=3*CURVE_B_I_ZZZ;
     if (Q->inf) return 0;
     if (P->inf)
     {
         ECP8_ZZZ_copy(P,Q);
-		FP8_YYY_zero(lam);
         return 0;
     }
 
-	if (P==Q)
-	{
-		ECP8_ZZZ_sdbl(P,lam);
-		return 1;
-	}
+	FP8_YYY_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
+	FP8_YYY_mul(&t1,&(P->y),&(Q->y));	//t1.mul(Q.y);		 // y.Q.y
 
-	if (FP8_YYY_equals(&(P->x),&(Q->x)))
-	{
-		if (FP8_YYY_equals(&(P->y),&(Q->y)))
-		{
-			ECP8_ZZZ_copy(P,Q);
-			ECP8_ZZZ_sdbl(P,lam);
-			return 1;
-		}
-		else
-		{
-			FP8_YYY_zero(&(P->y));
-			FP8_YYY_zero(&(P->x));
-			P->inf=1;
-			return -1;
-		}
-	}
+	FP8_YYY_mul(&t2,&(P->z),&(Q->z));	//t2.mul(Q.z);
+	FP8_YYY_add(&t3,&(P->x),&(P->y));	//t3.add(y); 
+	FP8_YYY_norm(&t3);				//t3.norm();          //t3=X1+Y1         
+	FP8_YYY_add(&t4,&(Q->x),&(Q->y));	//t4.add(Q.y); 
+	FP8_YYY_norm(&t4);				//t4.norm();			//t4=X2+Y2
+	FP8_YYY_mul(&t3,&t3,&t4);		//t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
+	FP8_YYY_add(&t4,&t0,&t1);		//t4.add(t1);		//t4=X1.X2+Y1.Y2
 
-	FP8_YYY_sub(lam,&(P->y),&(Q->y));
-	FP8_YYY_norm(lam);
-	FP8_YYY_sub(&t2,&(P->x),&(Q->x));
-	FP8_YYY_norm(&t2);
-	FP8_YYY_inv(&t2,&t2);
-	FP8_YYY_mul(lam,lam,&t2);
+	FP8_YYY_sub(&t3,&t3,&t4);		//t3.sub(t4); 
+	FP8_YYY_norm(&t3);				//t3.norm(); 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP8_YYY_times_i(&t3);			//t3.mul_ip();  
+	FP8_YYY_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+#endif
+                   
+	FP8_YYY_add(&t4,&(P->y),&(P->z));	//t4.add(z); 
+	FP8_YYY_norm(&t4);				//t4.norm();			//t4=Y1+Z1
 
-	FP8_YYY_add(&(P->x),&(P->x),&(Q->x));
-	FP8_YYY_sqr(&t,lam);
+	FP8_YYY_add(&x3,&(Q->y),&(Q->z));	//x3.add(Q.z); 
+	FP8_YYY_norm(&x3);				//x3.norm();			//x3=Y2+Z2
 
-	FP8_YYY_norm(&(P->x));
-	FP8_YYY_sub(&t,&t,&(P->x));
+	FP8_YYY_mul(&t4,&t4,&x3);		//t4.mul(x3);						//t4=(Y1+Z1)(Y2+Z2)
 
-	FP8_YYY_copy(&(P->x),&t);
-	FP8_YYY_norm(&(P->x));
+	FP8_YYY_add(&x3,&t1,&t2);		//x3.add(t2);						//X3=Y1.Y2+Z1.Z2
+	
+	FP8_YYY_sub(&t4,&t4,&x3);		//t4.sub(x3); 
+	FP8_YYY_norm(&t4);				//t4.norm(); 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP8_YYY_times_i(&t4);			//t4.mul_ip(); 
+	FP8_YYY_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+#endif
 
-	FP8_YYY_sub(&(P->y),&(Q->x),&(P->x));
-	FP8_YYY_norm(&(P->y));
+	FP8_YYY_add(&x3,&(P->x),&(P->z));	//x3.add(z); 
+	FP8_YYY_norm(&x3);				//x3.norm();	// x3=X1+Z1
+		
+	FP8_YYY_add(&y3,&(Q->x),&(Q->z));	//y3.add(Q.z); 
+	FP8_YYY_norm(&y3);				//y3.norm();				// y3=X2+Z2
+	FP8_YYY_mul(&x3,&x3,&y3);		//x3.mul(y3);							// x3=(X1+Z1)(X2+Z2)
 
-	FP8_YYY_mul(&(P->y),&(P->y),lam);
-	FP8_YYY_sub(&(P->y),&(P->y),&(Q->y));
+	FP8_YYY_add(&y3,&t0,&t2);		//y3.add(t2);							// y3=X1.X2+Z1+Z2
+	FP8_YYY_sub(&y3,&x3,&y3);		//y3.rsub(x3); 
+	FP8_YYY_norm(&y3);				//y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP8_YYY_times_i(&t0);			//t0.mul_ip(); 
+	FP8_YYY_norm(&t0);				//t0.norm(); // x.Q.x
+	FP8_YYY_times_i(&t1);			//t1.mul_ip(); 
+	FP8_YYY_norm(&t1);				//t1.norm(); // y.Q.y
+#endif
 
-	FP8_YYY_norm(&(P->y));
+	FP8_YYY_add(&x3,&t0,&t0);		//x3.add(t0); 
+	FP8_YYY_add(&t0,&t0,&x3);		//t0.add(x3); 
+	FP8_YYY_norm(&t0);				//t0.norm();
+	FP8_YYY_imul(&t2,&t2,b3);		//t2.imul(b); 	
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP8_YYY_times_i(&t2);
+#endif
+
+	FP8_YYY_add(&z3,&t1,&t2);		//z3.add(t2); 
+	FP8_YYY_norm(&z3);				//z3.norm();
+	FP8_YYY_sub(&t1,&t1,&t2);		//t1.sub(t2); 
+	FP8_YYY_norm(&t1);				//t1.norm(); 
+	FP8_YYY_imul(&y3,&y3,b3);		//y3.imul(b); 
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP8_YYY_times_i(&y3);
+	FP8_YYY_norm(&y3);
+#endif
+
+	FP8_YYY_mul(&x3,&y3,&t4);		//x3.mul(t4); 
+
+	FP8_YYY_mul(&t2,&t3,&t1);		//t2.mul(t1); 
+	FP8_YYY_sub(&(P->x),&t2,&x3);		//x3.rsub(t2);
+	FP8_YYY_mul(&y3,&y3,&t0);		//y3.mul(t0); 
+	FP8_YYY_mul(&t1,&t1,&z3);		//t1.mul(z3); 
+	FP8_YYY_add(&(P->y),&y3,&t1);		//y3.add(t1);
+	FP8_YYY_mul(&t0,&t0,&t3);		//t0.mul(t3); 
+	FP8_YYY_mul(&z3,&z3,&t4);		//z3.mul(t4); 
+	FP8_YYY_add(&(P->z),&z3,&t0);		//z3.add(t0);
+
+
+	FP8_YYY_norm(&(P->x));			//x.norm(); 
+	FP8_YYY_norm(&(P->y));			//y.norm();
+	FP8_YYY_norm(&(P->z));			//z.norm();
 
     return 0;
 }
@@ -476,6 +557,7 @@ void ECP8_ZZZ_reduce(ECP8_ZZZ *P)
 {
 	FP8_YYY_reduce(&(P->x));
 	FP8_YYY_reduce(&(P->y));
+	FP8_YYY_reduce(&(P->z));
 }
 
 /* P*=e */
@@ -489,7 +571,7 @@ void ECP8_ZZZ_mul(ECP8_ZZZ *P,BIG_XXX e)
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
 
     if (ECP8_ZZZ_isinf(P)) return;
-
+    ECP8_ZZZ_affine(P);
     /* precompute table */
 
     ECP8_ZZZ_copy(&Q,P);
@@ -538,7 +620,7 @@ void ECP8_ZZZ_mul(ECP8_ZZZ *P,BIG_XXX e)
         ECP8_ZZZ_add(P,&Q);
     }
     ECP8_ZZZ_sub(P,&C); /* apply correction */
-	ECP8_ZZZ_reduce(P);
+	ECP8_ZZZ_affine(P);
 }
 
 void ECP8_ZZZ_frob_constants(FP2_YYY F[3])
@@ -581,36 +663,16 @@ void ECP8_ZZZ_frob_constants(FP2_YYY F[3])
 void ECP8_ZZZ_frob(ECP8_ZZZ *P,FP2_YYY F[3],int n)
 {
 	int i;
-	FP8_YYY X,Y;
+	FP8_YYY X,Y,Z;
 
     if (P->inf) return;
 
-	ECP8_ZZZ_get(&X,&Y,P);		// F=(1+i)^(p-19)/24
-/*
-	FP2_YYY_sqr(&FF,F);			// FF=F^2=(1+i)^(p-19)/12
-	FP2_YYY_copy(&W,&FF);
-	FP2_YYY_mul_ip(&W);			// W=(1+i)^12/12.(1+i)^(p-19)/12 = (1+i)^(p-7)/12
-	FP2_YYY_norm(&W);
-	FP2_YYY_sqr(&FFF,&W);
-	FP2_YYY_mul(&W,&W,&FFF);	// W=(1+i)^(p-7)/4
+	//ECP8_get(&X,&Y,P);		// F=(1+i)^(p-19)/24
 
-	FP2_YYY_mul_ip(&W);			// W=(1+i)^4/4.W=(1+i)^(p-7)/4 = (1+i)^(p-3)/4
-	FP2_YYY_norm(&W);
+	FP8_YYY_copy(&X,&(P->x));
+	FP8_YYY_copy(&Y,&(P->y));
+	FP8_YYY_copy(&Z,&(P->z));
 
-	FP2_YYY_copy(&FFF,F);
-
-#if SEXTIC_TWIST_ZZZ == M_TYPE	
-	FP2_YYY_mul_ip(&FFF);		// (1+i)^24/24.(1+i)^(p-19)/24 = (1+i)^(p+5)/24
-	FP2_YYY_inv(&FFF,&FFF);		// (1+i)^-(p+5)/24
-	FP2_YYY_sqr(&FF,&FFF);		// (1+i)^-(p+5)/12
-#endif
-
-
-	FP2_YYY_mul_ip(&FF);		// FF=(1+i)^(p-19)/12.(1+i)^12/12 = (1+i)^(p-7)/12					// FF=(1+i)^12/12.(1+i)^-(p+5)/12 = (1+i)^-(p-7)/12
-	FP2_YYY_norm(&FF);
-
-	FP2_YYY_mul(&FFF,&FFF,&FF);  // (1+i)^(p-7)/12 . (1+i)^(p-19)/24 = (1+i)^(p-11)/8				// (1+i)^-(p-7)/12 . (1+i)^-(p+5)/24 = (1+i)^-(p-3)/8
-*/
 	for (i=0;i<n;i++)
 	{
 		FP8_YYY_frob(&X,&F[2]);		// X^p		
@@ -630,10 +692,12 @@ void ECP8_ZZZ_frob(ECP8_ZZZ *P,FP2_YYY F[3],int n)
 #if SEXTIC_TWIST_ZZZ == D_TYPE
 		FP8_YYY_times_i2(&Y); FP8_YYY_times_i2(&Y); FP8_YYY_times_i(&Y);  // Y^p.(1+i)^(p-1)/8
 #endif
-
+		FP8_YYY_frob(&Z,&F[2]);
 	}
 
-	ECP8_ZZZ_set(P,&X,&Y);
+	FP8_YYY_copy(&(P->x),&X);
+	FP8_YYY_copy(&(P->y),&Y);
+	FP8_YYY_copy(&(P->z),&Z);
 }
 
 /* Side channel attack secure */
@@ -658,8 +722,10 @@ void ECP8_ZZZ_mul16(ECP8_ZZZ *P,ECP8_ZZZ Q[16],BIG_XXX u[16])
 	ECP8_ZZZ_frob_constants(X);
 
     for (i=0; i<16; i++)
+	{
+        ECP8_ZZZ_affine(&Q[i]);
         BIG_XXX_copy(t[i],u[i]);
-
+	}
 // Precomputed table
     ECP8_ZZZ_copy(&T1[0],&Q[0]); // Q[0]
     ECP8_ZZZ_copy(&T1[1],&T1[0]);
@@ -827,8 +893,7 @@ void ECP8_ZZZ_mul16(ECP8_ZZZ *P,ECP8_ZZZ Q[16],BIG_XXX u[16])
 	ECP8_ZZZ_copy(&W,P);   
 	ECP8_ZZZ_sub(&W,&Q[12]);
 	ECP8_ZZZ_cmove(P,&W,pb4);
-
-	ECP8_ZZZ_reduce(P);
+	ECP8_ZZZ_affine(P);
 }
 
 /*
@@ -1021,7 +1086,7 @@ void ECP8_ZZZ_mapit(ECP8_ZZZ *Q,octet *W)
 		FP4_YYY_from_FP2(&X4,&T);
 		FP8_YYY_from_FP4(&X8,&X4);
         if (ECP8_ZZZ_setx(Q,&X8)) break;
-        BIG_XXX_inc(hv,1); BIG_XXX_norm(hv);
+        BIG_XXX_inc(hv,1);
     }
 
 	ECP8_ZZZ_frob_constants(X);
@@ -1094,7 +1159,7 @@ void ECP8_ZZZ_mapit(ECP8_ZZZ *Q,octet *W)
 	ECP8_ZZZ_add(Q,&x2Q);
 	ECP8_ZZZ_add(Q,&xQ);
 
-	ECP8_ZZZ_reduce(Q);
+	ECP8_ZZZ_affine(Q);
 
 }
 

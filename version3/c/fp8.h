@@ -132,6 +132,14 @@ extern void FP8_YYY_pmul(FP8_YYY *x,FP8_YYY *y,FP4_YYY *a);
  */
 extern void FP8_YYY_qmul(FP8_YYY *x,FP8_YYY *y,FP2_YYY *a);
 
+/**	@brief Multiplication of an FP8 by an FP
+ *
+	@param x FP8 instance, on exit = y*a
+	@param y FP8 instance
+	@param a FP multiplier
+ */
+extern void FP8_YYY_tmul(FP8_YYY *x,FP8_YYY *y,FP_YYY *a);
+
 /**	@brief Multiplication of an FP8 by a small integer
  *
 	@param x FP8 instance, on exit = y*i
@@ -273,6 +281,13 @@ extern void FP8_YYY_div_i(FP8_YYY *x);
 	@param x FP8 instance
  */
 extern void FP8_YYY_div_i2(FP8_YYY *x);
+
+/**	@brief Divide FP8 number by QNR/2
+ *
+	Divide FP8 by the QNR/2
+	@param x FP8 instance
+ */
+extern void FP8_YYY_div_2i(FP8_YYY *x);
 
 
 #endif

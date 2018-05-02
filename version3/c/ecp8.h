@@ -18,6 +18,7 @@ typedef struct
     int inf; /**< Infinity Flag */
     FP8_YYY x;   /**< x-coordinate of point */
     FP8_YYY y;   /**< y-coordinate of point */
+	FP8_YYY z;	/**< z-coordinate of point */
 } ECP8_ZZZ;
 
 
@@ -81,6 +82,14 @@ extern void ECP8_ZZZ_inf(ECP8_ZZZ *P);
 	@return 1 if P=Q, else returns 0
  */
 extern int ECP8_ZZZ_equals(ECP8_ZZZ *P,ECP8_ZZZ *Q);
+
+
+/**	@brief Converts an ECP8 point from Projective (x,y,z) coordinates to affine (x,y) coordinates
+ *
+	@param P ECP8 instance to be converted to affine form
+ */
+extern void ECP8_ZZZ_affine(ECP8_ZZZ *P);
+
 
 /**	@brief Extract x and y coordinates of an ECP8 point P
  *
@@ -157,14 +166,14 @@ extern void ECP8_ZZZ_reduce(ECP8_ZZZ *P);
 	@param P ECP8 instance, on exit =2*P
 	@param lam FP8 instance, slope of line
  */
-extern int ECP8_ZZZ_sdbl(ECP8_ZZZ *P,FP8_YYY *lam);
+//extern int ECP8_ZZZ_sdbl(ECP8_ZZZ *P,FP8_YYY *lam);
 /**	@brief Adds ECP8 instance Q to ECP8 instance P and returns slope
  *
 	@param P ECP8 instance, on exit =P+Q
 	@param Q ECP8 instance to be added to P
 	@param lam FP8 instance, slope of line
  */
-extern int ECP8_ZZZ_sadd(ECP8_ZZZ *P,ECP8_ZZZ *Q,FP8_YYY *lam);
+//extern int ECP8_ZZZ_sadd(ECP8_ZZZ *P,ECP8_ZZZ *Q,FP8_YYY *lam);
 
 
 /**	@brief Doubles an ECP8 instance P

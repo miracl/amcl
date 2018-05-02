@@ -35,40 +35,110 @@ namespace ZZZ {
 /* Line function */
 static void ZZZ::PAIR_line(FP24 *v,ECP4 *A,ECP4 *B,FP *Qx,FP *Qy)
 {
-	FP2 t;
-	FP4 T,X,Y,lam;
+	FP4 X1,Y1,T1,T2;
+	FP4 XX,YY,ZZ,YZ;
     FP8 a,b,c;
 
-	ECP4_get(&X,&Y,A);
+	if (A==B)
+    {
+        /* doubling */
+ 		FP4_copy(&XX,&(A->x));	//FP4 XX=new FP4(A.getx());  //X
+		FP4_copy(&YY,&(A->y));	//FP4 YY=new FP4(A.gety());  //Y
+		FP4_copy(&ZZ,&(A->z));	//FP4 ZZ=new FP4(A.getz());  //Z
 
-	ECP4_sadd(A,B,&lam);
 
-	FP4_mul(&T,&lam,&X);    // T=lam*X
-	FP4_sub(&Y,&Y,&T);		// Y=Y-lam*X
-	FP2_from_FP(&t,Qy);
-	FP2_neg(&t,&t);			// t=-Qy
-	FP2_norm(&t);
-	FP4_from_FP2(&T,&t);
+		FP4_copy(&YZ,&YY);		//FP4 YZ=new FP4(YY);        //Y 
+		FP4_mul(&YZ,&YZ,&ZZ);		//YZ.mul(ZZ);                //YZ
+		FP4_sqr(&XX,&XX);		//XX.sqr();	               //X^2
+		FP4_sqr(&YY,&YY);		//YY.sqr();	               //Y^2
+		FP4_sqr(&ZZ,&ZZ);		//ZZ.sqr();			       //Z^2
+			
+		FP4_imul(&YZ,&YZ,4);	//YZ.imul(4);
+		FP4_neg(&YZ,&YZ);		//YZ.neg(); 
+		FP4_norm(&YZ);			//YZ.norm();       //-4YZ
 
-#if SEXTIC_TWIST_ZZZ==M_TYPE
-	FP4_times_i(&T);
-#endif
+		FP4_imul(&XX,&XX,6);					//6X^2
+		FP4_qmul(&XX,&XX,Qx);	               //6X^2.Xs
 
-	FP8_from_FP4s(&a,&T,&Y); // (-Qy,Y-lam*X)
-	FP8_norm(&a);
+		FP4_imul(&ZZ,&ZZ,3*CURVE_B_I);	//3Bz^2 
 
-	//FP2_from_FP(&t,Qx);		// t=Qx
-	FP4_qmul(&T,&lam,Qx);	// T=lam*Qx
-	
+		FP4_qmul(&YZ,&YZ,Qy);	//-4YZ.Ys
+
 #if SEXTIC_TWIST_ZZZ==D_TYPE
-	FP8_from_FP4(&b,&T);	// (lam*Qx,0)
-	FP8_zero(&c);
+		FP4_div_2i(&ZZ);		//6(b/i)z^2
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP4_times_i(&ZZ);
+		FP4_add(&ZZ,&ZZ,&ZZ);  // 6biz^2
+		FP4_times_i(&YZ);
+		FP4_norm(&YZ);	
+#endif
+		FP4_norm(&ZZ);			// 6bi.Z^2 
+
+		FP4_add(&YY,&YY,&YY);	// 2y^2
+		FP4_sub(&ZZ,&ZZ,&YY);	// 
+		FP4_norm(&ZZ);			// 6b.Z^2-2Y^2
+
+		FP8_from_FP4s(&a,&YZ,&ZZ); // -4YZ.Ys | 6b.Z^2-2Y^2 | 6X^2.Xs 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+		FP8_from_FP4(&b,&XX);	
+		FP8_zero(&c);
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP8_zero(&b);
+		FP8_from_FP4H(&c,&XX);
 #endif
 
+		ECP4_dbl(A);				//A.dbl();
+    }
+    else
+    {
+        /* addition */
+
+		FP4_copy(&X1,&(A->x));		//FP4 X1=new FP4(A.getx());    // X1
+		FP4_copy(&Y1,&(A->y));		//FP4 Y1=new FP4(A.gety());    // Y1
+		FP4_copy(&T1,&(A->z));		//FP4 T1=new FP4(A.getz());    // Z1
+			
+		FP4_copy(&T2,&T1);		//FP4 T2=new FP4(A.getz());    // Z1
+
+		FP4_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());    // T1=Z1.Y2 
+		FP4_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());    // T2=Z1.X2
+
+		FP4_sub(&X1,&X1,&T2);		//X1.sub(T2); 
+		FP4_norm(&X1);				//X1.norm();  // X1=X1-Z1.X2
+		FP4_sub(&Y1,&Y1,&T1);		//Y1.sub(T1); 
+		FP4_norm(&Y1);				//Y1.norm();  // Y1=Y1-Z1.Y2
+
+		FP4_copy(&T1,&X1);			//T1.copy(X1);            // T1=X1-Z1.X2
+
+		FP4_qmul(&X1,&X1,Qy);		//X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
 #if SEXTIC_TWIST_ZZZ==M_TYPE
-	FP8_from_FP4H(&c,&T);	// (lam*Qx,0)
-	FP8_zero(&b);
+		FP4_times_i(&X1);
+		FP4_norm(&X1);
 #endif
+
+		FP4_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());       // T1=(X1-Z1.X2).Y2
+
+		FP4_copy(&T2,&Y1);			//T2.copy(Y1);            // T2=Y1-Z1.Y2
+		FP4_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());       // T2=(Y1-Z1.Y2).X2
+		FP4_sub(&T2,&T2,&T1);		//T2.sub(T1); 
+		FP4_norm(&T2);				//T2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+		FP4_qmul(&Y1,&Y1,Qx);		//Y1.pmul(Qx);  
+		FP4_neg(&Y1,&Y1);			//Y1.neg(); 
+		FP4_norm(&Y1);				//Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
+
+		FP8_from_FP4s(&a,&X1,&T2);	// (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+		FP8_from_FP4(&b,&Y1);		//b=new FP4(Y1);
+		FP8_zero(&c);
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP8_zero(&b);
+		FP8_from_FP4H(&c,&Y1);		//b=new FP4(Y1);
+#endif
+		ECP4_add(A,B);			//A.add(B);
+    }
+
 
     FP24_from_FP8s(v,&a,&b,&c);
 }
@@ -78,7 +148,7 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P,ECP *Q)
 {
     BIG x,n,n3;
 	FP Qx,Qy;
-    int i,nb,bt;
+    int i,j,nb,bt;
     ECP4 A;
     FP24 lv;
 
@@ -97,11 +167,11 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P,ECP *Q)
     FP24_one(r);
     nb=BIG_nbits(n3);  // n3
 
-//	j=0;
+	j=0;
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)
     {
-//		j++;
+		j++;
 		FP24_sqr(r,r);
         PAIR_line(&lv,&A,&A,&Qx,&Qy);
         FP24_smul(r,&lv,SEXTIC_TWIST_ZZZ);
@@ -418,6 +488,8 @@ void ZZZ::PAIR_G2mul(ECP4 *P,BIG e)
 
     BIG_rcopy(y,CURVE_Order);
     gs(u,e);
+
+    ECP4_affine(P);
 
     ECP4_copy(&Q[0],P);
     for (i=1; i<8; i++)

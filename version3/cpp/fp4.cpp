@@ -112,6 +112,7 @@ void YYY::FP4_neg(FP4 *w,FP4 *x)
 {
     /* Just one field neg */
     FP2 m,t;
+	FP4_norm(x);
 
     FP2_add(&m,&(x->a),&(x->b));
 //	FP2_norm(&m);
@@ -672,6 +673,19 @@ void YYY::FP4_div_i(FP4 *f)
 	FP2_copy(&(f->a),&v);
 	FP2_copy(&(f->b),&u);
 }
+
+void YYY::FP4_div_2i(FP4 *f)
+{
+	FP2 u,v;
+	FP2_copy(&u,&(f->a));
+	FP2_copy(&v,&(f->b));
+	FP2_div_ip2(&u);
+	FP2_add(&v,&v,&v);
+	FP2_norm(&v);
+	FP2_copy(&(f->a),&v);
+	FP2_copy(&(f->b),&u);
+}
+
 
 #endif
 

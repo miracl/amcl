@@ -332,8 +332,10 @@ void YYY::FP2_mul_ip(FP2 *w)
 void YYY::FP2_div_ip2(FP2 *w)
 {
     FP2 t;
+	FP2_norm(&t);
     FP_add(&(t.a),&(w->a),&(w->b));
     FP_sub(&(t.b),&(w->b),&(w->a));
+	FP2_norm(&t);
 	FP2_copy(w,&t);
 }
 

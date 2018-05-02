@@ -212,6 +212,7 @@ void ECP_ZZZ_rhs(FP_YYY *v,FP_YYY *x)
 
     FP_YYY_mul(&t,v,&t);
     FP_YYY_sub(&t,&t,&one);
+	FP_YYY_norm(&t);
     if (CURVE_A_ZZZ==1) FP_YYY_sub(v,v,&one);
 
     if (CURVE_A_ZZZ==-1)
@@ -220,6 +221,7 @@ void ECP_ZZZ_rhs(FP_YYY *v,FP_YYY *x)
         FP_YYY_norm(v);
         FP_YYY_neg(v,v);
     }
+	FP_YYY_norm(v);
 	FP_YYY_inv(&t,&t);
 	FP_YYY_mul(v,v,&t);
 	FP_YYY_reduce(v);
@@ -364,7 +366,7 @@ int ECP_ZZZ_setx(ECP_ZZZ *P,BIG_XXX x,int s)
 
 void ECP_ZZZ_mapit(ECP_ZZZ *P,octet *W)
 {
-    BIG_XXX q,x;
+    BIG_XXX q,c,x;
     BIG_XXX_fromBytes(x,W->val);
     BIG_XXX_rcopy(q,Modulus_YYY);
     BIG_XXX_mod(x,q);
@@ -377,7 +379,6 @@ void ECP_ZZZ_mapit(ECP_ZZZ *P,octet *W)
         BIG_XXX_norm(x);
     }
 #if PAIRING_FRIENDLY_ZZZ == BLS
-    BIG_XXX c;
     BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
     ECP_ZZZ_mul(P,c);
 #endif

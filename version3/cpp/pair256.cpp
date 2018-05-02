@@ -35,43 +35,114 @@ namespace ZZZ {
 /* Line function */
 static void ZZZ::PAIR_line(FP48 *v,ECP8 *A,ECP8 *B,FP *Qx,FP *Qy)
 {
-	FP2 t;
-	FP4 t4;
-	FP8 T,X,Y,lam;
+	//FP2 t;
+
+	FP8 X1,Y1,T1,T2;
+	FP8 XX,YY,ZZ,YZ;
     FP16 a,b,c;
 
-	ECP8_get(&X,&Y,A);
+	if (A==B)
+    {
+        /* doubling */
+ 		FP8_copy(&XX,&(A->x));	//FP8 XX=new FP8(A.getx());  //X
+		FP8_copy(&YY,&(A->y));	//FP8 YY=new FP8(A.gety());  //Y
+		FP8_copy(&ZZ,&(A->z));	//FP8 ZZ=new FP8(A.getz());  //Z
 
-	ECP8_sadd(A,B,&lam);
 
-	FP8_mul(&T,&lam,&X);    // T=lam*X
-	FP8_sub(&Y,&Y,&T);		// Y=Y-lam*X
-	FP2_from_FP(&t,Qy);
-	FP2_neg(&t,&t);			// t=-Qy
-	FP2_norm(&t);
-	FP4_from_FP2(&t4,&t);
-	FP8_from_FP4(&T,&t4);
+		FP8_copy(&YZ,&YY);		//FP8 YZ=new FP8(YY);        //Y 
+		FP8_mul(&YZ,&YZ,&ZZ);		//YZ.mul(ZZ);                //YZ
+		FP8_sqr(&XX,&XX);		//XX.sqr();	               //X^2
+		FP8_sqr(&YY,&YY);		//YY.sqr();	               //Y^2
+		FP8_sqr(&ZZ,&ZZ);		//ZZ.sqr();			       //Z^2
+			
+		FP8_imul(&YZ,&YZ,4);	//YZ.imul(4);
+		FP8_neg(&YZ,&YZ);		//YZ.neg(); 
+		FP8_norm(&YZ);			//YZ.norm();       //-4YZ
 
-#if SEXTIC_TWIST_ZZZ==M_TYPE
-	FP8_times_i(&T);
-#endif
+		FP8_imul(&XX,&XX,6);					//6X^2
+		//FP2_from_FP(&t,Qx);
+		FP8_tmul(&XX,&XX,Qx);	               //6X^2.Xs
 
-	FP16_from_FP8s(&a,&T,&Y); // (-Qy,Y-lam*X)
-	FP16_norm(&a);
+		FP8_imul(&ZZ,&ZZ,3*CURVE_B_I);	//3Bz^2 
+		//FP2_from_FP(&t,Qy);
+		FP8_tmul(&YZ,&YZ,Qy);	//-4YZ.Ys
 
-	FP2_from_FP(&t,Qx);		// t=Qx
-	//FP4_from_FP2(&t4,&t);
-	FP8_qmul(&T,&lam,&t);	// T=lam*Qx
-	
 #if SEXTIC_TWIST_ZZZ==D_TYPE
-	FP16_from_FP8(&b,&T);	// (lam*Qx,0)
-	FP16_zero(&c);
+		FP8_div_2i(&ZZ);		//6(b/i)z^2
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP8_times_i(&ZZ);
+		FP8_add(&ZZ,&ZZ,&ZZ);  // 6biz^2
+		FP8_times_i(&YZ);
+		FP8_norm(&YZ);	
+#endif
+		FP8_norm(&ZZ);			// 6bi.Z^2 
+
+		FP8_add(&YY,&YY,&YY);	// 2y^2
+		FP8_sub(&ZZ,&ZZ,&YY);	// 
+		FP8_norm(&ZZ);			// 6b.Z^2-2Y^2
+
+		FP16_from_FP8s(&a,&YZ,&ZZ); // -4YZ.Ys | 6b.Z^2-2Y^2 | 6X^2.Xs 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+		FP16_from_FP8(&b,&XX);	
+		FP16_zero(&c);
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP16_zero(&b);
+		FP16_from_FP8H(&c,&XX);
 #endif
 
+		ECP8_dbl(A);				//A.dbl();
+    }
+    else
+    {
+        /* addition */
+
+		FP8_copy(&X1,&(A->x));		//FP8 X1=new FP8(A.getx());    // X1
+		FP8_copy(&Y1,&(A->y));		//FP8 Y1=new FP8(A.gety());    // Y1
+		FP8_copy(&T1,&(A->z));		//FP8 T1=new FP8(A.getz());    // Z1
+			
+		FP8_copy(&T2,&T1);		//FP8 T2=new FP8(A.getz());    // Z1
+
+		FP8_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());    // T1=Z1.Y2 
+		FP8_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());    // T2=Z1.X2
+
+		FP8_sub(&X1,&X1,&T2);		//X1.sub(T2); 
+		FP8_norm(&X1);				//X1.norm();  // X1=X1-Z1.X2
+		FP8_sub(&Y1,&Y1,&T1);		//Y1.sub(T1); 
+		FP8_norm(&Y1);				//Y1.norm();  // Y1=Y1-Z1.Y2
+
+		FP8_copy(&T1,&X1);			//T1.copy(X1);            // T1=X1-Z1.X2
+		//FP2_from_FP(&t,Qy);
+		FP8_tmul(&X1,&X1,Qy);		//X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
 #if SEXTIC_TWIST_ZZZ==M_TYPE
-	FP16_from_FP8H(&c,&T);	// (lam*Qx,0)
-	FP16_zero(&b);
+		FP8_times_i(&X1);
+		FP8_norm(&X1);
 #endif
+
+		FP8_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());       // T1=(X1-Z1.X2).Y2
+
+		FP8_copy(&T2,&Y1);			//T2.copy(Y1);            // T2=Y1-Z1.Y2
+		FP8_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());       // T2=(Y1-Z1.Y2).X2
+		FP8_sub(&T2,&T2,&T1);		//T2.sub(T1); 
+		FP8_norm(&T2);				//T2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+		//FP2_from_FP(&t,Qx);
+		FP8_tmul(&Y1,&Y1,Qx);		//Y1.pmul(Qx);  
+		FP8_neg(&Y1,&Y1);			//Y1.neg(); 
+		FP8_norm(&Y1);				//Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
+
+		FP16_from_FP8s(&a,&X1,&T2);	// (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+		FP16_from_FP8(&b,&Y1);		//b=new FP4(Y1);
+		FP16_zero(&c);
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP16_zero(&b);
+		FP16_from_FP8H(&c,&Y1);		//b=new FP4(Y1);
+#endif
+		ECP8_add(A,B);			// A.add(B);
+    }
+
 
     FP48_from_FP16s(v,&a,&b,&c);
 }
@@ -226,6 +297,7 @@ void ZZZ::PAIR_fexp(FP48 *r)
     FP48_frob(r,&X,8);
 
     FP48_mul(r,&t7);
+
 
 // Ghamman & Fouotsa Method for hard part of fexp - r^e1 . r^p^e2 . r^p^2^e3 ..
 
@@ -530,6 +602,8 @@ void ZZZ::PAIR_G2mul(ECP8 *P,BIG e)
 
     BIG_rcopy(y,CURVE_Order);
     gs(u,e);
+
+    ECP8_affine(P);
 
     ECP8_copy(&Q[0],P);
     for (i=1; i<16; i++)

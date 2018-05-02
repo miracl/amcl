@@ -27,40 +27,109 @@ under the License.
 /* Line function */
 static void PAIR_ZZZ_line(FP24_YYY *v,ECP4_ZZZ *A,ECP4_ZZZ *B,FP_YYY *Qx,FP_YYY *Qy)
 {
-	FP2_YYY t;
-	FP4_YYY T,X,Y,lam;
+	FP4_YYY X1,Y1,T1,T2;
+	FP4_YYY XX,YY,ZZ,YZ;
     FP8_YYY a,b,c;
 
-	ECP4_ZZZ_get(&X,&Y,A);
+	if (A==B)
+    {
+        /* doubling */
+ 		FP4_YYY_copy(&XX,&(A->x));	//FP4_YYY XX=new FP4_YYY(A.getx());  //X
+		FP4_YYY_copy(&YY,&(A->y));	//FP4_YYY YY=new FP4_YYY(A.gety());  //Y
+		FP4_YYY_copy(&ZZ,&(A->z));	//FP4_YYY ZZ=new FP4_YYY(A.getz());  //Z
 
-	ECP4_ZZZ_sadd(A,B,&lam);
 
-	FP4_YYY_mul(&T,&lam,&X);    // T=lam*X
-	FP4_YYY_sub(&Y,&Y,&T);		// Y=Y-lam*X
-	FP2_YYY_from_FP(&t,Qy);
-	FP2_YYY_neg(&t,&t);			// t=-Qy
-	FP2_YYY_norm(&t);
-	FP4_YYY_from_FP2(&T,&t);
+		FP4_YYY_copy(&YZ,&YY);		//FP4_YYY YZ=new FP4_YYY(YY);        //Y 
+		FP4_YYY_mul(&YZ,&YZ,&ZZ);		//YZ.mul(ZZ);                //YZ
+		FP4_YYY_sqr(&XX,&XX);		//XX.sqr();	               //X^2
+		FP4_YYY_sqr(&YY,&YY);		//YY.sqr();	               //Y^2
+		FP4_YYY_sqr(&ZZ,&ZZ);		//ZZ.sqr();			       //Z^2
+			
+		FP4_YYY_imul(&YZ,&YZ,4);	//YZ.imul(4);
+		FP4_YYY_neg(&YZ,&YZ);		//YZ.neg(); 
+		FP4_YYY_norm(&YZ);			//YZ.norm();       //-4YZ
 
-#if SEXTIC_TWIST_ZZZ==M_TYPE
-	FP4_YYY_times_i(&T);
-#endif
+		FP4_YYY_imul(&XX,&XX,6);					//6X^2
+		FP4_YYY_qmul(&XX,&XX,Qx);	               //6X^2.Xs
 
-	FP8_YYY_from_FP4s(&a,&T,&Y); // (-Qy,Y-lam*X)
-	FP8_YYY_norm(&a);
+		FP4_YYY_imul(&ZZ,&ZZ,3*CURVE_B_I_ZZZ);	//3Bz^2 
 
-	//FP2_YYY_from_FP(&t,Qx);		// t=Qx
-	FP4_YYY_qmul(&T,&lam,Qx);	// T=lam*Qx
-	
+		FP4_YYY_qmul(&YZ,&YZ,Qy);	//-4YZ.Ys
+
 #if SEXTIC_TWIST_ZZZ==D_TYPE
-	FP8_YYY_from_FP4(&b,&T);	// (lam*Qx,0)
-	FP8_YYY_zero(&c);
+		FP4_YYY_div_2i(&ZZ);		//6(b/i)z^2
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP4_YYY_times_i(&ZZ);
+		FP4_YYY_add(&ZZ,&ZZ,&ZZ);  // 6biz^2
+		FP4_YYY_times_i(&YZ);
+		FP4_YYY_norm(&YZ);	
+#endif
+		FP4_YYY_norm(&ZZ);			// 6bi.Z^2 
+
+		FP4_YYY_add(&YY,&YY,&YY);	// 2y^2
+		FP4_YYY_sub(&ZZ,&ZZ,&YY);	// 
+		FP4_YYY_norm(&ZZ);			// 6b.Z^2-2Y^2
+
+		FP8_YYY_from_FP4s(&a,&YZ,&ZZ); // -4YZ.Ys | 6b.Z^2-2Y^2 | 6X^2.Xs 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+		FP8_YYY_from_FP4(&b,&XX);	
+		FP8_YYY_zero(&c);
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP8_YYY_zero(&b);
+		FP8_YYY_from_FP4H(&c,&XX);
 #endif
 
+		ECP4_ZZZ_dbl(A);				//A.dbl();
+    }
+    else
+    {
+        /* addition */
+
+		FP4_YYY_copy(&X1,&(A->x));		//FP4_YYY X1=new FP4_YYY(A.getx());    // X1
+		FP4_YYY_copy(&Y1,&(A->y));		//FP4_YYY Y1=new FP4_YYY(A.gety());    // Y1
+		FP4_YYY_copy(&T1,&(A->z));		//FP4_YYY T1=new FP4_YYY(A.getz());    // Z1
+			
+		FP4_YYY_copy(&T2,&T1);		//FP4_YYY T2=new FP4_YYY(A.getz());    // Z1
+
+		FP4_YYY_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());    // T1=Z1.Y2 
+		FP4_YYY_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());    // T2=Z1.X2
+
+		FP4_YYY_sub(&X1,&X1,&T2);		//X1.sub(T2); 
+		FP4_YYY_norm(&X1);				//X1.norm();  // X1=X1-Z1.X2
+		FP4_YYY_sub(&Y1,&Y1,&T1);		//Y1.sub(T1); 
+		FP4_YYY_norm(&Y1);				//Y1.norm();  // Y1=Y1-Z1.Y2
+
+		FP4_YYY_copy(&T1,&X1);			//T1.copy(X1);            // T1=X1-Z1.X2
+
+		FP4_YYY_qmul(&X1,&X1,Qy);		//X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
 #if SEXTIC_TWIST_ZZZ==M_TYPE
-	FP8_YYY_from_FP4H(&c,&T);	// (lam*Qx,0)
-	FP8_YYY_zero(&b);
+		FP4_YYY_times_i(&X1);
+		FP4_YYY_norm(&X1);
 #endif
+
+		FP4_YYY_mul(&T1,&T1,&(B->y));	//T1.mul(B.gety());       // T1=(X1-Z1.X2).Y2
+
+		FP4_YYY_copy(&T2,&Y1);			//T2.copy(Y1);            // T2=Y1-Z1.Y2
+		FP4_YYY_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());       // T2=(Y1-Z1.Y2).X2
+		FP4_YYY_sub(&T2,&T2,&T1);		//T2.sub(T1); 
+		FP4_YYY_norm(&T2);				//T2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+		FP4_YYY_qmul(&Y1,&Y1,Qx);		//Y1.pmul(Qx);  
+		FP4_YYY_neg(&Y1,&Y1);			//Y1.neg(); 
+		FP4_YYY_norm(&Y1);				//Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
+
+		FP8_YYY_from_FP4s(&a,&X1,&T2);	// (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+		FP8_YYY_from_FP4(&b,&Y1);		//b=new FP4(Y1);
+		FP8_YYY_zero(&c);
+#endif
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+		FP8_YYY_zero(&b);
+		FP8_YYY_from_FP4H(&c,&Y1);		//b=new FP4(Y1);
+#endif
+		ECP4_ZZZ_add(A,B);			//A.add(B);
+    }
 
     FP24_YYY_from_FP8s(v,&a,&b,&c);
 }
@@ -70,7 +139,7 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q)
 {
     BIG_XXX x,n,n3;
 	FP_YYY Qx,Qy;
-    int i,nb,bt;
+    int i,j,nb,bt;
     ECP4_ZZZ A;
     FP24_YYY lv;
 
@@ -89,11 +158,11 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q)
     FP24_YYY_one(r);
     nb=BIG_XXX_nbits(n3);  // n3
 
-//	j=0;
+	j=0;
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)
     {
-//		j++;
+		j++;
 		FP24_YYY_sqr(r,r);
         PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
         FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
@@ -410,6 +479,8 @@ void PAIR_ZZZ_G2mul(ECP4_ZZZ *P,BIG_XXX e)
 
     BIG_XXX_rcopy(y,CURVE_Order_ZZZ);
     gs(u,e);
+
+    ECP4_ZZZ_affine(P);
 
     ECP4_ZZZ_copy(&Q[0],P);
     for (i=1; i<8; i++)

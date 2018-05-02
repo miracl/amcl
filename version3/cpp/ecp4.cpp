@@ -29,7 +29,7 @@ using namespace YYY;
 int ZZZ::ECP4_isinf(ECP4 *P)
 {
 	if (P->inf) return 1;
-	P->inf=FP4_iszilch(&(P->x));
+	P->inf=FP4_iszilch(&(P->x)) & FP4_iszilch(&(P->z));
     return P->inf;
 }
 
@@ -39,6 +39,7 @@ void ZZZ::ECP4_copy(ECP4 *P,ECP4 *Q)
     P->inf=Q->inf;
     FP4_copy(&(P->x),&(Q->x));
     FP4_copy(&(P->y),&(Q->y));
+    FP4_copy(&(P->z),&(Q->z));
 }
 
 /* set P to Infinity */
@@ -47,6 +48,7 @@ void ZZZ::ECP4_inf(ECP4 *P)
     P->inf=1;
     FP4_zero(&(P->x));
     FP4_one(&(P->y));
+    FP4_zero(&(P->z));
 }
 
 /* Conditional move Q to P dependant on d */
@@ -54,6 +56,7 @@ static void ECP4_cmove(ZZZ::ECP4 *P,ZZZ::ECP4 *Q,int d)
 {
     FP4_cmove(&(P->x),&(Q->x),d);
     FP4_cmove(&(P->y),&(Q->y),d);
+    FP4_cmove(&(P->z),&(Q->z),d);
     d=~(d-1);
     P->inf^=(P->inf^Q->inf)&d;
 }
@@ -89,22 +92,53 @@ static void ECP4_select(ZZZ::ECP4 *P,ZZZ::ECP4 W[],sign32 b)
     ECP4_cmove(P,&MP,(int)(m&1));
 }
 
+/* Make P affine (so z=1) */
+void ZZZ::ECP4_affine(ECP4 *P)
+{
+    FP4 one,iz;
+    if (ECP4_isinf(P)) return;
+
+    FP4_one(&one);
+    if (FP4_isunity(&(P->z)))
+    {
+        FP4_reduce(&(P->x));
+        FP4_reduce(&(P->y));
+        return;
+    }
+
+    FP4_inv(&iz,&(P->z));
+    FP4_mul(&(P->x),&(P->x),&iz);
+    FP4_mul(&(P->y),&(P->y),&iz);
+
+    FP4_reduce(&(P->x));
+    FP4_reduce(&(P->y));
+    FP4_copy(&(P->z),&one);
+}
+
 /* return 1 if P==Q, else 0 */
 /* SU= 312 */
 int ZZZ::ECP4_equals(ECP4 *P,ECP4 *Q)
 {
+    FP4 a,b;
     if (ECP4_isinf(P) && ECP4_isinf(Q)) return 1;
     if (ECP4_isinf(P) || ECP4_isinf(Q)) return 0;
 
-    if (!FP4_equals(&(P->x),&(Q->x))) return 0;
-    if (!FP4_equals(&(P->y),&(Q->y))) return 0;
+    FP4_mul(&a,&(P->x),&(Q->z));
+    FP4_mul(&b,&(Q->x),&(P->z));
+    if (!FP4_equals(&a,&b)) return 0;
+
+    FP4_mul(&a,&(P->y),&(Q->z));
+    FP4_mul(&b,&(Q->y),&(P->z));
+    if (!FP4_equals(&a,&b)) return 0;
     return 1;
+
 }
 
 /* extract x, y from point P */
 int ZZZ::ECP4_get(FP4 *x,FP4 *y,ECP4 *P)
 {
     if (P->inf) return -1;
+	ECP4_affine(P);
     FP4_copy(y,&(P->y));
     FP4_copy(x,&(P->x));
     return 0;
@@ -254,6 +288,8 @@ int ZZZ::ECP4_set(ECP4 *P,FP4 *x,FP4 *y)
     P->inf=0;
     FP4_copy(&(P->x),x);
     FP4_copy(&(P->y),y);
+
+    FP4_one(&(P->z));
     return 1;
 }
 
@@ -273,7 +309,7 @@ int ZZZ::ECP4_setx(ECP4 *P,FP4 *x)
     P->inf=0;
     FP4_copy(&(P->x),x);
     FP4_copy(&(P->y),&y);
-
+    FP4_one(&(P->z));
     return 1;
 }
 
@@ -287,120 +323,164 @@ void ZZZ::ECP4_neg(ECP4 *P)
     FP4_norm(&(P->y));
 }
 
-
-int ZZZ::ECP4_dbl(ECP4 *P)
-{
-	FP4 lam;
-	return ECP4_sdbl(P,&lam);
-}
-
-int ZZZ::ECP4_add(ECP4 *P,ECP4 *Q)
-{
-	FP4 lam;
-	return ECP4_sadd(P,Q,&lam);
-}
-
 /* R+=R */
 /* return -1 for Infinity, 0 for addition, 1 for doubling */
-int ZZZ::ECP4_sdbl(ECP4 *P,FP4 *lam)
+int ZZZ::ECP4_dbl(ECP4 *P)
 {
-    FP4 t,t2;
+    FP4 t0,t1,t2,t3,iy,x3,y3;
     if (P->inf) return -1;
-	if (FP4_iszilch(&(P->y)))
-	{
-		FP4_zero(&(P->x));
-		P->inf=1;
-		return -1;
-	}
 
-	FP4_sqr(lam,&(P->x));
-	FP4_imul(lam,lam,3);
+	FP4_copy(&iy,&(P->y));		//FP4 iy=new FP4(y);
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP4_times_i(&iy);			//iy.mul_ip(); 
+	FP4_norm(&iy);				//iy.norm();
+#endif
 
-	FP4_add(&t,&(P->y),&(P->y));
-	FP4_norm(&t);
+	FP4_sqr(&t0,&(P->y));			//t0.sqr();   
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP4_times_i(&t0);			//t0.mul_ip(); 
+#endif
 
-	FP4_inv(&t,&t);
-	FP4_mul(lam,lam,&t);
+	FP4_mul(&t1,&iy,&(P->z));	//t1.mul(z);
+	FP4_sqr(&t2,&(P->z));				//t2.sqr();
 
-	FP4_copy(&t,&(P->x));
-	FP4_add(&t2,&(P->x),&(P->x));
-	FP4_sqr(&(P->x),lam);
+	FP4_add(&(P->z),&t0,&t0);	//z.add(t0); 
+	FP4_norm(&(P->z));				//z.norm(); 
+	FP4_add(&(P->z),&(P->z),&(P->z));	//z.add(z); 
+	FP4_add(&(P->z),&(P->z),&(P->z));	//z.add(z); 
+	FP4_norm(&(P->z));			//z.norm();  
 
+	FP4_imul(&t2,&t2,3*CURVE_B_I);	//t2.imul(3*ROM.CURVE_B_I); 
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP4_times_i(&t2);
 	FP4_norm(&t2);
-	FP4_sub(&(P->x),&(P->x),&t2);
+#endif
 
-	FP4_norm(&(P->x));	
-	FP4_sub(&t,&t,&(P->x));
-	FP4_norm(&t);
+	FP4_mul(&x3,&t2,&(P->z));	//x3.mul(z); 
 
-	FP4_mul(&t,&t,lam);
-	FP4_sub(&t,&t,&(P->y));
-	FP4_copy(&(P->y),&t);
+	FP4_add(&y3,&t0,&t2);		//y3.add(t2); 
+	FP4_norm(&y3);				//y3.norm();
+	FP4_mul(&(P->z),&(P->z),&t1);	//z.mul(t1);
 
-	FP4_norm(&(P->y));	
+	FP4_add(&t1,&t2,&t2);		//t1.add(t2); 
+	FP4_add(&t2,&t2,&t1);		//t2.add(t1); 
+	FP4_norm(&t2);				//t2.norm();  
+	FP4_sub(&t0,&t0,&t2);		//t0.sub(t2); 
+	FP4_norm(&t0);				//t0.norm();                           //y^2-9bz^2
+	FP4_mul(&y3,&y3,&t0);		//y3.mul(t0); 
+	FP4_add(&(P->y),&y3,&x3);		//y3.add(x3);                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+
+	FP4_mul(&t1,&(P->x),&iy);		//t1.mul(iy);						//
+
+	FP4_norm(&t0);			//x.norm(); 
+	FP4_mul(&(P->x),&t0,&t1);	//x.mul(t1); 
+	FP4_add(&(P->x),&(P->x),&(P->x));	//x.add(x);       //(y^2-9bz^2)xy2
+
+	FP4_norm(&(P->x));			//x.norm(); 
+
+	FP4_norm(&(P->y));			//y.norm();
 
     return 1;
 }
 
 /* Set P+=Q */
 
-int ZZZ::ECP4_sadd(ECP4 *P,ECP4 *Q,FP4 *lam)
+int ZZZ::ECP4_add(ECP4 *P,ECP4 *Q)
 {
-    FP4 t,t2;
+    FP4 t0,t1,t2,t3,t4,x3,y3,z3;
+	int b3=3*CURVE_B_I;
     if (Q->inf) return 0;
     if (P->inf)
     {
         ECP4_copy(P,Q);
-		FP4_zero(lam);
         return 0;
     }
 
-	if (P==Q)
-	{
-		ECP4_sdbl(P,lam);
-		return 1;
-	}
+	FP4_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
+	FP4_mul(&t1,&(P->y),&(Q->y));	//t1.mul(Q.y);		 // y.Q.y
 
-	if (FP4_equals(&(P->x),&(Q->x)))
-	{
-		if (FP4_equals(&(P->y),&(Q->y)))
-		{
-			ECP4_copy(P,Q);
-			ECP4_sdbl(P,lam);
-			return 1;
-		}
-		else
-		{
-			FP4_zero(&(P->y));
-			FP4_zero(&(P->x));
-			P->inf=1;
-			return -1;
-		}
-	}
+	FP4_mul(&t2,&(P->z),&(Q->z));	//t2.mul(Q.z);
+	FP4_add(&t3,&(P->x),&(P->y));	//t3.add(y); 
+	FP4_norm(&t3);				//t3.norm();          //t3=X1+Y1         
+	FP4_add(&t4,&(Q->x),&(Q->y));	//t4.add(Q.y); 
+	FP4_norm(&t4);				//t4.norm();			//t4=X2+Y2
+	FP4_mul(&t3,&t3,&t4);		//t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
+	FP4_add(&t4,&t0,&t1);		//t4.add(t1);		//t4=X1.X2+Y1.Y2
 
-	FP4_sub(lam,&(P->y),&(Q->y));
-	FP4_norm(lam);
-	FP4_sub(&t2,&(P->x),&(Q->x));
-	FP4_norm(&t2);
-	FP4_inv(&t2,&t2);
-	FP4_mul(lam,lam,&t2);
+	FP4_sub(&t3,&t3,&t4);		//t3.sub(t4); 
+	FP4_norm(&t3);				//t3.norm(); 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP4_times_i(&t3);			//t3.mul_ip();  
+	FP4_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+#endif
+                   
+	FP4_add(&t4,&(P->y),&(P->z));	//t4.add(z); 
+	FP4_norm(&t4);				//t4.norm();			//t4=Y1+Z1
 
-	FP4_add(&(P->x),&(P->x),&(Q->x));
-	FP4_sqr(&t,lam);
+	FP4_add(&x3,&(Q->y),&(Q->z));	//x3.add(Q.z); 
+	FP4_norm(&x3);				//x3.norm();			//x3=Y2+Z2
 
-	FP4_norm(&(P->x));
-	FP4_sub(&t,&t,&(P->x));
+	FP4_mul(&t4,&t4,&x3);		//t4.mul(x3);						//t4=(Y1+Z1)(Y2+Z2)
 
-	FP4_copy(&(P->x),&t);
-	FP4_norm(&(P->x));
+	FP4_add(&x3,&t1,&t2);		//x3.add(t2);						//X3=Y1.Y2+Z1.Z2
+	
+	FP4_sub(&t4,&t4,&x3);		//t4.sub(x3); 
+	FP4_norm(&t4);				//t4.norm(); 
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP4_times_i(&t4);			//t4.mul_ip(); 
+	FP4_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+#endif
 
-	FP4_sub(&(P->y),&(Q->x),&(P->x));
-	FP4_norm(&(P->y));
+	FP4_add(&x3,&(P->x),&(P->z));	//x3.add(z); 
+	FP4_norm(&x3);				//x3.norm();	// x3=X1+Z1
+		
+	FP4_add(&y3,&(Q->x),&(Q->z));	//y3.add(Q.z); 
+	FP4_norm(&y3);				//y3.norm();				// y3=X2+Z2
+	FP4_mul(&x3,&x3,&y3);		//x3.mul(y3);							// x3=(X1+Z1)(X2+Z2)
 
-	FP4_mul(&(P->y),&(P->y),lam);
-	FP4_sub(&(P->y),&(P->y),&(Q->y));
+	FP4_add(&y3,&t0,&t2);		//y3.add(t2);							// y3=X1.X2+Z1+Z2
+	FP4_sub(&y3,&x3,&y3);		//y3.rsub(x3); 
+	FP4_norm(&y3);				//y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
+#if SEXTIC_TWIST_ZZZ==D_TYPE
+	FP4_times_i(&t0);			//t0.mul_ip(); 
+	FP4_norm(&t0);				//t0.norm(); // x.Q.x
+	FP4_times_i(&t1);			//t1.mul_ip(); 
+	FP4_norm(&t1);				//t1.norm(); // y.Q.y
+#endif
 
-	FP4_norm(&(P->y));
+	FP4_add(&x3,&t0,&t0);		//x3.add(t0); 
+	FP4_add(&t0,&t0,&x3);		//t0.add(x3); 
+	FP4_norm(&t0);				//t0.norm();
+	FP4_imul(&t2,&t2,b3);		//t2.imul(b); 	
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP4_times_i(&t2);
+#endif
+
+	FP4_add(&z3,&t1,&t2);		//z3.add(t2); 
+	FP4_norm(&z3);				//z3.norm();
+	FP4_sub(&t1,&t1,&t2);		//t1.sub(t2); 
+	FP4_norm(&t1);				//t1.norm(); 
+	FP4_imul(&y3,&y3,b3);		//y3.imul(b); 
+#if SEXTIC_TWIST_ZZZ==M_TYPE
+	FP4_times_i(&y3);
+	FP4_norm(&y3);
+#endif
+
+	FP4_mul(&x3,&y3,&t4);		//x3.mul(t4); 
+
+	FP4_mul(&t2,&t3,&t1);		//t2.mul(t1); 
+	FP4_sub(&(P->x),&t2,&x3);		//x3.rsub(t2);
+	FP4_mul(&y3,&y3,&t0);		//y3.mul(t0); 
+	FP4_mul(&t1,&t1,&z3);		//t1.mul(z3); 
+	FP4_add(&(P->y),&y3,&t1);		//y3.add(t1);
+	FP4_mul(&t0,&t0,&t3);		//t0.mul(t3); 
+	FP4_mul(&z3,&z3,&t4);		//z3.mul(t4); 
+	FP4_add(&(P->z),&z3,&t0);		//z3.add(t0);
+
+
+	FP4_norm(&(P->x));			//x.norm(); 
+	FP4_norm(&(P->y));			//y.norm();
+	FP4_norm(&(P->z));			//z.norm();
 
     return 0;
 }
@@ -419,6 +499,7 @@ void ZZZ::ECP4_reduce(ECP4 *P)
 {
 	FP4_reduce(&(P->x));
 	FP4_reduce(&(P->y));
+	FP4_reduce(&(P->z));
 }
 
 /* P*=e */
@@ -432,6 +513,7 @@ void ZZZ::ECP4_mul(ECP4 *P,BIG e)
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
 
     if (ECP4_isinf(P)) return;
+    ECP4_affine(P);
 
     /* precompute table */
 
@@ -481,7 +563,7 @@ void ZZZ::ECP4_mul(ECP4 *P,BIG e)
         ECP4_add(P,&Q);
     }
     ECP4_sub(P,&C); /* apply correction */
-	ECP4_reduce(P);
+	ECP4_affine(P);
 }
 
 // calculate frobenius constants 
@@ -519,10 +601,14 @@ void ZZZ::ECP4_frob_constants(FP2 F[3])
 void ZZZ::ECP4_frob(ECP4 *P,FP2 F[3],int n)
 {
 	int i;
-	FP4 X,Y;
+	FP4 X,Y,Z;
     if (P->inf) return;
 
-	ECP4_get(&X,&Y,P);		// F=(1+i)^(p-7)/12
+	//ECP4_get(&X,&Y,P);		// F=(1+i)^(p-7)/12
+
+	FP4_copy(&X,&(P->x));
+	FP4_copy(&Y,&(P->y));
+	FP4_copy(&Z,&(P->z));
 
 	for (i=0;i<n;i++)
 	{
@@ -532,9 +618,16 @@ void ZZZ::ECP4_frob(ECP4 *P,FP2 F[3],int n)
 		FP4_frob(&Y,&F[2]);		// Y^p
 		FP4_pmul(&Y,&Y,&F[1]);
 		FP4_times_i(&Y);		// Y.p.(1+i)^(p-3)/4.(1+i)^(2/4) = Y^p.(1+i)^(p-1)/4	// (1+i)^-(p+1)/4 .(1+i)^2/4 = Y^p.(1+i)^-(p-1)/4
+
+		FP4_frob(&Z,&F[2]);
 	}
 
-	ECP4_set(P,&X,&Y);
+	FP4_copy(&(P->x),&X);
+	FP4_copy(&(P->y),&Y);
+	FP4_copy(&(P->z),&Z);
+	
+
+	//ECP4_set(P,&X,&Y);
 }
 
 /* Side channel attack secure */
@@ -555,8 +648,10 @@ void ZZZ::ECP4_mul8(ECP4 *P,ECP4 Q[8],BIG u[8])
 	ECP4_frob_constants(X);
 
     for (i=0; i<8; i++)
+	{
+        ECP4_affine(&Q[i]);
         BIG_copy(t[i],u[i]);
-
+	}
 // Precomputed table
     ECP4_copy(&T1[0],&Q[0]); // Q[0]
     ECP4_copy(&T1[1],&T1[0]);
@@ -663,7 +758,7 @@ void ZZZ::ECP4_mul8(ECP4 *P,ECP4 Q[8],BIG u[8])
 	ECP4_sub(&W,&Q[4]);
 	ECP4_cmove(P,&W,pb2);
 
-	ECP4_reduce(P);
+	ECP4_affine(P);
 }
 /*
 void ZZZ::ECP4_mul8(ECP4 *P,ECP4 Q[8],BIG u[8])
@@ -803,7 +898,7 @@ void ZZZ::ECP4_mapit(ECP4 *Q,octet *W)
         FP2_from_BIGs(&T,one,hv);  /*******/
 		FP4_from_FP2(&X4,&T);
         if (ECP4_setx(Q,&X4)) break;
-        BIG_inc(hv,1); BIG_norm(hv);
+        BIG_inc(hv,1);
     }
 
 	ECP4_frob_constants(X);
@@ -847,7 +942,7 @@ void ZZZ::ECP4_mapit(ECP4 *Q,octet *W)
 	ECP4_add(Q,&x2Q);
 	ECP4_add(Q,&xQ);
 
-	ECP4_reduce(Q);
+	ECP4_affine(Q);
 
 }
 
