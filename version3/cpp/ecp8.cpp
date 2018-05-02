@@ -20,7 +20,7 @@ under the License.
 /* AMCL Weierstrass elliptic curve functions over FP2 */
 
 //#include <iostream>
-#include "ECP8_ZZZ.h"
+#include "ecp8_ZZZ.h"
 
 using namespace std;
 using namespace XXX;
