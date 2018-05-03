@@ -60,7 +60,7 @@ var FP12 = function(ctx) {
         /* test x==1 ? */
         isunity: function() {
             var one = new ctx.FP4(1);
-            return (this.a.equals(one) && this.b.iszilch() && this.b.iszilch());
+            return (this.a.equals(one) && this.b.iszilch() && this.c.iszilch());
         },
 
 
