@@ -132,23 +132,64 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 		replace(fpath+"ECP.java","@AK@","32")
 
 	if pf != "NOT" :
-		os.system(copytext+"ECP2.java "+fpath+"ECP2.java")
 		os.system(copytext+"FP2.java "+fpath+"FP2.java")
 		os.system(copytext+"FP4.java "+fpath+"FP4.java")
-		os.system(copytext+"FP12.java "+fpath+"FP12.java")
-		os.system(copytext+"PAIR.java "+fpath+"PAIR.java")
-		os.system(copytext+"MPIN.java "+fpath+"MPIN.java")
-		os.system(copytext+"TestMPIN.java "+fpathTest+"TestMPIN.java")	#ms
-		os.system(copytext+"TesttimeMPIN.java "+fpathTest+"TesttimeMPIN.java")	#ms
 
 		replace(fpath+"FP2.java","XXX",tc)
 		replace(fpath+"FP4.java","XXX",tc)
-		replace(fpath+"FP12.java","XXX",tc)
-		replace(fpath+"ECP2.java","XXX",tc)
-		replace(fpath+"PAIR.java","XXX",tc)
-		replace(fpath+"MPIN.java","XXX",tc)
-		replace(fpathTest+"TestMPIN.java","XXX",tc)  #ms
-		replace(fpathTest+"TesttimeMPIN.java","XXX",tc)  #ms
+
+		if cs == "128" :
+
+			os.system(copytext+"ECP2.java "+fpath+"ECP2.java")
+			os.system(copytext+"FP12.java "+fpath+"FP12.java")
+			os.system(copytext+"PAIR.java "+fpath+"PAIR.java")
+			os.system(copytext+"MPIN.java "+fpath+"MPIN.java")
+			os.system(copytext+"TestMPIN.java "+fpathTest+"TestMPIN.java")	#ms
+			os.system(copytext+"TesttimeMPIN.java "+fpathTest+"TesttimeMPIN.java")	#ms
+
+			replace(fpath+"FP12.java","XXX",tc)
+			replace(fpath+"ECP2.java","XXX",tc)
+			replace(fpath+"PAIR.java","XXX",tc)
+			replace(fpath+"MPIN.java","XXX",tc)
+			replace(fpathTest+"TestMPIN.java","XXX",tc)  #ms
+			replace(fpathTest+"TesttimeMPIN.java","XXX",tc)  #ms
+
+		if cs == "192" :
+			os.system(copytext+"ECP4.java "+fpath+"ECP4.java")
+			os.system(copytext+"FP8.java "+fpath+"FP8.java")
+			os.system(copytext+"FP24.java "+fpath+"FP24.java")
+			os.system(copytext+"PAIR192.java "+fpath+"PAIR192.java")
+			os.system(copytext+"MPIN192.java "+fpath+"MPIN192.java")
+			os.system(copytext+"TestMPIN192.java "+fpathTest+"TestMPIN192.java")	#ms
+			os.system(copytext+"TesttimeMPIN192.java "+fpathTest+"TesttimeMPIN192.java")	#ms
+
+			replace(fpath+"FP8.java","XXX",tc)
+			replace(fpath+"FP24.java","XXX",tc)
+			replace(fpath+"ECP4.java","XXX",tc)
+			replace(fpath+"PAIR192.java","XXX",tc)
+			replace(fpath+"MPIN192.java","XXX",tc)
+			replace(fpathTest+"TestMPIN192.java","XXX",tc)  #ms
+			replace(fpathTest+"TesttimeMPIN192.java","XXX",tc)  #ms
+
+		if cs == "256" :
+			os.system(copytext+"FP8.java "+fpath+"FP8.java")
+			os.system(copytext+"ECP8.java "+fpath+"ECP8.java")
+			os.system(copytext+"FP16.java "+fpath+"FP16.java")
+			os.system(copytext+"FP48.java "+fpath+"FP48.java")
+			os.system(copytext+"PAIR256.java "+fpath+"PAIR256.java")
+			os.system(copytext+"MPIN256.java "+fpath+"MPIN256.java")
+			os.system(copytext+"TestMPIN256.java "+fpathTest+"TestMPIN256.java")	#ms
+			os.system(copytext+"TesttimeMPIN256.java "+fpathTest+"TesttimeMPIN256.java")	#ms
+
+			replace(fpath+"FP8.java","XXX",tc)
+			replace(fpath+"FP16.java","XXX",tc)
+			replace(fpath+"FP48.java","XXX",tc)
+			replace(fpath+"ECP8.java","XXX",tc)
+			replace(fpath+"PAIR256.java","XXX",tc)
+			replace(fpath+"MPIN256.java","XXX",tc)
+			replace(fpathTest+"TestMPIN256.java","XXX",tc)  #ms
+			replace(fpathTest+"TesttimeMPIN256.java","XXX",tc)  #ms
+
 
 
 os.system("mkdir " + amclpath)
@@ -185,15 +226,17 @@ print("20. BLS381")
 print("21. FP256BN")
 print("22. FP512BN")
 print("23. BLS461\n")
+print("24. BLS24")
+print("25. BLS48\n")
 
 print("RSA")
-print("24. RSA2048")
-print("25. RSA3072")
-print("26. RSA4096")
+print("26. RSA2048")
+print("27. RSA3072")
+print("28. RSA4096")
 
 selection=[]
 ptr=0
-max=27
+max=29
 
 curve_selected=False
 pfcurve_selected=False
@@ -304,22 +347,31 @@ while ptr<max:
 		curveset("BLS461","58","60","461","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 
+	if x==24:
+		curveset("BLS24","60","56","479","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","192")
+		pfcurve_selected=True
+
+	if x==25:
+		curveset("BLS48","70","58","556","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","256")
+		pfcurve_selected=True
+
+
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
 # The RSA name reflects the modulus size, which is a 2^m multiplier
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==24:
+	if x==26:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("RSA2048","128","58","2")
 		#rsaset("RSA2048","64","60","4")
 		#rsaset("RSA2048","32","56","8")
 		rsa_selected=True
-	if x==25:
+	if x==27:
 		rsaset("RSA3072","48","56","8")
 		rsa_selected=True
-	if x==26:
+	if x==28:
 		#rsaset("RSA4096","32","56","16")
 		rsaset("RSA4096","64","60","8")
 		rsa_selected=True

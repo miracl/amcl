@@ -380,10 +380,16 @@ public final class FP {
 /* this=1/this mod Modulus */
 	public void inverse()
 	{
+/*
 		BIG r=redc();
 		r.invmodp(p);
 		x.copy(r);
 		nres();
+*/
+		BIG m2=new BIG(p);
+		m2.dec(2); m2.norm();
+		copy(pow(m2));
+
 	}
 
 /* return TRUE if this==a */
@@ -402,7 +408,43 @@ public final class FP {
 		XES=1;
 	}
 
-/* return this^e mod Modulus */
+	public FP pow(BIG e)
+	{
+		byte[] w=new byte[1+(BIG.NLEN*BIG.BASEBITS+3)/4];
+		FP [] tb=new FP[16];
+		BIG t=new BIG(e);
+		t.norm();
+		int nb=1+(t.nbits()+3)/4;
+
+		for (int i=0;i<nb;i++)
+		{
+			int lsbs=t.lastbits(4);
+			t.dec(lsbs);
+			t.norm();
+			w[i]=(byte)lsbs;
+			t.fshr(4);
+		}
+		tb[0]=new FP(1);
+		tb[1]=new FP(this);
+		for (int i=2;i<16;i++)
+		{
+			tb[i]=new FP(tb[i-1]);
+			tb[i].mul(this);
+		}
+		FP r=new FP(tb[w[nb-1]]);
+		for (int i=nb-2;i>=0;i--)
+		{
+			r.sqr();
+			r.sqr();
+			r.sqr();
+			r.sqr();
+			r.mul(tb[w[i]]);
+		}
+		r.reduce();
+		return r;
+	}
+
+/* return this^e mod Modulus 
 	public FP pow(BIG e)
 	{
 		int bt;
@@ -420,7 +462,7 @@ public final class FP {
 		}
 		r.x.mod(p);
 		return r;
-	}
+	} */
 
 /* return sqrt(this) mod Modulus */
 	public FP sqrt()
