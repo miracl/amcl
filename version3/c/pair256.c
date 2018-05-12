@@ -150,7 +150,7 @@ void PAIR_ZZZ_ate(FP48_YYY *r,ECP8_ZZZ *P,ECP_ZZZ *Q)
 
     BIG_XXX_copy(n,x);
 
-    BIG_XXX_norm(n);
+    //BIG_XXX_norm(n);
 	BIG_XXX_pmul(n3,n,3);
 	BIG_XXX_norm(n3);
 
@@ -207,7 +207,7 @@ void PAIR_ZZZ_double_ate(FP48_YYY *r,ECP8_ZZZ *P,ECP_ZZZ *Q,ECP8_ZZZ *R,ECP_ZZZ 
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
     BIG_XXX_copy(n,x);
 
-    BIG_XXX_norm(n);
+    //BIG_XXX_norm(n);
 	BIG_XXX_pmul(n3,n,3);
 	BIG_XXX_norm(n3);
 

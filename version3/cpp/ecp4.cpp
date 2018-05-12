@@ -333,7 +333,7 @@ int ZZZ::ECP4_dbl(ECP4 *P)
 	FP4_copy(&iy,&(P->y));		//FP4 iy=new FP4(y);
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP4_times_i(&iy);			//iy.mul_ip(); 
-	FP4_norm(&iy);				//iy.norm();
+	//FP4_norm(&iy);				//iy.norm();
 #endif
 
 	FP4_sqr(&t0,&(P->y));			//t0.sqr();   
@@ -353,7 +353,7 @@ int ZZZ::ECP4_dbl(ECP4 *P)
 	FP4_imul(&t2,&t2,3*CURVE_B_I);	//t2.imul(3*ROM.CURVE_B_I); 
 #if SEXTIC_TWIST_ZZZ==M_TYPE
 	FP4_times_i(&t2);
-	FP4_norm(&t2);
+	//FP4_norm(&t2);
 #endif
 
 	FP4_mul(&x3,&t2,&(P->z));	//x3.mul(z); 
@@ -411,7 +411,7 @@ int ZZZ::ECP4_add(ECP4 *P,ECP4 *Q)
 	FP4_norm(&t3);				//t3.norm(); 
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP4_times_i(&t3);			//t3.mul_ip();  
-	FP4_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+	//FP4_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 #endif
                    
 	FP4_add(&t4,&(P->y),&(P->z));	//t4.add(z); 
@@ -428,7 +428,7 @@ int ZZZ::ECP4_add(ECP4 *P,ECP4 *Q)
 	FP4_norm(&t4);				//t4.norm(); 
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP4_times_i(&t4);			//t4.mul_ip(); 
-	FP4_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+	//FP4_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 #endif
 
 	FP4_add(&x3,&(P->x),&(P->z));	//x3.add(z); 
@@ -443,9 +443,9 @@ int ZZZ::ECP4_add(ECP4 *P,ECP4 *Q)
 	FP4_norm(&y3);				//y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP4_times_i(&t0);			//t0.mul_ip(); 
-	FP4_norm(&t0);				//t0.norm(); // x.Q.x
+	//FP4_norm(&t0);				//t0.norm(); // x.Q.x
 	FP4_times_i(&t1);			//t1.mul_ip(); 
-	FP4_norm(&t1);				//t1.norm(); // y.Q.y
+	//FP4_norm(&t1);				//t1.norm(); // y.Q.y
 #endif
 
 	FP4_add(&x3,&t0,&t0);		//x3.add(t0); 
@@ -463,7 +463,7 @@ int ZZZ::ECP4_add(ECP4 *P,ECP4 *Q)
 	FP4_imul(&y3,&y3,b3);		//y3.imul(b); 
 #if SEXTIC_TWIST_ZZZ==M_TYPE
 	FP4_times_i(&y3);
-	FP4_norm(&y3);
+	//FP4_norm(&y3);
 #endif
 
 	FP4_mul(&x3,&y3,&t4);		//x3.mul(t4); 

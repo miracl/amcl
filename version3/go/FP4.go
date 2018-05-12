@@ -530,7 +530,7 @@ func (F *FP4) div_2i() {
 	u:=NewFP2copy(F.a)
 	v:=NewFP2copy(F.b)
 	u.div_ip2()
-	v.add(v)
+	v.add(v); v.norm()
 	F.a.copy(v)
 	F.b.copy(u)
 }

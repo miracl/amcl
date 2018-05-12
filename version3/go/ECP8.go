@@ -339,7 +339,7 @@ func (E *ECP8) dbl() int {
 
 	iy:=NewFP8copy(E.y)
 	if SEXTIC_TWIST == D_TYPE {
-		iy.times_i(); iy.norm()
+		iy.times_i(); //iy.norm()
 	}
 
 	t0:=NewFP8copy(E.y)                  //***** Change 
@@ -361,7 +361,7 @@ func (E *ECP8) dbl() int {
 	t2.imul(3*CURVE_B_I) 
 	if SEXTIC_TWIST == M_TYPE {
 		t2.times_i()
-		t2.norm()
+		//t2.norm()
 	}
 	x3:=NewFP8copy(t2)
 	x3.mul(E.z) 
@@ -407,7 +407,7 @@ func (E *ECP8) Add(Q *ECP8) int {
 
 	t3.sub(t4); t3.norm(); 
 	if SEXTIC_TWIST == D_TYPE {
-		t3.times_i();  t3.norm()         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+		t3.times_i();  //t3.norm()         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 	}
 	t4.copy(E.y);                    
 	t4.add(E.z); t4.norm()			//t4=Y1+Z1
@@ -420,7 +420,7 @@ func (E *ECP8) Add(Q *ECP8) int {
 	
 	t4.sub(x3); t4.norm();
 	if SEXTIC_TWIST == D_TYPE {	
-		t4.times_i(); t4.norm()          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+		t4.times_i(); //t4.norm()          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 	}
 	x3.copy(E.x); x3.add(E.z); x3.norm()	// x3=X1+Z1
 	y3:=NewFP8copy(Q.x)				
@@ -431,8 +431,8 @@ func (E *ECP8) Add(Q *ECP8) int {
 	y3.rsub(x3); y3.norm()				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
 	if SEXTIC_TWIST == D_TYPE {
-		t0.times_i(); t0.norm() // x.Q.x
-		t1.times_i(); t1.norm() // y.Q.y
+		t0.times_i(); //t0.norm() // x.Q.x
+		t1.times_i(); //t1.norm() // y.Q.y
 	}
 	x3.copy(t0); x3.add(t0) 
 	t0.add(x3); t0.norm()
@@ -445,7 +445,7 @@ func (E *ECP8) Add(Q *ECP8) int {
 	y3.imul(b) 
 	if SEXTIC_TWIST == M_TYPE {
 		y3.times_i()
-		y3.norm()
+		//y3.norm()
 	}
 	x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2)
 	y3.mul(t0); t1.mul(z3); y3.add(t1)

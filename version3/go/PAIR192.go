@@ -123,7 +123,7 @@ func Ate(P *ECP4,Q *ECP) *FP24 {
 	n:=NewBIGcopy(x)
 	var lv *FP24
 	
-	n.copy(x); n.norm()
+	//n.copy(x); n.norm()
 
 	n3:=NewBIGcopy(n);
 	n3.pmul(3);
@@ -168,7 +168,7 @@ func Ate2(P *ECP4,Q *ECP,R *ECP4,S *ECP) *FP24 {
 	n:=NewBIGcopy(x)
 	var lv *FP24
 
-	n.copy(x); n.norm()
+	//n.copy(x); n.norm()
 
 	n3:=NewBIGcopy(n);
 	n3.pmul(3);

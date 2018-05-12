@@ -767,11 +767,6 @@ void BIG_XXX_monty(BIG_XXX a,BIG_XXX md,chunk MC,DBIG_XXX d)
 
 #endif
 
-#ifdef DEBUG_NORM
-    a[MPV_XXX]=1;
-    a[MNV_XXX]=0;
-#endif
-
 #else
     int j;
     chunk m,carry;
@@ -792,6 +787,12 @@ void BIG_XXX_monty(BIG_XXX a,BIG_XXX md,chunk MC,DBIG_XXX d)
     BIG_XXX_norm(a);
 
 #endif
+
+#ifdef DEBUG_NORM
+    a[MPV_XXX]=1;
+    a[MNV_XXX]=0;
+#endif
+
 }
 
 /* General shift left of a by n bits */

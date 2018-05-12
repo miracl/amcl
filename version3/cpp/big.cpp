@@ -747,9 +747,6 @@ void XXX::BIG_monty(BIG a,BIG md,chunk MC,DBIG d)
 
 #endif
 
-#ifdef DEBUG_NORM
-	a[MPV_XXX]=1;  a[MNV_XXX]=0;
-#endif
 
 #else
     int j;
@@ -771,6 +768,12 @@ void XXX::BIG_monty(BIG a,BIG md,chunk MC,DBIG d)
     BIG_norm(a);
 
 #endif
+
+#ifdef DEBUG_NORM
+	a[MPV_XXX]=1;  a[MNV_XXX]=0;
+#endif
+
+
 }
 
 /* General shift left of a by n bits */

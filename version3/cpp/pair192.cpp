@@ -156,7 +156,7 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P,ECP *Q)
 
     BIG_copy(n,x);
 
-    BIG_norm(n);
+    //BIG_norm(n);
 	BIG_pmul(n3,n,3);
 	BIG_norm(n3);
 
@@ -213,7 +213,7 @@ void ZZZ::PAIR_double_ate(FP24 *r,ECP4 *P,ECP *Q,ECP4 *R,ECP *S)
     BIG_rcopy(x,CURVE_Bnx);
     BIG_copy(n,x);
 
-    BIG_norm(n);
+    //BIG_norm(n);
 	BIG_pmul(n3,n,3);
 	BIG_norm(n3);
 
