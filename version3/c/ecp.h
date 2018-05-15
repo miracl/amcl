@@ -103,7 +103,7 @@ extern const BIG_XXX CURVE_BB_ZZZ[4][4]; /**< BN curve constant for GS decomposi
 
 typedef struct
 {
-    int inf; /**< Infinity Flag - not needed for Edwards representation */
+//    int inf; /**< Infinity Flag - not needed for Edwards representation */
 
     FP_YYY x; /**< x-coordinate of point */
 #if CURVETYPE_ZZZ!=MONTGOMERY

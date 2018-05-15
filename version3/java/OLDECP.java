@@ -49,18 +49,18 @@ public final class ECP {
 	private FP x;
 	private FP y;
 	private FP z;
-//	private boolean INF;
+	private boolean INF;
 
 /* Constructor - set to O */
 	public ECP() {
-		//INF=true;
+		INF=true;
 		x=new FP(0);
 		y=new FP(1);
 		z=new FP(0);
 	}
 /* test for O point-at-infinity */
 	public boolean is_infinity() {
-//		if (INF) return true;                            // Edits made
+		if (INF) return true;                            // Edits made
 		if (CURVETYPE==EDWARDS)
 		{
 			return (x.iszilch() && y.equals(z));
@@ -83,12 +83,12 @@ public final class ECP {
 		z.cswap(Q.z,d);
 	//	if (CURVETYPE!=EDWARDS)
 	//	{
-	//		boolean bd;
-	//		if (d==0) bd=false;
-	//		else bd=true;
-	//		bd=bd&(INF^Q.INF);
-	//		INF^=bd;
-	//		Q.INF^=bd;
+			boolean bd;
+			if (d==0) bd=false;
+			else bd=true;
+			bd=bd&(INF^Q.INF);
+			INF^=bd;
+			Q.INF^=bd;
 	//	}
 	}
 
@@ -100,10 +100,10 @@ public final class ECP {
 		z.cmove(Q.z,d);
 	//	if (CURVETYPE!=EDWARDS)
 	//	{
-	//		boolean bd;
-	//		if (d==0) bd=false;
-	//		else bd=true;
-	//		INF^=(INF^Q.INF)&bd;
+			boolean bd;
+			if (d==0) bd=false;
+			else bd=true;
+			INF^=(INF^Q.INF)&bd;
 	//	}
 	}
 
@@ -139,8 +139,8 @@ public final class ECP {
 
 /* Test P == Q */
 	public boolean equals(ECP Q) {
-//		if (is_infinity() && Q.is_infinity()) return true;
-//		if (is_infinity() || Q.is_infinity()) return false;
+		if (is_infinity() && Q.is_infinity()) return true;
+		if (is_infinity() || Q.is_infinity()) return false;
 
 		FP a=new FP(0);                                        // Edits made
 		FP b=new FP(0);
@@ -162,7 +162,7 @@ public final class ECP {
 		x.copy(P.x);
 		if (CURVETYPE!=MONTGOMERY) y.copy(P.y);
 		z.copy(P.z);
-		//INF=P.INF;
+		INF=P.INF;
 	}
 /* this=-this */
 	public void neg() {
@@ -179,7 +179,7 @@ public final class ECP {
 	}
 /* set this=O */
 	public void inf() {
-//		INF=true;
+		INF=true;
 		x.zero();
 		if (CURVETYPE!=MONTGOMERY) y.one();
 		if (CURVETYPE!=EDWARDS) z.zero();
@@ -241,17 +241,15 @@ public final class ECP {
 
 		if (CURVETYPE==MONTGOMERY)
 		{
-			if (rhs.jacobi()!=1) inf();
-			//if (rhs.jacobi()==1) INF=false;
-			//else inf();
+			if (rhs.jacobi()==1) INF=false;
+			else inf();
 		}
 		else
 		{
 			FP y2=new FP(y);
 			y2.sqr();
-			if (!y2.equals(rhs)) inf();
-			//if (y2.equals(rhs)) INF=false;
-			//else inf();
+			if (y2.equals(rhs)) INF=false;
+			else inf();
 		}
 	}
 /* set (x,y) from BIG and a bit */
@@ -265,7 +263,7 @@ public final class ECP {
 			FP ny=rhs.sqrt();
 			if (ny.redc().parity()!=s) ny.neg();
 			y.copy(ny);
-			//INF=false;
+			INF=false;
 		}
 		else inf();
 	}
@@ -279,14 +277,14 @@ public final class ECP {
 		if (rhs.jacobi()==1)
 		{
 			if (CURVETYPE!=MONTGOMERY) y.copy(rhs.sqrt());
-			//INF=false;
+			INF=false;
 		}
-		else inf(); //INF=true;
+		else INF=true;
 	}
 
 /* set to affine - from (x,y,z) to (x,y) */
 	public void affine() {
-		if (is_infinity()) return;	// 
+		if (is_infinity()) return;
 		FP one=new FP(1);
 		if (z.equals(one)) return;
 		z.inverse();
@@ -385,7 +383,7 @@ public final class ECP {
 
 /* this*=2 */
 	public void dbl() {
-//		if (INF) return;
+		if (INF) return;
 		
 		if (CURVETYPE==WEIERSTRASS)
 		{
@@ -540,12 +538,12 @@ public final class ECP {
 
 /* this+=Q */
 	public void add(ECP Q) {
-//		if (INF)
-//		{
-//			copy(Q);
-//			return;
-//		}
-//		if (Q.INF) return;
+		if (INF)
+		{
+			copy(Q);
+			return;
+		}
+		if (Q.INF) return;
 
 		if (CURVETYPE==WEIERSTRASS)
 		{

@@ -24,16 +24,15 @@ under the License.
 
 int ECP2_ZZZ_isinf(ECP2_ZZZ *P)
 {
-    if (P->inf) return 1;
-    P->inf=FP2_YYY_iszilch(&(P->x)) & FP2_YYY_iszilch(&(P->z));
-    return P->inf;
+//    if (P->inf) return 1;
+    return (FP2_YYY_iszilch(&(P->x)) & FP2_YYY_iszilch(&(P->z)));
 }
 
 /* Set P=Q */
 /* SU= 16 */
 void ECP2_ZZZ_copy(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 {
-    P->inf=Q->inf;
+//    P->inf=Q->inf;
     FP2_YYY_copy(&(P->x),&(Q->x));
     FP2_YYY_copy(&(P->y),&(Q->y));
     FP2_YYY_copy(&(P->z),&(Q->z));
@@ -43,7 +42,7 @@ void ECP2_ZZZ_copy(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 /* SU= 8 */
 void ECP2_ZZZ_inf(ECP2_ZZZ *P)
 {
-    P->inf=1;
+//    P->inf=1;
     FP2_YYY_zero(&(P->x));
     FP2_YYY_one(&(P->y));
     FP2_YYY_zero(&(P->z));
@@ -55,8 +54,8 @@ static void ECP2_ZZZ_cmove(ECP2_ZZZ *P,ECP2_ZZZ *Q,int d)
     FP2_YYY_cmove(&(P->x),&(Q->x),d);
     FP2_YYY_cmove(&(P->y),&(Q->y),d);
     FP2_YYY_cmove(&(P->z),&(Q->z),d);
-    d=~(d-1);
-    P->inf^=(P->inf^Q->inf)&d;
+//    d=~(d-1);
+//    P->inf^=(P->inf^Q->inf)&d;
 }
 
 /* return 1 if b==c, no branching */
@@ -95,8 +94,8 @@ static void ECP2_ZZZ_select(ECP2_ZZZ *P,ECP2_ZZZ W[],sign32 b)
 int ECP2_ZZZ_equals(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 {
     FP2_YYY a,b;
-    if (ECP2_ZZZ_isinf(P) && ECP2_ZZZ_isinf(Q)) return 1;
-    if (ECP2_ZZZ_isinf(P) || ECP2_ZZZ_isinf(Q)) return 0;
+//    if (ECP2_ZZZ_isinf(P) && ECP2_ZZZ_isinf(Q)) return 1;
+//    if (ECP2_ZZZ_isinf(P) || ECP2_ZZZ_isinf(Q)) return 0;
 
     FP2_YYY_mul(&a,&(P->x),&(Q->z));
     FP2_YYY_mul(&b,&(Q->x),&(P->z));
@@ -136,7 +135,7 @@ void ECP2_ZZZ_affine(ECP2_ZZZ *P)
 /* SU= 16 */
 int ECP2_ZZZ_get(FP2_YYY *x,FP2_YYY *y,ECP2_ZZZ *P)
 {
-    if (P->inf) return -1;
+    if (ECP2_ZZZ_isinf(P)) return -1;
     ECP2_ZZZ_affine(P);
     FP2_YYY_copy(y,&(P->y));
     FP2_YYY_copy(x,&(P->x));
@@ -148,7 +147,7 @@ int ECP2_ZZZ_get(FP2_YYY *x,FP2_YYY *y,ECP2_ZZZ *P)
 void ECP2_ZZZ_output(ECP2_ZZZ *P)
 {
     FP2_YYY x,y;
-    if (P->inf)
+    if (ECP2_ZZZ_isinf(P))
     {
         printf("Infinity\n");
         return;
@@ -165,7 +164,7 @@ void ECP2_ZZZ_output(ECP2_ZZZ *P)
 void ECP2_ZZZ_outputxyz(ECP2_ZZZ *P)
 {
     ECP2_ZZZ Q;
-    if (P->inf)
+    if (ECP2_ZZZ_isinf(P))
     {
         printf("Infinity\n");
         return;
@@ -265,11 +264,12 @@ int ECP2_ZZZ_set(ECP2_ZZZ *P,FP2_YYY *x,FP2_YYY *y)
 
     if (!FP2_YYY_equals(&y2,&rhs))
     {
-        P->inf=1;
+		ECP2_ZZZ_inf(P);
+       // P->inf=1;
         return 0;
     }
 
-    P->inf=0;
+  //  P->inf=0;
     FP2_YYY_copy(&(P->x),x);
     FP2_YYY_copy(&(P->y),y);
 
@@ -286,11 +286,11 @@ int ECP2_ZZZ_setx(ECP2_ZZZ *P,FP2_YYY *x)
 
     if (!FP2_YYY_sqrt(&y,&y))
     {
-        P->inf=1;
+		ECP2_ZZZ_inf(P);
         return 0;
     }
 
-    P->inf=0;
+ //   P->inf=0;
     FP2_YYY_copy(&(P->x),x);
     FP2_YYY_copy(&(P->y),&y);
     FP2_YYY_one(&(P->z));
@@ -313,7 +313,7 @@ void ECP2_ZZZ_neg(ECP2_ZZZ *P)
 int ECP2_ZZZ_dbl(ECP2_ZZZ *P)
 {
     FP2_YYY t0,t1,t2,iy,x3,y3;
-    if (P->inf) return -1;
+//    if (P->inf) return -1;
 
     FP2_YYY_copy(&iy,&(P->y));		//FP2 iy=new FP2(y);
 #if SEXTIC_TWIST_ZZZ==D_TYPE
@@ -380,13 +380,13 @@ int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 {
     FP2_YYY t0,t1,t2,t3,t4,x3,y3,z3;
     int b3=3*CURVE_B_I_ZZZ;
-    if (Q->inf) return 0;
+/*    if (Q->inf) return 0;
     if (P->inf)
     {
         ECP2_ZZZ_copy(P,Q);
         return 0;
     }
-
+*/
     //FP2_YYY_copy(&t0,&(P->x));		//FP2 t0=new FP2(x);
     FP2_YYY_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
     //FP2_YYY_copy(&t1,&(P->y));		//FP2 t1=new FP2(y);
@@ -563,7 +563,7 @@ void ECP2_ZZZ_mul(ECP2_ZZZ *P,BIG_XXX e)
 void ECP2_ZZZ_frob(ECP2_ZZZ *P,FP2_YYY *X)
 {
     FP2_YYY X2;
-    if (P->inf) return;
+//    if (P->inf) return;
 //printf("X= "); FP2_YYY_output(X); printf("\n");
     FP2_YYY_sqr(&X2,X);
 //printf("X2= "); FP2_YYY_output(&X2); printf("\n");

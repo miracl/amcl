@@ -25,11 +25,11 @@ public final class ECP2 {
 	private FP2 x;
 	private FP2 y;
 	private FP2 z;
-//	private boolean INF;
+	private boolean INF;
 
 /* Constructor - set this=O */
 	public ECP2() {
-//		INF=true;
+		INF=true;
 		x=new FP2(0);
 		y=new FP2(1);
 		z=new FP2(0);
@@ -37,7 +37,7 @@ public final class ECP2 {
 
 /* Test this=O? */
 	public boolean is_infinity() {
-//		if (INF) return true;                    //******
+		if (INF) return true;                    //******
 		return (x.iszilch() && z.iszilch());
 	}
 /* copy this=P */
@@ -46,11 +46,11 @@ public final class ECP2 {
 		x.copy(P.x);
 		y.copy(P.y);
 		z.copy(P.z);
-//		INF=P.INF;
+		INF=P.INF;
 	}
 /* set this=O */
 	public void inf() {
-//		INF=true;
+		INF=true;
 		x.zero();
 		y.one();
 		z.zero();
@@ -63,10 +63,10 @@ public final class ECP2 {
 		y.cmove(Q.y,d);
 		z.cmove(Q.z,d);
 
-	//	boolean bd;
-	//	if (d==0) bd=false;
-	//	else bd=true;
-	//	INF^=(INF^Q.INF)&bd;
+		boolean bd;
+		if (d==0) bd=false;
+		else bd=true;
+		INF^=(INF^Q.INF)&bd;
 	}
 
 /* return 1 if b==c, no branching */
@@ -102,8 +102,8 @@ public final class ECP2 {
 
 /* Test if P == Q */
 	public boolean equals(ECP2 Q) {
-//		if (is_infinity() && Q.is_infinity()) return true;
-//		if (is_infinity() || Q.is_infinity()) return false;
+		if (is_infinity() && Q.is_infinity()) return true;
+		if (is_infinity() || Q.is_infinity()) return false;
 
 
 		FP2 a=new FP2(x);                            // *****
@@ -249,9 +249,8 @@ public final class ECP2 {
 		FP2 rhs=RHS(x);
 		FP2 y2=new FP2(y);
 		y2.sqr();
-		if (!y2.equals(rhs)) inf();
-//		if (y2.equals(rhs)) INF=false;
-//		else {x.zero();INF=true;}
+		if (y2.equals(rhs)) INF=false;
+		else {x.zero();INF=true;}
 	}
 
 /* construct this from x - but set to O if not on curve */
@@ -263,14 +262,14 @@ public final class ECP2 {
 		if (rhs.sqrt()) 
 		{
 			y.copy(rhs);
-			//INF=false;
+			INF=false;
 		}
-		else {/*x.zero();INF=true;*/ inf();}
+		else {x.zero();INF=true;}
 	}
 
 /* this+=this */
 	public int dbl() {
-//		if (INF) return -1;      
+		if (INF) return -1;      
 //System.out.println("Into dbl");
 		FP2 iy=new FP2(y);
 		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
@@ -322,12 +321,12 @@ public final class ECP2 {
 
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
 	public int add(ECP2 Q) {
-//		if (INF)
-//		{
-//			copy(Q);
-//			return -1;
-//		}
-//		if (Q.INF) return -1;
+		if (INF)
+		{
+			copy(Q);
+			return -1;
+		}
+		if (Q.INF) return -1;
 //System.out.println("Into add");
 		int b=3*ROM.CURVE_B_I;
 		FP2 t0=new FP2(x);
@@ -412,7 +411,7 @@ public final class ECP2 {
 /* set this*=q, where q is Modulus, using Frobenius */
 	public void frob(FP2 X)
 	{
-//		if (INF) return;
+		if (INF) return;
 		FP2 X2=new FP2(X);
 
 		X2.sqr();

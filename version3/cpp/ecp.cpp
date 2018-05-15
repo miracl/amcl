@@ -30,20 +30,20 @@ using namespace YYY;
 /* test for P=O point-at-infinity */
 int ZZZ::ECP_isinf(ECP *P)
 {
-	if (P->inf) return 1;
-    FP_reduce(&(P->x));     FP_reduce(&(P->z));
+//	if (P->inf) return 1;
+//    FP_reduce(&(P->x));     FP_reduce(&(P->z));
 #if CURVETYPE_ZZZ==EDWARDS
-    FP_reduce(&(P->y));
-    P->inf= (FP_iszilch(&(P->x)) && FP_equals(&(P->y),&(P->z)));
+//    FP_reduce(&(P->y));
+    return (FP_iszilch(&(P->x)) && FP_equals(&(P->y),&(P->z)));
 #endif
 #if CURVETYPE_ZZZ==WEIERSTRASS
-    FP_reduce(&(P->y));
-    P->inf= (FP_iszilch(&(P->x)) && FP_iszilch(&(P->z)));
+//    FP_reduce(&(P->y));
+    return (FP_iszilch(&(P->x)) && FP_iszilch(&(P->z)));
 #endif
 #if CURVETYPE_ZZZ==MONTGOMERY
-    P->inf= FP_iszilch(&(P->z));
+    return FP_iszilch(&(P->z));
 #endif
-	return P->inf;
+//	return P->inf;
 
 }
 
@@ -55,12 +55,12 @@ static void ECP_cswap(ZZZ::ECP *P,ZZZ::ECP *Q,int d)
     FP_cswap(&(P->y),&(Q->y),d);
 #endif
     FP_cswap(&(P->z),&(Q->z),d);
-
+/*
     d=~(d-1);
     d=d&(P->inf^Q->inf);
     P->inf^=d;
     Q->inf^=d;
-
+*/
 }
 
 #if CURVETYPE_ZZZ!=MONTGOMERY
@@ -72,10 +72,10 @@ static void ECP_cmove(ZZZ::ECP *P,ZZZ::ECP *Q,int d)
     FP_cmove(&(P->y),&(Q->y),d);
 #endif
     FP_cmove(&(P->z),&(Q->z),d);
-
+/*
     d=~(d-1);
     P->inf^=(P->inf^Q->inf)&d;
-
+*/
 }
 
 /* return 1 if b==c, no branching */
@@ -117,8 +117,8 @@ static void ECP_select(ZZZ::ECP *P,ZZZ::ECP W[],sign32 b)
 int ZZZ::ECP_equals(ECP *P,ECP *Q)
 {
     FP a,b;
-    if (ECP_isinf(P) && ECP_isinf(Q)) return 1;
-    if (ECP_isinf(P) || ECP_isinf(Q)) return 0;
+//    if (ECP_isinf(P) && ECP_isinf(Q)) return 1;
+//    if (ECP_isinf(P) || ECP_isinf(Q)) return 0;
 
 
     FP_mul(&a,&(P->x),&(Q->z));
@@ -139,7 +139,7 @@ int ZZZ::ECP_equals(ECP *P,ECP *Q)
 /* SU=16 */
 void ZZZ::ECP_copy(ECP *P,ECP *Q)
 {
-    P->inf=Q->inf;
+//    P->inf=Q->inf;
     FP_copy(&(P->x),&(Q->x));
 #if CURVETYPE_ZZZ!=MONTGOMERY
     FP_copy(&(P->y),&(Q->y));
@@ -176,7 +176,7 @@ void ZZZ::ECP_inf(ECP *P)
 #else
 	FP_one(&(P->z));
 #endif
-    P->inf=1;
+//    P->inf=1;
 }
 
 /* Calculate right Hand Side of curve equation y^2=RHS */
@@ -214,6 +214,7 @@ void ZZZ::ECP_rhs(FP *v,FP *x)
     
     FP_mul(&t,v,&t);
     FP_sub(&t,&t,&one);
+	FP_norm(&t);
     if (CURVE_A==1) FP_sub(v,v,&one);
 
     if (CURVE_A==-1)
@@ -222,6 +223,7 @@ void ZZZ::ECP_rhs(FP *v,FP *x)
 		FP_norm(v);
         FP_neg(v,v);
     }
+	FP_norm(v);
 	FP_inv(&t,&t);
 	FP_mul(v,v,&t);
 	FP_reduce(v);
@@ -262,7 +264,7 @@ int ZZZ::ECP_set(ECP *P,BIG x)
         ECP_inf(P);
         return 0;
     }
-    P->inf=0;
+    //P->inf=0;
     FP_nres(&(P->x),x);
     FP_one(&(P->z));
     return 1;
@@ -316,7 +318,7 @@ int ZZZ::ECP_set(ECP *P,BIG x,BIG y)
         return 0;
     }
 
-    P->inf=0;
+  //  P->inf=0;
 
     FP_nres(&(P->x),x);
     FP_nres(&(P->y),y);
@@ -343,7 +345,7 @@ int ZZZ::ECP_setx(ECP *P,BIG x,int s)
         return 0;
     }
 
-    P->inf=0;
+   // P->inf=0;
 
     FP_nres(&(P->x),x);
     FP_sqrt(&(P->y),&rhs);
@@ -528,7 +530,7 @@ void ZZZ::ECP_dbl(ECP *P)
 #if CURVETYPE_ZZZ==WEIERSTRASS
     FP t0,t1,t2,t3,x3,y3,z3,b;
 
-    if (ECP_isinf(P)) return;
+//    if (ECP_isinf(P)) return;
 
 	if (CURVE_A==0)
 	{
@@ -667,7 +669,7 @@ void ZZZ::ECP_dbl(ECP *P)
 
 	FP C,D,H,J;
 
-	if (ECP_isinf(P)) return;
+//	if (ECP_isinf(P)) return;
 
 	//FP_copy(&C,&(P->x));			//FP C=new FP(x);
 	FP_sqr(&C,&(P->x));							//C.sqr();
@@ -708,7 +710,7 @@ void ZZZ::ECP_dbl(ECP *P)
 #if CURVETYPE_ZZZ==MONTGOMERY
 	FP A,B,AA,BB,C;
 
-    if (ECP_isinf(P)) return;
+//    if (ECP_isinf(P)) return;
 
 	//FP_copy(&A,&(P->x));			//FP A=new FP(x);
 	//FP_copy(&B,&(P->x));			//FP B=new FP(x);		
@@ -794,13 +796,14 @@ void ZZZ::ECP_add(ECP *P,ECP *Q)
 
 	int b3;
 	FP t0,t1,t2,t3,t4,x3,y3,z3,b;
-
+/*
     if (ECP_isinf(Q)) return;
     if (ECP_isinf(P))
     {
         ECP_copy(P,Q);
         return;
     }
+*/
 	if (CURVE_A==0)
 	{
 		b3=3*CURVE_B_I;					//int b=3*ROM.CURVE_B_I;
@@ -995,14 +998,14 @@ void ZZZ::ECP_add(ECP *P,ECP *Q)
 #else
 	FP A,B,C,D,E,F,G,b;
 
-		
+/*		
     if (ECP_isinf(Q)) return;
     if (ECP_isinf(P))
     {
         ECP_copy(P,Q);
         return;
     }
-
+*/
 
 	//FP_copy(&A,&(P->z));		//FP A=new FP(z);
 	//FP_copy(&C,&(P->x));		//FP C=new FP(x);

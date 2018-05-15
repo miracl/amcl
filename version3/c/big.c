@@ -767,6 +767,8 @@ void BIG_XXX_monty(BIG_XXX a,BIG_XXX md,chunk MC,DBIG_XXX d)
 
 #endif
 
+
+
 #else
     int j;
     chunk m,carry;
@@ -792,7 +794,6 @@ void BIG_XXX_monty(BIG_XXX a,BIG_XXX md,chunk MC,DBIG_XXX d)
     a[MPV_XXX]=1;
     a[MNV_XXX]=0;
 #endif
-
 }
 
 /* General shift left of a by n bits */

@@ -27,7 +27,7 @@ type ECP2 struct {
 	x *FP2
 	y *FP2
 	z *FP2
-	INF bool
+//	INF bool
 }
 
 func NewECP2() *ECP2 {
@@ -35,27 +35,26 @@ func NewECP2() *ECP2 {
 	E.x=NewFP2int(0)
 	E.y=NewFP2int(1)
 	E.z=NewFP2int(0)
-	E.INF=true
+//	E.INF=true
 	return E
 }
 
 /* Test this=O? */
 func (E *ECP2) Is_infinity() bool {
-	if E.INF {return true}
+//	if E.INF {return true}
 	E.x.reduce(); E.y.reduce(); E.z.reduce()
-	E.INF=E.x.iszilch() && E.z.iszilch()
-	return E.INF
+	return E.x.iszilch() && E.z.iszilch()
 }
 /* copy this=P */
 func (E *ECP2) Copy(P *ECP2) {
 	E.x.copy(P.x)
 	E.y.copy(P.y)
 	E.z.copy(P.z)
-	E.INF=P.INF
+//	E.INF=P.INF
 }
 /* set this=O */
 func (E *ECP2) inf() {
-	E.INF=true
+//	E.INF=true
 	E.x.zero()
 	E.y.one()
 	E.z.zero()
@@ -72,12 +71,13 @@ func (E *ECP2) cmove(Q *ECP2,d int) {
 	E.x.cmove(Q.x,d)
 	E.y.cmove(Q.y,d)
 	E.z.cmove(Q.z,d)
-
+/*
 	var bd bool
 	if (d==0) {
 		bd=false
 	} else {bd=true}
 	E.INF=(E.INF!=(E.INF!=Q.INF)&&bd)
+*/
 }
 
 /* Constant time select from pre-computed table */
@@ -104,8 +104,8 @@ func (E *ECP2) selector(W []*ECP2,b int32) {
 
 /* Test if P == Q */
 func (E *ECP2) Equals(Q *ECP2) bool {
-	if E.Is_infinity() && Q.Is_infinity() {return true}
-	if E.Is_infinity() || Q.Is_infinity() {return false}
+//	if E.Is_infinity() && Q.Is_infinity() {return true}
+//	if E.Is_infinity() || Q.Is_infinity() {return false}
 
 	a:=NewFP2copy(E.x)
 	b:=NewFP2copy(Q.x)
@@ -229,9 +229,9 @@ func NewECP2fp2s(ix *FP2,iy *FP2) *ECP2 {
 	rhs:=RHS2(E.x)
 	y2:=NewFP2copy(E.y)
 	y2.sqr()
-	if y2.Equals(rhs) {
-		E.INF=false
-	} else {E.x.zero();E.INF=true}
+	if !y2.Equals(rhs) {
+		E.inf()
+	} 
 	return E
 }
 
@@ -244,14 +244,14 @@ func NewECP2fp2(ix *FP2) *ECP2 {
 	rhs:=RHS2(E.x)
 	if rhs.sqrt() {
 			E.y.copy(rhs)
-			E.INF=false;
-	} else {E.x.zero();E.INF=true}
+			//E.INF=false;
+	} else {E.inf()}
 	return E
 }
 
 /* this+=this */
 func (E *ECP2) dbl() int {
-	if E.INF {return -1}
+//	if E.INF {return -1}
 
 	iy:=NewFP2copy(E.y)
 	if SEXTIC_TWIST == D_TYPE {
@@ -300,12 +300,12 @@ func (E *ECP2) dbl() int {
 
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
 func (E *ECP2) Add(Q *ECP2) int {
-	if E.INF {
+/*	if E.INF {
 		E.Copy(Q)
 		return -1
 	}
 	if Q.INF {return -1}
-
+*/
 	b:=3*CURVE_B_I
 	t0:=NewFP2copy(E.x)
 	t0.mul(Q.x)         // x.Q.x
@@ -383,7 +383,7 @@ func (E *ECP2) Sub(Q *ECP2) int {
 }
 /* set this*=q, where q is Modulus, using Frobenius */
 func (E *ECP2) frob(X *FP2) {
-	if E.INF {return}
+//	if E.INF {return}
 	X2:=NewFP2copy(X)
 	X2.sqr()
 	E.x.conj()

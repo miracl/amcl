@@ -27,21 +27,21 @@ under the License.
 /* test for P=O point-at-infinity */
 int ECP_ZZZ_isinf(ECP_ZZZ *P)
 {
-    if (P->inf) return 1;
-    FP_YYY_reduce(&(P->x));
-    FP_YYY_reduce(&(P->z));
+//    if (P->inf) return 1;
+//    FP_YYY_reduce(&(P->x));
+//    FP_YYY_reduce(&(P->z));
 #if CURVETYPE_ZZZ==EDWARDS
-    FP_YYY_reduce(&(P->y));
-    P->inf= (FP_YYY_iszilch(&(P->x)) && FP_YYY_equals(&(P->y),&(P->z)));
+//    FP_YYY_reduce(&(P->y));
+    return (FP_YYY_iszilch(&(P->x)) && FP_YYY_equals(&(P->y),&(P->z)));
 #endif
 #if CURVETYPE_ZZZ==WEIERSTRASS
-    FP_YYY_reduce(&(P->y));
-    P->inf= (FP_YYY_iszilch(&(P->x)) && FP_YYY_iszilch(&(P->z)));
+//    FP_YYY_reduce(&(P->y));
+    return (FP_YYY_iszilch(&(P->x)) && FP_YYY_iszilch(&(P->z)));
 #endif
 #if CURVETYPE_ZZZ==MONTGOMERY
-    P->inf= FP_YYY_iszilch(&(P->z));
+    return FP_YYY_iszilch(&(P->z));
 #endif
-    return P->inf;
+//    return P->inf;
 
 }
 
@@ -53,12 +53,12 @@ static void ECP_ZZZ_cswap(ECP_ZZZ *P,ECP_ZZZ *Q,int d)
     FP_YYY_cswap(&(P->y),&(Q->y),d);
 #endif
     FP_YYY_cswap(&(P->z),&(Q->z),d);
-
+/*
     d=~(d-1);
     d=d&(P->inf^Q->inf);
     P->inf^=d;
     Q->inf^=d;
-
+*/
 }
 
 #if CURVETYPE_ZZZ!=MONTGOMERY
@@ -70,10 +70,10 @@ static void ECP_ZZZ_cmove(ECP_ZZZ *P,ECP_ZZZ *Q,int d)
     FP_YYY_cmove(&(P->y),&(Q->y),d);
 #endif
     FP_YYY_cmove(&(P->z),&(Q->z),d);
-
+/*
     d=~(d-1);
     P->inf^=(P->inf^Q->inf)&d;
-
+*/
 }
 
 /* return 1 if b==c, no branching */
@@ -115,8 +115,8 @@ static void ECP_ZZZ_select(ECP_ZZZ *P,ECP_ZZZ W[],sign32 b)
 int ECP_ZZZ_equals(ECP_ZZZ *P,ECP_ZZZ *Q)
 {
     FP_YYY a,b;
-    if (ECP_ZZZ_isinf(P) && ECP_ZZZ_isinf(Q)) return 1;
-    if (ECP_ZZZ_isinf(P) || ECP_ZZZ_isinf(Q)) return 0;
+//    if (ECP_ZZZ_isinf(P) && ECP_ZZZ_isinf(Q)) return 1;
+//    if (ECP_ZZZ_isinf(P) || ECP_ZZZ_isinf(Q)) return 0;
 
 
     FP_YYY_mul(&a,&(P->x),&(Q->z));
@@ -137,7 +137,7 @@ int ECP_ZZZ_equals(ECP_ZZZ *P,ECP_ZZZ *Q)
 /* SU=16 */
 void ECP_ZZZ_copy(ECP_ZZZ *P,ECP_ZZZ *Q)
 {
-    P->inf=Q->inf;
+//    P->inf=Q->inf;
     FP_YYY_copy(&(P->x),&(Q->x));
 #if CURVETYPE_ZZZ!=MONTGOMERY
     FP_YYY_copy(&(P->y),&(Q->y));
@@ -174,7 +174,7 @@ void ECP_ZZZ_inf(ECP_ZZZ *P)
 #else
     FP_YYY_one(&(P->z));
 #endif
-    P->inf=1;
+//    P->inf=1;
 }
 
 /* Calculate right Hand Side of curve equation y^2=RHS */
@@ -262,7 +262,7 @@ int ECP_ZZZ_set(ECP_ZZZ *P,BIG_XXX x)
         ECP_ZZZ_inf(P);
         return 0;
     }
-    P->inf=0;
+ //   P->inf=0;
     FP_YYY_nres(&(P->x),x);
     FP_YYY_one(&(P->z));
     return 1;
@@ -316,7 +316,7 @@ int ECP_ZZZ_set(ECP_ZZZ *P,BIG_XXX x,BIG_XXX y)
         return 0;
     }
 
-    P->inf=0;
+   // P->inf=0;
 
     FP_YYY_nres(&(P->x),x);
     FP_YYY_nres(&(P->y),y);
@@ -343,7 +343,7 @@ int ECP_ZZZ_setx(ECP_ZZZ *P,BIG_XXX x,int s)
         return 0;
     }
 
-    P->inf=0;
+  //  P->inf=0;
 
     FP_YYY_nres(&(P->x),x);
     FP_YYY_sqrt(&(P->y),&rhs);
@@ -553,7 +553,7 @@ void ECP_ZZZ_dbl(ECP_ZZZ *P)
 #if CURVETYPE_ZZZ==WEIERSTRASS
     FP_YYY t0,t1,t2,t3,x3,y3,z3,b;
 
-    if (ECP_ZZZ_isinf(P)) return;
+ //   if (ECP_ZZZ_isinf(P)) return;
 
     if (CURVE_A_ZZZ==0)
     {
@@ -692,7 +692,7 @@ void ECP_ZZZ_dbl(ECP_ZZZ *P)
 
     FP_YYY C,D,H,J;
 
-    if (ECP_ZZZ_isinf(P)) return;
+//    if (ECP_ZZZ_isinf(P)) return;
 
     //FP_YYY_copy(&C,&(P->x));			//FP C=new FP(x);
     FP_YYY_sqr(&C,&(P->x));							//C.sqr();
@@ -733,7 +733,7 @@ void ECP_ZZZ_dbl(ECP_ZZZ *P)
 #if CURVETYPE_ZZZ==MONTGOMERY
     FP_YYY A,B,AA,BB,C;
 
-    if (ECP_ZZZ_isinf(P)) return;
+//    if (ECP_ZZZ_isinf(P)) return;
 
     //FP_YYY_copy(&A,&(P->x));			//FP A=new FP(x);
     //FP_YYY_copy(&B,&(P->x));			//FP B=new FP(x);
@@ -819,13 +819,14 @@ void ECP_ZZZ_add(ECP_ZZZ *P,ECP_ZZZ *Q)
 
     int b3;
     FP_YYY t0,t1,t2,t3,t4,x3,y3,z3,b;
-
+/*
     if (ECP_ZZZ_isinf(Q)) return;
     if (ECP_ZZZ_isinf(P))
     {
         ECP_ZZZ_copy(P,Q);
         return;
     }
+*/
     if (CURVE_A_ZZZ==0)
     {
         b3=3*CURVE_B_I_ZZZ;					//int b=3*ROM.CURVE_B_I;
@@ -1020,14 +1021,14 @@ void ECP_ZZZ_add(ECP_ZZZ *P,ECP_ZZZ *Q)
 #else
     FP_YYY A,B,C,D,E,F,G,b;
 
-
+/*
     if (ECP_ZZZ_isinf(Q)) return;
     if (ECP_ZZZ_isinf(P))
     {
         ECP_ZZZ_copy(P,Q);
         return;
     }
-
+*/
 
     //FP_YYY_copy(&A,&(P->z));		//FP A=new FP(z);
     //FP_YYY_copy(&C,&(P->x));		//FP C=new FP(x);

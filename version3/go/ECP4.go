@@ -27,7 +27,7 @@ type ECP4 struct {
 	x *FP4
 	y *FP4
 	z *FP4
-	INF bool
+//	INF bool
 }
 
 func NewECP4() *ECP4 {
@@ -35,16 +35,15 @@ func NewECP4() *ECP4 {
 	E.x=NewFP4int(0)
 	E.y=NewFP4int(1)
 	E.z=NewFP4int(0)
-	E.INF=true
+//	E.INF=true
 	return E
 }
 
 /* Test this=O? */
 func (E *ECP4) Is_infinity() bool {
-	if E.INF {return true}
+//	if E.INF {return true}
 	E.x.reduce(); E.y.reduce(); E.z.reduce()
-	E.INF=E.x.iszilch() && E.z.iszilch()
-	return E.INF
+	return E.x.iszilch() && E.z.iszilch()
 }
 
 /* copy this=P */
@@ -52,11 +51,11 @@ func (E *ECP4) Copy(P *ECP4) {
 	E.x.copy(P.x)
 	E.y.copy(P.y)
 	E.z.copy(P.z)
-	E.INF=P.INF
+//	E.INF=P.INF
 }
 /* set this=O */
 func (E *ECP4) inf() {
-	E.INF=true
+//	E.INF=true
 	E.x.zero()
 	E.y.one()
 	E.z.zero()
@@ -72,12 +71,13 @@ func (E *ECP4) cmove(Q *ECP4,d int) {
 	E.x.cmove(Q.x,d)
 	E.y.cmove(Q.y,d)
 	E.z.cmove(Q.z,d)
-
+/*
 	var bd bool
 	if (d==0) {
 		bd=false
 	} else {bd=true}
 	E.INF=(E.INF!=((E.INF!=Q.INF)&&bd))
+*/
 }
 
 /* Constant time select from pre-computed table */
@@ -255,9 +255,9 @@ func NewECP4fp4s(ix *FP4,iy *FP4) *ECP4 {
 	rhs:=RHS4(E.x)
 	y2:=NewFP4copy(E.y)
 	y2.sqr()
-	if y2.Equals(rhs) {
-		E.INF=false
-	} else {E.x.zero();E.INF=true}
+	if !y2.Equals(rhs) {
+		E.inf()
+	}
 	return E
 }
 
@@ -270,14 +270,14 @@ func NewECP4fp4(ix *FP4) *ECP4 {
 	rhs:=RHS4(E.x)
 	if rhs.sqrt() {
 			E.y.copy(rhs)
-			E.INF=false;
-	} else {E.x.zero();E.INF=true}
+			//E.INF=false;
+	} else {E.inf()}
 	return E
 }
 
 /* this+=this */
 func (E *ECP4) dbl() int {
-	if E.INF {return -1}
+//	if E.INF {return -1}
 
 	iy:=NewFP4copy(E.y)
 	if SEXTIC_TWIST == D_TYPE {
@@ -303,7 +303,7 @@ func (E *ECP4) dbl() int {
 	t2.imul(3*CURVE_B_I) 
 	if SEXTIC_TWIST == M_TYPE {
 		t2.times_i()
-		//t2.norm()
+		t2.norm()
 	}
 	x3:=NewFP4copy(t2)
 	x3.mul(E.z) 
@@ -326,12 +326,12 @@ func (E *ECP4) dbl() int {
 
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
 func (E *ECP4) Add(Q *ECP4) int {
-	if E.INF {
+/*	if E.INF {
 		E.Copy(Q)
 		return -1
 	}
 	if Q.INF {return -1}
-
+*/
 	b:=3*CURVE_B_I
 	t0:=NewFP4copy(E.x)
 	t0.mul(Q.x)         // x.Q.x
@@ -433,7 +433,7 @@ func ECP4_frob_constants() [3]*FP2 {
 
 /* set this*=q, where q is Modulus, using Frobenius */
 func (E *ECP4) frob(F [3]*FP2,n int) {
-	if E.INF {return}
+//	if E.INF {return}
 	for i:=0;i<n;i++ {
 		E.x.frob(F[2])
 		E.x.pmul(F[0])

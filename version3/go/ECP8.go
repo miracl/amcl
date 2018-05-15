@@ -27,7 +27,7 @@ type ECP8 struct {
 	x *FP8
 	y *FP8
 	z *FP8
-	INF bool
+//	INF bool
 }
 
 func NewECP8() *ECP8 {
@@ -35,16 +35,15 @@ func NewECP8() *ECP8 {
 	E.x=NewFP8int(0)
 	E.y=NewFP8int(1)
 	E.z=NewFP8int(0)
-	E.INF=true
+//	E.INF=true
 	return E
 }
 
 /* Test this=O? */
 func (E *ECP8) Is_infinity() bool {
-	if E.INF {return true}
+//	if E.INF {return true}
 	E.x.reduce(); E.y.reduce(); E.z.reduce()
-	E.INF=E.x.iszilch() && E.z.iszilch()
-	return E.INF
+	return E.x.iszilch() && E.z.iszilch()
 }
 
 /* copy this=P */
@@ -52,11 +51,11 @@ func (E *ECP8) Copy(P *ECP8) {
 	E.x.copy(P.x)
 	E.y.copy(P.y)
 	E.z.copy(P.z)
-	E.INF=P.INF
+//	E.INF=P.INF
 }
 /* set this=O */
 func (E *ECP8) inf() {
-	E.INF=true
+//	E.INF=true
 	E.x.zero()
 	E.y.one()
 	E.z.zero()
@@ -72,12 +71,13 @@ func (E *ECP8) cmove(Q *ECP8,d int) {
 	E.x.cmove(Q.x,d)
 	E.y.cmove(Q.y,d)
 	E.z.cmove(Q.z,d)
-
+/*
 	var bd bool
 	if (d==0) {
 		bd=false
 	} else {bd=true}
 	E.INF=(E.INF!=((E.INF!=Q.INF)&&bd))
+*/
 }
 
 /* Constant time select from pre-computed table */
@@ -104,8 +104,8 @@ func (E *ECP8) selector(W []*ECP8,b int32) {
 
 /* Test if P == Q */
 func (E *ECP8) Equals(Q *ECP8) bool {
-	if E.Is_infinity() && Q.Is_infinity() {return true}
-	if E.Is_infinity() || Q.Is_infinity() {return false}
+//	if E.Is_infinity() && Q.Is_infinity() {return true}
+//	if E.Is_infinity() || Q.Is_infinity() {return false}
 
 	a:=NewFP8copy(E.x)
 	b:=NewFP8copy(Q.x)
@@ -313,9 +313,9 @@ func NewECP8fp8s(ix *FP8,iy *FP8) *ECP8 {
 	rhs:=RHS4(E.x)
 	y2:=NewFP8copy(E.y)
 	y2.sqr()
-	if y2.Equals(rhs) {
-		E.INF=false
-	} else {E.x.zero();E.INF=true}
+	if !y2.Equals(rhs) {
+		E.inf()
+	} 
 	return E
 }
 
@@ -328,14 +328,14 @@ func NewECP8fp8(ix *FP8) *ECP8 {
 	rhs:=RHS4(E.x)
 	if rhs.sqrt() {
 			E.y.copy(rhs)
-			E.INF=false;
-	} else {E.x.zero();E.INF=true}
+			//E.INF=false;
+	} else {E.inf()}
 	return E
 }
 
 /* this+=this */
 func (E *ECP8) dbl() int {
-	if E.INF {return -1}
+//	if E.INF {return -1}
 
 	iy:=NewFP8copy(E.y)
 	if SEXTIC_TWIST == D_TYPE {
@@ -384,12 +384,12 @@ func (E *ECP8) dbl() int {
 
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
 func (E *ECP8) Add(Q *ECP8) int {
-	if E.INF {
+/*	if E.INF {
 		E.Copy(Q)
 		return -1
 	}
 	if Q.INF {return -1}
-
+*/
 	b:=3*CURVE_B_I
 	t0:=NewFP8copy(E.x)
 	t0.mul(Q.x)         // x.Q.x
@@ -493,7 +493,7 @@ func ECP8_frob_constants() [3]*FP2 {
 
 /* set this*=q, where q is Modulus, using Frobenius */
 func (E *ECP8) frob(F [3]*FP2,n int) {
-	if E.INF {return}
+//	if E.INF {return}
 	for i:=0;i<n;i++ {
 		E.x.frob(F[2])
 		E.x.qmul(F[0])

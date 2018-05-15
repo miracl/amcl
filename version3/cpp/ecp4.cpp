@@ -28,15 +28,14 @@ using namespace YYY;
 
 int ZZZ::ECP4_isinf(ECP4 *P)
 {
-	if (P->inf) return 1;
-	P->inf=FP4_iszilch(&(P->x)) & FP4_iszilch(&(P->z));
-    return P->inf;
+//	if (P->inf) return 1;
+	return (FP4_iszilch(&(P->x)) & FP4_iszilch(&(P->z)));
 }
 
 /* Set P=Q */
 void ZZZ::ECP4_copy(ECP4 *P,ECP4 *Q)
 {
-    P->inf=Q->inf;
+//    P->inf=Q->inf;
     FP4_copy(&(P->x),&(Q->x));
     FP4_copy(&(P->y),&(Q->y));
     FP4_copy(&(P->z),&(Q->z));
@@ -45,7 +44,7 @@ void ZZZ::ECP4_copy(ECP4 *P,ECP4 *Q)
 /* set P to Infinity */
 void ZZZ::ECP4_inf(ECP4 *P)
 {
-    P->inf=1;
+//    P->inf=1;
     FP4_zero(&(P->x));
     FP4_one(&(P->y));
     FP4_zero(&(P->z));
@@ -57,8 +56,8 @@ static void ECP4_cmove(ZZZ::ECP4 *P,ZZZ::ECP4 *Q,int d)
     FP4_cmove(&(P->x),&(Q->x),d);
     FP4_cmove(&(P->y),&(Q->y),d);
     FP4_cmove(&(P->z),&(Q->z),d);
-    d=~(d-1);
-    P->inf^=(P->inf^Q->inf)&d;
+//    d=~(d-1);
+//    P->inf^=(P->inf^Q->inf)&d;
 }
 
 /* return 1 if b==c, no branching */
@@ -120,8 +119,8 @@ void ZZZ::ECP4_affine(ECP4 *P)
 int ZZZ::ECP4_equals(ECP4 *P,ECP4 *Q)
 {
     FP4 a,b;
-    if (ECP4_isinf(P) && ECP4_isinf(Q)) return 1;
-    if (ECP4_isinf(P) || ECP4_isinf(Q)) return 0;
+ //   if (ECP4_isinf(P) && ECP4_isinf(Q)) return 1;
+ //   if (ECP4_isinf(P) || ECP4_isinf(Q)) return 0;
 
     FP4_mul(&a,&(P->x),&(Q->z));
     FP4_mul(&b,&(Q->x),&(P->z));
@@ -137,7 +136,7 @@ int ZZZ::ECP4_equals(ECP4 *P,ECP4 *Q)
 /* extract x, y from point P */
 int ZZZ::ECP4_get(FP4 *x,FP4 *y,ECP4 *P)
 {
-    if (P->inf) return -1;
+    if (ECP4_isinf(P)) return -1;
 	ECP4_affine(P);
     FP4_copy(y,&(P->y));
     FP4_copy(x,&(P->x));
@@ -148,7 +147,7 @@ int ZZZ::ECP4_get(FP4 *x,FP4 *y,ECP4 *P)
 void ZZZ::ECP4_output(ECP4 *P)
 {
     FP4 x,y;
-    if (P->inf)
+    if (ECP4_isinf(P))
     {
         printf("Infinity\n");
         return;
@@ -281,11 +280,12 @@ int ZZZ::ECP4_set(ECP4 *P,FP4 *x,FP4 *y)
 
     if (!FP4_equals(&y2,&rhs))
     {
-        P->inf=1;
+		ECP4_inf(P);
+        //P->inf=1;
         return 0;
     }
 
-    P->inf=0;
+    //P->inf=0;
     FP4_copy(&(P->x),x);
     FP4_copy(&(P->y),y);
 
@@ -302,11 +302,12 @@ int ZZZ::ECP4_setx(ECP4 *P,FP4 *x)
 
     if (!FP4_sqrt(&y,&y))
     {
-        P->inf=1;
+		ECP4_inf(P);
+   //     P->inf=1;
         return 0;
     }
 
-    P->inf=0;
+    //P->inf=0;
     FP4_copy(&(P->x),x);
     FP4_copy(&(P->y),&y);
     FP4_one(&(P->z));
@@ -328,7 +329,7 @@ void ZZZ::ECP4_neg(ECP4 *P)
 int ZZZ::ECP4_dbl(ECP4 *P)
 {
     FP4 t0,t1,t2,t3,iy,x3,y3;
-    if (P->inf) return -1;
+//    if (P->inf) return -1;
 
 	FP4_copy(&iy,&(P->y));		//FP4 iy=new FP4(y);
 #if SEXTIC_TWIST_ZZZ==D_TYPE
@@ -389,13 +390,13 @@ int ZZZ::ECP4_add(ECP4 *P,ECP4 *Q)
 {
     FP4 t0,t1,t2,t3,t4,x3,y3,z3;
 	int b3=3*CURVE_B_I;
-    if (Q->inf) return 0;
+/*    if (Q->inf) return 0;
     if (P->inf)
     {
         ECP4_copy(P,Q);
         return 0;
     }
-
+*/
 	FP4_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
 	FP4_mul(&t1,&(P->y),&(Q->y));	//t1.mul(Q.y);		 // y.Q.y
 
@@ -602,7 +603,7 @@ void ZZZ::ECP4_frob(ECP4 *P,FP2 F[3],int n)
 {
 	int i;
 	FP4 X,Y,Z;
-    if (P->inf) return;
+//    if (P->inf) return;
 
 	//ECP4_get(&X,&Y,P);		// F=(1+i)^(p-7)/12
 

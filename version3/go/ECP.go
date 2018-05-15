@@ -45,7 +45,7 @@ type ECP struct {
 	x *FP
 	y *FP
 	z *FP
-	INF bool
+//	INF bool
 }
 
 /* Constructors */
@@ -54,7 +54,7 @@ func NewECP() *ECP {
 	E.x=NewFPint(0)
 	E.y=NewFPint(1)
 	E.z=NewFPint(0)
-	E.INF=true
+//	E.INF=true
 	return E
 }
 
@@ -67,15 +67,15 @@ func NewECPbigs(ix *BIG,iy *BIG) *ECP {
 	rhs:=RHS(E.x)
 
 	if CURVETYPE==MONTGOMERY {
-		if rhs.jacobi()==1 {
-			E.INF=false
-		} else {E.inf()}
+		if rhs.jacobi()!=1 {
+			E.inf()
+		}
 	} else {
 		y2:=NewFPcopy(E.y)
 		y2.sqr()
-		if y2.Equals(rhs) {
-			E.INF=false
-		} else {E.inf()}
+		if !y2.Equals(rhs) {
+			E.inf()
+		}
 	}
 	return E
 }
@@ -91,7 +91,7 @@ func NewECPbigint(ix *BIG,s int) *ECP {
 		ny:=rhs.sqrt()
 		if ny.redc().parity()!=s {ny.neg()}
 		E.y.copy(ny)
-		E.INF=false
+		//E.INF=false
 	} else {E.inf()}
 	return E;
 }
@@ -105,27 +105,27 @@ func NewECPbig(ix *BIG) *ECP {
 	E.z=NewFPint(1)
 	if rhs.jacobi()==1 {
 		if CURVETYPE!=MONTGOMERY {E.y.copy(rhs.sqrt())}
-		E.INF=false
-	} else {E.INF=true}
+		//E.INF=false
+	} else {E.inf()}
 	return E
 }
 
 /* test for O point-at-infinity */
 func (E *ECP) Is_infinity() bool {
-	if E.INF {return true}
+//	if E.INF {return true}
 	E.x.reduce(); E.z.reduce()
 	if CURVETYPE==EDWARDS {
 		E.y.reduce();
-		E.INF=(E.x.iszilch() && E.y.Equals(E.z))
+		return (E.x.iszilch() && E.y.Equals(E.z))
 	} 
 	if CURVETYPE==WEIERSTRASS {
 		E.y.reduce();
-		E.INF=(E.x.iszilch() && E.z.iszilch())
+		return (E.x.iszilch() && E.z.iszilch())
 	}
 	if CURVETYPE==MONTGOMERY {
-		E.INF=E.z.iszilch()
+		return E.z.iszilch()
 	}
-	return E.INF
+	return true
 }
 
 /* Conditional swap of P and Q dependant on d */
@@ -133,13 +133,13 @@ func (E *ECP) cswap(Q *ECP,d int) {
 	E.x.cswap(Q.x,d)
 	if CURVETYPE!=MONTGOMERY {E.y.cswap(Q.y,d)}
 	E.z.cswap(Q.z,d)
-
+/*
 	bd:=true
 	if d==0 {bd=false}
 	bd=bd&&(E.INF!=Q.INF)
 	E.INF=(bd!=E.INF)
 	Q.INF=(bd!=Q.INF)
-
+*/
 }
 
 /* Conditional move of Q to P dependant on d */
@@ -147,10 +147,11 @@ func (E *ECP) cmove(Q *ECP,d int) {
 	E.x.cmove(Q.x,d)
 	if CURVETYPE!=MONTGOMERY {E.y.cmove(Q.y,d)}
 	E.z.cmove(Q.z,d);
-
+/*
 	bd:=true
 	if d==0 {bd=false}
 	E.INF=(E.INF!=((E.INF!=Q.INF)&&bd))
+*/
 }
 
 /* return 1 if b==c, no branching */
@@ -165,7 +166,7 @@ func (E *ECP) Copy(P *ECP) {
 	E.x.copy(P.x);
 	if CURVETYPE!=MONTGOMERY {E.y.copy(P.y)}
 	E.z.copy(P.z);
-	E.INF=P.INF;
+//	E.INF=P.INF;
 }
 
 /* this=-this */
@@ -204,7 +205,7 @@ func (E *ECP) selector(W []*ECP,b int32) {
 
 /* set this=O */
 func (E *ECP) inf() {
-	E.INF=true;
+//	E.INF=true;
 	E.x.zero()
 	if CURVETYPE!=MONTGOMERY {E.y.one()}
 	if CURVETYPE!=EDWARDS {
@@ -214,8 +215,8 @@ func (E *ECP) inf() {
 
 /* Test P == Q */
 func( E *ECP) Equals(Q *ECP) bool {
-	if E.Is_infinity() && Q.Is_infinity() {return true}
-	if E.Is_infinity() || Q.Is_infinity() {return false}
+//	if E.Is_infinity() && Q.Is_infinity() {return true}
+//	if E.Is_infinity() || Q.Is_infinity() {return false}
 
 	a:=NewFPint(0)
 	b:=NewFPint(0)
@@ -363,7 +364,7 @@ func (E *ECP) toString() string {
 /* this*=2 */
 func (E *ECP) dbl() {
 
-	if E.INF {return}
+//	if E.INF {return}
 	if CURVETYPE==WEIERSTRASS {
 		if CURVE_A==0 {
 			t0:=NewFPcopy(E.y)                      /*** Change ***/    // Edits made
@@ -489,7 +490,7 @@ func (E *ECP) dbl() {
 		BB:=NewFPint(0)
 		C:=NewFPint(0)
 	
-		if E.INF {return}
+	//	if E.INF {return}
 
 		A.add(E.z); A.norm()
 		AA.copy(A); AA.sqr()
@@ -510,13 +511,13 @@ func (E *ECP) dbl() {
 
 /* this+=Q */
 func (E *ECP) Add(Q *ECP) {
-
+/*
 	if E.INF {
 		E.Copy(Q)
 		return
 	}
 	if Q.INF {return}
-
+*/
 	if CURVETYPE==WEIERSTRASS {
 		if CURVE_A==0 {
 			b:=3*CURVE_B_I

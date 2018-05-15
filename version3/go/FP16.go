@@ -176,7 +176,7 @@ func (F *FP16) pmul(s *FP8) {
 	F.b.mul(s)
 }
 
-/* this*=s where s is FP4 */
+/* this*=s where s is FP2 */
 func (F *FP16) qmul(s *FP2) {
 	F.a.qmul(s)
 	F.b.qmul(s)

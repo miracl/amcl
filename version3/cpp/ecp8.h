@@ -21,7 +21,7 @@ namespace ZZZ {
 
 typedef struct
 {
-    int inf; /**< Infinity Flag */
+//    int inf; /**< Infinity Flag */
     YYY::FP8 x;   /**< x-coordinate of point */
     YYY::FP8 y;   /**< y-coordinate of point */
     YYY::FP8 z;   /**< z-coordinate of point */

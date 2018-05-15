@@ -28,15 +28,14 @@ using namespace YYY;
 
 int ZZZ::ECP8_isinf(ECP8 *P)
 {
-	if (P->inf) return 1;
-	P->inf=FP8_iszilch(&(P->x)) & FP8_iszilch(&(P->z));
-    return P->inf;
+//	if (P->inf) return 1;
+	return (FP8_iszilch(&(P->x)) & FP8_iszilch(&(P->z)));
 }
 
 /* Set P=Q */
 void ZZZ::ECP8_copy(ECP8 *P,ECP8 *Q)
 {
-    P->inf=Q->inf;
+//    P->inf=Q->inf;
     FP8_copy(&(P->x),&(Q->x));
     FP8_copy(&(P->y),&(Q->y));
     FP8_copy(&(P->z),&(Q->z));
@@ -45,7 +44,7 @@ void ZZZ::ECP8_copy(ECP8 *P,ECP8 *Q)
 /* set P to Infinity */
 void ZZZ::ECP8_inf(ECP8 *P)
 {
-    P->inf=1;
+//    P->inf=1;
     FP8_zero(&(P->x));
     FP8_one(&(P->y));
     FP8_zero(&(P->z));
@@ -57,8 +56,8 @@ static void ECP8_cmove(ZZZ::ECP8 *P,ZZZ::ECP8 *Q,int d)
     FP8_cmove(&(P->x),&(Q->x),d);
     FP8_cmove(&(P->y),&(Q->y),d);
     FP8_cmove(&(P->z),&(Q->z),d);
-    d=~(d-1);
-    P->inf^=(P->inf^Q->inf)&d;
+//    d=~(d-1);
+//    P->inf^=(P->inf^Q->inf)&d;
 }
 
 /* return 1 if b==c, no branching */
@@ -120,8 +119,8 @@ void ZZZ::ECP8_affine(ECP8 *P)
 int ZZZ::ECP8_equals(ECP8 *P,ECP8 *Q)
 {
     FP8 a,b;
-    if (ECP8_isinf(P) && ECP8_isinf(Q)) return 1;
-    if (ECP8_isinf(P) || ECP8_isinf(Q)) return 0;
+//    if (ECP8_isinf(P) && ECP8_isinf(Q)) return 1;
+//    if (ECP8_isinf(P) || ECP8_isinf(Q)) return 0;
 
     FP8_mul(&a,&(P->x),&(Q->z));
     FP8_mul(&b,&(Q->x),&(P->z));
@@ -136,7 +135,7 @@ int ZZZ::ECP8_equals(ECP8 *P,ECP8 *Q)
 /* extract x, y from point P */
 int ZZZ::ECP8_get(FP8 *x,FP8 *y,ECP8 *P)
 {
-    if (P->inf) return -1;
+    if (ECP8_isinf(P)) return -1;
 	ECP8_affine(P);
     FP8_copy(y,&(P->y));
     FP8_copy(x,&(P->x));
@@ -147,7 +146,7 @@ int ZZZ::ECP8_get(FP8 *x,FP8 *y,ECP8 *P)
 void ZZZ::ECP8_output(ECP8 *P)
 {
     FP8 x,y;
-    if (P->inf)
+    if (ECP8_isinf(P))
     {
         printf("Infinity\n");
         return;
@@ -340,11 +339,12 @@ int ZZZ::ECP8_set(ECP8 *P,FP8 *x,FP8 *y)
 
     if (!FP8_equals(&y2,&rhs))
     {
-        P->inf=1;
+		ECP8_inf(P);
+        //P->inf=1;
         return 0;
     }
 
-    P->inf=0;
+  //  P->inf=0;
     FP8_copy(&(P->x),x);
     FP8_copy(&(P->y),y);
     FP8_one(&(P->z));
@@ -360,11 +360,12 @@ int ZZZ::ECP8_setx(ECP8 *P,FP8 *x)
 
     if (!FP8_sqrt(&y,&y))
     {
-        P->inf=1;
+		ECP8_inf(P);
+       // P->inf=1;
         return 0;
     }
 
-    P->inf=0;
+//    P->inf=0;
     FP8_copy(&(P->x),x);
     FP8_copy(&(P->y),&y);
     FP8_one(&(P->z));
@@ -388,7 +389,7 @@ void ZZZ::ECP8_neg(ECP8 *P)
 int ZZZ::ECP8_dbl(ECP8 *P)
 {
     FP8 t0,t1,t2,t3,iy,x3,y3;
-    if (P->inf) return -1;
+//    if (P->inf) return -1;
 
 	FP8_copy(&iy,&(P->y));		//FP8 iy=new FP8(y);
 #if SEXTIC_TWIST_ZZZ==D_TYPE
@@ -449,12 +450,12 @@ int ZZZ::ECP8_add(ECP8 *P,ECP8 *Q)
 {
     FP8 t0,t1,t2,t3,t4,x3,y3,z3;
 	int b3=3*CURVE_B_I;
-    if (Q->inf) return 0;
+/*    if (Q->inf) return 0;
     if (P->inf)
     {
         ECP8_copy(P,Q);
         return 0;
-    }
+    }*/
 
 	FP8_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
 	FP8_mul(&t1,&(P->y),&(Q->y));	//t1.mul(Q.y);		 // y.Q.y
@@ -667,7 +668,7 @@ void ZZZ::ECP8_frob(ECP8 *P,FP2 F[3],int n)
 	int i;
 	FP8 X,Y,Z;
 
-    if (P->inf) return;
+    //if (P->inf) return;
 
 	//ECP8_get(&X,&Y,P);		// F=(1+i)^(p-19)/24
 
