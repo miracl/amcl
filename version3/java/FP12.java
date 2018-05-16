@@ -686,8 +686,10 @@ t1.norm();
 		byte[] s=new byte[BIG.NLEN*BIG.BASEBITS+1];
 
 		for (i=0;i<4;i++)
+		{
 			t[i]=new BIG(u[i]);
-
+			t[i].norm();
+		}
 		g[0]=new FP12(q[0]);  // q[0]
 		g[1]=new FP12(g[0]); g[1].mul(q[1]); // q[0].q[1]
 		g[2]=new FP12(g[0]); g[2].mul(q[2]); // q[0].q[2]
@@ -705,7 +707,7 @@ t1.norm();
     // Number of bits
         mt.zero();
         for (i=0;i<4;i++) {
-            mt.add(t[i]); mt.norm();
+            mt.or(t[i]); 
         }
         nb=1+mt.nbits();
 

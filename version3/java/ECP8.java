@@ -645,6 +645,7 @@ public final class ECP8 {
 		{
 			t[i]=new BIG(u[i]);
 			Q[i].affine();
+			t[i].norm();
 		}
 
         T1[0] = new ECP8(); T1[0].copy(Q[0]);  // Q[0]
@@ -689,7 +690,7 @@ public final class ECP8 {
     // Number of bits
         mt.zero();
         for (i=0;i<16;i++) {
-            mt.add(t[i]); mt.norm();
+            mt.or(t[i]);
         }
         nb=1+mt.nbits();
 
@@ -842,7 +843,6 @@ public final class ECP8 {
 			x3Q.neg();
 			x5Q.neg();
 			x7Q.neg();
-
 		}	
 
 		x8Q.sub(x7Q);

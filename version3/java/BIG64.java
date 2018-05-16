@@ -477,6 +477,13 @@ public class BIG {
 			w[i]+=x.w[i];
 	}
 
+/* this|=x */
+	public void or(BIG x) {
+		for (int i=0;i<NLEN;i++)
+			w[i]|=x.w[i];
+	}
+
+
 /* this+=x, where x is int */
 	public void inc(int x) {
 		norm();

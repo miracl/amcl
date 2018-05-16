@@ -384,6 +384,12 @@ func (r *BIG) add(x *BIG) {
 	}
 }
 
+func (r *BIG) or(x *BIG) {
+	for i:=0;i<NLEN;i++ {
+		r.w[i]=r.w[i]|x.w[i] 
+	}
+}
+
 /* return this+x */
 func (r *BIG) Plus(x *BIG) *BIG {
 	s:=new(BIG)

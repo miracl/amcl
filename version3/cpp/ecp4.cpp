@@ -691,8 +691,7 @@ void ZZZ::ECP4_mul8(ECP4 *P,ECP4 Q[8],BIG u[8])
     BIG_zero(mt);
     for (i=0; i<8; i++)
     {
-        BIG_add(mt,mt,t[i]);
-        BIG_norm(mt);
+        BIG_or(mt,mt,t[i]);
     }
     nb=1+BIG_nbits(mt);
 

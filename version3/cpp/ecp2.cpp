@@ -623,8 +623,7 @@ void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
     BIG_zero(mt);
     for (i=0; i<4; i++)
     {
-        BIG_add(mt,mt,t[i]);
-        BIG_norm(mt);
+        BIG_or(mt,mt,t[i]);
     }
     nb=1+BIG_nbits(mt);
 

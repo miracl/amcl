@@ -55,7 +55,7 @@ public class TesttimeMPIN192 extends TestCase
 		}
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BLS)
 		{
-			System.out.print("BLS Pairing-Friendly Curve\n");
+			System.out.print("BLS24 Pairing-Friendly Curve\n");
 		}
 
 		System.out.format("Modulus size %d bits\n",FP.MODBITS); 

@@ -203,6 +203,15 @@ extern void BIG_invmod2m(BIG x);
 	@param z BIG number
  */
 extern void BIG_add(BIG x,BIG y,BIG z);
+
+/**	@brief Set BIG to logical or of two BIGs - output normalised
+ *
+	@param x BIG number, or of other two
+	@param y BIG number
+	@param z BIG number
+ */
+extern void BIG_or(BIG x,BIG y,BIG z);
+
 /**	@brief Increment BIG by a small integer - output not normalised
  *
 	@param x BIG number to be incremented

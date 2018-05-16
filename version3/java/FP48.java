@@ -895,7 +895,10 @@ public final class FP48 {
 		byte[] s4=new byte[BIG.NLEN*BIG.BASEBITS+1];
 
 		for (i=0;i<16;i++)
+		{
 			t[i]=new BIG(u[i]);
+			t[i].norm();
+		}
 
 		g1[0]=new FP48(q[0]);  // q[0]
 		g1[1]=new FP48(g1[0]); g1[1].mul(q[1]); // q[0].q[1]
@@ -939,7 +942,7 @@ public final class FP48 {
     // Number of bits
         mt.zero();
         for (i=0;i<16;i++) {
-            mt.add(t[i]); mt.norm();
+            mt.or(t[i]);
         }
         nb=1+mt.nbits();
 

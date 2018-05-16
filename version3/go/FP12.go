@@ -636,12 +636,13 @@ func pow4(q []*FP12,u []*BIG) *FP12 {
 // Make it odd
 	pb:=1-t[0].parity()
 	t[0].inc(pb)
-	t[0].norm();
+//	t[0].norm();
 
 // Number of bits
 	mt.zero()
 	for i:=0;i<4;i++ {
-		mt.add(t[i]); mt.norm()
+		t[i].norm()
+		mt.or(t[i])
 	}
 
 	nb:=1+mt.nbits();

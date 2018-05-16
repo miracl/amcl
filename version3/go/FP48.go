@@ -873,24 +873,25 @@ func pow16(q []*FP48,u []*BIG) *FP48 {
 // Make them odd
 	pb1:=1-t[0].parity()
 	t[0].inc(pb1)
-	t[0].norm();
+//	t[0].norm();
 
 	pb2:=1-t[4].parity()
 	t[4].inc(pb2)
-	t[4].norm();
+//	t[4].norm();
 
 	pb3:=1-t[8].parity()
 	t[8].inc(pb3)
-	t[8].norm();
+//	t[8].norm();
 
 	pb4:=1-t[12].parity()
 	t[12].inc(pb4)
-	t[12].norm();
+//	t[12].norm();
 
 // Number of bits
 	mt.zero()
 	for i:=0;i<16;i++ {
-		mt.add(t[i]); mt.norm()
+		t[i].norm()
+		mt.or(t[i])
 	}
 
 	nb:=1+mt.nbits();

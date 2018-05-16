@@ -567,8 +567,7 @@ void FP12_YYY_pow4(FP12_YYY *p,FP12_YYY *q,BIG_XXX u[4])
     BIG_XXX_zero(mt);
     for (i=0; i<4; i++)
     {
-        BIG_XXX_add(mt,mt,t[i]);
-        BIG_XXX_norm(mt);
+        BIG_XXX_or(mt,mt,t[i]);
     }
     nb=1+BIG_XXX_nbits(mt);
 

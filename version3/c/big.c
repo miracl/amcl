@@ -368,6 +368,21 @@ void BIG_XXX_add(BIG_XXX c,BIG_XXX a,BIG_XXX b)
 #endif
 }
 
+/* Set c=a or b */
+void BIG_XXX_or(BIG_XXX c,BIG_XXX a,BIG_XXX b)
+{
+    int i;
+	BIG_XXX_norm(a);
+	BIG_XXX_norm(b);
+    for (i=0; i<NLEN_XXX; i++)
+        c[i]=a[i]|b[i];
+#ifdef DEBUG_NORM
+    c[MPV_XXX]=1;
+    c[MNV_XXX]=0;
+#endif
+}
+
+
 /* Set c=c+d */
 void BIG_XXX_inc(BIG_XXX c,int d)
 {

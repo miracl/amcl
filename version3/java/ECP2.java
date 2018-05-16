@@ -510,6 +510,7 @@ public final class ECP2 {
 		for (i=0;i<4;i++)
 		{
 			t[i]=new BIG(u[i]);
+			t[i].norm();
 			Q[i].affine();
 		}
 
@@ -530,7 +531,7 @@ public final class ECP2 {
     // Number of bits
         mt.zero();
         for (i=0;i<4;i++) {
-            mt.add(t[i]); mt.norm();
+            mt.or(t[i]); 
         }
         nb=1+mt.nbits();
 

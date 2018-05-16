@@ -627,8 +627,7 @@ void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ Q[4],BIG_XXX u[4])
     BIG_XXX_zero(mt);
     for (i=0; i<4; i++)
     {
-        BIG_XXX_add(mt,mt,t[i]);
-        BIG_XXX_norm(mt);
+        BIG_XXX_or(mt,mt,t[i]);
     }
     nb=1+BIG_XXX_nbits(mt);
 

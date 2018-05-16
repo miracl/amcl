@@ -365,6 +365,23 @@ void XXX::BIG_add(BIG c,BIG a,BIG b)
 #endif
 }
 
+/* Set c=a or b */
+/* SU= 8 */
+void XXX::BIG_or(BIG c,BIG a,BIG b)
+{
+    int i;
+	BIG_norm(a);
+	BIG_norm(b);
+    for (i=0; i<NLEN_XXX; i++)
+        c[i]=a[i]|b[i];
+#ifdef DEBUG_NORM
+	c[MPV_XXX]=1;
+	c[MNV_XXX]=0;
+#endif
+
+}
+
+
 /* Set c=c+d */
 void XXX::BIG_inc(BIG c,int d)
 {

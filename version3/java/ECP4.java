@@ -578,6 +578,7 @@ public final class ECP4 {
 		{
 			t[i]=new BIG(u[i]);
 			Q[i].affine();
+			t[i].norm();
 		}
 
         T1[0] = new ECP4(); T1[0].copy(Q[0]);  // Q[0]
@@ -610,7 +611,7 @@ public final class ECP4 {
     // Number of bits
         mt.zero();
         for (i=0;i<8;i++) {
-            mt.add(t[i]); mt.norm();
+            mt.or(t[i]); 
         }
         nb=1+mt.nbits();
 

@@ -624,8 +624,7 @@ void YYY::FP48_pow16(FP48 *p,FP48 *q,BIG u[16])
     BIG_zero(mt);
     for (i=0; i<16; i++)
     {
-        BIG_add(mt,mt,t[i]);
-        BIG_norm(mt);
+        BIG_or(mt,mt,t[i]);
     }
     nb=1+BIG_nbits(mt);
 

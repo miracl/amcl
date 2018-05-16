@@ -731,16 +731,17 @@ func pow8(q []*FP24,u []*BIG) *FP24 {
 // Make them odd
 	pb1:=1-t[0].parity()
 	t[0].inc(pb1)
-	t[0].norm();
+//	t[0].norm();
 
 	pb2:=1-t[4].parity()
 	t[4].inc(pb2)
-	t[4].norm();
+//	t[4].norm();
 
 // Number of bits
 	mt.zero()
 	for i:=0;i<8;i++ {
-		mt.add(t[i]); mt.norm()
+		t[i].norm()
+		mt.or(t[i])
 	}
 
 	nb:=1+mt.nbits();

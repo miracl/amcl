@@ -604,8 +604,7 @@ void FP24_YYY_pow8(FP24_YYY *p,FP24_YYY *q,BIG_XXX u[8])
     BIG_XXX_zero(mt);
     for (i=0; i<8; i++)
     {
-        BIG_XXX_add(mt,mt,t[i]);
-        BIG_XXX_norm(mt);
+        BIG_XXX_or(mt,mt,t[i]);
     }
     nb=1+BIG_XXX_nbits(mt);
 
