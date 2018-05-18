@@ -646,6 +646,10 @@ impl FP12 {
 		let mut mt=BIG::new();
 		let mut t:[BIG;4]=[BIG::new_copy(&u[0]),BIG::new_copy(&u[1]),BIG::new_copy(&u[2]),BIG::new_copy(&u[3])];
 
+		for i in 0..4 {
+			t[i].norm();
+		}
+
 // precomputation
 		g[0].copy(&q[0]); r.copy(&g[0]);
 		g[1].copy(&r); g[1].mul(&q[1]);  // q[0].q[1]
@@ -665,7 +669,7 @@ impl FP12 {
 // Number of bits
 		mt.zero();
 		for i in 0..4 {
-			mt.add(&t[i]); mt.norm();
+			mt.or(&t[i]);
 		}
 
 		let nb=1+mt.nbits();

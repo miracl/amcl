@@ -30,7 +30,6 @@ use amcl::rsa2048::ff;
 use amcl::bn254;
 use amcl::bn254::pair;
 use amcl::bn254::ecp2::ECP2;
-use amcl::bn254::fp2::FP2;
 
 use std::time::Instant;
 
@@ -83,7 +82,7 @@ fn main()
 	println!("Modulus size {:} bits",ed25519::fp::MODBITS); 
 	println!("{:} bit build",arch::CHUNK); 
 
-	let mut G=ed25519::ecp::ECP::generator();
+	let G=ed25519::ecp::ECP::generator();
 
 	let mut r=ed25519::big::BIG::new_ints(&ed25519::rom::CURVE_ORDER);
 	let mut s=ed25519::big::BIG::randomnum(&r,&mut rng);

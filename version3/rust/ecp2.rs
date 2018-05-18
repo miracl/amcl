@@ -27,7 +27,7 @@ pub struct ECP2 {
 	x:FP2,
 	y:FP2,
 	z:FP2,
-	inf: bool
+//	inf: bool
 }
 
 #[allow(non_snake_case)]
@@ -38,7 +38,7 @@ impl ECP2 {
 				x: FP2::new(),
 				y: FP2::new_int(1),
 				z: FP2::new(),
-				inf: true
+//				inf: true
 		}
 	}
 #[allow(non_snake_case)]
@@ -53,8 +53,8 @@ impl ECP2 {
 		let mut y2=FP2::new_copy(&E.y);
 		y2.sqr();
 		if y2.equals(&mut rhs) {
-			E.inf=false;
-		} else {E.x.zero();E.inf=true}
+			//E.inf=false;
+		} else {E.inf();}
 		return E;
 }
 
@@ -68,14 +68,14 @@ impl ECP2 {
 		let mut rhs=ECP2::rhs(&mut E.x);
 		if rhs.sqrt() {
 			E.y.copy(&rhs);
-			E.inf=false;
-		} else {E.x.zero();E.inf=true}
+		//	E.inf=false;
+		} else {E.inf();}
 		return E;
 	}
 
 /* Test this=O? */
 	pub fn is_infinity(&self) -> bool {
-		if self.inf {return true}
+	//	if self.inf {return true}
 		let mut xx=FP2::new_copy(&self.x);
 		let mut zz=FP2::new_copy(&self.z);
 		return xx.iszilch() && zz.iszilch();
@@ -86,12 +86,12 @@ impl ECP2 {
 		self.x.copy(&P.x);
 		self.y.copy(&P.y);
 		self.z.copy(&P.z);
-		self.inf=P.inf;
+	//	self.inf=P.inf;
 	}
 
 /* set self=O */
 	pub fn inf(&mut self) {
-		self.inf=true;
+	//	self.inf=true;
 		self.x.zero();
 		self.y.one();
 		self.z.zero();
@@ -108,12 +108,12 @@ impl ECP2 {
 		self.x.cmove(&Q.x,d);
 		self.y.cmove(&Q.y,d);
 		self.z.cmove(&Q.z,d);
-
+/*
 		let bd:bool;
 		if d==0 {bd=false}
 		else {bd=true}
 
-		self.inf=(self.inf!=(self.inf!=Q.inf)&&bd);
+		self.inf=(self.inf!=(self.inf!=Q.inf)&&bd); */
 	}
 
 /* return 1 if b==c, no branching */
@@ -147,8 +147,8 @@ impl ECP2 {
 
 /* Test if P == Q */
 	pub fn equals(&mut self,Q :&mut ECP2) -> bool {
-		if self.is_infinity() && Q.is_infinity() {return true}
-		if self.is_infinity() || Q.is_infinity() {return false}
+	//	if self.is_infinity() && Q.is_infinity() {return true}
+	//	if self.is_infinity() || Q.is_infinity() {return false}
 
 		let mut a=FP2::new_copy(&self.x);
 		let mut b=FP2::new_copy(&Q.x); 
@@ -268,7 +268,7 @@ impl ECP2 {
 
 /* self+=self */
 	pub fn dbl(&mut self) -> isize {
-		if self.inf {return -1}
+	//	if self.inf {return -1}
 
 		let mut iy=FP2::new_copy(&self.y);
 		if ecp::SEXTIC_TWIST==ecp::D_TYPE {		
@@ -318,11 +318,11 @@ impl ECP2 {
 
 /* self+=Q - return 0 for add, 1 for double, -1 for O */
 	pub fn add(&mut self,Q:&ECP2) -> isize {
-		if self.inf {
+		/*if self.inf {
 			self.copy(Q);
 			return -1;
 		}
-		if Q.inf {return -1}
+		if Q.inf {return -1}*/
 
 
 		let b=3*rom::CURVE_B_I;
@@ -403,7 +403,7 @@ impl ECP2 {
 
 /* set this*=q, where q is Modulus, using Frobenius */
 	pub fn frob(&mut self,x:&FP2) {
-	 	if self.inf {return}
+	// 	if self.inf {return}
 		let mut x2=FP2::new_copy(x);
 		x2.sqr();
 		self.x.conj();
@@ -499,6 +499,7 @@ impl ECP2 {
 
 		for i in 0..4 {
 			Q[i].affine();
+			t[i].norm();
 		}
 
 		T[0].copy(&Q[0]); W.copy(&T[0]);
@@ -518,7 +519,7 @@ impl ECP2 {
 // Number of bits
 		mt.zero();
 		for i in 0..4 {
-			mt.add(&t[i]); mt.norm();
+			mt.or(&t[i]);
 		}
 
 		let nb=1+mt.nbits();

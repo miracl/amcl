@@ -357,11 +357,17 @@ impl FP {
     }
 /* self=1/self mod Modulus */
     pub fn inverse(&mut self) {
+/*        
   		let mut p = BIG::new_ints(&rom::MODULUS);      	
         let mut r=self.redc();
         r.invmodp(&mut p);
         self.x.copy(&r);
         self.nres();
+*/
+        let mut m2 = BIG::new_ints(&rom::MODULUS); 
+        m2.dec(2); m2.norm();
+        let inv=self.pow(&mut m2);
+        self.copy(&inv);          
     }
 
 /* return TRUE if self==a */
@@ -372,7 +378,47 @@ impl FP {
         return false;
     }   
 
+
 /* return self^e mod Modulus */
+    pub fn pow(&mut self,e: &mut BIG) -> FP {
+        let mut tb:[FP;16]=[FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new()];
+        const CT:usize=1+(big::NLEN*(big::BASEBITS as usize)+3)/4;
+        let mut w:[i8;CT]=[0;CT];
+
+        self.norm();
+        let mut t=BIG::new_copy(e);
+        t.norm();
+        let nb=1+(t.nbits()+3)/4;
+
+        for i in (0..nb) {
+            let lsbs=t.lastbits(4);
+            t.dec(lsbs);
+            t.norm();
+            w[i]=lsbs as i8;
+            t.fshr(4);
+        }
+        tb[0].one();
+        tb[1].copy(&self);
+
+        let mut c=FP::new();
+        for i in (2..16) {
+            c.copy(&tb[i-1]);
+            tb[i].copy(&c);
+            tb[i].mul(&self);
+        }
+        let mut r=FP::new_copy(&tb[w[nb-1] as usize]);
+        for i in  (0..nb-1).rev() {
+            r.sqr();
+            r.sqr();
+            r.sqr();
+            r.sqr();
+            r.mul(&tb[w[i] as usize])
+        }
+        r.reduce();
+        return r;
+}
+
+/* return self^e mod Modulus 
     pub fn pow(&mut self,e: &mut BIG) -> FP {
       	let p = BIG::new_ints(&rom::MODULUS);   	
         let mut r=FP::new_int(1);
@@ -388,7 +434,7 @@ impl FP {
         }
         r.x.rmod(&p);
         return r;
-    }
+    } */
 
 /* return sqrt(this) mod Modulus */
     pub fn sqrt(&mut self) -> FP {

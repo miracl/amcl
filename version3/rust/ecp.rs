@@ -26,7 +26,7 @@ pub struct ECP {
 	x:FP,
 	y:FP,
 	z:FP,
-	inf: bool
+//	inf: bool
 }
 
 pub const WEIERSTRASS:usize=0;
@@ -56,7 +56,7 @@ impl ECP {
 				x: FP::new(),
 				y: FP::new_int(1),
 				z: FP::new(),
-				inf: true
+//				inf: true
 		}
 	}
 
@@ -69,13 +69,13 @@ impl ECP {
 		let mut rhs=ECP::rhs(&mut E.x);
 		if CURVETYPE==MONTGOMERY {
 			if rhs.jacobi()==1 {
-				E.inf=false;
+			//	E.inf=false;
 			} else {E.inf()}
 		} else {
 			let mut y2=FP::new_copy(&E.y);
 			y2.sqr();	
 			if y2.equals(&mut rhs) {
-				E.inf=false
+			//	E.inf=false
 			} else {E.inf()}
 		}
 		return E;
@@ -93,7 +93,7 @@ impl ECP {
 			let mut ny=rhs.sqrt();
 			if ny.redc().parity()!=s {ny.neg()}
 			E.y.copy(&ny);
-			E.inf=false;
+		//	E.inf=false;
 		} else {E.inf()}
 		return E;
 	}
@@ -107,14 +107,14 @@ impl ECP {
 		let mut rhs=ECP::rhs(&mut E.x);
 		if rhs.jacobi()==1 {
 			if CURVETYPE!=MONTGOMERY {E.y.copy(&rhs.sqrt())}
-			E.inf=false;
-		} else {E.inf=true}
+		//	E.inf=false;
+		} else {E.inf();}
 		return E;
 	}
 
 /* set this=O */
 	pub fn inf(&mut self) {
-		self.inf=true;
+	//	self.inf=true;
 		self.x.zero();
 		if CURVETYPE!=MONTGOMERY {
 			self.y.one();
@@ -166,7 +166,7 @@ impl ECP {
 
 /* test for O point-at-infinity */
 	pub fn is_infinity(&self) -> bool {
-		if self.inf {return true}
+	//	if self.inf {return true}
 		let mut xx=FP::new_copy(&self.x);
 		let mut zz=FP::new_copy(&self.z);
 
@@ -188,12 +188,12 @@ impl ECP {
 		self.x.cswap(&mut Q.x,d);
 		if CURVETYPE!=MONTGOMERY {self.y.cswap(&mut Q.y,d)}
 		self.z.cswap(&mut Q.z,d);
-		
+/*		
 		let mut bd=true;
 		if d==0 {bd=false}
 		bd=bd&&(self.inf!=Q.inf);
 		self.inf=bd!=self.inf;
-		Q.inf=bd!=Q.inf;
+		Q.inf=bd!=Q.inf; */
 	}
 
 /* Conditional move of Q to P dependant on d */
@@ -201,9 +201,10 @@ impl ECP {
 		self.x.cmove(&Q.x,d);
 		if CURVETYPE!=MONTGOMERY {self.y.cmove(&Q.y,d)}
 		self.z.cmove(&Q.z,d);
+	/*	
 		let mut bd=true;
 		if d==0 {bd=false}
-		self.inf=(self.inf!=((self.inf!=Q.inf)&&bd));
+		self.inf=(self.inf!=((self.inf!=Q.inf)&&bd)); */
 	}
 
 /* return 1 if b==c, no branching */
@@ -218,7 +219,7 @@ impl ECP {
 		self.x.copy(&P.x);
 		if CURVETYPE!=MONTGOMERY {self.y.copy(&P.y)}
 		self.z.copy(&P.z);
-		self.inf=P.inf;
+	//	self.inf=P.inf;
 }
 
 /* this=-this */
@@ -261,8 +262,8 @@ impl ECP {
 
 /* Test P == Q */
 	pub fn equals(&mut self,Q: &mut ECP) -> bool {
-		if self.is_infinity() && Q.is_infinity() {return true}
-		if self.is_infinity() || Q.is_infinity() {return false}
+	//	if self.is_infinity() && Q.is_infinity() {return true}
+	//	if self.is_infinity() || Q.is_infinity() {return false}
 
 		let mut a=FP::new();
 		let mut b=FP::new();
@@ -279,7 +280,7 @@ impl ECP {
 
 /* set to affine - from (x,y,z) to (x,y) */
 	pub fn affine(&mut self) {
-		if self.is_infinity() {self.inf(); return}
+		if self.is_infinity() { return}
 		let mut one=FP::new_int(1);
 		if self.z.equals(&mut one) {return}
 		self.z.inverse();
@@ -373,7 +374,7 @@ impl ECP {
 
 /* this*=2 */
 	pub fn dbl(&mut self) {
-		if self.inf {return}
+	//	if self.inf {return}
 
 		if CURVETYPE==WEIERSTRASS {
 
@@ -529,11 +530,11 @@ impl ECP {
     /* self+=Q */
     pub fn add(&mut self,Q:&ECP)
     {
-        if self.inf {
+    /*    if self.inf {
 			self.copy(&Q);
 			return;
         }
-        if Q.inf {return} 
+        if Q.inf {return}  */
 
         if CURVETYPE==WEIERSTRASS {
  

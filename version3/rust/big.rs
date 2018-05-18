@@ -303,6 +303,12 @@ impl BIG {
 		}
 	}
 
+    pub fn or(&mut self,r:&BIG) {
+        for i in 0 ..NLEN {
+            self.w[i]|=r.w[i] 
+        }
+    }
+
     pub fn dbl(&mut self) {
         for i in 0 ..NLEN {
             self.w[i]+=self.w[i]
