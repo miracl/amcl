@@ -17,26 +17,26 @@
     under the License.
 */
 
-/* AMCL Fp^12 functions */
+/* AMCL Fp^24 functions */
 
-/* FP12 elements are of the form a+i.b+i^2.c */
+/* FP24 elements are of the form a+i.b+i^2.c */
 
-var FP12 = function(ctx) {
+var FP24 = function(ctx) {
 
     /* general purpose constructor */
-    var FP12 = function(d, e, f) {
-        if (d instanceof FP12) {
-            this.a = new ctx.FP4(d.a);
-            this.b = new ctx.FP4(d.b);
-            this.c = new ctx.FP4(d.c);
+    var FP24 = function(d, e, f) {
+        if (d instanceof FP24) {
+            this.a = new ctx.FP8(d.a);
+            this.b = new ctx.FP8(d.b);
+            this.c = new ctx.FP8(d.c);
         } else {
-            this.a = new ctx.FP4(d);
-            this.b = new ctx.FP4(e);
-            this.c = new ctx.FP4(f);
+            this.a = new ctx.FP8(d);
+            this.b = new ctx.FP8(e);
+            this.c = new ctx.FP8(f);
         }
     };
 
-    FP12.prototype = {
+    FP24.prototype = {
         /* reduce all components of this mod Modulus */
         reduce: function() {
             this.a.reduce();
@@ -59,10 +59,9 @@ var FP12 = function(ctx) {
 
         /* test x==1 ? */
         isunity: function() {
-            var one = new ctx.FP4(1);
+            var one = new ctx.FP8(1);
             return (this.a.equals(one) && this.b.iszilch() && this.c.iszilch());
         },
-
 
         /* conditional copy of g to this depending on d */
         cmove: function(g, d) {
@@ -74,20 +73,20 @@ var FP12 = function(ctx) {
 
         /* Constant time select from pre-computed table */
         select: function(g, b) {
-            var invf = new FP12(0),
+            var invf = new FP24(0),
             m = b >> 31,
             babs = (b ^ m) - m;
 
             babs = (babs - 1) / 2;
 
-            this.cmove(g[0], FP12.teq(babs, 0)); // conditional move
-            this.cmove(g[1], FP12.teq(babs, 1));
-            this.cmove(g[2], FP12.teq(babs, 2));
-            this.cmove(g[3], FP12.teq(babs, 3));
-            this.cmove(g[4], FP12.teq(babs, 4));
-            this.cmove(g[5], FP12.teq(babs, 5));
-            this.cmove(g[6], FP12.teq(babs, 6));
-            this.cmove(g[7], FP12.teq(babs, 7));
+            this.cmove(g[0], FP24.teq(babs, 0)); // conditional move
+            this.cmove(g[1], FP24.teq(babs, 1));
+            this.cmove(g[2], FP24.teq(babs, 2));
+            this.cmove(g[3], FP24.teq(babs, 3));
+            this.cmove(g[4], FP24.teq(babs, 4));
+            this.cmove(g[5], FP24.teq(babs, 5));
+            this.cmove(g[6], FP24.teq(babs, 6));
+            this.cmove(g[7], FP24.teq(babs, 7));
 
             invf.copy(this);
             invf.conj();
@@ -135,14 +134,14 @@ var FP12 = function(ctx) {
             this.c.conj();
         },
 
-        /* set this from 3 FP4s */
+        /* set this from 3 FP8s */
         set: function(d, e, f) {
             this.a.copy(d);
             this.b.copy(e);
             this.c.copy(f);
         },
 
-        /* set this from one ctx.FP4 */
+        /* set this from one ctx.FP8 */
         seta: function(d) {
             this.a.copy(d);
             this.b.zero();
@@ -151,10 +150,10 @@ var FP12 = function(ctx) {
 
         /* Granger-Scott Unitary Squaring */
         usqr: function() {
-            var A = new ctx.FP4(this.a), //A.copy(this.a)
-                B = new ctx.FP4(this.c), //B.copy(this.c)
-                C = new ctx.FP4(this.b), //C.copy(this.b)
-                D = new ctx.FP4(0);
+            var A = new ctx.FP8(this.a), //A.copy(this.a)
+                B = new ctx.FP8(this.c), //B.copy(this.c)
+                C = new ctx.FP8(this.b), //C.copy(this.b)
+                D = new ctx.FP8(0);
 
             this.a.sqr();
             D.copy(this.a);
@@ -189,10 +188,10 @@ var FP12 = function(ctx) {
 
         /* Chung-Hasan SQR2 method from http://cacr.uwaterloo.ca/techreports/2006/cacr2006-24.pdf */
         sqr: function() {
-            var A = new ctx.FP4(this.a), //A.copy(this.a)
-                B = new ctx.FP4(this.b), //B.copy(this.b)
-                C = new ctx.FP4(this.c), //C.copy(this.c)
-                D = new ctx.FP4(this.a); //D.copy(this.a)
+            var A = new ctx.FP8(this.a), //A.copy(this.a)
+                B = new ctx.FP8(this.b), //B.copy(this.b)
+                C = new ctx.FP8(this.c), //C.copy(this.c)
+                D = new ctx.FP8(this.a); //D.copy(this.a)
 
             A.sqr();
             B.mul(this.c);
@@ -223,14 +222,14 @@ var FP12 = function(ctx) {
             this.norm();
         },
 
-        /* FP12 full multiplication this=this*y */
+        /* FP24 full multiplication this=this*y */
         mul: function(y) {
-            var z0 = new ctx.FP4(this.a), //z0.copy(this.a)
-                z1 = new ctx.FP4(0),
-                z2 = new ctx.FP4(this.b), //z2.copy(this.b)
-                z3 = new ctx.FP4(0),
-                t0 = new ctx.FP4(this.a), //t0.copy(this.a)
-                t1 = new ctx.FP4(y.a); //t1.copy(y.a)
+            var z0 = new ctx.FP8(this.a), //z0.copy(this.a)
+                z1 = new ctx.FP8(0),
+                z2 = new ctx.FP8(this.b), //z2.copy(this.b)
+                z3 = new ctx.FP8(0),
+                t0 = new ctx.FP8(this.a), //t0.copy(this.a)
+                t1 = new ctx.FP8(y.a); //t1.copy(y.a)
 
             z0.mul(y.a);
             z2.mul(y.b);
@@ -298,11 +297,11 @@ var FP12 = function(ctx) {
         /* Special case this*=y that arises from special form of ATE pairing line function */
         smul: function(y, twist) {
             if (twist == ctx.ECP.D_TYPE) {
-                var z0 = new ctx.FP4(this.a), //z0.copy(this.a);
-                    z2 = new ctx.FP4(this.b), //z2.copy(this.b);
-                    z3 = new ctx.FP4(this.b), //z3.copy(this.b);
-                    t0 = new ctx.FP4(0),
-                    t1 = new ctx.FP4(y.a); //t1.copy(y.a);
+                var z0 = new ctx.FP8(this.a), //z0.copy(this.a);
+                    z2 = new ctx.FP8(this.b), //z2.copy(this.b);
+                    z3 = new ctx.FP8(this.b), //z3.copy(this.b);
+                    t0 = new ctx.FP8(0),
+                    t1 = new ctx.FP8(y.a); //t1.copy(y.a);
 
                 z0.mul(y.a);
                 z2.pmul(y.b.real());
@@ -341,12 +340,12 @@ var FP12 = function(ctx) {
             }
 
             if (twist == ctx.ECP.M_TYPE) {
-                var z0=new ctx.FP4(this.a);
-                var z1=new ctx.FP4(0);
-                var z2=new ctx.FP4(0);
-                var z3=new ctx.FP4(0);
-                var t0=new ctx.FP4(this.a);
-                var t1=new ctx.FP4(0);
+                var z0=new ctx.FP8(this.a);
+                var z1=new ctx.FP8(0);
+                var z2=new ctx.FP8(0);
+                var z3=new ctx.FP8(0);
+                var t0=new ctx.FP8(this.a);
+                var t1=new ctx.FP8(0);
 
                 z0.mul(y.a);
                 t0.add(this.b);
@@ -396,10 +395,10 @@ var FP12 = function(ctx) {
 
         /* this=1/this */
         inverse: function() {
-            var f0 = new ctx.FP4(this.a), //f0.copy(this.a)
-                f1 = new ctx.FP4(this.b), //f1.copy(this.b)
-                f2 = new ctx.FP4(this.a), //f2.copy(this.a)
-                f3 = new ctx.FP4(0);
+            var f0 = new ctx.FP8(this.a), //f0.copy(this.a)
+                f1 = new ctx.FP8(this.b), //f1.copy(this.b)
+                f2 = new ctx.FP8(this.a), //f2.copy(this.a)
+                f3 = new ctx.FP8(0);
 
             f0.sqr();
             f1.mul(this.c);
@@ -441,24 +440,29 @@ var FP12 = function(ctx) {
         },
 
         /* this=this^p, where p=Modulus, using Frobenius */
-        frob: function(f) {
+        frob: function(f,n) {
             var f2 = new ctx.FP2(f),
                 f3 = new ctx.FP2(f);
 
             f2.sqr();
             f3.mul(f2);
 
-            this.a.frob(f3);
-            this.b.frob(f3);
-            this.c.frob(f3);
+			f3.mul_ip(); f3.norm();
 
-            this.b.pmul(f);
-            this.c.pmul(f2);
-        },
+			for (var i=0;i<n;i++)
+			{
+				this.a.frob(f3);
+				this.b.frob(f3);
+				this.c.frob(f3);
+
+				this.b.qmul(f); this.b.times_i2();
+				this.c.qmul(f2); this.c.times_i2(); this.c.times_i2();
+			}
+		},
 
         /* trace function */
         trace: function() {
-            var t = new ctx.FP4(0);
+            var t = new ctx.FP8(0);
 
             t.copy(this.a);
             t.imul(3);
@@ -477,56 +481,110 @@ var FP12 = function(ctx) {
             var t = [],
                 i;
 
-            this.a.geta().getA().toBytes(t);
+            this.a.geta().geta().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i] = t[i];
             }
-            this.a.geta().getB().toBytes(t);
+            this.a.geta().geta().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + ctx.BIG.MODBYTES] = t[i];
             }
-            this.a.getb().getA().toBytes(t);
+            this.a.geta().getb().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 2 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.a.getb().getB().toBytes(t);
+            this.a.geta().getb().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 3 * ctx.BIG.MODBYTES] = t[i];
             }
 
-            this.b.geta().getA().toBytes(t);
+            this.a.getb().geta().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 4 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.b.geta().getB().toBytes(t);
+            this.a.getb().geta().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 5 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.b.getb().getA().toBytes(t);
+            this.a.getb().getb().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 6 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.b.getb().getB().toBytes(t);
+            this.a.getb().getb().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 7 * ctx.BIG.MODBYTES] = t[i];
             }
 
-            this.c.geta().getA().toBytes(t);
+
+            this.b.geta().geta().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 8 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.c.geta().getB().toBytes(t);
+            this.b.geta().geta().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 9 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.c.getb().getA().toBytes(t);
+            this.b.geta().getb().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 10 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.c.getb().getB().toBytes(t);
+            this.b.geta().getb().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 w[i + 11 * ctx.BIG.MODBYTES] = t[i];
             }
+
+            this.b.getb().geta().getA().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 12 * ctx.BIG.MODBYTES] = t[i];
+            }
+            this.b.getb().geta().getB().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 13 * ctx.BIG.MODBYTES] = t[i];
+            }
+            this.b.getb().getb().getA().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 14 * ctx.BIG.MODBYTES] = t[i];
+            }
+            this.b.getb().getb().getB().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 15 * ctx.BIG.MODBYTES] = t[i];
+            }
+
+
+            this.c.geta().geta().getA().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 16 * ctx.BIG.MODBYTES] = t[i];
+            }
+            this.c.geta().geta().getB().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 17 * ctx.BIG.MODBYTES] = t[i];
+            }
+            this.c.geta().getb().getA().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 18 * ctx.BIG.MODBYTES] = t[i];
+            }
+            this.c.geta().getb().getB().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 19 * ctx.BIG.MODBYTES] = t[i];
+            }
+
+            this.c.getb().geta().getA().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 20 * ctx.BIG.MODBYTES] = t[i];
+            }
+            this.c.getb().geta().getB().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 21 * ctx.BIG.MODBYTES] = t[i];
+            }
+            this.c.getb().getb().getA().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 22 * ctx.BIG.MODBYTES] = t[i];
+            }
+            this.c.getb().getb().getB().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                w[i + 23 * ctx.BIG.MODBYTES] = t[i];
+            }
+
         },
 
         /* set this=this^e */
@@ -540,7 +598,7 @@ var FP12 = function(ctx) {
             e3.pmul(3);
             e3.norm();
 
-            w = new FP12(this); //w.copy(this);
+            w = new FP24(this); //w.copy(this);
             nb = e3.nbits();
 
             for (i = nb - 2; i >= 1; i--)
@@ -567,8 +625,8 @@ var FP12 = function(ctx) {
             var R = [],
                 i, b;
 
-            R[0] = new FP12(1);
-            R[1] = new FP12(this);
+            R[0] = new FP24(1);
+            R[1] = new FP24(this);
 
             for (i = bts - 1; i >= 0; i--) {
                 b = (e >> i) & 1;
@@ -601,8 +659,8 @@ var FP12 = function(ctx) {
             b = new ctx.BIG(e);
             b.div(m);
 
-            g1 = new FP12(0);
-            g2 = new FP12(0);
+            g1 = new FP24(0);
+            g2 = new FP24(0);
             g1.copy(this);
 
             c = g1.trace();
@@ -613,7 +671,7 @@ var FP12 = function(ctx) {
             }
 
             g2.copy(g1);
-            g2.frob(f);
+            g2.frob(f,1);
             cp = g2.trace();
             g1.conj();
             g2.mul(g1);
@@ -627,9 +685,9 @@ var FP12 = function(ctx) {
     };
 
     /* convert from byte array to FP12 */
-    FP12.fromBytes = function(w) {
+    FP24.fromBytes = function(w) {
         var t = [],
-            i, a, b, c, d, e, f, g, r;
+            i, a, b, c, d, e, f, g, r, ea, eb;
 
         for (i = 0; i < ctx.BIG.MODBYTES; i++) {
             t[i] = w[i];
@@ -651,7 +709,7 @@ var FP12 = function(ctx) {
         b = ctx.BIG.fromBytes(t);
         d = new ctx.FP2(a, b); //d.bset(a,b);
 
-        e = new ctx.FP4(c, d); //e.set(c,d);
+        ea = new ctx.FP4(c, d); //e.set(c,d);
 
         for (i = 0; i < ctx.BIG.MODBYTES; i++) {
             t[i] = w[i + 4 * ctx.BIG.MODBYTES];
@@ -671,9 +729,12 @@ var FP12 = function(ctx) {
             t[i] = w[i + 7 * ctx.BIG.MODBYTES];
         }
         b = ctx.BIG.fromBytes(t);
-        d = new ctx.FP2(a, b);
+        d = new ctx.FP2(a, b); //d.bset(a,b);
 
-        f = new ctx.FP4(c, d); //f.set(c,d);
+        eb = new ctx.FP4(c, d); //e.set(c,d);
+
+		e = new ctx.FP8(ea,eb);
+
 
         for (i = 0; i < ctx.BIG.MODBYTES; i++) {
             t[i] = w[i + 8 * ctx.BIG.MODBYTES];
@@ -693,198 +754,214 @@ var FP12 = function(ctx) {
             t[i] = w[i + 11 * ctx.BIG.MODBYTES];
         }
         b = ctx.BIG.fromBytes(t);
+        d = new ctx.FP2(a, b);
+
+		ea = new ctx.FP4(c, d); //e.set(c,d);
+
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 12 * ctx.BIG.MODBYTES];
+        }
+        a = ctx.BIG.fromBytes(t);
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 13 * ctx.BIG.MODBYTES];
+        }
+        b = ctx.BIG.fromBytes(t);
+        c = new ctx.FP2(a, b); //c.bset(a,b);
+
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 14 * ctx.BIG.MODBYTES];
+        }
+        a = ctx.BIG.fromBytes(t);
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 15 * ctx.BIG.MODBYTES];
+        }
+        b = ctx.BIG.fromBytes(t);
+        d = new ctx.FP2(a, b);
+
+		eb = new ctx.FP4(c, d); //e.set(c,d);
+
+        f = new ctx.FP8(ea, eb); //f.set(c,d);
+
+
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 16 * ctx.BIG.MODBYTES];
+        }
+        a = ctx.BIG.fromBytes(t);
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 17 * ctx.BIG.MODBYTES];
+        }
+        b = ctx.BIG.fromBytes(t);
+        c = new ctx.FP2(a, b); //c.bset(a,b);
+
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 18 * ctx.BIG.MODBYTES];
+        }
+        a = ctx.BIG.fromBytes(t);
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 19 * ctx.BIG.MODBYTES];
+        }
+        b = ctx.BIG.fromBytes(t);
         d = new ctx.FP2(a, b); //d.bset(a,b);
 
-        g = new ctx.FP4(c, d); //g.set(c,d);
+		ea = new ctx.FP4(c, d); //e.set(c,d);
 
-        r = new FP12(e, f, g); //r.set(e,f,g);
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 20 * ctx.BIG.MODBYTES];
+        }
+        a = ctx.BIG.fromBytes(t);
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 21 * ctx.BIG.MODBYTES];
+        }
+        b = ctx.BIG.fromBytes(t);
+        c = new ctx.FP2(a, b); //c.bset(a,b);
+
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 22 * ctx.BIG.MODBYTES];
+        }
+        a = ctx.BIG.fromBytes(t);
+        for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+            t[i] = w[i + 23 * ctx.BIG.MODBYTES];
+        }
+        b = ctx.BIG.fromBytes(t);
+        d = new ctx.FP2(a, b); //d.bset(a,b);
+
+		eb = new ctx.FP4(c, d); //e.set(c,d);
+
+        g = new ctx.FP8(ea, eb); //g.set(c,d);
+
+
+        r = new FP24(e, f, g); //r.set(e,f,g);
 
         return r;
     };
 
-
     /* return 1 if b==c, no branching */
-    FP12.teq = function(b, c) {
+    FP24.teq = function(b, c) {
         var x = b ^ c;
         x -= 1; // if x=0, x now -1
         return ((x >> 31) & 1);
     };
 
-    /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
+    /* p=q0^u0.q1^u1.q2^u2.q3^u3... */
 // Bos & Costello https://eprint.iacr.org/2013/458.pdf
 // Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
 // Side channel attack secure 
 
-    FP12.pow4 = function(q, u) {
-        var g = [],
-            r = new FP12(0),
-            p = new FP12(0),
+    FP24.pow8 = function(q, u) {
+        var g1 = [],
+			g2 = [],
+            r = new FP24(0),
+            p = new FP24(0),
             t = [],
             mt = new ctx.BIG(0),
-            w = [],
-            s = [], 
-            i, j, nb, pb;
+            w1 = [],
+            s1 = [], 
+            w2 = [],
+            s2 = [], 
+            i, j, k, nb, pb1, pb2;
 
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < 8; i++) {
             t[i] = new ctx.BIG(u[i]); t[i].norm();
         }
 
-        g[0] = new FP12(q[0]);  // q[0]
-        g[1] = new FP12(g[0]); g[1].mul(q[1])   // q[0].q[1]
-        g[2] = new FP12(g[0]); g[2].mul(q[2])   // q[0].q[2]
-        g[3] = new FP12(g[1]); g[3].mul(q[2])   // q[0].q[1].q[2]
-        g[4] = new FP12(q[0]); g[4].mul(q[3])   // q[0].q[3]
-        g[5] = new FP12(g[1]); g[5].mul(q[3])   // q[0].q[1].q[3]
-        g[6] = new FP12(g[2]); g[6].mul(q[3])   // q[0].q[2].q[3]
-        g[7] = new FP12(g[3]); g[7].mul(q[3])   // q[0].q[1].q[2].q[3]
+        g1[0] = new FP24(q[0]);  // q[0]
+        g1[1] = new FP24(g1[0]); g1[1].mul(q[1]);   // q[0].q[1]
+        g1[2] = new FP24(g1[0]); g1[2].mul(q[2]);   // q[0].q[2]
+        g1[3] = new FP24(g1[1]); g1[3].mul(q[2]);   // q[0].q[1].q[2]
+        g1[4] = new FP24(q[0]);  g1[4].mul(q[3]);   // q[0].q[3]
+        g1[5] = new FP24(g1[1]); g1[5].mul(q[3]);   // q[0].q[1].q[3]
+        g1[6] = new FP24(g1[2]); g1[6].mul(q[3]);   // q[0].q[2].q[3]
+        g1[7] = new FP24(g1[3]); g1[7].mul(q[3]);   // q[0].q[1].q[2].q[3]
+
+//  Use Frobenius 
+        var Fa = new ctx.BIG(0);
+        Fa.rcopy(ctx.ROM_FIELD.Fra);
+        var Fb = new ctx.BIG(0);
+        Fb.rcopy(ctx.ROM_FIELD.Frb);
+        var f = new ctx.FP2(Fa, Fb);
+
+		for (i=0;i<8;i++) {
+			g2[i]=new FP24(g1[i]);
+			g2[i].frob(f,4);
+		}
 
     // Make it odd
-        pb=1-t[0].parity();
-        t[0].inc(pb);
+        pb1=1-t[0].parity();
+        t[0].inc(pb1);
         t[0].norm();
+
+        pb2=1-t[4].parity();
+        t[4].inc(pb2);
+        t[4].norm();
 
     // Number of bits
         mt.zero();
-        for (i=0;i<4;i++) {
-            mt.or(t[i]);
+        for (i=0;i<8;i++) {
+            mt.or(t[i]); 
         }
 
         nb=1+mt.nbits();
 
     // Sign pivot 
-        s[nb-1]=1;
+        s1[nb-1]=1;
+        s2[nb-1]=1;
         for (i=0;i<nb-1;i++) {
             t[0].fshr(1);
-            s[i]=2*t[0].parity()-1;
+            s1[i]=2*t[0].parity()-1;
+            t[4].fshr(1);
+            s2[i]=2*t[4].parity()-1;
+ 
         }
 
     // Recoded exponent
         for (i=0; i<nb; i++) {
-            w[i]=0;
-            var k=1;
+            w1[i]=0;
+            k=1;
             for (j=1; j<4; j++) {
-                var bt=s[i]*t[j].parity();
+                var bt=s1[i]*t[j].parity();
                 t[j].fshr(1);
                 t[j].dec(bt>>1);
                 t[j].norm();
-                w[i]+=bt*k;
+                w1[i]+=bt*k;
+                k*=2;
+            }
+            w2[i]=0;
+            k=1;
+            for (j=5; j<8; j++) {
+                var bt=s2[i]*t[j].parity();
+                t[j].fshr(1);
+                t[j].dec(bt>>1);
+                t[j].norm();
+                w2[i]+=bt*k;
                 k*=2;
             }
         }   
 
     // Main loop
-        p.select(g,2*w[nb-1]+1); 
+        p.select(g1,2*w1[nb-1]+1); 
+		r.select(g2,2*w2[nb-1]+1); 
+		p.mul(r);
         for (i=nb-2;i>=0;i--) {
             p.usqr();
-            r.select(g,2*w[i]+s[i]);
+            r.select(g1,2*w1[i]+s1[i]);
+            p.mul(r);
+            r.select(g2,2*w2[i]+s2[i]);
             p.mul(r);
         }
 
     // apply correction
         r.copy(q[0]); r.conj();   
         r.mul(p);
-        p.cmove(r,pb);
+        p.cmove(r,pb1);
+
+        r.copy(q[4]); r.conj();   
+        r.mul(p);
+        p.cmove(r,pb2);
+
 
         p.reduce();
         return p;
     };
 
-
-    /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
-    /* Timing attack secure, but not cache attack secure */
-/*
-    FP12.pow4 = function(q, u) {
-        var a = [],
-            g = [],
-            s = [],
-            c = new FP12(1),
-            p = new FP12(0),
-            t = [],
-            mt = new ctx.BIG(0),
-            w = [],
-            i, j, nb, m;
-
-        for (i = 0; i < 4; i++) {
-            t[i] = new ctx.BIG(u[i]);
-        }
-
-        s[0] = new FP12(0);
-        s[1] = new FP12(0);
-
-        g[0] = new FP12(q[0]);
-        s[0].copy(q[1]);
-        s[0].conj();
-        g[0].mul(s[0]);
-        g[1] = new FP12(g[0]);
-        g[2] = new FP12(g[0]);
-        g[3] = new FP12(g[0]);
-        g[4] = new FP12(q[0]);
-        g[4].mul(q[1]);
-        g[5] = new FP12(g[4]);
-        g[6] = new FP12(g[4]);
-        g[7] = new FP12(g[4]);
-
-        s[1].copy(q[2]);
-        s[0].copy(q[3]);
-        s[0].conj();
-        s[1].mul(s[0]);
-        s[0].copy(s[1]);
-        s[0].conj();
-        g[1].mul(s[0]);
-        g[2].mul(s[1]);
-        g[5].mul(s[0]);
-        g[6].mul(s[1]);
-        s[1].copy(q[2]);
-        s[1].mul(q[3]);
-        s[0].copy(s[1]);
-        s[0].conj();
-        g[0].mul(s[0]);
-        g[3].mul(s[1]);
-        g[4].mul(s[0]);
-        g[7].mul(s[1]);
-
-        // if power is even add 1 to power, and add q to correction 
-
-        for (i = 0; i < 4; i++) {
-            if (t[i].parity() == 0) {
-                t[i].inc(1);
-                t[i].norm();
-                c.mul(q[i]);
-            }
-            mt.add(t[i]);
-            mt.norm();
-        }
-        c.conj();
-        nb = 1 + mt.nbits();
-
-        // convert exponent to signed 1-bit window 
-        for (j = 0; j < nb; j++) {
-            for (i = 0; i < 4; i++) {
-                a[i] = (t[i].lastbits(2) - 2);
-                t[i].dec(a[i]);
-                t[i].norm();
-                t[i].fshr(1);
-            }
-            w[j] = (8 * a[0] + 4 * a[1] + 2 * a[2] + a[3]);
-        }
-        w[nb] = (8 * t[0].lastbits(2) + 4 * t[1].lastbits(2) + 2 * t[2].lastbits(2) + t[3].lastbits(2));
-        p.copy(g[Math.floor((w[nb] - 1) / 2)]);
-
-        for (i = nb - 1; i >= 0; i--) {
-            m = w[i] >> 31;
-            j = (w[i] ^ m) - m; // j=abs(w[i]) 
-            j = (j - 1) / 2;
-            s[0].copy(g[j]);
-            s[1].copy(g[j]);
-            s[1].conj();
-            p.usqr();
-            p.mul(s[m & 1]);
-        }
-        p.mul(c); // apply correction 
-        p.reduce();
-
-        return p;
-    };
-*/
-    return FP12;
+    return FP24;
 };

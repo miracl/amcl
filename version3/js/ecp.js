@@ -26,7 +26,7 @@ var ECP = function(ctx) {
         this.x = new ctx.FP(0);
         this.y = new ctx.FP(1);
         this.z = new ctx.FP(0);
-        this.INF = true;
+//        this.INF = true;
     };
 
     ECP.WEIERSTRASS = 0;
@@ -51,29 +51,29 @@ var ECP = function(ctx) {
     ECP.prototype = {
         /* test this=O point-at-infinity */
         is_infinity: function() {
-            if (this.INF) {
-                return true;
-            }
+  //          if (this.INF) {
+  //              return true;
+  //          }
 
             this.x.reduce();
             this.z.reduce();
 
             if (ECP.CURVETYPE == ECP.EDWARDS) {
                 this.y.reduce();
-                this.INF = (this.x.iszilch() && this.y.equals(this.z));
+                return (this.x.iszilch() && this.y.equals(this.z));
             } else if (ECP.CURVETYPE == ECP.WEIERSTRASS) {
                 this.y.reduce();
-                this.INF = (this.x.iszilch() && this.z.iszilch());
+                return (this.x.iszilch() && this.z.iszilch());
             } else if (ECP.CURVETYPE == ECP.MONTGOMERY) {
-                this.INF = (this.z.iszilch());
+                return (this.z.iszilch());
             }
 
-            return this.INF;
+            return true;
         },
 
         /* conditional swap of this and Q dependant on d */
         cswap: function(Q, d) {
-            var bd;
+    //        var bd;
 
             this.x.cswap(Q.x, d);
             if (ECP.CURVETYPE != ECP.MONTGOMERY) {
@@ -81,16 +81,16 @@ var ECP = function(ctx) {
             }
             this.z.cswap(Q.z, d);
 
-            bd = (d !== 0) ? true : false;
-            bd = bd & (this.INF ^ Q.INF);
-            this.INF ^= bd;
-            Q.INF ^= bd;
+   //         bd = (d !== 0) ? true : false;
+   //         bd = bd & (this.INF ^ Q.INF);
+   //         this.INF ^= bd;
+   //         Q.INF ^= bd;
 
         },
 
         /* conditional move of Q to P dependant on d */
         cmove: function(Q, d) {
-            var bd;
+  //          var bd;
 
             this.x.cmove(Q.x, d);
             if (ECP.CURVETYPE != ECP.MONTGOMERY) {
@@ -98,8 +98,8 @@ var ECP = function(ctx) {
             }
             this.z.cmove(Q.z, d);
 
-            bd = (d !== 0) ? true : false;
-            this.INF ^= (this.INF ^ Q.INF) & bd;
+    //        bd = (d !== 0) ? true : false;
+    //        this.INF ^= (this.INF ^ Q.INF) & bd;
         },
 
         /* Constant time select from pre-computed table */
@@ -129,13 +129,13 @@ var ECP = function(ctx) {
         equals: function(Q) {
             var a, b;
 
-            if (this.is_infinity() && Q.is_infinity()) {
-                return true;
-            }
+       //     if (this.is_infinity() && Q.is_infinity()) {
+       //         return true;
+       //     }
 
-            if (this.is_infinity() || Q.is_infinity()) {
-                return false;
-            }
+       //     if (this.is_infinity() || Q.is_infinity()) {
+       //         return false;
+       //     }
 
             a = new ctx.FP(0);
             b = new ctx.FP(0);
@@ -172,7 +172,7 @@ var ECP = function(ctx) {
                 this.y.copy(P.y);
             }
             this.z.copy(P.z);
-            this.INF = P.INF;
+       //     this.INF = P.INF;
         },
 
         /* this=-this */
@@ -191,7 +191,7 @@ var ECP = function(ctx) {
 
         /* set this=O */
         inf: function() {
-            this.INF = true;
+   //         this.INF = true;
             this.x.zero();
 
             if (ECP.CURVETYPE != ECP.MONTGOMERY) {
@@ -218,21 +218,23 @@ var ECP = function(ctx) {
             rhs = ECP.RHS(this.x);
 
             if (ECP.CURVETYPE == ECP.MONTGOMERY) {
-                if (rhs.jacobi() == 1) {
-                    this.INF = false;
-                } else {
-                    this.inf();
-                }
+				if (rhs.jacobi() != 1) this.inf();
+                //if (rhs.jacobi() == 1) {
+                //    this.INF = false;
+                //} else {
+                //    this.inf();
+                //}
             } else {
                 y2 = new ctx.FP(0);
                 y2.copy(this.y);
                 y2.sqr();
 
-                if (y2.equals(rhs)) {
-                    this.INF = false;
-                } else {
-                    this.inf();
-                }
+				if (!y2.equals(rhs)) this.inf();
+           //     if (y2.equals(rhs)) {
+           //         this.INF = false;
+           //     } else {
+           //         this.inf();
+           //     }
             }
         },
 
@@ -251,7 +253,7 @@ var ECP = function(ctx) {
                     ny.neg();
                 }
                 this.y = ny;
-                this.INF = false;
+                //this.INF = false;
             } else {
                 this.inf();
             }
@@ -270,9 +272,9 @@ var ECP = function(ctx) {
                 if (ECP.CURVETYPE != ECP.MONTGOMERY) {
                     this.y = rhs.sqrt();
                 }
-                this.INF = false;
+            //    this.INF = false;
             } else {
-                this.INF = true;
+                this.inf();
             }
         },
 
@@ -387,9 +389,9 @@ var ECP = function(ctx) {
                 A, B, AA, BB;
 
             if (ECP.CURVETYPE == ECP.WEIERSTRASS) {
-                if (this.INF) {
-                    return;
-                }
+               // if (this.INF) {
+               //     return;
+               // }
 
                 if (ctx.ROM_CURVE.CURVE_A == 0) {
                     t0 = new ctx.FP(0);
@@ -611,7 +613,7 @@ var ECP = function(ctx) {
         add: function(Q) {
             var b, t0, t1, t2, t3, t4, x3, y3, z3,
                 A, B, C, D, E, F, G;
-
+/*
             if (this.INF) {
                 this.copy(Q);
                 return;
@@ -620,7 +622,7 @@ var ECP = function(ctx) {
             if (Q.INF) {
                 return;
             }
-
+*/
             if (ECP.CURVETYPE == ECP.WEIERSTRASS) {
                 //System.out.println("Into add");
                 if (ctx.ROM_CURVE.CURVE_A == 0) {

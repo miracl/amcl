@@ -22,17 +22,17 @@ var CTXLIST = {
         "BITS": "256",
         "FIELD": "25519",
         "CURVE": "ED25519",
-        "@NB": 32,
-        "@BASE": 24,
-        "@NBT": 255,
-        "@M8": 5,
-        "@MT": 1,
-        "@CT": 1,
-        "@PF": 0,
-        "@ST": 0,
-        "@SX": 0,
-		"@HT": 32,    /* Hash output size */
-		"@AK": 16     /* AES key size */
+        "@NB": 32,		/* Number of bytes in Modulus */
+        "@BASE": 24,	/* Number base as power of 2 */
+        "@NBT": 255,	/* Number of bits in modulus */
+        "@M8": 5,		/* Modulus mod 8 */
+        "@MT": 1,		/* Modulus Type (pseudo-mersenne,...) */
+        "@CT": 1,		/* Curve Type (Weierstrass,...) */
+        "@PF": 0,		/* Pairing Friendly */
+        "@ST": 0,		/* Sextic Twist Type */
+        "@SX": 0,		/* Sign of x parameter */
+		"@HT": 32,		/* Hash output size */
+		"@AK": 16		/* AES key size */
     },
 
     "C25519": {
@@ -375,6 +375,44 @@ var CTXLIST = {
 		"@AK": 16
     },
 
+
+
+    "BLS24": {
+        "BITS": "480",
+        "FIELD": "BLS24",
+        "CURVE": "BLS24",
+        "@NB": 60,
+        "@BASE": 23,
+        "@NBT": 479,
+        "@M8": 3,
+        "@MT": 0,
+        "@CT": 0,
+        "@PF": 3,
+        "@ST": 1,
+        "@SX": 0,
+		"@HT": 48,
+		"@AK": 24
+    },
+
+
+    "BLS48": {
+        "BITS": "560",
+        "FIELD": "BLS48",
+        "CURVE": "BLS48",
+        "@NB": 70,
+        "@BASE": 23,
+        "@NBT": 556,
+        "@M8": 3,
+        "@MT": 0,
+        "@CT": 0,
+        "@PF": 4,
+        "@ST": 1,
+        "@SX": 0,
+		"@HT": 64,
+		"@AK": 32
+    },
+
+
     "BLS381": {
         "BITS": "381",
         "FIELD": "BLS381",
@@ -536,6 +574,15 @@ var CTX = function(input_parameter) {
             case "BLS381":
                 this.ROM_CURVE = ROM_CURVE_BLS381();
                 break;
+
+            case "BLS24":
+                this.ROM_CURVE = ROM_CURVE_BLS24();
+                break;
+
+            case "BLS48":
+                this.ROM_CURVE = ROM_CURVE_BLS48();
+                break;
+
             case "BLS461":
                 this.ROM_CURVE = ROM_CURVE_BLS461();
                 break;
@@ -596,6 +643,16 @@ var CTX = function(input_parameter) {
             case "BLS383":
                 this.ROM_FIELD = ROM_FIELD_BLS383();
                 break;
+
+            case "BLS24":
+                this.ROM_FIELD = ROM_FIELD_BLS24();
+                break;
+
+            case "BLS48":
+                this.ROM_FIELD = ROM_FIELD_BLS48();
+                break;
+
+
             case "BLS381":
                 this.ROM_FIELD = ROM_FIELD_BLS381();
                 break;
@@ -610,13 +667,34 @@ var CTX = function(input_parameter) {
         this.ECP = ECP(this);
         this.ECDH = ECDH(this);
 
-        if (this.config['@PF'] != 0) {
+        if (this.config['@PF'] == 1   || this.config['@PF'] == 2) {
             this.FP2 = FP2(this);
             this.FP4 = FP4(this);
             this.FP12 = FP12(this);
             this.ECP2 = ECP2(this);
             this.PAIR = PAIR(this);
             this.MPIN = MPIN(this);
+        }
+
+        if (this.config['@PF'] == 3) {
+            this.FP2 = FP2(this);
+            this.FP4 = FP4(this);
+			this.FP8 = FP8(this);
+            this.FP24 = FP24(this);
+            this.ECP4 = ECP4(this);
+            this.PAIR192 = PAIR192(this);
+            this.MPIN192 = MPIN192(this);
+        }
+
+        if (this.config['@PF'] == 4) {
+            this.FP2 = FP2(this);
+            this.FP4 = FP4(this);
+			this.FP8 = FP8(this);
+			this.FP16 = FP16(this);
+            this.FP48 = FP48(this);
+            this.ECP8 = ECP8(this);
+            this.PAIR256 = PAIR256(this);
+            this.MPIN256 = MPIN256(this);
         }
 
         return;

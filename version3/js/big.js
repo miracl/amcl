@@ -332,6 +332,19 @@ var BIG = function(ctx) {
             return this;
         },
 
+
+        /* this|=y */
+        or: function(y) {
+            var i;
+
+            for (i = 0; i < BIG.NLEN; i++) {
+                this.w[i] |= y.w[i];
+            }
+
+            return this;
+        },
+
+
         /* return this+x */
         plus: function(x) {
             var s = new BIG(0),
