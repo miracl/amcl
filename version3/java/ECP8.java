@@ -827,15 +827,14 @@ public final class ECP8 {
 
 /* Efficient hash maps to G2 on BLS curves - Budroni, Pintore */
 
-		ECP8 xQ,x2Q,x3Q,x4Q,x5Q,x6Q,x7Q,x8Q;
-		xQ=new ECP8(); xQ.copy(Q); xQ.mul(x);
-		x2Q=new ECP8(); x2Q.copy(xQ); x2Q.mul(x);
-		x3Q=new ECP8(); x3Q.copy(x2Q); x3Q.mul(x);
-		x4Q=new ECP8(); x4Q.copy(x3Q); x4Q.mul(x);
-		x5Q=new ECP8(); x5Q.copy(x4Q); x5Q.mul(x);
-		x6Q=new ECP8(); x6Q.copy(x5Q); x6Q.mul(x);
-		x7Q=new ECP8(); x7Q.copy(x6Q); x7Q.mul(x);
-		x8Q=new ECP8(); x8Q.copy(x7Q); x8Q.mul(x);
+		ECP8 xQ=Q.mul(x);
+		ECP8 x2Q=xQ.mul(x);
+		ECP8 x3Q=x2Q.mul(x);
+		ECP8 x4Q=x3Q.mul(x);
+		ECP8 x5Q=x4Q.mul(x);
+		ECP8 x6Q=x5Q.mul(x);
+		ECP8 x7Q=x6Q.mul(x);
+		ECP8 x8Q=x7Q.mul(x);
 
 		if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
 		{

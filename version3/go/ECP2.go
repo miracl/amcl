@@ -659,8 +659,8 @@ func ECP2_mapit(h []byte) *ECP2 {
 		Q.Add(T)
 	}
 	if CURVE_PAIRING_TYPE==BLS {
-		xQ=NewECP2()
-		x2Q=NewECP2()
+//		xQ=NewECP2()
+//		x2Q=NewECP2()
 
 		xQ=Q.mul(x)
 		x2Q=xQ.mul(x)

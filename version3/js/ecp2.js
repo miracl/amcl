@@ -883,8 +883,8 @@ var ECP2 = function(ctx) {
         }
 
         if (ctx.ECP.CURVE_PAIRING_TYPE == ctx.ECP.BLS) {
-            xQ = new ECP2();
-            x2Q = new ECP2();
+        //    xQ = new ECP2();
+        //    x2Q = new ECP2();
 
             xQ = Q.mul(x);
             x2Q = xQ.mul(x);

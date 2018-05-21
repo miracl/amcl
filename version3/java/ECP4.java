@@ -700,11 +700,10 @@ public final class ECP4 {
 
 /* Efficient hash maps to G2 on BLS curves - Budroni, Pintore */
 
-		ECP4 xQ,x2Q,x3Q,x4Q;
-		xQ=new ECP4(); xQ.copy(Q); xQ.mul(x);
-		x2Q=new ECP4(); x2Q.copy(xQ); x2Q.mul(x);
-		x3Q=new ECP4(); x3Q.copy(x2Q); x3Q.mul(x);
-		x4Q=new ECP4(); x4Q.copy(x3Q); x4Q.mul(x);
+		ECP4 xQ=Q.mul(x);
+		ECP4 x2Q=xQ.mul(x);
+		ECP4 x3Q=x2Q.mul(x);
+		ECP4 x4Q=x3Q.mul(x);
 
 		if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
 		{

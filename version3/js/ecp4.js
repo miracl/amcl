@@ -814,15 +814,10 @@ var ECP4 = function(ctx) {
         x.rcopy(ctx.ROM_CURVE.CURVE_Bnx);
 
  
-        xQ = new ECP4();
-        x2Q = new ECP4();
-        x3Q = new ECP4();
-        x4Q = new ECP4();
-
-		xQ.copy(Q); xQ.mul(x);
-		x2Q.copy(xQ); x2Q.mul(x);
-		x3Q.copy(x2Q); x3Q.mul(x);
-		x4Q.copy(x3Q); x4Q.mul(x);
+        xQ = Q.mul(x);
+        x2Q = xQ.mul(x);
+        x3Q = x2Q.mul(x);
+        x4Q = x3Q.mul(x);
 
         if (ctx.ECP.SIGN_OF_X == ctx.ECP.NEGATIVEX) {
             xQ.neg();

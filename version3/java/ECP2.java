@@ -716,12 +716,12 @@ public final class ECP2 {
 
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BLS)
 		{
-			ECP2 xQ,x2Q;
-			xQ=new ECP2();
-			x2Q=new ECP2();
+		//	ECP2 xQ,x2Q;
+		//	xQ=new ECP2();
+		//	x2Q=new ECP2();
 
-			xQ=Q.mul(x);
-			x2Q=xQ.mul(x);
+			ECP2 xQ=Q.mul(x);
+			ECP2 x2Q=xQ.mul(x);
 
 			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
 			{

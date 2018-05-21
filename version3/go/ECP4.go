@@ -303,7 +303,7 @@ func (E *ECP4) dbl() int {
 	t2.imul(3*CURVE_B_I) 
 	if SEXTIC_TWIST == M_TYPE {
 		t2.times_i()
-		t2.norm()
+		//t2.norm()
 	}
 	x3:=NewFP4copy(t2)
 	x3.mul(E.z) 
@@ -536,7 +536,7 @@ func ECP4_mapit(h []byte) *ECP4 {
 	one:=NewBIGint(1)
 	var X2 *FP2
 	var X *FP4 
-	var Q,xQ,x2Q,x3Q,x4Q *ECP4
+	var Q *ECP4
 	hv.Mod(q)
 	for true {
 		X2=NewFP2bigs(one,hv)
@@ -545,12 +545,14 @@ func ECP4_mapit(h []byte) *ECP4 {
 		if !Q.Is_infinity() {break}
 		hv.inc(1); hv.norm()
 	}
+
+
 	F:=ECP4_frob_constants()
 	x:=NewBIGints(CURVE_Bnx)
-	xQ=NewECP4(); xQ.Copy(Q); xQ.mul(x)
-	x2Q=NewECP4(); x2Q.Copy(xQ); x2Q.mul(x)
-	x3Q=NewECP4(); x3Q.Copy(x2Q); x3Q.mul(x)
-	x4Q=NewECP4(); x4Q.Copy(x3Q); x4Q.mul(x)
+	xQ:=Q.mul(x)
+	x2Q:=xQ.mul(x)
+	x3Q:=x2Q.mul(x)
+	x4Q:=x3Q.mul(x)
 
 	if SIGN_OF_X==NEGATIVEX {
 		xQ.neg()

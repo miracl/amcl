@@ -608,7 +608,7 @@ func ECP8_mapit(h []byte) *ECP8 {
 	var X2 *FP2
 	var X4 *FP4 
 	var X *FP8
-	var Q,xQ,x2Q,x3Q,x4Q,x5Q,x6Q,x7Q,x8Q *ECP8
+	var Q *ECP8
 	hv.Mod(q)
 	for true {
 		X2=NewFP2bigs(one,hv)
@@ -621,14 +621,14 @@ func ECP8_mapit(h []byte) *ECP8 {
 	F:=ECP8_frob_constants()
 	x:=NewBIGints(CURVE_Bnx)
 
-	xQ=NewECP8(); xQ.Copy(Q); xQ.mul(x)
-	x2Q=NewECP8(); x2Q.Copy(xQ); x2Q.mul(x)
-	x3Q=NewECP8(); x3Q.Copy(x2Q); x3Q.mul(x)
-	x4Q=NewECP8(); x4Q.Copy(x3Q); x4Q.mul(x)
-	x5Q=NewECP8(); x5Q.Copy(x4Q); x5Q.mul(x)
-	x6Q=NewECP8(); x6Q.Copy(x5Q); x6Q.mul(x)
-	x7Q=NewECP8(); x7Q.Copy(x6Q); x7Q.mul(x)
-	x8Q=NewECP8(); x8Q.Copy(x7Q); x8Q.mul(x)
+	xQ:=Q.mul(x)
+	x2Q:=xQ.mul(x)
+	x3Q:=x2Q.mul(x)
+	x4Q:=x3Q.mul(x)
+	x5Q:=x4Q.mul(x)
+	x6Q:=x5Q.mul(x)
+	x7Q:=x6Q.mul(x)
+	x8Q:=x7Q.mul(x)
 
 	if SIGN_OF_X==NEGATIVEX {
 		xQ.neg()
