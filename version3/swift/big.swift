@@ -317,6 +317,16 @@ final public class BIG{
             w[i]+=x.w[i]
         }
     }
+
+/* this|=x */
+    func or(_ x: BIG)
+    {
+        for i in 0 ..< BIG.NLEN
+        {
+            w[i]|=x.w[i]
+        }
+    }
+
 /* this+=x, where x is int */
     func inc(_ x: Int) {
         norm();

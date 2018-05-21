@@ -48,7 +48,7 @@ final public class ECP {
     private var x:FP
     private var y:FP
     private var z:FP
-    private var INF:Bool
+    //private var INF:Bool
     
    /* Constructor - set to O */
     init()
@@ -56,13 +56,13 @@ final public class ECP {
         x=FP(0)
         y=FP(1)
         z=FP(0)
-        INF=true
+    //    INF=true
     }
     
     /* test for O point-at-infinity */
     public func is_infinity() -> Bool
     {
-        if INF {return true}        
+        //if INF {return true}        
         if (ECP.CURVETYPE==ECP.EDWARDS)
         {
             return x.iszilch() && y.equals(z)
@@ -84,13 +84,13 @@ final public class ECP {
         x.cswap(Q.x,d);
         if ECP.CURVETYPE != ECP.MONTGOMERY {y.cswap(Q.y,d)}
         z.cswap(Q.z,d);
-
+/*
         var bd:Bool
         if d==0 {bd=false}
         else {bd=true}
         bd=bd && (INF != Q.INF)
         INF = (INF != bd)
-        Q.INF = (Q.INF != bd)
+        Q.INF = (Q.INF != bd) */
     }
     
     /* Conditional move of Q to P dependant on d */
@@ -99,10 +99,10 @@ final public class ECP {
         x.cmove(Q.x,d);
         if ECP.CURVETYPE != ECP.MONTGOMERY {y.cmove(Q.y,d)}
         z.cmove(Q.z,d);
-        var bd:Bool
+   /*     var bd:Bool
         if d==0 {bd=false}
         else {bd=true}
-        INF = (INF != Q.INF) && bd;
+        INF = (INF != Q.INF) && bd; */
     }
     
     /* return 1 if b==c, no branching */
@@ -119,7 +119,7 @@ final public class ECP {
         x.copy(P.x)
         if ECP.CURVETYPE != ECP.MONTGOMERY {y.copy(P.y)}
         z.copy(P.z)
-        INF=P.INF
+    //    INF=P.INF
     }
     /* self=-self */
     func neg() {
@@ -161,8 +161,8 @@ final public class ECP {
     /* Test P == Q */
     func equals(_ Q: ECP) -> Bool
     {
-        if (is_infinity() && Q.is_infinity()) {return true}
-        if (is_infinity() || Q.is_infinity()) {return false}
+    //    if (is_infinity() && Q.is_infinity()) {return true}
+    //    if (is_infinity() || Q.is_infinity()) {return false}
  
         let a=FP(0)
         let b=FP(0)
@@ -181,7 +181,7 @@ final public class ECP {
 /* set self=O */
     func inf()
     {
-        INF=true;
+    //    INF=true;
         x.zero()
         if ECP.CURVETYPE != ECP.MONTGOMERY {y.one()}
         if ECP.CURVETYPE != ECP.EDWARDS {z.zero()}
@@ -239,20 +239,18 @@ final public class ECP {
         x=FP(ix)
         y=FP(iy)
         z=FP(1)
-        INF=true
+    //    INF=true
         let rhs=ECP.RHS(x);
     
         if ECP.CURVETYPE == ECP.MONTGOMERY
         {
-            if rhs.jacobi()==1 {INF=false}
-            else {inf()}
+            if rhs.jacobi() != 1 {inf()}
         }
         else
         {
             let y2=FP(y)
             y2.sqr()
-            if y2.equals(rhs) {INF=false}
-            else {inf()}
+            if !y2.equals(rhs) {inf()}
         }
     }
     
@@ -263,13 +261,13 @@ final public class ECP {
         let rhs=ECP.RHS(x)
         y=FP(0)
         z=FP(1)
-        INF=true
+    //    INF=true
         if rhs.jacobi()==1
         {
             let ny=rhs.sqrt()
             if (ny.redc().parity() != s) {ny.neg()}
             y.copy(ny)
-            INF=false;
+   //         INF=false;
         }
         else {inf()}
     }
@@ -284,9 +282,9 @@ final public class ECP {
         if rhs.jacobi()==1
         {
             if ECP.CURVETYPE != ECP.MONTGOMERY {y.copy(rhs.sqrt())}
-            INF=false;
+         //   INF=false;
         }
-        else {INF=true}
+        else {inf()}
     }
     
     /* set to affine - from (x,y,z) to (x,y) */
@@ -392,7 +390,7 @@ final public class ECP {
     /* self*=2 */
     func dbl()
     {
-        if INF {return} 
+//        if INF {return} 
         if (ECP.CURVETYPE == ECP.WEIERSTRASS)
         {
 
@@ -545,12 +543,12 @@ final public class ECP {
     /* self+=Q */
     func add(_ Q:ECP)
     {
-        if (INF)
+    /*    if (INF)
         {
             copy(Q)
             return
         }
-        if Q.INF {return}
+        if Q.INF {return} */
 
         if ECP.CURVETYPE == ECP.WEIERSTRASS
         {

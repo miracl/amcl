@@ -135,7 +135,7 @@ public func TimeECDH(_ rng: RAND)
     
 
     var s:ed25519.BIG
-    var G=ed25519.ECP.generator();
+    let G=ed25519.ECP.generator();
     
     let r=ed25519.BIG(ed25519.ROM.CURVE_Order)
     s=ed25519.BIG.randomnum(r,rng)

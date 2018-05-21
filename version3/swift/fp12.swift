@@ -646,8 +646,10 @@ final public class FP12
         let p=FP12(0)
         
         var t=[BIG]()
-        for i in 0 ..< 4
-            {t.append(BIG(u[i]))}
+        for i in 0 ..< 4 {
+            t.append(BIG(u[i]))
+            t[i].norm()
+        }
 
         let mt=BIG(0);
         var w=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)           
@@ -671,7 +673,7 @@ final public class FP12
 // Number of bits
         mt.zero();
         for i in 0 ..< 4 {
-            mt.add(t[i]); mt.norm()
+            mt.or(t[i]); 
         }
 
         let nb=1+mt.nbits()

@@ -350,10 +350,16 @@ final public class FP {
 /* this=1/this mod Modulus */
     func inverse()
     {
+/*        
         let r=redc()
         r.invmodp(FP.p)
         x.copy(r)
         nres()
+*/
+        let m2=BIG(ROM.Modulus);
+        m2.dec(2); m2.norm()
+        copy(pow(m2))
+
     }
     
 /* return TRUE if this==a */
@@ -364,7 +370,45 @@ final public class FP {
         if (BIG.comp(a.x,x)==0) {return true}
         return false;
     }
+
+
 /* return this^e mod Modulus */
+    func pow(_ e: BIG) -> FP
+    {
+        var tb=[FP]() 
+        let n=1+(BIG.NLEN*Int(BIG.BASEBITS)+3)/4
+        var w=[Int8](repeating: 0,count: n)     
+        norm()
+        let t=BIG(e); t.norm()
+        let nb=1+(t.nbits()+3)/4    
+
+        for i in 0 ..< nb  {
+            let lsbs=t.lastbits(4)
+            t.dec(lsbs)
+            t.norm()
+            w[i]=Int8(lsbs)
+            t.fshr(4);
+        }
+        tb.append(FP(1))
+        tb.append(FP(self))
+        for i in 2 ..< 16 {
+            tb.append(FP(tb[i-1]))
+            tb[i].mul(self)
+        }
+        let r=FP(tb[Int(w[nb-1])])
+        for i in (0...nb-2).reversed() {
+            r.sqr()
+            r.sqr()
+            r.sqr()
+            r.sqr()
+            r.mul(tb[Int(w[i])])
+        }
+        r.reduce()
+        return r
+    }
+
+
+/* return this^e mod Modulus 
     func pow(_ e: BIG) -> FP
     {
         let r=FP(1)
@@ -381,7 +425,8 @@ final public class FP {
         }
         r.x.mod(FP.p);
         return r;
-    }
+    } */
+
 /* return sqrt(this) mod Modulus */
     func sqrt() -> FP
     {

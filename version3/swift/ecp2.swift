@@ -29,12 +29,12 @@ final public class ECP2 {
     private var x:FP2
     private var y:FP2
     private var z:FP2
-    private var INF:Bool
+ //   private var INF:Bool
     
     /* Constructor - set self=O */
     init()
     {
-        INF=true
+    //    INF=true
         x=FP2(0)
         y=FP2(1)
         z=FP2(0)
@@ -42,7 +42,7 @@ final public class ECP2 {
     /* Test self=O? */
     public func is_infinity() -> Bool
     {
-        if INF {return true}
+    //    if INF {return true}
         return x.iszilch() && z.iszilch()
     }
     /* copy self=P */
@@ -51,11 +51,11 @@ final public class ECP2 {
         x.copy(P.x)
         y.copy(P.y)
         z.copy(P.z)
-        INF=P.INF
+    //    INF=P.INF
     }
     /* set self=O */
     func inf() {
-        INF=true
+    //    INF=true
         x.zero()
         y.one()
         z.zero()
@@ -66,11 +66,11 @@ final public class ECP2 {
         x.cmove(Q.x,d);
         y.cmove(Q.y,d);
         z.cmove(Q.z,d);
-    
+    /*
         var bd:Bool
         if d==0 {bd=false}
         else {bd=true}
-        INF = (INF != ((INF != Q.INF) && bd))
+        INF = (INF != ((INF != Q.INF) && bd)) */
     }
     
     /* return 1 if b==c, no branching */
@@ -106,8 +106,8 @@ final public class ECP2 {
     /* Test if P == Q */
     func equals(_ Q:ECP2) -> Bool
     {
-        if is_infinity() && Q.is_infinity() {return true}
-        if is_infinity() || Q.is_infinity() {return false}
+    //    if is_infinity() && Q.is_infinity() {return true}
+    //    if is_infinity() || Q.is_infinity() {return false}
     
         let a=FP2(x)                            // *****
         let b=FP2(Q.x)
@@ -247,8 +247,7 @@ final public class ECP2 {
         let rhs=ECP2.RHS(x)
         let y2=FP2(y)
         y2.sqr()
-        if y2.equals(rhs) {INF=false}
-        else {x.zero(); INF=true}
+        if !y2.equals(rhs) {inf()}
     }
     /* construct this from x - but set to O if not on curve */
     init(_ ix:FP2)
@@ -260,15 +259,15 @@ final public class ECP2 {
         if rhs.sqrt()
         {
             y.copy(rhs);
-            INF=false;
+        //    INF=false;
         }
-        else {x.zero(); INF=true;}
+        else {inf()}
     }
     
     /* this+=this */
     @discardableResult func dbl() -> Int
     {
-        if (INF) {return -1}
+    //    if (INF) {return -1}
         if y.iszilch()
         {
             inf();
@@ -321,12 +320,12 @@ final public class ECP2 {
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
     @discardableResult func add(_ Q:ECP2) -> Int
     {
-        if INF
+    /*    if INF
         {
             copy(Q)
             return -1
         }
-        if Q.INF {return -1}
+        if Q.INF {return -1} */
 
         let b=3*ROM.CURVE_B_I
         let t0=FP2(x)
@@ -406,7 +405,7 @@ final public class ECP2 {
 /* set self*=q, where q is Modulus, using Frobenius */
     func frob(_ X:FP2)
     {
-        if INF {return}
+    //    if INF {return}
         let X2=FP2(X)
         X2.sqr()
         x.conj()
@@ -504,6 +503,7 @@ final public class ECP2 {
         for i in 0 ..< 4
         {
             t.append(BIG(u[i]))
+            t[i].norm()
             Q[i].affine()
         }
 
@@ -526,7 +526,7 @@ final public class ECP2 {
 // Number of bits
         mt.zero();
         for i in 0 ..< 4 {
-            mt.add(t[i]); mt.norm()
+            mt.or(t[i]); 
         }
 
         let nb=1+mt.nbits()
