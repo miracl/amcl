@@ -131,7 +131,7 @@ impl HASH256 {
 
 /* process an array of bytes */	
 	pub fn process_array(&mut self,b: &[u8]) {
-		for i in 0..b.len() {self.process((b[i]))}
+		for i in 0..b.len() {self.process(b[i])}
 	}
 
 /* process a 32-bit integer */

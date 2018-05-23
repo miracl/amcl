@@ -121,24 +121,60 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 
 
 	if pf != "NOT" :
-		os.system(copytext+"ecp2.rs "+fpath+"ecp2.rs")
+
 		os.system(copytext+"fp2.rs "+fpath+"fp2.rs")
 		os.system(copytext+"fp4.rs "+fpath+"fp4.rs")
-		os.system(copytext+"fp12.rs "+fpath+"fp12.rs")
-		os.system(copytext+"pair.rs "+fpath+"pair.rs")
-		os.system(copytext+"mpin.rs "+fpath+"mpin.rs")
-
 		replace(fpath+"fp2.rs","xxx",tc)
 		replace(fpath+"fp4.rs","xxx",tc)
-		replace(fpath+"fp12.rs","xxx",tc)
-		replace(fpath+"ecp2.rs","xxx",tc)
-		replace(fpath+"pair.rs","xxx",tc)
-		replace(fpath+"mpin.rs","xxx",tc)
 
-		os.system(copytext+"modpf.rs "+fpath+"mod.rs")
+		if cs == "128" :
+			os.system(copytext+"ecp2.rs "+fpath+"ecp2.rs")
+			os.system(copytext+"fp12.rs "+fpath+"fp12.rs")
+			os.system(copytext+"pair.rs "+fpath+"pair.rs")
+			os.system(copytext+"mpin.rs "+fpath+"mpin.rs")
+
+			replace(fpath+"fp12.rs","xxx",tc)
+			replace(fpath+"ecp2.rs","xxx",tc)
+			replace(fpath+"pair.rs","xxx",tc)
+			replace(fpath+"mpin.rs","xxx",tc)
+
+			os.system(copytext+"modpf.rs "+fpath+"mod.rs")
+
+
+		if cs == "192" :
+			os.system(copytext+"fp8.rs "+fpath+"fp8.rs")
+			os.system(copytext+"ecp4.rs "+fpath+"ecp4.rs")
+			os.system(copytext+"fp24.rs "+fpath+"fp24.rs")
+			os.system(copytext+"pair192.rs "+fpath+"pair192.rs")
+			os.system(copytext+"mpin192.rs "+fpath+"mpin192.rs")
+
+			replace(fpath+"fp8.rs","xxx",tc)
+			replace(fpath+"fp24.rs","xxx",tc)
+			replace(fpath+"ecp4.rs","xxx",tc)
+			replace(fpath+"pair192.rs","xxx",tc)
+			replace(fpath+"mpin192.rs","xxx",tc)
+
+			os.system(copytext+"modpf192.rs "+fpath+"mod.rs")
+
+		if cs == "256" :
+			os.system(copytext+"fp8.rs "+fpath+"fp8.rs")
+			os.system(copytext+"fp16.rs "+fpath+"fp16.rs")
+			os.system(copytext+"ecp8.rs "+fpath+"ecp8.rs")
+			os.system(copytext+"fp48.rs "+fpath+"fp48.rs")
+			os.system(copytext+"pair256.rs "+fpath+"pair256.rs")
+			os.system(copytext+"mpin256.rs "+fpath+"mpin256.rs")
+
+			replace(fpath+"fp8.rs","xxx",tc)
+			replace(fpath+"fp16.rs","xxx",tc)
+			replace(fpath+"fp48.rs","xxx",tc)
+			replace(fpath+"ecp8.rs","xxx",tc)
+			replace(fpath+"pair256.rs","xxx",tc)
+			replace(fpath+"mpin256.rs","xxx",tc)
+
+			os.system(copytext+"modpf256.rs "+fpath+"mod.rs")
+
 	else :
-		os.system(copytext+"modecc.rs "+fpath+"mod.rs")
-	
+		os.system(copytext+"modecc.rs "+fpath+"mod.rs")	
 	#os.system("go install amcl"+slashtext+tc)
 
 os.system("cargo new amcl")
@@ -181,16 +217,17 @@ print("20. bls381")
 print("21. fp256BN")
 print("22. fp512BN")
 print("23. bls461\n")
-
+print("24. bls24")
+print("25. bls48\n")
 
 print("RSA")
-print("24. rsa2048")
-print("25. rsa3072")
-print("26. rsa4096")
+print("26. rsa2048")
+print("27. rsa3072")
+print("28. rsa4096")
 
 selection=[]
 ptr=0
-max=27
+max=29
 
 curve_selected=False
 pfcurve_selected=False
@@ -300,23 +337,31 @@ while ptr<max:
 		curveset("bls461","58","60","461","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 
+	if x==24:
+		curveset("bls24","60","56","479","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","192")
+		pfcurve_selected=True
+
+	if x==25:
+		curveset("bls48","70","58","556","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","256")
+		pfcurve_selected=True
+
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
 # The RSA name reflects the modulus size, which is a 2^m multiplier
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==24:
+	if x==26:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("rsa2048","128","58","2")
 		#rsaset("RSA2048","64","60","4")
 		#rsaset("RSA2048","32","56","8")
 		rsa_selected=True
-	if x==25:
+	if x==27:
 		rsaset("rsa3072","48","56","8")
 		rsa_selected=True
-	if x==26:
+	if x==28:
 		#rsaset("RSA4096","32","56","16")
 		rsaset("rsa4096","64","60","8")
 		rsa_selected=True
@@ -337,13 +382,12 @@ os.system(deltext+" fp*.rs")
 os.system(deltext+" mod*.rs")
 os.system(deltext+" lib.rs")
 
-os.system(deltext+" ecp.rs")
 os.system(deltext+" ecdh.rs")
 os.system(deltext+" ff.rs")
 os.system(deltext+" rsa.rs")
-os.system(deltext+" ecp2.rs")
-os.system(deltext+" pair.rs")
-os.system(deltext+" mpin.rs")
+os.system(deltext+" ecp*.rs")
+os.system(deltext+" pair*.rs")
+os.system(deltext+" mpin*.rs")
 os.system(deltext+" rom*.rs")
 
 # create library

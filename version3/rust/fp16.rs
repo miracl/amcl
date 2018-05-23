@@ -17,48 +17,48 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use xxx::fp::FP;
 use xxx::fp2::FP2;
+use xxx::fp8::FP8;
 use xxx::big::BIG;
 
 #[derive(Copy, Clone)]
-pub struct FP4 {
-	a:FP2,
-	b:FP2,
+pub struct FP16 {
+	a:FP8,
+	b:FP8,
 }
 
-impl FP4 {
+impl FP16 {
 
-	pub fn new() -> FP4 {
-		FP4 {
-				a: FP2::new(),
-				b: FP2::new(),
+	pub fn new() -> FP16 {
+		FP16 {
+				a: FP8::new(),
+				b: FP8::new(),
 		}
 	}
 
-	pub fn new_int(a: isize) -> FP4 {
-		let mut f=FP4::new();
-		f.a.copy(&FP2::new_int(a));
+	pub fn new_int(a: isize) -> FP16 {
+		let mut f=FP16::new();
+		f.a.copy(&FP8::new_int(a));
 		f.b.zero();
 		return f;
 	}	
 
-	pub fn new_copy(x: &FP4) -> FP4 {
-		let mut f=FP4::new();
+	pub fn new_copy(x: &FP16) -> FP16 {
+		let mut f=FP16::new();
 		f.a.copy(&x.a);
 		f.b.copy(&x.b);
 		return f;
 	}	
 
-	pub fn new_fp2s(c: &FP2,d: &FP2) -> FP4 {
-		let mut f=FP4::new();
+	pub fn new_fp8s(c: &FP8,d: &FP8) -> FP16 {
+		let mut f=FP16::new();
 		f.a.copy(c);
 		f.b.copy(d);
 		return f;
 	}	
 
-	pub fn new_fp2(c: &FP2) -> FP4 {
-		let mut f=FP4::new();
+	pub fn new_fp8(c: &FP8) -> FP16 {
+		let mut f=FP16::new();
 		f.a.copy(c);
 		f.b.zero();
 		return f;
@@ -76,7 +76,7 @@ impl FP4 {
 		self.b.norm();
 	}	
 
-	pub fn cmove(&mut self,g:&FP4,d: isize) {
+	pub fn cmove(&mut self,g:&FP16,d: isize) {
 		self.a.cmove(&g.a,d);
 		self.b.cmove(&g.b,d);
 	}	
@@ -89,7 +89,7 @@ impl FP4 {
 
 /* test self=1 ? */
 	pub fn isunity(&mut self) -> bool {
-		let mut one=FP2::new_int(1);
+		let mut one=FP8::new_int(1);
 		return self.a.equals(&mut one) && self.b.iszilch();
 	}
 
@@ -98,27 +98,27 @@ impl FP4 {
 		return self.b.iszilch();
 	}
 /* extract real part a */
-	pub fn real(&self) -> FP2 {
-		let f=FP2::new_copy(&self.a);
+	pub fn real(&self) -> FP8 {
+		let f=FP8::new_copy(&self.a);
 		return f;
 	}
 
-	pub fn geta(&self) -> FP2 {
-		let f=FP2::new_copy(&self.a);
+	pub fn geta(&self) -> FP8 {
+		let f=FP8::new_copy(&self.a);
 		return f;
 	}
 /* extract imaginary part b */
-	pub fn getb(&self) -> FP2 {
-		let f=FP2::new_copy(&self.b);
+	pub fn getb(&self) -> FP8 {
+		let f=FP8::new_copy(&self.b);
 		return f;
 	}
 
 /* test self=x */
-	pub fn equals(&mut self,x:&mut FP4) -> bool {
+	pub fn equals(&mut self,x:&mut FP16) -> bool {
 		return self.a.equals(&mut x.a) && self.b.equals(&mut x.b);
 	}
 /* copy self=x */
-	pub fn copy(&mut self,x :&FP4) {
+	pub fn copy(&mut self,x :&FP16) {
 		self.a.copy(&x.a);
 		self.b.copy(&x.b);
 	}
@@ -135,11 +135,11 @@ impl FP4 {
 		self.b.zero();
 	}	
 
-/* negate self mod Modulus */
+	/* negate self mod Modulus */
 	pub fn neg(&mut self) {
 		self.norm();
-		let mut m=FP2::new_copy(&self.a);
-		let mut t=FP2::new();
+		let mut m=FP8::new_copy(&self.a);
+		let mut t=FP8::new();
 
 		m.add(&self.b);
 		m.neg();
@@ -163,12 +163,12 @@ impl FP4 {
 	}
 
 /* self+=a */
-	pub fn add(&mut self,x:&FP4) {
+	pub fn add(&mut self,x:&FP16) {
 		self.a.add(&x.a);
 		self.b.add(&x.b);
 	}
 
-	pub fn padd(&mut self,x:&FP2) {
+	pub fn padd(&mut self,x:&FP8) {
 		self.a.add(x);
 	}
 
@@ -178,29 +178,30 @@ impl FP4 {
 	}
 
 /* self-=a */
-	pub fn sub(&mut self,x:&FP4) {
-		let mut m=FP4::new_copy(x);
+	pub fn sub(&mut self,x:&FP16) {
+		let mut m=FP16::new_copy(x);
 		m.neg();
 		self.add(&m);
 	}
 
-/* self-=a */
-	pub fn rsub(&mut self,x:&FP4) {
+/* this-=x */
+	pub fn rsub(&mut self,x:&FP16) {
 		self.neg();
 		self.add(x);
-	}	
+}
 
-/* self*=s, where s is an FP2 */
-	pub fn pmul(&mut self,s:&FP2) {
+/* self*=s, where s is an FP8 */
+	pub fn pmul(&mut self,s:&FP8) {
 		self.a.mul(s);
 		self.b.mul(s);
 	}
 
-/* self*=s, where s is an FP */
-	pub fn qmul(&mut self,s:&FP) {
-		self.a.pmul(s);
-		self.b.pmul(s);
+/* self*=s, where s is an FP2 */
+	pub fn qmul(&mut self,s:&FP2) {
+		self.a.qmul(s);
+		self.b.qmul(s);
 	}
+
 
 /* self*=i, where i is an int */
 	pub fn imul(&mut self,c: isize) {
@@ -212,14 +213,14 @@ impl FP4 {
 	pub fn sqr(&mut self) {
 	//	self.norm();
 
-		let mut t1=FP2::new_copy(&self.a);
-		let mut t2=FP2::new_copy(&self.b);
-		let mut t3=FP2::new_copy(&self.a);
+		let mut t1=FP8::new_copy(&self.a);
+		let mut t2=FP8::new_copy(&self.b);
+		let mut t3=FP8::new_copy(&self.a);
 
 
 		t3.mul(&self.b);
 		t1.add(&self.b);
-		t2.mul_ip();
+		t2.times_i();
 
 		t2.add(&self.a);
 
@@ -231,7 +232,7 @@ impl FP4 {
 		self.a.mul(&t2);
 
 		t2.copy(&t3);
-		t2.mul_ip();
+		t2.times_i();
 		t2.add(&t3); t2.norm();
 		t2.neg();
 		self.a.add(&t2);
@@ -243,13 +244,13 @@ impl FP4 {
 	}
 
 /* self*=y */
-	pub fn mul(&mut self,y :&FP4) {
+	pub fn mul(&mut self,y :&FP16) {
 		self.norm();
 
-		let mut t1=FP2::new_copy(&self.a);
-		let mut t2=FP2::new_copy(&self.b);
-		let mut t3=FP2::new();
-		let mut t4=FP2::new_copy(&self.b);
+		let mut t1=FP8::new_copy(&self.a);
+		let mut t2=FP8::new_copy(&self.b);
+		let mut t3=FP8::new();
+		let mut t4=FP8::new_copy(&self.b);
 
 		t1.mul(&y.a);
 		t2.mul(&y.b);
@@ -271,7 +272,7 @@ impl FP4 {
 		self.b.copy(&t4);
 		self.b.add(&t3);	
 
-		t2.mul_ip();
+		t2.times_i();
 		self.a.copy(&t2);
 		self.a.add(&t1);
 
@@ -287,13 +288,13 @@ impl FP4 {
 	pub fn inverse(&mut self) {
 		self.norm();
 
-		let mut t1=FP2::new_copy(&self.a);
-		let mut t2=FP2::new_copy(&self.b);
+		let mut t1=FP8::new_copy(&self.a);
+		let mut t2=FP8::new_copy(&self.b);
 
 		t1.sqr();
 		t2.sqr();
-		t2.mul_ip(); t2.norm();
-		t1.sub(&t2);
+		t2.times_i(); t2.norm();
+		t1.sub(&t2); t1.norm();
 		t1.inverse();
 		self.a.mul(&t1);
 		t1.neg(); t1.norm();
@@ -303,30 +304,43 @@ impl FP4 {
 /* self*=i where i = sqrt(-1+sqrt(-1)) */
 	pub fn times_i(&mut self) {
 	//	self.norm();
-		let mut s=FP2::new_copy(&self.b);
-		let mut t=FP2::new_copy(&self.b);
+		let mut s=FP8::new_copy(&self.b);
+		let t=FP8::new_copy(&self.a);
 		s.times_i();
-		t.add(&s);
-	//	t.norm();
-		self.b.copy(&self.a);
-		self.a.copy(&t);
+		self.a.copy(&s);	
+		self.b.copy(&t);
+
 		self.norm();
 	}	
 
-/* self=self^p using Frobenius */
+	pub fn times_i2(&mut self) {
+		self.a.times_i();
+		self.b.times_i();
+	}
+
+	pub fn times_i4(&mut self) {
+		self.a.times_i2();
+		self.b.times_i2();
+	}
+
+	/* self=self^p using Frobenius */
 	pub fn frob(&mut self,f: &FP2) {
-		self.a.conj();
-		self.b.conj();
-		self.b.mul(f);
-	}	
+		let mut ff=FP2::new_copy(f);
+		ff.sqr();  ff.norm();
+		self.a.frob(&ff);
+		self.b.frob(&ff);
+		self.b.qmul(f);
+		self.b.times_i();	
+
+	}
 
 /* self=self^e */
-	pub fn pow(&mut self,e: &mut BIG) -> FP4 {
+	pub fn pow(&mut self,e: &mut BIG) -> FP16 {
 		self.norm();
 		e.norm();
-		let mut w=FP4::new_copy(self);
+		let mut w=FP16::new_copy(self);
 		let mut z=BIG::new_copy(&e);
-		let mut r=FP4::new_int(1);
+		let mut r=FP16::new_int(1);
 		loop {
 			let bt=z.parity();
 			z.fshr(1);
@@ -339,9 +353,9 @@ impl FP4 {
 	}	
 
 /* XTR xtr_a function */
-	pub fn xtr_a(&mut self,w:&FP4,y:&FP4,z:&FP4) {
-		let mut r=FP4::new_copy(w);
-		let mut t=FP4::new_copy(w);
+	pub fn xtr_a(&mut self,w:&FP16,y:&FP16,z:&FP16) {
+		let mut r=FP16::new_copy(w);
+		let mut t=FP16::new_copy(w);
 	//	y.norm();
 		r.sub(y); r.norm();
 		r.pmul(&self.a);
@@ -358,21 +372,21 @@ impl FP4 {
 
 /* XTR xtr_d function */
 	pub fn xtr_d(&mut self) {
-		let mut w=FP4::new_copy(self);
+		let mut w=FP16::new_copy(self);
 		self.sqr(); w.conj();
 		w.dbl(); w.norm();
 		self.sub(&w);
 		self.reduce();
 	}
 
-/* r=x^n using XTR method on traces of FP12s */
-	pub fn xtr_pow(&mut self,n: &mut BIG) -> FP4 {
-		let mut a=FP4::new_int(3);
-		let mut b=FP4::new_copy(self);
-		let mut c=FP4::new_copy(&b);
+/* r=x^n using XTR method on traces of FP24s */
+	pub fn xtr_pow(&mut self,n: &mut BIG) -> FP16 {
+		let mut a=FP16::new_int(3);
+		let mut b=FP16::new_copy(self);
+		let mut c=FP16::new_copy(&b);
 		c.xtr_d();
-		let mut t=FP4::new();
-		let mut r=FP4::new();
+		let mut t=FP16::new();
+		let mut r=FP16::new();
 
 		n.norm();
 		let par=n.parity();
@@ -406,18 +420,18 @@ impl FP4 {
 	}
 
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
-	pub fn xtr_pow2(&mut self,ck: &FP4,ckml: &FP4,ckm2l: &FP4,a: &mut BIG,b: &mut BIG) -> FP4 {
+	pub fn xtr_pow2(&mut self,ck: &FP16,ckml: &FP16,ckm2l: &FP16,a: &mut BIG,b: &mut BIG) -> FP16 {
 		a.norm(); b.norm();
 		let mut e=BIG::new_copy(a);
 		let mut d=BIG::new_copy(b);
 		let mut w=BIG::new();
 
-		let mut cu=FP4::new_copy(ck);  // can probably be passed in w/o copying
-		let mut cv=FP4::new_copy(self);
-		let mut cumv=FP4::new_copy(ckml);
-		let mut cum2v=FP4::new_copy(ckm2l);
-		let mut r=FP4::new();
-		let mut t=FP4::new();
+		let mut cu=FP16::new_copy(ck);  // can probably be passed in w/o copying
+		let mut cv=FP16::new_copy(self);
+		let mut cumv=FP16::new_copy(ckml);
+		let mut cum2v=FP16::new_copy(ckm2l);
+		let mut r=FP16::new();
+		let mut t=FP16::new();
 
 		let mut f2:usize=0;
 		while d.parity()==0 && e.parity()==0 {
@@ -534,87 +548,4 @@ impl FP4 {
 		r=r.xtr_pow(&mut d);
 		return r;
 	}
-
-
-/* this/=2 */
-	pub fn div2(&mut self) {
-		self.a.div2();
-		self.b.div2();
-	}
-
-	pub fn div_i(&mut self) {
-		let mut u=FP2::new_copy(&self.a);
-		let v=FP2::new_copy(&self.b);
-		u.div_ip();
-		self.a.copy(&v);
-		self.b.copy(&u);
-	}	
-
-	pub fn div_2i(&mut self) {
-		let mut u=FP2::new_copy(&self.a);
-		let mut v=FP2::new_copy(&self.b);
-		u.div_ip2();
-		v.dbl(); v.norm();
-		self.a.copy(&v);
-		self.b.copy(&u);
-	}
-
-/* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */
-/* returns true if this is QR */
-	pub fn sqrt(&mut self) -> bool {
-		if self.iszilch() {return true;}
-
-		let mut a=FP2::new_copy(&self.a);
-		let mut s=FP2::new_copy(&self.b);
-		let mut t=FP2::new_copy(&self.a);
-
-		if s.iszilch() {
-			if t.sqrt() {
-				self.a.copy(&t);
-				self.b.zero();
-			} else {
-				t.div_ip();
-				t.sqrt();
-				self.b.copy(&t);
-				self.a.zero();
-			}
-			return true;
-		}
-		s.sqr();
-		a.sqr();
-		s.mul_ip();
-		s.norm();
-		a.sub(&s);   
-
-		s.copy(&a);
-		if !s.sqrt() {
-			return false;
-		}
-
-		a.copy(&t); a.add(&s); a.norm(); a.div2();
-
-		if !a.sqrt() {
-			a.copy(&t); a.sub(&s); a.norm(); a.div2();
-			if !a.sqrt() {
-				return false
-			}
-		}
-		t.copy(&self.b);
-		s.copy(&a); s.add(&a);
-		s.inverse();
-
-		t.mul(&s);
-		self.a.copy(&a);
-		self.b.copy(&t);
-
-		return true;
-	}
-
-
 }
-/*
-fn main()
-{
-	let mut w=FP4::new();
-}
-*/

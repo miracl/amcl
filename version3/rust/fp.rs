@@ -374,7 +374,7 @@ impl FP {
     pub fn equals(&mut self,a: &mut FP) -> bool {
         a.reduce();
         self.reduce();
-        if BIG::comp(&(a.x),(&self.x))==0 {return true}
+        if BIG::comp(&(a.x),&self.x)==0 {return true}
         return false;
     }   
 
@@ -390,7 +390,7 @@ impl FP {
         t.norm();
         let nb=1+(t.nbits()+3)/4;
 
-        for i in (0..nb) {
+        for i in 0..nb {
             let lsbs=t.lastbits(4);
             t.dec(lsbs);
             t.norm();
@@ -401,7 +401,7 @@ impl FP {
         tb[1].copy(&self);
 
         let mut c=FP::new();
-        for i in (2..16) {
+        for i in 2..16 {
             c.copy(&tb[i-1]);
             tb[i].copy(&c);
             tb[i].mul(&self);

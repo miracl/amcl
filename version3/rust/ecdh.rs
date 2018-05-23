@@ -506,14 +506,13 @@ pub fn ecies_encrypt(sha: usize,p1: &[u8],p2: &[u8],rng: &mut RAND,w: &[u8],m: &
 	let mut k2:[u8;ecp::AESKEY]=[0;ecp::AESKEY];
 	let mut u:[u8;EGS]=[0;EGS];
 	let mut vz:[u8;3*EFS+1]=[0;3*EFS+1];	
-	let mut k:[u8;EFS]=[0;EFS];
+	let mut k:[u8;2*ecp::AESKEY]=[0;2*ecp::AESKEY];
 
 	if key_pair_generate(Some(rng),&mut u,v)!=0 {return None}
 	if ecpsvdp_dh(&u,&w,&mut z)!=0 {return None}     
 
 	for i in 0..2*EFS+1 {vz[i]=v[i]}
 	for i in 0..EFS {vz[2*EFS+1+i]=z[i]}
-
 
 	kdf2(sha,&vz,Some(p1),2*ecp::AESKEY,&mut k);
 
@@ -547,7 +546,7 @@ pub fn ecies_decrypt(sha: usize,p1: &[u8],p2: &[u8],v: &[u8],c: &mut Vec<u8>,t: 
 	let mut k1:[u8;ecp::AESKEY]=[0;ecp::AESKEY];
 	let mut k2:[u8;ecp::AESKEY]=[0;ecp::AESKEY];
 	let mut vz:[u8;3*EFS+1]=[0;3*EFS+1];	
-	let mut k:[u8;EFS]=[0;EFS];
+	let mut k:[u8;2*ecp::AESKEY]=[0;2*ecp::AESKEY];
 
 	let mut tag:[u8;32]=[0;32];  /* 32 is max length of tag */
 

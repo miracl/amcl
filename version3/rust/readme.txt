@@ -18,8 +18,8 @@ or
 
 python3 config64.py
 
-Then select options 1, 17 and 24 (these are fixed for the example 
-program provided). Select 0 to exit.
+Then select options 1, 3, 7, 17, 19, 24, 25 and 26 (these are fixed for 
+the example program provided). Select 0 to exit.
 
 Then copy the library from amcl/target/release/libamcl.rlib to the
 root directory, and execute
@@ -33,15 +33,5 @@ rustc BenchtestALL.rs --extern amcl=libamcl.rlib
 Run this test program by executing the program BenchtestALL.exe
 
 
-
-If you wish to test/benchtest other curves:-
-
-(a) Edit TestALL.rs and BenchtestALL.rs, and change all occurences of 
-ed25519 to nist256
-
-(b) Go through the process above again from scratch, but this time
-select options 3, 17 and 24
-
-And thats it!
 
 

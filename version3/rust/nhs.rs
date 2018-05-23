@@ -231,7 +231,7 @@ fn compress(poly: &[i32],array: &mut [u8]) {
 	let mut i=0;
 	while i<DEGREE  {
 		for _ in 0..8  {
-			let b=round((poly[i]*8),PRIME)&7; 
+			let b=round(poly[i]*8,PRIME)&7; 
 			col=(col<<3)+b;
 			i+=1;
 		}
@@ -252,7 +252,7 @@ fn decompress(array: &[u8],poly: &mut [i32]) {
 		j+=3;
 		for _ in 0..8 {
 			let b=(col&0xe00000)>>21; col<<=3;
-			poly[i]=round((b*PRIME),8);
+			poly[i]=round(b*PRIME,8);
 			i+=1;
 		}
 	}
