@@ -620,7 +620,14 @@ os.system("g++ -O3 -c aes.cpp")
 os.system("g++ -O3 -c gcm.cpp")
 os.system("g++ -O3 -c newhope.cpp")
 
-os.system("ar rc amcl.a *.o")
+if sys.platform.startswith("win") :
+	os.system("for %i in (*.o) do @echo %~nxi >> f.list")
+	os.system("ar rc amcl.a @f.list")
+	os.system(deltext+" f.list")
+
+else :
+	os.system("ar rc amcl.a *.o")
+
 os.system(deltext+" *.o")
 
 

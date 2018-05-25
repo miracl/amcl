@@ -617,7 +617,14 @@ os.system("gcc -O3 -std=c99 -c aes.c")
 os.system("gcc -O3 -std=c99 -c gcm.c")
 os.system("gcc -O3 -std=c99 -c newhope.c")
 
-os.system("ar rc amcl.a *.o")
+if sys.platform.startswith("win") :
+	os.system("for %i in (*.o) do @echo %~nxi >> f.list")
+	os.system("ar rc amcl.a @f.list")
+	os.system(deltext+" f.list")
+
+else :
+	os.system("ar rc amcl.a *.o")
+
 os.system(deltext+" *.o")
 
 
