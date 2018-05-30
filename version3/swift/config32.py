@@ -104,12 +104,27 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 		replace(fpath+"ecp.swift","@AK@","32")
 
 	if pf != "NOT" :
-		os.system(copytext+"ecp2.swift "+fpath+"ecp2.swift")
+
 		os.system(copytext+"fp2.swift "+fpath+"fp2.swift")
 		os.system(copytext+"fp4.swift "+fpath+"fp4.swift")
-		os.system(copytext+"fp12.swift "+fpath+"fp12.swift")
-		os.system(copytext+"pair.swift "+fpath+"pair.swift")
-		os.system(copytext+"mpin.swift "+fpath+"mpin.swift")
+		if cs == "128" :
+			os.system(copytext+"ecp2.swift "+fpath+"ecp2.swift")
+			os.system(copytext+"fp12.swift "+fpath+"fp12.swift")
+			os.system(copytext+"pair.swift "+fpath+"pair.swift")
+			os.system(copytext+"mpin.swift "+fpath+"mpin.swift")
+		if cs == "192" :
+			os.system(copytext+"fp8.swift "+fpath+"fp8.swift")
+			os.system(copytext+"ecp4.swift "+fpath+"ecp4.swift")
+			os.system(copytext+"fp24.swift "+fpath+"fp24.swift")
+			os.system(copytext+"pair192.swift "+fpath+"pair192.swift")
+			os.system(copytext+"mpin192.swift "+fpath+"mpin192.swift")
+		if cs == "256" :
+			os.system(copytext+"fp8.swift "+fpath+"fp8.swift")
+			os.system(copytext+"fp16.swift "+fpath+"fp16.swift")
+			os.system(copytext+"ecp8.swift "+fpath+"ecp8.swift")
+			os.system(copytext+"fp48.swift "+fpath+"fp48.swift")
+			os.system(copytext+"pair256.swift "+fpath+"pair256.swift")
+			os.system(copytext+"mpin256.swift "+fpath+"mpin256.swift")
 	else :
 		os.system(copytext+"ecdh.swift "+fpath+"ecdh.swift")
 
@@ -156,14 +171,17 @@ print("21. fp256BN")
 print("22. fp512BN")
 print("23. bls461\n")
 
+print("24. bls24")
+print("25. bls48\n")
+
 print("RSA")
-print("24. rsa2048")
-print("25. rsa3072")
-print("26. rsa4096")
+print("26. rsa2048")
+print("27. rsa3072")
+print("28. rsa4096")
 
 selection=[]
 ptr=0
-max=27
+max=29
 
 curve_selected=False
 pfcurve_selected=False
@@ -275,23 +293,31 @@ while ptr<max:
 		curveset("bls461","58","28","461","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 
+	if x==24:
+		curveset("bls24","60","29","479","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","192")
+		pfcurve_selected=True
+
+	if x==25:
+		curveset("bls48","70","29","556","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","256")
+		pfcurve_selected=True
+
 
 # rsaset(rsaname,big_length_bytes,bits_in_base,multiplier)
 # The RSA name reflects the modulus size, which is a 2^m multiplier
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==24:
+	if x==26:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("rsa2048","128","28","2")
 		#rsaset("rsa2048","64","29","60",4")
 		#rsaset("rsa2048","32","29","56","8")
 		rsa_selected=True
-	if x==25:
+	if x==27:
 		rsaset("rsa3072","48","28","8")
 		rsa_selected=True
-	if x==26:
+	if x==28:
 		#rsaset("rsa4096","32","29","56",16")
 		rsaset("rsa4096","64","29","8")
 		rsa_selected=True
@@ -307,13 +333,12 @@ os.system(deltext+" big.swift")
 os.system(deltext+" dbig.swift")
 os.system(deltext+" fp*.swift")
 
-os.system(deltext+" ecp.swift")
+os.system(deltext+" ecp*.swift")
 os.system(deltext+" ecdh.swift")
 os.system(deltext+" ff.swift")
 os.system(deltext+" rsa.swift")
-os.system(deltext+" ecp2.swift")
-os.system(deltext+" pair.swift")
-os.system(deltext+" mpin.swift")
+os.system(deltext+" pair*.swift")
+os.system(deltext+" mpin*.swift")
 os.system(deltext+" rom*.swift")
 
 os.system(deltext+"amcl"+slashtext+"*.*")

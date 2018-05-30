@@ -27,10 +27,15 @@
 import Foundation
 import amcl // comment out for Xcode
 import ed25519
+import nist256
+import goldilocks
 import bn254
+import bls383
+import bls24
+import bls48
 import rsa2048
 
-public func TimeRSA(_ rng: RAND)
+public func TimeRSA_2048(_ rng: RAND)
 {
     let RFS=RSA.RFS
     let MIN_TIME=10.0
@@ -101,7 +106,7 @@ public func TimeRSA(_ rng: RAND)
 }
 
 
-public func TimeECDH(_ rng: RAND)
+public func TimeECDH_ed25519(_ rng: RAND)
 {
     let MIN_TIME=10.0
     let MIN_ITERS=10
@@ -163,7 +168,132 @@ public func TimeECDH(_ rng: RAND)
     }    
 }
 
-public func TimeMPIN(_ rng: RAND)
+public func TimeECDH_nist256(_ rng: RAND)
+{
+    let MIN_TIME=10.0
+    let MIN_ITERS=10
+    
+    var fail=false;
+
+    print("\nTiming/Testing NIST256 ECC")
+    if nist256.ECP.CURVETYPE==nist256.ECP.WEIERSTRASS {
+        print("Weierstrass parameterisation")
+    }
+    if nist256.ECP.CURVETYPE==nist256.ECP.EDWARDS {
+        print("Edwards parameterisation")
+    }
+    if nist256.ECP.CURVETYPE==nist256.ECP.MONTGOMERY {
+        print("Montgomery representation")
+    }
+    if nist256.FP.MODTYPE==nist256.FP.PSEUDO_MERSENNE {
+        print("Pseudo-Mersenne Modulus")
+    }
+    if nist256.FP.MODTYPE==nist256.FP.MONTGOMERY_FRIENDLY {
+        print("Montgomery Friendly Modulus")
+    }
+    if nist256.FP.MODTYPE==nist256.FP.GENERALISED_MERSENNE {
+        print("Generalised-Mersenne Modulus")
+    }
+    if nist256.FP.MODTYPE==nist256.FP.NOT_SPECIAL {
+        print("Not special Modulus")
+    }
+    print("Modulus size \(nist256.FP.MODBITS) bits")
+    print("\(nist256.BIG.CHUNK) bit build")
+    
+
+    var s:nist256.BIG
+    let G=nist256.ECP.generator();
+    
+    let r=nist256.BIG(nist256.ROM.CURVE_Order)
+    s=nist256.BIG.randomnum(r,rng)
+    
+    var W=G.mul(r)
+    if !W.is_infinity() {
+        print("FAILURE - rG!=O")
+        fail=true;
+    }
+    
+    let start=Date()
+    var iterations=0
+    var elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        W=G.mul(s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "EC  mul - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+
+    if !fail {
+       print("All tests pass")
+    }    
+}
+
+
+public func TimeECDH_goldilocks(_ rng: RAND)
+{
+    let MIN_TIME=10.0
+    let MIN_ITERS=10
+    
+    var fail=false;
+
+    print("\nTiming/Testing GOLDILOCKS ECC")
+    if goldilocks.ECP.CURVETYPE==goldilocks.ECP.WEIERSTRASS {
+        print("Weierstrass parameterisation")
+    }
+    if goldilocks.ECP.CURVETYPE==goldilocks.ECP.EDWARDS {
+        print("Edwards parameterisation")
+    }
+    if goldilocks.ECP.CURVETYPE==goldilocks.ECP.MONTGOMERY {
+        print("Montgomery representation")
+    }
+    if goldilocks.FP.MODTYPE==goldilocks.FP.PSEUDO_MERSENNE {
+        print("Pseudo-Mersenne Modulus")
+    }
+    if goldilocks.FP.MODTYPE==goldilocks.FP.MONTGOMERY_FRIENDLY {
+        print("Montgomery Friendly Modulus")
+    }
+    if goldilocks.FP.MODTYPE==goldilocks.FP.GENERALISED_MERSENNE {
+        print("Generalised-Mersenne Modulus")
+    }
+    if goldilocks.FP.MODTYPE==goldilocks.FP.NOT_SPECIAL {
+        print("Not special Modulus")
+    }
+    print("Modulus size \(goldilocks.FP.MODBITS) bits")
+    print("\(goldilocks.BIG.CHUNK) bit build")
+    
+
+    var s:goldilocks.BIG
+    let G=goldilocks.ECP.generator();
+    
+    let r=goldilocks.BIG(goldilocks.ROM.CURVE_Order)
+    s=goldilocks.BIG.randomnum(r,rng)
+    
+    var W=G.mul(r)
+    if !W.is_infinity() {
+        print("FAILURE - rG!=O")
+        fail=true;
+    }
+    
+    let start=Date()
+    var iterations=0
+    var elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        W=G.mul(s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "EC  mul - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+
+    if !fail {
+       print("All tests pass")
+    }    
+}
+
+public func TimeMPIN_bn254(_ rng: RAND)
 {
     let MIN_TIME=10.0
     let MIN_ITERS=10   
@@ -184,7 +314,7 @@ public func TimeMPIN(_ rng: RAND)
     let r=bn254.BIG(bn254.ROM.CURVE_Order)
     let s=bn254.BIG.randomnum(r,rng)
     
-    var P=PAIR.G1mul(G,r);
+    var P=bn254.PAIR.G1mul(G,r);
     
     if !P.is_infinity() {
         print("FAILURE - rP!=O")
@@ -195,7 +325,7 @@ public func TimeMPIN(_ rng: RAND)
     var iterations=0
     var elapsed=0.0
     while elapsed<MIN_TIME || iterations<MIN_ITERS {
-        P=PAIR.G1mul(G,s)
+        P=bn254.PAIR.G1mul(G,s)
         iterations+=1
         elapsed = -start.timeIntervalSinceNow
     }
@@ -203,9 +333,9 @@ public func TimeMPIN(_ rng: RAND)
     print(String(format: "G1  mul              - %d iterations",iterations),terminator: "");
     print(String(format: " %.2f ms per iteration",elapsed))
     
-    var Q=ECP2.generator();
+    var Q=bn254.ECP2.generator();
     
-    var W=PAIR.G2mul(Q,r)
+    var W=bn254.PAIR.G2mul(Q,r)
     
     if !W.is_infinity() {
         print("FAILURE - rQ!=O")
@@ -216,7 +346,7 @@ public func TimeMPIN(_ rng: RAND)
     iterations=0
     elapsed=0.0
     while elapsed<MIN_TIME || iterations<MIN_ITERS {
-        W=PAIR.G2mul(Q,s)
+        W=bn254.PAIR.G2mul(Q,s)
         iterations+=1
         elapsed = -start.timeIntervalSinceNow
     }
@@ -224,10 +354,10 @@ public func TimeMPIN(_ rng: RAND)
     print(String(format: "G2  mul              - %d iterations",iterations),terminator: "");
     print(String(format: " %.2f ms per iteration",elapsed))
     
-    var w=PAIR.ate(Q,P)
-    w=PAIR.fexp(w)
+    var w=bn254.PAIR.ate(Q,P)
+    w=bn254.PAIR.fexp(w)
     
-    var g=PAIR.GTpow(w,r)
+    var g=bn254.PAIR.GTpow(w,r)
     
     if !g.isunity() {
         print("FAILURE - g^r!=1")
@@ -238,7 +368,7 @@ public func TimeMPIN(_ rng: RAND)
     iterations=0
     elapsed=0.0
     while elapsed<MIN_TIME || iterations<MIN_ITERS {
-        g=PAIR.GTpow(w,s)
+        g=bn254.PAIR.GTpow(w,s)
         iterations+=1
         elapsed = -start.timeIntervalSinceNow
     }
@@ -264,7 +394,7 @@ public func TimeMPIN(_ rng: RAND)
     iterations=0
     elapsed=0.0
     while elapsed<MIN_TIME || iterations<MIN_ITERS {
-        w=PAIR.ate(Q,P)
+        w=bn254.PAIR.ate(Q,P)
         iterations+=1
         elapsed = -start.timeIntervalSinceNow
     }
@@ -276,7 +406,7 @@ public func TimeMPIN(_ rng: RAND)
     iterations=0
     elapsed=0.0
     while elapsed<MIN_TIME || iterations<MIN_ITERS {
-        g=PAIR.fexp(w)
+        g=bn254.PAIR.fexp(w)
         iterations+=1
         elapsed = -start.timeIntervalSinceNow
     }
@@ -287,14 +417,14 @@ public func TimeMPIN(_ rng: RAND)
     P.copy(G)
     Q.copy(W)
     
-    P=PAIR.G1mul(P,s)
-    g=PAIR.ate(Q,P)
-    g=PAIR.fexp(g)
+    P=bn254.PAIR.G1mul(P,s)
+    g=bn254.PAIR.ate(Q,P)
+    g=bn254.PAIR.fexp(g)
     
     P.copy(G)
-    Q=PAIR.G2mul(Q,s)
-    w=PAIR.ate(Q,P)
-    w=PAIR.fexp(w)
+    Q=bn254.PAIR.G2mul(Q,s)
+    w=bn254.PAIR.ate(Q,P)
+    w=bn254.PAIR.fexp(w)
     
     if !g.equals(w) {
         print("FAILURE - e(sQ,P)!=e(Q,sP)")
@@ -306,6 +436,438 @@ public func TimeMPIN(_ rng: RAND)
     }
 }
 
+public func TimeMPIN_bls383(_ rng: RAND)
+{
+    let MIN_TIME=10.0
+    let MIN_ITERS=10   
+    var fail=false;
+
+    print("\nTiming/Testing BLS383 Pairings")
+    if bls383.ECP.CURVE_PAIRING_TYPE==bls383.ECP.BN {
+        print("BN Pairing-Friendly Curve")
+    }
+    if bls383.ECP.CURVE_PAIRING_TYPE==bls383.ECP.BLS {
+        print("BLS Pairing-Friendly Curve")
+    }
+    print("Modulus size \(bls383.FP.MODBITS) bits")
+    print("\(bls383.BIG.CHUNK) bit build")
+    
+    let G=bls383.ECP.generator();
+    
+    let r=bls383.BIG(bls383.ROM.CURVE_Order)
+    let s=bls383.BIG.randomnum(r,rng)
+    
+    var P=bls383.PAIR.G1mul(G,r);
+    
+    if !P.is_infinity() {
+        print("FAILURE - rP!=O")
+        fail=true
+    }
+    
+    var start=Date()
+    var iterations=0
+    var elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        P=bls383.PAIR.G1mul(G,s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "G1  mul              - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+    
+    var Q=bls383.ECP2.generator();
+    
+    var W=bls383.PAIR.G2mul(Q,r)
+    
+    if !W.is_infinity() {
+        print("FAILURE - rQ!=O")
+        fail=true
+    }
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        W=bls383.PAIR.G2mul(Q,s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "G2  mul              - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+    
+    var w=bls383.PAIR.ate(Q,P)
+    w=bls383.PAIR.fexp(w)
+    
+    var g=bls383.PAIR.GTpow(w,r)
+    
+    if !g.isunity() {
+        print("FAILURE - g^r!=1")
+        fail=true
+    }
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        g=bls383.PAIR.GTpow(w,s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "GT  pow              - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+   
+    g.copy(w)
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        _=g.compow(s,r)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "GT  pow (compressed) - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        w=bls383.PAIR.ate(Q,P)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "PAIRing ATE          - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        g=bls383.PAIR.fexp(w)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "PAIRing FEXP         - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+ 
+    P.copy(G)
+    Q.copy(W)
+    
+    P=bls383.PAIR.G1mul(P,s)
+    g=bls383.PAIR.ate(Q,P)
+    g=bls383.PAIR.fexp(g)
+    
+    P.copy(G)
+    Q=bls383.PAIR.G2mul(Q,s)
+    w=bls383.PAIR.ate(Q,P)
+    w=bls383.PAIR.fexp(w)
+    
+    if !g.equals(w) {
+        print("FAILURE - e(sQ,P)!=e(Q,sP)")
+        fail=true
+    }
+    
+    if !fail {
+        print("All tests pass")
+    }
+}
+
+
+public func TimeMPIN_bls24(_ rng: RAND)
+{
+    let MIN_TIME=10.0
+    let MIN_ITERS=10   
+    var fail=false;
+
+    print("\nTiming/Testing BLS24 Pairings")
+    if bls24.ECP.CURVE_PAIRING_TYPE==bls24.ECP.BN {
+        print("BN Pairing-Friendly Curve")
+    }
+    if bls24.ECP.CURVE_PAIRING_TYPE==bls24.ECP.BLS {
+        print("BLS24 Pairing-Friendly Curve")
+    }
+    print("Modulus size \(bls24.FP.MODBITS) bits")
+    print("\(bls24.BIG.CHUNK) bit build")
+    
+    let G=bls24.ECP.generator();
+    
+    let r=bls24.BIG(bls24.ROM.CURVE_Order)
+    let s=bls24.BIG.randomnum(r,rng)
+    
+    var P=PAIR192.G1mul(G,r);
+    
+    if !P.is_infinity() {
+        print("FAILURE - rP!=O")
+        fail=true
+    }
+    
+    var start=Date()
+    var iterations=0
+    var elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        P=PAIR192.G1mul(G,s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "G1  mul              - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+    
+    var Q=ECP4.generator();
+    
+    var W=PAIR192.G2mul(Q,r)
+    
+    if !W.is_infinity() {
+        print("FAILURE - rQ!=O")
+        fail=true
+    }
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        W=PAIR192.G2mul(Q,s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "G2  mul              - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+    
+    var w=PAIR192.ate(Q,P)
+    w=PAIR192.fexp(w)
+    
+    var g=PAIR192.GTpow(w,r)
+    
+    if !g.isunity() {
+        print("FAILURE - g^r!=1")
+        fail=true
+    }
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        g=PAIR192.GTpow(w,s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "GT  pow              - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+   
+    g.copy(w)
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        _=g.compow(s,r)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "GT  pow (compressed) - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        w=PAIR192.ate(Q,P)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "PAIRing ATE          - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        g=PAIR192.fexp(w)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "PAIRing FEXP         - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+ 
+    P.copy(G)
+    Q.copy(W)
+    
+    P=PAIR192.G1mul(P,s)
+    g=PAIR192.ate(Q,P)
+    g=PAIR192.fexp(g)
+    
+    P.copy(G)
+    Q=PAIR192.G2mul(Q,s)
+    w=PAIR192.ate(Q,P)
+    w=PAIR192.fexp(w)
+    
+    if !g.equals(w) {
+        print("FAILURE - e(sQ,P)!=e(Q,sP)")
+        fail=true
+    }
+    
+    if !fail {
+        print("All tests pass")
+    }
+}
+
+
+public func TimeMPIN_bls48(_ rng: RAND)
+{
+    let MIN_TIME=10.0
+    let MIN_ITERS=10   
+    var fail=false;
+
+    print("\nTiming/Testing BLS48 Pairings")
+    if bls48.ECP.CURVE_PAIRING_TYPE==bls48.ECP.BN {
+        print("BN Pairing-Friendly Curve")
+    }
+    if bls48.ECP.CURVE_PAIRING_TYPE==bls48.ECP.BLS {
+        print("BLS48 Pairing-Friendly Curve")
+    }
+    print("Modulus size \(bls48.FP.MODBITS) bits")
+    print("\(bls48.BIG.CHUNK) bit build")
+    
+    let G=bls48.ECP.generator();
+    
+    let r=bls48.BIG(bls48.ROM.CURVE_Order)
+    let s=bls48.BIG.randomnum(r,rng)
+    
+    var P=PAIR256.G1mul(G,r);
+    
+    if !P.is_infinity() {
+        print("FAILURE - rP!=O")
+        fail=true
+    }
+    
+    var start=Date()
+    var iterations=0
+    var elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        P=PAIR256.G1mul(G,s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "G1  mul              - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+    
+    var Q=ECP8.generator();
+    
+    var W=PAIR256.G2mul(Q,r)
+    
+    if !W.is_infinity() {
+        print("FAILURE - rQ!=O")
+        fail=true
+    }
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        W=PAIR256.G2mul(Q,s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "G2  mul              - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+    
+    var w=PAIR256.ate(Q,P)
+    w=PAIR256.fexp(w)
+    
+    var g=PAIR256.GTpow(w,r)
+    
+    if !g.isunity() {
+        print("FAILURE - g^r!=1")
+        fail=true
+    }
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        g=PAIR256.GTpow(w,s)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "GT  pow              - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+   
+    g.copy(w)
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        _=g.compow(s,r)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "GT  pow (compressed) - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+    
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        w=PAIR256.ate(Q,P)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "PAIRing ATE          - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+
+    start=Date()
+    iterations=0
+    elapsed=0.0
+    while elapsed<MIN_TIME || iterations<MIN_ITERS {
+        g=PAIR256.fexp(w)
+        iterations+=1
+        elapsed = -start.timeIntervalSinceNow
+    }
+    elapsed=1000.0*elapsed/Double(iterations)
+    print(String(format: "PAIRing FEXP         - %d iterations",iterations),terminator: "");
+    print(String(format: " %.2f ms per iteration",elapsed))
+ 
+    P.copy(G)
+    Q.copy(W)
+    
+    P=PAIR256.G1mul(P,s)
+    g=PAIR256.ate(Q,P)
+    g=PAIR256.fexp(g)
+    
+    P.copy(G)
+    Q=PAIR256.G2mul(Q,s)
+    w=PAIR256.ate(Q,P)
+    w=PAIR256.fexp(w)
+    
+    if !g.equals(w) {
+        print("FAILURE - e(sQ,P)!=e(Q,sP)")
+        fail=true
+    }
+    
+    if !fail {
+        print("All tests pass")
+    }
+}
+
+
 var RAW=[UInt8](repeating: 0,count: 100)
 let rng=RAND()
     
@@ -314,7 +876,13 @@ for i in 0 ..< 100 {RAW[i]=UInt8(i&0xff)}
 rng.seed(100,RAW)
 
 
-TimeECDH(rng)  
-TimeRSA(rng)
-TimeMPIN(rng)
+TimeECDH_ed25519(rng)  
+TimeECDH_nist256(rng)
+TimeECDH_goldilocks(rng)
+TimeRSA_2048(rng)
+TimeMPIN_bn254(rng)
+TimeMPIN_bls383(rng)
+TimeMPIN_bls24(rng)
+TimeMPIN_bls48(rng)
+
 

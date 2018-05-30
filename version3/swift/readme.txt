@@ -5,7 +5,7 @@ So for example to support both ed25519 and the NIST P256 curves, one
 could import into a particular module both "ed25519" and "nist256"
 
 Separate ROM files provide the constants required for each curve. Some
-files (big.swift, fp.rswift, ecp.swift) also specify certain constants 
+files (big.swift, fp.swift, ecp.swift) also specify certain constants 
 that must be set for the particular curve.
 
 --------------------------------------
@@ -24,19 +24,14 @@ or
 
 python3 config64.py
 
-Then select options 1, 17 and 24 (these are fixed for the example 
-program provided). Select 0 to exit.
+Then select options 1, 3, 7, 17, 19, 24, 25 and 26 (these are fixed for the 
+example program provided). Select 0 to exit.
 
 Then execute
 
-swift -I. -L. -led25519 -lbn254 -lrsa2048 TestALL.swift 
+swift -I. -L. -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 TestALL.swift 
 
 and
 
-swift -I. -L. -led25519 -lbn254 -lrsa2048 BenchtestALL.swift 
-
-
-For example to test the bls381 pairing-friendly curve, select
-1, 20 and 24 instead, and replace bn254 by bls381 above and in
-TestALL.swift and BenchtestALL.swift.
+swift -I. -L. -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 BenchtestALL.swift 
 

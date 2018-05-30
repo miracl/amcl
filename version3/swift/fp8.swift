@@ -18,43 +18,43 @@
 */
 
 //
-//  fp4.swift
+//  fp8.swift
 //
 //  Created by Michael Scott on 07/07/2015.
 //  Copyright (c) 2015 Michael Scott. All rights reserved.
 //
 
-/* Finite Field arithmetic  Fp^4 functions */
+/* Finite Field arithmetic  Fp^8 functions */
 
-/* FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1))  */
+/* FP8 elements are of the form a+ib, where i is sqrt(sqrt(-1+sqrt(-1)))  */
 
-final public class FP4 {
-    private final var a:FP2
-    private final var b:FP2
+final public class FP8 {
+    private final var a:FP4
+    private final var b:FP4
 
     /* constructors */
     init(_ c:Int)
     {
-        a=FP2(c)
-        b=FP2(0)
+        a=FP4(c)
+        b=FP4(0)
     }
     
-    init(_ x:FP4)
+    init(_ x:FP8)
     {
-        a=FP2(x.a)
-        b=FP2(x.b)
+        a=FP4(x.a)
+        b=FP4(x.b)
     }
     
-    init(_ c:FP2,_ d:FP2)
+    init(_ c:FP4,_ d:FP4)
     {
-        a=FP2(c)
-        b=FP2(d)
+        a=FP4(c)
+        b=FP4(d)
     }
     
-    init(_ c:FP2)
+    init(_ c:FP4)
     {
-        a=FP2(c)
-        b=FP2(0)
+        a=FP4(c)
+        b=FP4(0)
     }
     /* reduce all components of this mod Modulus */
     func reduce()
@@ -68,6 +68,7 @@ final public class FP4 {
         a.norm()
         b.norm()
     }
+
     /* test this==0 ? */
     func iszilch() -> Bool
     {
@@ -75,7 +76,7 @@ final public class FP4 {
         return a.iszilch() && b.iszilch()
     }
 
-    func cmove(_ g:FP4,_ d:Int)
+    func cmove(_ g:FP8,_ d:Int)
     {
         a.cmove(g.a,d)
         b.cmove(g.b,d)
@@ -85,7 +86,7 @@ final public class FP4 {
     /* test this==1 ? */
     func isunity() -> Bool
     {
-    let one=FP2(1);
+    let one=FP4(1);
     return a.equals(one) && b.iszilch()
     }
     
@@ -95,27 +96,28 @@ final public class FP4 {
         return b.iszilch();
     }
     /* extract real part a */
-    func real() -> FP2
+    func real() -> FP4
     {
         return a;
     }
     
-    func geta() -> FP2
+    func geta() -> FP4
     {
         return a;
     }
     /* extract imaginary part b */
-    func getb() -> FP2
+    func getb() -> FP4
     {
     return b;
     }
+
     /* test self=x? */
-    func equals(_ x:FP4) -> Bool
+    func equals(_ x:FP8) -> Bool
     {
         return a.equals(x.a) && b.equals(x.b)
     }
     /* copy self=x */
-    func copy(_ x:FP4)
+    func copy(_ x:FP8)
     {
         a.copy(x.a)
         b.copy(x.b)
@@ -135,9 +137,9 @@ final public class FP4 {
     /* set self=-self */
     func neg()
     {
-	norm()
-        let m=FP2(a)
-        let t=FP2(0)
+    norm()
+        let m=FP4(a)
+        let t=FP4(0)
         m.add(b)
         m.neg()
     //    m.norm()
@@ -158,36 +160,42 @@ final public class FP4 {
         a.neg(); norm()
     }
     /* self+=x */
-    func add(_ x:FP4)
+    func add(_ x:FP8)
     {
         a.add(x.a)
         b.add(x.b)
     }
     /* self-=x */
-    func sub(_ x:FP4)
+    func sub(_ x:FP8)
     {
-        let m=FP4(x)
+        let m=FP8(x)
         m.neg()
         add(m)
     }
-    
+
     /* self-=x */
-    func rsub(_ x: FP4) {
+    func rsub(_ x: FP8) {
         neg()
         add(x)
     }    
 
-    /* self*=s where s is FP2 */
-    func pmul(_ s:FP2)
+    /* self*=s where s is FP4 */
+    func pmul(_ s:FP4)
     {
         a.mul(s)
         b.mul(s)
     }
 
-    /* self*=s where s is FP */
-    func qmul(_ s:FP) {
+    /* self*=s where s is FP2 */
+    func qmul(_ s:FP2) {
         a.pmul(s)
         b.pmul(s)
+    }
+
+    /* self*=s where s is FP */
+    func tmul(_ s:FP) {
+        a.qmul(s)
+        b.qmul(s)
     }
 
     /* self*=c where c is int */
@@ -196,18 +204,19 @@ final public class FP4 {
         a.imul(c)
         b.imul(c)
     }
+
     /* self*=self */
     func sqr()
     {
 //        norm();
     
-        let t1=FP2(a)
-        let t2=FP2(b)
-        let t3=FP2(a)
+        let t1=FP4(a)
+        let t2=FP4(b)
+        let t3=FP4(a)
     
         t3.mul(b)
         t1.add(b)
-        t2.mul_ip()
+        t2.times_i()
     
         t2.add(a)
 
@@ -217,7 +226,7 @@ final public class FP4 {
         a.mul(t2)
     
         t2.copy(t3)
-        t2.mul_ip()
+        t2.times_i()
         t2.add(t3); t2.norm()
 
         t2.neg()
@@ -228,15 +237,16 @@ final public class FP4 {
     
         norm()
     }
+
     /* self*=y */
-    func mul(_ y:FP4)
+    func mul(_ y:FP8)
     {
     //    norm();
     
-        let t1=FP2(a)
-        let t2=FP2(b)
-        let t3=FP2(0)
-        let t4=FP2(b)
+        let t1=FP4(a)
+        let t2=FP4(b)
+        let t3=FP4(0)
+        let t4=FP4(b)
     
         t1.mul(y.a)
         t2.mul(y.b)
@@ -258,7 +268,7 @@ final public class FP4 {
         b.copy(t4)
         b.add(t3)
 
-        t2.mul_ip()
+        t2.times_i()
         a.copy(t2)
         a.add(t1)
 
@@ -269,8 +279,8 @@ final public class FP4 {
     {
         return ("["+a.toString()+","+b.toString()+"]")
     }
-    
-    func toRawString() -> String
+
+   func toRawString() -> String
     {
         return ("["+a.toRawString()+","+b.toRawString()+"]")
     }
@@ -279,48 +289,54 @@ final public class FP4 {
     {
         norm();
     
-        let t1=FP2(a)
-        let t2=FP2(b)
+        let t1=FP4(a)
+        let t2=FP4(b)
     
         t1.sqr()
         t2.sqr()
-        t2.mul_ip(); t2.norm()
-        t1.sub(t2)
+        t2.times_i(); t2.norm()
+        t1.sub(t2); t1.norm()
         t1.inverse()
         a.mul(t1)
         t1.neg(); t1.norm()
         b.mul(t1)
     }
-    
+
     /* self*=i where i = sqrt(-1+sqrt(-1)) */
     func times_i()
     {
-    //    norm();
-        let s=FP2(b)
-        let t=FP2(b)
+        let s=FP4(b)
+        let t=FP4(a)
         s.times_i()
-        t.add(s)
-    //    t.norm()
-        b.copy(a)
-        a.copy(t)
+        a.copy(s)
+        b.copy(t)
         norm()
     }
-    
+
+    func times_i2() {
+        a.times_i()
+        b.times_i()
+    }    
+
     /* self=self^p using Frobenius */
     func frob(_ f:FP2)
     {
-        a.conj()
-        b.conj()
-        b.mul(f)
+        let ff=FP2(f); ff.sqr(); ff.mul_ip(); ff.norm()
+
+        a.frob(ff)
+        b.frob(ff)
+        b.pmul(f)
+        b.times_i()
     }
+
     /* self=self^e */
-    func pow(_ e:BIG) -> FP4
+    func pow(_ e:BIG) -> FP8
     {
         norm()
         e.norm()
-        let w=FP4(self)
+        let w=FP8(self)
         let z=BIG(e)
-        let r=FP4(1)
+        let r=FP8(1)
         while (true)
         {
             let bt=z.parity()
@@ -332,11 +348,12 @@ final public class FP4 {
         r.reduce()
         return r
     }
+
     /* XTR xtr_a function */
-    func xtr_A(_ w:FP4,_ y:FP4,_ z:FP4)
+    func xtr_A(_ w:FP8,_ y:FP8,_ z:FP8)
     {
-        let r=FP4(w)
-        let t=FP4(w)
+        let r=FP8(w)
+        let t=FP8(w)
         r.sub(y); r.norm()
         r.pmul(a)
         t.add(y); t.norm()
@@ -352,21 +369,21 @@ final public class FP4 {
     /* XTR xtr_d function */
     func xtr_D()
     {
-        let w=FP4(self)
+        let w=FP8(self)
         sqr(); w.conj()
         w.add(w); w.norm();
         sub(w)
         reduce()
     }
-    /* r=x^n using XTR method on traces of FP12s */
-    func xtr_pow(_ n:BIG) -> FP4
+    /* r=x^n using XTR method on traces of FP24s */
+    func xtr_pow(_ n:BIG) -> FP8
     {
-        let a=FP4(3)
-        let b=FP4(self)
-        let c=FP4(b)
+        let a=FP8(3)
+        let b=FP8(self)
+        let c=FP8(b)
         c.xtr_D()
-        let t=FP4(0)
-        let r=FP4(0)
+        let t=FP8(0)
+        let r=FP8(0)
     
         n.norm();
         let par=n.parity()
@@ -381,22 +398,22 @@ final public class FP4 {
         {
             if (v.bit(UInt(i)) != 1)
             {
-				t.copy(b)
-				conj()
-				c.conj()
-				b.xtr_A(a,self,c)
-				conj()
-				c.copy(t)
-				c.xtr_D()
-				a.xtr_D()
+                t.copy(b)
+                conj()
+                c.conj()
+                b.xtr_A(a,self,c)
+                conj()
+                c.copy(t)
+                c.xtr_D()
+                a.xtr_D()
             }
             else
             {
-				t.copy(a); t.conj()
-				a.copy(b)
-				a.xtr_D()
-				b.xtr_A(c,self,t)
-				c.xtr_D()
+                t.copy(a); t.conj()
+                a.copy(b)
+                a.xtr_D()
+                b.xtr_A(c,self,t)
+                c.xtr_D()
             }
             i-=1
         }
@@ -406,20 +423,20 @@ final public class FP4 {
         return r
     }
     
-    /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
-    func xtr_pow2(_ ck:FP4,_ ckml:FP4,_ ckm2l:FP4,_ a:BIG,_ b:BIG) -> FP4
+    /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP24s. See Stam thesis. */
+    func xtr_pow2(_ ck:FP8,_ ckml:FP8,_ ckm2l:FP8,_ a:BIG,_ b:BIG) -> FP8
     {
         a.norm(); b.norm()
         let e=BIG(a)
         let d=BIG(b)
         let w=BIG(0)
     
-        let cu=FP4(ck)  // can probably be passed in w/o copying
-        let cv=FP4(self)
-        let cumv=FP4(ckml)
-        let cum2v=FP4(ckm2l)
-        var r=FP4(0)
-        let t=FP4(0)
+        let cu=FP8(ck)  // can probably be passed in w/o copying
+        let cv=FP8(self)
+        let cumv=FP8(ckml)
+        let cum2v=FP8(ckm2l)
+        var r=FP8(0)
+        let t=FP8(0)
     
         var f2:Int=0
         while d.parity()==0 && e.parity()==0
@@ -433,9 +450,9 @@ final public class FP4 {
         {
             if BIG.comp(d,e)>0
             {
-				w.copy(e); w.imul(4); w.norm()
-				if BIG.comp(d,w)<=0
-				{
+                w.copy(e); w.imul(4); w.norm()
+                if BIG.comp(d,w)<=0
+                {
                     w.copy(d); d.copy(e)
                     e.rsub(w); e.norm()
     
@@ -447,9 +464,9 @@ final public class FP4 {
                     cv.copy(cu)
                     cu.copy(t)
     
-				}
-				else if d.parity()==0
-				{
+                }
+                else if d.parity()==0
+                {
                     d.fshr(1)
                     r.copy(cum2v); r.conj()
                     t.copy(cumv)
@@ -458,9 +475,9 @@ final public class FP4 {
                     cum2v.xtr_D()
                     cumv.copy(t)
                     cu.xtr_D()
-				}
-				else if e.parity()==1
-				{
+                }
+                else if e.parity()==1
+                {
                     d.sub(e); d.norm()
                     d.fshr(1)
                     t.copy(cv)
@@ -470,9 +487,9 @@ final public class FP4 {
                     cum2v.xtr_D()
                     cum2v.conj()
                     cv.copy(t)
-				}
-				else
-				{
+                }
+                else
+                {
                     w.copy(d)
                     d.copy(e); d.fshr(1)
                     e.copy(w)
@@ -484,22 +501,22 @@ final public class FP4 {
                     t.xtr_D()
                     cv.copy(cu)
                     cu.copy(t)
-				}
+                }
             }
             if BIG.comp(d,e)<0
             {
-				w.copy(d); w.imul(4); w.norm()
-				if BIG.comp(e,w)<=0
-				{
+                w.copy(d); w.imul(4); w.norm()
+                if BIG.comp(e,w)<=0
+                {
                     e.sub(d); e.norm()
                     t.copy(cv)
                     t.xtr_A(cu,cumv,cum2v)
                     cum2v.copy(cumv)
                     cumv.copy(cu)
                     cu.copy(t)
-				}
-				else if e.parity()==0
-				{
+                }
+                else if e.parity()==0
+                {
                     w.copy(d)
                     d.copy(e); d.fshr(1)
                     e.copy(w)
@@ -511,9 +528,9 @@ final public class FP4 {
                     t.xtr_D()
                     cv.copy(cu)
                     cu.copy(t)
-				}
-				else if d.parity()==1
-				{
+                }
+                else if d.parity()==1
+                {
                     w.copy(e)
                     e.copy(d)
                     w.sub(d); w.norm()
@@ -527,9 +544,9 @@ final public class FP4 {
                     cu.copy(cv)
                     cu.xtr_D()
                     cv.copy(t)
-				}
-				else
-				{
+                }
+                else
+                {
                     d.fshr(1)
                     r.copy(cum2v); r.conj()
                     t.copy(cumv)
@@ -538,7 +555,7 @@ final public class FP4 {
                     cum2v.xtr_D()
                     cumv.copy(t)
                     cu.xtr_D()
-				}
+                }
             }
         }
         r.copy(cv)
@@ -549,6 +566,7 @@ final public class FP4 {
         return r
     }
     
+
     /* self/=2 */
     func div2() {
         a.div2()
@@ -556,17 +574,22 @@ final public class FP4 {
     }
 
     func div_i() {
-        let u=FP2(a)
-        let v=FP2(b)
-        u.div_ip()
+        let u=FP4(a)
+        let v=FP4(b)
+        u.div_i()
         a.copy(v)
         b.copy(u)
     }   
 
+    func div_i2() {
+        a.div_i()
+        b.div_i()
+    }
+
     func div_2i() {
-        let u=FP2(a)
-        let v=FP2(b)
-        u.div_ip2()
+        let u=FP4(a)
+        let v=FP4(b)
+        u.div_2i()
         v.add(v); v.norm()
         a.copy(v)
         b.copy(u) 
@@ -577,16 +600,16 @@ final public class FP4 {
     func sqrt() -> Bool {
         if iszilch() {return true}
 
-        let aa=FP2(a)
-        let s=FP2(b)
-        let t=FP2(a)
+        let aa=FP4(a)
+        let s=FP4(b)
+        let t=FP4(a)
 
         if s.iszilch() {
             if t.sqrt() {
                 a.copy(t)
                 b.zero()
             } else {
-                t.div_ip()
+                t.div_i()
                 _=t.sqrt()
                 b.copy(t)
                 a.zero()
@@ -595,7 +618,7 @@ final public class FP4 {
         }
         s.sqr()
         a.sqr()
-        s.mul_ip()
+        s.times_i()
         s.norm()
         aa.sub(s)
 
@@ -622,6 +645,5 @@ final public class FP4 {
 
         return true
     }
-
 
 }
