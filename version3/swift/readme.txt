@@ -24,7 +24,7 @@ or
 
 python3 config64.py
 
-Then select options 1, 3, 7, 17, 19, 24, 25 and 26 (these are fixed for the 
+Then select options 1, 3, 7, 18, 20, 25, 26 and 27 (these are fixed for the 
 example program provided). Select 0 to exit.
 
 Then execute

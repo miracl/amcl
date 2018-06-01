@@ -11,6 +11,7 @@ namespace ZZZ {
 /* Curve Params - see rom.c */
 extern const int CURVE_A;     /**< Elliptic curve A parameter */
 extern const int CURVE_B_I;
+extern const int CURVE_Cof_I;
 extern const XXX::BIG CURVE_B;     /**< Elliptic curve B parameter */
 extern const XXX::BIG CURVE_Order; /**< Elliptic curve group order */
 extern const XXX::BIG CURVE_Cof;   /**< Elliptic curve cofactor */
@@ -262,6 +263,12 @@ extern void ECP_mul(ECP *P,XXX::BIG b);
 	@param f BIG number multiplier
  */
 extern void ECP_mul2(ECP *P,ECP *Q,XXX::BIG e,XXX::BIG f);
+
+/**	@brief Multiplies random point by co-factor
+ *
+	@param Q ECP multiplied by co-factor
+ */
+extern void ECP_cfp(ECP *Q);
 
 /**	@brief Maps random BIG to curve point of correct order
  *

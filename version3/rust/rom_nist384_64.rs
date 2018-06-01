@@ -27,6 +27,7 @@ pub const R2MODP:[Chunk;NLEN]=[0xFE000000010000,0xFFFFFF,0x2,0xFFFFFFFE00,0x1000
 pub const MCONST:Chunk=0x100000001;
 
 // nist384 Curve 
+pub const CURVE_COF_I:isize = 1;
 pub const CURVE_A:isize = -3;
 pub const CURVE_B_I:isize = 0;
 pub const CURVE_COF:[Chunk;NLEN]=[0x1,0x0,0x0,0x0,0x0,0x0,0x0];

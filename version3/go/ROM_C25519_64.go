@@ -26,6 +26,7 @@ var Modulus= [...]Chunk {0xFFFFFFFFFFFFED,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0xFF
 var R2modp= [...]Chunk {0xA4000000000000,0x5,0x0,0x0,0x0}
 const MConst Chunk=0x13
 
+const CURVE_Cof_I int= 8
 var CURVE_Cof=[...]Chunk {0x8,0x0,0x0,0x0,0x0}
 const CURVE_A int= 486662
 const CURVE_B_I int= 0

@@ -27,6 +27,8 @@ pub const R2MODP:[Chunk;NLEN]=[0x288CC9C,0x18D2374,0x646BD2B,0x4929E67,0xD6F7F2D
 pub const MCONST:Chunk=0x64E1155;
 
 // anssi Curve
+
+pub const CURVE_COF_I:isize = 1;
 pub const CURVE_A:isize = -3;
 pub const CURVE_B_I:isize = 0;
 pub const CURVE_COF:[Chunk;NLEN]=[0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0];

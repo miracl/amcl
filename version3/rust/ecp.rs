@@ -936,6 +936,25 @@ impl ECP {
 		return S;
 	}
 
+	pub fn cfp(&mut self) {
+		let cf=rom::CURVE_COF_I;
+		if cf==1 {return}
+		if cf==4 {
+			self.dbl(); self.dbl();
+			self.affine();
+			return;
+		} 
+		if cf==8 {
+			self.dbl(); self.dbl(); self.dbl();
+			self.affine();
+			return;
+		}
+		let c=BIG::new_ints(&rom::CURVE_COF);
+		let P=self.mul(&c);
+		self.copy(&P);	
+	}
+
+
 #[allow(non_snake_case)]
 	pub fn mapit(h: &[u8]) -> ECP {
 		let mut q=BIG::new_ints(&rom::MODULUS);
@@ -944,15 +963,20 @@ impl ECP {
 		let mut P:ECP;
 
 		loop {
-			P=ECP::new_bigint(&x,0);
+			loop {
+				if CURVETYPE!=MONTGOMERY {
+					P=ECP::new_bigint(&x,0);
+				} else {
+					P=ECP::new_big(&x);
+				}
+				x.inc(1); x.norm();
+				if !P.is_infinity() {break}
+			}
+			P.cfp();
 			if !P.is_infinity() {break}
-			x.inc(1); x.norm();
 		}
-		if CURVE_PAIRING_TYPE!=BN {
-			let mut c=BIG::new_ints(&rom::CURVE_COF);
-			P=P.mul(&mut c);
-		}	
-		return P;
+			
+		return P;	
 	}
 
 	pub fn generator() -> ECP {

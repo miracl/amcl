@@ -15,8 +15,8 @@ var ctx2 = new CTX("C25519");
 ```
 The following is the list of all elliptic curves supported by MCJS
 ```
-['ED25519', 'C25519', 'C41417', 'GOLDILOCKS', 'NIST256', 'NIST384','NIST521', 'BRAINPOOL', 'ANSSI', 'HIFIVE', 'NUMS256W', 
-'NUMS256E', 'NUMS384W', 'NUMS384E', 'NUMS512W', 'NUMS512E', 'BN254', 'BN254CX', 'BLS383', 'BLS381', 'FP256BN', 'FP512BN', 'BLS461'];
+['ED25519', 'C25519', 'C41417', 'GOLDILOCKS', 'NIST256', 'NIST384','NIST521', 'BRAINPOOL', 'ANSSI', 'HIFIVE', 'NUMS256W', 'SECP256K1'
+'NUMS256E', 'NUMS384W', 'NUMS384E', 'NUMS512W', 'NUMS512E', 'BN254', 'BN254CX', 'BLS383', 'BLS381', 'FP256BN', 'FP512BN', 'BLS461', 'BLS24', 'BLS48'];
 ```
 
 This library supports also RSA encryption/decryption and RSA signature. The following is a quick example on how to use RSA. First initialize the context

@@ -30,7 +30,8 @@ public static final long[] Modulus= {0xFFFFFFFFFFFFEDL,0xFFFFFFFFFFFFFFL,0xFFFFF
 public static final long[] R2modp= {0xA4000000000000L,0x5L,0x0L,0x0L,0x0L};
 public static final long MConst= 0x13L;
 
-public static final int CURVE_Cof= 8;
+public static final int CURVE_Cof_I= 8;
+public static final int[] CURVE_Cof= {0x8L,0x0L,0x0L,0x0L,0x0L};
 public static final int CURVE_A= 486662;
 public static final int CURVE_B_I= 0;
 public static final long[] CURVE_B= {0x0L,0x0L,0x0L,0x0L,0x0L};

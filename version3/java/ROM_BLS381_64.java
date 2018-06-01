@@ -32,6 +32,7 @@ public static final long MConst= 0x1F3FFFCFFFCFFFDL;
 
 public static final int CURVE_A= 0;
 public static final int CURVE_B_I= 4;
+public static final int CURVE_Cof_I= 0;
 public static final long[] CURVE_B= {0x4L,0x0L,0x0L,0x0L,0x0L,0x0L,0x0L};
 public static final long[] CURVE_Order= {0x3FFFFFF00000001L,0x36900BFFF96FFBFL,0x180809A1D80553BL,0x14CA675F520CCE7L,0x73EDA7L,0x0L,0x0L};
 public static final long[] CURVE_Gx= {0x33AF00ADB22C6BBL,0x17A0FFE5E86BBFEL,0x3A3F171BAC586C5L,0x13E5DD2E4168538L,0x4FA9AC0FC3688CL,0x65F5E509A558E3L,0x17F1D3A73L};

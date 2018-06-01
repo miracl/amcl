@@ -36,7 +36,8 @@ final public class ROM{
 	static let MConst:Chunk = 0x13;
 
 // ED25519 Curve
-	static let CURVE_Cof:Int = 8
+	static let CURVE_Cof_I:Int = 8
+	static let CURVE_Cof:[Chunk] = [0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0]
 	static let CURVE_A:Int = -1
 	static let CURVE_B_I:Int = 0
 	static let CURVE_B:[Chunk] = [0x135978A3,0xF5A6E50,0x10762ADD,0x149A82,0x1E898007,0x3CBBBC,0x19CE331D,0x1DC56DFF,0x52036C]
@@ -56,7 +57,8 @@ final public class ROM{
 	static let MConst:Chunk = 0x13
 
 // ED25519 Curve
-	static let CURVE_Cof:Int = 8
+	static let CURVE_Cof_I:Int = 8
+	static let CURVE_Cof:[Chunk] = [0x8,0x0,0x0,0x0,0x0]
 	static let CURVE_A:Int = -1
 	static let CURVE_B_I:Int = 0
 	static let CURVE_B:[Chunk] = [0xEB4DCA135978A3,0xA4D4141D8AB75,0x797779E8980070,0x2B6FFE738CC740,0x52036CEE]

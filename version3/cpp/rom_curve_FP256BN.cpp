@@ -15,6 +15,7 @@ namespace FP256BN {
 
 using namespace B256_28;
 
+const int CURVE_Cof_I=1;
 const int CURVE_A= 0;
 const int CURVE_B_I= 3;
 const BIG CURVE_B= {0x3,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
@@ -58,6 +59,7 @@ const BIG CURVE_BB[4][4]= {{{0x5AA80D,0xAA5DACA,0x9921A8D,0x65FB129,0x49E0CDC,0x
 
 using namespace B256_56;
 
+const int CURVE_Cof_I=1;
 const int CURVE_A= 0;
 const int CURVE_B_I= 3;
 const BIG CURVE_B= {0x3L,0x0L,0x0L,0x0L,0x0L};

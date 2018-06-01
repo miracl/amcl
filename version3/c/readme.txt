@@ -40,7 +40,7 @@ or
 
 python3 config32.py
 
-Then select options 1, 3, 7, 17, 19, 24, 25 and 26, which are fixed for the example 
+Then select options 1, 3, 7, 18, 20, 25, 26 and 27, which are fixed for the example 
 program. (For a 16-bit build select 1,3 and 5). Select 0 then to exit.
 
 Then compile

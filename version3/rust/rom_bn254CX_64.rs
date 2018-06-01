@@ -30,6 +30,7 @@ pub const FRA:[Chunk;NLEN]=[0xD9083355C80EA3,0x7326F173F8215B,0x8AACA718986867,0
 pub const FRB:[Chunk;NLEN]=[0x8D1BBC06534710,0x63C7269546C062,0xD9CDBC4E3ABBD8,0x623628A900DC53,0x10A6F7D0];
 
 // bn254CX Curve
+pub const CURVE_COF_I:isize = 1;
 pub const CURVE_A:isize = 0;
 pub const CURVE_B_I:isize = 2;
 pub const CURVE_B:[Chunk;NLEN]=[0x2,0x0,0x0,0x0,0x0];

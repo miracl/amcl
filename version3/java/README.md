@@ -15,7 +15,7 @@ or perhaps
 
 python3 config64.py
 
-Choose options 1, 3, 7, 17, 19, 24, 25 and 26, for example.
+Choose options 1, 3, 7, 18, 20, 25, 26 and 27, for example.
 
 Once the library is configured, you can compile and install with maven:
 

@@ -60,9 +60,9 @@ var ECDH = function(ctx) {
 
             for (i = 0; i < len; i++) {
                 ch = b[i];
-				s += String.fromCharCode(ch);
-                //s += ((ch >>> 4) & 15).toString(16);
-                //s += (ch & 15).toString(16);
+				//s += String.fromCharCode(ch);
+                s += ((ch >>> 4) & 15).toString(16);
+                s += (ch & 15).toString(16);
             }
 
             return s;

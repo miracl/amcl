@@ -29,6 +29,7 @@ pub const R2MODP:[Chunk;NLEN]=[0xB9A3787,0x9E04F49,0x8F3CF49,0x2931721,0xF1DBC89
 pub const MCONST:Chunk=0xEFD89B9;
 
 // brainpool Curve 
+pub const CURVE_COF_I:isize = 1;
 pub const CURVE_A:isize = -3;
 pub const CURVE_B_I:isize = 0;
 pub const CURVE_COF:[Chunk;NLEN]=[0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0];

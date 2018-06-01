@@ -1317,26 +1317,56 @@ void ZZZ::ECP_mul2(ECP *P,ECP *Q,BIG e,BIG f)
 
 #endif
 
+void ZZZ::ECP_cfp(ECP *P)
+{ /* multiply point by curves cofactor */
+	BIG c;
+	int cf=CURVE_Cof_I;
+	if (cf==1) return;
+	if (cf==4)
+	{
+		ECP_dbl(P);
+		ECP_dbl(P);
+		ECP_affine(P);
+		return;
+	}
+	if (cf==8)
+	{
+		ECP_dbl(P);
+		ECP_dbl(P);
+		ECP_dbl(P);
+		ECP_affine(P);
+		return;
+	}
+	BIG_rcopy(c,CURVE_Cof);
+	ECP_mul(P,c);
+	return;
+}
 
 /* map BIG to point on curve of correct order */
 /* The BIG should be the output of some hash function */
 
 void ZZZ::ECP_mapit(ECP *P,octet *W)
 {
-    BIG q,c,x;
+    BIG q,x;
 	BIG_fromBytes(x,W->val);
     BIG_rcopy(q,Modulus);
     BIG_mod(x,q);
-	int k=0;
 
-    while (!ECP_setx(P,x,0))
+	for (;;)
 	{
-        BIG_inc(x,1); k++; BIG_norm(x);
-	}
-#if PAIRING_FRIENDLY_ZZZ == BLS
-    BIG_rcopy(c,CURVE_Cof);
-    ECP_mul(P,c);
+		for (;;)
+		{
+#if CURVETYPE_ZZZ!=MONTGOMERY
+			ECP_setx(P,x,0);
+#else
+			ECP_set(P,x);
 #endif
+			BIG_inc(x,1); BIG_norm(x);
+			if (!ECP_isinf(P)) break;
+		}
+		ECP_cfp(P);
+		if (!ECP_isinf(P)) break;
+	}
 }
 
 void ZZZ::ECP_generator(ECP *G)

@@ -30,7 +30,8 @@ public class ROM
 	public static final long[] R2modp= {0x9000000000000L,0x0L,0x0L,0x0L,0x0L,0x0L};
 	public static final long MConst= 0x3L;
 
-	public static final int CURVE_Cof= 8;
+	public static final int CURVE_Cof_I= 8;
+	public static final int[] CURVE_Cof= {0x8L,0x0L,0x0L,0x0L,0x0L,0x0L};
 	public static final int CURVE_A= 1;
 	public static final int CURVE_B_I= 11111;
 	public static final long[] CURVE_B= {0x2B67L,0x0L,0x0L,0x0L,0x0L,0x0L};

@@ -27,6 +27,7 @@ pub const R2MODP:[Chunk;NLEN]=[0x9000000000000,0x0,0x0,0x0,0x0,0x0];
 pub const MCONST:Chunk=0x3;
 
 // hifive Curve
+pub const CURVE_COF_I:isize = 8;
 pub const CURVE_A:isize = 1;
 pub const CURVE_B_I:isize = 11111;
 pub const CURVE_COF:[Chunk;NLEN]=[0x8,0x0,0x0,0x0,0x0,0x0];

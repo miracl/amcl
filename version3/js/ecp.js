@@ -994,6 +994,28 @@ var ECP = function(ctx) {
             }
         },
 
+// multiply this by the curves cofactor
+		cfp: function() {
+			var cf=ctx.ROM_CURVE.CURVE_Cof_I;
+			if (cf==1) return;
+			if (cf==4)
+			{
+				this.dbl(); this.dbl();
+				this.affine();
+				return;
+			} 
+			if (cf==8)
+			{
+				this.dbl(); this.dbl(); this.dbl();
+				this.affine();
+				return;
+			}
+			var c=new ctx.BIG(0);
+			c.rcopy(ctx.ROM_CURVE.CURVE_Cof);
+			this.copy(this.mul(c));
+		},
+
+
         /* return e.this - SPA immune, using Ladder */
 
         mul: function(e) {
@@ -1320,22 +1342,21 @@ var ECP = function(ctx) {
         q.rcopy(ctx.ROM_FIELD.Modulus);
         x.mod(q);
 
-        for (;;) {
-            P.setxi(x, 0);
-            if (!P.is_infinity()) {
-                break;
-            }
-            x.inc(1);
-            x.norm();
-        }
+		for (;;)
+		{
+			for (;;) {
+				if (ECP.CURVETYPE != ECP.MONTGOMERY)
+					P.setxi(x,0);
+				else
+					P.setx(x);
+				x.inc(1); x.norm();
+				if (!P.is_infinity()) break;
 
-        if (ECP.CURVE_PAIRING_TYPE != ECP.BN) {
-            c = new ctx.BIG(0);
-            c.rcopy(ctx.ROM_CURVE.CURVE_Cof);
-            P = P.mul(c);
-        }
-
-        return P;
+			}
+			P.cfp();
+			if (!P.is_infinity()) break;
+		}
+		return P;
     };
 
     return ECP;

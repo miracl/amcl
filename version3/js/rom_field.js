@@ -364,3 +364,18 @@ var ROM_FIELD_NIST521 = function() {
     };
     return ROM_FIELD_NIST521;
 };
+
+
+var ROM_FIELD_SECP256K1 = function() {
+    /* Fixed Data in ROM - Field and Curve parameters */
+
+    var ROM_FIELD_SECP256K1 = {
+
+        // SECP256K1 modulus
+		// Base Bits= 24
+		Modulus: [0xFFFC2F,0xFFFEFF,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFFFF,0xFFFF],
+		R2modp: [0xA10000,0xE90,0x7A2,0x100,0x0,0x0,0x0,0x0,0x0,0x0,0x0],
+		MConst: 0x253531,
+    };
+    return ROM_FIELD_SECP256K1;
+};

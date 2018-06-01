@@ -920,20 +920,43 @@ func (E *ECP) Mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 	return S
 }
 
+func (E *ECP) cfp() {
+	cf:=CURVE_Cof_I;
+	if cf==1 {return}
+	if cf==4 {
+		E.dbl(); E.dbl()
+		E.Affine();
+		return;
+	} 
+	if cf==8 {
+		E.dbl(); E.dbl(); E.dbl()
+		E.Affine();
+		return;
+	}
+	c:=NewBIGints(CURVE_Cof);
+	E.Copy(E.mul(c));
+}
+
 func ECP_mapit(h []byte) *ECP {
 	q:=NewBIGints(Modulus)
 	x:=FromBytes(h[:])
 	x.Mod(q)
 	var P *ECP
+
 	for true {
-		P=NewECPbigint(x,0)
+		for true {
+			if CURVETYPE!=MONTGOMERY {
+				P=NewECPbigint(x,0)
+			} else {
+				P=NewECPbig(x)
+			}
+			x.inc(1); x.norm()
+			if !P.Is_infinity() {break}
+		}
+		P.cfp()
 		if !P.Is_infinity() {break}
-		x.inc(1); x.norm()
 	}
-	if CURVE_PAIRING_TYPE!=BN {
-		c:=NewBIGints(CURVE_Cof)
-		P=P.mul(c)
-	}	
+			
 	return P
 }
 

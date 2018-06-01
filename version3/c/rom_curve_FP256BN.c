@@ -13,6 +13,7 @@
 
 #if CHUNK==32
 
+const int CURVE_Cof_I_FP256BN= 1;
 const int CURVE_A_FP256BN= 0;
 const int CURVE_B_I_FP256BN= 3;
 const BIG_256_28 CURVE_B_FP256BN= {0x3,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
@@ -59,7 +60,7 @@ const BIG_256_28 CURVE_BB_FP256BN[4][4]= {{{0x5AA80D,0xAA5DACA,0x9921A8D,0x65FB1
 
 #if CHUNK==64
 
-
+const int CURVE_Cof_I_FP256BN= 1;
 const int CURVE_A_FP256BN= 0;
 const int CURVE_B_I_FP256BN= 3;
 const BIG_256_56 CURVE_B_FP256BN= {0x3L,0x0L,0x0L,0x0L,0x0L};

@@ -35,7 +35,8 @@ static let R2modp:[Chunk] = [0x22E2400,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0]
 static let MConst:Chunk = 0xBD
 
 //  nums256 Edwards Curve
-static let CURVE_Cof:Int = 4
+static let CURVE_Cof_I:Int = 4
+static let CURVE_Cof:[Chunk] = [0x4,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0]
 static let CURVE_A:Int = 1
 static let CURVE_B_I:Int = -15342
 static let CURVE_B:[Chunk] = [0x1FFFC355,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0x1FFFFFFF,0xFFFFFF]
@@ -55,7 +56,8 @@ static let R2modp:[Chunk] = [0x89000000000000,0x8B,0x0,0x0,0x0]
 static let MConst:Chunk = 0xBD
 
 //  nums256 Edwards Curve
-static let CURVE_Cof:Int = 4
+static let CURVE_Cof_I:Int = 4
+static let CURVE_Cof:[Chunk] = [0x4,0x0,0x0,0x0,0x0]
 static let CURVE_A:Int = 1
 static let CURVE_B_I:Int = -15342
 static let CURVE_B:[Chunk] = [0xFFFFFFFFFFC355,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF,0xFFFFFFFF]

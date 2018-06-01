@@ -207,28 +207,28 @@ print("12. nums256e")
 print("13. nums384w")
 print("14. nums384e")
 print("15. nums512w")
-print("16. nums512e\n")
-
+print("16. nums512e")
+print("17. secp256k1\n");
 
 print("Pairing-Friendly Elliptic Curves")
-print("17. bn254")
-print("18. bn254CX")
-print("19. bls383")
-print("20. bls381")
-print("21. fp256BN")
-print("22. fp512BN")
-print("23. bls461\n")
-print("24. bls24")
-print("25. bls48\n")
+print("18. bn254")
+print("19. bn254CX")
+print("20. bls383")
+print("21. bls381")
+print("22. fp256BN")
+print("23. fp512BN")
+print("24. bls461\n")
+print("25. bls24")
+print("26. bls48\n")
 
 print("RSA")
-print("26. rsa2048")
-print("27. rsa3072")
-print("28. rsa4096")
+print("27. rsa2048")
+print("28. rsa3072")
+print("29. rsa4096")
 
 selection=[]
 ptr=0
-max=29
+max=30
 
 curve_selected=False
 pfcurve_selected=False
@@ -313,38 +313,41 @@ while ptr<max:
 		curveset("nums512e","64","29","512","7","PSEUDO_MERSENNE","EDWARDS","NOT","NOT","NOT","256")
 		curve_selected=True
 
-
-
 	if x==17:
+		curveset("secp256k1","32","28","256","7","NOT_SPECIAL","WEIERSTRASS","NOT","NOT","NOT","128")
+		curve_selected=True
+
+
+	if x==18:
 		curveset("bn254","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
-	if x==18:
+	if x==19:
 		curveset("bn254CX","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
-	if x==19:
+	if x==20:
 		curveset("bls383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","D_TYPE","POSITIVEX","128")
 		pfcurve_selected=True
 
-	if x==20:
+	if x==21:
 		curveset("bls381","48","29","381","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 
-	if x==21:
+	if x==22:
 		curveset("fp256bn","32","28","256","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
-	if x==22:
+	if x==23:
 		curveset("fp512bn","64","29","512","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","POSITIVEX","128")
 		pfcurve_selected=True
 # https://eprint.iacr.org/2017/334.pdf
-	if x==23:
+	if x==24:
 		curveset("bls461","58","28","461","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 
-	if x==24:
+	if x==25:
 		curveset("bls24","60","29","479","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","192")
 		pfcurve_selected=True
 
-	if x==25:
+	if x==26:
 		curveset("bls48","70","29","556","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","256")
 		pfcurve_selected=True
 
@@ -354,17 +357,17 @@ while ptr<max:
 # of the underlying big length
 
 # There are choices here, different ways of getting the same result, but some faster than others
-	if x==26:
+	if x==27:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
 		rsaset("rsa2048","128","28","2")
 		#rsaset("RSA2048","64","29","4")
 		#rsaset("RSA2048","32","29","8")
 		rsa_selected=True
-	if x==27:
+	if x==28:
 		rsaset("rsa3072","48","28","8")
 		rsa_selected=True
-	if x==28:
+	if x==29:
 		#rsaset("RSA4096","32","29","16")
 		rsaset("rsa4096","64","29","8")
 		rsa_selected=True

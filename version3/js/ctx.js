@@ -52,6 +52,24 @@ var CTXLIST = {
 		"@AK": 16
     },
 
+
+    "SECP256K1": {
+        "BITS": "256",
+        "FIELD": "SECP256K1",
+        "CURVE": "SECP256K1",
+        "@NB": 32,
+        "@BASE": 24,
+        "@NBT": 256,
+        "@M8": 7,
+        "@MT": 0,
+        "@CT": 0,
+        "@PF": 0,
+        "@ST": 0,
+        "@SX": 0,
+		"@HT": 32,
+		"@AK": 16
+    },
+
     "NIST256": {
         "BITS": "256",
         "FIELD": "NIST256",
@@ -517,6 +535,9 @@ var CTX = function(input_parameter) {
             case "NIST256":
                 this.ROM_CURVE = ROM_CURVE_NIST256();
                 break;
+            case "SECP256K1":
+                this.ROM_CURVE = ROM_CURVE_SECP256K1();
+                break;
             case "NIST384":
                 this.ROM_CURVE = ROM_CURVE_NIST384();
                 break;
@@ -597,6 +618,9 @@ var CTX = function(input_parameter) {
                 break;
             case "NIST256":
                 this.ROM_FIELD = ROM_FIELD_NIST256();
+                break;
+            case "SECP256K1":
+                this.ROM_FIELD = ROM_FIELD_SECP256K1();
                 break;
             case "NIST384":
                 this.ROM_FIELD = ROM_FIELD_NIST384();

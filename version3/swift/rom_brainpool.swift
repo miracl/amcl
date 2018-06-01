@@ -38,7 +38,8 @@ static let R2modp:[Chunk] = [0xB9A3787,0x9E04F49,0x8F3CF49,0x2931721,0xF1DBC89,0
 static let MConst:Chunk = 0xEFD89B9
 
 //  Brainpool Curve
-static let CURVE_Cof:Int=1
+static let CURVE_Cof_I:Int=1
+static let CURVE_Cof:[Chunk] = [0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0]
 static let CURVE_A:Int = -3
 static let CURVE_B_I:Int = 0
 static let CURVE_B:[Chunk] = [0xEE92B04,0xE58101F,0xF49256A,0xEBC4AF2,0x6B7BF93,0x733D0B7,0x4FE66A7,0x30D84EA,0x62C61C4,0x6]
@@ -57,7 +58,8 @@ static let R2modp:[Chunk] = [0x9E04F49B9A3787,0x29317218F3CF49,0x54E8C3CF1DBC89,
 static let MConst:Chunk = 0xA75590CEFD89B9
 
 //  Brainpool Curve
-static let CURVE_Cof:Int=1
+static let CURVE_Cof_I:Int=1
+static let CURVE_Cof:[Chunk] = [0x1,0x0,0x0,0x0,0x0]
 static let CURVE_A:Int = -3
 static let CURVE_B_I:Int = 0
 static let CURVE_B:[Chunk] = [0xE58101FEE92B04,0xEBC4AF2F49256A,0x733D0B76B7BF93,0x30D84EA4FE66A7,0x662C61C4]

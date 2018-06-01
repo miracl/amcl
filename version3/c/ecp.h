@@ -32,6 +32,7 @@
 
 /* Curve Params - see rom_zzz.c */
 extern const int CURVE_A_ZZZ;         /**< Elliptic curve A parameter */
+extern const int CURVE_Cof_I_ZZZ;     /**< Elliptic curve cofactor */
 extern const int CURVE_B_I_ZZZ;       /**< Elliptic curve B_i parameter */
 extern const BIG_XXX CURVE_B_ZZZ;     /**< Elliptic curve B parameter */
 extern const BIG_XXX CURVE_Order_ZZZ; /**< Elliptic curve group order */
@@ -216,13 +217,22 @@ extern void ECP_ZZZ_sub(ECP_ZZZ *P,ECP_ZZZ *Q);
 	@param s an integer representing the "sign" of y, in fact its least significant bit.
  */
 extern int ECP_ZZZ_setx(ECP_ZZZ *P,BIG_XXX x,int s);
+
+#endif
+
+/**	@brief Multiplies Point by curve co-factor
+ *
+	@param Q ECP instance
+ */
+extern void ECP_ZZZ_cfp(ECP_ZZZ *Q);
+
 /**	@brief Maps random BIG to curve point of correct order
  *
 	@param Q ECP instance of correct order
 	@param w OCTET byte array to be mapped
  */
 extern void ECP_ZZZ_mapit(ECP_ZZZ *Q,octet *w);
-#endif
+
 /**	@brief Converts an ECP point from Projective (x,y,z) coordinates to affine (x,y) coordinates
  *
 	@param P ECP instance to be converted to affine form

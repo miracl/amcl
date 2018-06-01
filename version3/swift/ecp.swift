@@ -979,22 +979,45 @@ final public class ECP {
         return S;
     }
     
+   func cfp()
+   {
+
+	let cf=ROM.CURVE_Cof_I;
+	if cf==1 {return}
+	if cf==4 {
+		dbl(); dbl()
+		affine()
+		return
+	} 
+	if cf==8 {
+		dbl(); dbl(); dbl()
+		affine()
+		return;
+	}
+	let c=BIG(ROM.CURVE_Cof);
+	copy(mul(c));
+
+   }
+
     static func mapit(_ h:[UInt8]) -> ECP
     {
         let q=BIG(ROM.Modulus)
         let x=BIG.fromBytes(h)
         x.mod(q)
-        var P=ECP(x,0)
-        while (true)
-        {
-            if !P.is_infinity() {break}
-            x.inc(1); x.norm();
-            P=ECP(x,0);
-        }
-        if ECP.CURVE_PAIRING_TYPE != ECP.BN {
-            let c=BIG(ROM.CURVE_Cof)
-            P=P.mul(c)
-        }
+        let P=ECP()
+        while (true) {
+		while (true) {
+			if ECP.CURVETYPE != ECP.MONTGOMERY {
+				P.copy(ECP(x,0))
+			} else {
+				P.copy(ECP(x))
+			}
+			x.inc(1); x.norm();
+			if !P.is_infinity() {break}
+		}
+		P.cfp()
+		if !P.is_infinity() {break}
+	}
 
         return P
     }    

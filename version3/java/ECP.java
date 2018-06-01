@@ -978,7 +978,28 @@ public final class ECP {
 		return S;
 	}
 
-/* Hash byte string to curve point */
+// multiply a point by the curves cofactor
+	public void cfp()
+	{
+		int cf=ROM.CURVE_Cof_I;
+		if (cf==1) return;
+		if (cf==4)
+		{
+			dbl(); dbl();
+			affine();
+			return;
+		} 
+		if (cf==8)
+		{
+			dbl(); dbl(); dbl();
+			affine();
+			return;
+		}
+		BIG c=new BIG(ROM.CURVE_Cof);
+		copy(mul(c));
+	}
+
+/* Map byte string to curve point */
 	public static ECP mapit(byte[] h)
 	{
 		BIG q=new BIG(ROM.Modulus);
@@ -988,15 +1009,17 @@ public final class ECP {
 
 		while (true)
 		{
-			P=new ECP(x,0);
+			while (true)
+			{
+				if (CURVETYPE!=MONTGOMERY)
+					P=new ECP(x,0);
+				else
+					P=new ECP(x);	
+				x.inc(1); x.norm();
+				if (!P.is_infinity()) break;
+			}
+			P.cfp();
 			if (!P.is_infinity()) break;
-			x.inc(1); x.norm();
-		}
-
-		if (ECP.CURVE_PAIRING_TYPE!=ECP.BN)
-		{
-			BIG c=new BIG(ROM.CURVE_Cof);
-			P=P.mul(c);
 		}
 		return P;
 	}

@@ -361,30 +361,59 @@ int ECP_ZZZ_setx(ECP_ZZZ *P,BIG_XXX x,int s)
     return 1;
 }
 
+#endif
+
+void ECP_ZZZ_cfp(ECP_ZZZ *P)
+{ /* multiply point by curves cofactor */
+	BIG_XXX c;
+	int cf=CURVE_Cof_I_ZZZ;
+	if (cf==1) return;
+	if (cf==4)
+	{
+		ECP_ZZZ_dbl(P);
+		ECP_ZZZ_dbl(P);
+		ECP_ZZZ_affine(P);
+		return;
+	}
+	if (cf==8)
+	{
+		ECP_ZZZ_dbl(P);
+		ECP_ZZZ_dbl(P);
+		ECP_ZZZ_dbl(P);
+		ECP_ZZZ_affine(P);
+		return;
+	}
+	BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
+	ECP_ZZZ_mul(P,c);
+	return;
+}
+
 /* map BIG to point on curve of correct order */
 /* The BIG should be the output of some hash function */
 
 void ECP_ZZZ_mapit(ECP_ZZZ *P,octet *W)
 {
-    BIG_XXX q,c,x;
-    BIG_XXX_fromBytes(x,W->val);
+    BIG_XXX q,x;
+	BIG_XXX_fromBytes(x,W->val);
     BIG_XXX_rcopy(q,Modulus_YYY);
     BIG_XXX_mod(x,q);
-    int k=0;
 
-    while (!ECP_ZZZ_setx(P,x,0))
-    {
-        BIG_XXX_inc(x,1);
-        k++;
-        BIG_XXX_norm(x);
-    }
-#if PAIRING_FRIENDLY_ZZZ == BLS
-    BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
-    ECP_ZZZ_mul(P,c);
+	for (;;)
+	{
+		for (;;)
+		{
+#if CURVETYPE_ZZZ!=MONTGOMERY
+			ECP_ZZZ_setx(P,x,0);
+#else
+			ECP_ZZZ_set(P,x);
 #endif
+			BIG_XXX_inc(x,1); BIG_XXX_norm(x);
+			if (!ECP_ZZZ_isinf(P)) break;
+		}
+		ECP_ZZZ_cfp(P);
+		if (!ECP_ZZZ_isinf(P)) break;
+	}
 }
-
-#endif
 
 /* Convert P to Affine, from (x,y,z) to (x,y) */
 /* SU=160 */
