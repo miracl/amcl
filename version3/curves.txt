@@ -11,6 +11,7 @@ Here we briefly describe the supported curves
 9. C41417 - An efficient high-security 414-bit curve https://eprint.iacr.org/2014/526
 10. NIST521 - The NIST standard 521-bit curve secp521r1 http://www.secg.org/SEC2-Ver-1.0.pdf
 11-16. The Microsoft NUMS suggested standard curves - https://www.microsoft.com/en-us/research/publication/selecting-elliptic-curves-for-cryptography-an-efficiency-and-security-analysis/
+17. SEC256K1 - The other NIST standard Bitcoin curve
 
 Pairing-friendly curves
 
@@ -18,16 +19,16 @@ Note that efforts to standardise these curves seem to have stalled, probably due
 into their true security. There seems to be a move from BN curves to BLS curves for 128-bit
 security and above.
 
-17. BN254 - The Nogami BN curve - https://eprint.iacr.org/2005/133
-18. BN254CX - The CertiVox standard BN curve
-19. BLS383 - Our own suggested new standard curve, a 383-bit BLS12 curve - https://eprint.iacr.org/2002/088
-20. BLS381 - The zk-SNARK BLS12 standard curve - https://blog.z.cash/new-snark-curve/
-21. FP256BN - An ISO standard 256-bit BN curve, as recomended for use by FIDO - https://tools.ietf.org/pdf/draft-kasamatsu-bncurves-02.pdf
-22. FP512BN - An ISO standard 512-bit BN curve, as recomended for use by FIDO - https://tools.ietf.org/pdf/draft-kasamatsu-bncurves-02.pdf
-23. BLS461 - A 461 bit BLS12 curve suggested by Barbulescu and Duquesne https://eprint.iacr.org/2017/334
+18. BN254 - The Nogami BN curve - https://eprint.iacr.org/2005/133
+19. BN254CX - The CertiVox standard BN curve
+20. BLS383 - Our own suggested new standard curve, a 383-bit BLS12 curve - https://eprint.iacr.org/2002/088
+21. BLS381 - The zk-SNARK BLS12 standard curve - https://blog.z.cash/new-snark-curve/
+22. FP256BN - An ISO standard 256-bit BN curve, as recomended for use by FIDO - https://tools.ietf.org/pdf/draft-kasamatsu-bncurves-02.pdf
+23. FP512BN - An ISO standard 512-bit BN curve, as recomended for use by FIDO - https://tools.ietf.org/pdf/draft-kasamatsu-bncurves-02.pdf
+24. BLS461 - A 461 bit BLS12 curve suggested by Barbulescu and Duquesne https://eprint.iacr.org/2017/334
 
-24. BLS24 - An experimental (approx AES-192 bit security) BLS24 GT-Strong curve
-25. BLS48 - An experimental (approx AES-256 bit security) BLS48 GT-Strong curve
+25. BLS24 - An experimental (approx AES-192 bit security) BLS24 GT-Strong curve
+26. BLS48 - An experimental (approx AES-256 bit security) BLS48 GT-Strong curve
 
 Note that it is quite possible to add new curves, and some programs are supplied to assist in the process.
 Let us know if you have a particular request - mike.scott@miracl.com
