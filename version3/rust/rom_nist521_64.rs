@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use nist384::big::NLEN;
+use nist521::big::NLEN;
 use arch::Chunk;
 
 // Base Bits= 60
