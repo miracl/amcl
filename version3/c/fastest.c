@@ -12,7 +12,7 @@ int main()
 
 	printf("Insert this code in file fp_YYY.c\n\n");
 
-	printf("static void FP_YYY_modmul(BIG_XXX r,BIG_XXX a,BIG_XXX b)\n");
+	printf("void FP_YYY_modmul(BIG_XXX r,BIG_XXX a,BIG_XXX b)\n");
 
 	printf("{\n");
 	printf("\tdchunk t,c,s;\n");

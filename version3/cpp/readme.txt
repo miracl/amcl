@@ -55,9 +55,7 @@ g++ -O2  benchtest_all.cpp amcl.a -o benchtest_all
 This program provides some timings.
 
 *Using clang on Windows
-Download clang 4.0.1 from http://releases.llvm.org/download.html
+Download latest clang from http://releases.llvm.org/download.html
 Choose Clang for Windows (64-bit) (.sig) 
-Download Visual C++ 2015 build tools from http://landinghub.visualstudio.com/visual-cpp-build-tools
-(This is a free download)
-Open a command window and type "\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64"
+Install a free version of Microsoft Visual C++ https://www.visualstudio.com/downloads/
 Now use "clang++" wherever "g++" was used before.
