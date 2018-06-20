@@ -174,8 +174,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 
 	else :
 		os.system(copytext+"modecc.rs "+fpath+"mod.rs")
-	
-	#os.system("go install amcl"+slashtext+tc)
+
 
 os.system("cargo new amcl")
 #os.system("mkdir amcl"+slashtext+"src")
@@ -188,8 +187,6 @@ os.system(copytext+ "nhs.rs amcl"+slashtext+"src"+slashtext+".")
 os.system(copytext+ "arch32.rs amcl"+slashtext+"src"+slashtext+"arch.rs")
 os.system(copytext+ "lib.rs amcl"+slashtext+"src"+slashtext+"lib.rs")
 
-
-#os.system("go install amcl")
 
 print("Elliptic Curves")
 print("1. ed25519")
@@ -373,6 +370,8 @@ while ptr<max:
 		rsa_selected=True
 
 os.system("cargo rustc --manifest-path amcl"+slashtext+"Cargo.toml --release --lib -- --cfg D32")
+
+#os.system("cargo rustc --target wasm32-unknown-emscripten --manifest-path amcl"+slashtext+"Cargo.toml --release --lib -- --cfg D32")
 
 os.system(deltext+" hash*.rs")
 os.system(deltext+" sha3.rs")
