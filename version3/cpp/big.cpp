@@ -80,8 +80,8 @@ void XXX::BIG_rawoutput(BIG a)
     printf("(");
     for (i=0; i<NLEN_XXX-1; i++)
 #if CHUNK==64
-        printf("%x,",(uintmax_t) a[i]);
-    printf("%x)",(uintmax_t) a[NLEN_XXX-1]);
+        printf("%jx,",(uintmax_t) a[i]);
+    printf("%jx)",(uintmax_t) a[NLEN_XXX-1]);
 #else
         printf("%x,",(unsigned int) a[i]);
     printf("%x)",(unsigned int) a[NLEN_XXX-1]);
@@ -214,8 +214,8 @@ void XXX::BIG_drawoutput(DBIG a)
     printf("(");
     for (i=0; i<DNLEN_XXX-1; i++)
 #if CHUNK==64
-        printf("%x,",(uintmax_t) a[i]);
-    printf("%x)",(uintmax_t) a[DNLEN_XXX-1]);
+        printf("%jx,",(uintmax_t) a[i]);
+    printf("%jx)",(uintmax_t) a[DNLEN_XXX-1]);
 #else
         printf("%x,",(unsigned int) a[i]);
     printf("%x)",(unsigned int) a[DNLEN_XXX-1]);

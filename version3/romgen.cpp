@@ -665,22 +665,37 @@ int main(int argc, char **argv)
 		curve_a=0;
 	
 		mip->IOBASE=16;
-		x=(char *)"11000001000000040";              // SIGN_OF_X is POSITIVE
+	//	x=(char *)"11000001000000040";              
+		x=(char *)"10008000001001200";	// SIGN_OF_X is POSITIVE
 		p=(pow(x,6)-2*pow(x,5)+2*pow(x,3)+x+1)/3;
 		t=x+1;
 		r=pow(x,4)-x*x+1;
 		cof=(p+1-t)/r;
 
-		gx=-2; gy=-1;
-		curve_b=9;
+	//	gx=-2; gy=-1;
+	//	curve_b=9;
+		gx=1; gy=4;
+		curve_b=15;
 		ecurve((Big)0,curve_b,p,MR_AFFINE);
-		mip->TWIST=MR_SEXTIC_D;
+	//	mip->TWIST=MR_SEXTIC_D;
+		mip->TWIST=MR_SEXTIC_M;
 
 		P.set(gx,gy);
 		P*=cof;
 		P.get(gx,gy);
 
-		while (!Q.set(randn2())) ; // probably not best way to choose this
+		//cout << "gx= " << gx << endl;
+		//cout << "gy= " << gy << endl;
+		//cout << "y^2= " << (gy*gy)%p << endl;
+		//cout << "x^3+b= " << (gx*gx*gx+15)%p << endl;
+
+		//while (!Q.set(randn2())) ; // probably not best way to choose this
+
+		Xa=1;
+		while (!Q.set(Xa))
+		{
+			Xa=Xa+(ZZn2)1;
+		}
 
 		TT=t*t-2*p;
 		PP=p*p;
@@ -690,7 +705,7 @@ int main(int argc, char **argv)
 		Q=(np/r)*Q;
 
 		zcru=pow((ZZn)2,(p-1)/3);
-		zcru*=zcru;   // right cube root of unity
+	//	zcru*=zcru;   // right cube root of unity
 		cru=(Big)zcru;
 	}
 
@@ -1213,6 +1228,11 @@ int main(int argc, char **argv)
 
 	cout << pre7 << toupperit((char *)"Modulus",lang) << post7; mc=output(chunk,words,p,m); cout << term << endl;
 	r2modp=pow((Big)2,2*words*bb)%p;
+
+
+//cout << "\ngx*R2modp= " << r2modp*gx << endl;
+//cout << "mod p = " << redc(r2modp*gx) << endl << endl;
+
 	cout << pre7 << toupperit((char *)"R2modp",lang) << post7; output(chunk,words,r2modp,m); cout << term << endl;
 
 

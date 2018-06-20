@@ -21,7 +21,7 @@ security and above.
 
 18. BN254 - The Nogami BN curve - https://eprint.iacr.org/2005/133
 19. BN254CX - The CertiVox standard BN curve
-20. BLS383 - Our own suggested new standard curve, a 383-bit BLS12 curve - https://eprint.iacr.org/2002/088
+20. BLS383 - Our own suggested new standard curve, a GT-Strong 383-bit BLS12 curve - https://eprint.iacr.org/2002/088
 21. BLS381 - The zk-SNARK BLS12 standard curve - https://blog.z.cash/new-snark-curve/
 22. FP256BN - An ISO standard 256-bit BN curve, as recomended for use by FIDO - https://tools.ietf.org/pdf/draft-kasamatsu-bncurves-02.pdf
 23. FP512BN - An ISO standard 512-bit BN curve, as recomended for use by FIDO - https://tools.ietf.org/pdf/draft-kasamatsu-bncurves-02.pdf

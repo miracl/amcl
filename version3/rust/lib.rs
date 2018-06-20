@@ -1,4 +1,3 @@
-#![feature(i128_type)]
 pub mod arch;
 pub mod aes;
 pub mod gcm;

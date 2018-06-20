@@ -280,7 +280,7 @@ while ptr<max:
 		curveset("bn254CX","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 	if x==20:
-		curveset("bls383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","D_TYPE","POSITIVEX","128")
+		curveset("bls383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","128")
 		pfcurve_selected=True
 
 	if x==21:

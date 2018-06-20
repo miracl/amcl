@@ -85,9 +85,9 @@
 #define BIG_BN_rcopy BIG_256_56_rcopy
 #define BIG_BN_randomnum BIG_256_56_randomnum 
 
-#define BIG_BLS12 BIG_384_56
-#define BIG_BLS12_rcopy BIG_384_56_rcopy
-#define BIG_BLS12_randomnum BIG_384_56_randomnum 
+#define BIG_BLS12 BIG_384_58
+#define BIG_BLS12_rcopy BIG_384_58_rcopy
+#define BIG_BLS12_randomnum BIG_384_58_randomnum 
 
 #define BIG_BLS24 BIG_480_56
 #define BIG_BLS24_rcopy BIG_480_56_rcopy

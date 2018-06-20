@@ -1273,12 +1273,12 @@ int mpin192_BLS24(csprng *RNG)
 
     HASH_ALL(HASH_TYPE_BLS24,&HCID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);  // new
     i=MPIN_CLIENT_KEY(HASH_TYPE_BLS24,&G1,&G2,pin,&R,&X,&H,&T,&CK);      // new H
-    printf("Client Key = ",i);
+    printf("Client Key = ");
     OCT_output(&CK);
 
     HASH_ALL(HASH_TYPE_BLS24,&HSID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);
     i=MPIN_SERVER_KEY(HASH_TYPE_BLS24,&Z,&SST,&W,&H,pHID,pxID,pxCID,&SK); // new H,pHID
-    printf("Server Key = ",i);
+    printf("Server Key = ");
     OCT_output(&SK);
 #endif
     return 0;
@@ -1526,12 +1526,12 @@ int mpin256_BLS48(csprng *RNG)
 
     HASH_ALL(HASH_TYPE_BLS48,&HCID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);  // new
     i=MPIN_CLIENT_KEY(HASH_TYPE_BLS48,&G1,&G2,pin,&R,&X,&H,&T,&CK);      // new H
-    printf("Client Key = ",i);
+    printf("Client Key = ");
     OCT_output(&CK);
 
     HASH_ALL(HASH_TYPE_BLS48,&HSID,pxID,pxCID,&SEC,&Y,&Z,&T,&H);
     i=MPIN_SERVER_KEY(HASH_TYPE_BLS48,&Z,&SST,&W,&H,pHID,pxID,pxCID,&SK); // new H,pHID
-    printf("Server Key = ",i);
+    printf("Server Key = ");
     OCT_output(&SK);
 #endif
     return 0;
