@@ -328,7 +328,7 @@ func ECDH_KEY_PAIR_GENERATE(RNG *amcl.RAND,S []byte,W []byte) int {
 
 	WP:=G.mul(s)
 
-	WP.ToBytes(W)
+	WP.ToBytes(W,false)
 
 	return res
 }

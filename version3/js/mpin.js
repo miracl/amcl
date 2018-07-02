@@ -338,7 +338,7 @@ var MPIN = function(ctx) {
 
             P.add(Q);
 
-            P.toBytes(R);
+            P.toBytes(R,false);
 
             return 0;
         },
@@ -401,7 +401,7 @@ var MPIN = function(ctx) {
             R = R.pinmul(factor, facbits);
             P.sub(R);
 
-            P.toBytes(TOKEN);
+            P.toBytes(TOKEN,false);
 
             return 0;
         },
@@ -422,7 +422,7 @@ var MPIN = function(ctx) {
             R = R.pinmul(factor, facbits);
             P.add(R);
 
-            P.toBytes(TOKEN);
+            P.toBytes(TOKEN,false);
 
             return 0;
         },
@@ -472,7 +472,7 @@ var MPIN = function(ctx) {
                 P = ctx.ECP.mapit(G);
             }
 
-            ctx.PAIR.G1mul(P, x).toBytes(W);
+            ctx.PAIR.G1mul(P, x).toBytes(W,false);
 
             return 0;
         },
@@ -490,7 +490,7 @@ var MPIN = function(ctx) {
                 s = ctx.BIG.fromBytes(S);
 
             P = ctx.PAIR.G1mul(P, s);
-            P.toBytes(CTT);
+            P.toBytes(CTT,false);
 
             return 0;
         },
@@ -538,7 +538,7 @@ var MPIN = function(ctx) {
 
                 if (xID != null) {
                     P = ctx.PAIR.G1mul(P, x);
-                    P.toBytes(xID);
+                    P.toBytes(xID,false);
                     W = ctx.PAIR.G1mul(W, x);
                     P.add(W);
                 } else {
@@ -547,16 +547,16 @@ var MPIN = function(ctx) {
                 }
 
                 if (xCID != null) {
-                    P.toBytes(xCID);
+                    P.toBytes(xCID,false);
                 }
             } else {
                 if (xID != null) {
                     P = ctx.PAIR.G1mul(P, x);
-                    P.toBytes(xID);
+                    P.toBytes(xID,false);
                 }
             }
 
-            T.toBytes(SEC);
+            T.toBytes(SEC,false);
 
             return 0;
         },
@@ -581,8 +581,8 @@ var MPIN = function(ctx) {
 
             P = ctx.PAIR.G1mul(P, px);
             P.neg();
-            P.toBytes(SEC);
-            //ctx.PAIR.G1mul(P,px).toBytes(SEC);
+            P.toBytes(SEC,false);
+            //ctx.PAIR.G1mul(P,px).toBytes(SEC,false);
 
             return 0;
         },
@@ -593,15 +593,15 @@ var MPIN = function(ctx) {
                 P = ctx.ECP.mapit(h),
                 R;
 
-            P.toBytes(HID);
+            P.toBytes(HID,false);
             if (date !== 0) {
-                //if (HID!=null) P.toBytes(HID);
+                //if (HID!=null) P.toBytes(HID,false);
                 h = this.hashit(sha, date, h);
                 R = ctx.ECP.mapit(h);
                 P.add(R);
-                P.toBytes(HTID);
+                P.toBytes(HTID,false);
             }
-            //else P.toBytes(HID);
+            //else P.toBytes(HID,false);
         },
 
         /* Implement step 1 of MPin protocol on server side. Pa is the client public key in case of DVS, otherwise must be set to null */

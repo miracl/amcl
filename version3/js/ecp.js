@@ -343,15 +343,9 @@ var ECP = function(ctx) {
         },
 
         /* convert to byte array */
-        toBytes: function(b) {
+        toBytes: function(b,compress) {
             var t = [],
                 i;
-
-            if (ECP.CURVETYPE != ECP.MONTGOMERY) {
-                b[0] = 0x04;
-            } else {
-                b[0] = 0x02;
-            }
 
             this.affine();
             this.x.redc().toBytes(t);
@@ -360,11 +354,23 @@ var ECP = function(ctx) {
                 b[i + 1] = t[i];
             }
 
-            if (ECP.CURVETYPE != ECP.MONTGOMERY) {
-                this.y.redc().toBytes(t);
-                for (i = 0; i < ctx.BIG.MODBYTES; i++) {
-                    b[i + ctx.BIG.MODBYTES + 1] = t[i];
-                }
+            if (ECP.CURVETYPE == ECP.MONTGOMERY) {
+                b[0] = 0x06;
+				return;
+			}
+  
+			if (compress)
+			{
+				b[0]=0x02;
+				if (this.y.redc().parity()==1) b[0]=0x03;
+				return;
+			}
+			
+			b[0]=0x04;
+
+            this.y.redc().toBytes(t);
+            for (i = 0; i < ctx.BIG.MODBYTES; i++) {
+                b[i + ctx.BIG.MODBYTES + 1] = t[i];
             }
         },
         /* convert to hex string */
@@ -1261,6 +1267,12 @@ var ECP = function(ctx) {
             return P;
         }
 
+		if (ECP.CURVETYPE == ECP.MONTGOMERY)
+		{
+			P.setx(px);
+            return P;
+		}
+
         if (b[0] == 0x04) {
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 t[i] = b[i + ctx.BIG.MODBYTES + 1];
@@ -1275,10 +1287,15 @@ var ECP = function(ctx) {
             P.setxy(px, py);
 
             return P;
-        } else {
-            P.setx(px);
-            return P;
-        }
+        } 
+
+		if (b[0]==0x02 || b[0]==0x03)
+		{
+			P.setxi(px,b[0]&1);
+			return P;
+		}
+
+		return P;
     };
 
     /* Calculate RHS of curve equation */

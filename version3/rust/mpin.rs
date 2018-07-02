@@ -259,7 +259,7 @@ pub fn recombine_g1(r1: &[u8],r2: &[u8],r: &mut [u8]) -> isize {
 
 	P.add(&mut Q);
 
-	P.tobytes(r);
+	P.tobytes(r,false);
 	return 0;
 }
 
@@ -332,7 +332,7 @@ pub fn get_g1_multiple(rng: Option<&mut RAND>,typ: usize,x: &mut [u8],g: &[u8],w
 
 
 
-	pair::g1mul(&mut P,&mut sx).tobytes(w);
+	pair::g1mul(&mut P,&mut sx).tobytes(w,false);
 	return 0;
 }
 
@@ -362,7 +362,7 @@ pub fn extract_factor(sha: usize,cid: &[u8],factor: i32,facbits: i32,token: &mut
 	R=R.pinmul(factor,facbits);
 	P.sub(&mut R);
 
-	P.tobytes(token);
+	P.tobytes(token,false);
 
 	return 0;
 }
@@ -380,7 +380,7 @@ pub fn restore_factor(sha: usize,cid: &[u8],factor: i32,facbits: i32,token: &mut
 	R=R.pinmul(factor,facbits);
 	P.add(&mut R);
 
-	P.tobytes(token);
+	P.tobytes(token,false);
 
 	return 0;
 }
@@ -398,7 +398,7 @@ pub fn extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isize {
 	R=R.pinmul(pin%MAXPIN,PBLEN);
 	P.sub(&mut R);
 
-	P.tobytes(token);
+	P.tobytes(token,false);
 
 	return 0;
 }
@@ -435,7 +435,7 @@ pub fn get_client_permit(sha: usize,date: usize,s: &[u8],cid: &[u8],ctt: &mut [u
 	let mut P=ECP::mapit(&h);
 
 	let mut sc=BIG::frombytes(s);
-	pair::g1mul(&mut P,&mut sc).tobytes(ctt);
+	pair::g1mul(&mut P,&mut sc).tobytes(ctt,false);
 	return 0;
 }
 
@@ -477,22 +477,22 @@ pub fn client_1(sha: usize,date: usize,client_id: &[u8],rng: Option<&mut RAND>,x
 		W=ECP::mapit(&h2);
 		if let Some(mut rxid)=xid {
 			P=pair::g1mul(&mut P,&mut sx);
-			P.tobytes(&mut rxid);
+			P.tobytes(&mut rxid,false);
 			W=pair::g1mul(&mut W,&mut sx);
 			P.add(&mut W);
 		} else {
 			P.add(&mut W);
 			P=pair::g1mul(&mut P,&mut sx);
 		}
-		if let Some(mut rxcid)=xcid {P.tobytes(&mut rxcid)}
+		if let Some(mut rxcid)=xcid {P.tobytes(&mut rxcid,false)}
 	} else {
 		if let Some(mut rxid)=xid {
 			P=pair::g1mul(&mut P,&mut sx);
-			P.tobytes(&mut rxid);
+			P.tobytes(&mut rxid,false);
 		}
 	}
 
-	T.tobytes(sec);
+	T.tobytes(sec,false);
 	return 0;
 }
 
@@ -506,13 +506,13 @@ pub fn server_1(sha: usize,date: usize,cid: &[u8],hid: &mut [u8],htid: Option<&m
 
 	let mut P=ECP::mapit(&h);
 	
-	P.tobytes(hid);
+	P.tobytes(hid,false);
 	if date!=0 {
 		let mut h2:[u8;RM]=[0;RM];		
 		hashit(sha,date,&h,&mut h2);
 		let mut R=ECP::mapit(&h2);
 		P.add(&mut R);
-		if let Some(rhtid)=htid {P.tobytes(rhtid);}
+		if let Some(rhtid)=htid {P.tobytes(rhtid,false);}
 	} 
 }
 
@@ -531,7 +531,7 @@ pub fn client_2(x: &[u8],y: &[u8],sec: &mut [u8]) -> isize {
 
 	P=pair::g1mul(&mut P,&mut px);
 	P.neg();
-	P.tobytes(sec);
+	P.tobytes(sec,false);
 	
 	return 0;
 }

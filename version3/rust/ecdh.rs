@@ -333,7 +333,7 @@ pub fn key_pair_generate(rng: Option<&mut RAND>,s: &mut [u8],w: &mut [u8]) -> is
 
 	let mut WP=G.mul(&mut sc);
 
-	WP.tobytes(w);
+	WP.tobytes(w,false);
 
 	return res;
 }

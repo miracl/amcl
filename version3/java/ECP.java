@@ -333,20 +333,31 @@ public final class ECP {
 		return z;
 	}
 /* convert to byte array */
-	public void toBytes(byte[] b)
+	public void toBytes(byte[] b,boolean compress)
 	{
 		byte[] t=new byte[BIG.MODBYTES];
-		if (CURVETYPE!=MONTGOMERY) b[0]=0x04;
-		else b[0]=0x02;
-	
 		affine();
+
 		x.redc().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++) b[i+1]=t[i];
-		if (CURVETYPE!=MONTGOMERY)
+
+		if (CURVETYPE==MONTGOMERY)
 		{
-			y.redc().toBytes(t);
-			for (int i=0;i<BIG.MODBYTES;i++) b[i+BIG.MODBYTES+1]=t[i];
+			b[0]=0x06;
+			return;
 		}
+
+		if (compress)
+		{
+			b[0]=0x02;
+			if (y.redc().parity()==1) b[0]=0x03;
+			return;
+		}
+
+		b[0]=0x04;
+
+		y.redc().toBytes(t);
+		for (int i=0;i<BIG.MODBYTES;i++) b[i+BIG.MODBYTES+1]=t[i];
 	}
 /* convert from byte array to point */
 	public static ECP fromBytes(byte[] b)
@@ -358,6 +369,11 @@ public final class ECP {
 		BIG px=BIG.fromBytes(t);
 		if (BIG.comp(px,p)>=0) return new ECP();
 
+		if (CURVETYPE==MONTGOMERY)
+		{
+			return new ECP(px);
+		}
+
 		if (b[0]==0x04)
 		{
 			for (int i=0;i<BIG.MODBYTES;i++) t[i]=b[i+BIG.MODBYTES+1];
@@ -365,7 +381,12 @@ public final class ECP {
 			if (BIG.comp(py,p)>=0) return new ECP();
 			return new ECP(px,py);
 		}
-		else return new ECP(px);
+
+		if (b[0]==0x02 || b[0]==0x03)
+		{
+			return new ECP(px,(int)(b[0]&1));
+		}
+		return new ECP();
 	}
 /* convert to hex string */
 	public String toString() {

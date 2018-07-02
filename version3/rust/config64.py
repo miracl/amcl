@@ -370,7 +370,7 @@ while ptr<max:
 
 os.system("cargo rustc --manifest-path amcl"+slashtext+"Cargo.toml --release --lib -- --cfg D64")
 
-#os.system("cargo rustc --target wasm32-unknown-emscripten --manifest-path amcl"+slashtext+"Cargo.toml --release --lib -- --cfg D64")
+#os.system("cargo rustc --target wasm64-unknown-emscripten --manifest-path amcl"+slashtext+"Cargo.toml --release --lib -- --cfg D64")
 
 os.system(deltext+" hash*.rs")
 os.system(deltext+" sha3.rs")

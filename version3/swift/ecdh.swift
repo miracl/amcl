@@ -352,7 +352,7 @@ final public class ECDH
         s.toBytes(&S)
 
         let WP=G.mul(s)
-        WP.toBytes(&W)
+        WP.toBytes(&W,false)
     
         return res;
     }

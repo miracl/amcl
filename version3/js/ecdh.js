@@ -458,7 +458,7 @@ var ECDH = function(ctx) {
             s.toBytes(S);
 
             WP = G.mul(s);
-            WP.toBytes(W);
+            WP.toBytes(W,false);
 
             return res;
         },

@@ -329,20 +329,29 @@ impl ECP {
 	}
 
 /* convert to byte array */
-	pub fn tobytes(&mut self,b: &mut [u8]) {
+	pub fn tobytes(&mut self,b: &mut [u8],compress: bool) {
 		let mb=big::MODBYTES as usize;
 		let mut t:[u8;big::MODBYTES as usize]=[0;big::MODBYTES as usize];
-		if CURVETYPE!=MONTGOMERY {
-			b[0]=0x04;
-		} else {b[0]=0x02}
-	
+
 		self.affine();
 		self.x.redc().tobytes(&mut t);
 		for i in 0..mb {b[i+1]=t[i]}
-		if CURVETYPE!=MONTGOMERY {
-			self.y.redc().tobytes(&mut t);
-			for i in 0..mb {b[i+mb+1]=t[i]}
+
+		if CURVETYPE==MONTGOMERY {
+			b[0]=0x06;
+			return;
+		} 
+	
+		if compress {
+			b[0]=0x02;
+			if self.y.redc().parity()==1 {b[0]=0x03}
+			return;
 		}
+
+		b[0]=0x04;
+		
+		self.y.redc().tobytes(&mut t);
+		for i in 0..mb {b[i+mb+1]=t[i]}
 	}
 
 /* convert from byte array to point */
@@ -355,12 +364,22 @@ impl ECP {
 		let px=BIG::frombytes(&t);
 		if BIG::comp(&px,&p)>=0 {return ECP::new()}
 
+		if CURVETYPE==MONTGOMERY {
+			return ECP::new_big(&px)
+		}
+
 		if b[0]==0x04 {
 			for i in 0..mb {t[i]=b[i+mb+1]}
 			let py=BIG::frombytes(&t);
 			if BIG::comp(&py,&p)>=0 {return ECP::new()}
 			return ECP::new_bigs(&px,&py);
-		} else {return ECP::new_big(&px)}
+		} 
+
+		if b[0]==0x02 || b[0]==0x03 {
+			return ECP::new_bigint(&px,(b[0]&1) as isize)
+		}
+
+		return ECP::new()
 	}
 
 /* convert to hex string */

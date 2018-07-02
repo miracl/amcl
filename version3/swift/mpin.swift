@@ -250,7 +250,7 @@ final public class MPIN
     
         P.add(Q)
     
-        P.toBytes(&R)
+        P.toBytes(&R,false)
         return 0;
     }
     // W=W1+W2 in group G2
@@ -296,7 +296,7 @@ final public class MPIN
         R=R.pinmul(factor,facbits)
         P.sub(R)
     
-        P.toBytes(&TOKEN)
+        P.toBytes(&TOKEN,false)
     
         return 0
     }    
@@ -312,7 +312,7 @@ final public class MPIN
         R=R.pinmul(factor,facbits)
         P.add(R)
     
-        P.toBytes(&TOKEN)
+        P.toBytes(&TOKEN,false)
     
         return 0
     }    
@@ -329,7 +329,7 @@ final public class MPIN
         R=R.pinmul(pin%MAXPIN,MPIN.PBLEN)
         P.sub(R)
     
-        P.toBytes(&TOKEN)
+        P.toBytes(&TOKEN,false)
     
         return 0
     }*/
@@ -350,8 +350,8 @@ final public class MPIN
 
         P=PAIR.G1mul(P,px)
         P.neg()
-        P.toBytes(&SEC);
-      //  PAIR.G1mul(P,px).toBytes(&SEC)
+        P.toBytes(&SEC,false);
+      //  PAIR.G1mul(P,px).toBytes(&SEC,false)
         return 0
     }
     
@@ -395,7 +395,7 @@ final public class MPIN
             if xID != nil
             {
 				P=PAIR.G1mul(P,x)
-				P.toBytes(&xID!)
+				P.toBytes(&xID!,false)
 				W=PAIR.G1mul(W,x)
 				P.add(W)
             }
@@ -404,19 +404,19 @@ final public class MPIN
 				P.add(W);
 				P=PAIR.G1mul(P,x);
             }
-            if xCID != nil {P.toBytes(&xCID!)}
+            if xCID != nil {P.toBytes(&xCID!,false)}
         }
         else
         {
             if xID != nil
             {
 				P=PAIR.G1mul(P,x)
-				P.toBytes(&xID!)
+				P.toBytes(&xID!,false)
             }
         }
     
     
-        T.toBytes(&SEC);
+        T.toBytes(&SEC,false);
         return 0;
     }
     // Extract Server Secret SST=S*Q where Q is fixed generator in G2 and S is master secret
@@ -462,7 +462,7 @@ final public class MPIN
         else
             {P=ECP.mapit(G)}
     
-        PAIR.G1mul(P,x).toBytes(&W)
+        PAIR.G1mul(P,x).toBytes(&W,false)
         return 0;
     }
     // Client secret CST=S*H(CID) where CID is client ID and S is master secret
@@ -478,7 +478,7 @@ final public class MPIN
         let P=ECP.mapit(h)
     
         let s=BIG.fromBytes(S)
-        PAIR.G1mul(P,s).toBytes(&CTT)
+        PAIR.G1mul(P,s).toBytes(&CTT,false)
         return 0;
     }
   
@@ -488,16 +488,16 @@ final public class MPIN
         var h=MPIN.hashit(sha,0,CID)
         let P=ECP.mapit(h)
 
-	P.toBytes(&HID)
+	P.toBytes(&HID,false)
         if date != 0
         {
-       //     if HID != nil {P.toBytes(&HID!)}
+       //     if HID != nil {P.toBytes(&HID!,false)}
             h=hashit(sha,date,h)
             let R=ECP.mapit(h)
             P.add(R)
-            P.toBytes(&HTID!)
+            P.toBytes(&HTID!,false)
         }
-        //else {P.toBytes(&HID!)}
+        //else {P.toBytes(&HID!,false)}
     }
     // Implement step 2 of MPin protocol on server side
     static public func SERVER_2(_ date:Int32,_ HID:[UInt8]?,_ HTID:[UInt8]?,_ Y:[UInt8],_ SST:[UInt8],_ xID:[UInt8]?,_ xCID:[UInt8]?,_ mSEC:[UInt8],_ E:inout [UInt8]?,_ F:inout [UInt8]?) -> Int

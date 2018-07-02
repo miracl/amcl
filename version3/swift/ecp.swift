@@ -342,21 +342,30 @@ final public class ECP {
         return z;
     }
     /* convert to byte array */
-    func toBytes(_ b:inout [UInt8])
+    func toBytes(_ b:inout [UInt8],_ compress: Bool)
     {
         let RM=Int(BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
-        if ECP.CURVETYPE != ECP.MONTGOMERY {b[0]=0x04}
-        else {b[0]=0x02}
-    
+
         affine()
         x.redc().toBytes(&t)
         for i in 0 ..< RM {b[i+1]=t[i]}
-        if ECP.CURVETYPE != ECP.MONTGOMERY
-        {
-            y.redc().toBytes(&t);
-            for i in 0 ..< RM {b[i+RM+1]=t[i]}
-        }
+
+        if ECP.CURVETYPE == ECP.MONTGOMERY {
+		b[0]=0x06
+		return
+	}
+    
+	if compress {
+		b[0]=0x02
+		if y.redc().parity()==1 {b[0]=0x03}
+		return
+	}
+
+	b[0]=0x04
+
+        y.redc().toBytes(&t);
+        for i in 0 ..< RM {b[i+RM+1]=t[i]}
     }
     /* convert from byte array to point */
     static func fromBytes(_ b: [UInt8]) -> ECP
@@ -369,14 +378,22 @@ final public class ECP {
         let px=BIG.fromBytes(t)
         if BIG.comp(px,p)>=0 {return ECP()}
     
-        if (b[0]==0x04)
-        {
+        if ECP.CURVETYPE == ECP.MONTGOMERY {
+		return ECP(px)
+	}
+
+        if b[0]==0x04 {
             for i in 0 ..< RM {t[i]=b[i+RM+1]}
             let py=BIG.fromBytes(t)
             if BIG.comp(py,p)>=0 {return ECP()}
             return ECP(px,py)
         }
-        else {return ECP(px)}
+        
+	if b[0]==0x02 || b[0]==0x03 {
+	    return ECP(px,Int(b[0]&1))
+	}
+
+	return ECP()
     }
     /* convert to hex string */
     func toString() -> String

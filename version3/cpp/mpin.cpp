@@ -177,7 +177,7 @@ int ZZZ::MPIN_DECODING(octet *D)
         map(&W,u,su);
         map(&P,v,sv);
         ECP_add(&P,&W);
-        ECP_toOctet(D,&P);
+        ECP_toOctet(D,&P,false);
     }
 
     return res;
@@ -196,7 +196,7 @@ int ZZZ::MPIN_RECOMBINE_G1(octet *R1,octet *R2,octet *R)
     if (res==0)
     {
         ECP_add(&P,&T);
-        ECP_toOctet(R,&P);
+        ECP_toOctet(R,&P,false);
     }
     return res;
 }
@@ -255,7 +255,7 @@ int ZZZ::MPIN_EXTRACT_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TO
         ECP_pinmul(&R,factor,facbits);
         ECP_sub(&P,&R);
 
-        ECP_toOctet(TOKEN,&P);
+        ECP_toOctet(TOKEN,&P,false);
     }
     return res;
 }
@@ -277,7 +277,7 @@ int ZZZ::MPIN_RESTORE_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TO
         ECP_pinmul(&R,factor,facbits);
         ECP_add(&P,&R);
 
-        ECP_toOctet(TOKEN,&P);
+        ECP_toOctet(TOKEN,&P,false);
     }
     return res;
 }
@@ -299,7 +299,7 @@ int ZZZ::MPIN_CLIENT_2(octet *X,octet *Y,octet *SEC)
         //	BIG_sub(px,r,px);
         PAIR_G1mul(&P,px);
         ECP_neg(&P);
-        ECP_toOctet(SEC,&P);
+        ECP_toOctet(SEC,&P,false);
     }
     return res;
 }
@@ -341,7 +341,7 @@ int ZZZ::MPIN_GET_G1_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     if (res==0)
     {
         PAIR_G1mul(&P,x);
-        ECP_toOctet(W,&P);
+        ECP_toOctet(W,&P,false);
     }
     return res;
 }
@@ -442,7 +442,7 @@ int ZZZ::MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,in
             if (xID!=NULL)
             {
                 PAIR_G1mul(&P,x);				// P=x.H(ID)
-                ECP_toOctet(xID,&P);  // xID
+                ECP_toOctet(xID,&P,false);  // xID
                 PAIR_G1mul(&W,x);               // W=x.H(T|ID)
                 ECP_add(&P,&W);
             }
@@ -451,20 +451,20 @@ int ZZZ::MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,in
                 ECP_add(&P,&W);
                 PAIR_G1mul(&P,x);
             }
-            if (xCID!=NULL) ECP_toOctet(xCID,&P);  // U
+            if (xCID!=NULL) ECP_toOctet(xCID,&P,false);  // U
         }
         else
         {
             if (xID!=NULL)
             {
                 PAIR_G1mul(&P,x);				// P=x.H(ID)
-                ECP_toOctet(xID,&P);  // xID
+                ECP_toOctet(xID,&P,false);  // xID
             }
         }
     }
 
     if (res==0)
-        ECP_toOctet(SEC,&T);  // V
+        ECP_toOctet(SEC,&T,false);  // V
 
     return res;
 }
@@ -515,7 +515,7 @@ int ZZZ::MPIN_GET_CLIENT_PERMIT(int sha,int date,octet *S,octet *CID,octet *CTT)
     PAIR_G1mul(&P,s);
 //printf("OP= "); ECP_output(&P); printf("\n");
 //
-    ECP_toOctet(CTT,&P);
+    ECP_toOctet(CTT,&P,false);
     return 0;
 }
 
@@ -537,11 +537,11 @@ void ZZZ::MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
     ECP_mapit(&P,&H);
 #endif
 
-    ECP_toOctet(HID,&P);  // new
+    ECP_toOctet(HID,&P,false);  // new
 
     if (date)
     {
-        //	if (HID!=NULL) ECP_toOctet(HID,&P);
+        //	if (HID!=NULL) ECP_toOctet(HID,&P,false);
 #ifdef USE_ANONYMOUS
         mhashit(sha,date,CID,&H);
 #else
@@ -549,9 +549,9 @@ void ZZZ::MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 #endif
         ECP_mapit(&R,&H);
         ECP_add(&P,&R);
-        ECP_toOctet(HTID,&P);
+        ECP_toOctet(HTID,&P,false);
     }
-    //else ECP_toOctet(HID,&P);
+    //else ECP_toOctet(HID,&P,false);
 
 }
 

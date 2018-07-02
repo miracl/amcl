@@ -538,7 +538,7 @@ void ECP_ZZZ_rawoutput(ECP_ZZZ *P)
 
 /* SU=88 */
 /* Convert P to octet string */
-void ECP_ZZZ_toOctet(octet *W,ECP_ZZZ *P)
+void ECP_ZZZ_toOctet(octet *W,ECP_ZZZ *P,bool compress)
 {
 #if CURVETYPE_ZZZ==MONTGOMERY
     BIG_XXX x;
@@ -549,10 +549,20 @@ void ECP_ZZZ_toOctet(octet *W,ECP_ZZZ *P)
 #else
     BIG_XXX x,y;
     ECP_ZZZ_get(x,y,P);
-    W->len=2*MODBYTES_XXX+1;
-    W->val[0]=4;
-    BIG_XXX_toBytes(&(W->val[1]),x);
-    BIG_XXX_toBytes(&(W->val[MODBYTES_XXX+1]),y);
+	if (compress)
+	{
+		W->val[0]=0x02;
+		if (BIG_XXX_parity(y)==1) W->val[0]=0x03;
+		W->len=MODBYTES_XXX+1;
+		BIG_XXX_toBytes(&(W->val[1]),x);
+	}
+	else
+	{
+		W->val[0]=4;
+		W->len=2*MODBYTES_XXX+1;
+		BIG_XXX_toBytes(&(W->val[1]),x);
+		BIG_XXX_toBytes(&(W->val[MODBYTES_XXX+1]),y);
+	}
 #endif
 }
 
@@ -567,9 +577,17 @@ int ECP_ZZZ_fromOctet(ECP_ZZZ *P,octet *W)
     return 0;
 #else
     BIG_XXX x,y;
-    BIG_XXX_fromBytes(x,&(W->val[1]));
-    BIG_XXX_fromBytes(y,&(W->val[MODBYTES_XXX+1]));
-    if (ECP_ZZZ_set(P,x,y)) return 1;
+	int typ=W->val[0];
+	BIG_XXX_fromBytes(x,&(W->val[1]));
+	if (typ==0x04)
+	{
+		BIG_XXX_fromBytes(y,&(W->val[MODBYTES_XXX+1]));
+		if (ECP_ZZZ_set(P,x,y)) return 1;
+	}
+	if (typ==0x02 || typ==0x03)
+	{
+		if (ECP_ZZZ_setx(P,x,typ&1)) return 1;
+	}
     return 0;
 #endif
 }

@@ -318,20 +318,29 @@ func (E *ECP) getz() *FP {
 }
 
 /* convert to byte array */
-func (E *ECP) ToBytes(b []byte) {
+func (E *ECP) ToBytes(b []byte,compress bool) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
-	if CURVETYPE!=MONTGOMERY {
-		b[0]=0x04
-	} else {b[0]=0x02}
-	
+
 	E.Affine()
 	E.x.redc().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+1]=t[i]}
-	if CURVETYPE!=MONTGOMERY {
-		E.y.redc().ToBytes(t[:])
-		for i:=0;i<MB;i++ {b[i+MB+1]=t[i]}
+
+	if CURVETYPE==MONTGOMERY {
+		b[0]=0x06
+		return;
+	} 
+
+	if compress {
+		b[0]=0x02
+		if E.y.redc().parity()==1 {b[0]=0x03}
+		return;
 	}
+	
+	b[0]=0x04
+
+	E.y.redc().ToBytes(t[:])
+	for i:=0;i<MB;i++ {b[i+MB+1]=t[i]}
 }
 
 /* convert from byte array to point */
@@ -344,12 +353,22 @@ func ECP_fromBytes(b []byte) *ECP {
 	px:=FromBytes(t[:])
 	if comp(px,p)>=0 {return NewECP()}
 
-	if (b[0]==0x04) {
+	if CURVETYPE==MONTGOMERY {
+		return NewECPbig(px)
+	}
+
+	if b[0]==0x04 {
 		for i:=0;i<MB;i++ {t[i]=b[i+MB+1]}
 		py:=FromBytes(t[:])
 		if comp(py,p)>=0 {return NewECP()}
 		return NewECPbigs(px,py)
-	} else {return NewECPbig(px)}
+	}
+
+	if b[0]==0x02 || b[0]==0x03 {
+		return NewECPbigint(px,int(b[0]&1))
+	}
+
+	return NewECP()
 }
 
 /* convert to hex string */

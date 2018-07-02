@@ -305,7 +305,7 @@ public class MPIN192
 
 		P.add(Q);
 
-		P.toBytes(R);
+		P.toBytes(R,false);
 		return 0;
 	}
 
@@ -351,7 +351,7 @@ public class MPIN192
 		R=R.pinmul(pin,PBLEN);
 		P.sub(R);
 
-		P.toBytes(TOKEN);
+		P.toBytes(TOKEN,false);
 
 		return 0;
 	}
@@ -371,7 +371,7 @@ public class MPIN192
 
 		P=PAIR192.G1mul(P,px);
 		P.neg();
-		P.toBytes(SEC);
+		P.toBytes(SEC,false);
 		return 0;
 	}
 
@@ -416,7 +416,7 @@ public class MPIN192
 			if (xID!=null)
 			{
 				P=PAIR192.G1mul(P,x);
-				P.toBytes(xID);
+				P.toBytes(xID,false);
 				W=PAIR192.G1mul(W,x);
 				P.add(W);
 			}
@@ -425,19 +425,19 @@ public class MPIN192
 				P.add(W);
 				P=PAIR192.G1mul(P,x);
 			}
-			if (xCID!=null) P.toBytes(xCID);
+			if (xCID!=null) P.toBytes(xCID,false);
 		}
 		else
 		{
 			if (xID!=null)
 			{
 				P=PAIR192.G1mul(P,x);
-				P.toBytes(xID);
+				P.toBytes(xID,false);
 			}
 		}
 
 
-		T.toBytes(SEC);
+		T.toBytes(SEC,false);
 		return 0;
 	}
 
@@ -483,7 +483,7 @@ public class MPIN192
 		else
 			P=ECP.mapit(G);
 
-		PAIR192.G1mul(P,x).toBytes(W);
+		PAIR192.G1mul(P,x).toBytes(W,false);
 		return 0;
 	}
 
@@ -503,7 +503,7 @@ public class MPIN192
 		BIG s=BIG.fromBytes(S);
 		ECP OP=PAIR192.G1mul(P,s);
 
-		OP.toBytes(CTT);
+		OP.toBytes(CTT,false);
 		return 0;
 	}
 
@@ -513,16 +513,16 @@ public class MPIN192
 		byte[] h=hashit(sha,0,CID,EFS);
 		ECP R,P=ECP.mapit(h);
 
-		P.toBytes(HID);   // new
+		P.toBytes(HID,false);   // new
 		if (date!=0)
 		{
-	//		if (HID!=null) P.toBytes(HID);
+	//		if (HID!=null) P.toBytes(HID,false);
 			h=hashit(sha,date,h,EFS);
 			R=ECP.mapit(h);
 			P.add(R);
-			P.toBytes(HTID);
+			P.toBytes(HTID,false);
 		}
-	//	else P.toBytes(HID);
+	//	else P.toBytes(HID,false);
 	}
 
 /* Implement step 2 of MPin protocol on server side */

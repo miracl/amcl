@@ -195,48 +195,70 @@ int ZZZ::ECP_SP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octe
     if (H.len>MODBYTES_XXX) hlen=MODBYTES_XXX;
     BIG_fromBytesLen(f,H.val,hlen);
 
-    do
-    {
-        if (RNG!=NULL)
-        {
+
+	if (RNG!=NULL)
+	{
+
+		do
+		{
+		
             BIG_randomnum(u,r,RNG);
             BIG_randomnum(w,r,RNG); /* randomize calculation */
-        }
-        else
-        {
-            BIG_fromBytes(u,K->val);
-            BIG_mod(u,r);
-        }
+       
+#ifdef AES_S
+			BIG_mod2m(u,2*AES_S);
+#endif
+			ECP_copy(&V,&G);
+			ECP_mul(&V,u);
+
+			ECP_get(vx,vx,&V);
+
+			BIG_copy(c,vx);
+			BIG_mod(c,r);
+			if (BIG_iszilch(c)) continue;
+        
+            BIG_modmul(u,u,w,r);
+        
+
+			BIG_invmodp(u,u,r);
+			BIG_modmul(d,s,c,r);
+
+			BIG_add(d,f,d);
+        
+            BIG_modmul(d,d,w,r);
+       
+
+			BIG_modmul(d,u,d,r);
+
+		}
+		while (BIG_iszilch(d));
+	}
+	else
+	{
+		BIG_fromBytes(u,K->val);
+		BIG_mod(u,r);
 
 #ifdef AES_S
-        BIG_mod2m(u,2*AES_S);
+		BIG_mod2m(u,2*AES_S);
 #endif
-        ECP_copy(&V,&G);
-        ECP_mul(&V,u);
+		ECP_copy(&V,&G);
+		ECP_mul(&V,u);
 
-        ECP_get(vx,vx,&V);
+		ECP_get(vx,vx,&V);
 
-        BIG_copy(c,vx);
-        BIG_mod(c,r);
-        if (BIG_iszilch(c)) continue;
-        if (RNG!=NULL)
-        {
-            BIG_modmul(u,u,w,r);
-        }
+		BIG_copy(c,vx);
+		BIG_mod(c,r);
+		if (BIG_iszilch(c)) return ECDH_ERROR;
+        
+		BIG_invmodp(u,u,r);
+		BIG_modmul(d,s,c,r);
 
-        BIG_invmodp(u,u,r);
-        BIG_modmul(d,s,c,r);
-
-        BIG_add(d,f,d);
-        if (RNG!=NULL)
-        {
-            BIG_modmul(d,d,w,r);
-        }
-
-        BIG_modmul(d,u,d,r);
+		BIG_add(d,f,d);
+  
+		BIG_modmul(d,u,d,r);
+		if (BIG_iszilch(d)) return ECDH_ERROR;
 
     }
-    while (BIG_iszilch(d));
 
     C->len=D->len=EGS_ZZZ;
 

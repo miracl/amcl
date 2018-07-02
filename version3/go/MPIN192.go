@@ -233,7 +233,7 @@ func MPIN_RECOMBINE_G1(R1 []byte,R2 []byte,R []byte) int {
 
 	P.Add(Q)
 
-	P.ToBytes(R[:])
+	P.ToBytes(R[:],false)
 	return 0
 }
 
@@ -276,7 +276,7 @@ func MPIN_EXTRACT_FACTOR(sha int,CID []byte,factor int32,facbits int32,TOKEN []b
 	R=R.pinmul(factor,facbits)
 	P.Sub(R)
 
-	P.ToBytes(TOKEN)
+	P.ToBytes(TOKEN,false)
 
 	return 0
 }
@@ -291,7 +291,7 @@ func MPIN_RESTORE_FACTOR(sha int,CID []byte,factor int32,facbits int32,TOKEN []b
 	R=R.pinmul(factor,facbits)
 	P.Add(R)
 
-	P.ToBytes(TOKEN)
+	P.ToBytes(TOKEN,false)
 
 	return 0
 }
@@ -307,7 +307,7 @@ func MPIN_EXTRACT_PIN(sha int,CID []byte,pin int,TOKEN []byte) int {
 	R=R.pinmul(int32(pin)%MAXPIN,PBLEN)
 	P.Sub(R)
 
-	P.ToBytes(TOKEN)
+	P.ToBytes(TOKEN,false)
 
 	return 0
 }*/
@@ -326,8 +326,8 @@ func MPIN_CLIENT_2(X []byte,Y []byte,SEC []byte) int {
 
 	P=G1mul(P,px)
 	P.neg()
-	P.ToBytes(SEC)
-	//G1mul(P,px).ToBytes(SEC)
+	P.ToBytes(SEC,false)
+	//G1mul(P,px).ToBytes(SEC,false)
 	return 0
 }
 
@@ -362,23 +362,23 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *amcl.RAND,X []byte,pin
 		W=ECP_mapit(h)
 		if xID!=nil {
 			P=G1mul(P,x)
-			P.ToBytes(xID)
+			P.ToBytes(xID,false)
 			W=G1mul(W,x)
 			P.Add(W)
 		} else {
 			P.Add(W)
 			P=G1mul(P,x)
 		}
-		if xCID!=nil {P.ToBytes(xCID)}
+		if xCID!=nil {P.ToBytes(xCID,false)}
 	} else {
 		if xID!=nil {
 			P=G1mul(P,x)
-			P.ToBytes(xID)
+			P.ToBytes(xID,false)
 		}
 	}
 
 
-	T.ToBytes(SEC)
+	T.ToBytes(SEC,false)
 	return 0
 }
 
@@ -416,7 +416,7 @@ func MPIN_GET_G1_MULTIPLE(rng *amcl.RAND,typ int,X []byte,G []byte,W []byte) int
 		if P.Is_infinity() {return INVALID_POINT}
 	} else {P=ECP_mapit(G)}
 
-	G1mul(P,x).ToBytes(W)
+	G1mul(P,x).ToBytes(W,false)
 	return 0
 }
 
@@ -432,7 +432,7 @@ func MPIN_GET_CLIENT_PERMIT(sha,date int,S []byte,CID []byte,CTT []byte) int {
 	P:=ECP_mapit(h)
 
 	s:=FromBytes(S)
-	G1mul(P,s).ToBytes(CTT)
+	G1mul(P,s).ToBytes(CTT,false)
 	return 0
 }
 
@@ -441,14 +441,14 @@ func MPIN_SERVER_1(sha int,date int,CID []byte,HID []byte,HTID []byte) {
 	h:=mhashit(sha,0,CID)
 	P:=ECP_mapit(h)
 	
-	P.ToBytes(HID);
+	P.ToBytes(HID,false);
 	if date!=0 {
-	//	if HID!=nil {P.ToBytes(HID)}
+	//	if HID!=nil {P.ToBytes(HID,false)}
 		h=mhashit(sha,int32(date),h)
 		R:=ECP_mapit(h)
 		P.Add(R)
-		P.ToBytes(HTID)
-	} //else {P.ToBytes(HID)}
+		P.ToBytes(HTID,false)
+	} //else {P.ToBytes(HID,false)}
 }
 
 /* Implement step 2 of MPin protocol on server side */
