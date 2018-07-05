@@ -27,6 +27,7 @@
  */
 
 var SHA3 = function(ctx) {
+    "use strict";
 
     var SHA3 = function(olen) {
         this.length = 0;

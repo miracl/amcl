@@ -18,6 +18,7 @@
 */
 
 var HASH384 = function(ctx) {
+    "use strict";
 
     var HASH384 = function() {
         this.length = [];

@@ -18,6 +18,7 @@
 */
 
 var HASH256 = function() {
+    "use strict";
 
     var HASH256 = function() {
         this.length = [];

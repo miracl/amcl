@@ -37,6 +37,7 @@
  */
 
 var GCM = function(ctx) {
+    "use strict";
 
     var GCM = function() {
         this.table = new Array(128);

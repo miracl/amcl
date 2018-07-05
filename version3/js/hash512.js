@@ -18,6 +18,7 @@
 */
 
 var HASH512 = function(ctx) {
+    "use strict";
 
     var HASH512 = function() {
         this.length = [];

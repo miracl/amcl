@@ -20,6 +20,7 @@
 /* MPIN API Functions */
 
 var MPIN = function(ctx) {
+    "use strict";
 
     var MPIN = {
         BAD_PARAMS: -11,
@@ -429,7 +430,7 @@ var MPIN = function(ctx) {
 
         /* Extract Server Secret SST=S*Q where Q is fixed generator in G2 and S is master secret */
         GET_SERVER_SECRET: function(S, SST) {
-			var s,Q;
+            var s,Q;
 
             Q = ctx.ECP2.generator();
 
@@ -609,7 +610,7 @@ var MPIN = function(ctx) {
             var Q, sQ, R, y, P, g;
 
             if (typeof Pa === "undefined" || Pa == null) {
-				Q = ctx.ECP2.generator();
+                Q = ctx.ECP2.generator();
 
             } else {
                 Q = ctx.ECP2.fromBytes(Pa);
@@ -1033,7 +1034,7 @@ var MPIN = function(ctx) {
         */
         GET_DVS_KEYPAIR: function(rng, Z, Pa) {
             var r = new ctx.BIG(0),
-                z, A, B, QX, QY, Q;
+                z, Q;
 
             r.rcopy(ctx.ROM_CURVE.CURVE_Order);
 

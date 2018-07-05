@@ -20,6 +20,7 @@
 /* rudimentary unsigned 64-bit type for SHA384 and SHA512 */
 
 var UInt64 = function() {
+    "use strict";
 
     var UInt64 = function(top, bot) {
         this.top = top;

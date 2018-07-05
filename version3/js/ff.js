@@ -20,6 +20,7 @@
 /* AMCL FF number class */
 
 var FF = function(ctx) {
+    "use strict";
 
     /* General purpose Constructor */
     var FF = function(n) {
