@@ -53,7 +53,11 @@ func NewECP() *ECP {
 	E:=new(ECP)
 	E.x=NewFPint(0)
 	E.y=NewFPint(1)
-	E.z=NewFPint(0)
+	if CURVETYPE==EDWARDS {
+		E.z=NewFPint(1)
+	} else {
+		E.z=NewFPint(0)
+	}
 //	E.INF=true
 	return E
 }

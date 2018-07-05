@@ -56,7 +56,14 @@ public final class ECP {
 		//INF=true;
 		x=new FP(0);
 		y=new FP(1);
-		z=new FP(0);
+		if (CURVETYPE==EDWARDS)
+		{
+			z=new FP(1);
+		}
+		else
+		{
+			z=new FP(0);
+		}
 	}
 /* test for O point-at-infinity */
 	public boolean is_infinity() {

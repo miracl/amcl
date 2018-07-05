@@ -51,13 +51,22 @@ pub const AESKEY:usize=@AK@;
 #[allow(non_snake_case)]
 impl ECP {
 
-	pub fn new() -> ECP {
+	pub fn pnew() -> ECP {
 		ECP {
 				x: FP::new(),
 				y: FP::new_int(1),
 				z: FP::new(),
 //				inf: true
 		}
+
+	}
+
+	pub fn new() -> ECP {
+		let mut E=ECP::pnew();
+		if CURVETYPE==EDWARDS {
+			E.z.one();
+		}
+		return E;
 	}
 
 /* set (x,y) from two BIGs */

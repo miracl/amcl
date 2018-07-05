@@ -55,7 +55,11 @@ final public class ECP {
     {
         x=FP(0)
         y=FP(1)
-        z=FP(0)
+        if ECP.CURVETYPE==ECP.EDWARDS {
+		z=FP(1)
+	} else {
+		z=FP(0)
+	}
     //    INF=true
     }
     
