@@ -18,6 +18,7 @@
 */
 
 var AES = function() {
+    "use strict";
 
     var AES = function() {
         this.Nk = 0;
