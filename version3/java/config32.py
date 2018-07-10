@@ -43,8 +43,8 @@ def rsaset(tb,nb,base,ml) :
 
 	fpath=amclpath+slashtext+tb+slashtext
 	fpathTest=amclTestPath+slashtext+tb+slashtext  #ms
-	os.system("mkdir "+amclpath+slashtext+tb)
-	os.system("mkdir "+amclTestPath+slashtext+tb)  #ms
+	os.system("mkdir -p "+amclpath+slashtext+tb)
+	os.system("mkdir -p "+amclTestPath+slashtext+tb)  #ms
 
 	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
@@ -79,8 +79,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 
 	fpath=amclpath+slashtext+tc+slashtext
 	fpathTest=amclTestPath+slashtext+tc+slashtext  #ms
-	os.system("mkdir "+amclpath+slashtext+tc)
-	os.system("mkdir "+amclTestPath+slashtext+tc)  #ms
+	os.system("mkdir -p "+amclpath+slashtext+tc)
+	os.system("mkdir -p "+amclTestPath+slashtext+tc)  #ms
 
 	os.system(copytext+"BIG32.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG32.java "+fpath+"DBIG.java")
@@ -192,7 +192,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fpathTest+"TesttimeMPIN256.java","XXX",tc)  #ms
 
 
-os.system("mkdir " + amclpath)
+os.system("mkdir -p " + amclpath)
 
 os.system(copytext + "pom.xml " + "amcl" + slashtext + ".")
 for file in ['HASH*.java', 'SHA3.java', 'RAND.java', 'AES.java', 'GCM.java', 'NHS.java']:
