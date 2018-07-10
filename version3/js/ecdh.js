@@ -458,7 +458,7 @@ var ECDH = function(ctx) {
             s.toBytes(S);
 
             WP = G.mul(s);
-            WP.toBytes(W,false);
+            WP.toBytes(W,false);  // To use point compression on public keys, change to true 
 
             return res;
         },
@@ -554,7 +554,7 @@ var ECDH = function(ctx) {
 
             do {
                 u = ctx.BIG.randomnum(r, RNG);
-                w = ctx.BIG.randomnum(r, RNG);
+                w = ctx.BIG.randomnum(r, RNG);  /* side channel masking */
                 // if (ROM.AES_S>0)
                 // {
                 //  u.mod2m(2*ROM.AES_S);

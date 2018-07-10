@@ -350,7 +350,7 @@ public final class ECDH {
 		s.toBytes(S);
 
 		WP=G.mul(s);
-		WP.toBytes(W,false);
+		WP.toBytes(W,false);  // To use point compression on public keys, change to true 
 
 		return res;
 	}
@@ -437,7 +437,7 @@ public final class ECDH {
 
 		do {
 			u=BIG.randomnum(r,RNG);
-			w=BIG.randomnum(r,RNG);
+			w=BIG.randomnum(r,RNG); /* side channel masking */
 			//if (ROM.AES_S>0)
 			//{
 			//	u.mod2m(2*ROM.AES_S);

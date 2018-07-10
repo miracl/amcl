@@ -328,12 +328,12 @@ func ECDH_KEY_PAIR_GENERATE(RNG *amcl.RAND,S []byte,W []byte) int {
 
 	WP:=G.mul(s)
 
-	WP.ToBytes(W,false)
+	WP.ToBytes(W,false)    // To use point compression on public keys, change to true 
 
 	return res
 }
 
-/* validate public key. Set full=true for fuller check */
+/* validate public key */
 func ECDH_PUBLIC_KEY_VALIDATE(W []byte) int {
 	WP:=ECP_fromBytes(W)
 	res:=0
@@ -405,7 +405,7 @@ func ECDH_ECPSP_DSA(sha int,RNG *amcl.RAND,S []byte,F []byte,C []byte,D []byte) 
 
 	for d.iszilch() {
 		u:=Randomnum(r,RNG);
-		w:=Randomnum(r,RNG);
+		w:=Randomnum(r,RNG);  /* side channel masking */
 		//if AES_S>0 {
 		//	u.mod2m(2*AES_S)
 		//}			

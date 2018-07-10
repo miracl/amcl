@@ -352,12 +352,12 @@ final public class ECDH
         s.toBytes(&S)
 
         let WP=G.mul(s)
-        WP.toBytes(&W,false)
+        WP.toBytes(&W,false)  // To use point compression on public keys, change to true 
     
         return res;
     }
    
-    /* validate public key. Set full=true for fuller check */
+    /* validate public key */
     static public func PUBLIC_KEY_VALIDATE(_ W:[UInt8]) -> Int
     {
         var WP=ECP.fromBytes(W);
@@ -432,7 +432,7 @@ final public class ECDH
     
         repeat {
             let u=BIG.randomnum(r,RNG);
-            let w=BIG.randomnum(r,RNG);
+            let w=BIG.randomnum(r,RNG);  /* side channel masking */
   	    //if ROM.AES_S>0
 	    //{
 		//u.mod2m(2*ROM.AES_S)
