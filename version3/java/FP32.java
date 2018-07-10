@@ -40,8 +40,8 @@ public final class FP {
 
 
 	public final BIG x;
-	public static BIG p=new BIG(ROM.Modulus);
-	public static BIG r2modp=new BIG(ROM.R2modp);   /*** Change ***/
+	public BIG p=new BIG(ROM.Modulus);
+	public BIG r2modp=new BIG(ROM.R2modp);   /*** Change ***/
 	public int XES;
 
 /**************** 32-bit specific ************************/
@@ -114,7 +114,7 @@ public final class FP {
 		}
 		if (MODTYPE==NOT_SPECIAL)
 		{
-			return BIG.monty(p,ROM.MConst,d);
+			return BIG.monty(new BIG(ROM.Modulus),ROM.MConst,d);
 		}
 
 		return new BIG(0);

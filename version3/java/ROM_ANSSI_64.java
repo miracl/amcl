@@ -31,7 +31,7 @@ public class ROM
 	public static final long MConst= 0x97483A164E1155L;
 
 	public static final int CURVE_Cof_I= 1;
-	public static final int[] CURVE_Cof= {0x1,0x0,0x0,0x0,0x0};
+	public static final long[] CURVE_Cof= {0x1L,0x0L,0x0L,0x0L,0x0L};
 	public static final int CURVE_A= -3;
 	public static final int CURVE_B_I= 0;
 	public static final long[] CURVE_B= {0x75ED967B7BB73FL,0xC9AE4B1A18030L,0x754A44C00FDFECL,0x5428A9300D4ABAL,0xEE353FCAL};

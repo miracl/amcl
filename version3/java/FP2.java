@@ -231,7 +231,7 @@ public final class FP2 {
 		BIG C=new BIG(a.x);
 		BIG D=new BIG(y.a.x);
 
-		pR.ucopy(FP.p);
+		pR.ucopy(new BIG(ROM.Modulus));
 
 		DBIG A=BIG.mul(a.x,y.a.x);
 		DBIG B=BIG.mul(b.x,y.b.x);
