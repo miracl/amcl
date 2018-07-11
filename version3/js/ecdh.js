@@ -110,7 +110,7 @@ var ECDH = function(ctx) {
 
             W = [];
 
-            len = ctx.BIG.MODBYTES;
+            len = pad; // ctx.BIG.MODBYTES;
 
             if (sha >= len) {
                 for (i = 0; i < len; i++) {
