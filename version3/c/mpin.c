@@ -574,15 +574,17 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     {
         if (date)
         {
-            BIG_XXX_fromBytes(px,&(xCID->val[1]));
-            BIG_XXX_fromBytes(py,&(xCID->val[PFS_ZZZ+1]));
+            //BIG_XXX_fromBytes(px,&(xCID->val[1]));
+            //BIG_XXX_fromBytes(py,&(xCID->val[PFS_ZZZ+1]));
+			if (!ECP_ZZZ_fromOctet(&R,xCID))  res=MPIN_INVALID_POINT;
         }
         else
         {
-            BIG_XXX_fromBytes(px,&(xID->val[1]));
-            BIG_XXX_fromBytes(py,&(xID->val[PFS_ZZZ+1]));
+            //BIG_XXX_fromBytes(px,&(xID->val[1]));
+            //BIG_XXX_fromBytes(py,&(xID->val[PFS_ZZZ+1]));
+			if (!ECP_ZZZ_fromOctet(&R,xID))  res=MPIN_INVALID_POINT;
         }
-        if (!ECP_ZZZ_set(&R,px,py)) res=MPIN_INVALID_POINT; // x(A+AT)
+        //if (!ECP_ZZZ_set(&R,px,py)) res=MPIN_INVALID_POINT; // x(A+AT)
     }
     if (res==0)
     {

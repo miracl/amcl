@@ -588,7 +588,7 @@ void ZZZ::MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 /* Implement M-Pin on server side */
 int ZZZ::MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F,octet *Pa)
 {
-    BIG px,py,y;
+    BIG y;
     FP48 g;
     ECP8 Q,sQ;
     ECP P,R;
@@ -613,15 +613,18 @@ int ZZZ::MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet
     {
         if (date)
         {
-            BIG_fromBytes(px,&(xCID->val[1]));
-            BIG_fromBytes(py,&(xCID->val[PFS_ZZZ+1]));
+            //BIG_fromBytes(px,&(xCID->val[1]));
+            //BIG_fromBytes(py,&(xCID->val[PFS_ZZZ+1]));
+			if (!ECP_fromOctet(&R,xCID))  res=MPIN_INVALID_POINT;
+		
         }
         else
         {
-            BIG_fromBytes(px,&(xID->val[1]));
-            BIG_fromBytes(py,&(xID->val[PFS_ZZZ+1]));
+            //BIG_fromBytes(px,&(xID->val[1]));
+            //BIG_fromBytes(py,&(xID->val[PFS_ZZZ+1]));
+			if (!ECP_fromOctet(&R,xID))  res=MPIN_INVALID_POINT;
         }
-        if (!ECP_set(&R,px,py)) res=MPIN_INVALID_POINT; // x(A+AT)
+        //if (!ECP_set(&R,px,py)) res=MPIN_INVALID_POINT; // x(A+AT)
     }
     if (res==0)
     {

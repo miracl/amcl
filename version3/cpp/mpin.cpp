@@ -299,7 +299,9 @@ int ZZZ::MPIN_CLIENT_2(octet *X,octet *Y,octet *SEC)
         //	BIG_sub(px,r,px);
         PAIR_G1mul(&P,px);
         ECP_neg(&P);
-        ECP_toOctet(SEC,&P,false);
+        ECP_toOctet(SEC,&P,false);   /* change to TRUE for point compression */
+
+/*		printf("CLIENT SEC= "); ECP_output(&P); printf("\n"); */
     }
     return res;
 }
@@ -341,7 +343,7 @@ int ZZZ::MPIN_GET_G1_MULTIPLE(csprng *RNG,int type,octet *X,octet *G,octet *W)
     if (res==0)
     {
         PAIR_G1mul(&P,x);
-        ECP_toOctet(W,&P,false);
+        ECP_toOctet(W,&P,false);  /* change to TRUE for point compression */
     }
     return res;
 }
@@ -442,7 +444,7 @@ int ZZZ::MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,in
             if (xID!=NULL)
             {
                 PAIR_G1mul(&P,x);				// P=x.H(ID)
-                ECP_toOctet(xID,&P,false);  // xID
+                ECP_toOctet(xID,&P,false);  // xID		/* change to TRUE for point compression */
                 PAIR_G1mul(&W,x);               // W=x.H(T|ID)
                 ECP_add(&P,&W);
             }
@@ -451,20 +453,20 @@ int ZZZ::MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,in
                 ECP_add(&P,&W);
                 PAIR_G1mul(&P,x);
             }
-            if (xCID!=NULL) ECP_toOctet(xCID,&P,false);  // U
+            if (xCID!=NULL) ECP_toOctet(xCID,&P,false);  // U     /* change to TRUE for point compression */
         }
         else
         {
             if (xID!=NULL)
             {
                 PAIR_G1mul(&P,x);				// P=x.H(ID)
-                ECP_toOctet(xID,&P,false);  // xID
+                ECP_toOctet(xID,&P,false);  // xID     /* change to TRUE for point compression */
             }
         }
     }
 
     if (res==0)
-        ECP_toOctet(SEC,&T,false);  // V
+        ECP_toOctet(SEC,&T,false);  // V    /* change to TRUE for point compression */
 
     return res;
 }
@@ -558,7 +560,7 @@ void ZZZ::MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 /* Implement M-Pin on server side */
 int ZZZ::MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet *xID,octet *xCID,octet *mSEC,octet *E,octet *F,octet *Pa)
 {
-    BIG px,py,y;
+    BIG y;
     FP12 g;
     ECP2 Q,sQ;
     ECP P,R;
@@ -582,15 +584,18 @@ int ZZZ::MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet
     {
         if (date)
         {
-            BIG_fromBytes(px,&(xCID->val[1]));
-            BIG_fromBytes(py,&(xCID->val[PFS_ZZZ+1]));
+            //BIG_fromBytes(px,&(xCID->val[1]));
+            //BIG_fromBytes(py,&(xCID->val[PFS_ZZZ+1]));
+			if (!ECP_fromOctet(&R,xCID))  res=MPIN_INVALID_POINT;
+		
         }
         else
         {
-            BIG_fromBytes(px,&(xID->val[1]));
-            BIG_fromBytes(py,&(xID->val[PFS_ZZZ+1]));
+            //BIG_fromBytes(px,&(xID->val[1]));
+            //BIG_fromBytes(py,&(xID->val[PFS_ZZZ+1]));
+			if (!ECP_fromOctet(&R,xID))  res=MPIN_INVALID_POINT;
         }
-        if (!ECP_set(&R,px,py)) res=MPIN_INVALID_POINT; // x(A+AT)
+        //if (!ECP_set(&R,px,py)) res=MPIN_INVALID_POINT; // x(A+AT)
     }
     if (res==0)
     {
@@ -610,6 +615,9 @@ int ZZZ::MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet
         ECP_add(&P,&R); // x(A+AT)+y(A+T)
 		ECP_affine(&P);
         if (!ECP_fromOctet(&R,mSEC))  res=MPIN_INVALID_POINT; // V
+
+//		printf("CLIENT SEC= "); ECP_output(&R); printf("\n");
+
     }
     if (res==0)
     {
