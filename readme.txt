@@ -18,7 +18,7 @@ supported languages. New users should use this version.
 The main improvement is that AMCL v3 can optionally simultaneously support 
 multiple elliptic curves and RSA key sizes within a single appliction.
 
-Note that AMCL is largely configure at compile time. In version 3 this
+Note that AMCL is largely configured at compile time. In version 3 this
 configuration is handled by the Python script.
 
 AMCL is available in 32-bit and 64-bit versions in most languages. Limited 

@@ -1,3 +1,5 @@
+**New** August 2018. A Python version of the library is now available.
+
 Several helper programs are provided to assist with the addition of
 new elliptic curves. Note that these programs will not be needed if using
 one of the supported curves. These programs must be build using the MIRACL
