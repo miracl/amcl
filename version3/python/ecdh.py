@@ -14,8 +14,6 @@ from XXX.ecp import *
 def ECP_KeyPairGenerate(S) :
 	G = generator()
 
-	print("G= ",G)
-
 	if S is None :
 		s=big.rand(curve.r)
 	else :

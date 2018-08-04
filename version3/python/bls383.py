@@ -20,6 +20,8 @@ else :
 	t=x+1
 
 r=x*x*x*x-x*x+1
+
+# elliptic curve
 A=0
 B=15
 

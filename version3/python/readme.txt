@@ -1,6 +1,6 @@
 This Python version of the library is ideal for beginners, or for people
 interested in quickly putting together a "proof of concept" implementation
-that requires Elliptic curve or pairng based cryptography.
+that requires Elliptic curve or pairing based cryptography.
 
 Note this Python version is NOT for serious production use. Since the
 handling of big numbers is outside of our control, side-channel attacks
@@ -27,7 +27,7 @@ to support.
 
 py config.py
 
-Select options 1 and 4, which are fixed for the example program. Select 0 
+Select options 1 and 5, which are fixed for the example program. Select 0 
 to exit.
 
 Then run the test program 

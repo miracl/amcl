@@ -18,6 +18,8 @@ else :
 
 t=6*x*x+1
 r=p+1-t
+
+# elliptic curve
 A=0
 B=2
 
