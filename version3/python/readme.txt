@@ -27,7 +27,7 @@ to support.
 
 py config.py
 
-Select options 1 and 5, which are fixed for the example program. Select 0 
+Select options 1 and 7, which are fixed for the example program. Select 0 
 to exit.
 
 Then run the test program 

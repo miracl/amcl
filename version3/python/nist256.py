@@ -1,4 +1,4 @@
-# ED25519 curve constants
+# NIST256 curve constants
 
 from constants import *
 

@@ -79,16 +79,17 @@ print("1. ED25519")
 print("2. C25519")
 print("3. NIST256")
 print("4. GOLDILOCKS")
-
+print("5. NIST384")
+print("6. NIST521")
 
 print("Pairing-Friendly Elliptic Curves")
-print("5. BN254")
-print("6. BLS383")
-
+print("7. BN254")
+print("8. BLS383")
+print("9. BLS381")
 
 selection=[]
 ptr=0
-max=7
+max=10
 
 curve_selected=False
 pfcurve_selected=False
@@ -126,13 +127,21 @@ while ptr<max:
 	if x==4:
 		curveset("goldilocks","NOT")
 		curve_selected=True
-
-
 	if x==5:
+		curveset("nist384","NOT")
+		curve_selected=True
+	if x==6:
+		curveset("nist521","NOT")
+		curve_selected=True
+
+	if x==7:
 		curveset("bn254","BN")
 		pfcurve_selected=True
-	if x==6:
+	if x==8:
 		curveset("bls383","BLS")  
+		pfcurve_selected=True
+	if x==9:
+		curveset("bls381","BLS")  
 		pfcurve_selected=True
 
 
@@ -152,3 +161,6 @@ os.system(deltext+" nist256.py")
 os.system(deltext+" bn254.py")
 os.system(deltext+" bls383.py")
 os.system(deltext+" goldilocks.py")
+os.system(deltext+" bls381.py")
+os.system(deltext+" nist384.py")
+os.system(deltext+" nist521.py")

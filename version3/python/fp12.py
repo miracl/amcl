@@ -203,7 +203,9 @@ class Fp12:
 			if big.bit(e3, i) == 1 and big.bit(e, i) == 0:
 				r*=x
 			if big.bit(e3, i) == 0 and big.bit(e, i) == 1:
-				r*=x.conj()			
+				x.conj()
+				r*=x
+				x.conj()
 		return r
 
 	def __str__(self):			# pretty print

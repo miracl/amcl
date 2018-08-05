@@ -245,7 +245,7 @@ def fexp(r):
 		x//=2
 		y2=y1.pow(x)
 		if curve.SignOfX == NEGATIVEX :
-				y3.conj();
+				y2.conj();
 		x*=2
 
 		y3=r.copy()
