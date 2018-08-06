@@ -23,11 +23,11 @@ This Python version is very small, accessible, and easy to use.
 
 To see it in action, copy all of the files in this directory to a fresh directory. 
 Then execute the python3 script config.py and select the curves that you wish 
-to support. 
+to support. (On Linux use python3 instead of py).
 
 py config.py
 
-Select options 1 and 7, which are fixed for the example program. Select 0 
+Select options 1 and 8, which are fixed for the example program. Select 0 
 to exit.
 
 Then run the test program 
