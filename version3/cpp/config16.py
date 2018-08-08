@@ -36,7 +36,7 @@ def rsaset(tb,tff,nb,base,ml) :
 	os.system(copytext+" config_ff.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"WWW",tff)
-	replace(fnameh,"@ML@",ml);
+	replace(fnameh,"@ML@",ml)
 
 	fnamec="big_"+bd+".cpp"
 	fnameh="big_"+bd+".h"
@@ -131,7 +131,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	replace(fnameh,"XXX",bd)
 	os.system("g++ -O3 -c "+fnamec)
 
-	os.system("g++ -O3 -c rom_field_"+tf+".cpp");
+	os.system("g++ -O3 -c rom_field_"+tf+".cpp")
 
 	fnamec="ecp_"+tc+".cpp"
 	fnameh="ecp_"+tc+".h"
@@ -161,7 +161,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	replace(fnameh,"XXX",bd)
 	os.system("g++ -O3 -c "+fnamec)
 
-	os.system("g++ -O3 -c rom_curve_"+tc+".cpp");
+	os.system("g++ -O3 -c rom_curve_"+tc+".cpp")
 
 	if pf != "NOT" :
 		fnamec="fp2_"+tf+".cpp"
@@ -363,7 +363,7 @@ else :
 os.system(deltext+" *.o")
 
 
-#print("Your section was ");	
+#print("Your section was ")
 #for i in range(0,ptr):
 #	print (selection[i])
 
