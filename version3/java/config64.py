@@ -4,6 +4,7 @@ import sys
 deltext=""
 slashtext=""
 copytext=""
+makedir=""
 org1text="org"
 org2text="apache"
 org3text="milagro"
@@ -12,10 +13,12 @@ if sys.platform.startswith("linux")  :
 	copytext="cp "
 	deltext="rm "
 	slashtext="/"
+	makedir="mkdir -p "
 if sys.platform.startswith("win") :
 	copytext="copy "
 	deltext="del "
 	slashtext="\\"
+	makedir="md "
 
 amclpath = "amcl" + slashtext + "src" + slashtext + "main" + slashtext + "java" + slashtext + org1text + slashtext + org2text + slashtext + org3text +slashtext + "amcl"
 amclTestPath = "amcl" + slashtext + "src" + slashtext + "test" + slashtext + "java" + slashtext + org1text + slashtext + org2text + slashtext + org3text +slashtext + "amcl"
@@ -43,8 +46,8 @@ def rsaset(tb,nb,base,ml) :
 
 	fpath=amclpath+slashtext+tb+slashtext
 	fpathTest=amclTestPath+slashtext+tb+slashtext #ms
-	os.system("mkdir -p "+amclpath+slashtext+tb)
-	os.system("mkdir -p "+amclTestPath+slashtext+tb) #ms
+	os.system(makedir+amclpath+slashtext+tb)
+	os.system(makedir+amclTestPath+slashtext+tb) #ms
 	
 	os.system(copytext+"BIG64.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG64.java "+fpath+"DBIG.java")
@@ -80,8 +83,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 
 	fpath=amclpath+slashtext+tc+slashtext
 	fpathTest=amclTestPath+slashtext+tc+slashtext  #ms
-	os.system("mkdir -p "+amclpath+slashtext+tc)
-	os.system("mkdir -p "+amclTestPath+slashtext+tc)  #ms
+	os.system(makedir+amclpath+slashtext+tc)
+	os.system(makedir+amclTestPath+slashtext+tc)  #ms
 
 	os.system(copytext+"BIG64.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG64.java "+fpath+"DBIG.java")
@@ -192,7 +195,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 
 
 
-os.system("mkdir -p " + amclpath)
+os.system(makedir + amclpath)
 
 os.system(copytext + "pom.xml " + "amcl" + slashtext + ".")
 for file in ['HASH*.java', 'SHA3.java', 'RAND.java', 'AES.java', 'GCM.java', 'NHS.java']:

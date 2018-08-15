@@ -151,8 +151,11 @@ public final class PAIR192 {
 
 		ECP4 A=new ECP4();
 		FP24 r=new FP24(1);
-
 		A.copy(P);
+
+		ECP4 MP=new ECP4();
+		MP.copy(P); MP.neg();
+
 		int nb=n3.nbits();
 
 		for (int i=nb-2;i>=1;i--)
@@ -169,10 +172,10 @@ public final class PAIR192 {
 			}
 			if (bt==-1)
 			{
-				P.neg();
-				lv=line(A,P,Qx,Qy);
+				//P.neg();
+				lv=line(A,MP,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				P.neg();
+				//P.neg();
 			}
 		}
 
@@ -208,6 +211,13 @@ public final class PAIR192 {
 
 		A.copy(P);
 		B.copy(R);
+
+		ECP4 MP=new ECP4();
+		MP.copy(P); MP.neg();
+		ECP4 MR=new ECP4();
+		MR.copy(R); MR.neg();
+
+
 		int nb=n3.nbits();
 
 		for (int i=nb-2;i>=1;i--)
@@ -229,14 +239,14 @@ public final class PAIR192 {
 			}
 			if (bt==-1)
 			{
-				P.neg(); 
-				lv=line(A,P,Qx,Qy);
+				//P.neg(); 
+				lv=line(A,MP,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				P.neg(); 
-				R.neg();
-				lv=line(B,R,Sx,Sy);
+				//P.neg(); 
+				//R.neg();
+				lv=line(B,MR,Sx,Sy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				R.neg();
+				//R.neg();
 			}
 		}
 
