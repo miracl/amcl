@@ -140,7 +140,7 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q)
     BIG_XXX x,n,n3;
 	FP_YYY Qx,Qy;
     int i,j,nb,bt;
-    ECP4_ZZZ A;
+    ECP4_ZZZ A,NP;
     FP24_YYY lv;
 
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
@@ -155,6 +155,8 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q)
     FP_YYY_copy(&Qy,&(Q->y));
 
     ECP4_ZZZ_copy(&A,P);
+	ECP4_ZZZ_copy(&NP,P); ECP4_ZZZ_neg(&NP);
+
     FP24_YYY_one(r);
     nb=BIG_XXX_nbits(n3);  // n3
 
@@ -178,10 +180,10 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q)
 		if (bt==-1)
 		{
 //printf("bt=-1\n");
-			ECP4_ZZZ_neg(P);
-            PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
+			//ECP4_ZZZ_neg(P);
+            PAIR_ZZZ_line(&lv,&A,&NP,&Qx,&Qy);
             FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			ECP4_ZZZ_neg(P);
+			//ECP4_ZZZ_neg(P);
 		}
 
     }
@@ -198,7 +200,7 @@ void PAIR_ZZZ_double_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q,ECP4_ZZZ *R,ECP_ZZZ 
     BIG_XXX x,n,n3;
 	FP_YYY Qx,Qy,Sx,Sy;
     int i,nb,bt;
-    ECP4_ZZZ A,B;
+    ECP4_ZZZ A,B,NP,NR;
     FP24_YYY lv;
 
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
@@ -216,6 +218,10 @@ void PAIR_ZZZ_double_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q,ECP4_ZZZ *R,ECP_ZZZ 
 
     ECP4_ZZZ_copy(&A,P);
     ECP4_ZZZ_copy(&B,R);
+	ECP4_ZZZ_copy(&NP,P); ECP4_ZZZ_neg(&NP);
+	ECP4_ZZZ_copy(&NR,R); ECP4_ZZZ_neg(&NR);
+
+
     FP24_YYY_one(r);
     nb=BIG_XXX_nbits(n3);
 
@@ -240,14 +246,14 @@ void PAIR_ZZZ_double_ate(FP24_YYY *r,ECP4_ZZZ *P,ECP_ZZZ *Q,ECP4_ZZZ *R,ECP_ZZZ 
         }
 		if (bt==-1)
 		{
-			ECP4_ZZZ_neg(P); 
-            PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
+			//ECP4_ZZZ_neg(P); 
+            PAIR_ZZZ_line(&lv,&A,&NP,&Qx,&Qy);
             FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			ECP4_ZZZ_neg(P); 
-			ECP4_ZZZ_neg(R);
-            PAIR_ZZZ_line(&lv,&B,R,&Sx,&Sy);
+			//ECP4_ZZZ_neg(P); 
+			//ECP4_ZZZ_neg(R);
+            PAIR_ZZZ_line(&lv,&B,&NR,&Sx,&Sy);
             FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			ECP4_ZZZ_neg(R);
+			//ECP4_ZZZ_neg(R);
 		}
 	}
 

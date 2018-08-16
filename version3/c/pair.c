@@ -141,7 +141,7 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
     BIG_XXX x,n,n3;
     FP_YYY Qx,Qy;
     int i,nb,bt;
-    ECP2_ZZZ A;
+    ECP2_ZZZ A,NP;
     FP12_YYY lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
     ECP2_ZZZ KA;
@@ -181,6 +181,8 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
     FP_YYY_copy(&Qy,&(Q->y));
 
     ECP2_ZZZ_copy(&A,P);
+	ECP2_ZZZ_copy(&NP,P); ECP2_ZZZ_neg(&NP);
+
     FP12_YYY_one(r);
     nb=BIG_XXX_nbits(n3);  //n
 
@@ -200,10 +202,10 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q)
         }
         if (bt==-1)
         {
-            ECP2_ZZZ_neg(P);
-            PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
+            //ECP2_ZZZ_neg(P);
+            PAIR_ZZZ_line(&lv,&A,&NP,&Qx,&Qy);
             FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-            ECP2_ZZZ_neg(P);
+            //ECP2_ZZZ_neg(P);
         }
 
 //       FP12_YYY_sqr(r,r);
@@ -245,7 +247,7 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
     BIG_XXX x,n,n3;
     FP_YYY Qx,Qy,Sx,Sy;
     int i,nb,bt;
-    ECP2_ZZZ A,B;
+    ECP2_ZZZ A,B,NP,NR;
     FP12_YYY lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
     FP2_YYY X;
@@ -286,6 +288,11 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 
     ECP2_ZZZ_copy(&A,P);
     ECP2_ZZZ_copy(&B,R);
+
+	ECP2_ZZZ_copy(&NP,P); ECP2_ZZZ_neg(&NP);
+	ECP2_ZZZ_copy(&NR,R); ECP2_ZZZ_neg(&NR);
+
+
     FP12_YYY_one(r);
     nb=BIG_XXX_nbits(n3);
 
@@ -312,15 +319,15 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P,ECP_ZZZ *Q,ECP2_ZZZ *R,ECP_ZZZ 
 
         if (bt==-1)
         {
-            ECP2_ZZZ_neg(P);
-            PAIR_ZZZ_line(&lv,&A,P,&Qx,&Qy);
+            //ECP2_ZZZ_neg(P);
+            PAIR_ZZZ_line(&lv,&A,&NP,&Qx,&Qy);
             FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-            ECP2_ZZZ_neg(P);
+            //ECP2_ZZZ_neg(P);
 
-            ECP2_ZZZ_neg(R);
-            PAIR_ZZZ_line(&lv,&B,R,&Sx,&Sy);
+            //ECP2_ZZZ_neg(R);
+            PAIR_ZZZ_line(&lv,&B,&NR,&Sx,&Sy);
             FP12_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-            ECP2_ZZZ_neg(R);
+            //ECP2_ZZZ_neg(R);
         }
 
         //FP12_YYY_sqr(r,r);

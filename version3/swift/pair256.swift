@@ -136,6 +136,10 @@ final public class PAIR256 {
         let r=FP48(1)
     
         A.copy(P)
+	let NP=ECP8()
+	NP.copy(P)
+	NP.neg()
+
         let nb=n3.nbits()
     
         for i in (1...nb-2).reversed()
@@ -150,10 +154,10 @@ final public class PAIR256 {
               r.smul(lv,ECP.SEXTIC_TWIST)
             }
             if bt == -1 {
-                P.neg()
-                lv=line(A,P,Qx,Qy)
+                //P.neg()
+                lv=line(A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-                P.neg()
+                //P.neg()
             }
         }
     
@@ -186,6 +190,14 @@ final public class PAIR256 {
     
         A.copy(P)
         B.copy(R)
+	let NP=ECP8()
+	NP.copy(P)
+	NP.neg()
+	let NR=ECP8()
+	NR.copy(R)
+	NR.neg()
+
+
         let nb=n3.nbits()
     
         for i in (1...nb-2).reversed()
@@ -205,14 +217,14 @@ final public class PAIR256 {
             }
 
             if bt == -1 {
-                P.neg(); 
-                lv=line(A,P,Qx,Qy)
+                //P.neg(); 
+                lv=line(A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-                P.neg(); 
-                R.neg()
-                lv=line(B,R,Sx,Sy)
+                //P.neg(); 
+                //R.neg()
+                lv=line(B,NR,Sx,Sy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-                R.neg()                
+                //R.neg()                
             }            
 
         }

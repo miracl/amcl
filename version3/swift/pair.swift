@@ -153,9 +153,13 @@ final public class PAIR {
         let Qy=FP(Q.gety())
     
         let A=ECP2()
-        let r=FP12(1)
-    
         A.copy(P)
+
+	let NP=ECP2()
+	NP.copy(P)
+	NP.neg()
+
+        let r=FP12(1)
         let nb=n3.nbits()
     
         for i in (1...nb-2).reversed()
@@ -170,10 +174,10 @@ final public class PAIR {
 		      r.smul(lv,ECP.SEXTIC_TWIST)
             }
             if bt == -1 {
-                P.neg()
-                lv=line(A,P,Qx,Qy)
+                //P.neg()
+                lv=line(A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-                P.neg()
+                //P.neg()
             }
         }
     
@@ -238,6 +242,14 @@ final public class PAIR {
     
         A.copy(P)
         B.copy(R)
+	let NP=ECP2()
+	NP.copy(P)
+	NP.neg()
+	let NR=ECP2()
+	NR.copy(R)
+	NR.neg()
+
+
         let nb=n3.nbits()
     
         for i in (1...nb-2).reversed()
@@ -258,14 +270,14 @@ final public class PAIR {
             }
 
             if bt == -1 {
-                P.neg(); 
-                lv=line(A,P,Qx,Qy)
+                //P.neg(); 
+                lv=line(A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-		P.neg(); 
-		R.neg()
-                lv=line(B,R,Sx,Sy)
+		//P.neg(); 
+		//R.neg()
+                lv=line(B,NR,Sx,Sy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-                R.neg()                
+                //R.neg()                
             }            
 
         }

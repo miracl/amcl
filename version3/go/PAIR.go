@@ -152,6 +152,11 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 	r:=NewFP12int(1)
 
 	A.Copy(P)
+
+	NP:=NewECP2()
+	NP.Copy(P)
+	NP.neg()
+
 	nb:=n3.nbits()
 
 	for i:=nb-2;i>=1;i-- {
@@ -164,10 +169,10 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 			r.smul(lv,SEXTIC_TWIST)
 		}	
 		if bt==-1 {
-			P.neg()
-			lv=line(A,P,Qx,Qy)
+			//P.neg()
+			lv=line(A,NP,Qx,Qy)
 			r.smul(lv,SEXTIC_TWIST)
-			P.neg()
+			//P.neg()
 		}		
 	}
 
@@ -235,6 +240,14 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 
 	A.Copy(P)
 	B.Copy(R)
+	NP:=NewECP2()
+	NP.Copy(P)
+	NP.neg()
+	NR:=NewECP2()
+	NR.Copy(R)
+	NR.neg()
+
+
 	nb:=n3.nbits()
 
 	for i:=nb-2;i>=1;i-- {
@@ -251,14 +264,14 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 			r.smul(lv,SEXTIC_TWIST)
 		}
 		if bt==-1 {
-			P.neg(); 
-			lv=line(A,P,Qx,Qy)
+			//P.neg(); 
+			lv=line(A,NP,Qx,Qy)
 			r.smul(lv,SEXTIC_TWIST)
-			P.neg(); 
-			R.neg()
-			lv=line(B,R,Sx,Sy)
+			//P.neg(); 
+			//R.neg()
+			lv=line(B,NR,Sx,Sy)
 			r.smul(lv,SEXTIC_TWIST)
-			R.neg()
+			//R.neg()
 		}
 	}
 

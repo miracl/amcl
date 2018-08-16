@@ -149,7 +149,7 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P,ECP *Q)
     BIG x,n,n3;
 	FP Qx,Qy;
     int i,j,nb,bt;
-    ECP4 A;
+    ECP4 A,NP;
     FP24 lv;
 
     BIG_rcopy(x,CURVE_Bnx);
@@ -164,6 +164,9 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P,ECP *Q)
     FP_copy(&Qy,&(Q->y));
 
     ECP4_copy(&A,P);
+
+	ECP4_copy(&NP,P); ECP4_neg(&NP);
+
     FP24_one(r);
     nb=BIG_nbits(n3);  // n3
 
@@ -175,22 +178,19 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P,ECP *Q)
 		FP24_sqr(r,r);
         PAIR_line(&lv,&A,&A,&Qx,&Qy);
         FP24_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-//printf("r= "); FP24_output(r); printf("\n");
-//if (j>3) exit(0);
+
 		bt= BIG_bit(n3,i)-BIG_bit(n,i);  // BIG_bit(n,i); 
         if (bt==1)
         {
-//printf("bt=1\n");
             PAIR_line(&lv,&A,P,&Qx,&Qy);
             FP24_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
 		if (bt==-1)
 		{
-//printf("bt=-1\n");
-			ECP4_neg(P);
-            PAIR_line(&lv,&A,P,&Qx,&Qy);
+			//ECP4_neg(P);
+            PAIR_line(&lv,&A,&NP,&Qx,&Qy);
             FP24_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			ECP4_neg(P);
+			//ECP4_neg(P);
 		}
 
     }
@@ -207,7 +207,7 @@ void ZZZ::PAIR_double_ate(FP24 *r,ECP4 *P,ECP *Q,ECP4 *R,ECP *S)
     BIG x,n,n3;
 	FP Qx,Qy,Sx,Sy;
     int i,nb,bt;
-    ECP4 A,B;
+    ECP4 A,B,NP,NR;
     FP24 lv;
 
     BIG_rcopy(x,CURVE_Bnx);
@@ -225,6 +225,11 @@ void ZZZ::PAIR_double_ate(FP24 *r,ECP4 *P,ECP *Q,ECP4 *R,ECP *S)
 
     ECP4_copy(&A,P);
     ECP4_copy(&B,R);
+
+	ECP4_copy(&NP,P); ECP4_neg(&NP);
+	ECP4_copy(&NR,R); ECP4_neg(&NR);
+
+
     FP24_one(r);
     nb=BIG_nbits(n3);
 
@@ -249,14 +254,14 @@ void ZZZ::PAIR_double_ate(FP24 *r,ECP4 *P,ECP *Q,ECP4 *R,ECP *S)
         }
 		if (bt==-1)
 		{
-			ECP4_neg(P); 
-            PAIR_line(&lv,&A,P,&Qx,&Qy);
+			//ECP4_neg(P); 
+            PAIR_line(&lv,&A,&NP,&Qx,&Qy);
             FP24_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			ECP4_neg(P); 
-			ECP4_neg(R);
-            PAIR_line(&lv,&B,R,&Sx,&Sy);
+			//ECP4_neg(P); 
+			//ECP4_neg(R);
+            PAIR_line(&lv,&B,&NR,&Sx,&Sy);
             FP24_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			ECP4_neg(R);
+			//ECP4_neg(R);
 		}
 	}
 

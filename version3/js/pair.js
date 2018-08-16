@@ -129,7 +129,7 @@ var PAIR = function(ctx) {
         /* Optimal R-ate pairing */
         ate: function(P, Q) {
             var fa, fb, f, x, n, n3, K, lv,
-                Qx, Qy, A, r, nb, bt,
+                Qx, Qy, A, NP, r, nb, bt,
                 i;
 
             x = new ctx.BIG(0);
@@ -172,8 +172,12 @@ var PAIR = function(ctx) {
 
             A = new ctx.ECP2();
             r = new ctx.FP12(1);
-
             A.copy(P);
+
+			NP = new ctx.ECP2();
+			NP.copy(P);
+			NP.neg();
+
             nb = n3.nbits();
 
             for (i = nb - 2; i >= 1; i--) {
@@ -189,10 +193,10 @@ var PAIR = function(ctx) {
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 }
                 if (bt == -1) {
-                    P.neg();
-                    lv = PAIR.line(A, P, Qx, Qy);
+                    //P.neg();
+                    lv = PAIR.line(A, NP, Qx, Qy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-                    P.neg();
+                    //P.neg();
                 }
             }
 
@@ -224,7 +228,7 @@ var PAIR = function(ctx) {
         /* Optimal R-ate double pairing e(P,Q).e(R,S) */
         ate2: function(P, Q, R, S) {
             var fa, fb, f, x, n, n3, K, lv,
-                Qx, Qy, Sx, Sy, A, B, r, nb, bt,
+                Qx, Qy, Sx, Sy, A, B, NP,NR,r, nb, bt,
                 i;
 
 
@@ -273,6 +277,14 @@ var PAIR = function(ctx) {
 
             A.copy(P);
             B.copy(R);
+
+			NP = new ctx.ECP2();
+			NP.copy(P);
+			NP.neg();
+			NR = new ctx.ECP2();
+			NR.copy(R);
+			NR.neg();
+
             nb = n3.nbits();
 
             for (i = nb - 2; i >= 1; i--) {
@@ -291,14 +303,14 @@ var PAIR = function(ctx) {
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 }
                 if (bt == -1) {
-                    P.neg();
-                    lv = PAIR.line(A, P, Qx, Qy);
+                    //P.neg();
+                    lv = PAIR.line(A, NP, Qx, Qy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-                    P.neg();
-                    R.neg();
-                    lv = PAIR.line(B, R, Sx, Sy);
+                    //P.neg();
+                    //R.neg();
+                    lv = PAIR.line(B, NR, Sx, Sy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-                    R.neg();
+                    //R.neg();
                 }
             }
 
