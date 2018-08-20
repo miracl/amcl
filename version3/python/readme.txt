@@ -34,3 +34,6 @@ Then run the test program
 
 py test.py
 
+or
+
+python3 test.py

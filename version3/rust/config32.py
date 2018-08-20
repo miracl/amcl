@@ -4,8 +4,7 @@ import sys
 deltext=""
 slashtext=""
 copytext=""
-if sys.platform.startswith("linux") or \
-	sys.platform.startswith("darwin") :
+if sys.platform.startswith("linux")  :
 	copytext="cp "
 	deltext="rm "
 	slashtext="/"
@@ -56,7 +55,7 @@ def rsaset(tb,nb,base,ml) :
 	replace(fpath+"big.rs","@NB@",nb)
 	replace(fpath+"big.rs","@BASE@",base)
 
-	replace(fpath+"ff.rs","@ML@",ml);
+	replace(fpath+"ff.rs","@ML@",ml)
 
 	#os.system("go install amcl"+slashtext+tb)
 
@@ -206,7 +205,7 @@ print("13. nums384w")
 print("14. nums384e")
 print("15. nums512w")
 print("16. nums512e")
-print("17. secp256k1\n");
+print("17. secp256k1\n")
 
 print("Pairing-Friendly Elliptic Curves")
 print("18. bn254")
