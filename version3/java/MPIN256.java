@@ -262,7 +262,7 @@ public class MPIN256
 		su=rng.getByte(); /*if (su<0) su=-su;*/ su%=2;
 		
 		ECP W=map(u,su);
-		P.sub(W);
+		P.sub(W); P.affine();
 		sv=P.getS();
 		rn=unmap(v,P);
 		m=rng.getByte(); /*if (m<0) m=-m;*/ m%=rn;
@@ -292,7 +292,7 @@ public class MPIN256
 		sv=(D[0]>>1)&1;
 		ECP W=map(u,su);
 		ECP P=map(v,sv);
-		P.add(W);
+		P.add(W); P.affine();
 		u=P.getX();
 		v=P.getY();
 		D[0]=0x04;
@@ -312,7 +312,7 @@ public class MPIN256
 
 		if (P.is_infinity() || Q.is_infinity()) return INVALID_POINT;
 
-		P.add(Q);
+		P.add(Q); P.affine();
 
 		P.toBytes(R,false);
 		return 0;
@@ -326,7 +326,7 @@ public class MPIN256
 
 		if (P.is_infinity() || Q.is_infinity()) return INVALID_POINT;
 
-		P.add(Q);
+		P.add(Q); P.affine();
 	
 		P.toBytes(W);
 		return 0;
@@ -358,7 +358,7 @@ public class MPIN256
 		pin%=MAXPIN;
 
 		R=R.pinmul(pin,PBLEN);
-		P.sub(R);
+		P.sub(R); P.affine();
 
 		P.toBytes(TOKEN,false);
 
@@ -427,11 +427,11 @@ public class MPIN256
 				P=PAIR256.G1mul(P,x);
 				P.toBytes(xID,false);
 				W=PAIR256.G1mul(W,x);
-				P.add(W);
+				P.add(W); P.affine();
 			}
 			else
 			{
-				P.add(W);
+				P.add(W); P.affine();
 				P=PAIR256.G1mul(P,x);
 			}
 			if (xCID!=null) P.toBytes(xCID,false);
@@ -445,7 +445,7 @@ public class MPIN256
 			}
 		}
 
-
+		T.affine();
 		T.toBytes(SEC,false);
 		return 0;
 	}
@@ -528,7 +528,7 @@ public class MPIN256
 	//		if (HID!=null) P.toBytes(HID,false);
 			h=hashit(sha,date,h,EFS);
 			R=ECP.mapit(h);
-			P.add(R);
+			P.add(R); P.affine();
 			P.toBytes(HTID,false);
 		}
 	//	else P.toBytes(HID,false);

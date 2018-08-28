@@ -564,7 +564,7 @@ void ZZZ::PAIR_G1mul(ECP *P,BIG e)
     BIG_rcopy(q,CURVE_Order);
     glv(u,e);
 
-    ECP_affine(P);
+    //ECP_affine(P);
     ECP_copy(&Q,P);
     FP_rcopy(&cru,CURVE_Cru);
     FP_mul(&(Q.x),&(Q.x),&cru);
@@ -630,7 +630,8 @@ void ZZZ::PAIR_G2mul(ECP8 *P,BIG e)
             BIG_copy(u[i],x);
             ECP8_neg(&Q[i]);
         }
-        BIG_norm(u[i]);            
+        BIG_norm(u[i]);   
+		ECP8_affine(&Q[i]);
     }
 
     ECP8_mul16(P,Q,u);

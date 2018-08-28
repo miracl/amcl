@@ -42,7 +42,7 @@ public final class FP12 {
 	}
 /* test x==0 ? */
 	public boolean iszilch() {
-		reduce();
+		//reduce();
 		return (a.iszilch() && b.iszilch() && c.iszilch());
 	}
 

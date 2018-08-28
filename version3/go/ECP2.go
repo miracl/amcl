@@ -354,7 +354,7 @@ func (E *ECP2) Add(Q *ECP2) int {
 	t0.add(x3); t0.norm()
 	t2.imul(b) 	
 	if SEXTIC_TWIST == M_TYPE {
-		t2.mul_ip()
+		t2.mul_ip(); t2.norm()
 	}
 	z3:=NewFP2copy(t1); z3.add(t2); z3.norm()
 	t1.sub(t2); t1.norm()

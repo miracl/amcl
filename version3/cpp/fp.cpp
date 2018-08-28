@@ -208,10 +208,11 @@ void YYY::FP_mod(BIG a,DBIG d)
 /* SU= 48 */
 int YYY::FP_iszilch(FP *x)
 {
-    BIG m;
+    BIG m,t;
     BIG_rcopy(m,Modulus);
-    BIG_mod(x->g,m);
-    return BIG_iszilch(x->g);
+	BIG_copy(t,x->g);
+    BIG_mod(t,m);
+    return BIG_iszilch(t);
 }
 
 void YYY::FP_copy(FP *y,FP *x)
@@ -257,8 +258,11 @@ void YYY::FP_zero(FP *x)
 
 int YYY::FP_equals(FP *x,FP *y)
 {
-	FP_reduce(x); FP_reduce(y);
-	if (BIG_comp(x->g,y->g)==0) return 1;
+	FP xg,yg;
+	FP_copy(&xg,x);
+	FP_copy(&yg,y);
+	FP_reduce(&xg); FP_reduce(&yg);
+	if (BIG_comp(xg.g,yg.g)==0) return 1;
 	return 0;
 }
 

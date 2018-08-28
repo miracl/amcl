@@ -65,6 +65,13 @@ public final class ECP {
 			z=new FP(0);
 		}
 	}
+
+    public ECP(ECP e) {
+        this.x = new FP(e.x);
+        this.y = new FP(e.y);
+        this.z = new FP(e.z);
+    }
+
 /* test for O point-at-infinity */
 	public boolean is_infinity() {
 //		if (INF) return true;                            // Edits made
@@ -307,20 +314,20 @@ public final class ECP {
 /* extract x as a BIG */
 	public BIG getX()
 	{
-		affine();
+		//affine();
 		return x.redc();
 	}
 /* extract y as a BIG */
 	public BIG getY()
 	{
-		affine();
+		//affine();
 		return y.redc();
 	}
 
 /* get sign of Y */
 	public int getS()
 	{
-		affine();
+		//affine();
 		BIG y=getY();
 		return y.parity();
 	}
@@ -343,7 +350,7 @@ public final class ECP {
 	public void toBytes(byte[] b,boolean compress)
 	{
 		byte[] t=new byte[BIG.MODBYTES];
-		affine();
+		//affine();
 
 		x.redc().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++) b[i+1]=t[i];
@@ -398,7 +405,7 @@ public final class ECP {
 /* convert to hex string */
 	public String toString() {
 		if (is_infinity()) return "infinity";
-		affine();
+		//affine();
 		if (CURVETYPE==MONTGOMERY) return "("+x.redc().toString()+")";
 		else return "("+x.redc().toString()+","+y.redc().toString()+")";
 	}
@@ -806,9 +813,9 @@ public final class ECP {
 	}
 /* this-=Q */
 	public void sub(ECP Q) {
-		Q.neg();
-		add(Q);
-		Q.neg();
+		ECP NQ=new ECP(Q);
+		NQ.neg();
+		add(NQ);
 	}
 
 /* constant time multiply by small integer of length bts - use ladder */
@@ -880,7 +887,7 @@ public final class ECP {
 			ECP[] W=new ECP[8];
 			byte[] w=new byte[1+(BIG.NLEN*BIG.BASEBITS+3)/4];
 
-			affine();
+			//affine();
 
 // precompute table 
 			Q.copy(this);
@@ -945,8 +952,8 @@ public final class ECP {
 		int i,s,ns,nb;
 		byte a,b;
 
-		affine();
-		Q.affine();
+		//affine();
+		//Q.affine();
 
 		te.copy(e);
 		tf.copy(f);

@@ -451,6 +451,7 @@ int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
     FP2_YYY_imul(&t2,&t2,b3);		//t2.imul(b);
 #if SEXTIC_TWIST_ZZZ==M_TYPE
     FP2_YYY_mul_ip(&t2);
+    FP2_YYY_norm(&t2);
 #endif
     //FP2_YYY_copy(&z3,&t1);			//FP2 z3=new FP2(t1);
     FP2_YYY_add(&z3,&t1,&t2);		//z3.add(t2);

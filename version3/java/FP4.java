@@ -40,7 +40,7 @@ public final class FP4 {
 	}
 /* test this==0 ? */
 	public boolean iszilch() {
-		reduce();
+		//reduce();
 		return (a.iszilch() && b.iszilch());
 	}
 

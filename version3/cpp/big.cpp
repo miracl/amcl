@@ -142,8 +142,9 @@ void XXX::BIG_toBytes(char *b,BIG a)
 {
     int i;
     BIG c;
-    BIG_norm(a);
+    //BIG_norm(a);
     BIG_copy(c,a);
+	BIG_norm(c);
     for (i=MODBYTES_XXX-1; i>=0; i--)
     {
         b[i]=c[0]&0xff;
@@ -995,12 +996,14 @@ int XXX::BIG_dcomp(DBIG a,DBIG b)
 int XXX::BIG_nbits(BIG a)
 {
     int bts,k=NLEN_XXX-1;
+	BIG t;
     chunk c;
-    BIG_norm(a);
-    while (k>=0 && a[k]==0) k--;
+	BIG_copy(t,a);
+    BIG_norm(t);
+    while (k>=0 && t[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS_XXX*k;
-    c=a[k];
+    c=t[k];
     while (c!=0)
     {
         c/=2;
@@ -1030,10 +1033,12 @@ int XXX::BIG_dnbits(DBIG a)
 
 /* Set b=b mod c */
 /* SU= 16 */
-void XXX::BIG_mod(BIG b,BIG c)
+void XXX::BIG_mod(BIG b,BIG c1)
 {
     int k=0;
     BIG r; /**/
+	BIG c;
+	BIG_copy(c,c1);
 
     BIG_norm(b);
     if (BIG_comp(b,c)<0)
@@ -1288,9 +1293,12 @@ void XXX::BIG_randomnum(BIG m,BIG q,csprng *rng)
 
 /* Set r=a*b mod m */
 /* SU= 96 */
-void XXX::BIG_modmul(BIG r,BIG a,BIG b,BIG m)
+void XXX::BIG_modmul(BIG r,BIG a1,BIG b1,BIG m)
 {
     DBIG d;
+	BIG a,b;
+	BIG_copy(a,a1);
+	BIG_copy(b,b1);
     BIG_mod(a,m);
     BIG_mod(b,m);
 
@@ -1300,9 +1308,11 @@ void XXX::BIG_modmul(BIG r,BIG a,BIG b,BIG m)
 
 /* Set a=a*a mod m */
 /* SU= 88 */
-void XXX::BIG_modsqr(BIG r,BIG a,BIG m)
+void XXX::BIG_modsqr(BIG r,BIG a1,BIG m)
 {
     DBIG d;
+	BIG a;
+	BIG_copy(a,a1);
     BIG_mod(a,m);
     BIG_sqr(d,a);
     BIG_dmod(r,d,m);
@@ -1310,8 +1320,10 @@ void XXX::BIG_modsqr(BIG r,BIG a,BIG m)
 
 /* Set r=-a mod m */
 /* SU= 16 */
-void XXX::BIG_modneg(BIG r,BIG a,BIG m)
+void XXX::BIG_modneg(BIG r,BIG a1,BIG m)
 {
+	BIG a;
+	BIG_copy(a,a1);
     BIG_mod(a,m);
     BIG_sub(r,m,a);
 //    BIG_mod(r,m);
@@ -1319,10 +1331,13 @@ void XXX::BIG_modneg(BIG r,BIG a,BIG m)
 
 /* Set a=a/b mod m */
 /* SU= 136 */
-void XXX::BIG_moddiv(BIG r,BIG a,BIG b,BIG m)
+void XXX::BIG_moddiv(BIG r,BIG a1,BIG b1,BIG m)
 {
     DBIG d;
     BIG z;
+	BIG a,b;
+	BIG_copy(a,a1);
+	BIG_copy(b,b1);
     BIG_mod(a,m);
     BIG_invmodp(z,b,m);
 

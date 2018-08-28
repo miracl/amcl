@@ -400,7 +400,7 @@ public final class PAIR192 {
 		ECP R;
 		if (USE_GLV)
 		{
-			P.affine();
+			//P.affine();
 			R=new ECP();
 			R.copy(P);
 			int i,np,nn;
@@ -455,7 +455,7 @@ public final class PAIR192 {
 
 			BIG t=new BIG(0);
 			int i,np,nn;
-			P.affine();
+			//P.affine();
 
 			Q[0]=new ECP4(); Q[0].copy(P);
 			for (i=1;i<8;i++)
@@ -474,6 +474,7 @@ public final class PAIR192 {
 					Q[i].neg();
 				}
 				u[i].norm();	
+				Q[i].affine();
 			}
 
 			R=ECP4.mul8(Q,u);

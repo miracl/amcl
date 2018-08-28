@@ -43,7 +43,7 @@ public final class FP48 {
 	}
 /* test x==0 ? */
 	public boolean iszilch() {
-		reduce();
+		//reduce();
 		return (a.iszilch() && b.iszilch() && c.iszilch());
 	}
 

@@ -30,7 +30,7 @@ using namespace XXX;
 /* SU= 8 */
 int YYY::FP2_iszilch(FP2 *x)
 {
-    FP2_reduce(x);
+    //FP2_reduce(x);
     if (FP_iszilch(&(x->a)) && FP_iszilch(&(x->b))) return 1;
     return 0;
 }
@@ -48,7 +48,7 @@ int YYY::FP2_isunity(FP2 *x)
 {
     FP one;
     FP_one(&one);
-    FP2_reduce(x);
+    //FP2_reduce(x);
     if (FP_equals(&(x->a),&one) && FP_iszilch(&(x->b))) return 1;
     return 0;
 }

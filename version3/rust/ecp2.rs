@@ -373,7 +373,7 @@ impl ECP2 {
 		t0.add(&x3); t0.norm();
 		t2.imul(b); 	
 		if ecp::SEXTIC_TWIST==ecp::M_TYPE {	
-			t2.mul_ip();
+			t2.mul_ip(); t2.norm();
 		}
 		let mut z3=FP2::new_copy(&t1); z3.add(&t2); z3.norm();
 		t1.sub(&t2); t1.norm(); 

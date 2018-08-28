@@ -130,13 +130,14 @@ public class BIG {
 
 /* return number of bits */
 	public int nbits() {
+		BIG t=new BIG(this);
 		int bts,k=NLEN-1;
 		long c;
-		norm();
-		while (k>=0 && w[k]==0) k--;
+		t.norm();
+		while (k>=0 && t.w[k]==0) k--;
 		if (k<0) return 0;
 		bts=BASEBITS*k;
-		c=w[k];
+		c=t.w[k];
 		while (c!=0) {c/=2; bts++;}
 		return bts;
 	}
@@ -216,7 +217,7 @@ public class BIG {
 		return carry;
 	}
 
-/* this*=c and catch overflow in DBIG */
+/* return this*c and catch overflow in DBIG */
 	public DBIG pxmul(int c)
 	{
 		DBIG m=new DBIG(0);	
@@ -531,8 +532,9 @@ public class BIG {
 /* convert this BIG to byte array */
 	public void tobytearray(byte[] b,int n)
 	{
-		norm();
+		
 		BIG c=new BIG(this);
+		c.norm();
 
 		for (int i=MODBYTES-1;i>=0;i--)
 		{
@@ -649,10 +651,11 @@ public class BIG {
 	}
 
 /* reduce this mod m */
-	public void mod(BIG m)
+	public void mod(BIG m1)
 	{
 		int k=0;  
 		BIG r=new BIG(0);
+		BIG m=new BIG(m1);
 
 		norm();
 		if (comp(this,m)<0) return;
@@ -675,11 +678,12 @@ public class BIG {
 	}
 
 /* divide this by m */
-	public void div(BIG m)
+	public void div(BIG m1)
 	{
 		int d,k=0;
 		norm();
 		BIG e=new BIG(1);
+		BIG m=new BIG(m1);
 		BIG b=new BIG(this);
 		BIG r=new BIG(0);
 		zero();
@@ -761,8 +765,10 @@ public class BIG {
 	}
 
 /* return a*b mod m */
-	public static BIG modmul(BIG a,BIG b,BIG m)
+	public static BIG modmul(BIG a1,BIG b1,BIG m)
 	{
+		BIG a=new BIG(a1);
+		BIG b=new BIG(b1);
 		a.mod(m);
 		b.mod(m);
 		DBIG d=mul(a,b);
@@ -770,23 +776,26 @@ public class BIG {
 	}
 
 /* return a^2 mod m */
-	public static BIG modsqr(BIG a,BIG m)
+	public static BIG modsqr(BIG a1,BIG m)
 	{
+		BIG a=new BIG(a1);
 		a.mod(m);
 		DBIG d=sqr(a);
 		return d.mod(m);
 	}
 
 /* return -a mod m */
-	public static BIG modneg(BIG a,BIG m)
+	public static BIG modneg(BIG a1,BIG m)
 	{
+		BIG a=new BIG(a1);
 		a.mod(m);
 		return m.minus(a);
 	}
 
 /* return this^e mod m */
-	public BIG powmod(BIG e,BIG m)
+	public BIG powmod(BIG e1,BIG m)
 	{
+		BIG e=new BIG(e1);
 		int bt;
 		norm();
 		e.norm();

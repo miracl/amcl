@@ -477,7 +477,7 @@ public final class PAIR256 {
 		ECP R;
 		if (USE_GLV)
 		{
-			P.affine();
+			//P.affine();
 			R=new ECP();
 			R.copy(P);
 			int i,np,nn;
@@ -532,7 +532,7 @@ public final class PAIR256 {
 
 			BIG t=new BIG(0);
 			int i,np,nn;
-			P.affine();
+			//P.affine();
 
 			Q[0]=new ECP8(); Q[0].copy(P);
 			for (i=1;i<16;i++)
@@ -550,7 +550,8 @@ public final class PAIR256 {
 					u[i].copy(t);
 					Q[i].neg();
 				}
-				u[i].norm();	
+				u[i].norm();
+				Q[i].affine();
 			}
 
 			R=ECP8.mul16(Q,u);

@@ -35,6 +35,12 @@ public final class ECP8 {
 		z=new FP8(0);
 	}
 
+    public ECP8(ECP8 e) {
+        this.x = new FP8(e.x);
+        this.y = new FP8(e.y);
+        this.z = new FP8(e.z);
+    }
+
 /* Test this=O? */
 	public boolean is_infinity() {
 //		if (INF) return true;                    //******
@@ -146,13 +152,13 @@ public final class ECP8 {
 /* extract affine x as FP8 */
 	public FP8 getX()
 	{
-		affine();
+		//affine();
 		return x;
 	}
 /* extract affine y as FP8 */
 	public FP8 getY()
 	{
-		affine();
+		//affine();
 		return y;
 	}
 /* extract projective x */
@@ -175,7 +181,7 @@ public final class ECP8 {
 	public void toBytes(byte[] b)
 	{
 		byte[] t=new byte[BIG.MODBYTES];
-		affine();
+		//affine();
 		int MB=BIG.MODBYTES;
 
 		x.geta().geta().getA().toBytes(t);
@@ -301,7 +307,7 @@ public final class ECP8 {
 /* convert this to hex string */
 	public String toString() {
 		if (is_infinity()) return "infinity";
-		affine();
+		//affine();
 		return "("+x.toString()+","+y.toString()+")";
 	}
 
@@ -492,9 +498,13 @@ public final class ECP8 {
 
 /* set this-=Q */
 	public int sub(ECP8 Q) {
-		Q.neg();
-		int D=add(Q);
-		Q.neg();
+		ECP8 NQ=new ECP8(Q);
+		NQ.neg();
+		int D=add(NQ);
+
+//		Q.neg();
+//		int D=add(Q);
+//		Q.neg();
 		return D;
 	}
 
@@ -566,7 +576,7 @@ public final class ECP8 {
 
 		if (is_infinity()) return new ECP8();
 
-		affine();
+		//affine();
 
 /* precompute table */
 		Q.copy(this);
@@ -644,7 +654,7 @@ public final class ECP8 {
 		for (i=0;i<16;i++)
 		{
 			t[i]=new BIG(u[i]);
-			Q[i].affine();
+			//Q[i].affine();
 			t[i].norm();
 		}
 

@@ -35,6 +35,12 @@ public final class ECP4 {
 		z=new FP4(0);
 	}
 
+    public ECP4(ECP4 e) {
+        this.x = new FP4(e.x);
+        this.y = new FP4(e.y);
+        this.z = new FP4(e.z);
+    }
+
 /* Test this=O? */
 	public boolean is_infinity() {
 //		if (INF) return true;                    //******
@@ -145,13 +151,13 @@ public final class ECP4 {
 /* extract affine x as FP4 */
 	public FP4 getX()
 	{
-		affine();
+		//affine();
 		return x;
 	}
 /* extract affine y as FP4 */
 	public FP4 getY()
 	{
-		affine();
+		//affine();
 		return y;
 	}
 /* extract projective x */
@@ -174,7 +180,7 @@ public final class ECP4 {
 	public void toBytes(byte[] b)
 	{
 		byte[] t=new byte[BIG.MODBYTES];
-		affine();
+		//affine();
 		int MB=BIG.MODBYTES;
 
 		x.geta().getA().toBytes(t);
@@ -252,7 +258,7 @@ public final class ECP4 {
 /* convert this to hex string */
 	public String toString() {
 		if (is_infinity()) return "infinity";
-		affine();
+		//affine();
 		return "("+x.toString()+","+y.toString()+")";
 	}
 
@@ -443,9 +449,13 @@ public final class ECP4 {
 
 /* set this-=Q */
 	public int sub(ECP4 Q) {
-		Q.neg();
-		int D=add(Q);
-		Q.neg();
+		ECP4 NQ=new ECP4(Q);
+		NQ.neg();
+		int D=add(NQ);
+
+		//Q.neg();
+		//int D=add(Q);
+		//Q.neg();
 		return D;
 	}
 
@@ -504,7 +514,7 @@ public final class ECP4 {
 
 		if (is_infinity()) return new ECP4();
 
-		affine();
+		//affine();
 
 /* precompute table */
 		Q.copy(this);
@@ -577,7 +587,7 @@ public final class ECP4 {
 		for (i=0;i<8;i++)
 		{
 			t[i]=new BIG(u[i]);
-			Q[i].affine();
+			//Q[i].affine();
 			t[i].norm();
 		}
 

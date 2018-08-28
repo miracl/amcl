@@ -190,8 +190,9 @@ public final class FP {
 
 /* test this=0? */
 	public boolean iszilch() {
-		reduce();
-		return x.iszilch();
+		FP z=new FP(this);
+		z.reduce();
+		return z.x.iszilch();
 	}
 
 /* copy from FP b */
@@ -392,9 +393,11 @@ public final class FP {
 /* return TRUE if this==a */
 	public boolean equals(FP a)
 	{
-		a.reduce();
-		reduce();
-		if (BIG.comp(a.x,x)==0) return true;
+		FP f=new FP(this);
+		FP s=new FP(a);
+		f.reduce();
+		s.reduce();
+		if (BIG.comp(f.x,s.x)==0) return true;
 		return false;
 	}
 
