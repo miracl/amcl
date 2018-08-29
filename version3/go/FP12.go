@@ -77,7 +77,7 @@ func (F *FP12) norm() {
 }
 /* test x==0 ? */
 func (F *FP12) iszilch() bool {
-	F.reduce()
+	//F.reduce()
 	return (F.a.iszilch() && F.b.iszilch() && F.c.iszilch())
 }
 

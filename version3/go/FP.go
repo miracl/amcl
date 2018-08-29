@@ -172,8 +172,9 @@ func (F *FP) reduce() {
 
 /* test this=0? */
 func (F *FP) iszilch() bool {
-	F.reduce()
-	return F.x.iszilch()
+	W:=NewFPcopy(F)
+	W.reduce()
+	return W.x.iszilch()
 }
 
 /* copy from FP b */
@@ -321,9 +322,12 @@ func (F *FP) inverse() {
 
 /* return TRUE if this==a */
 func (F *FP) Equals(a *FP) bool {
-	a.reduce()
-	F.reduce()
-	if (comp(a.x,F.x)==0) {return true}
+	f:=NewFPcopy(F)
+	s:=NewFPcopy(a);
+
+	s.reduce()
+	f.reduce()
+	if (comp(s.x,f.x)==0) {return true}
 	return false
 }
 

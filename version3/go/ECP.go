@@ -293,18 +293,20 @@ func (E *ECP) Affine() {
 
 /* extract x as a BIG */
 func (E *ECP) GetX() *BIG {
-	E.Affine()
-	return E.x.redc()
+	W:=NewECP(); W.Copy(E)
+	W.Affine()
+	return W.x.redc()
 }
 /* extract y as a BIG */
 func (E *ECP) GetY() *BIG {
-	E.Affine()
-	return E.y.redc()
+	W:=NewECP(); W.Copy(E)
+	W.Affine()
+	return W.y.redc()
 }
 
 /* get sign of Y */
 func (E *ECP) GetS() int {
-	E.Affine()
+	//E.Affine()
 	y:=E.GetY()
 	return y.parity()
 }
@@ -325,9 +327,9 @@ func (E *ECP) getz() *FP {
 func (E *ECP) ToBytes(b []byte,compress bool) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
-
-	E.Affine()
-	E.x.redc().ToBytes(t[:])
+	W:=NewECP(); W.Copy(E);
+	W.Affine()
+	W.x.redc().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+1]=t[i]}
 
 	if CURVETYPE==MONTGOMERY {
@@ -337,13 +339,13 @@ func (E *ECP) ToBytes(b []byte,compress bool) {
 
 	if compress {
 		b[0]=0x02
-		if E.y.redc().parity()==1 {b[0]=0x03}
+		if W.y.redc().parity()==1 {b[0]=0x03}
 		return;
 	}
 	
 	b[0]=0x04
 
-	E.y.redc().ToBytes(t[:])
+	W.y.redc().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+MB+1]=t[i]}
 }
 
@@ -377,11 +379,12 @@ func ECP_fromBytes(b []byte) *ECP {
 
 /* convert to hex string */
 func (E *ECP) toString() string {
-	if E.Is_infinity() {return "infinity"}
-	E.Affine();
+	W:=NewECP(); W.Copy(E);
+	W.Affine()
+	if W.Is_infinity() {return "infinity"}
 	if CURVETYPE==MONTGOMERY {
-		return "("+E.x.redc().toString()+")"
-	} else {return "("+E.x.redc().toString()+","+E.y.redc().toString()+")"}
+		return "("+W.x.redc().toString()+")"
+	} else {return "("+W.x.redc().toString()+","+W.y.redc().toString()+")"}
 }
 
 /* this*=2 */
@@ -754,9 +757,9 @@ func (E *ECP) dadd(Q *ECP,W *ECP) {
 
 /* this-=Q */
 func (E *ECP) Sub(Q *ECP) {
-	Q.neg()
-	E.Add(Q)
-	Q.neg()
+	NQ:=NewECP(); NQ.Copy(Q);
+	NQ.neg()
+	E.Add(NQ)
 }
 
 /* constant time multiply by small integer of length bts - use ladder */
@@ -816,7 +819,7 @@ func (E *ECP) mul(e *BIG) *ECP {
 		var W []*ECP
 		var w [1+(NLEN*int(BASEBITS)+3)/4]int8
 
-		E.Affine();
+		//E.Affine();
 
 		Q.Copy(E);
 		Q.dbl();
@@ -881,8 +884,8 @@ func (E *ECP) Mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 	//ECP[] W=new ECP[8];
 	var w [1+(NLEN*int(BASEBITS)+1)/2]int8		
 
-	E.Affine()
-	Q.Affine()
+	//E.Affine()
+	//Q.Affine()
 
 	te.copy(e)
 	tf.copy(f)
@@ -948,12 +951,12 @@ func (E *ECP) cfp() {
 	if cf==1 {return}
 	if cf==4 {
 		E.dbl(); E.dbl()
-		E.Affine();
+		//E.Affine();
 		return;
 	} 
 	if cf==8 {
 		E.dbl(); E.dbl(); E.dbl()
-		E.Affine();
+		//E.Affine();
 		return;
 	}
 	c:=NewBIGints(CURVE_Cof);

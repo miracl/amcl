@@ -133,13 +133,15 @@ func (E *ECP4) Affine() {
 
 /* extract affine x as FP2 */
 func (E *ECP4) GetX() *FP4 {
-	E.Affine()
-	return E.x
+	W:=NewECP4(); W.Copy(E)
+	W.Affine()
+	return W.x
 }
 /* extract affine y as FP2 */
 func (E *ECP4) GetY() *FP4 {
-	E.Affine();
-	return E.y;
+	W:=NewECP4(); W.Copy(E)
+	W.Affine()
+	return W.y;
 }
 
 /* extract projective x */
@@ -160,22 +162,25 @@ func (E *ECP4) ToBytes(b []byte) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
 
-	E.x.geta().GetA().ToBytes(t[:])
+	W:=NewECP4(); W.Copy(E);
+	W.Affine()
+
+	W.x.geta().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i]=t[i]}
-	E.x.geta().GetB().ToBytes(t[:])
+	W.x.geta().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+MB]=t[i]}
-	E.x.getb().GetA().ToBytes(t[:])
+	W.x.getb().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+2*MB]=t[i]}
-	E.x.getb().GetB().ToBytes(t[:])
+	W.x.getb().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+3*MB]=t[i]}
 
-	E.y.geta().GetA().ToBytes(t[:])
+	W.y.geta().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+4*MB]=t[i]}
-	E.y.geta().GetB().ToBytes(t[:])
+	W.y.geta().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+5*MB]=t[i]}
-	E.y.getb().GetA().ToBytes(t[:])
+	W.y.getb().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+6*MB]=t[i]}
-	E.y.getb().GetB().ToBytes(t[:])
+	W.y.getb().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+7*MB]=t[i]}
 
 }
@@ -220,9 +225,10 @@ func ECP4_fromBytes(b []byte) *ECP4 {
 
 /* convert this to hex string */
 func (E *ECP4) ToString() string {
-	if E.Is_infinity() {return "infinity"}
-	E.Affine()
-	return "("+E.x.toString()+","+E.y.toString()+")"
+	W:=NewECP4(); W.Copy(E);
+	W.Affine()
+	if W.Is_infinity() {return "infinity"}
+	return "("+W.x.toString()+","+W.y.toString()+")"
 }
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
@@ -402,9 +408,10 @@ func (E *ECP4) Add(Q *ECP4) int {
 
 /* set this-=Q */
 func (E *ECP4) Sub(Q *ECP4) int {
-	Q.neg()
-	D:=E.Add(Q)
-	Q.neg()
+	NQ:=NewECP4(); NQ.Copy(Q)
+	NQ.neg()	
+	D:=E.Add(NQ)
+	//Q.neg()
 	return D
 }
 
@@ -466,7 +473,7 @@ func (E *ECP4) mul(e *BIG) *ECP4 {
 	var W []*ECP4
 	var w [1+(NLEN*int(BASEBITS)+3)/4]int8
 
-	E.Affine()
+	//E.Affine()
 /* precompute table */
 	Q.Copy(E)
 	Q.dbl()
@@ -604,7 +611,7 @@ func mul8(Q []*ECP4,u []*BIG) *ECP4 {
 
 	for i:=0;i<8;i++ {
 		t=append(t,NewBIGcopy(u[i]));
-		Q[i].Affine();
+		//Q[i].Affine();
 	}
 
 	T1=append(T1,NewECP4()); T1[0].Copy(Q[0])	// Q[0]

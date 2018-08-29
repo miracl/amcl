@@ -87,7 +87,7 @@ func (F *FP2) norm() {
 
 /* test this=0 ? */
 func (F *FP2) iszilch() bool {
-	F.reduce()
+	//F.reduce()
 	return (F.a.iszilch() && F.b.iszilch())
 }
 

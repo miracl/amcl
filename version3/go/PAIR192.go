@@ -118,7 +118,7 @@ func line(A *ECP4,B *ECP4,Qx *FP,Qy *FP) *FP24 {
 }
 
 /* Optimal R-ate pairing */
-func Ate(P *ECP4,Q *ECP) *FP24 {
+func Ate(P1 *ECP4,Q1 *ECP) *FP24 {
 	x:=NewBIGints(CURVE_Bnx)
 	n:=NewBIGcopy(x)
 	var lv *FP24
@@ -128,6 +128,10 @@ func Ate(P *ECP4,Q *ECP) *FP24 {
 	n3:=NewBIGcopy(n);
 	n3.pmul(3);
 	n3.norm();
+
+	P:=NewECP4(); P.Copy(P1); P.Affine()
+	Q:=NewECP(); Q.Copy(Q1); Q.Affine()
+
 
 	Qx:=NewFPcopy(Q.getx())
 	Qy:=NewFPcopy(Q.gety())
@@ -167,7 +171,7 @@ func Ate(P *ECP4,Q *ECP) *FP24 {
 }
 
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-func Ate2(P *ECP4,Q *ECP,R *ECP4,S *ECP) *FP24 {
+func Ate2(P1 *ECP4,Q1 *ECP,R1 *ECP4,S1 *ECP) *FP24 {
 	x:=NewBIGints(CURVE_Bnx)
 	n:=NewBIGcopy(x)
 	var lv *FP24
@@ -177,6 +181,12 @@ func Ate2(P *ECP4,Q *ECP,R *ECP4,S *ECP) *FP24 {
 	n3:=NewBIGcopy(n);
 	n3.pmul(3);
 	n3.norm();
+
+	P:=NewECP4(); P.Copy(P1); P.Affine()
+	Q:=NewECP(); Q.Copy(Q1); Q.Affine()
+	R:=NewECP4(); R.Copy(R1); R.Affine()
+	S:=NewECP(); S.Copy(S1); S.Affine()
+
 
 	Qx:=NewFPcopy(Q.getx())
 	Qy:=NewFPcopy(Q.gety())
@@ -366,11 +376,11 @@ func gs(e *BIG) []*BIG {
 func G1mul(P *ECP,e *BIG) *ECP {
 	var R *ECP
 	if (USE_GLV) {
-		P.Affine()
+		//P.Affine()
 		R=NewECP()
 		R.Copy(P)
 		Q:=NewECP()
-		Q.Copy(P)
+		Q.Copy(P); Q.Affine()
 		q:=NewBIGints(CURVE_Order)
 		cru:=NewFPbig(NewBIGints(CURVE_Cru))
 		t:=NewBIGint(0)
@@ -414,7 +424,7 @@ func G2mul(P *ECP4,e *BIG) *ECP4 {
 		u:=gs(e)
 
 		t:=NewBIGint(0)
-		P.Affine()
+		//P.Affine()
 
 		Q=append(Q,NewECP4());  Q[0].Copy(P);
 		for i:=1;i<8;i++ {

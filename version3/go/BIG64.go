@@ -343,12 +343,13 @@ func (r *BIG) shl(k uint) {
 
 /* return number of bits */
 func (r *BIG) nbits() int {
+	t:=NewBIGcopy(r)
 	k:=NLEN-1
-	r.norm()
-	for (k>=0 && r.w[k]==0) {k--}
+	t.norm()
+	for (k>=0 && t.w[k]==0) {k--}
 	if k<0 {return 0}
 	bts:=int(BASEBITS)*k;
-	c:=r.w[k];
+	c:=t.w[k];
 	for c!=0 {c/=2; bts++}
 	return bts
 }
@@ -465,8 +466,9 @@ func (r *BIG) pmul(c int) Chunk {
 
 /* convert this BIG to byte array */
 func (r *BIG) tobytearray(b []byte,n int) {
-	r.norm();
+	//r.norm();
 	c:=NewBIGcopy(r)
+	c.norm();
 
 	for i:=int(MODBYTES)-1;i>=0;i-- {
 		b[i+n]=byte(c.w[0])
@@ -594,7 +596,8 @@ func (r *BIG) invmod2m() {
 }
 
 /* reduce this mod m */
-func (r *BIG) Mod(m *BIG) {
+func (r *BIG) Mod(m1 *BIG) {
+	m:=NewBIGcopy(m1)
 	sr:=NewBIG()
 	r.norm()
 	if comp(r,m)<0 {return}
@@ -623,7 +626,8 @@ func (r *BIG) Mod(m *BIG) {
 }
 
 /* divide this by m */
-func (r *BIG) div(m *BIG) {
+func (r *BIG) div(m1 *BIG) {
+	m:=NewBIGcopy(m1)
 	var d int
 	k:=0
 	r.norm();
@@ -740,7 +744,9 @@ func nafbits(x *BIG,x3 *BIG ,i int) [3]int {
 */
 
 /* return a*b mod m */
-func Modmul(a,b,m *BIG) *BIG {
+func Modmul(a1,b1,m *BIG) *BIG {
+	a:=NewBIGcopy(a1)
+	b:=NewBIGcopy(b1)
 	a.Mod(m)
 	b.Mod(m)
 	d:=mul(a,b);
@@ -748,14 +754,16 @@ func Modmul(a,b,m *BIG) *BIG {
 }
 
 /* return a^2 mod m */
-func Modsqr(a,m *BIG) *BIG {
+func Modsqr(a1,m *BIG) *BIG {
+	a:=NewBIGcopy(a1)
 	a.Mod(m)
 	d:=sqr(a)
 	return d.mod(m)
 }
 
 /* return -a mod m */
-func Modneg(a,m *BIG) *BIG {
+func Modneg(a1,m *BIG) *BIG {
+	a:=NewBIGcopy(a1)
 	a.Mod(m)
 	return m.Minus(a)
 }
@@ -852,7 +860,8 @@ func (r *BIG) Invmodp(p *BIG) {
 }
 
 /* return this^e mod m */
-func (r *BIG) powmod(e *BIG,m *BIG) *BIG {
+func (r *BIG) powmod(e1 *BIG,m *BIG) *BIG {
+	e:=NewBIGcopy(e1)
 	r.norm()
 	e.norm()
 	a:=NewBIGint(1)
