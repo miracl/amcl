@@ -144,12 +144,13 @@ static void ZZZ::PAIR_line(FP12 *v,ECP2 *A,ECP2 *B,FP *Qx,FP *Qy)
 }
 
 /* Optimal R-ate pairing r=e(P,Q) */
-void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
+void ZZZ::PAIR_ate(FP12 *r,ECP2 *P1,ECP *Q1)
 {
     BIG x,n,n3;
 	FP Qx,Qy;
     int i,nb,bt;
-    ECP2 A,NP;
+    ECP2 A,NP,P;
+	ECP Q;
     FP12 lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
     ECP2 KA;
@@ -186,13 +187,19 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
 
 //    ECP2_affine(P);
 //    ECP_affine(Q);
+	ECP2_copy(&P,P1);
+	ECP_copy(&Q,Q1);
 
-    FP_copy(&Qx,&(Q->x));
-    FP_copy(&Qy,&(Q->y));
+	ECP2_affine(&P);
+	ECP_affine(&Q);
 
-    ECP2_copy(&A,P);
 
-	ECP2_copy(&NP,P); ECP2_neg(&NP);
+    FP_copy(&Qx,&(Q.x));
+    FP_copy(&Qy,&(Q.y));
+
+    ECP2_copy(&A,&P);
+
+	ECP2_copy(&NP,&P); ECP2_neg(&NP);
 
     FP12_one(r);
     nb=BIG_nbits(n3);
@@ -207,7 +214,7 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
 		bt=BIG_bit(n3,i)-BIG_bit(n,i); // bt=BIG_bit(n,i);
         if (bt==1)
         {
-            PAIR_line(&lv,&A,P,&Qx,&Qy);
+            PAIR_line(&lv,&A,&P,&Qx,&Qy);
             FP12_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
 		if (bt==-1)
@@ -225,7 +232,7 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
 #endif
     /* R-ate fixup required for BN curves */
 #if PAIRING_FRIENDLY_ZZZ==BN
-    ECP2_copy(&KA,P);
+    ECP2_copy(&KA,&P);
     ECP2_frob(&KA,&X);
 #if SIGN_OF_X_ZZZ==NEGATIVEX
     ECP2_neg(&A);
@@ -241,13 +248,14 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P,ECP *Q)
 }
 
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
+void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P1,ECP *Q1,ECP2 *R1,ECP *S1)
 {
 
     BIG x,n,n3;
 	FP Qx,Qy,Sx,Sy;
     int i,nb,bt;
-    ECP2 A,B,NP,NR;
+    ECP2 A,B,NP,NR,P,R;
+	ECP Q,S;
     FP12 lv;
 #if PAIRING_FRIENDLY_ZZZ==BN
     ECP2 K;
@@ -280,17 +288,31 @@ void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
 	BIG_pmul(n3,n,3);
 	BIG_norm(n3);
 
-    FP_copy(&Qx,&(Q->x));
-    FP_copy(&Qy,&(Q->y));
+	ECP2_copy(&P,P1);
+	ECP_copy(&Q,Q1);
 
-    FP_copy(&Sx,&(S->x));
-    FP_copy(&Sy,&(S->y));
+	ECP2_affine(&P);
+	ECP_affine(&Q);
 
-    ECP2_copy(&A,P);
-    ECP2_copy(&B,R);
+	ECP2_copy(&R,R1);
+	ECP_copy(&S,S1);
 
-	ECP2_copy(&NP,P); ECP2_neg(&NP);
-	ECP2_copy(&NR,R); ECP2_neg(&NR);
+	ECP2_affine(&R);
+	ECP_affine(&S);
+
+
+
+    FP_copy(&Qx,&(Q.x));
+    FP_copy(&Qy,&(Q.y));
+
+    FP_copy(&Sx,&(S.x));
+    FP_copy(&Sy,&(S.y));
+
+    ECP2_copy(&A,&P);
+    ECP2_copy(&B,&R);
+
+	ECP2_copy(&NP,&P); ECP2_neg(&NP);
+	ECP2_copy(&NR,&R); ECP2_neg(&NR);
 
     FP12_one(r);
     nb=BIG_nbits(n3);
@@ -308,10 +330,10 @@ void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
 		bt=BIG_bit(n3,i)-BIG_bit(n,i); // bt=BIG_bit(n,i);
         if (bt==1)
         {
-            PAIR_line(&lv,&A,P,&Qx,&Qy);
+            PAIR_line(&lv,&A,&P,&Qx,&Qy);
             FP12_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
-            PAIR_line(&lv,&B,R,&Sx,&Sy);
+            PAIR_line(&lv,&B,&R,&Sx,&Sy);
             FP12_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
 		if (bt==-1)
@@ -339,7 +361,7 @@ void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
     ECP2_neg(&B);
 #endif
 
-    ECP2_copy(&K,P);
+    ECP2_copy(&K,&P);
     ECP2_frob(&K,&X);
     PAIR_line(&lv,&A,&K,&Qx,&Qy);
     FP12_smul(r,&lv,SEXTIC_TWIST_ZZZ);
@@ -347,7 +369,7 @@ void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P,ECP *Q,ECP2 *R,ECP *S)
     ECP2_neg(&K);
     PAIR_line(&lv,&A,&K,&Qx,&Qy);
     FP12_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-    ECP2_copy(&K,R);
+    ECP2_copy(&K,&R);
     ECP2_frob(&K,&X);
 
     PAIR_line(&lv,&B,&K,&Sx,&Sy);
@@ -690,7 +712,7 @@ void ZZZ::PAIR_G1mul(ECP *P,BIG e)
     glv(u,e);
 
     //ECP_affine(P);
-    ECP_copy(&Q,P);
+    ECP_copy(&Q,P); ECP_affine(&Q);
     FP_rcopy(&cru,CURVE_Cru);
     FP_mul(&(Q.x),&(Q.x),&cru);
 
@@ -770,7 +792,6 @@ void ZZZ::PAIR_G2mul(ECP2 *P,BIG e)
             ECP2_neg(&Q[i]);
         }
         BIG_norm(u[i]);  
-		ECP2_affine(&Q[i]);
     }
 
 

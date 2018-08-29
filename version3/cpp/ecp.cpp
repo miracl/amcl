@@ -273,9 +273,12 @@ int ZZZ::ECP_set(ECP *P,BIG x)
 /* Extract x coordinate as BIG */
 int ZZZ::ECP_get(BIG x,ECP *P)
 {
-    if (ECP_isinf(P)) return -1;
+	ECP W;
+	ECP_copy(&W,P);
+	ECP_affine(W);
+    if (ECP_isinf(&W)) return -1;
     //ECP_affine(P);
-    FP_redc(x,&(P->x));
+    FP_redc(x,&(W.x));
     return 0;
 }
 
@@ -286,15 +289,15 @@ int ZZZ::ECP_get(BIG x,ECP *P)
 int ZZZ::ECP_get(BIG x,BIG y,ECP *P)
 {
     int s;
+	ECP W;
+	ECP_copy(&W,P);
+	ECP_affine(&W);
+    if (ECP_isinf(&W)) return -1;
 
-    if (ECP_isinf(P)) return -1;
-
-    //ECP_affine(P);
-
-    FP_redc(y,&(P->y));
+    FP_redc(y,&(W.y));
     s=BIG_parity(y);
 
-    FP_redc(x,&(P->x));
+    FP_redc(x,&(W.x));
 
     return s;
 }
@@ -1348,7 +1351,7 @@ void ZZZ::ECP_cfp(ECP *P)
 	{
 		ECP_dbl(P);
 		ECP_dbl(P);
-		ECP_affine(P);
+		//ECP_affine(P);
 		return;
 	}
 	if (cf==8)
@@ -1356,7 +1359,7 @@ void ZZZ::ECP_cfp(ECP *P)
 		ECP_dbl(P);
 		ECP_dbl(P);
 		ECP_dbl(P);
-		ECP_affine(P);
+		//ECP_affine(P);
 		return;
 	}
 	BIG_rcopy(c,CURVE_Cof);

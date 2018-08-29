@@ -142,8 +142,8 @@ void BIG_XXX_toBytes(char *b,BIG_XXX a)
 {
     int i;
     BIG_XXX c;
-    BIG_XXX_norm(a);
     BIG_XXX_copy(c,a);
+	BIG_XXX_norm(c);
     for (i=MODBYTES_XXX-1; i>=0; i--)
     {
         b[i]=c[0]&0xff;
@@ -1018,12 +1018,14 @@ int BIG_XXX_dcomp(DBIG_XXX a,DBIG_XXX b)
 int BIG_XXX_nbits(BIG_XXX a)
 {
     int bts,k=NLEN_XXX-1;
+	BIG_XXX t;
     chunk c;
-    BIG_XXX_norm(a);
-    while (k>=0 && a[k]==0) k--;
+	BIG_XXX_copy(t,a);
+    BIG_XXX_norm(t);
+    while (k>=0 && t[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS_XXX*k;
-    c=a[k];
+    c=t[k];
     while (c!=0)
     {
         c/=2;
@@ -1053,10 +1055,12 @@ int BIG_XXX_dnbits(DBIG_XXX a)
 
 /* Set b=b mod c */
 /* SU= 16 */
-void BIG_XXX_mod(BIG_XXX b,BIG_XXX c)
+void BIG_XXX_mod(BIG_XXX b,BIG_XXX c1)
 {
     int k=0;
     BIG_XXX r; /**/
+	BIG_XXX c;
+	BIG_XXX_copy(c,c1);
 
     BIG_XXX_norm(b);
     if (BIG_XXX_comp(b,c)<0)
@@ -1313,9 +1317,12 @@ void BIG_XXX_randomnum(BIG_XXX m,BIG_XXX q,csprng *rng)
 
 /* Set r=a*b mod m */
 /* SU= 96 */
-void BIG_XXX_modmul(BIG_XXX r,BIG_XXX a,BIG_XXX b,BIG_XXX m)
+void BIG_XXX_modmul(BIG_XXX r,BIG_XXX a1,BIG_XXX b1,BIG_XXX m)
 {
     DBIG_XXX d;
+	BIG_XXX a,b;
+	BIG_XXX_copy(a,a1);
+	BIG_XXX_copy(b,b1);
     BIG_XXX_mod(a,m);
     BIG_XXX_mod(b,m);
 
@@ -1325,9 +1332,11 @@ void BIG_XXX_modmul(BIG_XXX r,BIG_XXX a,BIG_XXX b,BIG_XXX m)
 
 /* Set a=a*a mod m */
 /* SU= 88 */
-void BIG_XXX_modsqr(BIG_XXX r,BIG_XXX a,BIG_XXX m)
+void BIG_XXX_modsqr(BIG_XXX r,BIG_XXX a1,BIG_XXX m)
 {
     DBIG_XXX d;
+	BIG_XXX a;
+	BIG_XXX_copy(a,a1);
     BIG_XXX_mod(a,m);
     BIG_XXX_sqr(d,a);
     BIG_XXX_dmod(r,d,m);
@@ -1335,8 +1344,10 @@ void BIG_XXX_modsqr(BIG_XXX r,BIG_XXX a,BIG_XXX m)
 
 /* Set r=-a mod m */
 /* SU= 16 */
-void BIG_XXX_modneg(BIG_XXX r,BIG_XXX a,BIG_XXX m)
+void BIG_XXX_modneg(BIG_XXX r,BIG_XXX a1,BIG_XXX m)
 {
+	BIG_XXX a;
+	BIG_XXX_copy(a,a1);
     BIG_XXX_mod(a,m);
     BIG_XXX_sub(r,m,a);
 //    BIG_XXX_mod(r,m);
@@ -1344,10 +1355,14 @@ void BIG_XXX_modneg(BIG_XXX r,BIG_XXX a,BIG_XXX m)
 
 /* Set a=a/b mod m */
 /* SU= 136 */
-void BIG_XXX_moddiv(BIG_XXX r,BIG_XXX a,BIG_XXX b,BIG_XXX m)
+void BIG_XXX_moddiv(BIG_XXX r,BIG_XXX a1,BIG_XXX b1,BIG_XXX m)
 {
     DBIG_XXX d;
     BIG_XXX z;
+	BIG_XXX a,b;
+	BIG_XXX_copy(a,a1);
+	BIG_XXX_copy(b,b1);
+
     BIG_XXX_mod(a,m);
     BIG_XXX_invmodp(z,b,m);
 

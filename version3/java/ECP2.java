@@ -150,14 +150,16 @@ public final class ECP2 {
 /* extract affine x as FP2 */
 	public FP2 getX()
 	{
-		//affine();
-		return x;
+		ECP2 W=new ECP2(this);
+		W.affine();
+		return W.x;
 	}
 /* extract affine y as FP2 */
 	public FP2 getY()
 	{
-		//affine();
-		return y;
+		ECP2 W=new ECP2(this);
+		W.affine();
+		return W.y;
 	}
 /* extract projective x */
 	public FP2 getx()
@@ -178,18 +180,19 @@ public final class ECP2 {
 	public void toBytes(byte[] b)
 	{
 		byte[] t=new byte[BIG.MODBYTES];
-		//affine();
-		x.getA().toBytes(t);
+		ECP2 W=new ECP2(this);
+		W.affine();
+		W.x.getA().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++)
 			b[i]=t[i];
-		x.getB().toBytes(t);
+		W.x.getB().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++)
 			b[i+BIG.MODBYTES]=t[i];
 
-		y.getA().toBytes(t);
+		W.y.getA().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++)
 			b[i+2*BIG.MODBYTES]=t[i];
-		y.getB().toBytes(t);
+		W.y.getB().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++)
 			b[i+3*BIG.MODBYTES]=t[i];
 	}
@@ -216,9 +219,10 @@ public final class ECP2 {
 	}
 /* convert this to hex string */
 	public String toString() {
-		if (is_infinity()) return "infinity";
-		//affine();
-		return "("+x.toString()+","+y.toString()+")";
+		ECP2 W=new ECP2(this);	
+		W.affine();
+		if (W.is_infinity()) return "infinity";
+		return "("+W.x.toString()+","+W.y.toString()+")";
 	}
 
 /* Calculate RHS of twisted curve equation x^3+B/i */

@@ -136,10 +136,13 @@ int ZZZ::ECP4_equals(ECP4 *P,ECP4 *Q)
 /* extract x, y from point P */
 int ZZZ::ECP4_get(FP4 *x,FP4 *y,ECP4 *P)
 {
-    if (ECP4_isinf(P)) return -1;
+	ECP4 W;
+	ECP4_copy(&W,P);
+	ECP4_affine(&W);
+    if (ECP4_isinf(&W)) return -1;
 	//ECP4_affine(P);
-    FP4_copy(y,&(P->y));
-    FP4_copy(x,&(P->x));
+    FP4_copy(y,&(W.y));
+    FP4_copy(x,&(W.x));
     return 0;
 }
 

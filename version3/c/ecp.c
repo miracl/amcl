@@ -271,9 +271,12 @@ int ECP_ZZZ_set(ECP_ZZZ *P,BIG_XXX x)
 /* Extract x coordinate as BIG */
 int ECP_ZZZ_get(BIG_XXX x,ECP_ZZZ *P)
 {
-    if (ECP_ZZZ_isinf(P)) return -1;
-    ECP_ZZZ_affine(P);
-    FP_YYY_redc(x,&(P->x));
+	ECP_ZZZ W;
+	ECP_ZZZ_copy(&W,P);
+	ECP_ZZZ_affine(&W);
+    if (ECP_ZZZ_isinf(&W)) return -1;
+    //ECP_ZZZ_affine(P);
+    FP_YYY_redc(x,&(Wx));
     return 0;
 }
 
@@ -283,16 +286,19 @@ int ECP_ZZZ_get(BIG_XXX x,ECP_ZZZ *P)
 /* SU=16 */
 int ECP_ZZZ_get(BIG_XXX x,BIG_XXX y,ECP_ZZZ *P)
 {
+	ECP_ZZZ W;
     int s;
+	ECP_ZZZ_copy(&W,P);
+	ECP_ZZZ_affine(&W);
 
-    if (ECP_ZZZ_isinf(P)) return -1;
+    if (ECP_ZZZ_isinf(&W)) return -1;
 
-    ECP_ZZZ_affine(P);
+    //ECP_ZZZ_affine(P);
 
-    FP_YYY_redc(y,&(P->y));
+    FP_YYY_redc(y,&(W.y));
     s=BIG_XXX_parity(y);
 
-    FP_YYY_redc(x,&(P->x));
+    FP_YYY_redc(x,&(W.x));
 
     return s;
 }
@@ -372,7 +378,7 @@ void ECP_ZZZ_cfp(ECP_ZZZ *P)
 	{
 		ECP_ZZZ_dbl(P);
 		ECP_ZZZ_dbl(P);
-		ECP_ZZZ_affine(P);
+		//ECP_ZZZ_affine(P);
 		return;
 	}
 	if (cf==8)
@@ -380,7 +386,7 @@ void ECP_ZZZ_cfp(ECP_ZZZ *P)
 		ECP_ZZZ_dbl(P);
 		ECP_ZZZ_dbl(P);
 		ECP_ZZZ_dbl(P);
-		ECP_ZZZ_affine(P);
+		//ECP_ZZZ_affine(P);
 		return;
 	}
 	BIG_XXX_rcopy(c,CURVE_Cof_ZZZ);
@@ -1149,9 +1155,12 @@ void ECP_ZZZ_add(ECP_ZZZ *P,ECP_ZZZ *Q)
 /* SU=16 */
 void  ECP_ZZZ_sub(ECP_ZZZ *P,ECP_ZZZ *Q)
 {
-    ECP_ZZZ_neg(Q);
-    ECP_ZZZ_add(P,Q);
-    ECP_ZZZ_neg(Q);
+	ECP_ZZZ NQ;
+	ECP_ZZZ_copy(&NQ,Q);
+	ECP_ZZZ_neg(&NQ);
+    //ECP_ZZZ_neg(Q);
+    ECP_ZZZ_add(P,&NQ);
+    //ECP_ZZZ_neg(Q);
 }
 
 #endif
@@ -1196,7 +1205,7 @@ void ECP_ZZZ_mul(ECP_ZZZ *P,BIG_XXX e)
         ECP_ZZZ_inf(P);
         return;
     }
-    ECP_ZZZ_affine(P);
+    //ECP_ZZZ_affine(P);
 
     ECP_ZZZ_copy(&R0,P);
     ECP_ZZZ_copy(&R1,P);
@@ -1303,8 +1312,8 @@ void ECP_ZZZ_mul2(ECP_ZZZ *P,ECP_ZZZ *Q,BIG_XXX e,BIG_XXX f)
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+1)/2];
     int i,a,b,s,ns,nb;
 
-    ECP_ZZZ_affine(P);
-    ECP_ZZZ_affine(Q);
+    //ECP_ZZZ_affine(P);
+    //ECP_ZZZ_affine(Q);
 
     BIG_XXX_copy(te,e);
     BIG_XXX_copy(tf,f);

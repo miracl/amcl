@@ -151,14 +151,16 @@ public final class ECP4 {
 /* extract affine x as FP4 */
 	public FP4 getX()
 	{
-		//affine();
-		return x;
+		ECP4 W= new ECP4(this);
+		W.affine();
+		return W.x;
 	}
 /* extract affine y as FP4 */
 	public FP4 getY()
 	{
-		//affine();
-		return y;
+		ECP4 W= new ECP4(this);
+		W.affine();
+		return W.y;
 	}
 /* extract projective x */
 	public FP4 getx()
@@ -180,32 +182,33 @@ public final class ECP4 {
 	public void toBytes(byte[] b)
 	{
 		byte[] t=new byte[BIG.MODBYTES];
+		ECP4 W=new ECP4(this);
 		//affine();
 		int MB=BIG.MODBYTES;
 
-		x.geta().getA().toBytes(t);
+		W.x.geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i]=t[i];
-		x.geta().getB().toBytes(t);
+		W.x.geta().getB().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+MB]=t[i];
-		x.getb().getA().toBytes(t);
+		W.x.getb().getA().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+2*MB]=t[i];
-		x.getb().getB().toBytes(t);
+		W.x.getb().getB().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+3*MB]=t[i];
 
-		y.geta().getA().toBytes(t);
+		W.y.geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+4*MB]=t[i];
-		y.geta().getB().toBytes(t);
+		W.y.geta().getB().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+5*MB]=t[i];
-		y.getb().getA().toBytes(t);
+		W.y.getb().getA().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+6*MB]=t[i];
-		y.getb().getB().toBytes(t);
+		W.y.getb().getB().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+7*MB]=t[i];
 
@@ -257,9 +260,10 @@ public final class ECP4 {
 
 /* convert this to hex string */
 	public String toString() {
-		if (is_infinity()) return "infinity";
-		//affine();
-		return "("+x.toString()+","+y.toString()+")";
+		ECP4 W=new ECP4(this);	
+		W.affine();
+		if (W.is_infinity()) return "infinity";
+		return "("+W.x.toString()+","+W.y.toString()+")";
 	}
 
 /* Calculate RHS of twisted curve equation x^3+B/i */

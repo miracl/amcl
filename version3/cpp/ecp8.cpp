@@ -135,10 +135,13 @@ int ZZZ::ECP8_equals(ECP8 *P,ECP8 *Q)
 /* extract x, y from point P */
 int ZZZ::ECP8_get(FP8 *x,FP8 *y,ECP8 *P)
 {
-    if (ECP8_isinf(P)) return -1;
+	ECP8 W;
+	ECP8_copy(&W,P);
+	ECP8_affine(&W);
+    if (ECP8_isinf(&W)) return -1;
 	//ECP8_affine(P);
-    FP8_copy(y,&(P->y));
-    FP8_copy(x,&(P->x));
+    FP8_copy(y,&(W.y));
+    FP8_copy(x,&(W.x));
     return 0;
 }
 

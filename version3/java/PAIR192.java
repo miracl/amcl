@@ -134,7 +134,7 @@ public final class PAIR192 {
 	}
 
 /* Optimal R-ate pairing */
-	public static FP24 ate(ECP4 P,ECP Q)
+	public static FP24 ate(ECP4 P1,ECP Q1)
 	{
 		FP2 f;
 		BIG x=new BIG(ROM.CURVE_Bnx);
@@ -142,6 +142,12 @@ public final class PAIR192 {
 		FP24 lv;
 		int bt;
 		
+		ECP4 P=new ECP4(P1);
+		ECP Q=new ECP(Q1);
+
+		P.affine();
+		Q.affine();
+
 		BIG n3=new BIG(n);
 		n3.pmul(3);
 		n3.norm();
@@ -188,13 +194,26 @@ public final class PAIR192 {
 	}
 
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-	public static FP24 ate2(ECP4 P,ECP Q,ECP4 R,ECP S)
+	public static FP24 ate2(ECP4 P1,ECP Q1,ECP4 R1,ECP S1)
 	{
 		FP2 f;
 		BIG x=new BIG(ROM.CURVE_Bnx);
 		BIG n=new BIG(x);
 		FP24 lv;
 		int bt;
+
+		ECP4 P=new ECP4(P1);
+		ECP Q=new ECP(Q1);
+
+		P.affine();
+		Q.affine();
+
+		ECP4 R=new ECP4(R1);
+		ECP S=new ECP(S1);
+
+		R.affine();
+		S.affine();
+
 
 		BIG n3=new BIG(n);
 		n3.pmul(3);
@@ -405,7 +424,7 @@ public final class PAIR192 {
 			R.copy(P);
 			int i,np,nn;
 			ECP Q=new ECP();
-			Q.copy(P);
+			Q.copy(P); Q.affine();
 			BIG q=new BIG(ROM.CURVE_Order);
 			FP cru=new FP(new BIG(ROM.CURVE_Cru));
 			BIG t=new BIG(0);
@@ -474,7 +493,7 @@ public final class PAIR192 {
 					Q[i].neg();
 				}
 				u[i].norm();	
-				Q[i].affine();
+				//Q[i].affine();
 			}
 
 			R=ECP4.mul8(Q,u);

@@ -28,7 +28,7 @@ under the License.
 /* SU= 8 */
 int FP2_YYY_iszilch(FP2_YYY *x)
 {
-    FP2_YYY_reduce(x);
+   // FP2_YYY_reduce(x);
     if (FP_YYY_iszilch(&(x->a)) && FP_YYY_iszilch(&(x->b))) return 1;
     return 0;
 }
@@ -46,7 +46,7 @@ int FP2_YYY_isunity(FP2_YYY *x)
 {
     FP_YYY one;
     FP_YYY_one(&one);
-    FP2_YYY_reduce(x);
+    //FP2_YYY_reduce(x);
     if (FP_YYY_equals(&(x->a),&one) && FP_YYY_iszilch(&(x->b))) return 1;
     return 0;
 }

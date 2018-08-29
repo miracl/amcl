@@ -138,11 +138,14 @@ void ZZZ::ECP2_affine(ECP2 *P)
 /* SU= 16 */
 int ZZZ::ECP2_get(FP2 *x,FP2 *y,ECP2 *P)
 {
-	if (ECP2_isinf(P)) return -1;
+	ECP2 W;
+	ECP2_copy(&W,P);
+	ECP2_affine(&W);
+	if (ECP2_isinf(&W)) return -1;
 //    if (P->inf) return -1;
     //ECP2_affine(P);
-    FP2_copy(y,&(P->y));
-    FP2_copy(x,&(P->x));
+    FP2_copy(y,&(W.y));
+    FP2_copy(x,&(W.x));
     return 0;
 }
 

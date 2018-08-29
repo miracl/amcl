@@ -135,10 +135,13 @@ void ECP2_ZZZ_affine(ECP2_ZZZ *P)
 /* SU= 16 */
 int ECP2_ZZZ_get(FP2_YYY *x,FP2_YYY *y,ECP2_ZZZ *P)
 {
-    if (ECP2_ZZZ_isinf(P)) return -1;
-    ECP2_ZZZ_affine(P);
-    FP2_YYY_copy(y,&(P->y));
-    FP2_YYY_copy(x,&(P->x));
+	ECP2_ZZZ W;
+	ECP2_ZZZ_copy(&W,P);
+	ECP2_ZZZ_affine(&W);
+    if (ECP2_ZZZ_isinf(&W)) return -1;
+    //ECP2_ZZZ_affine(P);
+    FP2_YYY_copy(y,&(W.y));
+    FP2_YYY_copy(x,&(W.x));
     return 0;
 }
 
@@ -489,9 +492,12 @@ int ECP2_ZZZ_add(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 /* SU= 16 */
 void ECP2_ZZZ_sub(ECP2_ZZZ *P,ECP2_ZZZ *Q)
 {
-    ECP2_ZZZ_neg(Q);
-    ECP2_ZZZ_add(P,Q);
-    ECP2_ZZZ_neg(Q);
+	ECP2_ZZZ NQ;
+	ECP2_ZZZ_copy(&NQ,Q);
+	ECP2_ZZZ_neg(&NQ);
+    //ECP2_ZZZ_neg(Q);
+    ECP2_ZZZ_add(P,&NQ);
+    //ECP2_ZZZ_neg(Q);
 }
 
 /* P*=e */
@@ -505,7 +511,7 @@ void ECP2_ZZZ_mul(ECP2_ZZZ *P,BIG_XXX e)
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
 
     if (ECP2_ZZZ_isinf(P)) return;
-    ECP2_ZZZ_affine(P);
+    //ECP2_ZZZ_affine(P);
 
 
     /* precompute table */
@@ -599,7 +605,7 @@ void ECP2_ZZZ_mul4(ECP2_ZZZ *P,ECP2_ZZZ Q[4],BIG_XXX u[4])
     for (i=0; i<4; i++)
     {
         BIG_XXX_copy(t[i],u[i]);
-        ECP2_ZZZ_affine(&Q[i]);
+        //ECP2_ZZZ_affine(&Q[i]);
     }
 
 // Precomputed table

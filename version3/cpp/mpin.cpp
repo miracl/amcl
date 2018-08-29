@@ -144,7 +144,7 @@ int ZZZ::MPIN_ENCODING(csprng *RNG,octet *E)
         if (su<0) su=-su;
         su%=2;
         map(&W,u,su);
-        ECP_sub(&P,&W); ECP_affine(&P);
+        ECP_sub(&P,&W); //ECP_affine(&P);
 
         rn=unmap(v,&sv,&P);
         m=RAND_byte(RNG);
@@ -176,7 +176,7 @@ int ZZZ::MPIN_DECODING(octet *D)
         sv=(D->val[0]>>1)&1;
         map(&W,u,su);
         map(&P,v,sv);
-        ECP_add(&P,&W); ECP_affine(&P);
+        ECP_add(&P,&W); //ECP_affine(&P);
         ECP_toOctet(D,&P,false);
     }
 
@@ -195,7 +195,7 @@ int ZZZ::MPIN_RECOMBINE_G1(octet *R1,octet *R2,octet *R)
     }
     if (res==0)
     {
-        ECP_add(&P,&T); ECP_affine(&P);
+        ECP_add(&P,&T); //ECP_affine(&P);
         ECP_toOctet(R,&P,false);
     }
     return res;
@@ -210,7 +210,7 @@ int ZZZ::MPIN_RECOMBINE_G2(octet *W1,octet *W2,octet *W)
     if (!ECP2_fromOctet(&T,W2)) res=MPIN_INVALID_POINT;
     if (res==0)
     {
-        ECP2_add(&Q,&T); ECP2_affine(&Q);
+        ECP2_add(&Q,&T); //ECP2_affine(&Q);
         ECP2_toOctet(W,&Q);
     }
     return res;
@@ -253,7 +253,7 @@ int ZZZ::MPIN_EXTRACT_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TO
         ECP_mapit(&R,&H);
 
         ECP_pinmul(&R,factor,facbits);
-        ECP_sub(&P,&R); ECP_affine(&P);
+        ECP_sub(&P,&R); //ECP_affine(&P);
 
         ECP_toOctet(TOKEN,&P,false);
     }
@@ -275,7 +275,7 @@ int ZZZ::MPIN_RESTORE_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TO
         ECP_mapit(&R,&H);
 
         ECP_pinmul(&R,factor,facbits);
-        ECP_add(&P,&R); ECP_affine(&P);
+        ECP_add(&P,&R); //ECP_affine(&P);
 
         ECP_toOctet(TOKEN,&P,false);
     }
@@ -446,11 +446,11 @@ int ZZZ::MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,in
                 PAIR_G1mul(&P,x);				// P=x.H(ID)
                 ECP_toOctet(xID,&P,false);  // xID		/* change to TRUE for point compression */
                 PAIR_G1mul(&W,x);               // W=x.H(T|ID)
-                ECP_add(&P,&W); ECP_affine(&P);
+                ECP_add(&P,&W); //ECP_affine(&P);
             }
             else
             {
-                ECP_add(&P,&W); ECP_affine(&P);
+                ECP_add(&P,&W); //ECP_affine(&P);
                 PAIR_G1mul(&P,x);
             }
             if (xCID!=NULL) ECP_toOctet(xCID,&P,false);  // U     /* change to TRUE for point compression */
@@ -467,7 +467,7 @@ int ZZZ::MPIN_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,in
 
     if (res==0)
 	{
-		ECP_affine(&T);
+		//ECP_affine(&T);
         ECP_toOctet(SEC,&T,false);  // V    /* change to TRUE for point compression */
 	}
     return res;
@@ -554,7 +554,7 @@ void ZZZ::MPIN_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
         mhashit(sha,date,&H,&H);
 #endif
         ECP_mapit(&R,&H);
-        ECP_add(&P,&R); ECP_affine(&P);
+        ECP_add(&P,&R); //ECP_affine(&P);
         ECP_toOctet(HTID,&P,false);
     }
     //else ECP_toOctet(HID,&P,false);
@@ -617,7 +617,7 @@ int ZZZ::MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet
     {
         PAIR_G1mul(&P,y);  // y(A+AT)
         ECP_add(&P,&R); // x(A+AT)+y(A+T)
-		ECP_affine(&P);
+		//ECP_affine(&P);
         if (!ECP_fromOctet(&R,mSEC))  res=MPIN_INVALID_POINT; // V
 
 //		printf("CLIENT SEC= "); ECP_output(&R); printf("\n");
@@ -647,7 +647,7 @@ int ZZZ::MPIN_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet
                     {
                         PAIR_G1mul(&P,y);  // yA
                         ECP_add(&P,&R); // yA+xA
-						ECP_affine(&P);
+						//ECP_affine(&P);
                     }
                 }
                 if (res==0)
@@ -894,7 +894,7 @@ int ZZZ::MPIN_SERVER_KEY(int sha,octet *Z,octet *SST,octet *W,octet *H,octet *HI
     {
         PAIR_G1mul(&A,h);
         ECP_add(&R,&A);  // new
-		ECP_affine(&R);
+		//ECP_affine(&R);
         PAIR_ate(&g,&sQ,&R);
         PAIR_fexp(&g);
         PAIR_G1mul(&U,w);

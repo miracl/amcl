@@ -206,10 +206,11 @@ void FP_YYY_mod(BIG_XXX a,DBIG_XXX d)
 /* SU= 48 */
 int FP_YYY_iszilch(FP_YYY *x)
 {
-    BIG_XXX m;
+    BIG_XXX m,t;
     BIG_XXX_rcopy(m,Modulus_YYY);
-    BIG_XXX_mod(x->g,m);
-    return BIG_XXX_iszilch(x->g);
+	BIG_XXX_copy(t,x->g);
+    BIG_XXX_mod(t,m);
+    return BIG_XXX_iszilch(t);
 }
 
 void FP_YYY_copy(FP_YYY *y,FP_YYY *x)
@@ -255,9 +256,12 @@ void FP_YYY_zero(FP_YYY *x)
 
 int FP_YYY_equals(FP_YYY *x,FP_YYY *y)
 {
-    FP_YYY_reduce(x);
-    FP_YYY_reduce(y);
-    if (BIG_XXX_comp(x->g,y->g)==0) return 1;
+	FP_YYY xg,yg;
+	FP_YYY_copy(&xg,x);
+	FP_YYY_copy(&yg,y);
+    FP_YYY_reduce(&xg);
+    FP_YYY_reduce(&yg);
+    if (BIG_XXX_comp(xg.g,yg.g)==0) return 1;
     return 0;
 }
 
