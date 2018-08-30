@@ -120,7 +120,7 @@ final public class PAIR {
         return FP12(a,b,c)
     }
     // Optimal R-ate pairing
-    static public func ate(_ P:ECP2,_ Q:ECP) -> FP12
+    static public func ate(_ P1:ECP2,_ Q1:ECP) -> FP12
     {
         let f=FP2(BIG(ROM.Fra),BIG(ROM.Frb))
         let x=BIG(ROM.CURVE_Bnx)
@@ -148,6 +148,10 @@ final public class PAIR {
         let n3=BIG(n)
         n3.pmul(3)
         n3.norm()
+
+	let P=ECP2(); P.copy(P1); P.affine()
+	let Q=ECP(); Q.copy(Q1); Q.affine()
+
 
         let Qx=FP(Q.getx())
         let Qy=FP(Q.gety())
@@ -205,7 +209,7 @@ final public class PAIR {
         return r
     }
     // Optimal R-ate double pairing e(P,Q).e(R,S)
-    static public func ate2(_ P:ECP2,_ Q:ECP,_ R:ECP2,_ S:ECP) -> FP12
+    static public func ate2(_ P1:ECP2,_ Q1:ECP,_ R1:ECP2,_ S1:ECP) -> FP12
     {
         let f=FP2(BIG(ROM.Fra),BIG(ROM.Frb))
         let x=BIG(ROM.CURVE_Bnx)
@@ -231,6 +235,12 @@ final public class PAIR {
         n3.pmul(3)
         n3.norm()
     
+	let P=ECP2(); P.copy(P1); P.affine()
+	let Q=ECP(); Q.copy(Q1); Q.affine()
+	let R=ECP2(); R.copy(R1); R.affine()
+	let S=ECP(); S.copy(S1); S.affine()
+
+
         let Qx=FP(Q.getx())
         let Qy=FP(Q.gety())
         let Sx=FP(S.getx())
@@ -552,11 +562,11 @@ final public class PAIR {
         var R:ECP
         if (ROM.USE_GLV)
         {
-            P.affine()
+            //P.affine()
             R=ECP()
             R.copy(P)
             let Q=ECP()
-            Q.copy(P)
+            Q.copy(P); Q.affine()
             let q=BIG(ROM.CURVE_Order)
             let cru=FP(BIG(ROM.CURVE_Cru))
             let t=BIG(0)
@@ -608,7 +618,7 @@ final public class PAIR {
             }
 
             let t=BIG(0)
-            P.affine()
+            //P.affine()
             Q.append(ECP2())
             Q[0].copy(P);
             for i in 1 ..< 4

@@ -58,9 +58,11 @@ def invmodp(a, p):
 # Modular arithmetic
 
 
-def modmul(a, b, p):
-	a %= p
-	b %= p
+def modmul(a1, b1, p):
+	
+	a = a1%p
+	b = b1%p
+
 	if a < 0:
 		a += p
 	if b < 0:

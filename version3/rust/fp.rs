@@ -190,9 +190,10 @@ impl FP {
     }
     
 /* test this=0? */
-    pub fn iszilch(&mut self) -> bool {
-        self.reduce();
-        return self.x.iszilch();
+    pub fn iszilch(&self) -> bool {
+        let mut a=FP::new_copy(self);
+        a.reduce();
+        return a.x.iszilch();
     }
     
 /* copy from FP b */
@@ -371,10 +372,12 @@ impl FP {
     }
 
 /* return TRUE if self==a */
-    pub fn equals(&mut self,a: &mut FP) -> bool {
-        a.reduce();
-        self.reduce();
-        if BIG::comp(&(a.x),&self.x)==0 {return true}
+    pub fn equals(&self,a: &FP) -> bool {
+	let mut f=FP::new_copy(self);
+        let mut s=FP::new_copy(a);
+        f.reduce();
+        s.reduce();
+        if BIG::comp(&(f.x),&(s.x))==0 {return true}
         return false;
     }   
 

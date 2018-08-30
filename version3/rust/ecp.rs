@@ -176,12 +176,12 @@ impl ECP {
 /* test for O point-at-infinity */
 	pub fn is_infinity(&self) -> bool {
 	//	if self.inf {return true}
-		let mut xx=FP::new_copy(&self.x);
-		let mut zz=FP::new_copy(&self.z);
+		let xx=FP::new_copy(&self.x);
+		let zz=FP::new_copy(&self.z);
 
 		if CURVETYPE==EDWARDS {
-			let mut yy=FP::new_copy(&self.y);
-			return xx.iszilch() && yy.equals(&mut zz);
+			let yy=FP::new_copy(&self.y);
+			return xx.iszilch() && yy.equals(&zz);
 		}
 		if CURVETYPE==WEIERSTRASS {
 			return xx.iszilch() && zz.iszilch();
@@ -302,20 +302,21 @@ impl ECP {
 	}
 
 /* extract x as a BIG */
-	pub fn getx(&mut self) -> BIG {
-		self.affine();
-		return self.x.redc();
+	pub fn getx(&self) -> BIG {
+		let mut W=ECP::new(); W.copy(self);
+		W.affine();
+		return W.x.redc();
 	}
 
 /* extract y as a BIG */
-	pub fn gety(&mut self) -> BIG {
-		self.affine();
-		return self.y.redc();
+	pub fn gety(&self) -> BIG {
+		let mut W=ECP::new(); W.copy(self);
+		W.affine();
+		return W.y.redc();
 	}
 
 /* get sign of Y */
-	pub fn gets(&mut self) -> isize {
-		self.affine();
+	pub fn gets(&self) -> isize {
 		let y=self.gety();
 		return y.parity();
 	}
@@ -338,12 +339,13 @@ impl ECP {
 	}
 
 /* convert to byte array */
-	pub fn tobytes(&mut self,b: &mut [u8],compress: bool) {
+	pub fn tobytes(&self,b: &mut [u8],compress: bool) {
 		let mb=big::MODBYTES as usize;
 		let mut t:[u8;big::MODBYTES as usize]=[0;big::MODBYTES as usize];
+		let mut W=ECP::new(); W.copy(self);
 
-		self.affine();
-		self.x.redc().tobytes(&mut t);
+		W.affine();
+		W.x.redc().tobytes(&mut t);
 		for i in 0..mb {b[i+1]=t[i]}
 
 		if CURVETYPE==MONTGOMERY {
@@ -353,13 +355,13 @@ impl ECP {
 	
 		if compress {
 			b[0]=0x02;
-			if self.y.redc().parity()==1 {b[0]=0x03}
+			if W.y.redc().parity()==1 {b[0]=0x03}
 			return;
 		}
 
 		b[0]=0x04;
 		
-		self.y.redc().tobytes(&mut t);
+		W.y.redc().tobytes(&mut t);
 		for i in 0..mb {b[i+mb+1]=t[i]}
 	}
 
@@ -392,12 +394,13 @@ impl ECP {
 	}
 
 /* convert to hex string */
-	pub fn tostring(&mut self) -> String {
-	 	if self.is_infinity() {self.inf(); return String::from("infinity")}
-		self.affine();
+	pub fn tostring(&self) -> String {
+		let mut W=ECP::new(); W.copy(self);
+	 	if W.is_infinity() {return String::from("infinity")}
+		//self.affine();
 		if CURVETYPE==MONTGOMERY {
-			return format!("({})",self.x.redc().tostring());
-		} else {return format!("({},{})",self.x.redc().tostring(),self.y.redc().tostring())} ; 
+			return format!("({})",W.x.redc().tostring());
+		} else {return format!("({},{})",W.x.redc().tostring(),W.y.redc().tostring())} ; 
 	}
 
 /* this*=2 */
@@ -969,12 +972,12 @@ impl ECP {
 		if cf==1 {return}
 		if cf==4 {
 			self.dbl(); self.dbl();
-			self.affine();
+			//self.affine();
 			return;
 		} 
 		if cf==8 {
 			self.dbl(); self.dbl(); self.dbl();
-			self.affine();
+			//self.affine();
 			return;
 		}
 		let c=BIG::new_ints(&rom::CURVE_COF);

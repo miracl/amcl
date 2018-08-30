@@ -143,14 +143,16 @@ final public class ECP2 {
     /* extract affine x as FP2 */
     func getX() -> FP2
     {
-        affine()
-        return x
+	let W=ECP2(); W.copy(self)
+        W.affine()
+        return W.x
     }
     /* extract affine y as FP2 */
     func getY() -> FP2
     {
-        affine()
-        return y
+	let W=ECP2(); W.copy(self)
+        W.affine()
+        return W.y
     }
     /* extract projective x */
     func getx() -> FP2
@@ -172,19 +174,20 @@ final public class ECP2 {
     {
         let RM=Int(BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
+	let W=ECP2(); W.copy(self)
 
-        affine();
-        x.getA().toBytes(&t)
+        W.affine();
+        W.x.getA().toBytes(&t)
         for i in 0 ..< RM
             {b[i]=t[i]}
-        x.getB().toBytes(&t);
+        W.x.getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+RM]=t[i]}
     
-        y.getA().toBytes(&t);
+        W.y.getA().toBytes(&t);
         for i in 0 ..< RM
             {b[i+2*RM]=t[i]}
-        y.getB().toBytes(&t);
+        W.y.getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+3*RM]=t[i]}
     }
@@ -212,9 +215,10 @@ final public class ECP2 {
 /* convert self to hex string */
     func toString() -> String
     {
-        if is_infinity() {return "infinity"}
-        affine()
-        return "("+x.toString()+","+y.toString()+")"
+	let W=ECP2(); W.copy(self)
+        if W.is_infinity() {return "infinity"}
+        W.affine()
+        return "("+W.x.toString()+","+W.y.toString()+")"
     }
     
 /* Calculate RHS of twisted curve equation x^3+B/i */
@@ -397,9 +401,10 @@ final public class ECP2 {
     /* set self-=Q */
     @discardableResult func sub(_ Q:ECP2) -> Int
     {
-        Q.neg()
-        let D=add(Q)
-        Q.neg()
+ 	let NQ=ECP2(); NQ.copy(Q)
+        NQ.neg()
+        let D=add(NQ)
+        //Q.neg()
         return D
     }
 /* set self*=q, where q is Modulus, using Frobenius */
@@ -434,7 +439,7 @@ final public class ECP2 {
     
         if is_infinity() {return ECP2()}
     
-        affine()
+        //affine()
     
     /* precompute table */
         Q.copy(self)
@@ -504,7 +509,7 @@ final public class ECP2 {
         {
             t.append(BIG(u[i]))
             t[i].norm()
-            Q[i].affine()
+            //Q[i].affine()
         }
 
     // precompute table 
@@ -588,7 +593,7 @@ final public class ECP2 {
         for i in 0 ..< 4
         {
             t.append(BIG(u[i]))
-            Q[i].affine()
+            //Q[i].affine()
         }
     
     // precompute table 

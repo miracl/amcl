@@ -532,7 +532,7 @@ final public class MPIN192
         if P.is_infinity() {return INVALID_POINT}
     
         P=PAIR192.G1mul(P,y)
-        P.add(R); P.affine()
+        P.add(R); //P.affine()
         R=ECP.fromBytes(mSEC)
         if R.is_infinity() {return MPIN192.INVALID_POINT}
 
@@ -553,7 +553,7 @@ final public class MPIN192
                     if R.is_infinity() {return MPIN192.INVALID_POINT}
     
                     P=PAIR192.G1mul(P,y);
-                    P.add(R); P.affine()
+                    P.add(R); //P.affine()
                 }
                 g=PAIR192.ate(Q,P);
                 g=PAIR192.fexp(g);
@@ -744,7 +744,7 @@ final public class MPIN192
         let w=BIG.fromBytes(W)
         let h=BIG.fromBytes(H)
         A=PAIR192.G1mul(A,h)
-        R.add(A); R.affine()
+        R.add(A); //R.affine()
 
         U=PAIR192.G1mul(U,w)
         var g=PAIR192.ate(sQ,R)

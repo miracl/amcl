@@ -64,7 +64,7 @@ def extract_pin(ID, PIN, SK):
 	if not S.fromBytes(SK) :
 		return bytearray(0)
 	S.add(P)
-	S.norm()
+	#S.norm()
 	return S.toBytes(False)
 
 # U=xH(ID)
@@ -116,7 +116,7 @@ def server(ID, Y, SS, U, V):
 		return (False,bytearray(0),bytearray(0))
 
 	TU.add(P)
-	TU.norm()
+	#TU.norm()
 	
 	r = pair.double_miller(Q, TV, sQ, TU)
 	r = pair.fexp(r)

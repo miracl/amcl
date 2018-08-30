@@ -76,8 +76,8 @@ impl ECP2 {
 /* Test this=O? */
 	pub fn is_infinity(&self) -> bool {
 	//	if self.inf {return true}
-		let mut xx=FP2::new_copy(&self.x);
-		let mut zz=FP2::new_copy(&self.z);
+		let xx=FP2::new_copy(&self.x);
+		let zz=FP2::new_copy(&self.z);
 		return xx.iszilch() && zz.iszilch();
 	}
 
@@ -176,15 +176,17 @@ impl ECP2 {
 	}
 
 /* extract affine x as FP2 */
-	pub fn getx(&mut self) -> FP2 {
-		self.affine();
-		return FP2::new_copy(&self.x);
+	pub fn getx(&self) -> FP2 {
+		let mut W=ECP2::new(); W.copy(self);
+		W.affine();
+		return FP2::new_copy(&W.x);
 	}
 
 /* extract affine y as FP2 */
-	pub fn gety(&mut self) -> FP2 {
-		self.affine();
-		return FP2::new_copy(&self.y);
+	pub fn gety(&self) -> FP2 {
+		let mut W=ECP2::new(); W.copy(self);
+		W.affine();
+		return FP2::new_copy(&W.y);
 	}
 
 /* extract projective x */
@@ -201,19 +203,20 @@ impl ECP2 {
 	}
 
 /* convert to byte array */
-	pub fn tobytes(&mut self,b: &mut [u8]) {
+	pub fn tobytes(&self,b: &mut [u8]) {
 		let mut t:[u8;big::MODBYTES as usize]=[0;big::MODBYTES as usize];
 		let mb=big::MODBYTES as usize;
+		let mut W=ECP2::new(); W.copy(self);
 
-		self.affine();
-		self.x.geta().tobytes(&mut t);
+		W.affine();
+		W.x.geta().tobytes(&mut t);
 		for i in 0..mb { b[i]=t[i]}
-		self.x.getb().tobytes(&mut t);
+		W.x.getb().tobytes(&mut t);
 		for i in 0..mb { b[i+mb]=t[i]}
 
-		self.y.geta().tobytes(&mut t);
+		W.y.geta().tobytes(&mut t);
 		for i in 0..mb {b[i+2*mb]=t[i]}
-		self.y.getb().tobytes(&mut t);
+		W.y.getb().tobytes(&mut t);
 		for i in 0..mb {b[i+3*mb]=t[i]}
 	}
 
@@ -238,10 +241,11 @@ impl ECP2 {
 	}
 
 /* convert this to hex string */
-	pub fn tostring(&mut  self) -> String {
-		if self.is_infinity() {return String::from("infinity")}
-		self.affine();
-		return format!("({},{})",self.x.tostring(),self.y.tostring());
+	pub fn tostring(&self) -> String {
+		let mut W=ECP2::new(); W.copy(self); W.affine();
+		if W.is_infinity() {return String::from("infinity")}
+		//self.affine();
+		return format!("({},{})",W.x.tostring(),W.y.tostring());
 }	
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
@@ -498,7 +502,7 @@ impl ECP2 {
 		let mut s:[i8;CT]=[0;CT];
 
 		for i in 0..4 {
-			Q[i].affine();
+			//Q[i].affine();
 			t[i].norm();
 		}
 

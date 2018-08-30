@@ -68,7 +68,7 @@ def e(P, Q):
 
 
 
-def miller(P, Q):
+def miller(P1, Q1):
 	x = curve.x
 	if curve.PairingFriendly == BN:
 		n=6*x
@@ -79,7 +79,11 @@ def miller(P, Q):
 	else:
 		n=x
 	n3=3*n
-	P.norm()
+
+	P=P1.copy()
+	Q=Q1.copy()
+
+	P.norm(); Q.norm()
 	A = P.copy()
 	Qx, Qy = Q.getxy()
 	nb = n3.bit_length()
@@ -110,7 +114,7 @@ def miller(P, Q):
 
 	return r
 
-def double_miller(P, Q, U, V):
+def double_miller(P1, Q1, U1, V1):
 	x = curve.x
 
 	if curve.PairingFriendly == BN:
@@ -123,10 +127,15 @@ def double_miller(P, Q, U, V):
 		n=x
 
 	n3=3*n
-	P.norm()
+
+	P=P1.copy()
+	Q=Q1.copy()
+	U=U1.copy()
+	V=V1.copy()
+
+	P.norm(); Q.norm(); U.norm(); V.norm()
 	A = P.copy()
 	Qx, Qy = Q.getxy()
-	U.norm()
 	B = U.copy()
 	Wx, Wy = V.getxy()
 	nb = n3.bit_length()

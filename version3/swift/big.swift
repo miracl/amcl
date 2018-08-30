@@ -256,11 +256,12 @@ final public class BIG{
     func nbits() -> Int
     {
         var k=(BIG.NLEN-1)
-        norm()
-        while k>=0 && w[k]==0 {k -= 1}
+	let t=BIG(self)
+        t.norm()
+        while k>=0 && t.w[k]==0 {k -= 1}
         if k<0 {return 0}
         var bts=Int(BIG.BASEBITS)*k
-        var c=w[k];
+        var c=t.w[k];
         while c != 0 {c/=2; bts += 1}
         return bts
     }
@@ -371,8 +372,9 @@ final public class BIG{
 /* convert this BIG to byte array */
     func tobytearray(_ b: inout [UInt8],_ n: Int)
     {
-        norm();
+        //norm();
         let c=BIG(self);
+	c.norm()
         for i in (0...Int(BIG.MODBYTES)-1).reversed()
         {
             b[i+n]=UInt8(c.w[0]&0xff);
@@ -581,9 +583,10 @@ final public class BIG{
         self.norm()
     }
     /* reduce this mod m */
-    func mod(_ m: BIG)
+    func mod(_ m1: BIG)
     {
         var k=0
+	let m=BIG(m1)
         let r=BIG(0)
         norm()
         if (BIG.comp(self,m)<0) {return}
@@ -611,13 +614,14 @@ final public class BIG{
         }
     }
     /* divide this by m */
-    func div(_ m: BIG)
+    func div(_ m1: BIG)
     {
         var k=0
         norm()
         let e=BIG(1)
         let b=BIG(self)
         let r=BIG(0)
+	let m=BIG(m1)
         zero()
     
         while (BIG.comp(b,m)>=0)
@@ -1083,8 +1087,9 @@ final public class BIG{
 
     
     /* return a*b mod m */
-    static func modmul(_ a: BIG,_ b :BIG,_ m: BIG) -> BIG
+    static func modmul(_ a1: BIG,_ b1 :BIG,_ m: BIG) -> BIG
     {
+	let a=BIG(a1); let b=BIG(b1);
         a.mod(m)
         b.mod(m)
         let d=mul(a,b)
@@ -1092,24 +1097,27 @@ final public class BIG{
     }
     
     /* return a^2 mod m */
-    static func modsqr(_ a: BIG,_ m: BIG) -> BIG
+    static func modsqr(_ a1: BIG,_ m: BIG) -> BIG
     {
+	let a=BIG(a1)
         a.mod(m)
         let d=sqr(a)
         return d.mod(m)
     }
     
     /* return -a mod m */
-    static func modneg(_ a: BIG,_ m: BIG) -> BIG
+    static func modneg(_ a1: BIG,_ m: BIG) -> BIG
     {
+	let a=BIG(a1)
         a.mod(m)
         return m.minus(a)
     }
     
     /* return this^e mod m */
-    func powmod(_ e: BIG,_ m: BIG) -> BIG
+    func powmod(_ e1: BIG,_ m: BIG) -> BIG
     {
         norm();
+	let e=BIG(e1)
         e.norm();
         var a=BIG(1)
         let z=BIG(e)

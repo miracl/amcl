@@ -137,8 +137,9 @@ var FP = function(ctx) {
 
         /* test this=0 */
         iszilch: function() {
-            this.reduce();
-            return this.f.iszilch();
+			var c=new FP(0); c.copy(this);
+            c.reduce();
+            return c.f.iszilch();
         },
 
         /* reduce this mod Modulus */
@@ -331,10 +332,12 @@ var FP = function(ctx) {
 
         /* return TRUE if this==a */
         equals: function(a) {
-            a.reduce();
-            this.reduce();
+			var ft=new FP(0); ft.copy(this);
+			var sd=new FP(0); sd.copy(a);
+            ft.reduce();
+            sd.reduce();
 
-            if (ctx.BIG.comp(a.f, this.f) === 0) {
+            if (ctx.BIG.comp(ft.f, sd.f) === 0) {
                 return true;
             }
 

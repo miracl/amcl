@@ -71,7 +71,7 @@ final public class FP4 {
     /* test this==0 ? */
     func iszilch() -> Bool
     {
-        reduce()
+        //reduce()
         return a.iszilch() && b.iszilch()
     }
 

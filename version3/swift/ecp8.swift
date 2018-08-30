@@ -138,14 +138,16 @@ final public class ECP8 {
     /* extract affine x as FP8 */
     func getX() -> FP8
     {
-        affine()
-        return x
+	let W=ECP8(); W.copy(self)
+        W.affine()
+        return W.x
     }
     /* extract affine y as FP8 */
     func getY() -> FP8
     {
-        affine()
-        return y
+	let W=ECP8(); W.copy(self)
+        W.affine()
+        return W.y
     }
     /* extract projective x */
     func getx() -> FP8
@@ -168,63 +170,63 @@ final public class ECP8 {
     {
         let RM=Int(BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
-
-        affine();
+	let W=ECP8(); W.copy(self)
+        W.affine();
         
-        x.geta().geta().getA().toBytes(&t)
+        W.x.geta().geta().getA().toBytes(&t)
         for i in 0 ..< RM
             {b[i]=t[i]}
-        x.geta().geta().getB().toBytes(&t);
+        W.x.geta().geta().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+RM]=t[i]}
     
-        x.geta().getb().getA().toBytes(&t)
+        W.x.geta().getb().getA().toBytes(&t)
         for i in 0 ..< RM
             {b[i+2*RM]=t[i]}
-        x.geta().getb().getB().toBytes(&t);
+        W.x.geta().getb().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+3*RM]=t[i]}
 
-        x.getb().geta().getA().toBytes(&t)
+        W.x.getb().geta().getA().toBytes(&t)
         for i in 0 ..< RM
             {b[i+4*RM]=t[i]}
-        x.getb().geta().getB().toBytes(&t);
+        W.x.getb().geta().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+5*RM]=t[i]}
     
-        x.getb().getb().getA().toBytes(&t)
+        W.x.getb().getb().getA().toBytes(&t)
         for i in 0 ..< RM
             {b[i+6*RM]=t[i]}
-        x.getb().getb().getB().toBytes(&t);
+        W.x.getb().getb().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+7*RM]=t[i]}
 
 
-        y.geta().geta().getA().toBytes(&t);
+        W.y.geta().geta().getA().toBytes(&t);
         for i in 0 ..< RM
             {b[i+8*RM]=t[i]}
-        y.geta().geta().getB().toBytes(&t);
+        W.y.geta().geta().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+9*RM]=t[i]}
 
-        y.geta().getb().getA().toBytes(&t);
+        W.y.geta().getb().getA().toBytes(&t);
         for i in 0 ..< RM
             {b[i+10*RM]=t[i]}
-        y.geta().getb().getB().toBytes(&t);
+        W.y.geta().getb().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+11*RM]=t[i]}
 
-        y.getb().geta().getA().toBytes(&t);
+        W.y.getb().geta().getA().toBytes(&t);
         for i in 0 ..< RM
             {b[i+12*RM]=t[i]}
-        y.getb().geta().getB().toBytes(&t);
+        W.y.getb().geta().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+13*RM]=t[i]}
 
-        y.getb().getb().getA().toBytes(&t);
+        W.y.getb().getb().getA().toBytes(&t);
         for i in 0 ..< RM
             {b[i+14*RM]=t[i]}
-        y.getb().getb().getB().toBytes(&t);
+        W.y.getb().getb().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+15*RM]=t[i]}            
       
@@ -314,9 +316,10 @@ final public class ECP8 {
 /* convert self to hex string */
     func toString() -> String
     {
-        if is_infinity() {return "infinity"}
-        affine()
-        return "("+x.toString()+","+y.toString()+")"
+	let W=ECP8(); W.copy(self)
+        if W.is_infinity() {return "infinity"}
+        W.affine()
+        return "("+W.x.toString()+","+W.y.toString()+")"
     }
     
 /* Calculate RHS of twisted curve equation x^3+B/i */
@@ -488,9 +491,10 @@ final public class ECP8 {
     /* set self-=Q */
     @discardableResult func sub(_ Q:ECP8) -> Int
     {
-        Q.neg()
-        let D=add(Q)
-        Q.neg()
+	let NQ=ECP8(); NQ.copy(Q)
+        NQ.neg()
+        let D=add(NQ)
+        //Q.neg()
         return D
     }
 
@@ -566,7 +570,7 @@ final public class ECP8 {
     
         if is_infinity() {return ECP8()}
     
-        affine()
+        //affine()
     
     /* precompute table */
         Q.copy(self)
@@ -654,7 +658,7 @@ final public class ECP8 {
         {
             t.append(BIG(u[i]))
             t[i].norm()
-            Q[i].affine()
+            //Q[i].affine()
         }
 
     // precompute table 

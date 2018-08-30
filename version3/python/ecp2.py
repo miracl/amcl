@@ -51,10 +51,11 @@ class ECp2:
 		return True
 
 	def get(self):				# return tuple Fp2 x and Fp2 y
-		if (self.isinf()):
+		W=self.copy()
+		if (W.isinf()):
 			return (Fp2(), Fp2())
-		self.norm()
-		return(self.x, self.y)
+		W.norm()
+		return(W.x, W.y)
 
 	def getZ(self):
 		return self.z.copy()
@@ -184,7 +185,7 @@ class ECp2:
 	def __rmul__(self, other):   # use NAF
 		b = other
 		b3 = 3 * b
-		self.norm()
+		#self.norm()
 		mself = -self
 		R = ECp2()
 		for i in range(b3.bit_length() - 1, 0, -1):
@@ -202,7 +203,7 @@ class ECp2:
 			X=X.inverse()
 		X2=X.copy()
 		X2.sqr()
-		self.norm()
+		#self.norm()
 		self.x=self.x.conj()
 		self.y=self.y.conj()
 		self.z=self.z.conj()
@@ -212,10 +213,11 @@ class ECp2:
 		return self
 
 	def __str__(self):			# pretty print
-		if self.isinf():
+		W=self.copy()
+		if W.isinf():
 			return "infinity"
-		self.norm()
-		return "[%s,%s]" % (self.x, self.y)
+		W.norm()
+		return "[%s,%s]" % (W.x, W.y)
 
 # convert from and to an array of bytes
 	def fromBytes(self,W) :

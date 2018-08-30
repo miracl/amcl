@@ -588,7 +588,7 @@ pub fn server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],x
 	if P.is_infinity() {return INVALID_POINT}
 
 	P=pair::g1mul(&mut P,&mut sy);
-	P.add(&mut R); P.affine();
+	P.add(&mut R); //P.affine();
 	R=ECP::frombytes(&msec);
 	if R.is_infinity() {return INVALID_POINT}
 
@@ -611,7 +611,7 @@ pub fn server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],x
 						R=ECP::frombytes(&rxid);
 						if R.is_infinity() {return INVALID_POINT}			
 						P=pair::g1mul(&mut P,&mut sy);
-						P.add(&mut R);	P.affine();								
+						P.add(&mut R);	//P.affine();								
 					}
 					g=pair::ate(&Q,&P);
 					g=pair::fexp(&g);
@@ -784,7 +784,7 @@ pub fn server_key(sha: usize,z: &[u8],sst: &[u8],w: &[u8],h: &[u8],hid: &[u8],xi
 	let mut w=BIG::frombytes(&w);
 	let mut h=BIG::frombytes(&h);
 	A=pair::g1mul(&mut A,&mut h);	// new
-	R.add(&mut A); R.affine();
+	R.add(&mut A); //R.affine();
 
 	U=pair::g1mul(&mut U,&mut w);
 	let mut g=pair::ate(&sQ,&R);

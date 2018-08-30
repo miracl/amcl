@@ -706,7 +706,7 @@ var MPIN256 = function(ctx) {
 
             P = ctx.PAIR256.G1mul(P, y);
             P.add(R);
-            P.affine();
+            //P.affine();
             R = ctx.ECP.fromBytes(mSEC);
             if (R.is_infinity()) {
                 return this.INVALID_POINT;
@@ -732,7 +732,7 @@ var MPIN256 = function(ctx) {
 
                         P = ctx.PAIR256.G1mul(P, y);
                         P.add(R);
-                        P.affine();
+                        //P.affine();
                     }
                     g = ctx.PAIR256.ate(Q, P);
                     g = ctx.PAIR256.fexp(g);
@@ -1036,7 +1036,7 @@ var MPIN256 = function(ctx) {
             h = ctx.BIG.fromBytes(H);
             A = ctx.PAIR256.G1mul(A, h);
             R.add(A);
-            R.affine();
+            //R.affine();
 
             U = ctx.PAIR256.G1mul(U, w);
             g = ctx.PAIR256.ate(sQ, R);

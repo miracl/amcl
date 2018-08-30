@@ -543,7 +543,7 @@ final public class MPIN256
         if P.is_infinity() {return INVALID_POINT}
     
         P=PAIR256.G1mul(P,y)
-        P.add(R); P.affine()
+        P.add(R); //P.affine()
         R=ECP.fromBytes(mSEC)
         if R.is_infinity() {return MPIN256.INVALID_POINT}
 
@@ -564,7 +564,7 @@ final public class MPIN256
                     if R.is_infinity() {return MPIN256.INVALID_POINT}
     
                     P=PAIR256.G1mul(P,y);
-                    P.add(R); P.affine()
+                    P.add(R); //P.affine()
                 }
                 g=PAIR256.ate(Q,P);
                 g=PAIR256.fexp(g);
@@ -732,7 +732,7 @@ final public class MPIN256
         let w=BIG.fromBytes(W)
         let h=BIG.fromBytes(H)
         A=PAIR256.G1mul(A,h)
-        R.add(A); R.affine()
+        R.add(A); //R.affine()
 
         U=PAIR256.G1mul(U,w)
         var g=PAIR256.ate(sQ,R)

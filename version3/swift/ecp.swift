@@ -313,20 +313,22 @@ final public class ECP {
     /* extract x as a BIG */
     func getX() -> BIG
     {
-        affine()
-        return x.redc()
+	let W=ECP(); W.copy(self)
+        W.affine()
+        return W.x.redc()
     }
     /* extract y as a BIG */
     func getY() -> BIG
     {
-        affine();
-        return y.redc();
+	let W=ECP(); W.copy(self)
+        W.affine();
+        return W.y.redc();
     }
     
     /* get sign of Y */
     func getS() -> Int
     {
-        affine()
+        //affine()
         let y=getY()
         return y.parity()
     }
@@ -350,9 +352,9 @@ final public class ECP {
     {
         let RM=Int(BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
-
-        affine()
-        x.redc().toBytes(&t)
+	let W=ECP(); W.copy(self)
+        W.affine()
+        W.x.redc().toBytes(&t)
         for i in 0 ..< RM {b[i+1]=t[i]}
 
         if ECP.CURVETYPE == ECP.MONTGOMERY {
@@ -362,13 +364,13 @@ final public class ECP {
     
 	if compress {
 		b[0]=0x02
-		if y.redc().parity()==1 {b[0]=0x03}
+		if W.y.redc().parity()==1 {b[0]=0x03}
 		return
 	}
 
 	b[0]=0x04
 
-        y.redc().toBytes(&t);
+        W.y.redc().toBytes(&t);
         for i in 0 ..< RM {b[i+RM+1]=t[i]}
     }
     /* convert from byte array to point */
@@ -402,10 +404,11 @@ final public class ECP {
     /* convert to hex string */
     func toString() -> String
     {
-        if is_infinity() {return "infinity"}
-        affine();
-        if ECP.CURVETYPE==ECP.MONTGOMERY {return "("+x.redc().toString()+")"}
-        else {return "("+x.redc().toString()+","+y.redc().toString()+")"}
+	let W=ECP(); W.copy(self)
+        if W.is_infinity() {return "infinity"}
+        W.affine();
+        if ECP.CURVETYPE==ECP.MONTGOMERY {return "("+W.x.redc().toString()+")"}
+        else {return "("+W.x.redc().toString()+","+W.y.redc().toString()+")"}
     }
     
     /* self*=2 */
@@ -798,9 +801,9 @@ final public class ECP {
     /* this-=Q */
     func sub(_ Q:ECP)
     {
-        Q.neg()
-        add(Q)
-        Q.neg()
+	let NQ=ECP(); NQ.copy(Q)
+        NQ.neg()
+        add(NQ)
     }
 
     /* constant time multiply by small integer of length bts - use ladder */
@@ -871,7 +874,7 @@ final public class ECP {
             let n=1+(BIG.NLEN*Int(BIG.BASEBITS)+3)/4
             var w=[Int8](repeating: 0,count: n)
     
-            affine();
+            //affine();
     
     // precompute table
             Q.copy(self)
@@ -938,8 +941,8 @@ final public class ECP {
         let n=1+(BIG.NLEN*Int(BIG.BASEBITS)+1)/2
         var w=[Int8](repeating: 0,count: n);
         
-        affine();
-        Q.affine();
+        //affine();
+        //Q.affine();
     
         te.copy(e);
         tf.copy(f);
@@ -1007,12 +1010,12 @@ final public class ECP {
 	if cf==1 {return}
 	if cf==4 {
 		dbl(); dbl()
-		affine()
+		//affine()
 		return
 	} 
 	if cf==8 {
 		dbl(); dbl(); dbl()
-		affine()
+		//affine()
 		return;
 	}
 	let c=BIG(ROM.CURVE_Cof);

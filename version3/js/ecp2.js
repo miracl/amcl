@@ -168,14 +168,16 @@ var ECP2 = function(ctx) {
 
         /* extract affine x as ctx.FP2 */
         getX: function() {
-            this.affine();
-            return this.x;
+			var W=new ECP2(); W.copy(this); W.affine();
+            //this.affine();
+            return W.x;
         },
 
         /* extract affine y as ctx.FP2 */
         getY: function() {
-            this.affine();
-            return this.y;
+			var W=new ECP2(); W.copy(this); W.affine();
+            //this.affine();
+            return W.y;
         },
 
         /* extract projective x */
@@ -197,22 +199,22 @@ var ECP2 = function(ctx) {
         toBytes: function(b) {
             var t = [],
                 i;
-
-            this.affine();
-            this.x.getA().toBytes(t);
+			var W=new ECP2(); W.copy(this);
+            W.affine();
+            W.x.getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i] = t[i];
             }
-            this.x.getB().toBytes(t);
+            W.x.getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + ctx.BIG.MODBYTES] = t[i];
             }
 
-            this.y.getA().toBytes(t);
+            W.y.getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + 2 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.y.getB().toBytes(t);
+            W.y.getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + 3 * ctx.BIG.MODBYTES] = t[i];
             }
@@ -220,11 +222,12 @@ var ECP2 = function(ctx) {
 
         /* convert this to hex string */
         toString: function() {
-            if (this.is_infinity()) {
+			var W=new ECP2(); W.copy(this);
+            if (W.is_infinity()) {
                 return "infinity";
             }
-            this.affine();
-            return "(" + this.x.toString() + "," + this.y.toString() + ")";
+            W.affine();
+            return "(" + W.x.toString() + "," + W.y.toString() + ")";
         },
 
         /* set this=(x,y) */
@@ -448,7 +451,7 @@ var ECP2 = function(ctx) {
             t0.norm();
             t2.imul(b);
             if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.M_TYPE) {
-                t2.mul_ip();
+                t2.mul_ip(); t2.norm();
             }
 
             z3 = new ctx.FP2(0);
@@ -488,10 +491,10 @@ var ECP2 = function(ctx) {
         /* this-=Q */
         sub: function(Q) {
             var D;
-
-            Q.neg();
-            D = this.add(Q);
-            Q.neg();
+			var NQ=new ECP2(); NQ.copy(Q);
+            NQ.neg();
+            D = this.add(NQ);
+            //Q.neg();
 
             return D;
         },
@@ -512,7 +515,7 @@ var ECP2 = function(ctx) {
                 return new ECP2();
             }
 
-            this.affine();
+            //this.affine();
 
             // precompute table
             Q.copy(this);
@@ -663,7 +666,7 @@ var ECP2 = function(ctx) {
 
         for (i = 0; i < 4; i++) {
             t[i] = new ctx.BIG(u[i]); t[i].norm();
-            Q[i].affine();
+            //Q[i].affine();
         }
 
         T[0] = new ECP2(); T[0].copy(Q[0]); // Q[0]

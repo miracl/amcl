@@ -50,7 +50,7 @@ var FP4 = function(ctx) {
 
         /* test this==0 ? */
         iszilch: function() {
-            this.reduce();
+            //this.reduce();
             return (this.a.iszilch() && this.b.iszilch());
         },
 

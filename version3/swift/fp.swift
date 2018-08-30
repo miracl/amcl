@@ -190,8 +190,9 @@ final public class FP {
 /* test this=0? */
     func iszilch() -> Bool
     {
-        reduce();
-        return x.iszilch()
+	let z=FP(self);
+        z.reduce();
+        return z.x.iszilch()
     }
     
 /* copy from FP b */
@@ -365,9 +366,11 @@ final public class FP {
 /* return TRUE if this==a */
     func equals(_ a: FP) -> Bool
     {
-        a.reduce()
-        reduce()
-        if (BIG.comp(a.x,x)==0) {return true}
+	let f=FP(self)
+	let s=FP(a)
+        f.reduce()
+        s.reduce()
+        if (BIG.comp(f.x,s.x)==0) {return true}
         return false;
     }
 

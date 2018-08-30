@@ -145,14 +145,16 @@ final public class ECP4 {
     /* extract affine x as FP4 */
     func getX() -> FP4
     {
-        affine()
-        return x
+	let W=ECP4(); W.copy(self)
+        W.affine()
+        return W.x
     }
     /* extract affine y as FP4 */
     func getY() -> FP4
     {
-        affine()
-        return y
+	let W=ECP4(); W.copy(self)
+        W.affine()
+        return W.y
     }
     /* extract projective x */
     func getx() -> FP4
@@ -175,35 +177,35 @@ final public class ECP4 {
     {
         let RM=Int(BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
-
-        affine();
+	let W=ECP4(); W.copy(self)
+        W.affine();
         
-        x.geta().getA().toBytes(&t)
+        W.x.geta().getA().toBytes(&t)
         for i in 0 ..< RM
             {b[i]=t[i]}
-        x.geta().getB().toBytes(&t);
+        W.x.geta().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+RM]=t[i]}
     
-        x.getb().getA().toBytes(&t)
+        W.x.getb().getA().toBytes(&t)
         for i in 0 ..< RM
             {b[i+2*RM]=t[i]}
-        x.getb().getB().toBytes(&t);
+        W.x.getb().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+3*RM]=t[i]}
 
 
-        y.geta().getA().toBytes(&t);
+        W.y.geta().getA().toBytes(&t);
         for i in 0 ..< RM
             {b[i+4*RM]=t[i]}
-        y.geta().getB().toBytes(&t);
+        W.y.geta().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+5*RM]=t[i]}
 
-        y.getb().getA().toBytes(&t);
+        W.y.getb().getA().toBytes(&t);
         for i in 0 ..< RM
             {b[i+6*RM]=t[i]}
-        y.getb().getB().toBytes(&t);
+        W.y.getb().getB().toBytes(&t);
         for i in 0 ..< RM
             {b[i+7*RM]=t[i]}
       
@@ -254,9 +256,10 @@ final public class ECP4 {
 /* convert self to hex string */
     func toString() -> String
     {
-        if is_infinity() {return "infinity"}
-        affine()
-        return "("+x.toString()+","+y.toString()+")"
+	let W=ECP4(); W.copy(self)
+        if W.is_infinity() {return "infinity"}
+        W.affine()
+        return "("+W.x.toString()+","+W.y.toString()+")"
     }
     
 /* Calculate RHS of twisted curve equation x^3+B/i */
@@ -430,9 +433,10 @@ final public class ECP4 {
     /* set self-=Q */
     @discardableResult func sub(_ Q:ECP4) -> Int
     {
-        Q.neg()
-        let D=add(Q)
-        Q.neg()
+	let NQ=ECP4(); NQ.copy(Q)
+        NQ.neg()
+        let D=add(NQ)
+        //Q.neg()
         return D
     }
 
@@ -494,7 +498,7 @@ final public class ECP4 {
     
         if is_infinity() {return ECP4()}
     
-        affine()
+        //affine()
     
     /* precompute table */
         Q.copy(self)
@@ -571,7 +575,7 @@ final public class ECP4 {
         {
             t.append(BIG(u[i]))
             t[i].norm()
-            Q[i].affine()
+            //Q[i].affine()
         }
 
     // precompute table 

@@ -74,8 +74,8 @@ impl ECP8 {
 
 /* Test this=O? */
 	pub fn is_infinity(&self) -> bool {
-		let mut xx=FP8::new_copy(&self.x);
-		let mut zz=FP8::new_copy(&self.z);
+		let xx=FP8::new_copy(&self.x);
+		let zz=FP8::new_copy(&self.z);
 		return xx.iszilch() && zz.iszilch();
 	}
 
@@ -163,15 +163,17 @@ impl ECP8 {
 	}
 
 /* extract affine x as FP8 */
-	pub fn getx(&mut self) -> FP8 {
-		self.affine();
-		return FP8::new_copy(&self.x);
+	pub fn getx(&self) -> FP8 {
+		let mut W=ECP8::new(); W.copy(self);
+		W.affine();
+		return FP8::new_copy(&W.x);
 	}
 
 /* extract affine y as FP8 */
-	pub fn gety(&mut self) -> FP8 {
-		self.affine();
-		return FP8::new_copy(&self.y);
+	pub fn gety(&self) -> FP8 {
+		let mut W=ECP8::new(); W.copy(self);
+		W.affine();
+		return FP8::new_copy(&W.y);
 	}
 
 /* extract projective x */
@@ -188,52 +190,53 @@ impl ECP8 {
 	}
 
 /* convert to byte array */
-	pub fn tobytes(&mut self,b: &mut [u8]) {
+	pub fn tobytes(&self,b: &mut [u8]) {
 		let mut t:[u8;big::MODBYTES as usize]=[0;big::MODBYTES as usize];
 		let mb=big::MODBYTES as usize;
+		let mut W=ECP8::new(); W.copy(self);
 
-		self.affine();
+		W.affine();
 
-		self.x.geta().geta().geta().tobytes(&mut t);
+		W.x.geta().geta().geta().tobytes(&mut t);
 		for i in 0..mb { b[i]=t[i]}
-		self.x.geta().geta().getb().tobytes(&mut t);
+		W.x.geta().geta().getb().tobytes(&mut t);
 		for i in 0..mb { b[i+mb]=t[i]}
 
-		self.x.geta().getb().geta().tobytes(&mut t);
+		W.x.geta().getb().geta().tobytes(&mut t);
 		for i in 0..mb { b[i+2*mb]=t[i]}
-		self.x.geta().getb().getb().tobytes(&mut t);
+		W.x.geta().getb().getb().tobytes(&mut t);
 		for i in 0..mb { b[i+3*mb]=t[i]}
 
-		self.x.getb().geta().geta().tobytes(&mut t);
+		W.x.getb().geta().geta().tobytes(&mut t);
 		for i in 0..mb { b[i+4*mb]=t[i]}
-		self.x.getb().geta().getb().tobytes(&mut t);
+		W.x.getb().geta().getb().tobytes(&mut t);
 		for i in 0..mb { b[i+5*mb]=t[i]}
 
-		self.x.getb().getb().geta().tobytes(&mut t);
+		W.x.getb().getb().geta().tobytes(&mut t);
 		for i in 0..mb { b[i+6*mb]=t[i]}
-		self.x.getb().getb().getb().tobytes(&mut t);
+		W.x.getb().getb().getb().tobytes(&mut t);
 		for i in 0..mb { b[i+7*mb]=t[i]}
 
 
 
-		self.y.geta().geta().geta().tobytes(&mut t);
+		W.y.geta().geta().geta().tobytes(&mut t);
 		for i in 0..mb {b[i+8*mb]=t[i]}
-		self.y.geta().geta().getb().tobytes(&mut t);
+		W.y.geta().geta().getb().tobytes(&mut t);
 		for i in 0..mb {b[i+9*mb]=t[i]}
 
-		self.y.geta().getb().geta().tobytes(&mut t);
+		W.y.geta().getb().geta().tobytes(&mut t);
 		for i in 0..mb {b[i+10*mb]=t[i]}
-		self.y.geta().getb().getb().tobytes(&mut t);
+		W.y.geta().getb().getb().tobytes(&mut t);
 		for i in 0..mb {b[i+11*mb]=t[i]}
 
-		self.y.getb().geta().geta().tobytes(&mut t);
+		W.y.getb().geta().geta().tobytes(&mut t);
 		for i in 0..mb {b[i+12*mb]=t[i]}
-		self.y.getb().geta().getb().tobytes(&mut t);
+		W.y.getb().geta().getb().tobytes(&mut t);
 		for i in 0..mb {b[i+13*mb]=t[i]}
 
-		self.y.getb().getb().geta().tobytes(&mut t);
+		W.y.getb().getb().geta().tobytes(&mut t);
 		for i in 0..mb {b[i+14*mb]=t[i]}
-		self.y.getb().getb().getb().tobytes(&mut t);
+		W.y.getb().getb().getb().tobytes(&mut t);
 		for i in 0..mb {b[i+15*mb]=t[i]}		
 	}
 
@@ -317,10 +320,10 @@ impl ECP8 {
 	}
 
 /* convert this to hex string */
-	pub fn tostring(&mut  self) -> String {
-		if self.is_infinity() {return String::from("infinity")}
-		self.affine();
-		return format!("({},{})",self.x.tostring(),self.y.tostring());
+	pub fn tostring(&self) -> String {
+		let mut W=ECP8::new(); W.copy(self); W.affine();
+		if W.is_infinity() {return String::from("infinity")}
+		return format!("({},{})",W.x.tostring(),W.y.tostring());
 }	
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
@@ -615,7 +618,7 @@ impl ECP8 {
 
 
 		for i in 0..16 {
-			Q[i].affine();
+			//Q[i].affine();
 			t[i].norm();
 		}
 

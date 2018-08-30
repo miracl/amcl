@@ -127,7 +127,7 @@ fn lineadd(A: &mut ECP2,B: &ECP2,qx: &FP,qy: &FP) -> FP12 {
 
 #[allow(non_snake_case)]
 /* Optimal R-ate pairing */
-pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
+pub fn ate(P1: &ECP2,Q1: &ECP) -> FP12 {
 	let mut f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
 	let x = BIG::new_ints(&rom::CURVE_BNX);
 	let mut n = BIG::new_copy(&x);
@@ -152,6 +152,10 @@ pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
 	n3.pmul(3);
 	n3.norm();
 
+	let mut P=ECP2::new(); P.copy(P1); P.affine();
+	let mut Q=ECP::new(); Q.copy(Q1); Q.affine();
+
+
 	let qx=FP::new_copy(&Q.getpx());
 	let qy=FP::new_copy(&Q.getpy());
 
@@ -171,7 +175,7 @@ pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
 		r.smul(&lv,ecp::SEXTIC_TWIST);
 		let bt=n3.bit(i)-n.bit(i);
 		if bt==1 {
-			lv=lineadd(&mut A,P,&qx,&qy);
+			lv=lineadd(&mut A,&P,&qx,&qy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}		
 		if bt == -1 {
@@ -211,7 +215,7 @@ pub fn ate(P: &ECP2,Q: &ECP) -> FP12 {
 
 #[allow(non_snake_case)]
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-pub fn ate2(P: &ECP2,Q: &ECP,R: &ECP2,S: &ECP) -> FP12 {
+pub fn ate2(P1: &ECP2,Q1: &ECP,R1: &ECP2,S1: &ECP) -> FP12 {
 	let mut f = FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
 	let x = BIG::new_ints(&rom::CURVE_BNX);
 	let mut n = BIG::new_copy(&x);
@@ -234,6 +238,11 @@ pub fn ate2(P: &ECP2,Q: &ECP,R: &ECP2,S: &ECP) -> FP12 {
 	let mut n3 = BIG::new_copy(&n);
 	n3.pmul(3);
 	n3.norm();
+
+	let mut P=ECP2::new(); P.copy(P1); P.affine();
+	let mut Q=ECP::new(); Q.copy(Q1); Q.affine();
+	let mut R=ECP2::new(); R.copy(R1); R.affine();
+	let mut S=ECP::new(); S.copy(S1); S.affine();
 
 
 	let qx=FP::new_copy(&Q.getpx());
@@ -266,9 +275,9 @@ pub fn ate2(P: &ECP2,Q: &ECP,R: &ECP2,S: &ECP) -> FP12 {
 		r.smul(&lv,ecp::SEXTIC_TWIST);
 		let bt=n3.bit(i)-n.bit(i);		
 		if bt == 1 {
-			lv=lineadd(&mut A,P,&qx,&qy);
+			lv=lineadd(&mut A,&P,&qx,&qy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
-			lv=lineadd(&mut B,R,&sx,&sy);
+			lv=lineadd(&mut B,&R,&sx,&sy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}
 		if bt == -1 {
@@ -572,7 +581,7 @@ pub fn g1mul(P: &ECP,e: &mut BIG) -> ECP {
 	//	P.affine();
 		R.copy(P);
 		let mut Q=ECP::new();
-		Q.copy(P);
+		Q.copy(P); Q.affine();
 		let q=BIG::new_ints(&rom::CURVE_ORDER);
 		let mut cru=FP::new_big(&BIG::new_ints(&rom::CURVE_CRU));
 		let mut u=glv(e);

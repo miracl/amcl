@@ -85,35 +85,39 @@ class ECp:
 		return True
 
 	def get(self):				# return tuple Fp x and Fp y
-		if self.isinf():
+		W=self.copy()
+		if W.isinf():
 			return (0, 0)
-		self.norm()
+		W.norm()
 		if curve.CurveType==MONTGOMERY:
-			return self.x.int()
-		return(self.x.int(), self.y.int())
+			return W.x.int()
+		return(W.x.int(), W.y.int())
 
 	def getxs(self):				# return tuple integer x and LSB of y
-		if self.isinf():
+		W=self.copy()
+		if W.isinf():
 			return (0, 0)
-		self.norm()
+		W.norm()
 		if curve.CurveType==MONTGOMERY:
-			return (self.x.int(),0)
-		return (self.x.int(), big.bit(self.y.int(), 0))
+			return (W.x.int(),0)
+		return (W.x.int(), big.bit(W.y.int(), 0))
 
 	def getx(self):				# return just integer x
-		if self.isinf():
+		W=self.copy()
+		if W.isinf():
 			return 0
-		self.norm()
-		return self.x.int()
+		W.norm()
+		return W.x.int()
 
 # Return as Fps
 	def getxy(self):
-		if (self.isinf()):
+		W=self.copy()
+		if (W.isinf()):
 			return (Fp(0), Fp(0))
-		self.norm()
+		W.norm()
 		if curve.CurveType==MONTGOMERY:
-			return self.x.copy()
-		return (self.x.copy(), self.y.copy())
+			return W.x.copy()
+		return (W.x.copy(), W.y.copy())
 
 	def __eq__(self, other):
 		zs = self.z
@@ -499,7 +503,7 @@ class ECp:
 		else :
 			b = other
 			b3 = 3 * b
-			self.norm()
+			#self.norm()
 
 			mself = -self
 			for i in range(b3.bit_length() - 1, 0, -1):
@@ -513,8 +517,8 @@ class ECp:
 		return R
 
 	def mul(P, a, Q, b):  # double multiplication a*P+b*Q
-		P.norm()
-		Q.norm()
+		#P.norm()
+		#Q.norm()
 		if a < 0:
 			a = -a
 			P = -P
@@ -529,7 +533,7 @@ class ECp:
 			k = ib
 		W = P.copy()
 		W.add(Q)
-		W.norm()
+		#W.norm()
 		for i in range(k - 1, -1, -1):
 			R.dbl()
 			if (big.bit(a, i) == 1):
@@ -543,12 +547,13 @@ class ECp:
 		return R
 
 	def __str__(self):			# pretty print
-		if self.isinf():
+		W=self.copy()
+		if W.isinf():
 			return "infinity"
-		self.norm()
+		W.norm()
 		if curve.CurveType==MONTGOMERY:
-			return "(%x)" % (self.x.int())
-		return "(%x,%x)" % (self.x.int(), self.y.int())
+			return "(%x)" % (W.x.int())
+		return "(%x,%x)" % (W.x.int(), W.y.int())
 
 # convert from and to an array of bytes
 	def fromBytes(self,W):

@@ -82,15 +82,15 @@ impl FP16 {
 	}	
 
 /* test self=0 ? */
-	pub fn iszilch(&mut self) -> bool {
-		self.reduce();
+	pub fn iszilch(&self) -> bool {
+		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch();
 	}	
 
 /* test self=1 ? */
-	pub fn isunity(&mut self) -> bool {
-		let mut one=FP8::new_int(1);
-		return self.a.equals(&mut one) && self.b.iszilch();
+	pub fn isunity(&self) -> bool {
+		let one=FP8::new_int(1);
+		return self.a.equals(&one) && self.b.iszilch();
 	}
 
 /* test is w real? That is in a+ib test b is zero */
@@ -114,8 +114,8 @@ impl FP16 {
 	}
 
 /* test self=x */
-	pub fn equals(&mut self,x:&mut FP16) -> bool {
-		return self.a.equals(&mut x.a) && self.b.equals(&mut x.b);
+	pub fn equals(&self,x:&FP16) -> bool {
+		return self.a.equals(&x.a) && self.b.equals(&x.b);
 	}
 /* copy self=x */
 	pub fn copy(&mut self,x :&FP16) {

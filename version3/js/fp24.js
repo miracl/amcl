@@ -54,7 +54,7 @@ var FP24 = function(ctx) {
 
         /* test x==0 ? */
         iszilch: function() {
-            this.reduce();
+            //this.reduce();
             return (this.a.iszilch() && this.b.iszilch() && this.c.iszilch());
         },
 
