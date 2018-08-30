@@ -24,7 +24,7 @@ class ECp2:
 		return copy.deepcopy(self)
 
 # convert to affine coordinates
-	def norm(self):				
+	def affine(self):				
 		if self.isinf() or self.z.isone():
 			return self
 		iz = self.z.inverse()
@@ -54,7 +54,7 @@ class ECp2:
 		W=self.copy()
 		if (W.isinf()):
 			return (Fp2(), Fp2())
-		W.norm()
+		W.affine()
 		return(W.x, W.y)
 
 	def getZ(self):
@@ -185,7 +185,7 @@ class ECp2:
 	def __rmul__(self, other):   # use NAF
 		b = other
 		b3 = 3 * b
-		#self.norm()
+		#self.affine()
 		mself = -self
 		R = ECp2()
 		for i in range(b3.bit_length() - 1, 0, -1):
@@ -203,7 +203,7 @@ class ECp2:
 			X=X.inverse()
 		X2=X.copy()
 		X2.sqr()
-		#self.norm()
+		#self.affine()
 		self.x=self.x.conj()
 		self.y=self.y.conj()
 		self.z=self.z.conj()
@@ -216,7 +216,7 @@ class ECp2:
 		W=self.copy()
 		if W.isinf():
 			return "infinity"
-		W.norm()
+		W.affine()
 		return "[%s,%s]" % (W.x, W.y)
 
 # convert from and to an array of bytes

@@ -83,7 +83,7 @@ def miller(P1, Q1):
 	P=P1.copy()
 	Q=Q1.copy()
 
-	P.norm(); Q.norm()
+	P.affine(); Q.affine()
 	A = P.copy()
 	Qx, Qy = Q.getxy()
 	nb = n3.bit_length()
@@ -133,7 +133,7 @@ def double_miller(P1, Q1, U1, V1):
 	U=U1.copy()
 	V=V1.copy()
 
-	P.norm(); Q.norm(); U.norm(); V.norm()
+	P.affine(); Q.affine(); U.affine(); V.affine()
 	A = P.copy()
 	Qx, Qy = Q.getxy()
 	B = U.copy()

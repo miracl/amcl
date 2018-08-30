@@ -27,7 +27,7 @@ class ECp:
 		return copy.deepcopy(self)
 
 # convert to affine coordinates
-	def norm(self):
+	def affine(self):
 		if  self.isinf() or self.z.isone():
 			return
 		iz = self.z.inverse() #iz / self.z
@@ -88,7 +88,7 @@ class ECp:
 		W=self.copy()
 		if W.isinf():
 			return (0, 0)
-		W.norm()
+		W.affine()
 		if curve.CurveType==MONTGOMERY:
 			return W.x.int()
 		return(W.x.int(), W.y.int())
@@ -97,7 +97,7 @@ class ECp:
 		W=self.copy()
 		if W.isinf():
 			return (0, 0)
-		W.norm()
+		W.affine()
 		if curve.CurveType==MONTGOMERY:
 			return (W.x.int(),0)
 		return (W.x.int(), big.bit(W.y.int(), 0))
@@ -106,7 +106,7 @@ class ECp:
 		W=self.copy()
 		if W.isinf():
 			return 0
-		W.norm()
+		W.affine()
 		return W.x.int()
 
 # Return as Fps
@@ -114,7 +114,7 @@ class ECp:
 		W=self.copy()
 		if (W.isinf()):
 			return (Fp(0), Fp(0))
-		W.norm()
+		W.affine()
 		if curve.CurveType==MONTGOMERY:
 			return W.x.copy()
 		return (W.x.copy(), W.y.copy())
@@ -485,7 +485,7 @@ class ECp:
 			R1.dbl()
 
 			D=self.copy()
-			D.norm();
+			D.affine();
 			nb=e.bit_length()
 			for i in range(nb-2,-1,-1) :
 				b=big.bit(e,i)
@@ -503,7 +503,7 @@ class ECp:
 		else :
 			b = other
 			b3 = 3 * b
-			#self.norm()
+			#self.affine()
 
 			mself = -self
 			for i in range(b3.bit_length() - 1, 0, -1):
@@ -513,12 +513,12 @@ class ECp:
 				if big.bit(b3, i) == 0 and big.bit(b, i) == 1:
 					R.add(mself)
 
-		R.norm()
+		R.affine()
 		return R
 
 	def mul(P, a, Q, b):  # double multiplication a*P+b*Q
-		#P.norm()
-		#Q.norm()
+		#P.affine()
+		#Q.affine()
 		if a < 0:
 			a = -a
 			P = -P
@@ -533,7 +533,7 @@ class ECp:
 			k = ib
 		W = P.copy()
 		W.add(Q)
-		#W.norm()
+		#W.affine()
 		for i in range(k - 1, -1, -1):
 			R.dbl()
 			if (big.bit(a, i) == 1):
@@ -550,7 +550,7 @@ class ECp:
 		W=self.copy()
 		if W.isinf():
 			return "infinity"
-		W.norm()
+		W.affine()
 		if curve.CurveType==MONTGOMERY:
 			return "(%x)" % (W.x.int())
 		return "(%x,%x)" % (W.x.int(), W.y.int())
