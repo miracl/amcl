@@ -512,7 +512,7 @@ func (F *FP12) ToBytes(w []byte) {
 }
 
 /* convert to hex string */
-func (F *FP12) toString() string {
+func (F *FP12) ToString() string {
 	return ("["+F.a.toString()+","+F.b.toString()+","+F.c.toString()+"]")
 }
 

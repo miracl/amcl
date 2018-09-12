@@ -68,7 +68,7 @@ func NewFPcopy(a *FP) *FP {
 
 func (F *FP) toString() string {
 	F.reduce()
-	return F.redc().toString()
+	return F.redc().ToString()
 }
 
 /* convert to Montgomery n-residue form */
@@ -327,7 +327,7 @@ func (F *FP) Equals(a *FP) bool {
 
 	s.reduce()
 	f.reduce()
-	if (comp(s.x,f.x)==0) {return true}
+	if (Comp(s.x,f.x)==0) {return true}
 	return false
 }
 

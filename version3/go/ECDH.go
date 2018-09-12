@@ -443,7 +443,7 @@ func ECDH_ECPVP_DSA(sha int,W []byte,F []byte,C []byte,D []byte) int {
 	d:=FromBytes(D)
 	f:=FromBytes(B[:])
      
-	if (c.iszilch() || comp(c,r)>=0 || d.iszilch() || comp(d,r)>=0) {
+	if (c.iszilch() || Comp(c,r)>=0 || d.iszilch() || Comp(d,r)>=0) {
             res=INVALID;
 	}
 
@@ -467,7 +467,7 @@ func ECDH_ECPVP_DSA(sha int,W []byte,F []byte,C []byte,D []byte) int {
 				d=P.GetX()
 				d.Mod(r)
 
-				if comp(d,c)!=0 {res=INVALID}
+				if Comp(d,c)!=0 {res=INVALID}
 			}
 		}
 	}

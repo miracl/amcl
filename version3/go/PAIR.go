@@ -722,9 +722,9 @@ func main() {
 	//r:=NewBIGints(CURVE_Order)
 	//xa:=NewBIGints(CURVE_Pxa)
 
-	fmt.Printf("P= "+P.toString())
+	fmt.Printf("P= "+P.ToString())
 	fmt.Printf("\n");
-	fmt.Printf("Q= "+Q.toString());
+	fmt.Printf("Q= "+Q.ToString());
 	fmt.Printf("\n");
 
 	//m:=NewBIGint(17)
@@ -733,21 +733,21 @@ func main() {
 	e=Fexp(e)
 	for i:=1;i<1000;i++ {
 		e=Ate(P,Q)
-//	fmt.Printf("\ne= "+e.toString())
+//	fmt.Printf("\ne= "+e.ToString())
 //	fmt.Printf("\n")
 
 		e=Fexp(e)
 	}
 	//	e=GTpow(e,m);
 
-	fmt.Printf("\ne= "+e.toString())
+	fmt.Printf("\ne= "+e.ToString())
 	fmt.Printf("\n");
 	GLV:=glv(r)
 
-	fmt.Printf("GLV[0]= "+GLV[0].toString())
+	fmt.Printf("GLV[0]= "+GLV[0].ToString())
 	fmt.Printf("\n")
 
-	fmt.Printf("GLV[0]= "+GLV[1].toString())
+	fmt.Printf("GLV[0]= "+GLV[1].ToString())
 	fmt.Printf("\n")
 
 	G:=NewECP(); G.Copy(Q)
@@ -758,20 +758,20 @@ func main() {
 	e=Fexp(e)
 
 	e=GTpow(e,xa)
-	fmt.Printf("\ne= "+e.toString());
+	fmt.Printf("\ne= "+e.ToString());
 	fmt.Printf("\n")
 
 	R=G2mul(R,xa)
 	e=Ate(R,G)
 	e=Fexp(e)
 
-	fmt.Printf("\ne= "+e.toString())
+	fmt.Printf("\ne= "+e.ToString())
 	fmt.Printf("\n")
 
 	G=G1mul(G,xa)
 	e=Ate(P,G)
 	e=Fexp(e)
-	fmt.Printf("\ne= "+e.toString())
+	fmt.Printf("\ne= "+e.ToString())
 	fmt.Printf("\n") 
 }
 */

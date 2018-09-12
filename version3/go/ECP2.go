@@ -196,7 +196,7 @@ func ECP2_fromBytes(b []byte) *ECP2 {
 }
 
 /* convert this to hex string */
-func (E *ECP2) toString() string {
+func (E *ECP2) ToString() string {
 	W:=NewECP2(); W.Copy(E);
 	W.Affine()
 	if W.Is_infinity() {return "infinity"}

@@ -357,7 +357,7 @@ func ECP_fromBytes(b []byte) *ECP {
 
 	for i:=0;i<MB;i++ {t[i]=b[i+1]}
 	px:=FromBytes(t[:])
-	if comp(px,p)>=0 {return NewECP()}
+	if Comp(px,p)>=0 {return NewECP()}
 
 	if CURVETYPE==MONTGOMERY {
 		return NewECPbig(px)
@@ -366,7 +366,7 @@ func ECP_fromBytes(b []byte) *ECP {
 	if b[0]==0x04 {
 		for i:=0;i<MB;i++ {t[i]=b[i+MB+1]}
 		py:=FromBytes(t[:])
-		if comp(py,p)>=0 {return NewECP()}
+		if Comp(py,p)>=0 {return NewECP()}
 		return NewECPbigs(px,py)
 	}
 
@@ -378,13 +378,13 @@ func ECP_fromBytes(b []byte) *ECP {
 }
 
 /* convert to hex string */
-func (E *ECP) toString() string {
+func (E *ECP) ToString() string {
 	W:=NewECP(); W.Copy(E);
 	W.Affine()
 	if W.Is_infinity() {return "infinity"}
 	if CURVETYPE==MONTGOMERY {
-		return "("+W.x.redc().toString()+")"
-	} else {return "("+W.x.redc().toString()+","+W.y.redc().toString()+")"}
+		return "("+W.x.redc().ToString()+")"
+	} else {return "("+W.x.redc().ToString()+","+W.y.redc().ToString()+")"}
 }
 
 /* this*=2 */
@@ -1010,11 +1010,11 @@ func main() {
 
 	//r.dec(7);
 	
-	fmt.Printf("Gx= "+Gx.toString())
+	fmt.Printf("Gx= "+Gx.ToString())
 	fmt.Printf("\n")
 
 	if CURVETYPE!=MONTGOMERY {
-		fmt.Printf("Gy= "+Gy.toString())
+		fmt.Printf("Gy= "+Gy.ToString())
 		fmt.Printf("\n")
 	}	
 
@@ -1022,14 +1022,14 @@ func main() {
 		P=NewECPbigs(Gx,Gy)
 	} else  {P=NewECPbig(Gx)}
 
-	fmt.Printf("P= "+P.toString());		
+	fmt.Printf("P= "+P.ToString());		
 	fmt.Printf("\n")
 
 	R:=P.mul(r);
 		//for (int i=0;i<10000;i++)
 		//	R=P.mul(r);
 	
-	fmt.Printf("R= "+R.toString())
+	fmt.Printf("R= "+R.ToString())
 	fmt.Printf("\n")
 }
 */
