@@ -858,7 +858,7 @@ func (r *BIG) Invmodp(p *BIG) {
 }
 
 /* return this^e mod m */
-func (r *BIG) powmod(e1 *BIG,m *BIG) *BIG {
+func (r *BIG) Powmod(e1 *BIG,m *BIG) *BIG {
 	e:=NewBIGcopy(e1)
 	r.norm()
 	e.norm()
@@ -938,7 +938,7 @@ func main() {
 	e.dec(1); e.norm();
 	fmt.Printf("Exponent= "+e.ToString())
 	fmt.Printf("\n")
-	a=a.powmod(e,m);
+	a=a.Powmod(e,m);
 	fmt.Printf("Result= "+a.ToString())
 }
 */
