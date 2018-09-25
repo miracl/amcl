@@ -166,6 +166,13 @@ void YYY::FP12_usqr(FP12 *w,FP12 *x)
     FP4_add(&(w->c),&(w->c),&(w->c));
     FP4_add(&(w->b),&B,&(w->b));
     FP4_add(&(w->c),&C,&(w->c));
+/*
+	FP n;
+	FP_one(&n);
+	FP4_qmul(&(w->a),&(w->a),&n);
+	FP4_qmul(&(w->b),&(w->b),&n);
+	FP4_qmul(&(w->c),&(w->c),&n);
+*/
 
     FP12_reduce(w);	    /* reduce here as in pow function repeated squarings would trigger multiple reductions */
 }

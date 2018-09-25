@@ -859,6 +859,29 @@ void XXX::BIG_shr(BIG a,int k)
 
 }
 
+/* Fast combined shift, subtract and norm. Return sign of result */
+int XXX::BIG_ssn(BIG r,BIG a,BIG m)
+{
+	int i,n=NLEN_XXX-1;
+	chunk carry;
+	m[0]=(m[0]>>1)|((m[1]<<(BASEBITS_XXX-1))&BMASK_XXX);
+	r[0]=a[0]-m[0];
+    carry=r[0]>>BASEBITS_XXX;
+    r[0]&=BMASK_XXX;
+    
+	for (i=1;i<n;i++)
+	{
+		m[i]=(m[i]>>1)|((m[i+1]<<(BASEBITS_XXX-1))&BMASK_XXX);
+		r[i]=a[i]-m[i]+carry;
+		carry=r[i]>>BASEBITS_XXX;
+		r[i]&=BMASK_XXX;
+	}
+	
+	m[n]>>=1;
+	r[n]=a[n]-m[n]+carry;
+	return ((r[n]>>(CHUNK-1))&1);
+}
+
 /* Faster shift right of a by k bits. Return shifted out part */
 /* a MUST be normalised */
 /* SU= 16 */

@@ -1085,6 +1085,24 @@ final public class BIG{
     }
 #endif
 
+/* Optimized combined shift, subtract and norm */
+    static func ssn(_ r: BIG,_ a :BIG,_ m: BIG) -> Int
+    {
+        let n=BIG.NLEN-1
+        m.w[0]=(m.w[0]>>1)|((m.w[1]<<(BIG.BASEBITS-1))&BIG.BMASK)
+	r.w[0]=a.w[0]-m.w[0]
+	var carry=r.w[0]>>BIG.BASEBITS
+	r.w[0] &= BIG.BMASK
+	for i in 1 ..< n {
+            m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(BIG.BASEBITS-1))&BIG.BMASK)
+            r.w[i]=a.w[i]-m.w[i]+carry
+            carry=r.w[i]>>BIG.BASEBITS
+            r.w[i] &= BIG.BMASK
+        }
+	m.w[n]>>=1
+	r.w[n]=a.w[n]-m.w[n]+carry
+	return Int((r.w[n]>>(BIG.CHUNK-1))&Chunk(1))
+    }
     
     /* return a*b mod m */
     static func modmul(_ a1: BIG,_ b1 :BIG,_ m: BIG) -> BIG

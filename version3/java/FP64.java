@@ -408,10 +408,24 @@ public final class FP {
 /* reduce this mod Modulus */
 	public void reduce()
 	{
-		x.mod(new BIG(ROM.Modulus));
+//		System.out.println("Reducing..");
+//		x.mod(new BIG(ROM.Modulus));
+		BIG m=new BIG(ROM.Modulus);
+		BIG r=new BIG(0);
+		x.norm();
+		int sr,sb=logb2(XES-1);
+		m.fshl(sb);
+
+		while (sb>0)
+		{
+// constant time...
+			sr=BIG.ssn(r,x,m);  // optimized combined shift, subtract and norm
+			x.cmove(r,1-sr);
+			sb--;
+		}
+
 		XES=1;
 	}
-
 	public FP pow(BIG e)
 	{
 		byte[] w=new byte[1+(BIG.NLEN*BIG.BASEBITS+3)/4];

@@ -65,8 +65,6 @@ void YYY::FP2_reduce(FP2 *w)
 /* SU= 16 */
 int YYY::FP2_equals(FP2 *x,FP2 *y)
 {
-    FP2_reduce(x);
-    FP2_reduce(y);
     if (FP_equals(&(x->a),&(y->a)) && FP_equals(&(x->b),&(y->b)))
         return 1;
     return 0;

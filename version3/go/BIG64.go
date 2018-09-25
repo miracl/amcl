@@ -926,6 +926,23 @@ func logb2(w uint32) uint {
 	return (r)
 }
 
+// Optimized combined shift, subtract and norm
+func ssn(r *BIG,a *BIG,m *BIG) int {
+        n:=NLEN-1
+        m.w[0]=(m.w[0]>>1)|((m.w[1]<<(BASEBITS-1))&BMASK)
+	r.w[0]=a.w[0]-m.w[0]
+	carry:=r.w[0]>>BASEBITS
+	r.w[0] &= BMASK
+	for i:=1;i<n;i++  {
+            m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(BASEBITS-1))&BMASK)
+            r.w[i]=a.w[i]-m.w[i]+carry
+            carry=r.w[i]>>BASEBITS
+            r.w[i] &= BMASK
+        }
+	m.w[n]>>=1
+	r.w[n]=a.w[n]-m.w[n]+carry
+	return int((r.w[n]>>uint(CHUNK-1))&1)
+}
 
 /*
 func main() {

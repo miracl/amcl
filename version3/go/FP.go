@@ -165,8 +165,19 @@ func mod(d *DBIG) *BIG {
 
 /* reduce this mod Modulus */
 func (F *FP) reduce() {
-	p:=NewBIGints(Modulus)
-	F.x.Mod(p)
+	m:=NewBIGints(Modulus)
+	r:=NewBIG()
+	sb:=logb2(uint32(F.XES-1))
+	F.x.norm()
+	m.fshl(sb)
+
+	for sb>0 {
+            sr:=ssn(r,F.x,m)
+	    F.x.cmove(r,1-sr)
+            sb -= 1
+	}
+
+	//F.x.Mod(m)
 	F.XES=1
 }
 

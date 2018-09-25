@@ -862,7 +862,7 @@ void BIG_XXX_dshl(DBIG_XXX a,int k)
 
 }
 
-/* General shift rightof a by k bits */
+/* General shift right of a by k bits */
 /* a MUST be normalised */
 /* SU= 32 */
 void BIG_XXX_shr(BIG_XXX a,int k)
@@ -875,6 +875,29 @@ void BIG_XXX_shr(BIG_XXX a,int k)
     if (NLEN_XXX>m)  a[NLEN_XXX-m-1]=a[NLEN_XXX-1]>>n;
     for (i=NLEN_XXX-m; i<NLEN_XXX; i++) a[i]=0;
 
+}
+
+/* Fast combined shift, subtract and norm. Return sign of result */
+int BIG_XXX_ssn(BIG_XXX r,BIG_XXX a,BIG_XXX m)
+{
+	int i,n=NLEN_XXX-1;
+	chunk carry;
+	m[0]=(m[0]>>1)|((m[1]<<(BASEBITS_XXX-1))&BMASK_XXX);
+	r[0]=a[0]-m[0];
+    carry=r[0]>>BASEBITS_XXX;
+    r[0]&=BMASK_XXX;
+    
+	for (i=1;i<n;i++)
+	{
+		m[i]=(m[i]>>1)|((m[i+1]<<(BASEBITS_XXX-1))&BMASK_XXX);
+		r[i]=a[i]-m[i]+carry;
+		carry=r[i]>>BASEBITS_XXX;
+		r[i]&=BMASK_XXX;
+	}
+	
+	m[n]>>=1;
+	r[n]=a[n]-m[n]+carry;
+	return ((r[n]>>(CHUNK-1))&1);
 }
 
 /* Faster shift right of a by k bits. Return shifted out part */

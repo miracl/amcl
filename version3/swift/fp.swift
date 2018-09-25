@@ -171,27 +171,41 @@ final public class FP {
     /* convert to string */
     func toString() -> String
     {
-        let s=redc().toString();
-        return s;
+        let s=redc().toString()
+        return s
     }
     
     func toRawString() -> String
     {
-        let s=x.toRawString();
-        return s;
+        let s=x.toRawString()
+        return s
     }
 /* reduce this mod Modulus */
     func reduce()
     {
-        x.mod(FP.p)
+
+        let m=BIG(FP.p)
+	let r=BIG(0)
+        var sb=FP.logb2(UInt32(xes-Int32(1)))
+        m.fshl(sb)
+
+        x.norm()
+
+        while sb>0 {
+            let sr=BIG.ssn(r,x,m)
+	    x.cmove(r,1-sr)
+            sb -= 1
+	}
+	
+        //x.mod(FP.p)
         xes=1
     }
     
 /* test this=0? */
     func iszilch() -> Bool
     {
-	let z=FP(self);
-        z.reduce();
+	let z=FP(self)
+        z.reduce()
         return z.x.iszilch()
     }
     

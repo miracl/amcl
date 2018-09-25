@@ -185,10 +185,12 @@ class ECp2:
 	def __rmul__(self, other):   # use NAF
 		b = other
 		b3 = 3 * b
+		k = b3.bit_length()
+		#k = curve.r.bit_length()+2
 		#self.affine()
 		mself = -self
 		R = ECp2()
-		for i in range(b3.bit_length() - 1, 0, -1):
+		for i in range(k - 1, 0, -1):
 			R.dbl()
 			if big.bit(b3, i) == 1 and big.bit(b, i) == 0:
 				R.add(self)

@@ -214,6 +214,7 @@ impl BIG {
 		}
 	}
 
+
 /* Shift right by less than a word */
 	pub fn fshr(&mut self, k: usize) -> isize {
 		let n = k;
@@ -975,6 +976,22 @@ impl BIG {
 
 */
 
+    pub fn ssn(r: &mut BIG,a: &BIG,m: &mut BIG) -> isize {
+        let n=NLEN-1;
+        m.w[0]=(m.w[0]>>1)|((m.w[1]<<(BASEBITS-1))&BMASK);
+	r.w[0]=a.w[0]-m.w[0];
+	let mut carry=r.w[0]>>BASEBITS;
+	r.w[0]&=BMASK;
+	for i in 1 ..n {
+            m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(BASEBITS-1))&BMASK);
+            r.w[i]=a.w[i]-m.w[i]+carry;
+            carry=r.w[i]>>BASEBITS;
+            r.w[i]&=BMASK;
+        }
+	m.w[n]>>=1;
+	r.w[n]=a.w[n]-m.w[n]+carry;
+	return ((r.w[n]>>(arch::CHUNK-1))&1) as isize;
+    }
 
     /* return a*b mod m */
     pub fn modmul(a1: &BIG,b1: &BIG,m: &BIG) -> BIG {

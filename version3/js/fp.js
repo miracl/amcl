@@ -144,9 +144,23 @@ var FP = function(ctx) {
 
         /* reduce this mod Modulus */
         reduce: function() {
-            var p = new ctx.BIG(0);
-            p.rcopy(ctx.ROM_FIELD.Modulus);
-            this.f.mod(p);
+            var m = new ctx.BIG(0);
+            m.rcopy(ctx.ROM_FIELD.Modulus);
+			var r = new ctx.BIG(0);
+
+			this.f.norm();
+			var sr,sb=FP.logb2(this.XES-1);
+			m.fshl(sb);
+
+			while (sb>0)
+			{
+// constant time...
+				sr=ctx.BIG.ssn(r,this.f,m);  // optimized combined shift, subtract and norm
+				this.f.cmove(r,1-sr);
+				sb--;
+			}			
+
+            //this.f.mod(m);
             this.XES = 1;
         },
 

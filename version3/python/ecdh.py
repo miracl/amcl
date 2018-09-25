@@ -17,7 +17,7 @@ def ECP_KeyPairGenerate(S) :
 	if S is None :
 		s=big.rand(curve.r)
 	else :
-		s=big.from_bytes(S) 
+		s=big.from_bytes(S)%curve.r
 	
 	Y = s * G
 

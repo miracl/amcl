@@ -434,21 +434,6 @@ void YYY::FP_sub(FP *r,FP *a,FP *b)
     FP_add(r,a,&n);
 }
 
-/* SU= 48 */
-/* Fully reduce a mod Modulus */
-void YYY::FP_reduce(FP *a)
-{
-    BIG m;
-    BIG_rcopy(m,Modulus);
-    BIG_mod(a->g,m);
-	a->XES=1;
-}
-
-void YYY::FP_norm(FP *x)
-{
-	BIG_norm(x->g);
-}
-
 // https://graphics.stanford.edu/~seander/bithacks.html
 // constant time log to base 2 (or number of bits in)
 
@@ -465,6 +450,35 @@ static int logb2(unsign32 v)
     v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
     r = (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     return r;
+}
+
+/* SU= 48 */
+/* Fully reduce a mod Modulus */
+void YYY::FP_reduce(FP *a)
+{
+    BIG m,r;
+	int sr,sb;
+    BIG_rcopy(m,Modulus);
+
+	BIG_norm(a->g);
+	sb=logb2(a->XES-1);  // sb does not depend on the actual data
+	BIG_fshl(m,sb);
+
+	while (sb>0)
+	{
+// constant time...
+		sr=BIG_ssn(r,a->g,m);  // optimized combined shift, subtract and norm
+		BIG_cmove(a->g,r,1-sr);
+		sb--;
+	}
+
+    //BIG_mod(a->g,m);
+	a->XES=1;
+}
+
+void YYY::FP_norm(FP *x)
+{
+	BIG_norm(x->g);
 }
 
 /* Set r=-a mod Modulus */

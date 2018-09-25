@@ -808,6 +808,23 @@ BIG = function(ctx) {
         }
     };
 
+	BIG.ssn = function(r,a,m) {
+		var n=BIG.NLEN-1;
+		m.w[0]=(m.w[0]>>1)|((m.w[1]<<(BIG.BASEBITS-1))&BIG.BMASK);
+		r.w[0]=a.w[0]-m.w[0];
+		var carry=r.w[0]>>BIG.BASEBITS;
+		r.w[0]&=BIG.BMASK;
+		for (var i=1;i<n;i++) {
+			m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(BIG.BASEBITS-1))&BIG.BMASK);
+			r.w[i]=a.w[i]-m.w[i]+carry;
+			carry=r.w[i]>>BIG.BASEBITS;
+			r.w[i]&=BIG.BMASK;
+		}
+		m.w[n]>>=1;
+		r.w[n]=a.w[n]-m.w[n]+carry;
+		return ((r.w[n]>>(BIG.CHUNK-1))&1);
+	};
+
     /* convert from byte array to BIG */
     BIG.frombytearray = function(b, n) {
         var m = new BIG(0),

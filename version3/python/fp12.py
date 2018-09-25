@@ -195,10 +195,11 @@ class Fp12:
 	def pow(self, other) : #unitary only
 		e = other
 		e3 = e*3
+		k = e3.bit_length()
 		x = self.copy()
 		r = self.copy()
 
-		for i in range(e3.bit_length() - 2, 0, -1):
+		for i in range(k - 2, 0, -1):
 			r.usqr()
 			if big.bit(e3, i) == 1 and big.bit(e, i) == 0:
 				r*=x

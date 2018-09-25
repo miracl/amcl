@@ -347,6 +347,16 @@ extern void BIG_XXX_dshl(DBIG_XXX x,int s);
 	@param s Number of bits to shift
  */
 extern void BIG_XXX_shr(BIG_XXX x,int s);
+
+/**	@brief Fast time-critical combined shift by 1 bit, subtract and normalise
+ *
+	@param r BIG number normalised output
+	@param a BIG number to be subtracted from
+	@param m BIG number to be shifted and subtracted
+	@return sign of r
+ */
+extern int BIG_XXX_ssn(BIG_XXX r,BIG_XXX a, BIG_XXX m);
+
 /**	@brief Fast shifts a BIG right by a small number of bits - input must be normalised, output will be normalised
  *
 	The number of bits to be shifted must be less than BASEBITS

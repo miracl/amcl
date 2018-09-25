@@ -405,7 +405,26 @@ public final class FP {
 	public void reduce()
 	{
 //		System.out.println("Reducing..");
-		x.mod(new BIG(ROM.Modulus));
+//		x.mod(new BIG(ROM.Modulus));
+		BIG m=new BIG(ROM.Modulus);
+		BIG r=new BIG(0);
+		x.norm();
+		int sr,sb=logb2(XES-1);
+		m.fshl(sb);
+
+		while (sb>0)
+		{
+// constant time...
+			sr=BIG.ssn(r,x,m);  // optimized combined shift, subtract and norm
+			//m.fshr(1);
+			//r.copy(x);
+			//r.sub(m);
+			//r.norm();
+			//sr=((r.w[BIG.NLEN-1]>>(BIG.CHUNK-1))&1);
+			x.cmove(r,1-sr);
+			sb--;
+		}
+
 		XES=1;
 	}
 

@@ -487,6 +487,7 @@ class ECp:
 			D=self.copy()
 			D.affine();
 			nb=e.bit_length()
+			#nb=curve.r.bit_length()
 			for i in range(nb-2,-1,-1) :
 				b=big.bit(e,i)
 				R=R1.copy()
@@ -503,16 +504,16 @@ class ECp:
 		else :
 			b = other
 			b3 = 3 * b
-			#self.affine()
+			k= b3.bit_length()
+			#k=curve.r.bit_length()+2;
 
 			mself = -self
-			for i in range(b3.bit_length() - 1, 0, -1):
+			for i in range(k - 1, 0, -1):
 				R.dbl()
 				if big.bit(b3, i) == 1 and big.bit(b, i) == 0:
 					R.add(self)
 				if big.bit(b3, i) == 0 and big.bit(b, i) == 1:
 					R.add(mself)
-
 		R.affine()
 		return R
 
@@ -531,6 +532,7 @@ class ECp:
 		k = ia
 		if (ib > ia):
 			k = ib
+		k=curve.r.bit_length()
 		W = P.copy()
 		W.add(Q)
 		#W.affine()

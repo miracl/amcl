@@ -184,8 +184,20 @@ impl FP {
 
 /* reduce this mod Modulus */
     pub fn reduce(&mut self) {
-  		let p = BIG::new_ints(&rom::MODULUS);      	
-        self.x.rmod(&p);
+        let mut m = BIG::new_ints(&rom::MODULUS);
+	let mut r = BIG::new();
+	
+        self.x.norm();
+        let mut sb=FP::logb2((self.xes-1) as u32);
+        m.fshl(sb);
+
+        while sb>0 {
+            let sr=BIG::ssn(&mut r,&self.x,&mut m);
+	    self.x.cmove(&r,1-sr);
+            sb=sb-1;
+	}
+
+        //self.x.rmod(&m);
         self.xes=1;
     }
     
