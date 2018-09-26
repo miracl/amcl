@@ -549,6 +549,18 @@ public final class ECDH {
 		return C;
 	}
 
+/* constant time n-byte compare */
+	static boolean ncomp(byte[] T1,byte[] T2,int n)
+	{
+		int res=0;
+		for (int i=0;i<n;i++)
+		{
+			res|=(int)(T1[i]^T2[i]);
+		}
+		if (res==0) return true;
+		return false;
+	}
+
 /* IEEE1363 ECIES decryption. Decryption of ciphertext V,C,T using private key U outputs plaintext M */
 	public static byte[] ECIES_DECRYPT(int sha,byte[] P1,byte[] P2,byte[] V,byte[] C,byte[] T,byte[] U)
 	{ 
@@ -584,9 +596,11 @@ public final class ECDH {
 	
 		HMAC(sha,AC,K2,TAG);
 
-		boolean same=true;
-		for (i=0;i<T.length;i++) if (T[i]!=TAG[i]) same=false;
-		if (!same) return new byte[0];
+		if (!ncomp(T,TAG,T.length)) return new byte[0];
+		
+//		boolean same=true;
+//		for (i=0;i<T.length;i++) if (T[i]!=TAG[i]) same=false;
+//		if (!same) return new byte[0];
 	
 		return M;
 

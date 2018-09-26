@@ -258,10 +258,19 @@ void YYY::FP_zero(FP *x)
 
 int YYY::FP_equals(FP *x,FP *y)
 {
+//	int i;
+//	chunk res=0;
 	FP xg,yg;
 	FP_copy(&xg,x);
 	FP_copy(&yg,y);
 	FP_reduce(&xg); FP_reduce(&yg);
+
+//	for (i=0;i<NLEN_XXX;i++)
+//	{
+//		res |= xg.g[i]^yg.g[i];
+//	}
+//	return res;
+
 	if (BIG_comp(xg.g,yg.g)==0) return 1;
 	return 0;
 }

@@ -535,6 +535,16 @@ final public class ECDH
         return C
     }
 
+/* constant time n-byte compare */
+    static func ncomp(_ T1:[UInt8],_ T2:[UInt8],_ n:Int) -> Bool {
+	var res=0
+	for i in 0 ..< n {
+		res|=Int(T1[i]^T2[i])
+	}
+	if res==0 {return true}
+	return false
+    }
+
     /* IEEE1363 ECIES decryption. Decryption of ciphertext V,C,T using private key U outputs plaintext M */
     static public func ECIES_DECRYPT(_ sha:Int,_ P1:[UInt8],_ P2:[UInt8],_ V:[UInt8],_ C:[UInt8],_ T:[UInt8],_ U:[UInt8]) -> [UInt8]
     {
@@ -568,12 +578,14 @@ final public class ECDH
     
         ECDH.HMAC(sha,AC,K2,&TAG)
     
-        var same=true
-        for i in 0 ..< T.count
-        {
-            if T[i] != TAG[i] {same=false}
-        }
-        if !same {return [UInt8]()}
+	if !ncomp(T,TAG,T.count) {return [UInt8]()}	
+
+ //       var same=true
+ //       for i in 0 ..< T.count
+ //       {
+ //           if T[i] != TAG[i] {same=false}
+ //       }
+ //       if !same {return [UInt8]()}
     
         return M;
     

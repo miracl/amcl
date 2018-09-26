@@ -415,7 +415,7 @@ int ECP_ZZZ_ECIES_DECRYPT(int sha,octet *P1,octet *P2,octet *V,octet *C,octet *T
     HMAC(sha,C,&K2,T->len,&TAG);
     C->len=len;
 
-    if (!OCT_comp(T,&TAG)) return 0;
+    if (!OCT_ncomp(T,&TAG,T->len)) return 0;
 
     return 1;
 

@@ -218,7 +218,7 @@ public func TestECDH_ed25519(_ rng: RAND)
         }
         else {print("Decryption succeeded")}
     
-        print("Message is 0x"); printBinary(M)
+        print("Message is 0x",terminator: ""); printBinary(M)
     
         print("Testing ECDSA")
 
@@ -353,7 +353,7 @@ public func TestECDH_nist256(_ rng: RAND)
         }
         else {print("Decryption succeeded")}
     
-        print("Message is 0x"); printBinary(M)
+        print("Message is 0x",terminator: ""); printBinary(M)
     
         print("Testing ECDSA")
 
@@ -487,7 +487,7 @@ public func TestECDH_goldilocks(_ rng: RAND)
         }
         else {print("Decryption succeeded")}
     
-        print("Message is 0x"); printBinary(M)
+        print("Message is 0x",terminator: ""); printBinary(M)
     
         print("Testing ECDSA")
 
@@ -508,8 +508,6 @@ public func TestECDH_goldilocks(_ rng: RAND)
         else {print("ECDSA Signature/Verification succeeded ")}
     }
 }
-
-
 
 public func TestMPIN_bn254(_ rng: RAND)
 {

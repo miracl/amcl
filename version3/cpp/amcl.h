@@ -223,6 +223,8 @@ extern void OCT_clear(octet *O);
 	@return 1 if equal, else 0
  */
 extern int  OCT_comp(octet *O,octet *P);
+
+
 /**	@brief Compare first n bytes of two octets
  *
 	@param O first Octet to be compared

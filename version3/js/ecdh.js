@@ -688,6 +688,16 @@ var ECDH = function(ctx) {
             return C;
         },
 
+		ncomp: function(T1,T2,n) {
+			var res=0;
+			for (var i=0;i<n;i++)
+			{
+				res|=(T1[i]^T2[i]);
+			}
+			if (res==0) return true;
+			return false;
+		},
+
         ECIES_DECRYPT: function(sha, P1, P2, V, C, T, U) {
             var Z = [],
                 VZ = [],
@@ -738,16 +748,20 @@ var ECDH = function(ctx) {
 
             this.HMAC(sha, AC, K2, TAG);
 
-            same = true;
-            for (i = 0; i < T.length; i++) {
-                if (T[i] != TAG[i]) {
-                    same = false;
-                }
-            }
+			if (!this.ncomp(T,TAG,T.length)) {
+				return [];
+			}
+		
+  //          same = true;
+  //          for (i = 0; i < T.length; i++) {
+  //              if (T[i] != TAG[i]) {
+  //                  same = false;
+  //              }
+  //          }
 
-            if (!same) {
-                return [];
-            }
+  //          if (!same) {
+  //              return [];
+  //          }
 
             return M;
         }
