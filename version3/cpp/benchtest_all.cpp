@@ -749,6 +749,7 @@ int BLS_48(csprng *RNG)
     printf("G1 mul              - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
 
+
 	ECP8_generator(&W);
 
 	ECP8_copy(&Q,&W);
@@ -772,6 +773,7 @@ int BLS_48(csprng *RNG)
     elapsed=1000.0*elapsed/iterations;
     printf("G2 mul              - %8d iterations  ",iterations);
     printf(" %8.2lf ms per iteration\n",elapsed);
+
 
 	PAIR_ate(&w,&Q,&P);
 	PAIR_fexp(&w);
@@ -952,7 +954,7 @@ int main()
 	pr[1]=ran>>8;
 	pr[2]=ran>>16;
 	pr[3]=ran>>24;
-	for (i=4;i<10;i++) pr[i]=i;
+	for (i=0;i<10;i++) pr[i]=i;    /*****4****/
     RAND_seed(&RNG,10,pr);
 
 	ED_25519(&RNG);

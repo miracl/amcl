@@ -419,8 +419,6 @@ final public class BIG{
             let ak=w[i]
             let (top,bot)=BIG.muladd(ak,Chunk(c),carry,Chunk(0))
             carry=top; w[i]=bot;
-            //carry=muladd(ak,Chunk(c),carry,i);
-            
         }
         return carry;
     }
@@ -433,7 +431,6 @@ final public class BIG{
         {
             let (top,bot)=BIG.muladd(w[j],Chunk(c),carry,m.w[j])
             carry=top; m.w[j]=bot
-  //          carry=m.muladd(w[j],c,carry,j)
         }
         m.w[BIG.NLEN]=carry
         return m;

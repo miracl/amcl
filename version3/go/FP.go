@@ -33,7 +33,7 @@ const MODBITS uint=@NBT@ /* Number of bits in Modulus */
 const MOD8 uint=@M8@  /* Modulus mod 8 */
 const MODTYPE int=@MT@ //NOT_SPECIAL
 
-const FEXCESS int32=(int32(1)<<@SH@)
+const FEXCESS int32=((int32(1)<<@SH@)-1)
 const OMASK Chunk= ((Chunk(-1))<<(MODBITS%BASEBITS))
 const TBITS uint=MODBITS%BASEBITS // Number of active bits in top word 
 const TMASK Chunk=(Chunk(1)<<TBITS)-1
@@ -162,22 +162,50 @@ func mod(d *DBIG) *BIG {
 	return NewBIG()
 }
 
+// find appoximation to quotient of a/m
+// Out by at most 2.
+// Note that MAXXES is bounded to be 2-bits less than half a word
+func quo(n *BIG,m *BIG) int {
+	var num  Chunk
+	var den  Chunk
+	hb:=uint(CHUNK)/2
+	if TBITS < hb {
+		sh:=hb-TBITS
+		num=((n.w[NLEN-1]<<sh))|(n.w[NLEN-2]>>(BASEBITS-sh))
+		den=((m.w[NLEN-1]<<sh))|(m.w[NLEN-2]>>(BASEBITS-sh))
+
+	} else {
+		num=n.w[NLEN-1]
+		den=m.w[NLEN-1]
+	}
+	return int(num/(den+1))
+}
 
 /* reduce this mod Modulus */
 func (F *FP) reduce() {
 	m:=NewBIGints(Modulus)
-	r:=NewBIG()
-	sb:=logb2(uint32(F.XES-1))
+	r:=NewBIGints(Modulus)
+	var sb uint
 	F.x.norm()
-	m.fshl(sb)
 
+	if F.XES > 16 {
+		q:=quo(F.x,m)
+		carry:=r.pmul(q)
+		r.w[NLEN-1]+=carry<<BASEBITS
+		F.x.sub(r)
+		F.x.norm()
+		sb=2
+	} else { 
+		sb=logb2(uint32(F.XES-1))
+	}
+
+	m.fshl(sb)
 	for sb>0 {
             sr:=ssn(r,F.x,m)
 	    F.x.cmove(r,1-sr)
             sb -= 1
 	}
 
-	//F.x.Mod(m)
 	F.XES=1
 }
 
@@ -245,7 +273,7 @@ func (F *FP) neg() {
 	m.fshl(sb)
 	F.x.rsub(m)		
 
-	F.XES=(1<<sb)
+	F.XES=(1<<sb)+1
 	if F.XES>FEXCESS {F.reduce()}
 }
 

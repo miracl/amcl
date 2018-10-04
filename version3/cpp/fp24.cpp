@@ -167,6 +167,7 @@ void YYY::FP24_usqr(FP24 *w,FP24 *x)
     FP8_add(&(w->b),&B,&(w->b));
     FP8_add(&(w->c),&C,&(w->c));
 
+//	FP24_norm(w);
     FP24_reduce(w);	    /* reduce here as in pow function repeated squarings would trigger multiple reductions */
 }
 

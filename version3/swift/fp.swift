@@ -37,7 +37,7 @@ final public class FP {
     static let MOD8:UInt = @M8@
     static public let MODTYPE =  @MT@   
 
-    static let FEXCESS:Int32 = (Int32(1)<<@SH@);
+    static let FEXCESS:Int32 = ((Int32(1)<<@SH@)-1)
     static let OMASK:Chunk=Chunk(-1)<<Chunk(FP.MODBITS%BIG.BASEBITS)
     static let TBITS:UInt=FP.MODBITS%BIG.BASEBITS; // Number of active bits in top word
     static let TMASK:Chunk=(1<<Chunk(FP.TBITS))-1
@@ -180,16 +180,30 @@ final public class FP {
         let s=x.toRawString()
         return s
     }
+
+
+
 /* reduce this mod Modulus */
     func reduce()
     {
 
         let m=BIG(FP.p)
-	let r=BIG(0)
-        var sb=FP.logb2(UInt32(xes-Int32(1)))
-        m.fshl(sb)
+	let r=BIG(FP.p)
+	var sb:Int
 
         x.norm()
+
+	if xes>16 {
+		let q=FP.quo(x,m)
+		let carry=r.pmul(q)
+		r.w[BIG.NLEN-1]+=carry<<BIG.BASEBITS; // correction - put any carry out back in again
+		x.sub(r)
+		x.norm()		
+		sb=2
+	} else {
+		sb=FP.logb2(UInt32(xes-Int32(1)))
+	}
+        m.fshl(sb)
 
         while sb>0 {
             let sr=BIG.ssn(r,x,m)
@@ -197,7 +211,6 @@ final public class FP {
             sb -= 1
 	}
 	
-        //x.mod(FP.p)
         xes=1
     }
     
@@ -276,6 +289,25 @@ final public class FP {
         let r = Int((   ((v + (v >> 4)) & 0xF0F0F0F)   &* 0x1010101) >> 24)
         return (r)
     }
+
+// find appoximation to quotient of a/m
+// Out by at most 2.
+// Note that MAXXES is bounded to be 2-bits less than half a word
+    static func quo(_ n: BIG,_ m: BIG) -> Int
+    {
+        let hb=UInt(BIG.CHUNK)/2
+	if FP.TBITS < hb {
+		let sh=hb-FP.TBITS;
+		let num=((n.w[BIG.NLEN-1]<<sh))|(n.w[BIG.NLEN-2]>>(BIG.BASEBITS-sh));
+		let den=((m.w[BIG.NLEN-1]<<sh))|(m.w[BIG.NLEN-2]>>(BIG.BASEBITS-sh));
+		return Int(num/(den+1));
+	} else {
+		let num=n.w[BIG.NLEN-1];
+		let den=m.w[BIG.NLEN-1];
+		return Int(num/(den+1));
+	}
+    }
+
     /* this = -this mod Modulus */
     func neg()
     {
@@ -283,7 +315,7 @@ final public class FP {
         let sb=FP.logb2(UInt32(xes-Int32(1)))
         m.fshl(sb)
         x.rsub(m)
-        xes=(1<<Int32(sb))
+        xes=(1<<Int32(sb))+1
         if xes>FP.FEXCESS {reduce()}
     }
     /* this*=c mod Modulus, where c is a small int */

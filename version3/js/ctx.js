@@ -39,6 +39,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,       /* Sextic Twist Type */
             "@SX": 0,       /* Sign of x parameter */
             "@HT": 32,      /* Hash output size */
+			"@SH": 9,       /* Maximum field excess */
             "@AK": 16       /* AES key size */
         },
 
@@ -56,6 +57,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 32,
+			"@SH": 9, 
             "@AK": 16
         },
 
@@ -74,6 +76,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 32,
+			"@SH": 8, 
             "@AK": 16
         },
 
@@ -91,6 +94,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 32,
+			"@SH": 8, 
             "@AK": 16
         },
 
@@ -108,6 +112,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 48,
+			"@SH": 7, 
             "@AK": 24
         },
 
@@ -125,6 +130,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 32,
+			"@SH": 8, 
             "@AK": 16
         },
 
@@ -142,6 +148,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 32,
+			"@SH": 8, 
             "@AK": 16
         },
 
@@ -159,6 +166,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 48,
+			"@SH": 9, 
             "@AK": 24
         },
 
@@ -176,6 +184,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 64,
+			"@SH": 11, 
             "@AK": 32
         },
 
@@ -193,6 +202,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 64,
+			"@SH": 4, 
             "@AK": 32
         },
 
@@ -210,6 +220,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 64,
+			"@SH": 8, 
             "@AK": 32
         },
 
@@ -227,6 +238,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 32,
+			"@SH": 8, 
             "@AK": 16
         },
 
@@ -244,6 +256,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 32,
+			"@SH": 8, 
             "@AK": 16
         },
 
@@ -261,6 +274,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 48,
+			"@SH": 7, 
             "@AK": 24
         },
 
@@ -278,6 +292,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 48,
+			"@SH": 7, 
             "@AK": 24
         },
 
@@ -295,6 +310,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 64,
+			"@SH": 11, 
             "@AK": 32
         },
 
@@ -312,6 +328,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 0,
             "@HT": 64,
+			"@SH": 11, 
             "@AK": 32
         },
 
@@ -329,6 +346,7 @@ var CTX = function(input_parameter) {
             "@ST": 1,
             "@SX": 1,
             "@HT": 32,
+			"@SH": 8, 
             "@AK": 16
         },
 
@@ -346,6 +364,7 @@ var CTX = function(input_parameter) {
             "@ST": 1,
             "@SX": 0,
             "@HT": 32,
+			"@SH": 11, 
             "@AK": 16
         },
 
@@ -363,6 +382,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 1,
             "@HT": 32,
+			"@SH": 10, 
             "@AK": 16
         },
 
@@ -380,6 +400,7 @@ var CTX = function(input_parameter) {
             "@ST": 0,
             "@SX": 1,
             "@HT": 32,
+			"@SH": 10, 
             "@AK": 16
         },
 
@@ -397,6 +418,7 @@ var CTX = function(input_parameter) {
             "@ST": 1,
             "@SX": 0,
             "@HT": 32,
+			"@SH": 8, 
             "@AK": 16
         },
 
@@ -414,6 +436,7 @@ var CTX = function(input_parameter) {
             "@ST": 1,
             "@SX": 0,
             "@HT": 48,
+			"@SH": 4, 
             "@AK": 24
         },
 
@@ -431,6 +454,7 @@ var CTX = function(input_parameter) {
             "@ST": 1,
             "@SX": 0,
             "@HT": 64,
+			"@SH": 11, 
             "@AK": 32
         },
 
@@ -448,6 +472,7 @@ var CTX = function(input_parameter) {
             "@ST": 1,
             "@SX": 1,
             "@HT": 32,
+			"@SH": 10, 
             "@AK": 16
         },
 
@@ -465,6 +490,7 @@ var CTX = function(input_parameter) {
             "@ST": 1,
             "@SX": 1,
             "@HT": 32,
+			"@SH": 11, 
             "@AK": 16
         },
 

@@ -461,18 +461,51 @@ static int logb2(unsign32 v)
     return r;
 }
 
+// find appoximation to quotient of a/m
+// Out by at most 2.
+// Note that MAXXES is bounded to be 2-bits less than half a word
+static int quo(BIG n,BIG m)
+{
+	int sh;
+	chunk num,den;
+	int hb=CHUNK/2;
+	if (TBITS_YYY<hb)
+	{
+		sh=hb-TBITS_YYY;
+		num=(n[NLEN_XXX-1]<<sh)|(n[NLEN_XXX-2]>>(BASEBITS_XXX-sh));
+		den=(m[NLEN_XXX-1]<<sh)|(m[NLEN_XXX-2]>>(BASEBITS_XXX-sh));
+	}
+	else
+	{
+		num=n[NLEN_XXX-1];
+		den=m[NLEN_XXX-1];
+	}
+	return (int)(num/(den+1));
+}
+
 /* SU= 48 */
 /* Fully reduce a mod Modulus */
 void YYY::FP_reduce(FP *a)
 {
     BIG m,r;
-	int sr,sb;
+	int sr,sb,q;
+	chunk carry;
+
     BIG_rcopy(m,Modulus);
-
 	BIG_norm(a->g);
-	sb=logb2(a->XES-1);  // sb does not depend on the actual data
-	BIG_fshl(m,sb);
 
+	if (a->XES>16)
+	{
+		q=quo(a->g,m);
+		carry=BIG_pmul(r,m,q);
+		r[NLEN_XXX-1]+=(carry<<BASEBITS_XXX); // correction - put any carry out back in again
+		BIG_sub(a->g,a->g,r);
+		BIG_norm(a->g);
+		sb=2;
+	}
+	else sb=logb2(a->XES-1);  // sb does not depend on the actual data
+
+	BIG_fshl(m,sb);
 	while (sb>0)
 	{
 // constant time...
@@ -480,8 +513,14 @@ void YYY::FP_reduce(FP *a)
 		BIG_cmove(a->g,r,1-sr);
 		sb--;
 	}
-
-    //BIG_mod(a->g,m);
+/*
+    BIG_rcopy(m,Modulus);
+	if (BIG_comp(a->g,m)>0)
+	{
+		printf("NOT fully reduced q=%x %x %x %x\n",q,quo(a->g,m),FEXCESS_YYY,a->XES);
+		exit(0);
+	}
+*/
 	a->XES=1;
 }
 
@@ -502,7 +541,7 @@ void YYY::FP_neg(FP *r,FP *a)
     sb=logb2(a->XES-1);
     BIG_fshl(m,sb);
     BIG_sub(r->g,m,a->g);
-	r->XES=((sign32)1<<sb);
+	r->XES=((sign32)1<<sb)+1;  // +1 to cover case where a is zero ?
 
     if (r->XES>FEXCESS_YYY)
     {

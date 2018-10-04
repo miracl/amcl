@@ -331,7 +331,7 @@ pub fn key_pair_generate(rng: Option<&mut RAND>,s: &mut [u8],w: &mut [u8]) -> is
 	//}
 	sc.tobytes(s);
 
-	let mut WP=G.mul(&mut sc);
+	let WP=G.mul(&mut sc);
 
 	WP.tobytes(w,false);   // To use point compression on public keys, change to true 
 

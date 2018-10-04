@@ -766,7 +766,7 @@ void ZZZ::PAIR_G2mul(ECP2 *P,BIG e)
     BIG_rcopy(y,CURVE_Order);
     gs(u,e);
 
-
+//printf("Into G2mul 1\n");
     //ECP2_affine(P);
 
 //printf("PPz= "); FP2_output(&(P->z)); printf("\n");
@@ -779,6 +779,8 @@ void ZZZ::PAIR_G2mul(ECP2 *P,BIG e)
         ECP2_copy(&Q[i],&Q[i-1]);
         ECP2_frob(&Q[i],&X);
     }
+
+//printf("Into G2mul 2\n");
 //printf("Q[0]= "); ECP2_output(&Q[0]); printf("\n");
 //printf("Q[1]= "); ECP2_output(&Q[1]); printf("\n");
     for (i=0; i<4; i++)
@@ -793,14 +795,14 @@ void ZZZ::PAIR_G2mul(ECP2 *P,BIG e)
         }
         BIG_norm(u[i]);  
     }
-
+//printf("Into G2mul 3\n");
 
 //printf("Q[2]= "); ECP2_output(&Q[2]); printf("\n");
 //printf("Q[3]= "); ECP2_output(&Q[3]); printf("\n");
 //exit(0);
 
     ECP2_mul4(P,Q,u);
-
+//printf("Into G2mul 4\n");
 #else
     ECP2_mul(P,e);
 #endif

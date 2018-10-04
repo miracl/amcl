@@ -450,16 +450,51 @@ static int logb2(unsign32 v)
     return r;
 }
 
+// find appoximation to quotient of a/m
+// Out by at most 2.
+// Note that MAXXES is bounded to be 2-bits less than half a word
+static int quo(BIG_XXX n,BIG_XXX m)
+{
+	int sh;
+	chunk num,den;
+	int hb=CHUNK/2;
+	if (TBITS_YYY<hb)
+	{
+		sh=hb-TBITS_YYY;
+		num=(n[NLEN_XXX-1]<<sh)|(n[NLEN_XXX-2]>>(BASEBITS_XXX-sh));
+		den=(m[NLEN_XXX-1]<<sh)|(m[NLEN_XXX-2]>>(BASEBITS_XXX-sh));
+	}
+	else
+	{
+		num=n[NLEN_XXX-1];
+		den=m[NLEN_XXX-1];
+	}
+	return (int)(num/(den+1));
+}
+
 /* SU= 48 */
 /* Fully reduce a mod Modulus */
 void FP_YYY_reduce(FP_YYY *a)
 {
     BIG_XXX m,r;
-	int sr,sb;
+	int sr,sb,q;
+	chunk carry;
+
     BIG_XXX_rcopy(m,Modulus_YYY);
 
 	BIG_XXX_norm(a->g);
-	sb=logb2(a->XES-1);  // sb does not depend on the actual data
+
+	if (a->XES>16)
+	{
+		q=quo(a->g,m);
+		carry=BIG_XXX_pmul(r,m,q);
+		r[NLEN_XXX-1]+=(carry<<BASEBITS_XXX); // correction - put any carry out back in again
+		BIG_XXX_sub(a->g,a->g,r);
+		BIG_XXX_norm(a->g);
+		sb=2;
+	}
+	else sb=logb2(a->XES-1);  // sb does not depend on the actual data
+
 	BIG_XXX_fshl(m,sb);
 
 	while (sb>0)
@@ -491,7 +526,7 @@ void FP_YYY_neg(FP_YYY *r,FP_YYY *a)
     sb=logb2(a->XES-1);
     BIG_XXX_fshl(m,sb);
     BIG_XXX_sub(r->g,m,a->g);
-    r->XES=((sign32)1<<sb);
+    r->XES=((sign32)1<<sb)+1;
 
     if (r->XES>FEXCESS_YYY)
     {

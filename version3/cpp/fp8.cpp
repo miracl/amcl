@@ -229,9 +229,11 @@ void YYY::FP8_mul(FP8 *w,FP8 *x,FP8 *y)
 {
 
     FP4 t1,t2,t3,t4;
-    FP4_mul(&t1,&(x->a),&(y->a)); 
-    FP4_mul(&t2,&(x->b),&(y->b)); 
 
+    FP4_mul(&t1,&(x->a),&(y->a)); 
+//printf("Into 8 mul 0a\n");
+    FP4_mul(&t2,&(x->b),&(y->b)); 
+//printf("Into 8 mul 0b\n");
     FP4_add(&t3,&(y->b),&(y->a));
     FP4_add(&t4,&(x->b),&(x->a));
 
@@ -239,7 +241,6 @@ void YYY::FP8_mul(FP8 *w,FP8 *x,FP8 *y)
 	FP4_norm(&t3); // 2
 
     FP4_mul(&t4,&t4,&t3); /* (xa+xb)(ya+yb) */
-
 	FP4_neg(&t3,&t1);  // 1
 	FP4_add(&t4,&t4,&t3);  //t4E=3
     FP4_norm(&t4);

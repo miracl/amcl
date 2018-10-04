@@ -82,8 +82,8 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	inb=int(nb)
 	inbt=int(nbt)
 	sh=ib*(1+((8*inb-1)//ib))-inbt
-	if sh > 30 :
-		sh=30
+	if sh > 14 :
+		sh=14
 	replace(fpath+"fp.swift","@SH@",str(sh))
 
 

@@ -225,9 +225,9 @@ void YYY::FP16_mul(FP16 *w,FP16 *x,FP16 *y)
 
 	FP8_norm(&t4); // 2
 	FP8_norm(&t3); // 2
-
+//printf("Into 16 mul 2\n");
     FP8_mul(&t4,&t4,&t3); /* (xa+xb)(ya+yb) */
-
+//printf("Into 16 mul 2a\n");
 	FP8_neg(&t3,&t1);  // 1
 	FP8_add(&t4,&t4,&t3);  //t4E=3
     FP8_norm(&t4);

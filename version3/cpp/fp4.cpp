@@ -236,10 +236,13 @@ void YYY::FP4_mul(FP4 *w,FP4 *x,FP4 *y)
 {
 
     FP2 t1,t2,t3,t4;
-    FP2_mul(&t1,&(x->a),&(y->a)); 
-    FP2_mul(&t2,&(x->b),&(y->b)); 
 
+    FP2_mul(&t1,&(x->a),&(y->a)); 
+
+    FP2_mul(&t2,&(x->b),&(y->b)); 
+//printf("Into 4 mul 0a\n");
     FP2_add(&t3,&(y->b),&(y->a));
+//printf("Into 4 mul 0b\n");
     FP2_add(&t4,&(x->b),&(x->a));
 
 	FP2_norm(&t4); // 2

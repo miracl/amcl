@@ -29,11 +29,11 @@ root directory, and execute
 
 rustc TestALL.rs --extern amcl=libamcl.rlib
 
-Run this test program by executing the program TestALL.exe
+Run this test program by executing the program TestALL
 
 rustc BenchtestALL.rs --extern amcl=libamcl.rlib
 
-Run this test program by executing the program BenchtestALL.exe
+Run this test program by executing the program BenchtestALL
 
 
 

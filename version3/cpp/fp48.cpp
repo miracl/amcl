@@ -168,6 +168,7 @@ void YYY::FP48_usqr(FP48 *w,FP48 *x)
     FP16_add(&(w->b),&B,&(w->b));
     FP16_add(&(w->c),&C,&(w->c));
 
+	//FP48_norm(w);
     FP48_reduce(w);	    /* reduce here as in pow function repeated squarings would trigger multiple reductions */
 }
 
@@ -257,8 +258,9 @@ FP16_norm(&t1);
 
 FP16_norm(&t0);
 FP16_norm(&t1);
-
+//printf("Into mul 3a\n");
     FP16_mul(&t0,&t1,&t0);
+//printf("Into mul 3b\n");
     FP16_add(&z2,&z2,&t0);
 
     FP16_mul(&t0,&(w->c),&(y->c));

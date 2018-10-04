@@ -135,17 +135,17 @@ void YYY::FP12_usqr(FP12 *w,FP12 *x)
 {
     FP4 A,B,C,D;
 
-    FP4_copy(&A,&(x->a));
+    FP4_copy(&A,&(x->a));   
 
-    FP4_sqr(&(w->a),&(x->a));
-    FP4_add(&D,&(w->a),&(w->a));
-    FP4_add(&(w->a),&D,&(w->a));
+    FP4_sqr(&(w->a),&(x->a));  // Wa XES=2
+    FP4_add(&D,&(w->a),&(w->a)); // Wa XES=4
+    FP4_add(&(w->a),&D,&(w->a)); // Wa XES=6
 
     FP4_norm(&(w->a));
     FP4_nconj(&A,&A);
 
     FP4_add(&A,&A,&A);
-    FP4_add(&(w->a),&(w->a),&A);
+    FP4_add(&(w->a),&(w->a),&A); // Wa XES=8
     FP4_sqr(&B,&(x->c));
     FP4_times_i(&B);
 
@@ -174,6 +174,7 @@ void YYY::FP12_usqr(FP12 *w,FP12 *x)
 	FP4_qmul(&(w->c),&(w->c),&n);
 */
 
+	//FP12_norm(w);
     FP12_reduce(w);	    /* reduce here as in pow function repeated squarings would trigger multiple reductions */
 }
 

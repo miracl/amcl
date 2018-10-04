@@ -582,16 +582,17 @@ void ZZZ::ECP2_frob(ECP2 *P,FP2 *X)
 {
     FP2 X2;
     FP2_sqr(&X2,X);
-
+//printf("Into frob  %d\n",(P->z).b.XES);
     FP2_conj(&(P->x),&(P->x));
     FP2_conj(&(P->y),&(P->y));
     FP2_conj(&(P->z),&(P->z));
+//printf("Into frob  %d\n",(P->z).b.XES);
     FP2_reduce(&(P->z));
-
+//printf("Into frob 2 \n");
     FP2_mul(&(P->x),&X2,&(P->x));
     FP2_mul(&(P->y),&X2,&(P->y));
     FP2_mul(&(P->y),X,&(P->y));
-
+//printf("Into frob 3 \n");
 }
 
 // Bos & Costello https://eprint.iacr.org/2013/458.pdf

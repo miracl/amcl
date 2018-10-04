@@ -22,6 +22,7 @@ use xxx::big::BIG;
 use xxx::dbig::DBIG;
 use xxx::rom;
 use arch::Chunk;
+use arch;
 
 //#[cfg(D32)]
 //use arch::DChunk;
@@ -41,7 +42,7 @@ pub const MODBITS:usize = @NBT@; /* Number of bits in Modulus */
 pub const MOD8: usize = @M8@;  /* Modulus mod 8 */
 pub const MODTYPE:usize=@MT@;
 
-pub const FEXCESS:i32 = ((1 as i32)<<@SH@);
+pub const FEXCESS:i32 = (((1 as i32)<<@SH@)-1);
 pub const OMASK:Chunk = (-1)<<(MODBITS%big::BASEBITS);
 pub const TBITS:usize=MODBITS%big::BASEBITS; // Number of active bits in top word
 pub const TMASK:Chunk=(1<<TBITS)-1;
@@ -185,10 +186,19 @@ impl FP {
 /* reduce this mod Modulus */
     pub fn reduce(&mut self) {
         let mut m = BIG::new_ints(&rom::MODULUS);
-	let mut r = BIG::new();
-	
-        self.x.norm();
-        let mut sb=FP::logb2((self.xes-1) as u32);
+	let mut r = BIG::new_copy(&m);
+        let mut sb : usize;
+	self.x.norm();
+	if self.xes>16 {
+		let q=FP::quo(&self.x,&m);
+		let carry=r.pmul(q);
+		r.w[big::NLEN-1]+=carry<<big::BASEBITS; // correction - put any carry out back in again
+		self.x.sub(&r);
+		self.x.norm();
+		sb=2;
+	} else { 
+		sb=FP::logb2((self.xes-1) as u32);
+	}
         m.fshl(sb);
 
         while sb>0 {
@@ -197,7 +207,6 @@ impl FP {
             sb=sb-1;
 	}
 
-        //self.x.rmod(&m);
         self.xes=1;
     }
     
@@ -276,14 +285,32 @@ impl FP {
         return r;    
     }
 
+// find appoximation to quotient of a/m
+// Out by at most 2.
+// Note that MAXXES is bounded to be 2-bits less than half a word
+    fn quo(n: &BIG,m: &BIG) -> isize {
+	let hb=arch::CHUNK/2;
+
+	if TBITS < hb {
+		let sh=hb-TBITS;
+		let num=((n.w[big::NLEN-1]<<sh))|(n.w[big::NLEN-2]>>(big::BASEBITS-sh));
+		let den=((m.w[big::NLEN-1]<<sh))|(m.w[big::NLEN-2]>>(big::BASEBITS-sh));
+		return (num/(den+1)) as isize;
+	} else {
+		let num=n.w[big::NLEN-1];
+		let den=m.w[big::NLEN-1];
+		return (num/(den+1)) as isize;
+	}
+    }
+
 /* this = -this mod Modulus */
     pub fn neg(&mut self) {
-  		let mut p = BIG::new_ints(&rom::MODULUS);   
+  	let mut p = BIG::new_ints(&rom::MODULUS);   
         let sb=FP::logb2((self.xes-1) as u32);
     
         p.fshl(sb);
         self.x.rsub(&p);
-        self.xes=1<<(sb as i32);
+        self.xes=1<<(sb as i32)+1;
         if self.xes>FEXCESS {self.reduce()}
 
     }
