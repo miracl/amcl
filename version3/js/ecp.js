@@ -220,6 +220,7 @@ var ECP = function(ctx) {
             this.y = new ctx.FP(0);
             this.y.bcopy(iy);
             this.z = new ctx.FP(1);
+			this.x.norm();
             rhs = ECP.RHS(this.x);
 
             if (ECP.CURVETYPE == ECP.MONTGOMERY) {
@@ -253,6 +254,7 @@ var ECP = function(ctx) {
 
             this.x = new ctx.FP(0);
             this.x.bcopy(ix);
+			this.x.norm();
             rhs = ECP.RHS(this.x);
             this.z = new ctx.FP(1);
 
@@ -274,6 +276,7 @@ var ECP = function(ctx) {
 
             this.x = new ctx.FP(0);
             this.x.bcopy(ix);
+			this.x.norm();
             rhs = ECP.RHS(this.x);
             this.z = new ctx.FP(1);
 
@@ -1315,7 +1318,7 @@ var ECP = function(ctx) {
         var r = new ctx.FP(0),
             b, cx, one, x3;
 
-        x.norm();
+        //x.norm();
         r.copy(x);
         r.sqr();
 

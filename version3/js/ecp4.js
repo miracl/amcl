@@ -244,6 +244,7 @@ var ECP4 = function(ctx) {
             this.x.copy(ix);
             this.y.copy(iy);
             this.z.one();
+			this.x.norm();
 
             rhs = ECP4.RHS(this.x);
 
@@ -267,7 +268,7 @@ var ECP4 = function(ctx) {
 
             this.x.copy(ix);
             this.z.one();
-
+			this.x.norm();
             rhs = ECP4.RHS(this.x);
 
             if (rhs.sqrt()) {
@@ -647,7 +648,7 @@ var ECP4 = function(ctx) {
     ECP4.RHS = function(x) {
         var r, c, b;
 
-        x.norm();
+        //x.norm();
         r = new ctx.FP4(x); //r.copy(x);
         r.sqr();
 

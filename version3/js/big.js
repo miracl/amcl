@@ -277,9 +277,10 @@ BIG = function(ctx) {
             var k = BIG.NLEN - 1,
                 bts, c;
 
-            this.norm();
+			var t=new BIG(0); t.copy(this);
+            t.norm();
 
-            while (k >= 0 && this.w[k] === 0) {
+            while (k >= 0 && t.w[k] === 0) {
                 k--;
             }
 
@@ -288,7 +289,7 @@ BIG = function(ctx) {
             }
 
             bts = BIG.BASEBITS * k;
-            c = this.w[k];
+            c = t.w[k];
 
             while (c !== 0) {
                 c = Math.floor(c / 2);
@@ -1375,7 +1376,7 @@ DBIG = function(ctx) {
             var k = ctx.BIG.DNLEN - 1,
                 bts, c;
 
-			var t=new BIG(0); t.copy(this);
+			var t=new DBIG(0); t.copy(this);
             t.norm();
 
             while (k >= 0 && t.w[k] === 0) {

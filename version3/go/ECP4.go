@@ -233,7 +233,7 @@ func (E *ECP4) ToString() string {
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 func RHS4(x *FP4) *FP4 {
-	x.norm()
+	//x.norm()
 	r:=NewFP4copy(x)
 	r.sqr()
 	b2:=NewFP2big(NewBIGints(CURVE_B))
@@ -258,6 +258,7 @@ func NewECP4fp4s(ix *FP4,iy *FP4) *ECP4 {
 	E.x=NewFP4copy(ix)
 	E.y=NewFP4copy(iy)
 	E.z=NewFP4int(1)
+	E.x.norm()
 	rhs:=RHS4(E.x)
 	y2:=NewFP4copy(E.y)
 	y2.sqr()
@@ -273,6 +274,7 @@ func NewECP4fp4(ix *FP4) *ECP4 {
 	E.x=NewFP4copy(ix)
 	E.y=NewFP4int(1)
 	E.z=NewFP4int(1)
+	E.x.norm()
 	rhs:=RHS4(E.x)
 	if rhs.sqrt() {
 			E.y.copy(rhs)

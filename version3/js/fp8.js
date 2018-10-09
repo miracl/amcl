@@ -304,14 +304,14 @@ var FP8 = function(ctx) {
 
         /* this=this^e */
         pow: function(e) {
-            this.norm();
-            e.norm();
+            //this.norm();
 
             var w = new FP8(this), //w.copy(this);
                 z = new ctx.BIG(e), //z.copy(e);
                 r = new FP8(1),
                 bt;
-
+			w.norm();
+			z.norm();
             for (;;) {
                 bt = z.parity();
                 z.fshr(1);
@@ -364,19 +364,21 @@ var FP8 = function(ctx) {
 
         /* r=x^n using XTR method on traces of FP12s */
         xtr_pow: function(n) {
+			var sf = new FP8(this);
+			sf.norm();
             var a = new FP8(3),
-                b = new FP8(this),
+                b = new FP8(sf),
                 c = new FP8(b),
                 t = new FP8(0),
                 r = new FP8(0),
                 par, v, nb, i;
-
+	
             c.xtr_D();
 
-            n.norm();
+            
             par = n.parity();
             v = new ctx.BIG(n);
-
+			v.norm();
             v.fshr(1);
 
             if (par === 0) {
@@ -388,10 +390,10 @@ var FP8 = function(ctx) {
             for (i = nb - 1; i >= 0; i--) {
                 if (v.bit(i) != 1) {
                     t.copy(b);
-                    this.conj();
+                    sf.conj();
                     c.conj();
-                    b.xtr_A(a, this, c);
-                    this.conj();
+                    b.xtr_A(a, sf, c);
+                    sf.conj();
                     c.copy(t);
                     c.xtr_D();
                     a.xtr_D();
@@ -400,7 +402,7 @@ var FP8 = function(ctx) {
                     t.conj();
                     a.copy(b);
                     a.xtr_D();
-                    b.xtr_A(c, this, t);
+                    b.xtr_A(c, sf, t);
                     c.xtr_D();
                 }
             }
@@ -417,8 +419,6 @@ var FP8 = function(ctx) {
 
         /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
         xtr_pow2: function(ck, ckml, ckm2l, a, b) {
-            a.norm();
-            b.norm();
 
             var e = new ctx.BIG(a), //e.copy(a)
                 d = new ctx.BIG(b), //d.copy(b)
@@ -431,6 +431,9 @@ var FP8 = function(ctx) {
                 t = new FP8(0),
                 f2 = 0,
                 i;
+
+            e.norm();
+            d.norm();
 
             while (d.parity() === 0 && e.parity() === 0) {
                 d.fshr(1);

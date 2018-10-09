@@ -518,27 +518,29 @@ func (F *FP12) ToString() string {
 
 /* this=this^e */ 
 func (F *FP12) Pow(e *BIG) *FP12 {
-	F.norm()
-	e.norm()
-	e3:=NewBIGcopy(e)
+	//F.norm()
+	e1:=NewBIGcopy(e)
+	e1.norm()
+	e3:=NewBIGcopy(e1)
 	e3.pmul(3)
 	e3.norm()
-
-	w:=NewFP12copy(F)
+	sf:=NewFP12copy(F)
+	sf.norm()
+	w:=NewFP12copy(sf)
 	//z:=NewBIGcopy(e)
 	//r:=NewFP12int(1)
 
 	nb:=e3.nbits()
 	for i:=nb-2;i>=1;i-- {
 		w.usqr()
-		bt:=e3.bit(i)-e.bit(i)
+		bt:=e3.bit(i)-e1.bit(i)
 		if bt==1 {
-			w.Mul(F)
+			w.Mul(sf)
 		}
 		if bt==-1 {
-			F.conj()
-			w.Mul(F)
-			F.conj()	
+			sf.conj()
+			w.Mul(sf)
+			sf.conj()	
 		}
 	}
 	w.reduce()

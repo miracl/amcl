@@ -744,25 +744,27 @@ func (F *FP48) ToString() string {
 
 /* this=this^e */ 
 func (F *FP48) Pow(e *BIG) *FP48 {
-	F.norm()
-	e.norm()
-	e3:=NewBIGcopy(e)
+	sf:=NewFP48copy(F)
+	sf.norm()
+	e1:=NewBIGcopy(e)
+	e1.norm()
+	e3:=NewBIGcopy(e1)
 	e3.pmul(3)
 	e3.norm()
 
-	w:=NewFP48copy(F)
+	w:=NewFP48copy(sf)
 
 	nb:=e3.nbits()
 	for i:=nb-2;i>=1;i-- {
 		w.usqr()
-		bt:=e3.bit(i)-e.bit(i)
+		bt:=e3.bit(i)-e1.bit(i)
 		if bt==1 {
-			w.Mul(F)
+			w.Mul(sf)
 		}
 		if bt==-1 {
-			F.conj()
-			w.Mul(F)
-			F.conj()	
+			sf.conj()
+			w.Mul(sf)
+			sf.conj()	
 		}
 	}
 	w.reduce()

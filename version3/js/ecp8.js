@@ -268,6 +268,7 @@ var ECP8 = function(ctx) {
             this.x.copy(ix);
             this.y.copy(iy);
             this.z.one();
+			this.x.norm();
 
             rhs = ECP8.RHS(this.x);
 
@@ -285,7 +286,7 @@ var ECP8 = function(ctx) {
 
             this.x.copy(ix);
             this.z.one();
-
+			this.x.norm();
             rhs = ECP8.RHS(this.x);
 
             if (rhs.sqrt()) {
@@ -733,7 +734,7 @@ var ECP8 = function(ctx) {
     ECP8.RHS = function(x) {
         var r, c, b;
 
-        x.norm();
+        //x.norm();
         r = new ctx.FP8(x); //r.copy(x);
         r.sqr();
 

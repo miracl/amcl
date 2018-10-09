@@ -311,11 +311,11 @@ func (F *FP16) frob(f *FP2) {
 
 /* this=this^e */
 func (F *FP16) pow(e *BIG) *FP16 {
-	F.norm()
-	e.norm()
 	w:=NewFP16copy(F)
+	w.norm();
 	z:=NewBIGcopy(e)
 	r:=NewFP16int(1)
+	z.norm()
 	for true {
 		bt:=z.parity()
 		z.fshr(1)
@@ -356,26 +356,28 @@ func (F *FP16) xtr_D() {
 
 /* r=x^n using XTR method on traces of FP12s */
 func (F *FP16) xtr_pow(n *BIG) *FP16 {
+	sf:=NewFP16copy(F);
+	sf.norm()
 	a:=NewFP16int(3)
-	b:=NewFP16copy(F)
+	b:=NewFP16copy(sf)
 	c:=NewFP16copy(b)
 	c.xtr_D()
 	t:=NewFP16int(0)
 	r:=NewFP16int(0)
 
-	n.norm()
+	
 	par:=n.parity()
-	v:=NewBIGcopy(n); v.fshr(1)
+	v:=NewBIGcopy(n); v.norm(); v.fshr(1)
 	if (par==0) {v.dec(1); v.norm()}
 
 	nb:=v.nbits();
 	for i:=nb-1;i>=0;i-- {
 		if v.bit(i)!=1 {
 			t.copy(b)
-			F.conj()
+			sf.conj()
 			c.conj()
-			b.xtr_A(a,F,c)
-			F.conj()
+			b.xtr_A(a,sf,c)
+			sf.conj()
 			c.copy(t)
 			c.xtr_D()
 			a.xtr_D()
@@ -383,7 +385,7 @@ func (F *FP16) xtr_pow(n *BIG) *FP16 {
 			t.copy(a); t.conj()
 			a.copy(b)
 			a.xtr_D()
-			b.xtr_A(c,F,t)
+			b.xtr_A(c,sf,t)
 			c.xtr_D()
 		}
 	}
@@ -396,11 +398,11 @@ func (F *FP16) xtr_pow(n *BIG) *FP16 {
 
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
 func (F *FP16) xtr_pow2(ck *FP16,ckml *FP16,ckm2l *FP16,a *BIG,b *BIG) *FP16 {
-	a.norm(); b.norm()
+
 	e:=NewBIGcopy(a)
 	d:=NewBIGcopy(b)
 	w:=NewBIGint(0)
-
+	e.norm(); d.norm()
 	cu:=NewFP16copy(ck)  // can probably be passed in w/o copying
 	cv:=NewFP16copy(F);
 	cumv:=NewFP16copy(ckml)

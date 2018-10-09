@@ -68,6 +68,7 @@ func NewECPbigs(ix *BIG,iy *BIG) *ECP {
 	E.x=NewFPbig(ix)
 	E.y=NewFPbig(iy)
 	E.z=NewFPint(1)
+	E.x.norm()
 	rhs:=RHS(E.x)
 
 	if CURVETYPE==MONTGOMERY {
@@ -89,6 +90,7 @@ func NewECPbigint(ix *BIG,s int) *ECP {
 	E:=new(ECP)
 	E.x=NewFPbig(ix)
 	E.y=NewFPint(0)
+	E.x.norm()
 	rhs:=RHS(E.x)
 	E.z=NewFPint(1)
 	if rhs.jacobi()==1 {
@@ -105,6 +107,7 @@ func NewECPbig(ix *BIG) *ECP {
 	E:=new(ECP)	
 	E.x=NewFPbig(ix)
 	E.y=NewFPint(0)
+	E.x.norm()
 	rhs:=RHS(E.x)
 	E.z=NewFPint(1)
 	if rhs.jacobi()==1 {
@@ -238,7 +241,7 @@ func( E *ECP) Equals(Q *ECP) bool {
 
 /* Calculate RHS of curve equation */
 func RHS(x *FP) *FP {
-	x.norm()
+	//x.norm()
 	r:=NewFPcopy(x)
 	r.sqr();
 
