@@ -332,11 +332,12 @@ void FP8_YYY_pow(FP8_YYY *r,FP8_YYY* a,BIG_XXX b)
     int bt;
 
     BIG_XXX_zero(zilch);
-    BIG_XXX_norm(b);
+
     BIG_XXX_copy(z,b);
     FP8_YYY_copy(&w,a);
+	FP8_YYY_norm(&w);
     FP8_YYY_one(r);
-
+    BIG_XXX_norm(z);
     while(1)
     {
         bt=BIG_XXX_parity(z);
@@ -390,7 +391,7 @@ void FP8_YYY_xtr_pow(FP8_YYY *r,FP8_YYY *x,BIG_XXX n)
     BIG_XXX v;
     FP2_YYY w2;
 	FP4_YYY w4;
-    FP8_YYY t,a,b,c;
+    FP8_YYY t,a,b,c,sf;
 
     BIG_XXX_zero(v);
     BIG_XXX_inc(v,3);
@@ -398,13 +399,14 @@ void FP8_YYY_xtr_pow(FP8_YYY *r,FP8_YYY *x,BIG_XXX n)
     FP2_YYY_from_BIG(&w2,v);
     FP4_YYY_from_FP2(&w4,&w2);
     FP8_YYY_from_FP4(&a,&w4);
+	FP8_YYY_copy(&sf,x);
+	FP8_YYY_norm(&sf);
+	FP8_YYY_copy(&b,&sf);
+    FP8_YYY_xtr_D(&c,&sf);
 
-	FP8_YYY_copy(&b,x);
-    FP8_YYY_xtr_D(&c,x);
-
-    BIG_XXX_norm(n);
     par=BIG_XXX_parity(n);
     BIG_XXX_copy(v,n);
+    BIG_XXX_norm(v);
     BIG_XXX_shr(v,1);
     if (par==0)
     {
@@ -418,10 +420,10 @@ void FP8_YYY_xtr_pow(FP8_YYY *r,FP8_YYY *x,BIG_XXX n)
         if (!BIG_XXX_bit(v,i))
         {
             FP8_YYY_copy(&t,&b);
-            FP8_YYY_conj(x,x);
+            FP8_YYY_conj(&sf,&sf);
             FP8_YYY_conj(&c,&c);
-            FP8_YYY_xtr_A(&b,&a,&b,x,&c);
-            FP8_YYY_conj(x,x);
+            FP8_YYY_xtr_A(&b,&a,&b,&sf,&c);
+            FP8_YYY_conj(&sf,&sf);
             FP8_YYY_xtr_D(&c,&t);
             FP8_YYY_xtr_D(&a,&a);
         }
@@ -429,7 +431,7 @@ void FP8_YYY_xtr_pow(FP8_YYY *r,FP8_YYY *x,BIG_XXX n)
         {
             FP8_YYY_conj(&t,&a);
             FP8_YYY_xtr_D(&a,&b);
-            FP8_YYY_xtr_A(&b,&c,&b,x,&t);
+            FP8_YYY_xtr_A(&b,&c,&b,&sf,&t);
             FP8_YYY_xtr_D(&c,&c);
         }
     }
@@ -446,10 +448,11 @@ void FP8_YYY_xtr_pow2(FP8_YYY *r,FP8_YYY *ck,FP8_YYY *cl,FP8_YYY *ckml,FP8_YYY *
     BIG_XXX d,e,w;
     FP8_YYY t,cu,cv,cumv,cum2v;
 
-    BIG_XXX_norm(a);
-	BIG_XXX_norm(b);
+
     BIG_XXX_copy(e,a);
     BIG_XXX_copy(d,b);
+    BIG_XXX_norm(e);
+	BIG_XXX_norm(d);
     FP8_YYY_copy(&cu,ck);
     FP8_YYY_copy(&cv,cl);
     FP8_YYY_copy(&cumv,ckml);
