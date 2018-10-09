@@ -268,7 +268,7 @@ public final class ECP4 {
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 	public static FP4 RHS(FP4 x) {
-		x.norm();
+		//x.norm();
 		FP4 r=new FP4(x);
 		r.sqr();
 		FP4 b=new FP4(new FP2(new BIG(ROM.CURVE_B)));
@@ -295,6 +295,7 @@ public final class ECP4 {
 		x=new FP4(ix);
 		y=new FP4(iy);
 		z=new FP4(1);
+		x.norm();
 		FP4 rhs=RHS(x);
 		FP4 y2=new FP4(y);
 		y2.sqr();
@@ -308,6 +309,7 @@ public final class ECP4 {
 		x=new FP4(ix);
 		y=new FP4(1);
 		z=new FP4(1);
+		x.norm();
 		FP4 rhs=RHS(x);
 		if (rhs.sqrt()) 
 		{

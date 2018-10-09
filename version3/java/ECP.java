@@ -202,7 +202,7 @@ public final class ECP {
 
 /* Calculate RHS of curve equation */
 	public static FP RHS(FP x) {
-		x.norm();
+		//x.norm();
 		FP r=new FP(x);
 		r.sqr();
 
@@ -251,6 +251,7 @@ public final class ECP {
 		x=new FP(ix);
 		y=new FP(iy);
 		z=new FP(1);
+		x.norm();
 		FP rhs=RHS(x);
 
 		if (CURVETYPE==MONTGOMERY)
@@ -271,6 +272,7 @@ public final class ECP {
 /* set (x,y) from BIG and a bit */
 	public ECP(BIG ix,int s) {
 		x=new FP(ix);
+		x.norm();
 		FP rhs=RHS(x);
 		y=new FP(0);
 		z=new FP(1);
@@ -287,6 +289,7 @@ public final class ECP {
 /* set from x - calculate y from curve equation */
 	public ECP(BIG ix) {
 		x=new FP(ix);
+		x.norm();
 		FP rhs=RHS(x);
 		y=new FP(0);
 		z=new FP(1);

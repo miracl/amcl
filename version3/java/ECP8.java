@@ -317,7 +317,7 @@ public final class ECP8 {
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 	public static FP8 RHS(FP8 x) {
-		x.norm();
+		//x.norm();
 		FP8 r=new FP8(x);
 		r.sqr();
 		FP8 b=new FP8(new FP4(new FP2(new BIG(ROM.CURVE_B))));
@@ -344,6 +344,7 @@ public final class ECP8 {
 		x=new FP8(ix);
 		y=new FP8(iy);
 		z=new FP8(1);
+		x.norm();
 		FP8 rhs=RHS(x);
 		FP8 y2=new FP8(y);
 		y2.sqr();
@@ -357,6 +358,7 @@ public final class ECP8 {
 		x=new FP8(ix);
 		y=new FP8(1);
 		z=new FP8(1);
+		x.norm();
 		FP8 rhs=RHS(x);
 		if (rhs.sqrt()) 
 		{

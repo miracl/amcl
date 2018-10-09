@@ -788,24 +788,27 @@ public final class FP48 {
 /* Note this is simple square and multiply, so not side-channel safe */
 	public FP48 pow(BIG e)
 	{
-		norm();
-		e.norm();
-		BIG e3=new BIG(e);
+		FP48 sf=new FP48(this);
+
+		sf.norm();
+		BIG e1=new BIG(e);
+		e1.norm();
+		BIG e3=new BIG(e1);
 		e3.pmul(3);
 		e3.norm();
 
-		FP48 w=new FP48(this);
+		FP48 w=new FP48(sf);
 
 		int nb=e3.nbits();
 		for (int i=nb-2;i>=1;i--)
 		{
 			w.usqr();
-			int bt=e3.bit(i)-e.bit(i);
+			int bt=e3.bit(i)-e1.bit(i);
 			if (bt==1)
-				w.mul(this);
+				w.mul(sf);
 			if (bt==-1)
 			{
-				conj(); w.mul(this); conj();
+				sf.conj(); w.mul(sf); sf.conj();
 			}
 		}
 		w.reduce();

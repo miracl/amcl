@@ -336,11 +336,11 @@ public final class FP8 {
 /* this=this^e */
 	public FP8 pow(BIG e)
 	{
-		norm();
-		e.norm();
 		FP8 w=new FP8(this);
+		w.norm();
 		BIG z=new BIG(e);
 		FP8 r=new FP8(1);
+		z.norm();
 		while (true)
 		{
 			int bt=z.parity();
@@ -386,16 +386,17 @@ public final class FP8 {
 
 /* r=x^n using XTR method on traces of FP12s */
 	public FP8 xtr_pow(BIG n) {
+		FP8 sf=new FP8(this);
+		sf.norm();
 		FP8 a=new FP8(3);
-		FP8 b=new FP8(this);
+		FP8 b=new FP8(sf);
 		FP8 c=new FP8(b);
 		c.xtr_D();
 		FP8 t=new FP8(0);
 		FP8 r=new FP8(0);
-
-		n.norm();
+		
 		int par=n.parity();
-		BIG v=new BIG(n); v.fshr(1);
+		BIG v=new BIG(n); v.norm(); v.fshr(1);
 		if (par==0) {v.dec(1); v.norm();}
 
 		int nb=v.nbits();
@@ -404,10 +405,10 @@ public final class FP8 {
 			if (v.bit(i)!=1)
 			{
 				t.copy(b);
-				conj();
+				sf.conj();
 				c.conj();
-				b.xtr_A(a,this,c);
-				conj();
+				b.xtr_A(a,sf,c);
+				sf.conj();
 				c.copy(t);
 				c.xtr_D();
 				a.xtr_D();
@@ -417,7 +418,7 @@ public final class FP8 {
 				t.copy(a); t.conj();
 				a.copy(b);
 				a.xtr_D();
-				b.xtr_A(c,this,t);
+				b.xtr_A(c,sf,t);
 				c.xtr_D();
 			}
 		}
@@ -430,10 +431,11 @@ public final class FP8 {
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
 	public FP8 xtr_pow2(FP8 ck,FP8 ckml,FP8 ckm2l,BIG a,BIG b)
 	{
-		a.norm(); b.norm();
+
 		BIG e=new BIG(a);
 		BIG d=new BIG(b);
 		BIG w=new BIG(0);
+		e.norm(); d.norm();
 
 		FP8 cu=new FP8(ck);  // can probably be passed in w/o copying
 		FP8 cv=new FP8(this);
