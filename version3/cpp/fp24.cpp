@@ -481,27 +481,31 @@ void YYY::FP24_compow(FP8 *c,FP24 *x,BIG e,BIG r)
 
 void YYY::FP24_pow(FP24 *r,FP24 *a,BIG b)
 {
-    FP24 w;
-    BIG b3;
+    FP24 w,sf;
+    BIG b1,b3;
     int i,nb,bt;
-    BIG_norm(b);
-	BIG_pmul(b3,b,3);
+	BIG_copy(b1,b);
+    BIG_norm(b1);
+	BIG_pmul(b3,b1,3);
 	BIG_norm(b3);
 
-    FP24_copy(&w,a);
+	FP24_copy(&sf,a);
+	FP24_norm(&sf);
+    FP24_copy(&w,&sf);
+
 
 	nb=BIG_nbits(b3);
 	for (i=nb-2;i>=1;i--)
 	{
 		FP24_usqr(&w,&w);
-		bt=BIG_bit(b3,i)-BIG_bit(b,i);
+		bt=BIG_bit(b3,i)-BIG_bit(b1,i);
 		if (bt==1)
-			FP24_mul(&w,a);
+			FP24_mul(&w,&sf);
 		if (bt==-1)
 		{
-			FP24_conj(a,a);
-			FP24_mul(&w,a);
-			FP24_conj(a,a);
+			FP24_conj(&sf,&sf);
+			FP24_mul(&w,&sf);
+			FP24_conj(&sf,&sf);
 		}
 	}
 

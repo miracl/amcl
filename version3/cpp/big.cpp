@@ -1039,12 +1039,14 @@ int XXX::BIG_nbits(BIG a)
 int XXX::BIG_dnbits(DBIG a)
 {
     int bts,k=DNLEN_XXX-1;
+	DBIG t;
     chunk c;
-    BIG_dnorm(a);
-    while (k>=0 && a[k]==0) k--;
+	BIG_dcopy(t,a);
+    BIG_dnorm(t);
+    while (k>=0 && t[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS_XXX*k;
-    c=a[k];
+    c=t[k];
     while (c!=0)
     {
         c/=2;

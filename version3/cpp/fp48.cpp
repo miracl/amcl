@@ -483,27 +483,30 @@ void YYY::FP48_compow(FP16 *c,FP48 *x,BIG e,BIG r)
 
 void YYY::FP48_pow(FP48 *r,FP48 *a,BIG b)
 {
-    FP48 w;
-    BIG b3;
+    FP48 w,sf;
+    BIG b1,b3;
     int i,nb,bt;
-    BIG_norm(b);
-	BIG_pmul(b3,b,3);
+	BIG_copy(b1,b);
+    BIG_norm(b1);
+	BIG_pmul(b3,b1,3);
 	BIG_norm(b3);
 
-    FP48_copy(&w,a);
+	FP48_copy(&sf,a);
+	FP48_norm(&sf);
+    FP48_copy(&w,&sf);
 
 	nb=BIG_nbits(b3);
 	for (i=nb-2;i>=1;i--)
 	{
 		FP48_usqr(&w,&w);
-		bt=BIG_bit(b3,i)-BIG_bit(b,i);
+		bt=BIG_bit(b3,i)-BIG_bit(b1,i);
 		if (bt==1)
-			FP48_mul(&w,a);
+			FP48_mul(&w,&sf);
 		if (bt==-1)
 		{
-			FP48_conj(a,a);
-			FP48_mul(&w,a);
-			FP48_conj(a,a);
+			FP48_conj(&sf,&sf);
+			FP48_mul(&w,&sf);
+			FP48_conj(&sf,&sf);
 		}
 	}
 
