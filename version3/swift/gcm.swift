@@ -45,7 +45,7 @@ import Foundation
 * See http://www.mindspring.com/~dmcgrew/gcm-nist-6.pdf
 */
 
-final class GCM {
+struct GCM {
     static let NB:Int=4
     static let GCM_ACCEPTING_HEADER:Int=0
     static let GCM_ACCEPTING_CIPHER:Int=1
@@ -77,7 +77,7 @@ final class GCM {
         return b
     }
     
-    private func precompute(_ H: [UInt8])
+    private mutating func precompute(_ H: [UInt8])
     {
         var b=[UInt8](repeating: 0,count: 4)
         var j=0
@@ -95,7 +95,7 @@ final class GCM {
         }
     }
  
-    private func gf2mul()
+    private mutating func gf2mul()
     { /* gf2m mul - Z=H*X mod 2^128 */
         var P=[UInt32](repeating: 0,count: 4)
     
@@ -120,7 +120,7 @@ final class GCM {
             j+=4
         }
     }
-    private func wrap()
+    private mutating func wrap()
     { /* Finish off GHASH */
         var F=[UInt32](repeating: 0,count: 4)
         var L=[UInt8](repeating: 0,count: 16)
@@ -141,7 +141,7 @@ final class GCM {
         gf2mul()
     }
     
-    private func ghash(_ plain: [UInt8],_ len: Int) -> Bool
+    private mutating func ghash(_ plain: [UInt8],_ len: Int) -> Bool
     {
     //    var B=[UInt8](count:16,repeatedValue:0)
     
@@ -165,7 +165,7 @@ final class GCM {
     }
     
     /* Initialize GCM mode */
-    func init_it(_ key: [UInt8],_ niv: Int,_ iv: [UInt8])
+    mutating func init_it(_ key: [UInt8],_ niv: Int,_ iv: [UInt8])
     { /* iv size niv is usually 12 bytes (96 bits). AES key size nk can be 16,24 or 32 bytes */
         var H=[UInt8](repeating: 0,count: 16)
         
@@ -195,7 +195,7 @@ final class GCM {
     }
     
     /* Add Header data - included but not encrypted */
-    func add_header(_ header: [UInt8],_ len: Int) -> Bool
+    mutating func add_header(_ header: [UInt8],_ len: Int) -> Bool
     { /* Add some header. Won't be encrypted, but will be authenticated. len is length of header */
         if status != GCM.GCM_ACCEPTING_HEADER {return false}
     
@@ -215,7 +215,7 @@ final class GCM {
         return true;
     }
     /* Add Plaintext - included and encrypted */
-    func add_plain(_ plain: [UInt8],_ len: Int) -> [UInt8]
+    mutating func add_plain(_ plain: [UInt8],_ len: Int) -> [UInt8]
     {
         var B=[UInt8](repeating: 0,count: 16)
         var b=[UInt8](repeating: 0,count: 4)
@@ -251,7 +251,7 @@ final class GCM {
         return cipher;
     }
     /* Add Ciphertext - decrypts to plaintext */
-    func add_cipher(_ cipher: [UInt8],_ len: Int) -> [UInt8]
+    mutating func add_cipher(_ cipher: [UInt8],_ len: Int) -> [UInt8]
     {
         var B=[UInt8](repeating: 0,count: 16)
         var b=[UInt8](repeating: 0,count: 4)
@@ -289,7 +289,7 @@ final class GCM {
     }
     
     /* Finish and extract Tag */
-    func finish(_ extract: Bool) -> [UInt8]
+    mutating func finish(_ extract: Bool) -> [UInt8]
     { /* Finish off GHASH and extract tag (MAC) */
         var tag=[UInt8](repeating: 0,count: 16)
     

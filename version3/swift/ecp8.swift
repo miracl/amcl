@@ -25,7 +25,7 @@
 
 /* AMCL Weierstrass elliptic curve functions over FP8 */
 
-final public class ECP8 {
+public struct ECP8 {
     private var x:FP8
     private var y:FP8
     private var z:FP8
@@ -46,7 +46,7 @@ final public class ECP8 {
         return x.iszilch() && z.iszilch()
     }
     /* copy self=P */
-    public func copy(_ P:ECP8)
+    public mutating func copy(_ P:ECP8)
     {
         x.copy(P.x)
         y.copy(P.y)
@@ -54,7 +54,7 @@ final public class ECP8 {
     //    INF=P.INF
     }
     /* set self=O */
-    func inf() {
+    mutating func inf() {
     //    INF=true
         x.zero()
         y.one()
@@ -62,7 +62,7 @@ final public class ECP8 {
     }
 
    /* Conditional move of Q to P dependant on d */
-    func cmove(_ Q:ECP8,_ d:Int)
+    mutating func cmove(_ Q:ECP8,_ d:Int)
     {
         x.cmove(Q.x,d);
         y.cmove(Q.y,d);
@@ -77,9 +77,9 @@ final public class ECP8 {
         return Int((x>>31)&1)
     }
     /* Constant time select from pre-computed table */
-    func select(_ W:[ECP8],_ b:Int32)
+    mutating func select(_ W:[ECP8],_ b:Int32)
     {
-        let MP=ECP8()
+        var MP=ECP8()
         let m=b>>31
         var babs=(b^m)-m
         
@@ -103,8 +103,8 @@ final public class ECP8 {
     func equals(_ Q:ECP8) -> Bool
     {
 
-        let a=FP8(x)                            // *****
-        let b=FP8(Q.x)
+        var a=FP8(x)                            // *****
+        var b=FP8(Q.x)
         a.mul(Q.z); b.mul(z) 
         if !a.equals(b) {return false}
         a.copy(y); a.mul(Q.z)
@@ -115,13 +115,13 @@ final public class ECP8 {
     }
 
    /* set self=-self */
-    func neg()
+    mutating func neg()
     {
         y.norm(); y.neg(); y.norm()
         return
     }
     /* set to Affine - (x,y,z) to (x,y) */
-    func affine() {
+    mutating func affine() {
         if is_infinity() {return}
         let one=FP8(1)
         if z.equals(one) {
@@ -138,14 +138,14 @@ final public class ECP8 {
     /* extract affine x as FP8 */
     func getX() -> FP8
     {
-	let W=ECP8(); W.copy(self)
+        var W=ECP8(); W.copy(self)
         W.affine()
         return W.x
     }
     /* extract affine y as FP8 */
     func getY() -> FP8
     {
-	let W=ECP8(); W.copy(self)
+        var W=ECP8(); W.copy(self)
         W.affine()
         return W.y
     }
@@ -170,7 +170,7 @@ final public class ECP8 {
     {
         let RM=Int(BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
-	let W=ECP8(); W.copy(self)
+        var W=ECP8(); W.copy(self)
         W.affine();
         
         W.x.geta().geta().getA().toBytes(&t)
@@ -239,20 +239,20 @@ final public class ECP8 {
         var t=[UInt8](repeating: 0,count: RM)
 
         for i in 0 ..< RM {t[i]=b[i]}
-        let ra=BIG.fromBytes(t);
+        var ra=BIG.fromBytes(t);
         for i in 0 ..< RM {t[i]=b[i+RM]}
-        let rb=BIG.fromBytes(t);
+        var rb=BIG.fromBytes(t);
 
-        let ra2=FP2(ra,rb)
+        var ra2=FP2(ra,rb)
 
         for i in 0 ..< RM {t[i]=b[i+2*RM]}
         ra.copy(BIG.fromBytes(t));
         for i in 0 ..< RM {t[i]=b[i+3*RM]}
         rb.copy(BIG.fromBytes(t));
 
-        let rb2=FP2(ra,rb)
+        var rb2=FP2(ra,rb)
 
-        let ra4=FP4(ra2,rb2)
+        var ra4=FP4(ra2,rb2)
 
         for i in 0 ..< RM {t[i]=b[i+4*RM]}
         ra.copy(BIG.fromBytes(t))
@@ -268,7 +268,7 @@ final public class ECP8 {
 
         rb2.copy(FP2(ra,rb))
 
-        let rb4=FP4(ra2,rb2)
+        var rb4=FP4(ra2,rb2)
 
         let rx=FP8(ra4,rb4)
 
@@ -316,7 +316,7 @@ final public class ECP8 {
 /* convert self to hex string */
     func toString() -> String
     {
-	let W=ECP8(); W.copy(self)
+        var W=ECP8(); W.copy(self)
         if W.is_infinity() {return "infinity"}
         W.affine()
         return "("+W.x.toString()+","+W.y.toString()+")"
@@ -325,10 +325,10 @@ final public class ECP8 {
 /* Calculate RHS of twisted curve equation x^3+B/i */
     static func RHS(_ x:FP8) -> FP8
     {
-        x.norm()
-        let r=FP8(x)
+        //x.norm()
+        var r=FP8(x)
         r.sqr()
-        let b=FP8(FP4(FP2(BIG(ROM.CURVE_B))))
+        var b=FP8(FP4(FP2(BIG(ROM.CURVE_B))))
         if ECP.SEXTIC_TWIST == ECP.D_TYPE {
             b.div_i()
         }
@@ -349,7 +349,7 @@ final public class ECP8 {
         y=FP8(iy)
         z=FP8(1)
         let rhs=ECP8.RHS(x)
-        let y2=FP8(y)
+        var y2=FP8(y)
         y2.sqr()
         if !y2.equals(rhs) {inf()}
     }
@@ -360,7 +360,7 @@ final public class ECP8 {
         x=FP8(ix)
         y=FP8(1)
         z=FP8(1)
-        let rhs=ECP8.RHS(x)
+        var rhs=ECP8.RHS(x)
         if rhs.sqrt()
         {
             y.copy(rhs);
@@ -369,7 +369,7 @@ final public class ECP8 {
     }
 
     /* this+=this */
-    @discardableResult func dbl() -> Int
+    @discardableResult mutating func dbl() -> Int
     {
         if y.iszilch()
         {
@@ -377,19 +377,19 @@ final public class ECP8 {
             return -1;
         }
     
-        let iy=FP8(y)
+        var iy=FP8(y)
         if ECP.SEXTIC_TWIST == ECP.D_TYPE {       
             iy.times_i(); 
         }
 
-        let t0=FP8(y) 
+        var t0=FP8(y) 
         t0.sqr();
         if ECP.SEXTIC_TWIST == ECP.D_TYPE {           
             t0.times_i() 
         }  
-        let t1=FP8(iy)  
+        var t1=FP8(iy)  
         t1.mul(z)
-        let t2=FP8(z)
+        var t2=FP8(z)
         t2.sqr()
 
         z.copy(t0)
@@ -402,10 +402,10 @@ final public class ECP8 {
         if ECP.SEXTIC_TWIST == ECP.M_TYPE {
             t2.times_i()  
         }
-        let x3=FP8(t2)
+        var x3=FP8(t2)
         x3.mul(z) 
 
-        let y3=FP8(t0)   
+        var y3=FP8(t0)   
 
         y3.add(t2); y3.norm()
         z.mul(t1)
@@ -420,20 +420,20 @@ final public class ECP8 {
         return 1
     }
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
-    @discardableResult func add(_ Q:ECP8) -> Int
+    @discardableResult mutating func add(_ Q:ECP8) -> Int
     {
 
         let b=3*ROM.CURVE_B_I
-        let t0=FP8(x)
+        var t0=FP8(x)
         t0.mul(Q.x)         // x.Q.x
-        let t1=FP8(y)
+        var t1=FP8(y)
         t1.mul(Q.y)         // y.Q.y
 
-        let t2=FP8(z)
+        var t2=FP8(z)
         t2.mul(Q.z)
-        let t3=FP8(x)
+        var t3=FP8(x)
         t3.add(y); t3.norm()          //t3=X1+Y1
-        let t4=FP8(Q.x)            
+        var t4=FP8(Q.x)            
         t4.add(Q.y); t4.norm()         //t4=X2+Y2
         t3.mul(t4)                     //t3=(X1+Y1)(X2+Y2)
         t4.copy(t0); t4.add(t1)        //t4=X1.X2+Y1.Y2
@@ -444,7 +444,7 @@ final public class ECP8 {
         }
         t4.copy(y)                    
         t4.add(z); t4.norm()           //t4=Y1+Z1
-        let x3=FP8(Q.y)
+        var x3=FP8(Q.y)
         x3.add(Q.z); x3.norm()         //x3=Y2+Z2
 
         t4.mul(x3)                     //t4=(Y1+Z1)(Y2+Z2)
@@ -456,7 +456,7 @@ final public class ECP8 {
             t4.times_i()          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
         }
         x3.copy(x); x3.add(z); x3.norm()   // x3=X1+Z1
-        let y3=FP8(Q.x)                
+        var y3=FP8(Q.x)                
         y3.add(Q.z); y3.norm()             // y3=X2+Z2
         x3.mul(y3)                         // x3=(X1+Z1)(X2+Z2)
         y3.copy(t0)
@@ -472,7 +472,7 @@ final public class ECP8 {
         if ECP.SEXTIC_TWIST == ECP.M_TYPE {
             t2.times_i()
         }  
-        let z3=FP8(t1); z3.add(t2); z3.norm()
+        var z3=FP8(t1); z3.add(t2); z3.norm()
         t1.sub(t2); t1.norm()
         y3.imul(b)
         if ECP.SEXTIC_TWIST == ECP.M_TYPE {          
@@ -489,9 +489,9 @@ final public class ECP8 {
         return 0
     }
     /* set self-=Q */
-    @discardableResult func sub(_ Q:ECP8) -> Int
+    @discardableResult mutating func sub(_ Q:ECP8) -> Int
     {
-	let NQ=ECP8(); NQ.copy(Q)
+        var NQ=ECP8(); NQ.copy(Q)
         NQ.neg()
         let D=add(NQ)
         //Q.neg()
@@ -504,10 +504,10 @@ final public class ECP8 {
         let Frb=BIG(ROM.Frb)
         let X=FP2(Fra,Frb)
 
-        let f0=FP2(X); f0.sqr()
-        let f2=FP2(f0)
+        var f0=FP2(X); f0.sqr()
+        var f2=FP2(f0)
         f2.mul_ip(); f2.norm()
-        let f1=FP2(f2); f1.sqr()
+        var f1=FP2(f2); f1.sqr()
         f2.mul(f1); 
 
         f2.mul_ip(); f2.norm()
@@ -527,7 +527,7 @@ final public class ECP8 {
     }
 
 /* set self*=q, where q is Modulus, using Frobenius */
-    func frob(_ F:[FP2],_ n:Int)
+    mutating func frob(_ F:[FP2],_ n:Int)
     {
         for _ in 0 ..< n {
             x.frob(F[2])
@@ -557,11 +557,11 @@ final public class ECP8 {
     func mul(_ e:BIG) -> ECP8
     {
     /* fixed size windows */
-        let mt=BIG()
-        let t=BIG()
-        let P=ECP8()
-        let Q=ECP8()
-        let C=ECP8()
+        var mt=BIG()
+        var t=BIG()
+        var P=ECP8()
+        var Q=ECP8()
+        var C=ECP8()
         
         var W=[ECP8]();
         for _ in 0 ..< 8 {W.append(ECP8())}
@@ -623,8 +623,8 @@ final public class ECP8 {
 
     static func mul16(_ Q:[ECP8],_ u:[BIG]) -> ECP8
     {
-        let W=ECP8()
-        let P=ECP8()
+        var W=ECP8()
+        var P=ECP8()
         
         var T1=[ECP8]()
         var T2=[ECP8]()
@@ -638,7 +638,7 @@ final public class ECP8 {
             T4.append(ECP8())            
         }
     
-        let mt=BIG()
+        var mt=BIG()
         var t=[BIG]()
     
         var w1=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)
@@ -829,14 +829,14 @@ final public class ECP8 {
         let F=ECP8.frob_constants()        
         x=BIG(ROM.CURVE_Bnx);
     
-        let xQ=Q.mul(x);
-        let x2Q=xQ.mul(x)
-        let x3Q=x2Q.mul(x)
-        let x4Q=x3Q.mul(x)
-        let x5Q=x4Q.mul(x);
-        let x6Q=x5Q.mul(x)
-        let x7Q=x6Q.mul(x)
-        let x8Q=x7Q.mul(x)        
+        var xQ=Q.mul(x);
+        var x2Q=xQ.mul(x)
+        var x3Q=x2Q.mul(x)
+        var x4Q=x3Q.mul(x)
+        var x5Q=x4Q.mul(x);
+        var x6Q=x5Q.mul(x)
+        var x7Q=x6Q.mul(x)
+        var x8Q=x7Q.mul(x)        
 
         if ECP.SIGN_OF_X == ECP.NEGATIVEX {
             xQ.neg()

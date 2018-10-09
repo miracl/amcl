@@ -1,4 +1,7 @@
 
+NEW: 7/10/2018 classes replaced with structs, which are *much* faster (~50%).
+Who knew?
+
 Each supported primitive is implemented inside of its own swift namespace. 
 
 So for example to support both ed25519 and the NIST P256 curves, one

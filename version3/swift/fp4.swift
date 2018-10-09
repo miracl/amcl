@@ -28,9 +28,9 @@
 
 /* FP4 elements are of the form a+ib, where i is sqrt(-1+sqrt(-1))  */
 
-final public class FP4 {
-    private final var a:FP2
-    private final var b:FP2
+public struct FP4 {
+    private var a:FP2
+    private var b:FP2
 
     /* constructors */
     init(_ c:Int)
@@ -57,13 +57,13 @@ final public class FP4 {
         b=FP2(0)
     }
     /* reduce all components of this mod Modulus */
-    func reduce()
+    mutating func reduce()
     {
         a.reduce()
         b.reduce()
     }
     /* normalise all components of this mod Modulus */
-    func norm()
+    mutating func norm()
     {
         a.norm()
         b.norm()
@@ -75,12 +75,11 @@ final public class FP4 {
         return a.iszilch() && b.iszilch()
     }
 
-    func cmove(_ g:FP4,_ d:Int)
+    mutating func cmove(_ g:FP4,_ d:Int)
     {
         a.cmove(g.a,d)
         b.cmove(g.b,d)
     }
-
 
     /* test this==1 ? */
     func isunity() -> Bool
@@ -115,29 +114,29 @@ final public class FP4 {
         return a.equals(x.a) && b.equals(x.b)
     }
     /* copy self=x */
-    func copy(_ x:FP4)
+    mutating func copy(_ x:FP4)
     {
         a.copy(x.a)
         b.copy(x.b)
     }
     /* set this=0 */
-    func zero()
+    mutating func zero()
     {
         a.zero()
         b.zero()
     }
     /* set this=1 */
-    func one()
+    mutating func one()
     {
         a.one()
         b.zero()
     }
     /* set self=-self */
-    func neg()
+    mutating func neg()
     {
-	norm()
-        let m=FP2(a)
-        let t=FP2(0)
+        norm()
+        var m=FP2(a)
+        var t=FP2(0)
         m.add(b)
         m.neg()
     //    m.norm()
@@ -148,62 +147,68 @@ final public class FP4 {
         norm()
     }
     /* self=conjugate(self) */
-    func conj()
+    mutating func conj()
     {
         b.neg(); norm()
     }
     /* this=-conjugate(this) */
-    func nconj()
+    mutating func nconj()
     {
         a.neg(); norm()
     }
+
+    mutating func adds(_ x: FP2)
+    {
+        a.add(x)
+    }
+
     /* self+=x */
-    func add(_ x:FP4)
+    mutating func add(_ x:FP4)
     {
         a.add(x.a)
         b.add(x.b)
     }
     /* self-=x */
-    func sub(_ x:FP4)
+    mutating func sub(_ x:FP4)
     {
-        let m=FP4(x)
+        var m=FP4(x)
         m.neg()
         add(m)
     }
     
     /* self-=x */
-    func rsub(_ x: FP4) {
+    mutating func rsub(_ x: FP4) {
         neg()
         add(x)
     }    
 
     /* self*=s where s is FP2 */
-    func pmul(_ s:FP2)
+    mutating func pmul(_ s:FP2)
     {
         a.mul(s)
         b.mul(s)
     }
 
     /* self*=s where s is FP */
-    func qmul(_ s:FP) {
+    mutating func qmul(_ s:FP) {
         a.pmul(s)
         b.pmul(s)
     }
 
     /* self*=c where c is int */
-    func imul(_ c:Int)
+    mutating func imul(_ c:Int)
     {
         a.imul(c)
         b.imul(c)
     }
     /* self*=self */
-    func sqr()
+    mutating func sqr()
     {
 //        norm();
     
-        let t1=FP2(a)
-        let t2=FP2(b)
-        let t3=FP2(a)
+        var t1=FP2(a)
+        var t2=FP2(b)
+        var t3=FP2(a)
     
         t3.mul(b)
         t1.add(b)
@@ -229,14 +234,14 @@ final public class FP4 {
         norm()
     }
     /* self*=y */
-    func mul(_ y:FP4)
+    mutating func mul(_ y:FP4)
     {
     //    norm();
     
-        let t1=FP2(a)
-        let t2=FP2(b)
-        let t3=FP2(0)
-        let t4=FP2(b)
+        var t1=FP2(a)
+        var t2=FP2(b)
+        var t3=FP2(0)
+        var t4=FP2(b)
     
         t1.mul(y.a)
         t2.mul(y.b)
@@ -275,12 +280,12 @@ final public class FP4 {
         return ("["+a.toRawString()+","+b.toRawString()+"]")
     }
     /* self=1/self */
-    func inverse()
+    mutating func inverse()
     {
         norm();
     
-        let t1=FP2(a)
-        let t2=FP2(b)
+        var t1=FP2(a)
+        var t2=FP2(b)
     
         t1.sqr()
         t2.sqr()
@@ -293,11 +298,11 @@ final public class FP4 {
     }
     
     /* self*=i where i = sqrt(-1+sqrt(-1)) */
-    func times_i()
+    mutating func times_i()
     {
     //    norm();
-        let s=FP2(b)
-        let t=FP2(b)
+        var s=FP2(b)
+        var t=FP2(b)
         s.times_i()
         t.add(s)
     //    t.norm()
@@ -307,7 +312,7 @@ final public class FP4 {
     }
     
     /* self=self^p using Frobenius */
-    func frob(_ f:FP2)
+    mutating func frob(_ f:FP2)
     {
         a.conj()
         b.conj()
@@ -316,11 +321,11 @@ final public class FP4 {
     /* self=self^e */
     func pow(_ e:BIG) -> FP4
     {
-        norm()
-        e.norm()
-        let w=FP4(self)
-        let z=BIG(e)
-        let r=FP4(1)
+        var w=FP4(self)
+        w.norm()        
+        var z=BIG(e)
+        var r=FP4(1)
+        z.norm()
         while (true)
         {
             let bt=z.parity()
@@ -333,10 +338,10 @@ final public class FP4 {
         return r
     }
     /* XTR xtr_a function */
-    func xtr_A(_ w:FP4,_ y:FP4,_ z:FP4)
+    mutating func xtr_A(_ w:FP4,_ y:FP4,_ z:FP4)
     {
-        let r=FP4(w)
-        let t=FP4(w)
+        var r=FP4(w)
+        var t=FP4(w)
         r.sub(y); r.norm()
         r.pmul(a)
         t.add(y); t.norm()
@@ -350,9 +355,9 @@ final public class FP4 {
         norm()
     }
     /* XTR xtr_d function */
-    func xtr_D()
+    mutating func xtr_D()
     {
-        let w=FP4(self)
+        var w=FP4(self)
         sqr(); w.conj()
         w.add(w); w.norm();
         sub(w)
@@ -361,16 +366,17 @@ final public class FP4 {
     /* r=x^n using XTR method on traces of FP12s */
     func xtr_pow(_ n:BIG) -> FP4
     {
-        let a=FP4(3)
-        let b=FP4(self)
-        let c=FP4(b)
+        var a=FP4(3)
+        var b=FP4(self)
+        var c=FP4(b)
         c.xtr_D()
-        let t=FP4(0)
-        let r=FP4(0)
+        var t=FP4(0)
+        var r=FP4(0)
+        var sf=FP4(self)
     
-        n.norm();
+        //n.norm();
         let par=n.parity()
-        let v=BIG(n); v.fshr(1)
+        var v=BIG(n); v.norm(); v.fshr(1)
         if par==0 {v.dec(1); v.norm()}
     
         let nb=v.nbits()
@@ -382,10 +388,10 @@ final public class FP4 {
             if (v.bit(UInt(i)) != 1)
             {
 				t.copy(b)
-				conj()
+				sf.conj()
 				c.conj()
-				b.xtr_A(a,self,c)
-				conj()
+				b.xtr_A(a,sf,c)
+				sf.conj()
 				c.copy(t)
 				c.xtr_D()
 				a.xtr_D()
@@ -395,7 +401,7 @@ final public class FP4 {
 				t.copy(a); t.conj()
 				a.copy(b)
 				a.xtr_D()
-				b.xtr_A(c,self,t)
+				b.xtr_A(c,sf,t)
 				c.xtr_D()
             }
             i-=1
@@ -409,17 +415,18 @@ final public class FP4 {
     /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
     func xtr_pow2(_ ck:FP4,_ ckml:FP4,_ ckm2l:FP4,_ a:BIG,_ b:BIG) -> FP4
     {
-        a.norm(); b.norm()
-        let e=BIG(a)
-        let d=BIG(b)
-        let w=BIG(0)
+
+        var e=BIG(a)
+        var d=BIG(b)
+        var w=BIG(0)
+        e.norm(); d.norm()
     
-        let cu=FP4(ck)  // can probably be passed in w/o copying
-        let cv=FP4(self)
-        let cumv=FP4(ckml)
-        let cum2v=FP4(ckm2l)
+        var cu=FP4(ck)  // can probably be passed in w/o copying
+        var cv=FP4(self)
+        var cumv=FP4(ckml)
+        var cum2v=FP4(ckm2l)
         var r=FP4(0)
-        let t=FP4(0)
+        var t=FP4(0)
     
         var f2:Int=0
         while d.parity()==0 && e.parity()==0
@@ -550,22 +557,22 @@ final public class FP4 {
     }
     
     /* self/=2 */
-    func div2() {
+    mutating func div2() {
         a.div2()
         b.div2()
     }
 
-    func div_i() {
-        let u=FP2(a)
+    mutating func div_i() {
+        var u=FP2(a)
         let v=FP2(b)
         u.div_ip()
         a.copy(v)
         b.copy(u)
     }   
 
-    func div_2i() {
-        let u=FP2(a)
-        let v=FP2(b)
+    mutating func div_2i() {
+        var u=FP2(a)
+        var v=FP2(b)
         u.div_ip2()
         v.add(v); v.norm()
         a.copy(v)
@@ -574,12 +581,12 @@ final public class FP4 {
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */
 /* returns true if this is QR */
-    func sqrt() -> Bool {
+    mutating func sqrt() -> Bool {
         if iszilch() {return true}
 
-        let aa=FP2(a)
-        let s=FP2(b)
-        let t=FP2(a)
+        var aa=FP2(a)
+        var s=FP2(b)
+        var t=FP2(a)
 
         if s.iszilch() {
             if t.sqrt() {
@@ -622,6 +629,4 @@ final public class FP4 {
 
         return true
     }
-
-
 }

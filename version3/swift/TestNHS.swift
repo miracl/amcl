@@ -36,8 +36,8 @@ public func TestNHS()
 
 
 	var RAW=[UInt8](repeating: 0,count: 100)
-	let srng=RAND()
-				let crng=RAND()
+	var srng=RAND()
+				var crng=RAND()
 				crng.clean()
     
 	srng.clean()
@@ -48,8 +48,8 @@ public func TestNHS()
 				crng.seed(100,RAW)
 
 
-	NHS.SERVER_1(srng,&SB,&S)
-				NHS.CLIENT(crng,SB,&UC,&KEYB)
+	NHS.SERVER_1(&srng,&SB,&S)
+				NHS.CLIENT(&crng,SB,&UC,&KEYB)
 
  			   	for i in 0..<32 {
             				let h=String(KEYB[i],radix:16)

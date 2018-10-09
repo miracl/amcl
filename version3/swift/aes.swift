@@ -26,7 +26,7 @@
 //   AES Encryption
 //
 
-final public class AES {
+public struct AES {
     var mode:Int=0;
     private var fkey=[UInt32](repeating: 0,count: 44)
     private var rkey=[UInt32](repeating: 0,count: 44)
@@ -305,7 +305,7 @@ final public class AES {
     }   
 
     /* reset cipher */
-    public func reset(_ m: Int,_ iv:[UInt8]?)
+    public mutating func reset(_ m: Int,_ iv:[UInt8]?)
     { /* reset mode, or reset iv */
         mode=m;
         for i in 0 ..< 16 {f[i]=0}
@@ -313,7 +313,7 @@ final public class AES {
             {for i in 0 ..< 16 {f[i]=iv![i]}} /*??*/
     }
     
-    public func init_it(_ m:Int,_ key:[UInt8],_ iv:[UInt8]?)
+    public mutating func init_it(_ m:Int,_ key:[UInt8],_ iv:[UInt8]?)
     {   /* Key=16 bytes */
         /* Key Scheduler. Create expanded encryption key */
         var CipherKey=[UInt32](repeating: 0,count: 4)
@@ -480,7 +480,7 @@ final public class AES {
     }
     
     /* Encrypt using selected mode of operation */
-    @discardableResult public func encrypt(_ buff:inout [UInt8]) -> UInt32
+    @discardableResult public mutating func encrypt(_ buff:inout [UInt8]) -> UInt32
     {
         var st=[UInt8](repeating: 0,count: 16)
     
@@ -552,7 +552,7 @@ final public class AES {
     }
     
     /* Decrypt using selected mode of operation */
-    @discardableResult public func decrypt(_ buff:inout [UInt8]) -> UInt32
+    @discardableResult public mutating func decrypt(_ buff:inout [UInt8]) -> UInt32
     {
 
         var st=[UInt8](repeating: 0,count: 16)
@@ -630,7 +630,7 @@ final public class AES {
     }
         
     /* Clean up and delete left-overs */
-    public func end()
+    public mutating func end()
     { // clean up
         for i in 0 ..< 44
             {fkey[i]=0; rkey[i]=0}

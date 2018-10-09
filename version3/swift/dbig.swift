@@ -1,3 +1,4 @@
+
 /*
 	Licensed to the Apache Software Foundation (ASF) under one
 	or more contributor license agreements.  See the NOTICE file
@@ -24,7 +25,7 @@
 //  Copyright (c) 2015 Michael Scott. All rights reserved.
 //
 
-final class DBIG{
+    struct DBIG{
     var w=[Chunk](repeating: 0,count: BIG.DNLEN)
     init() {
         for i in 0 ..< BIG.DNLEN {w[i]=0}
@@ -50,7 +51,7 @@ final class DBIG{
         for i in 0 ..< BIG.DNLEN {w[i]=x[i]}
     }
 
-    func cmove(_ g: DBIG,_ d: Int)
+    mutating func cmove(_ g: DBIG,_ d: Int)
     {
         let b = Chunk(-d)
     
@@ -61,19 +62,19 @@ final class DBIG{
     }
 
 /* Copy from another DBIG */
-    func copy(_ x: DBIG)
+    mutating func copy(_ x: DBIG)
     {
         for i in 0 ..< BIG.DNLEN {w[i] = x.w[i]}
     }
 
-    func ucopy(_ x: BIG)
+    mutating func ucopy(_ x: BIG)
     {
         for i in 0 ..< BIG.NLEN {w[i] = 0}
         for i in BIG.NLEN ..< BIG.DNLEN {w[i] = x.w[i-BIG.NLEN]}        
     }
 
     /* this+=x */
-    func add(_ x: DBIG)
+    mutating func add(_ x: DBIG)
     {
         for i in 0 ..< BIG.DNLEN
         {
@@ -82,7 +83,7 @@ final class DBIG{
     }
 
     /* this-=x */
-    func sub(_ x: DBIG)
+    mutating func sub(_ x: DBIG)
     {
         for i in 0 ..< BIG.DNLEN
         {
@@ -91,7 +92,7 @@ final class DBIG{
     }
 
     /* this-=x */
-    func rsub(_ x: DBIG)
+    mutating func rsub(_ x: DBIG)
     {
         for i in 0 ..< BIG.DNLEN
         {
@@ -105,7 +106,7 @@ final class DBIG{
         return Int32(prod>>Int64(BIG.BASEBITS))
     } */
     /* general shift left */
-    func shl(_ k: UInt)
+    mutating func shl(_ k: UInt)
     {
         let n=k%BIG.BASEBITS
         let m=Int(k/BIG.BASEBITS)
@@ -119,7 +120,7 @@ final class DBIG{
         for i in 0 ..< m {w[i]=0}
     }
     /* general shift right */
-    func shr(_ k: UInt)
+    mutating func shr(_ k: UInt)
     {
         let n=k%BIG.BASEBITS
         let m=Int(k/BIG.BASEBITS)
@@ -143,7 +144,7 @@ final class DBIG{
         return 0;
     }
     /* normalise BIG - force all digits < 2^BASEBITS */
-    func norm()
+    mutating func norm()
     {
         var carry:Chunk=0
         for i in 0 ..< BIG.DNLEN-1
@@ -155,12 +156,12 @@ final class DBIG{
         w[BIG.DNLEN-1]+=carry
     }
     /* reduces this DBIG mod a BIG, and returns the BIG */
-    func mod(_ c: BIG) -> BIG
+    mutating func mod(_ c: BIG) -> BIG
     {
         var k:Int=0
         norm()
-        let m=DBIG(c)
-        let r=DBIG(0)
+        var m=DBIG(c)
+        var r=DBIG(0)
     
         if DBIG.comp(self,m)<0 {return BIG(self)}
     
@@ -191,14 +192,14 @@ final class DBIG{
         return BIG(self)
     }
     /* return this/c */
-    func div(_ c:BIG) -> BIG
+    mutating func div(_ c:BIG) -> BIG
     {
         var k:Int=0
-        let m=DBIG(c)
-        let a=BIG(0)
-        let e=BIG(1)
-        let r=BIG(0)
-        let dr=DBIG(0)
+        var m=DBIG(c)
+        var a=BIG(0)
+        var e=BIG(1)
+        var r=BIG(0)
+        var dr=DBIG(0)
 
         norm()
     
@@ -237,9 +238,9 @@ final class DBIG{
     }
     
     /* split DBIG at position n, return higher half, keep lower half */
-    func split(_ n: UInt) -> BIG
+    mutating func split(_ n: UInt) -> BIG
     {
-        let t=BIG(0)
+        var t=BIG(0)
         let m=n%BIG.BASEBITS
         var carry=w[BIG.DNLEN-1]<<Chunk(BIG.BASEBITS-m)
     
@@ -257,11 +258,12 @@ final class DBIG{
     func nbits() -> Int
     {
         var k=(BIG.DNLEN-1)
-        norm()
-        while k>=0 && w[k]==0 {k -= 1}
+        var t=BIG(self)        
+        t.norm()
+        while k>=0 && t.w[k]==0 {k -= 1}
         if k<0 {return 0}
         var bts=Int(BIG.BASEBITS)*k
-        var c=w[k];
+        var c=t.w[k];
         while c != 0 {c/=2; bts+=1}
         return bts
     }
@@ -277,7 +279,7 @@ final class DBIG{
         for i in (0...len-1).reversed()
     //    for var i=len-1;i>=0;i--
         {
-            let b = DBIG(self)
+            var b = DBIG(self)
             b.shr(UInt(i*4))
             let n=String(b.w[0]&15,radix:16,uppercase:false)
             s+=n

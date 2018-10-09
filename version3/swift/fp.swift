@@ -25,7 +25,7 @@
 //  AMCL mod p functions
 //
 
-final public class FP {
+public struct FP {
 
 
     static public let NOT_SPECIAL=0
@@ -48,12 +48,12 @@ final public class FP {
     static let r2modp=BIG(ROM.R2modp)
 
 /* convert to Montgomery n-residue form */
-    func nres()
+    mutating func nres()
     {
         if FP.MODTYPE != FP.PSEUDO_MERSENNE && FP.MODTYPE != FP.GENERALISED_MERSENNE
         {
-            let d=BIG.mul(x,FP.r2modp);
-            x.copy(FP.mod(d))
+            var d=BIG.mul(x,FP.r2modp);
+            x.copy(FP.mod(&d))
             xes=2
         } else {xes=1}
     }
@@ -62,8 +62,8 @@ final public class FP {
     {
         if FP.MODTYPE != FP.PSEUDO_MERSENNE && FP.MODTYPE != FP.GENERALISED_MERSENNE
         {
-            let d=DBIG(x)
-            return FP.mod(d)
+            var d=DBIG(x)
+            return FP.mod(&d)
         }
         else
         {
@@ -73,12 +73,12 @@ final public class FP {
     }
     
     /* reduce a DBIG to a BIG using the appropriate form of the modulus */
-    static func mod(_ d: DBIG) -> BIG
+    static func mod(_ d: inout DBIG) -> BIG
     {
  
         if FP.MODTYPE==FP.PSEUDO_MERSENNE
         {
-            let t=d.split(FP.MODBITS)
+            var t=d.split(FP.MODBITS)
             let b=BIG(d)
             let v=t.pmul(Int(ROM.MConst))
 
@@ -102,7 +102,7 @@ final public class FP {
  //                   d.w[BIG.NLEN+i]+=d.muladd(d.w[i],ROM.MConst-1,d.w[i],BIG.NLEN+i-1)
             }
     
-            let b=BIG(0);
+            var b=BIG(0);
     
             for i in 0 ..< BIG.NLEN
             {
@@ -115,12 +115,12 @@ final public class FP {
         { // GoldiLocks Only
             let t=d.split(FP.MODBITS)
             let RM2=FP.MODBITS/2
-            let b=BIG(d)
+            var b=BIG(d)
             b.add(t)
-            let dd=DBIG(t)
+            var dd=DBIG(t)
             dd.shl(RM2)
             
-            let tt=dd.split(FP.MODBITS)
+            var tt=dd.split(FP.MODBITS)
             let lo=BIG(dd)
             b.add(tt)
             b.add(lo)
@@ -140,7 +140,7 @@ final public class FP {
         {
             let md=BIG(ROM.Modulus);
 
-            return BIG.monty(md,ROM.MConst,d)
+            return BIG.monty(md,ROM.MConst,&d)
         }
         return BIG(0)
     }
@@ -184,32 +184,32 @@ final public class FP {
 
 
 /* reduce this mod Modulus */
-    func reduce()
+    mutating func reduce()
     {
 
-        let m=BIG(FP.p)
-	let r=BIG(FP.p)
-	var sb:Int
+        var m=BIG(FP.p)
+        var r=BIG(FP.p)
+        var sb:Int
 
         x.norm()
 
-	if xes>16 {
-		let q=FP.quo(x,m)
-		let carry=r.pmul(q)
-		r.w[BIG.NLEN-1]+=carry<<BIG.BASEBITS; // correction - put any carry out back in again
-		x.sub(r)
-		x.norm()		
-		sb=2
-	} else {
-		sb=FP.logb2(UInt32(xes-Int32(1)))
-	}
+	   if xes>16 {
+		  let q=FP.quo(x,m)
+		  let carry=r.pmul(q)
+		  r.w[BIG.NLEN-1]+=carry<<Chunk(BIG.BASEBITS); // correction - put any carry out back in again
+		  x.sub(r)
+		  x.norm()		
+		  sb=2
+	   } else {
+		  sb=FP.logb2(UInt32(xes-Int32(1)))
+	   }
         m.fshl(sb)
 
         while sb>0 {
-            let sr=BIG.ssn(r,x,m)
-	    x.cmove(r,1-sr)
+            let sr=BIG.ssn(&r,x,&m)
+            x.cmove(r,1-sr)
             sb -= 1
-	}
+        }
 	
         xes=1
     }
@@ -217,41 +217,41 @@ final public class FP {
 /* test this=0? */
     func iszilch() -> Bool
     {
-	let z=FP(self)
+        var z=FP(self)
         z.reduce()
         return z.x.iszilch()
     }
     
 /* copy from FP b */
-    func copy(_ b: FP)
+    mutating func copy(_ b: FP)
     {
         x.copy(b.x)
         xes=b.xes
     }
     
 /* set this=0 */
-    func zero()
+    mutating func zero()
     {
         x.zero();
         xes=1;
     }
     
 /* set this=1 */
-    func one()
+    mutating func one()
     {
         x.one(); nres()
     }
     
 /* normalise this */
-    func norm()
+    mutating func norm()
     {
         x.norm();
     }
 /* swap FPs depending on d */
-    func cswap(_ b: FP,_ d: Int)
+    mutating func cswap(_ b: inout FP,_ d: Int)
     {
         var c=Int32(d)
-        x.cswap(b.x,d)
+        x.cswap(&(b.x),d)
         c = ~(c-1)
         let t=c&(xes^b.xes)
         xes^=t
@@ -259,20 +259,20 @@ final public class FP {
     }
     
 /* copy FPs depending on d */
-    func cmove(_ b: FP,_ d:Int)
+    mutating func cmove(_ b: FP,_ d:Int)
     {
         let c=Int32(-d)
         x.cmove(b.x,d)
         xes^=(xes^b.xes)&c        
     }
 /* this*=b mod Modulus */
-    func mul(_ b: FP)
+    mutating func mul(_ b: FP)
     {
 
         if Int64(xes)*Int64(b.xes) > Int64(FP.FEXCESS) {reduce()}
         
-        let d=BIG.mul(x,b.x)
-        x.copy(FP.mod(d))
+        var d=BIG.mul(x,b.x)
+        x.copy(FP.mod(&d))
         xes=2
     }
     static func logb2(_ w: UInt32) -> Int
@@ -296,22 +296,22 @@ final public class FP {
     static func quo(_ n: BIG,_ m: BIG) -> Int
     {
         let hb=UInt(BIG.CHUNK)/2
-	if FP.TBITS < hb {
-		let sh=hb-FP.TBITS;
-		let num=((n.w[BIG.NLEN-1]<<sh))|(n.w[BIG.NLEN-2]>>(BIG.BASEBITS-sh));
-		let den=((m.w[BIG.NLEN-1]<<sh))|(m.w[BIG.NLEN-2]>>(BIG.BASEBITS-sh));
-		return Int(num/(den+1));
-	} else {
-		let num=n.w[BIG.NLEN-1];
-		let den=m.w[BIG.NLEN-1];
-		return Int(num/(den+1));
-	}
+        if FP.TBITS < hb {
+		  let sh=Chunk(hb-FP.TBITS);
+		  let num=((n.w[BIG.NLEN-1]<<sh))|(n.w[BIG.NLEN-2]>>(Chunk(BIG.BASEBITS)-sh));
+		  let den=((m.w[BIG.NLEN-1]<<sh))|(m.w[BIG.NLEN-2]>>(Chunk(BIG.BASEBITS)-sh));
+		  return Int(num/(den+1));
+	   } else {
+		  let num=n.w[BIG.NLEN-1];
+		  let den=m.w[BIG.NLEN-1];
+		  return Int(num/(den+1));
+	   }
     }
 
     /* this = -this mod Modulus */
-    func neg()
+    mutating func neg()
     {
-        let m=BIG(FP.p)
+        var m=BIG(FP.p)
         let sb=FP.logb2(UInt32(xes-Int32(1)))
         m.fshl(sb)
         x.rsub(m)
@@ -319,7 +319,7 @@ final public class FP {
         if xes>FP.FEXCESS {reduce()}
     }
     /* this*=c mod Modulus, where c is a small int */
-    func imul(_ c: Int)
+    mutating func imul(_ c: Int)
     {
         var cc=c
     //    norm();
@@ -332,8 +332,8 @@ final public class FP {
 
         if FP.MODTYPE==FP.PSEUDO_MERSENNE || FP.MODTYPE==FP.GENERALISED_MERSENNE
         {
-            let d=x.pxmul(cc)
-            x.copy(FP.mod(d))
+            var d=x.pxmul(cc)
+            x.copy(FP.mod(&d))
             xes=2
         }
         else {
@@ -353,36 +353,36 @@ final public class FP {
     }
     
 /* this*=this mod Modulus */
-    func sqr()
+    mutating func sqr()
     {
         if Int64(xes)*Int64(xes) > Int64(FP.FEXCESS) {reduce()}   
-        let d=BIG.sqr(x);
-        x.copy(FP.mod(d));
+        var d=BIG.sqr(x);
+        x.copy(FP.mod(&d));
         xes=2
     }
     
     /* this+=b */
-    func add(_ b: FP)
+    mutating func add(_ b: FP)
     {
         x.add(b.x);
         xes+=b.xes
         if xes>FP.FEXCESS {reduce()}
     }
 /* this-=b */
-    func sub(_ b: FP)
+    mutating func sub(_ b: FP)
     {
-        let n=FP(b)
+        var n=FP(b)
         n.neg()
         self.add(n)
     }
 /* this=b-this */
-    func rsub(_ b: FP)
+    mutating func rsub(_ b: FP)
     {
         self.neg();
         self.add(b)
     }
 /* this/=2 mod Modulus */
-    func div2()
+    mutating func div2()
     {
     //    x.norm()
         if (x.parity()==0)
@@ -395,7 +395,7 @@ final public class FP {
         }
     }
 /* this=1/this mod Modulus */
-    func inverse()
+    mutating func inverse()
     {
 /*        
         let r=redc()
@@ -403,7 +403,7 @@ final public class FP {
         x.copy(r)
         nres()
 */
-        let m2=BIG(ROM.Modulus);
+        var m2=BIG(ROM.Modulus);
         m2.dec(2); m2.norm()
         copy(pow(m2))
 
@@ -412,8 +412,8 @@ final public class FP {
 /* return TRUE if this==a */
     func equals(_ a: FP) -> Bool
     {
-	let f=FP(self)
-	let s=FP(a)
+        var f=FP(self)
+        var s=FP(a)
         f.reduce()
         s.reduce()
         if (BIG.comp(f.x,s.x)==0) {return true}
@@ -422,13 +422,13 @@ final public class FP {
 
 
 /* return this^e mod Modulus */
-    func pow(_ e: BIG) -> FP
+    mutating func pow(_ e: BIG) -> FP
     {
         var tb=[FP]() 
         let n=1+(BIG.NLEN*Int(BIG.BASEBITS)+3)/4
         var w=[Int8](repeating: 0,count: n)     
         norm()
-        let t=BIG(e); t.norm()
+        var t=BIG(e); t.norm()
         let nb=1+(t.nbits()+3)/4    
 
         for i in 0 ..< nb  {
@@ -444,7 +444,7 @@ final public class FP {
             tb.append(FP(tb[i-1]))
             tb[i].mul(self)
         }
-        let r=FP(tb[Int(w[nb-1])])
+        var r=FP(tb[Int(w[nb-1])])
         for i in (0...nb-2).reversed() {
             r.sqr()
             r.sqr()
@@ -477,18 +477,18 @@ final public class FP {
     } */
 
 /* return sqrt(this) mod Modulus */
-    func sqrt() -> FP
+    mutating func sqrt() -> FP
     {
         reduce();
-        let b=BIG(FP.p)
+        var b=BIG(FP.p)
         if (FP.MOD8==5)
         {
             b.dec(5); b.norm(); b.shr(3)
-            let i=FP(self); i.x.shl(1)
+            var i=FP(self); i.x.shl(1)
             let v=i.pow(b)
             i.mul(v); i.mul(v)
             i.x.dec(1)
-            let r=FP(self)
+            var r=FP(self)
             r.mul(v); r.mul(i)
             r.reduce()
             return r
@@ -502,7 +502,7 @@ final public class FP {
 /* return jacobi symbol (this/Modulus) */
     func jacobi() -> Int
     {
-        let w=redc()
+        var w=redc()
         return w.jacobi(FP.p)
     }
     

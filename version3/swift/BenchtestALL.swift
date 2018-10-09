@@ -35,15 +35,15 @@ import bls24
 import bls48
 import rsa2048
 
-public func TimeRSA_2048(_ rng: RAND)
+public func TimeRSA_2048(_ rng: inout RAND)
 {
     let RFS=RSA.RFS
     let MIN_TIME=10.0
     let MIN_ITERS=10 
     var fail=false;
 
-    let pub=rsa_public_key(Int(FF.FFLEN))
-    let priv=rsa_private_key(Int(FF.HFLEN))
+    var pub=rsa_public_key(Int(FF.FFLEN))
+    var priv=rsa_private_key(Int(FF.HFLEN))
 
     var M=[UInt8](repeating: 0,count: RFS)
     var C=[UInt8](repeating: 0,count: RFS)
@@ -56,7 +56,7 @@ public func TimeRSA_2048(_ rng: RAND)
     var iterations=0
     var elapsed=0.0
     while elapsed<MIN_TIME || iterations<MIN_ITERS {
-        RSA.KEY_PAIR(rng,65537,priv,pub)
+        RSA.KEY_PAIR(&rng,65537,&priv,&pub)
         iterations+=1
         elapsed = -start.timeIntervalSinceNow
     }
@@ -106,7 +106,7 @@ public func TimeRSA_2048(_ rng: RAND)
 }
 
 
-public func TimeECDH_ed25519(_ rng: RAND)
+public func TimeECDH_ed25519(_ rng: inout RAND)
 {
     let MIN_TIME=10.0
     let MIN_ITERS=10
@@ -143,7 +143,7 @@ public func TimeECDH_ed25519(_ rng: RAND)
     let G=ed25519.ECP.generator();
     
     let r=ed25519.BIG(ed25519.ROM.CURVE_Order)
-    s=ed25519.BIG.randomnum(r,rng)
+    s=ed25519.BIG.randomnum(r,&rng)
     
     var W=G.mul(r)
     if !W.is_infinity() {
@@ -168,7 +168,7 @@ public func TimeECDH_ed25519(_ rng: RAND)
     }    
 }
 
-public func TimeECDH_nist256(_ rng: RAND)
+public func TimeECDH_nist256(_ rng: inout RAND)
 {
     let MIN_TIME=10.0
     let MIN_ITERS=10
@@ -205,7 +205,7 @@ public func TimeECDH_nist256(_ rng: RAND)
     let G=nist256.ECP.generator();
     
     let r=nist256.BIG(nist256.ROM.CURVE_Order)
-    s=nist256.BIG.randomnum(r,rng)
+    s=nist256.BIG.randomnum(r,&rng)
     
     var W=G.mul(r)
     if !W.is_infinity() {
@@ -231,7 +231,7 @@ public func TimeECDH_nist256(_ rng: RAND)
 }
 
 
-public func TimeECDH_goldilocks(_ rng: RAND)
+public func TimeECDH_goldilocks(_ rng: inout RAND)
 {
     let MIN_TIME=10.0
     let MIN_ITERS=10
@@ -268,7 +268,7 @@ public func TimeECDH_goldilocks(_ rng: RAND)
     let G=goldilocks.ECP.generator();
     
     let r=goldilocks.BIG(goldilocks.ROM.CURVE_Order)
-    s=goldilocks.BIG.randomnum(r,rng)
+    s=goldilocks.BIG.randomnum(r,&rng)
     
     var W=G.mul(r)
     if !W.is_infinity() {
@@ -293,7 +293,7 @@ public func TimeECDH_goldilocks(_ rng: RAND)
     }    
 }
 
-public func TimeMPIN_bn254(_ rng: RAND)
+public func TimeMPIN_bn254(_ rng: inout RAND)
 {
     let MIN_TIME=10.0
     let MIN_ITERS=10   
@@ -312,7 +312,7 @@ public func TimeMPIN_bn254(_ rng: RAND)
     let G=bn254.ECP.generator();
     
     let r=bn254.BIG(bn254.ROM.CURVE_Order)
-    let s=bn254.BIG.randomnum(r,rng)
+    let s=bn254.BIG.randomnum(r,&rng)
     
     var P=bn254.PAIR.G1mul(G,r);
     
@@ -436,7 +436,7 @@ public func TimeMPIN_bn254(_ rng: RAND)
     }
 }
 
-public func TimeMPIN_bls383(_ rng: RAND)
+public func TimeMPIN_bls383(_ rng: inout RAND)
 {
     let MIN_TIME=10.0
     let MIN_ITERS=10   
@@ -455,7 +455,7 @@ public func TimeMPIN_bls383(_ rng: RAND)
     let G=bls383.ECP.generator();
     
     let r=bls383.BIG(bls383.ROM.CURVE_Order)
-    let s=bls383.BIG.randomnum(r,rng)
+    let s=bls383.BIG.randomnum(r,&rng)
     
     var P=bls383.PAIR.G1mul(G,r);
     
@@ -580,7 +580,7 @@ public func TimeMPIN_bls383(_ rng: RAND)
 }
 
 
-public func TimeMPIN_bls24(_ rng: RAND)
+public func TimeMPIN_bls24(_ rng: inout RAND)
 {
     let MIN_TIME=10.0
     let MIN_ITERS=10   
@@ -599,7 +599,7 @@ public func TimeMPIN_bls24(_ rng: RAND)
     let G=bls24.ECP.generator();
     
     let r=bls24.BIG(bls24.ROM.CURVE_Order)
-    let s=bls24.BIG.randomnum(r,rng)
+    let s=bls24.BIG.randomnum(r,&rng)
     
     var P=PAIR192.G1mul(G,r);
     
@@ -724,7 +724,7 @@ public func TimeMPIN_bls24(_ rng: RAND)
 }
 
 
-public func TimeMPIN_bls48(_ rng: RAND)
+public func TimeMPIN_bls48(_ rng: inout RAND)
 {
     let MIN_TIME=10.0
     let MIN_ITERS=10   
@@ -743,7 +743,7 @@ public func TimeMPIN_bls48(_ rng: RAND)
     let G=bls48.ECP.generator();
     
     let r=bls48.BIG(bls48.ROM.CURVE_Order)
-    let s=bls48.BIG.randomnum(r,rng)
+    let s=bls48.BIG.randomnum(r,&rng)
     
     var P=PAIR256.G1mul(G,r);
     
@@ -869,20 +869,20 @@ public func TimeMPIN_bls48(_ rng: RAND)
 
 
 var RAW=[UInt8](repeating: 0,count: 100)
-let rng=RAND()
+var rng=RAND()
     
 rng.clean();
 for i in 0 ..< 100 {RAW[i]=UInt8(i&0xff)}
 rng.seed(100,RAW)
 
 
-TimeECDH_ed25519(rng)  
-TimeECDH_nist256(rng)
-TimeECDH_goldilocks(rng)
-TimeRSA_2048(rng)
-TimeMPIN_bn254(rng)
-TimeMPIN_bls383(rng)
-TimeMPIN_bls24(rng)
-TimeMPIN_bls48(rng)
+TimeECDH_ed25519(&rng)  
+TimeECDH_nist256(&rng)
+TimeECDH_goldilocks(&rng)
+TimeRSA_2048(&rng)
+TimeMPIN_bn254(&rng)
+TimeMPIN_bls383(&rng)
+TimeMPIN_bls24(&rng)
+TimeMPIN_bls48(&rng)
 
 

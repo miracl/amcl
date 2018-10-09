@@ -27,21 +27,21 @@
 /* AMCL Fp^24 functions */
 /* FP24 elements are of the form a+i.b+i^2.c */
 
-final public class FP24
+public struct FP24
 {
-    private final var a:FP8
-    private final var b:FP8
-    private final var c:FP8
+    private var a:FP8
+    private var b:FP8
+    private var c:FP8
     
     /* reduce all components of this mod Modulus */
-    func reduce()
+    mutating func reduce()
     {
         a.reduce()
         b.reduce()
         c.reduce()
     }
     /* normalise all components of this */
-    func norm()
+    mutating func norm()
     {
         a.norm();
         b.norm();
@@ -82,7 +82,7 @@ final public class FP24
         return a.iszilch() && b.iszilch() && c.iszilch()
     }
 
-    func cmove(_ g:FP24,_ d:Int)
+    mutating func cmove(_ g:FP24,_ d:Int)
     {
         a.cmove(g.a,d)
         b.cmove(g.b,d)
@@ -97,7 +97,7 @@ final public class FP24
         return Int((x>>31)&1)
     }
     /* Constant time select from pre-computed table */
-    func select(_ g:[FP24],_ b:Int32)
+    mutating func select(_ g:[FP24],_ b:Int32)
     {
 
         let m=b>>31
@@ -114,7 +114,7 @@ final public class FP24
         cmove(g[6],FP24.teq(babs,6))
         cmove(g[7],FP24.teq(babs,7))
     
-        let invf=FP24(self)
+        var invf=FP24(self)
         invf.conj()
         cmove(invf,Int(m&1))
     }
@@ -146,21 +146,21 @@ final public class FP24
         return c
     }
     /* copy self=x */
-    public func copy(_ x:FP24)
+    public mutating func copy(_ x:FP24)
     {
         a.copy(x.a)
         b.copy(x.b)
         c.copy(x.c)
     }
     /* set self=1 */
-    func one()
+    mutating func one()
     {
         a.one()
         b.zero()
         c.zero()
     }
     /* self=conj(self) */
-    func conj()
+    mutating func conj()
     {
         a.conj()
         b.nconj()
@@ -168,12 +168,12 @@ final public class FP24
     }
 
     /* Granger-Scott Unitary Squaring */
-    func usqr()
+    mutating func usqr()
     {
-        let A=FP8(a)
-        let B=FP8(c)
-        let C=FP8(b)
-        let D=FP8(0)
+        var A=FP8(a)
+        var B=FP8(c)
+        var C=FP8(b)
+        var D=FP8(0)
     
         a.sqr()
         D.copy(a); D.add(a)
@@ -208,12 +208,12 @@ final public class FP24
     }
 
     /* Chung-Hasan SQR2 method from http://cacr.uwaterloo.ca/techreports/2006/cacr2006-24.pdf */
-    func sqr()
+    mutating func sqr()
     {
-        let A=FP8(a)
-        let B=FP8(b)
-        let C=FP8(c)
-        let D=FP8(a)
+        var A=FP8(a)
+        var B=FP8(b)
+        var C=FP8(c)
+        var D=FP8(a)
     
         A.sqr()
         B.mul(c)
@@ -247,14 +247,14 @@ final public class FP24
     }
 
     /* FP24 full multiplication this=this*y */
-    func mul(_ y:FP24)
+    mutating func mul(_ y:FP24)
     {
-        let z0=FP8(a)
-        let z1=FP8(0)
-        let z2=FP8(b)
-        let z3=FP8(0)
-        let t0=FP8(a)
-        let t1=FP8(y.a)
+        var z0=FP8(a)
+        var z1=FP8(0)
+        var z2=FP8(b)
+        var z3=FP8(0)
+        var t0=FP8(a)
+        var t1=FP8(y.a)
     
         z0.mul(y.a)
         z2.mul(y.b)
@@ -306,19 +306,19 @@ final public class FP24
     }
 
     /* Special case of multiplication arises from special form of ATE pairing line function */
-    func smul(_ y:FP24,_ twist:Int)
+    mutating func smul(_ y:FP24,_ twist:Int)
     {
         if twist == ECP.D_TYPE {
-            let z0=FP8(a)
-            let z2=FP8(b)
-            let z3=FP8(b)
-            let t0=FP8(0)
-            let t1=FP8(y.a)
+            var z0=FP8(a)
+            var z2=FP8(b)
+            var z3=FP8(b)
+            var t0=FP8(0)
+            var t1=FP8(y.a)
     
             z0.mul(y.a)
             z2.pmul(y.b.real())
             b.add(a)
-            t1.real().add(y.b.real())
+            t1.adds(y.b.real())
     
             b.norm(); t1.norm()
 
@@ -344,12 +344,12 @@ final public class FP24
             a.copy(z0); a.add(z3)
         }
         if twist == ECP.M_TYPE {
-            let z0=FP8(a)
-            let z1=FP8(0)
-            let z2=FP8(0)
-            let z3=FP8(0)
-            let t0=FP8(a)
-            let t1=FP8(0)
+            var z0=FP8(a)
+            var z1=FP8(0)
+            var z2=FP8(0)
+            var z3=FP8(0)
+            var t0=FP8(a)
+            var t1=FP8(0)
         
             z0.mul(y.a)
             t0.add(b)
@@ -397,12 +397,12 @@ final public class FP24
     }
 
     /* self=1/self */
-    func inverse()
+    mutating func inverse()
     {
-        let f0=FP8(a)
-        let f1=FP8(b)
-        let f2=FP8(a)
-        let f3=FP8(0)
+        var f0=FP8(a)
+        var f1=FP8(b)
+        var f2=FP8(a)
+        var f3=FP8(0)
     
         norm()
         f0.sqr()
@@ -434,11 +434,11 @@ final public class FP24
     }
 
     /* self=self^p using Frobenius */
-    func frob(_ f:FP2,_ n:Int)
+    mutating func frob(_ f:FP2,_ n:Int)
     {
 
-        let f2=FP2(f)
-        let f3=FP2(f)
+        var f2=FP2(f)
+        var f3=FP2(f)
     
         f2.sqr()
         f3.mul(f2)
@@ -458,7 +458,7 @@ final public class FP24
     /* trace function */
     func trace() -> FP8
     {
-        let t=FP8(0)
+        var t=FP8(0)
         t.copy(a)
         t.imul(3)
         t.reduce()
@@ -472,18 +472,18 @@ final public class FP24
         var t=[UInt8](repeating: 0,count: RM)
     
         for i in 0 ..< RM {t[i]=w[i]}
-        let a=BIG.fromBytes(t)
+        var a=BIG.fromBytes(t)
         for i in 0 ..< RM {t[i]=w[i+RM]}
-        let b=BIG.fromBytes(t)
-        let c=FP2(a,b)
+        var b=BIG.fromBytes(t)
+        var c=FP2(a,b)
     
         for i in 0 ..< RM {t[i]=w[i+2*RM]}
         a.copy(BIG.fromBytes(t))
         for i in 0 ..< RM {t[i]=w[i+3*RM]}
         b.copy(BIG.fromBytes(t))
-        let d=FP2(a,b)
+        var d=FP2(a,b)
     
-        let ea=FP4(c,d)
+        var ea=FP4(c,d)
 
         for i in 0 ..< RM {t[i]=w[i+4*RM]}
         a.copy(BIG.fromBytes(t))
@@ -497,7 +497,7 @@ final public class FP24
         b.copy(BIG.fromBytes(t))
         d.copy(FP2(a,b))
     
-        let eb=FP4(c,d)
+        var eb=FP4(c,d)
 
         let e=FP8(ea,eb)
     
@@ -643,24 +643,27 @@ final public class FP24
     /* Note this is simple square and multiply, so not side-channel safe */
     func pow(_ e:BIG) -> FP24
     {
-        norm()
-        e.norm()
-        let e3=BIG(e)
+        var sf = FP24(self)
+        sf.norm()
+ 
+        var e1=BIG(e)
+        e1.norm()
+        var e3=BIG(e1)
         e3.pmul(3)
         e3.norm();
 
-        let w=FP24(self)
+        var w=FP24(sf)
         let nb=e3.nbits()
  
         for i in (1...nb-2).reversed()
         {
             w.usqr()
-            let bt=e3.bit(UInt(i))-e.bit(UInt(i))
+            let bt=e3.bit(UInt(i))-e1.bit(UInt(i))
             if bt == 1 {
-                w.mul(self)
+                w.mul(sf)
             }
             if bt == -1 {
-                self.conj(); w.mul(self); self.conj()
+                sf.conj(); w.mul(sf); sf.conj()
             }            
         }
     
@@ -669,7 +672,7 @@ final public class FP24
     }
 
     /* constant time powering by small integer of max length bts */
-    func pinpow(_ e:Int32,_ bts:Int32)
+    mutating func pinpow(_ e:Int32,_ bts:Int32)
     {
         var R=[FP24]()
         R.append(FP24(1))
@@ -690,16 +693,16 @@ final public class FP24
         let f=FP2(BIG(ROM.Fra),BIG(ROM.Frb))
         let q=BIG(ROM.Modulus)       
 
-        let g1=FP24(self)
-        let g2=FP24(self)
+        var g1=FP24(self)
+        var g2=FP24(self)
 
-        let m=BIG(q)
+        var m=BIG(q)
         m.mod(r)
     
-        let a=BIG(e)
+        var a=BIG(e)
         a.mod(m)
     
-        let b=BIG(e)
+        var b=BIG(e)
         b.div(m);
     
         var c=g1.trace()
@@ -738,8 +741,8 @@ final public class FP24
             g2.append(FP24(0))            
         }
         
-        let r=FP24(0)
-        let p=FP24(0)
+        var r=FP24(0)
+        var p=FP24(0)
         
         var t=[BIG]()
         for i in 0 ..< 8 {
@@ -747,7 +750,7 @@ final public class FP24
             t[i].norm()
         }
 
-        let mt=BIG(0);
+        var mt=BIG(0);
         var w1=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)           
         var s1=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)   
         var w2=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)           
