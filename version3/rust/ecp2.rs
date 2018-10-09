@@ -23,6 +23,7 @@ use xxx::ecp;
 use xxx::fp2::FP2;
 use xxx::big::BIG;
 
+//#[derive(Copy, Clone)]
 pub struct ECP2 {
 	x:FP2,
 	y:FP2,
@@ -48,8 +49,9 @@ impl ECP2 {
 		E.x.copy(&ix);
 		E.y.copy(&iy);
 		E.z.one();
+		E.x.norm();
 
-		let mut rhs=ECP2::rhs(&mut E.x);
+		let mut rhs=ECP2::rhs(&E.x);
 		let mut y2=FP2::new_copy(&E.y);
 		y2.sqr();
 		if !y2.equals(&mut rhs) {
@@ -64,8 +66,8 @@ impl ECP2 {
 		E.x.copy(&ix);
 		E.y.one();
 		E.z.one();
-
-		let mut rhs=ECP2::rhs(&mut E.x);
+		E.x.norm();
+		let mut rhs=ECP2::rhs(&E.x);
 		if rhs.sqrt() {
 			E.y.copy(&rhs);
 		//	E.inf=false;
@@ -249,8 +251,8 @@ impl ECP2 {
 }	
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
-	pub fn rhs(x:&mut FP2) -> FP2 {
-		x.norm();
+	pub fn rhs(x:&FP2) -> FP2 {
+		//x.norm();
 		let mut r=FP2::new_copy(x);
 		r.sqr();
 		let mut b=FP2::new_big(&BIG::new_ints(&rom::CURVE_B));

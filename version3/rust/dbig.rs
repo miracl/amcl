@@ -239,11 +239,12 @@ impl DBIG {
 /* return number of bits */
 	pub fn nbits(&mut self) -> usize {
 		let mut k=big::DNLEN-1;
-		self.norm();
-		while (k as isize)>=0 && self.w[k]==0 {k=k.wrapping_sub(1)}
+		let mut s=DBIG::new_copy(&self);        
+		s.norm();
+		while (k as isize)>=0 && s.w[k]==0 {k=k.wrapping_sub(1)}
 		if (k as isize) <0 {return 0}
 		let mut bts=(big::BASEBITS as usize)*k;
-		let mut c=self.w[k];
+		let mut c=s.w[k];
 		while c!=0 {c/=2; bts+=1;}
 		return bts;
 	}

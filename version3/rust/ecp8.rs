@@ -48,8 +48,9 @@ impl ECP8 {
 		E.x.copy(&ix);
 		E.y.copy(&iy);
 		E.z.one();
+		E.x.norm();
 
-		let mut rhs=ECP8::rhs(&mut E.x);
+		let mut rhs=ECP8::rhs(&E.x);
 		let mut y2=FP8::new_copy(&E.y);
 		y2.sqr();
 		if !y2.equals(&mut rhs) {
@@ -64,8 +65,9 @@ impl ECP8 {
 		E.x.copy(&ix);
 		E.y.one();
 		E.z.one();
+		E.x.norm();
 
-		let mut rhs=ECP8::rhs(&mut E.x);
+		let mut rhs=ECP8::rhs(&E.x);
 		if rhs.sqrt() {
 			E.y.copy(&rhs);
 		} else {E.inf();}
@@ -327,8 +329,8 @@ impl ECP8 {
 }	
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
-	pub fn rhs(x:&mut FP8) -> FP8 {
-		x.norm();
+	pub fn rhs(x:&FP8) -> FP8 {
+		//x.norm();
 		let mut r=FP8::new_copy(x);
 		r.sqr();
 		let mut b=FP8::new_fp4(&FP4::new_fp2(&FP2::new_big(&BIG::new_ints(&rom::CURVE_B))));

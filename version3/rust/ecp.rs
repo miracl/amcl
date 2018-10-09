@@ -75,7 +75,8 @@ impl ECP {
 		E.x.bcopy(ix); 
 		E.y.bcopy(iy); 
 		E.z.one(); 
-		let mut rhs=ECP::rhs(&mut E.x);
+		E.x.norm();
+		let mut rhs=ECP::rhs(&E.x);
 		if CURVETYPE==MONTGOMERY {
 			if rhs.jacobi()==1 {
 			//	E.inf=false;
@@ -94,9 +95,10 @@ impl ECP {
 	pub fn new_bigint(ix: &BIG,s: isize) -> ECP {
 		let mut E=ECP::new();
 		E.x.bcopy(ix); 
+		E.x.norm();
 		E.z.one(); 
 
-		let mut rhs=ECP::rhs(&mut E.x);
+		let mut rhs=ECP::rhs(&E.x);
 
 		if rhs.jacobi()==1 {
 			let mut ny=rhs.sqrt();
@@ -112,8 +114,9 @@ impl ECP {
 	pub fn new_big(ix: &BIG) -> ECP {
 		let mut E=ECP::new();
 		E.x.bcopy(ix); 
+		E.x.norm();
 		E.z.one(); 
-		let mut rhs=ECP::rhs(&mut E.x);
+		let mut rhs=ECP::rhs(&E.x);
 		if rhs.jacobi()==1 {
 			if CURVETYPE!=MONTGOMERY {E.y.copy(&rhs.sqrt())}
 		//	E.inf=false;
@@ -134,8 +137,8 @@ impl ECP {
 	}
 
 /* Calculate RHS of curve equation */
-	fn rhs(x: &mut FP) -> FP {
-		x.norm();
+	fn rhs(x: &FP) -> FP {
+		//x.norm();
 		let mut r=FP::new_copy(x);
 		r.sqr();
 

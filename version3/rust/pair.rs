@@ -29,6 +29,9 @@ use xxx::dbig::DBIG;
 use xxx::ecp;
 use xxx::rom;
 
+//use std::thread;
+
+
 #[allow(non_snake_case)]
 fn linedbl(A: &mut ECP2,qx: &FP,qy: &FP) -> FP12 {
 	let mut a=FP4::new();
@@ -170,7 +173,13 @@ pub fn ate(P1: &ECP2,Q1: &ECP) -> FP12 {
 	let nb=n3.nbits();
 
 	for i in (1..nb-1).rev() {
-		r.sqr();		
+		r.sqr();	
+		//let mut lv=FP12::new();
+		//let handler = thread::spawn(move || {
+		//	lv=linedbl(&mut A,&qx,&qy);
+		//});
+		//handler.join().unwrap();
+	
 		let mut lv=linedbl(&mut A,&qx,&qy);
 		r.smul(&lv,ecp::SEXTIC_TWIST);
 		let bt=n3.bit(i)-n.bit(i);

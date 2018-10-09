@@ -335,12 +335,12 @@ impl FP16 {
 	}
 
 /* self=self^e */
-	pub fn pow(&mut self,e: &mut BIG) -> FP16 {
-		self.norm();
-		e.norm();
+	pub fn pow(&self,e: &BIG) -> FP16 {
 		let mut w=FP16::new_copy(self);
+		w.norm();
 		let mut z=BIG::new_copy(&e);
 		let mut r=FP16::new_int(1);
+		z.norm();
 		loop {
 			let bt=z.parity();
 			z.fshr(1);
@@ -380,27 +380,28 @@ impl FP16 {
 	}
 
 /* r=x^n using XTR method on traces of FP24s */
-	pub fn xtr_pow(&mut self,n: &mut BIG) -> FP16 {
+	pub fn xtr_pow(&self,n: &BIG) -> FP16 {
+		let mut sf=FP16::new_copy(self);
+		sf.norm();
 		let mut a=FP16::new_int(3);
-		let mut b=FP16::new_copy(self);
+		let mut b=FP16::new_copy(&sf);
 		let mut c=FP16::new_copy(&b);
 		c.xtr_d();
 		let mut t=FP16::new();
 		let mut r=FP16::new();
 
-		n.norm();
 		let par=n.parity();
-		let mut v=BIG::new_copy(n); v.fshr(1);
+		let mut v=BIG::new_copy(n); v.norm(); v.fshr(1);
 		if par==0 {v.dec(1); v.norm(); }
 
 		let nb=v.nbits();
 		for i in (0..nb).rev() {
 			if v.bit(i)!=1 {
 				t.copy(&b);
-				self.conj();
+				sf.conj();
 				c.conj();
-				b.xtr_a(&a,self,&c);
-				self.conj();
+				b.xtr_a(&a,&sf,&c);
+				sf.conj();
 				c.copy(&t);
 				c.xtr_d();
 				a.xtr_d();
@@ -408,7 +409,7 @@ impl FP16 {
 				t.copy(&a); t.conj();
 				a.copy(&b);
 				a.xtr_d();
-				b.xtr_a(&c,self,&t);
+				b.xtr_a(&c,&sf,&t);
 				c.xtr_d();
 			}
 		}
@@ -420,11 +421,12 @@ impl FP16 {
 	}
 
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
-	pub fn xtr_pow2(&mut self,ck: &FP16,ckml: &FP16,ckm2l: &FP16,a: &mut BIG,b: &mut BIG) -> FP16 {
-		a.norm(); b.norm();
+	pub fn xtr_pow2(&mut self,ck: &FP16,ckml: &FP16,ckm2l: &FP16,a: &BIG,b: &BIG) -> FP16 {
+
 		let mut e=BIG::new_copy(a);
 		let mut d=BIG::new_copy(b);
 		let mut w=BIG::new();
+		d.norm(); e.norm();
 
 		let mut cu=FP16::new_copy(ck);  // can probably be passed in w/o copying
 		let mut cv=FP16::new_copy(self);
