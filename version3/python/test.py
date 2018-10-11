@@ -70,7 +70,7 @@ if ed25519.curve.CurveType != MONTGOMERY:
 # Now test a simple Pairing-based protocol MPIN on curve bn254
 
 # Assign the User an ID
-print("\nNow test MPIN on curve BN254\n")
+print("\nNow test MPIN on curve bn254\n")
 MPIN_ID = "testuser@miracl.com"
 print("MPIN_ID: ", MPIN_ID)
 
