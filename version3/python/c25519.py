@@ -7,8 +7,8 @@ EFS = 32   # elliptic curve field size in bytes
 CurveType = MONTGOMERY
 
 # field modulus
-p = 2**255-19 
-r = 2**252+27742317777372353535851937790883648493
+p = 2**255 - 19
+r = 2**252 + 27742317777372353535851937790883648493
 
 # elliptic curve
 A = 486662
