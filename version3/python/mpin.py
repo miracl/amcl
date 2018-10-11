@@ -117,7 +117,7 @@ def server(ID, Y, SS, U, V):
     Q = ecp2.generator()
 
     P = y * P
-    print("Got here")
+
     sQ = ECp2()
     if not sQ.fromBytes(SS):
         return (False, Fp12(), Fp12())
@@ -125,11 +125,11 @@ def server(ID, Y, SS, U, V):
     TU = ECp()
     if not TU.fromBytes(U):
         return (False, bytearray(0), bytearray(0))
-   
+
     TV = ECp()
     if not TV.fromBytes(V):
         return (False, bytearray(0), bytearray(0))
-    
+
     TU.add(P)
     # TU.affine()
 
@@ -212,7 +212,6 @@ def add_G1(A, B):
     if not B1.fromBytes(B):
         return None
     A1.add(B1)
-    A1.norm()
     return A1.toBytes(False)
 
 
@@ -225,5 +224,4 @@ def add_G2(A, B):
     if not B1.fromBytes(B):
         return None
     A1.add(B1)
-    A1.norm()
     return A1.toBytes()
