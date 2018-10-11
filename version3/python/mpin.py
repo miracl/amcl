@@ -68,10 +68,13 @@ def extract_pin(ID, PIN, SK):
 	return S.toBytes(False)
 
 # U=xH(ID)
-def client_1(ID):
+def client_1(ID,X):
 	P=H(ID)
-	w = big.rand(curve.r)
-	X = big.to_bytes(w)
+        if X:
+                w = big.from_bytes(X)
+        else:
+                w = big.rand(curve.r)
+                X = big.to_bytes(w)
 	P = w*P
 	return (X,P.toBytes(False))
 
@@ -184,3 +187,27 @@ def kangaroo(E, F):
 	if steps > 4 * TRAP or dm - dn >= MAXPIN:
 		res = 0
 	return res
+
+def add_G1(A, B):
+    """ Add two points in G1: C = A + B """    
+    A1 = ECp()
+    B1 = ECp()
+    if not A1.fromBytes(A):
+        return None
+    if not B1.fromBytes(B):
+        return None
+    A1.add(B1)
+    A1.norm()
+    return A1.toBytes(False)
+
+def add_G2(A, B):
+    """ Add two points in G2: C = A + B """    
+    A1 = ECp2()
+    B1 = ECp2()
+    if not A1.fromBytes(A):
+        return None
+    if not B1.fromBytes(B):
+        return None
+    A1.add(B1)
+    A1.norm()
+    return A1.toBytes()
