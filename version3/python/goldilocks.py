@@ -7,8 +7,8 @@ EFS = 56   # elliptic curve field size in bytes
 CurveType = EDWARDS
 
 # field modulus
-p = 2**448-2**224-1
-r = 2**446-0x8335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d
+p = 2**448 - 2**224 - 1
+r = 2**446 - 0x8335dc163bb124b65129c96fde933d8d723a70aadc873d6d54a7bb0d
 
 # elliptic curve
 A = 1
