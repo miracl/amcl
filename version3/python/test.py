@@ -94,7 +94,7 @@ print("Token: ", bytes(TOKEN).hex())
 
 PIN = int(input("Please enter four digit PIN to authenticate: "))
 
-X, U = bn254.mpin.client_1(MPIN_ID)
+X, U = bn254.mpin.client_1(MPIN_ID,None)
 
 print("X: ", bytes(X).hex())
 print("U: ", bytes(U).hex())
