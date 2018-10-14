@@ -42,7 +42,13 @@ var ctx = new CTX();
 
 
 To see some running examples, load TestALL.html or BenchtestALL.html into your favourite browser.
-You might have to wait a few minutes for the scripts to complete.
+You might have to wait a few seconds for the scripts to complete.
+
+Edit the html files (at the end of the file) to benchmark a different combination of curves
+
+NOTE: It has been noticed that in the Chrome browser (version 69) the time for each benchmark to complete
+depends on the order in which the individual benchmarks are called. To accurately test a particular benchmark, 
+make sure that it is the first to run by editing BenchtestALL.html
 
 For TestALL.html the PIN number is 1234.
 
