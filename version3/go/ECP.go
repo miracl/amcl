@@ -68,6 +68,7 @@ func NewECPbigs(ix *BIG,iy *BIG) *ECP {
 	E.x=NewFPbig(ix)
 	E.y=NewFPbig(iy)
 	E.z=NewFPint(1)
+	E.x.norm()
 	rhs:=RHS(E.x)
 
 	if CURVETYPE==MONTGOMERY {
@@ -89,6 +90,7 @@ func NewECPbigint(ix *BIG,s int) *ECP {
 	E:=new(ECP)
 	E.x=NewFPbig(ix)
 	E.y=NewFPint(0)
+	E.x.norm()
 	rhs:=RHS(E.x)
 	E.z=NewFPint(1)
 	if rhs.jacobi()==1 {
@@ -105,6 +107,7 @@ func NewECPbig(ix *BIG) *ECP {
 	E:=new(ECP)	
 	E.x=NewFPbig(ix)
 	E.y=NewFPint(0)
+	E.x.norm()
 	rhs:=RHS(E.x)
 	E.z=NewFPint(1)
 	if rhs.jacobi()==1 {
@@ -238,7 +241,7 @@ func( E *ECP) Equals(Q *ECP) bool {
 
 /* Calculate RHS of curve equation */
 func RHS(x *FP) *FP {
-	x.norm()
+	//x.norm()
 	r:=NewFPcopy(x)
 	r.sqr();
 
@@ -293,18 +296,20 @@ func (E *ECP) Affine() {
 
 /* extract x as a BIG */
 func (E *ECP) GetX() *BIG {
-	E.Affine()
-	return E.x.redc()
+	W:=NewECP(); W.Copy(E)
+	W.Affine()
+	return W.x.redc()
 }
 /* extract y as a BIG */
 func (E *ECP) GetY() *BIG {
-	E.Affine()
-	return E.y.redc()
+	W:=NewECP(); W.Copy(E)
+	W.Affine()
+	return W.y.redc()
 }
 
 /* get sign of Y */
 func (E *ECP) GetS() int {
-	E.Affine()
+	//E.Affine()
 	y:=E.GetY()
 	return y.parity()
 }
@@ -325,9 +330,9 @@ func (E *ECP) getz() *FP {
 func (E *ECP) ToBytes(b []byte,compress bool) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
-
-	E.Affine()
-	E.x.redc().ToBytes(t[:])
+	W:=NewECP(); W.Copy(E);
+	W.Affine()
+	W.x.redc().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+1]=t[i]}
 
 	if CURVETYPE==MONTGOMERY {
@@ -337,13 +342,13 @@ func (E *ECP) ToBytes(b []byte,compress bool) {
 
 	if compress {
 		b[0]=0x02
-		if E.y.redc().parity()==1 {b[0]=0x03}
+		if W.y.redc().parity()==1 {b[0]=0x03}
 		return;
 	}
 	
 	b[0]=0x04
 
-	E.y.redc().ToBytes(t[:])
+	W.y.redc().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+MB+1]=t[i]}
 }
 
@@ -355,7 +360,7 @@ func ECP_fromBytes(b []byte) *ECP {
 
 	for i:=0;i<MB;i++ {t[i]=b[i+1]}
 	px:=FromBytes(t[:])
-	if comp(px,p)>=0 {return NewECP()}
+	if Comp(px,p)>=0 {return NewECP()}
 
 	if CURVETYPE==MONTGOMERY {
 		return NewECPbig(px)
@@ -364,7 +369,7 @@ func ECP_fromBytes(b []byte) *ECP {
 	if b[0]==0x04 {
 		for i:=0;i<MB;i++ {t[i]=b[i+MB+1]}
 		py:=FromBytes(t[:])
-		if comp(py,p)>=0 {return NewECP()}
+		if Comp(py,p)>=0 {return NewECP()}
 		return NewECPbigs(px,py)
 	}
 
@@ -376,12 +381,13 @@ func ECP_fromBytes(b []byte) *ECP {
 }
 
 /* convert to hex string */
-func (E *ECP) toString() string {
-	if E.Is_infinity() {return "infinity"}
-	E.Affine();
+func (E *ECP) ToString() string {
+	W:=NewECP(); W.Copy(E);
+	W.Affine()
+	if W.Is_infinity() {return "infinity"}
 	if CURVETYPE==MONTGOMERY {
-		return "("+E.x.redc().toString()+")"
-	} else {return "("+E.x.redc().toString()+","+E.y.redc().toString()+")"}
+		return "("+W.x.redc().ToString()+")"
+	} else {return "("+W.x.redc().ToString()+","+W.y.redc().ToString()+")"}
 }
 
 /* this*=2 */
@@ -754,9 +760,9 @@ func (E *ECP) dadd(Q *ECP,W *ECP) {
 
 /* this-=Q */
 func (E *ECP) Sub(Q *ECP) {
-	Q.neg()
-	E.Add(Q)
-	Q.neg()
+	NQ:=NewECP(); NQ.Copy(Q);
+	NQ.neg()
+	E.Add(NQ)
 }
 
 /* constant time multiply by small integer of length bts - use ladder */
@@ -816,7 +822,7 @@ func (E *ECP) mul(e *BIG) *ECP {
 		var W []*ECP
 		var w [1+(NLEN*int(BASEBITS)+3)/4]int8
 
-		E.Affine();
+		//E.Affine();
 
 		Q.Copy(E);
 		Q.dbl();
@@ -881,8 +887,8 @@ func (E *ECP) Mul2(e *BIG,Q *ECP,f *BIG) *ECP {
 	//ECP[] W=new ECP[8];
 	var w [1+(NLEN*int(BASEBITS)+1)/2]int8		
 
-	E.Affine()
-	Q.Affine()
+	//E.Affine()
+	//Q.Affine()
 
 	te.copy(e)
 	tf.copy(f)
@@ -948,12 +954,12 @@ func (E *ECP) cfp() {
 	if cf==1 {return}
 	if cf==4 {
 		E.dbl(); E.dbl()
-		E.Affine();
+		//E.Affine();
 		return;
 	} 
 	if cf==8 {
 		E.dbl(); E.dbl(); E.dbl()
-		E.Affine();
+		//E.Affine();
 		return;
 	}
 	c:=NewBIGints(CURVE_Cof);
@@ -1007,11 +1013,11 @@ func main() {
 
 	//r.dec(7);
 	
-	fmt.Printf("Gx= "+Gx.toString())
+	fmt.Printf("Gx= "+Gx.ToString())
 	fmt.Printf("\n")
 
 	if CURVETYPE!=MONTGOMERY {
-		fmt.Printf("Gy= "+Gy.toString())
+		fmt.Printf("Gy= "+Gy.ToString())
 		fmt.Printf("\n")
 	}	
 
@@ -1019,14 +1025,14 @@ func main() {
 		P=NewECPbigs(Gx,Gy)
 	} else  {P=NewECPbig(Gx)}
 
-	fmt.Printf("P= "+P.toString());		
+	fmt.Printf("P= "+P.ToString());		
 	fmt.Printf("\n")
 
 	R:=P.mul(r);
 		//for (int i=0;i<10000;i++)
 		//	R=P.mul(r);
 	
-	fmt.Printf("R= "+R.toString())
+	fmt.Printf("R= "+R.ToString())
 	fmt.Printf("\n")
 }
 */

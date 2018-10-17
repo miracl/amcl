@@ -236,10 +236,13 @@ void YYY::FP4_mul(FP4 *w,FP4 *x,FP4 *y)
 {
 
     FP2 t1,t2,t3,t4;
-    FP2_mul(&t1,&(x->a),&(y->a)); 
-    FP2_mul(&t2,&(x->b),&(y->b)); 
 
+    FP2_mul(&t1,&(x->a),&(y->a)); 
+
+    FP2_mul(&t2,&(x->b),&(y->b)); 
+//printf("Into 4 mul 0a\n");
     FP2_add(&t3,&(y->b),&(y->a));
+//printf("Into 4 mul 0b\n");
     FP2_add(&t4,&(x->b),&(x->a));
 
 	FP2_norm(&t4); // 2
@@ -339,9 +342,10 @@ void YYY::FP4_pow(FP4 *r,FP4* a,BIG b)
     int bt;
 
     BIG_zero(zilch);
-    BIG_norm(b);
     BIG_copy(z,b);
+    BIG_norm(z);
     FP4_copy(&w,a);
+	FP4_norm(&w);
     FP4_one(r);
 
     while(1)
@@ -400,20 +404,22 @@ void YYY::FP4_xtr_pow(FP4 *r,FP4 *x,BIG n)
     int i,par,nb;
     BIG v;
     FP2 w;
-    FP4 t,a,b,c;
+    FP4 t,a,b,c,sf;
 
     BIG_zero(v);
     BIG_inc(v,3);
 	BIG_norm(v);
     FP2_from_BIG(&w,v);
     FP4_from_FP2(&a,&w);
-    
-	FP4_copy(&b,x);
-    FP4_xtr_D(&c,x);
+    FP4_copy(&sf,x);
+	FP4_norm(&sf);
+	FP4_copy(&b,&sf);
+    FP4_xtr_D(&c,&sf);
 
-    BIG_norm(n);
+    //BIG_norm(n);
     par=BIG_parity(n);
     BIG_copy(v,n);
+	BIG_norm(v);
     BIG_shr(v,1);
     if (par==0)
     {
@@ -427,10 +433,10 @@ void YYY::FP4_xtr_pow(FP4 *r,FP4 *x,BIG n)
         if (!BIG_bit(v,i))
         {
             FP4_copy(&t,&b);
-            FP4_conj(x,x);
+            FP4_conj(&sf,&sf);
             FP4_conj(&c,&c);
-            FP4_xtr_A(&b,&a,&b,x,&c);
-            FP4_conj(x,x);
+            FP4_xtr_A(&b,&a,&b,&sf,&c);
+            FP4_conj(&sf,&sf);
             FP4_xtr_D(&c,&t);
             FP4_xtr_D(&a,&a);
         }
@@ -438,7 +444,7 @@ void YYY::FP4_xtr_pow(FP4 *r,FP4 *x,BIG n)
         {
             FP4_conj(&t,&a);
             FP4_xtr_D(&a,&b);
-            FP4_xtr_A(&b,&c,&b,x,&t);
+            FP4_xtr_A(&b,&c,&b,&sf,&t);
             FP4_xtr_D(&c,&c);
         }
     }
@@ -456,10 +462,11 @@ void YYY::FP4_xtr_pow2(FP4 *r,FP4 *ck,FP4 *cl,FP4 *ckml,FP4 *ckm2l,BIG a,BIG b)
     BIG d,e,w;
     FP4 t,cu,cv,cumv,cum2v;
 
-    BIG_norm(a);
-	BIG_norm(b);
+
     BIG_copy(e,a);
     BIG_copy(d,b);
+    BIG_norm(e);
+	BIG_norm(d);
     FP4_copy(&cu,ck);
     FP4_copy(&cv,cl);
     FP4_copy(&cumv,ckml);

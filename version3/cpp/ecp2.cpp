@@ -138,11 +138,14 @@ void ZZZ::ECP2_affine(ECP2 *P)
 /* SU= 16 */
 int ZZZ::ECP2_get(FP2 *x,FP2 *y,ECP2 *P)
 {
-	if (ECP2_isinf(P)) return -1;
+	ECP2 W;
+	ECP2_copy(&W,P);
+	ECP2_affine(&W);
+	if (ECP2_isinf(&W)) return -1;
 //    if (P->inf) return -1;
-    ECP2_affine(P);
-    FP2_copy(y,&(P->y));
-    FP2_copy(x,&(P->x));
+    //ECP2_affine(P);
+    FP2_copy(y,&(W.y));
+    FP2_copy(x,&(W.x));
     return 0;
 }
 
@@ -390,6 +393,9 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
         return 0;
     }
 */
+
+
+
 	//FP2_copy(&t0,&(P->x));		//FP2 t0=new FP2(x);
 	FP2_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
 	//FP2_copy(&t1,&(P->y));		//FP2 t1=new FP2(y);
@@ -447,6 +453,7 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 	FP2_mul_ip(&t1);			//t1.mul_ip(); 
 	FP2_norm(&t1);				//t1.norm(); // y.Q.y
 #endif
+
 	//FP2_copy(&x3,&t0);			//x3.copy(t0); 
 	FP2_add(&x3,&t0,&t0);		//x3.add(t0); 
 	FP2_add(&t0,&t0,&x3);		//t0.add(x3); 
@@ -454,17 +461,21 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 	FP2_imul(&t2,&t2,b3);		//t2.imul(b); 	
 #if SEXTIC_TWIST_ZZZ==M_TYPE
 	FP2_mul_ip(&t2);
+	FP2_norm(&t2);
 #endif
+
 	//FP2_copy(&z3,&t1);			//FP2 z3=new FP2(t1); 
 	FP2_add(&z3,&t1,&t2);		//z3.add(t2); 
 	FP2_norm(&z3);				//z3.norm();
 	FP2_sub(&t1,&t1,&t2);		//t1.sub(t2); 
 	FP2_norm(&t1);				//t1.norm(); 
+
 	FP2_imul(&y3,&y3,b3);		//y3.imul(b); 
 #if SEXTIC_TWIST_ZZZ==M_TYPE
 	FP2_mul_ip(&y3);
 	FP2_norm(&y3);
 #endif
+
 	//FP2_copy(&x3,&y3);			//x3.copy(y3); 
 	FP2_mul(&x3,&y3,&t4);		//x3.mul(t4); 
 	//FP2_copy(&t2,&t3);			//t2.copy(t3); 
@@ -473,6 +484,7 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 	FP2_mul(&y3,&y3,&t0);		//y3.mul(t0); 
 	FP2_mul(&t1,&t1,&z3);		//t1.mul(z3); 
 	FP2_add(&(P->y),&y3,&t1);		//y3.add(t1);
+
 	FP2_mul(&t0,&t0,&t3);		//t0.mul(t3); 
 	FP2_mul(&z3,&z3,&t4);		//z3.mul(t4); 
 	FP2_add(&(P->z),&z3,&t0);		//z3.add(t0);
@@ -491,9 +503,12 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 /* SU= 16 */
 void ZZZ::ECP2_sub(ECP2 *P,ECP2 *Q)
 {
-    ECP2_neg(Q);
-    ECP2_add(P,Q);
-    ECP2_neg(Q);
+	ECP2 NQ;
+	ECP2_copy(&NQ,Q);
+	ECP2_neg(&NQ);
+    //ECP2_neg(Q);
+    ECP2_add(P,&NQ);
+    //ECP2_neg(Q);
 }
 
 /* P*=e */
@@ -507,7 +522,7 @@ void ZZZ::ECP2_mul(ECP2 *P,BIG e)
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
 
     if (ECP2_isinf(P)) return;
-    ECP2_affine(P);
+    //ECP2_affine(P);
 
 
     /* precompute table */
@@ -567,16 +582,17 @@ void ZZZ::ECP2_frob(ECP2 *P,FP2 *X)
 {
     FP2 X2;
     FP2_sqr(&X2,X);
-
+//printf("Into frob  %d\n",(P->z).b.XES);
     FP2_conj(&(P->x),&(P->x));
     FP2_conj(&(P->y),&(P->y));
     FP2_conj(&(P->z),&(P->z));
+//printf("Into frob  %d\n",(P->z).b.XES);
     FP2_reduce(&(P->z));
-
+//printf("Into frob 2 \n");
     FP2_mul(&(P->x),&X2,&(P->x));
     FP2_mul(&(P->y),&X2,&(P->y));
     FP2_mul(&(P->y),X,&(P->y));
-
+//printf("Into frob 3 \n");
 }
 
 // Bos & Costello https://eprint.iacr.org/2013/458.pdf
@@ -594,7 +610,7 @@ void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
     for (i=0; i<4; i++)
     {
         BIG_copy(t[i],u[i]);
-        ECP2_affine(&Q[i]);
+        //ECP2_affine(&Q[i]);
     }
 
 // Precomputed table

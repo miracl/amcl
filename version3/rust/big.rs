@@ -214,6 +214,7 @@ impl BIG {
 		}
 	}
 
+
 /* Shift right by less than a word */
 	pub fn fshr(&mut self, k: usize) -> isize {
 		let n = k;
@@ -265,7 +266,7 @@ impl BIG {
 /* return number of bits */
 	pub fn nbits(&self) -> usize {
 		let mut k=NLEN-1;
-        let mut s=BIG::new_copy(&self);        
+		let mut s=BIG::new_copy(&self);        
 		s.norm();
 		while (k as isize)>=0 && s.w[k]==0 {k=k.wrapping_sub(1)}
 		if (k as isize) <0 {return 0}
@@ -372,8 +373,9 @@ impl BIG {
 
 /* convert this BIG to byte array */
 	pub fn tobytearray(&mut self,b: &mut [u8],n:usize) {
-		self.norm();
+		//self.norm();
 		let mut c=BIG::new_copy(self);
+		c.norm();
 
 		for i in (0 ..(MODBYTES as usize)).rev() {
 			b[i+n]=(c.w[0]&0xff) as u8;
@@ -974,39 +976,60 @@ impl BIG {
 
 */
 
+    pub fn ssn(r: &mut BIG,a: &BIG,m: &mut BIG) -> isize {
+        let n=NLEN-1;
+        m.w[0]=(m.w[0]>>1)|((m.w[1]<<(BASEBITS-1))&BMASK);
+	r.w[0]=a.w[0]-m.w[0];
+	let mut carry=r.w[0]>>BASEBITS;
+	r.w[0]&=BMASK;
+	for i in 1 ..n {
+            m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(BASEBITS-1))&BMASK);
+            r.w[i]=a.w[i]-m.w[i]+carry;
+            carry=r.w[i]>>BASEBITS;
+            r.w[i]&=BMASK;
+        }
+	m.w[n]>>=1;
+	r.w[n]=a.w[n]-m.w[n]+carry;
+	return ((r.w[n]>>(arch::CHUNK-1))&1) as isize;
+    }
 
     /* return a*b mod m */
-    pub fn modmul(a: &mut BIG,b: &mut BIG,m: &BIG) -> BIG {
+    pub fn modmul(a1: &BIG,b1: &BIG,m: &BIG) -> BIG {
+        let mut a=BIG::new_copy(a1);
+        let mut b=BIG::new_copy(b1);
         a.rmod(m);
         b.rmod(m);
-        let mut d=BIG::mul(a,b);
+        let mut d=BIG::mul(&a,&b);
         return d.dmod(m);
     }
     
     /* return a^2 mod m */
-    pub fn modsqr(a: &mut BIG,m: &BIG) -> BIG {
+    pub fn modsqr(a1: &BIG,m: &BIG) -> BIG {
+        let mut a=BIG::new_copy(a1);
         a.rmod(m);
-        let mut d=BIG::sqr(a);
+        let mut d=BIG::sqr(&a);
         return d.dmod(m);
     }
     
     /* return -a mod m */
-    pub fn modneg(a: &mut BIG,m: &BIG) -> BIG {
+    pub fn modneg(a1: &BIG,m: &BIG) -> BIG {
+        let mut a=BIG::new_copy(a1);
         a.rmod(m);
-        return m.minus(a);
+        return m.minus(&a);
     }
 
     /* return this^e mod m */
-    pub fn powmod(&mut self,e: &mut BIG,m: &BIG) -> BIG {
+    pub fn powmod(&mut self,e1: &BIG,m: &BIG) -> BIG {
         self.norm();
+        let mut e=BIG::new_copy(e1);
         e.norm();
         let mut a=BIG::new_int(1);
-        let mut z=BIG::new_copy(e);
+        let mut z=BIG::new_copy(&e);
         let mut s=BIG::new_copy(self);
         loop {      
             let bt=z.parity();       
             z.fshr(1);    
-            if bt==1 {a=BIG::modmul(&mut a,&mut s,m)}
+            if bt==1 {a=BIG::modmul(&a,&s,m)}
             if z.iszilch() {break}
             s=BIG::modsqr(&mut s,m);         
         }

@@ -135,17 +135,17 @@ void YYY::FP12_usqr(FP12 *w,FP12 *x)
 {
     FP4 A,B,C,D;
 
-    FP4_copy(&A,&(x->a));
+    FP4_copy(&A,&(x->a));   
 
-    FP4_sqr(&(w->a),&(x->a));
-    FP4_add(&D,&(w->a),&(w->a));
-    FP4_add(&(w->a),&D,&(w->a));
+    FP4_sqr(&(w->a),&(x->a));  // Wa XES=2
+    FP4_add(&D,&(w->a),&(w->a)); // Wa XES=4
+    FP4_add(&(w->a),&D,&(w->a)); // Wa XES=6
 
     FP4_norm(&(w->a));
     FP4_nconj(&A,&A);
 
     FP4_add(&A,&A,&A);
-    FP4_add(&(w->a),&(w->a),&A);
+    FP4_add(&(w->a),&(w->a),&A); // Wa XES=8
     FP4_sqr(&B,&(x->c));
     FP4_times_i(&B);
 
@@ -166,7 +166,15 @@ void YYY::FP12_usqr(FP12 *w,FP12 *x)
     FP4_add(&(w->c),&(w->c),&(w->c));
     FP4_add(&(w->b),&B,&(w->b));
     FP4_add(&(w->c),&C,&(w->c));
+/*
+	FP n;
+	FP_one(&n);
+	FP4_qmul(&(w->a),&(w->a),&n);
+	FP4_qmul(&(w->b),&(w->b),&n);
+	FP4_qmul(&(w->c),&(w->c),&n);
+*/
 
+	//FP12_norm(w);
     FP12_reduce(w);	    /* reduce here as in pow function repeated squarings would trigger multiple reductions */
 }
 
@@ -478,27 +486,30 @@ void YYY::FP12_compow(FP4 *c,FP12 *x,BIG e,BIG r)
 
 void YYY::FP12_pow(FP12 *r,FP12 *a,BIG b)
 {
-    FP12 w;
-    BIG b3;
+    FP12 w,sf;
+    BIG b1,b3;
     int i,nb,bt;
-    BIG_norm(b);
-	BIG_pmul(b3,b,3);
+	BIG_copy(b1,b);
+	BIG_norm(b1);
+    //BIG_norm(b);
+	BIG_pmul(b3,b1,3);
 	BIG_norm(b3);
-
-    FP12_copy(&w,a);
+	FP12_copy(&sf,a);
+	FP12_norm(&sf);
+    FP12_copy(&w,&sf);
 
 	nb=BIG_nbits(b3);
 	for (i=nb-2;i>=1;i--)
 	{
 		FP12_usqr(&w,&w);
-		bt=BIG_bit(b3,i)-BIG_bit(b,i);
+		bt=BIG_bit(b3,i)-BIG_bit(b1,i);
 		if (bt==1)
-			FP12_mul(&w,a);
+			FP12_mul(&w,&sf);
 		if (bt==-1)
 		{
-			FP12_conj(a,a);
-			FP12_mul(&w,a);
-			FP12_conj(a,a);
+			FP12_conj(&sf,&sf);
+			FP12_mul(&w,&sf);
+			FP12_conj(&sf,&sf);
 		}
 	}
 

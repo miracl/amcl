@@ -131,10 +131,13 @@ int ECP4_ZZZ_equals(ECP4_ZZZ *P,ECP4_ZZZ *Q)
 /* extract x, y from point P */
 int ECP4_ZZZ_get(FP4_YYY *x,FP4_YYY *y,ECP4_ZZZ *P)
 {
-    if (ECP4_ZZZ_isinf(P)) return -1;
-	ECP4_ZZZ_affine(P);
-    FP4_YYY_copy(y,&(P->y));
-    FP4_YYY_copy(x,&(P->x));
+	ECP4_ZZZ W;
+	ECP4_ZZZ_copy(&W,P);
+	ECP4_ZZZ_affine(&W);
+    if (ECP4_ZZZ_isinf(&W)) return -1;
+	//ECP4_ZZZ_affine(P);
+    FP4_YYY_copy(y,&(W.y));
+    FP4_YYY_copy(x,&(W.x));
     return 0;
 }
 
@@ -486,9 +489,12 @@ int ECP4_ZZZ_add(ECP4_ZZZ *P,ECP4_ZZZ *Q)
 /* SU= 16 */
 void ECP4_ZZZ_sub(ECP4_ZZZ *P,ECP4_ZZZ *Q)
 {
-    ECP4_ZZZ_neg(Q);
-    ECP4_ZZZ_add(P,Q);
-    ECP4_ZZZ_neg(Q);
+	ECP4_ZZZ NQ;
+	ECP4_ZZZ_copy(&NQ,Q);
+	ECP4_ZZZ_neg(&NQ);
+    //ECP4_ZZZ_neg(Q);
+    ECP4_ZZZ_add(P,&NQ);
+    //ECP4_ZZZ_neg(Q);
 }
 
 
@@ -510,7 +516,7 @@ void ECP4_ZZZ_mul(ECP4_ZZZ *P,BIG_XXX e)
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
 
     if (ECP4_ZZZ_isinf(P)) return;
-    ECP4_ZZZ_affine(P);
+    //ECP4_ZZZ_affine(P);
 
     /* precompute table */
 
@@ -643,7 +649,7 @@ void ECP4_ZZZ_mul8(ECP4_ZZZ *P,ECP4_ZZZ Q[8],BIG_XXX u[8])
 
     for (i=0; i<8; i++)
 	{
-        ECP4_ZZZ_affine(&Q[i]);
+        //ECP4_ZZZ_affine(&Q[i]);
         BIG_XXX_copy(t[i],u[i]);
 	}
 

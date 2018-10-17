@@ -33,7 +33,7 @@ public final class FP {
 	public static final int MOD8=@M8@;  /* Modulus mod 8 */
 	public static final int MODTYPE=@MT@;
 
-	public static final int FEXCESS =((int)1<<@SH@); // BASEBITS*NLEN-MODBITS or 2^30 max!
+	public static final int FEXCESS = (((int)1<<@SH@)-1); // BASEBITS*NLEN-MODBITS or 2^30 max!
 	public static final int OMASK=(int)(-1)<<(MODBITS%BIG.BASEBITS);
 	public static final int TBITS=MODBITS%BIG.BASEBITS; // Number of active bits in top word 
 	public static final int TMASK=((int)1<<TBITS)-1;
@@ -120,8 +120,57 @@ public final class FP {
 		return new BIG(0);
 	}
 
-/*********************************************************/
+	private static int quo(BIG n,BIG m)
+	{
+		int sh;
+		int num,den;
+		int hb=BIG.CHUNK/2;
+		if (TBITS<hb)
+		{
+			sh=hb-TBITS;
+			num=(n.w[BIG.NLEN-1]<<sh)|(n.w[BIG.NLEN-2]>>(BIG.BASEBITS-sh));
+			den=(m.w[BIG.NLEN-1]<<sh)|(m.w[BIG.NLEN-2]>>(BIG.BASEBITS-sh));
+		}
+		else
+		{
+			num=n.w[BIG.NLEN-1];
+			den=m.w[BIG.NLEN-1];
+		}
+		return (int)(num/(den+1));
+	}
 
+/* reduce this mod Modulus */
+	public void reduce()
+	{
+		BIG m=new BIG(ROM.Modulus);
+		BIG r=new BIG(ROM.Modulus);
+		int sr,sb,q,carry;
+		x.norm();
+
+		if (XES>16)
+		{
+			q=quo(x,m);
+			carry=r.pmul(q);
+			r.w[BIG.NLEN-1]+=(carry<<BIG.BASEBITS); // correction - put any carry out back in again
+			x.sub(r);
+			x.norm();
+			sb=2;
+		}
+		else  sb=logb2(XES-1);
+
+		m.fshl(sb);
+		while (sb>0)
+		{
+// constant time...
+			sr=BIG.ssn(r,x,m);  // optimized combined shift, subtract and norm
+			x.cmove(r,1-sr);
+			sb--;
+		}
+
+		XES=1;
+	}
+
+/*********************************************************/
 
 /* Constructors */
 	public FP(int a)
@@ -190,8 +239,9 @@ public final class FP {
 
 /* test this=0? */
 	public boolean iszilch() {
-		reduce();
-		return x.iszilch();
+		FP z=new FP(this);
+		z.reduce();
+		return z.x.iszilch();
 	}
 
 /* copy from FP b */
@@ -341,7 +391,7 @@ public final class FP {
 		m.fshl(sb);
 		x.rsub(m);		
 
-		XES=(1<<sb);
+		XES=(1<<sb)+1;
 		if (XES>FEXCESS) reduce();
 	}
 
@@ -392,20 +442,13 @@ public final class FP {
 /* return TRUE if this==a */
 	public boolean equals(FP a)
 	{
-		a.reduce();
-		reduce();
-		if (BIG.comp(a.x,x)==0) return true;
+		FP f=new FP(this);
+		FP s=new FP(a);
+		f.reduce();
+		s.reduce();
+		if (BIG.comp(f.x,s.x)==0) return true;
 		return false;
 	}
-
-/* reduce this mod Modulus */
-	public void reduce()
-	{
-//		System.out.println("Reducing..");
-		x.mod(new BIG(ROM.Modulus));
-		XES=1;
-	}
-
 
 	public FP pow(BIG e)
 	{

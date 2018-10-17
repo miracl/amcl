@@ -483,27 +483,31 @@ void FP12_YYY_compow(FP4_YYY *c,FP12_YYY *x,BIG_XXX e,BIG_XXX r)
 
 void FP12_YYY_pow(FP12_YYY *r,FP12_YYY *a,BIG_XXX b)
 {
-    FP12_YYY w;
-    BIG_XXX b3;
+    FP12_YYY w,sf;
+    BIG_XXX b1,b3;
     int i,nb,bt;
-    BIG_XXX_norm(b);
-    BIG_XXX_pmul(b3,b,3);
+	BIG_XXX_copy(b1,b);
+    BIG_XXX_norm(b1);
+    BIG_XXX_pmul(b3,b1,3);
     BIG_XXX_norm(b3);
 
-    FP12_YYY_copy(&w,a);
+	FP12_YYY_copy(&sf,a);
+	FP12_YYY_norm(&sf);
+    FP12_YYY_copy(&w,&sf);
+
 
     nb=BIG_XXX_nbits(b3);
     for (i=nb-2; i>=1; i--)
     {
         FP12_YYY_usqr(&w,&w);
-        bt=BIG_XXX_bit(b3,i)-BIG_XXX_bit(b,i);
+        bt=BIG_XXX_bit(b3,i)-BIG_XXX_bit(b1,i);
         if (bt==1)
-            FP12_YYY_mul(&w,a);
+            FP12_YYY_mul(&w,&sf);
         if (bt==-1)
         {
-            FP12_YYY_conj(a,a);
-            FP12_YYY_mul(&w,a);
-            FP12_YYY_conj(a,a);
+            FP12_YYY_conj(&sf,&sf);
+            FP12_YYY_mul(&w,&sf);
+            FP12_YYY_conj(&sf,&sf);
         }
     }
 

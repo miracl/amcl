@@ -28,7 +28,7 @@ import amcl
 
 /* RSA API high-level functions  */
 
-final public class rsa_private_key {
+public struct rsa_private_key {
     var p:FF
     var q:FF
     var dp:FF
@@ -45,7 +45,7 @@ final public class rsa_private_key {
     }
 }
 
-final public class rsa_public_key
+public struct rsa_public_key
 {
     var e:Int
     var n:FF
@@ -57,7 +57,7 @@ final public class rsa_public_key
     }
 }
 
-final public class RSA {
+public struct RSA {
     
     static public let RFS=Int(BIG.MODBYTES*FF.FFLEN)
     static public let SHA256=32
@@ -72,7 +72,7 @@ final public class RSA {
     {
         if sha==RSA.SHA256
         {
-            let H=HASH256()
+            var H=HASH256()
             if A != nil {H.process_array(A!)}
             if n >= 0 {H.process_num(n)}
             let R=H.hash()
@@ -80,7 +80,7 @@ final public class RSA {
         }
         if sha==RSA.SHA384
         {
-            let H=HASH384()
+            var H=HASH384()
             if A != nil {H.process_array(A!)}
             if n >= 0 {H.process_num(n)}
             let R=H.hash()
@@ -88,7 +88,7 @@ final public class RSA {
         }
         if sha==RSA.SHA512
         {
-            let H=HASH512()
+            var H=HASH512()
             if A != nil {H.process_array(A!)}
             if n >= 0 {H.process_num(n)}
             let R=H.hash()
@@ -99,7 +99,7 @@ final public class RSA {
 
     /* generate an RSA key pair */
     
-    static public func KEY_PAIR(_ rng: RAND,_ e:Int,_ PRIV:rsa_private_key,_ PUB:rsa_public_key)
+    static public func KEY_PAIR(_ rng: inout RAND,_ e:Int,_ PRIV: inout rsa_private_key,_ PUB: inout rsa_public_key)
     { /* IEEE1363 A16.11/A16.12 more or less */
     
         let n=PUB.n.getlen()/2;
@@ -110,9 +110,9 @@ final public class RSA {
         while true
         {
     
-            PRIV.p.random(rng);
+            PRIV.p.random(&rng);
             while PRIV.p.lastbits(2) != 3 {PRIV.p.inc(1)}
-            while !FF.prime(PRIV.p,rng) {PRIV.p.inc(4)}
+            while !FF.prime(PRIV.p,&rng) {PRIV.p.inc(4)}
     
             p1.copy(PRIV.p);
             p1.dec(1);
@@ -123,9 +123,9 @@ final public class RSA {
     
         while true
         {
-            PRIV.q.random(rng);
+            PRIV.q.random(&rng);
             while PRIV.q.lastbits(2) != 3 {PRIV.q.inc(1)}
-            while !FF.prime(PRIV.q,rng) {PRIV.q.inc(4)}
+            while !FF.prime(PRIV.q,&rng) {PRIV.q.inc(4)}
     
             q1.copy(PRIV.q);
             q1.dec(1);
@@ -222,7 +222,7 @@ final public class RSA {
     
     
     /* OAEP Message Encoding for Encryption */
-    static public func OAEP_ENCODE(_ sha:Int,_ m:[UInt8],_ rng:RAND,_ p:[UInt8]?) -> [UInt8]
+    static public func OAEP_ENCODE(_ sha:Int,_ m:[UInt8],_ rng: inout RAND,_ p:[UInt8]?) -> [UInt8]
     {
         let olen=RFS-1;
         let mlen=m.count;

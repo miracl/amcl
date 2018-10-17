@@ -649,7 +649,7 @@ int main(int argc, char **argv)
 		Ya.set((ZZn)1,ZZn(0));
 		Q.set(Xa,Ya);
 
-		cofactor(Q,X,x);
+		Q=(p-1+t)*Q;                   // generator point in G2
 		cru=(18*pow(x,3)-18*x*x+9*x-2);
 	}
 

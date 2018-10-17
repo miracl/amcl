@@ -25,7 +25,7 @@
 
 import Foundation
 
-final public class SHA3{
+public struct SHA3{
 
     	private var length:UInt64
 	private var rate:Int
@@ -54,7 +54,7 @@ final public class SHA3{
         	return ((x<<UInt64(n))|(x>>(64-UInt64(n))))
     	}
    
-    	private func transform()
+    	private mutating func transform()
     	{ /* basic transformation step */
         	var c=[UInt64](repeating:0,count:5)
 		var d=[UInt64](repeating:0,count:5)
@@ -120,7 +120,7 @@ final public class SHA3{
     	}
     
     /* Re-Initialise Hash function */
-    	func init_it(_ olen: Int)
+    	mutating func init_it(_ olen: Int)
     	{ /* initialise */
 		len=olen
 		rate=200-2*olen 
@@ -140,7 +140,7 @@ final public class SHA3{
     	}
     
     /* process a single byte */
-    	public func process(_ byt: UInt8)
+    	public mutating func process(_ byt: UInt8)
     	{ /* process the next message byte */
 		let cnt=Int(length%UInt64(rate))
 		let b=cnt%8
@@ -152,7 +152,7 @@ final public class SHA3{
 		if cnt+1 == rate {transform()}
     	}
 
-	public func squeeze(_ buff:inout [UInt8],_ olen: Int)
+	public mutating func squeeze(_ buff:inout [UInt8],_ olen: Int)
 	{
 		var done=false
 		var m: Int = 0
@@ -183,7 +183,7 @@ final public class SHA3{
 	}
     
     /* Generate Hash */
-	public func hash(_ digest:inout [UInt8])
+	public mutating func hash(_ digest:inout [UInt8])
     	{ /* pad message and finish - supply digest */
         	let q=rate-Int(length%UInt64(rate))
 		if q==1 {process(0x86)}
@@ -195,7 +195,7 @@ final public class SHA3{
 		squeeze(&digest,len)
 	}
 
-       	public func shake(_ digest:inout [UInt8],_ olen: Int)
+    public mutating func shake(_ digest:inout [UInt8],_ olen: Int)
 	{
 		let q=rate-Int(length%UInt64(rate))
 		if q==1 {process(0x9f)}

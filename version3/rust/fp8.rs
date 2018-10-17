@@ -83,15 +83,15 @@ impl FP8 {
 	}	
 
 /* test self=0 ? */
-	pub fn iszilch(&mut self) -> bool {
-		self.reduce();
+	pub fn iszilch(&self) -> bool {
+		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch();
 	}	
 
 /* test self=1 ? */
-	pub fn isunity(&mut self) -> bool {
-		let mut one=FP4::new_int(1);
-		return self.a.equals(&mut one) && self.b.iszilch();
+	pub fn isunity(&self) -> bool {
+		let one=FP4::new_int(1);
+		return self.a.equals(&one) && self.b.iszilch();
 	}
 
 /* test is w real? That is in a+ib test b is zero */
@@ -115,8 +115,8 @@ impl FP8 {
 	}
 
 /* test self=x */
-	pub fn equals(&mut self,x:&mut FP8) -> bool {
-		return self.a.equals(&mut x.a) && self.b.equals(&mut x.b);
+	pub fn equals(&self,x:&FP8) -> bool {
+		return self.a.equals(&x.a) && self.b.equals(&x.b);
 	}
 /* copy self=x */
 	pub fn copy(&mut self,x :&FP8) {
@@ -336,12 +336,13 @@ impl FP8 {
 	}
 
 /* self=self^e */
-	pub fn pow(&mut self,e: &mut BIG) -> FP8 {
-		self.norm();
-		e.norm();
+	pub fn pow(&self,e: &BIG) -> FP8 {
+		//self.norm();
 		let mut w=FP8::new_copy(self);
+		w.norm();
 		let mut z=BIG::new_copy(&e);
 		let mut r=FP8::new_int(1);
+		z.norm();
 		loop {
 			let bt=z.parity();
 			z.fshr(1);
@@ -381,27 +382,28 @@ impl FP8 {
 	}
 
 /* r=x^n using XTR method on traces of FP24s */
-	pub fn xtr_pow(&mut self,n: &mut BIG) -> FP8 {
+	pub fn xtr_pow(&self,n: &BIG) -> FP8 {
+		let mut sf=FP8::new_copy(self);
+		sf.norm();
 		let mut a=FP8::new_int(3);
-		let mut b=FP8::new_copy(self);
+		let mut b=FP8::new_copy(&sf);
 		let mut c=FP8::new_copy(&b);
 		c.xtr_d();
 		let mut t=FP8::new();
 		let mut r=FP8::new();
-
-		n.norm();
+		
 		let par=n.parity();
-		let mut v=BIG::new_copy(n); v.fshr(1);
+		let mut v=BIG::new_copy(n); v.norm(); v.fshr(1);
 		if par==0 {v.dec(1); v.norm(); }
 
 		let nb=v.nbits();
 		for i in (0..nb).rev() {
 			if v.bit(i)!=1 {
 				t.copy(&b);
-				self.conj();
+				sf.conj();
 				c.conj();
-				b.xtr_a(&a,self,&c);
-				self.conj();
+				b.xtr_a(&a,&sf,&c);
+				sf.conj();
 				c.copy(&t);
 				c.xtr_d();
 				a.xtr_d();
@@ -409,7 +411,7 @@ impl FP8 {
 				t.copy(&a); t.conj();
 				a.copy(&b);
 				a.xtr_d();
-				b.xtr_a(&c,self,&t);
+				b.xtr_a(&c,&sf,&t);
 				c.xtr_d();
 			}
 		}
@@ -421,11 +423,12 @@ impl FP8 {
 	}
 
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
-	pub fn xtr_pow2(&mut self,ck: &FP8,ckml: &FP8,ckm2l: &FP8,a: &mut BIG,b: &mut BIG) -> FP8 {
-		a.norm(); b.norm();
+	pub fn xtr_pow2(&mut self,ck: &FP8,ckml: &FP8,ckm2l: &FP8,a: &BIG,b: &BIG) -> FP8 {
+
 		let mut e=BIG::new_copy(a);
 		let mut d=BIG::new_copy(b);
 		let mut w=BIG::new();
+		e.norm(); d.norm();
 
 		let mut cu=FP8::new_copy(ck);  // can probably be passed in w/o copying
 		let mut cv=FP8::new_copy(self);

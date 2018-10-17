@@ -40,7 +40,7 @@ public final class FP16 {
 	}
 /* test this==0 ? */
 	public boolean iszilch() {
-		reduce();
+		//reduce();
 		return (a.iszilch() && b.iszilch());
 	}
 
@@ -327,11 +327,11 @@ public final class FP16 {
 /* this=this^e */
 	public FP16 pow(BIG e)
 	{
-		norm();
-		e.norm();
 		FP16 w=new FP16(this);
+		w.norm();
 		BIG z=new BIG(e);
 		FP16 r=new FP16(1);
+		z.norm();
 		while (true)
 		{
 			int bt=z.parity();
@@ -377,16 +377,18 @@ public final class FP16 {
 
 /* r=x^n using XTR method on traces of FP12s */
 	public FP16 xtr_pow(BIG n) {
+		FP16 sf=new FP16(this);
+		sf.norm();
 		FP16 a=new FP16(3);
-		FP16 b=new FP16(this);
+		FP16 b=new FP16(sf);
 		FP16 c=new FP16(b);
 		c.xtr_D();
 		FP16 t=new FP16(0);
 		FP16 r=new FP16(0);
 
-		n.norm();
+		
 		int par=n.parity();
-		BIG v=new BIG(n); v.fshr(1);
+		BIG v=new BIG(n); v.norm(); v.fshr(1);
 		if (par==0) {v.dec(1); v.norm();}
 
 		int nb=v.nbits();
@@ -395,10 +397,10 @@ public final class FP16 {
 			if (v.bit(i)!=1)
 			{
 				t.copy(b);
-				conj();
+				sf.conj();
 				c.conj();
-				b.xtr_A(a,this,c);
-				conj();
+				b.xtr_A(a,sf,c);
+				sf.conj();
 				c.copy(t);
 				c.xtr_D();
 				a.xtr_D();
@@ -408,7 +410,7 @@ public final class FP16 {
 				t.copy(a); t.conj();
 				a.copy(b);
 				a.xtr_D();
-				b.xtr_A(c,this,t);
+				b.xtr_A(c,sf,t);
 				c.xtr_D();
 			}
 		}
@@ -421,11 +423,11 @@ public final class FP16 {
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
 	public FP16 xtr_pow2(FP16 ck,FP16 ckml,FP16 ckm2l,BIG a,BIG b)
 	{
-		a.norm(); b.norm();
+
 		BIG e=new BIG(a);
 		BIG d=new BIG(b);
 		BIG w=new BIG(0);
-
+		d.norm(); d.norm();
 		FP16 cu=new FP16(ck);  // can probably be passed in w/o copying
 		FP16 cv=new FP16(this);
 		FP16 cumv=new FP16(ckml);

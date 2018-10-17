@@ -253,7 +253,7 @@ public class MPIN192
 		su=rng.getByte(); /*if (su<0) su=-su;*/ su%=2;
 		
 		ECP W=map(u,su);
-		P.sub(W);
+		P.sub(W); //P.affine();
 		sv=P.getS();
 		rn=unmap(v,P);
 		m=rng.getByte(); /*if (m<0) m=-m;*/ m%=rn;
@@ -283,7 +283,7 @@ public class MPIN192
 		sv=(D[0]>>1)&1;
 		ECP W=map(u,su);
 		ECP P=map(v,sv);
-		P.add(W);
+		P.add(W); //P.affine();
 		u=P.getX();
 		v=P.getY();
 		D[0]=0x04;
@@ -303,7 +303,7 @@ public class MPIN192
 
 		if (P.is_infinity() || Q.is_infinity()) return INVALID_POINT;
 
-		P.add(Q);
+		P.add(Q); //P.affine();
 
 		P.toBytes(R,false);
 		return 0;
@@ -317,7 +317,7 @@ public class MPIN192
 
 		if (P.is_infinity() || Q.is_infinity()) return INVALID_POINT;
 
-		P.add(Q);
+		P.add(Q); //P.affine();
 	
 		P.toBytes(W);
 		return 0;
@@ -349,7 +349,7 @@ public class MPIN192
 		pin%=MAXPIN;
 
 		R=R.pinmul(pin,PBLEN);
-		P.sub(R);
+		P.sub(R); //P.affine();
 
 		P.toBytes(TOKEN,false);
 
@@ -418,11 +418,11 @@ public class MPIN192
 				P=PAIR192.G1mul(P,x);
 				P.toBytes(xID,false);
 				W=PAIR192.G1mul(W,x);
-				P.add(W);
+				P.add(W); //P.affine();
 			}
 			else
 			{
-				P.add(W);
+				P.add(W); //P.affine();
 				P=PAIR192.G1mul(P,x);
 			}
 			if (xCID!=null) P.toBytes(xCID,false);
@@ -436,7 +436,7 @@ public class MPIN192
 			}
 		}
 
-
+		//T.affine();
 		T.toBytes(SEC,false);
 		return 0;
 	}
@@ -519,7 +519,7 @@ public class MPIN192
 	//		if (HID!=null) P.toBytes(HID,false);
 			h=hashit(sha,date,h,EFS);
 			R=ECP.mapit(h);
-			P.add(R);
+			P.add(R); //P.affine();
 			P.toBytes(HTID,false);
 		}
 	//	else P.toBytes(HID,false);
@@ -556,7 +556,7 @@ public class MPIN192
 		if (P.is_infinity()) return INVALID_POINT;
 
 		P=PAIR192.G1mul(P,y);
-		P.add(R); P.affine();
+		P.add(R); //P.affine();
 		R=ECP.fromBytes(mSEC);
 		if (R.is_infinity()) return INVALID_POINT;
 
@@ -578,7 +578,7 @@ public class MPIN192
 					if (R.is_infinity()) return INVALID_POINT;
 
 					P=PAIR192.G1mul(P,y);
-					P.add(R); P.affine();
+					P.add(R); //P.affine();
 				}
 				g=PAIR192.ate(Q,P);
 				g=PAIR192.fexp(g);
@@ -729,7 +729,7 @@ public class MPIN192
 		BIG w=BIG.fromBytes(W);
 		BIG h=BIG.fromBytes(H);
 		A=PAIR192.G1mul(A,h);	// new
-		R.add(A); R.affine();
+		R.add(A); //R.affine();
 
 		U=PAIR192.G1mul(U,w);
 		FP24 g=PAIR192.ate(sQ,R);

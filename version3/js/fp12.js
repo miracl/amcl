@@ -54,7 +54,7 @@ var FP12 = function(ctx) {
 
         /* test x==0 ? */
         iszilch: function() {
-            this.reduce();
+            //this.reduce();
             return (this.a.iszilch() && this.b.iszilch() && this.c.iszilch());
         },
 
@@ -536,29 +536,29 @@ var FP12 = function(ctx) {
 
         /* set this=this^e */
         pow: function(e) {
-            var e3, w, nb, i, bt;
-
-            this.norm();
-            e.norm();
-
-            e3 = new ctx.BIG(e);
+            var e1, e3, w, nb, i, bt, sf;
+			e1 = new ctx.BIG(e);
+			e1.norm();
+            e3 = new ctx.BIG(e1);
             e3.pmul(3);
             e3.norm();
 
-            w = new FP12(this); //w.copy(this);
+			sf = new FP12(this);
+			sf.norm();
+            w = new FP12(sf); //w.copy(this);
             nb = e3.nbits();
 
             for (i = nb - 2; i >= 1; i--) {
                 w.usqr();
-                bt = e3.bit(i) - e.bit(i);
+                bt = e3.bit(i) - e1.bit(i);
 
                 if (bt == 1) {
-                    w.mul(this);
+                    w.mul(sf);
                 }
                 if (bt == -1) {
-                    this.conj();
-                    w.mul(this);
-                    this.conj();
+                    sf.conj();
+                    w.mul(sf);
+                    sf.conj();
                 }
             }
             w.reduce();

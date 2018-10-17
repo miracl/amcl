@@ -133,13 +133,15 @@ func (E *ECP8) Affine() {
 
 /* extract affine x as FP2 */
 func (E *ECP8) GetX() *FP8 {
-	E.Affine()
-	return E.x
+	W:=NewECP8(); W.Copy(E)
+	W.Affine()
+	return W.x
 }
 /* extract affine y as FP2 */
 func (E *ECP8) GetY() *FP8 {
-	E.Affine();
-	return E.y;
+	W:=NewECP8(); W.Copy(E)
+	W.Affine()
+	return W.y;
 }
 
 /* extract projective x */
@@ -160,42 +162,45 @@ func (E *ECP8) ToBytes(b []byte) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
 
-	E.x.geta().geta().GetA().ToBytes(t[:])
+	W:=NewECP8(); W.Copy(E);
+	W.Affine()
+
+	W.x.geta().geta().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i]=t[i]}
-	E.x.geta().geta().GetB().ToBytes(t[:])
+	W.x.geta().geta().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+MB]=t[i]}
-	E.x.geta().getb().GetA().ToBytes(t[:])
+	W.x.geta().getb().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+2*MB]=t[i]}
-	E.x.geta().getb().GetB().ToBytes(t[:])
+	W.x.geta().getb().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+3*MB]=t[i]}
 
-	E.x.getb().geta().GetA().ToBytes(t[:])
+	W.x.getb().geta().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+4*MB]=t[i]}
-	E.x.getb().geta().GetB().ToBytes(t[:])
+	W.x.getb().geta().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+5*MB]=t[i]}
-	E.x.getb().getb().GetA().ToBytes(t[:])
+	W.x.getb().getb().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+6*MB]=t[i]}
-	E.x.getb().getb().GetB().ToBytes(t[:])
+	W.x.getb().getb().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+7*MB]=t[i]}
 
 
 
-	E.y.geta().geta().GetA().ToBytes(t[:])
+	W.y.geta().geta().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+8*MB]=t[i]}
-	E.y.geta().geta().GetB().ToBytes(t[:])
+	W.y.geta().geta().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+9*MB]=t[i]}
-	E.y.geta().getb().GetA().ToBytes(t[:])
+	W.y.geta().getb().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+10*MB]=t[i]}
-	E.y.geta().getb().GetB().ToBytes(t[:])
+	W.y.geta().getb().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+11*MB]=t[i]}
 
-	E.y.getb().geta().GetA().ToBytes(t[:])
+	W.y.getb().geta().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+12*MB]=t[i]}
-	E.y.getb().geta().GetB().ToBytes(t[:])
+	W.y.getb().geta().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+13*MB]=t[i]}
-	E.y.getb().getb().GetA().ToBytes(t[:])
+	W.y.getb().getb().GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+14*MB]=t[i]}
-	E.y.getb().getb().GetB().ToBytes(t[:])
+	W.y.getb().getb().GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+15*MB]=t[i]}
 }
 
@@ -277,14 +282,15 @@ func ECP8_fromBytes(b []byte) *ECP8 {
 
 /* convert this to hex string */
 func (E *ECP8) ToString() string {
-	if E.Is_infinity() {return "infinity"}
-	E.Affine()
-	return "("+E.x.toString()+","+E.y.toString()+")"
+	W:=NewECP8(); W.Copy(E);
+	W.Affine()
+	if W.Is_infinity() {return "infinity"}
+	return "("+W.x.toString()+","+W.y.toString()+")"
 }
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 func RHS4(x *FP8) *FP8 {
-	x.norm()
+	//x.norm()
 	r:=NewFP8copy(x)
 	r.sqr()
 	b2:=NewFP2big(NewBIGints(CURVE_B))
@@ -310,6 +316,7 @@ func NewECP8fp8s(ix *FP8,iy *FP8) *ECP8 {
 	E.x=NewFP8copy(ix)
 	E.y=NewFP8copy(iy)
 	E.z=NewFP8int(1)
+	E.x.norm()
 	rhs:=RHS4(E.x)
 	y2:=NewFP8copy(E.y)
 	y2.sqr()
@@ -325,6 +332,7 @@ func NewECP8fp8(ix *FP8) *ECP8 {
 	E.x=NewFP8copy(ix)
 	E.y=NewFP8int(1)
 	E.z=NewFP8int(1)
+	E.x.norm()
 	rhs:=RHS4(E.x)
 	if rhs.sqrt() {
 			E.y.copy(rhs)
@@ -460,9 +468,10 @@ func (E *ECP8) Add(Q *ECP8) int {
 
 /* set this-=Q */
 func (E *ECP8) Sub(Q *ECP8) int {
-	Q.neg()
-	D:=E.Add(Q)
-	Q.neg()
+	NQ:=NewECP8(); NQ.Copy(Q)
+	NQ.neg()
+	D:=E.Add(NQ)
+	//Q.neg()
 	return D
 }
 
@@ -530,7 +539,7 @@ func (E *ECP8) mul(e *BIG) *ECP8 {
 	var W []*ECP8
 	var w [1+(NLEN*int(BASEBITS)+3)/4]int8
 
-	E.Affine()
+	//E.Affine()
 /* precompute table */
 	Q.Copy(E)
 	Q.dbl()
@@ -704,7 +713,7 @@ func mul16(Q []*ECP8,u []*BIG) *ECP8 {
 
 	for i:=0;i<16;i++ {
 		t=append(t,NewBIGcopy(u[i]));
-		Q[i].Affine();
+		//Q[i].Affine();
 	}
 
 	T1=append(T1,NewECP8()); T1[0].Copy(Q[0])	// Q[0]

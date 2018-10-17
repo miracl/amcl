@@ -343,18 +343,19 @@ func (r *BIG) shl(k uint) {
 
 /* return number of bits */
 func (r *BIG) nbits() int {
+	t:=NewBIGcopy(r)
 	k:=NLEN-1
-	r.norm()
-	for (k>=0 && r.w[k]==0) {k--}
+	t.norm()
+	for (k>=0 && t.w[k]==0) {k--}
 	if k<0 {return 0}
 	bts:=int(BASEBITS)*k;
-	c:=r.w[k];
+	c:=t.w[k];
 	for c!=0 {c/=2; bts++}
 	return bts
 }
 
 /* Convert to Hex String */
-func (r *BIG) toString() string {
+func (r *BIG) ToString() string {
 	s:=""
 	len:=r.nbits()
 
@@ -465,8 +466,9 @@ func (r *BIG) pmul(c int) Chunk {
 
 /* convert this BIG to byte array */
 func (r *BIG) tobytearray(b []byte,n int) {
-	r.norm();
+	//r.norm();
 	c:=NewBIGcopy(r)
+	c.norm();
 
 	for i:=int(MODBYTES)-1;i>=0;i-- {
 		b[i+n]=byte(c.w[0])
@@ -523,7 +525,7 @@ func smul(a *BIG,b *BIG) *BIG {
 
 
 /* Compare a and b, return 0 if a==b, -1 if a<b, +1 if a>b. Inputs must be normalised */
-func comp(a *BIG,b *BIG) int {
+func Comp(a *BIG,b *BIG) int {
 	for i:=NLEN-1;i>=0;i-- {
 		if a.w[i]==b.w[i] {continue}
 		if a.w[i]>b.w[i] {
@@ -594,14 +596,15 @@ func (r *BIG) invmod2m() {
 }
 
 /* reduce this mod m */
-func (r *BIG) Mod(m *BIG) {
+func (r *BIG) Mod(m1 *BIG) {
+	m:=NewBIGcopy(m1)
 	sr:=NewBIG()
 	r.norm()
-	if comp(r,m)<0 {return}
+	if Comp(r,m)<0 {return}
 
 	m.fshl(1); k:=1
 
-	for comp(r,m)>=0 {
+	for Comp(r,m)>=0 {
 		m.fshl(1)
 		k++;
 	}
@@ -614,7 +617,7 @@ func (r *BIG) Mod(m *BIG) {
 			sr.norm()
 			r.cmove(sr,int(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1)));
 /*
-		if comp(r,m)>=0 {
+		if Comp(r,m)>=0 {
 			r.sub(m)
 			r.norm()
 		} */
@@ -623,7 +626,8 @@ func (r *BIG) Mod(m *BIG) {
 }
 
 /* divide this by m */
-func (r *BIG) div(m *BIG) {
+func (r *BIG) div(m1 *BIG) {
+	m:=NewBIGcopy(m1)
 	var d int
 	k:=0
 	r.norm();
@@ -632,7 +636,7 @@ func (r *BIG) div(m *BIG) {
 	b:=NewBIGcopy(r)
 	r.zero();
 
-	for (comp(b,m)>=0) {
+	for (Comp(b,m)>=0) {
 		e.fshl(1)
 		m.fshl(1)
 		k++
@@ -652,7 +656,7 @@ func (r *BIG) div(m *BIG) {
 		sr.norm();
 		r.cmove(sr,d);
 /*
-		if comp(b,m)>=0 {
+		if Comp(b,m)>=0 {
 			r.add(e)
 			r.norm()
 			b.sub(m)
@@ -740,7 +744,9 @@ func nafbits(x *BIG,x3 *BIG ,i int) [3]int {
 */
 
 /* return a*b mod m */
-func Modmul(a,b,m *BIG) *BIG {
+func Modmul(a1,b1,m *BIG) *BIG {
+	a:=NewBIGcopy(a1)
+	b:=NewBIGcopy(b1)
 	a.Mod(m)
 	b.Mod(m)
 	d:=mul(a,b);
@@ -748,14 +754,16 @@ func Modmul(a,b,m *BIG) *BIG {
 }
 
 /* return a^2 mod m */
-func Modsqr(a,m *BIG) *BIG {
+func Modsqr(a1,m *BIG) *BIG {
+	a:=NewBIGcopy(a1)
 	a.Mod(m)
 	d:=sqr(a)
 	return d.mod(m)
 }
 
 /* return -a mod m */
-func Modneg(a,m *BIG) *BIG {
+func Modneg(a1,m *BIG) *BIG {
+	a:=NewBIGcopy(a1)
 	a.Mod(m)
 	return m.Minus(a)
 }
@@ -768,14 +776,14 @@ func (r *BIG) Jacobi(p *BIG) int {
 	n:=NewBIGint(0)
 	zilch:=NewBIGint(0)
 	one:=NewBIGint(1)
-	if (p.parity()==0 || comp(r,zilch)==0 || comp(p,one)<=0) {return 0}
+	if (p.parity()==0 || Comp(r,zilch)==0 || Comp(p,one)<=0) {return 0}
 	r.norm()
 	x.copy(r)
 	n.copy(p)
 	x.Mod(p)
 
-	for comp(n,one)>0 {
-		if comp(x,zilch)==0 {return 0}
+	for Comp(n,one)>0 {
+		if Comp(x,zilch)==0 {return 0}
 		n8:=n.lastbits(3)
 		k:=0
 		for x.parity()==0 {
@@ -805,7 +813,7 @@ func (r *BIG) Invmodp(p *BIG) {
 	x2:=NewBIGint(0)
 	t:=NewBIGint(0)
 	one:=NewBIGint(1)
-	for (comp(u,one)!=0 && comp(v,one)!=0) {
+	for (Comp(u,one)!=0 && Comp(v,one)!=0) {
 		for u.parity()==0 {
 			u.fshr(1);
 			if x1.parity()!=0 {
@@ -822,10 +830,10 @@ func (r *BIG) Invmodp(p *BIG) {
 			}
 			x2.fshr(1)
 		}
-		if comp(u,v)>=0 {
+		if Comp(u,v)>=0 {
 			u.sub(v)
 			u.norm()
-			if comp(x1,x2)>=0 {
+			if Comp(x1,x2)>=0 {
 				x1.sub(x2)
 			} else {
 				t.copy(p)
@@ -836,7 +844,7 @@ func (r *BIG) Invmodp(p *BIG) {
 		} else {
 			v.sub(u)
 			v.norm()
-			if comp(x2,x1)>=0 { 
+			if Comp(x2,x1)>=0 { 
 				x2.sub(x1)
 			} else {
 				t.copy(p)
@@ -846,13 +854,14 @@ func (r *BIG) Invmodp(p *BIG) {
 			x2.norm()
 		}
 	}
-	if comp(u,one)==0 {
+	if Comp(u,one)==0 {
 		r.copy(x1)
 	} else {r.copy(x2)}
 }
 
 /* return this^e mod m */
-func (r *BIG) powmod(e *BIG,m *BIG) *BIG {
+func (r *BIG) Powmod(e1 *BIG,m *BIG) *BIG {
+	e:=NewBIGcopy(e1)
 	r.norm()
 	e.norm()
 	a:=NewBIGint(1)
@@ -917,21 +926,38 @@ func logb2(w uint32) uint {
 	return (r)
 }
 
+// Optimized combined shift, subtract and norm
+func ssn(r *BIG,a *BIG,m *BIG) int {
+        n:=NLEN-1
+        m.w[0]=(m.w[0]>>1)|((m.w[1]<<(BASEBITS-1))&BMASK)
+	r.w[0]=a.w[0]-m.w[0]
+	carry:=r.w[0]>>BASEBITS
+	r.w[0] &= BMASK
+	for i:=1;i<n;i++  {
+            m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(BASEBITS-1))&BMASK)
+            r.w[i]=a.w[i]-m.w[i]+carry
+            carry=r.w[i]>>BASEBITS
+            r.w[i] &= BMASK
+        }
+	m.w[n]>>=1
+	r.w[n]=a.w[n]-m.w[n]+carry
+	return int((r.w[n]>>uint(CHUNK-1))&1)
+}
 
 /*
 func main() {
 	a := NewBIGint(3)
 	m := NewBIGints(Modulus)
 
-	fmt.Printf("Modulus= "+m.toString())
+	fmt.Printf("Modulus= "+m.ToString())
 	fmt.Printf("\n")
 
 
 	e := NewBIGcopy(m);
 	e.dec(1); e.norm();
-	fmt.Printf("Exponent= "+e.toString())
+	fmt.Printf("Exponent= "+e.ToString())
 	fmt.Printf("\n")
-	a=a.powmod(e,m);
-	fmt.Printf("Result= "+a.toString())
+	a=a.Powmod(e,m);
+	fmt.Printf("Result= "+a.ToString())
 }
 */

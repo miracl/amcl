@@ -93,8 +93,8 @@ impl FP2 {
 	}	
 
 /* test self=0 ? */
-	pub fn iszilch(&mut self) -> bool {
-		self.reduce();
+	pub fn iszilch(&self) -> bool {
+		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch();
 	}	
 
@@ -104,14 +104,14 @@ impl FP2 {
 	}		
 
 /* test self=1 ? */
-	pub fn isunity(&mut self) -> bool {
-		let mut one=FP::new_int(1);
-		return self.a.equals(&mut one) && self.b.iszilch();
+	pub fn isunity(&self) -> bool {
+		let one=FP::new_int(1);
+		return self.a.equals(&one) && self.b.iszilch();
 	}
 
 /* test self=x */
-	pub fn equals(&mut self,x:&mut FP2) -> bool {
-		return self.a.equals(&mut x.a) && self.b.equals(&mut x.b);
+	pub fn equals(&self,x:&FP2) -> bool {
+		return self.a.equals(&x.a) && self.b.equals(&x.b);
 	}
 
 /* extract a */

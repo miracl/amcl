@@ -47,8 +47,9 @@ impl ECP4 {
 		E.x.copy(&ix);
 		E.y.copy(&iy);
 		E.z.one();
+		E.x.norm();
 
-		let mut rhs=ECP4::rhs(&mut E.x);
+		let mut rhs=ECP4::rhs(&E.x);
 		let mut y2=FP4::new_copy(&E.y);
 		y2.sqr();
 		if !y2.equals(&mut rhs) {
@@ -63,8 +64,9 @@ impl ECP4 {
 		E.x.copy(&ix);
 		E.y.one();
 		E.z.one();
+		E.x.norm();
 
-		let mut rhs=ECP4::rhs(&mut E.x);
+		let mut rhs=ECP4::rhs(&E.x);
 		if rhs.sqrt() {
 			E.y.copy(&rhs);
 		} else {E.inf();}
@@ -73,8 +75,8 @@ impl ECP4 {
 
 /* Test this=O? */
 	pub fn is_infinity(&self) -> bool {
-		let mut xx=FP4::new_copy(&self.x);
-		let mut zz=FP4::new_copy(&self.z);
+		let xx=FP4::new_copy(&self.x);
+		let zz=FP4::new_copy(&self.z);
 		return xx.iszilch() && zz.iszilch();
 	}
 
@@ -162,15 +164,17 @@ impl ECP4 {
 	}
 
 /* extract affine x as FP4 */
-	pub fn getx(&mut self) -> FP4 {
-		self.affine();
+	pub fn getx(&self) -> FP4 {
+		let mut W=ECP4::new(); W.copy(self);
+		W.affine();
 		return FP4::new_copy(&self.x);
 	}
 
 /* extract affine y as FP4 */
-	pub fn gety(&mut self) -> FP4 {
-		self.affine();
-		return FP4::new_copy(&self.y);
+	pub fn gety(&self) -> FP4 {
+		let mut W=ECP4::new(); W.copy(self);
+		W.affine();
+		return FP4::new_copy(&W.y);
 	}
 
 /* extract projective x */
@@ -187,32 +191,34 @@ impl ECP4 {
 	}
 
 /* convert to byte array */
-	pub fn tobytes(&mut self,b: &mut [u8]) {
+	pub fn tobytes(&self,b: &mut [u8]) {
 		let mut t:[u8;big::MODBYTES as usize]=[0;big::MODBYTES as usize];
 		let mb=big::MODBYTES as usize;
 
-		self.affine();
+		let mut W=ECP4::new(); W.copy(self);
 
-		self.x.geta().geta().tobytes(&mut t);
+		W.affine();
+
+		W.x.geta().geta().tobytes(&mut t);
 		for i in 0..mb { b[i]=t[i]}
-		self.x.geta().getb().tobytes(&mut t);
+		W.x.geta().getb().tobytes(&mut t);
 		for i in 0..mb { b[i+mb]=t[i]}
 
-		self.x.getb().geta().tobytes(&mut t);
+		W.x.getb().geta().tobytes(&mut t);
 		for i in 0..mb { b[i+2*mb]=t[i]}
-		self.x.getb().getb().tobytes(&mut t);
+		W.x.getb().getb().tobytes(&mut t);
 		for i in 0..mb { b[i+3*mb]=t[i]}
 
 
 
-		self.y.geta().geta().tobytes(&mut t);
+		W.y.geta().geta().tobytes(&mut t);
 		for i in 0..mb {b[i+4*mb]=t[i]}
-		self.y.geta().getb().tobytes(&mut t);
+		W.y.geta().getb().tobytes(&mut t);
 		for i in 0..mb {b[i+5*mb]=t[i]}
 
-		self.y.getb().geta().tobytes(&mut t);
+		W.y.getb().geta().tobytes(&mut t);
 		for i in 0..mb {b[i+6*mb]=t[i]}
-		self.y.getb().getb().tobytes(&mut t);
+		W.y.getb().getb().tobytes(&mut t);
 		for i in 0..mb {b[i+7*mb]=t[i]}
 	}
 
@@ -259,15 +265,15 @@ impl ECP4 {
 	}
 
 /* convert this to hex string */
-	pub fn tostring(&mut  self) -> String {
-		if self.is_infinity() {return String::from("infinity")}
-		self.affine();
-		return format!("({},{})",self.x.tostring(),self.y.tostring());
+	pub fn tostring(&self) -> String {
+		let mut W=ECP4::new(); W.copy(self); W.affine();
+		if W.is_infinity() {return String::from("infinity")}
+		return format!("({},{})",W.x.tostring(),W.y.tostring());
 }	
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
-	pub fn rhs(x:&mut FP4) -> FP4 {
-		x.norm();
+	pub fn rhs(x:&FP4) -> FP4 {
+		//x.norm();
 		let mut r=FP4::new_copy(x);
 		r.sqr();
 		let mut b=FP4::new_fp2(&FP2::new_big(&BIG::new_ints(&rom::CURVE_B)));
@@ -536,7 +542,7 @@ impl ECP4 {
 		let mut s2:[i8;CT]=[0;CT];
 
 		for i in 0..8 {
-			Q[i].affine();
+			//Q[i].affine();
 			t[i].norm();
 		}
 

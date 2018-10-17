@@ -27,7 +27,7 @@
 import Foundation
 import amcl
 
-final public class MPIN192
+public struct MPIN192
 {
     static public let EFS=Int(BIG.MODBYTES)
     static public let EGS=Int(BIG.MODBYTES)
@@ -70,19 +70,19 @@ final public class MPIN192
         
         if sha==SHA256
         {
-            let H=HASH256()
+            var H=HASH256()
             H.process_array(t)
             h=H.hash()
         }
         if sha==SHA384
         {
-            let H=HASH384()
+            var H=HASH384()
             H.process_array(t)
             h=H.hash()
         }
         if sha==SHA512
         {
-            let H=HASH512()
+            var H=HASH512()
             H.process_array(t)
             h=H.hash()
         }
@@ -99,21 +99,21 @@ final public class MPIN192
         var R=[UInt8]()
         if sha==SHA256
         {
-            let H=HASH256()
+            var H=HASH256()
             if n != 0 {H.process_num(n)}
             H.process_array(ID)
             R=H.hash()
         }
         if sha==SHA384
         {
-            let H=HASH384()
+            var H=HASH384()
             if n != 0 {H.process_num(n)}
             H.process_array(ID)
             R=H.hash()
         }
         if sha==SHA512
         {
-            let H=HASH512()
+            var H=HASH512()
             if n != 0 {H.process_num(n)}
             H.process_array(ID)
             R=H.hash()
@@ -146,7 +146,7 @@ final public class MPIN192
     // maps a random u to a point on the curve
     static func map(_ u:BIG,_ cb:Int) -> ECP
     {
-        let x=BIG(u)
+        var x=BIG(u)
         let p=BIG(ROM.Modulus)
         x.mod(p)
         var P=ECP(x,cb)
@@ -185,7 +185,7 @@ final public class MPIN192
     // these next two functions implement elligator squared - http://eprint.iacr.org/2014/043
     // Elliptic curve point E in format (0x04,x,y} is converted to form {0x0-,u,v}
     // Note that u and v are indistinguisible from random strings
-    static public func ENCODING(_ rng:RAND,_ E:inout [UInt8]) -> Int
+    static public func ENCODING(_ rng: inout RAND,_ E:inout [UInt8]) -> Int
     {
         var T=[UInt8](repeating: 0,count: EFS)
     
@@ -194,11 +194,11 @@ final public class MPIN192
         for i in 0 ..< EFS {T[i]=E[i+EFS+1]}
         var v=BIG.fromBytes(T)
     
-        let P=ECP(u,v);
+        var P=ECP(u,v);
         if P.is_infinity() {return INVALID_POINT}
     
         let p=BIG(ROM.Modulus)
-        u=BIG.randomnum(p,rng)
+        u=BIG.randomnum(p,&rng)
     
         var su=rng.getByte();
         su%=2
@@ -233,7 +233,7 @@ final public class MPIN192
         let su=D[0]&1
         let sv=(D[0]>>1)&1
         let W=map(u,Int(su))
-        let P=map(v,Int(sv))
+        var P=map(v,Int(sv))
         P.add(W)
         u=P.getX()
         v=P.getY()
@@ -248,7 +248,7 @@ final public class MPIN192
     // R=R1+R2 in group G1
     static public func RECOMBINE_G1(_ R1:[UInt8],_ R2:[UInt8],_ R:inout [UInt8]) -> Int
     {
-        let P=ECP.fromBytes(R1)
+        var P=ECP.fromBytes(R1)
         let Q=ECP.fromBytes(R2)
     
         if P.is_infinity() || Q.is_infinity() {return INVALID_POINT}
@@ -261,7 +261,7 @@ final public class MPIN192
     // W=W1+W2 in group G2
     static public func RECOMBINE_G2(_ W1:[UInt8],_ W2:[UInt8],_  W:inout [UInt8]) -> Int
     {
-        let P=ECP4.fromBytes(W1)
+        var P=ECP4.fromBytes(W1)
         let Q=ECP4.fromBytes(W2)
     
         if P.is_infinity() || Q.is_infinity() {return INVALID_POINT}
@@ -272,10 +272,10 @@ final public class MPIN192
         return 0
     }
     // create random secret S
-    static public func RANDOM_GENERATE(_ rng:RAND,_ S:inout [UInt8]) -> Int
+    static public func RANDOM_GENERATE(_ rng: inout RAND,_ S:inout [UInt8]) -> Int
     {
         let r=BIG(ROM.CURVE_Order)
-        let s=BIG.randomnum(r,rng)
+        let s=BIG.randomnum(r,&rng)
     //if ROM.AES_S>0
     //{
     //  s.mod2m(2*ROM.AES_S)
@@ -293,7 +293,7 @@ final public class MPIN192
     // Extract factor from TOKEN for identity CID
     static public func EXTRACT_FACTOR(_ sha:Int,_ CID:[UInt8],_ factor:Int32,_ facbits:Int32,_ TOKEN:inout [UInt8]) -> Int
     {
-        let P=ECP.fromBytes(TOKEN)
+        var P=ECP.fromBytes(TOKEN)
         if P.is_infinity() {return INVALID_POINT}
         let h=MPIN192.hashit(sha,0,CID)
         var R=ECP.mapit(h)
@@ -309,7 +309,7 @@ final public class MPIN192
     // ERestore factor to TOKEN for identity CID
     static public func RESTORE_FACTOR(_ sha:Int,_ CID:[UInt8],_ factor:Int32,_ facbits:Int32,_ TOKEN:inout [UInt8]) -> Int
     {
-        let P=ECP.fromBytes(TOKEN)
+        var P=ECP.fromBytes(TOKEN)
         if P.is_infinity() {return INVALID_POINT}
         let h=MPIN192.hashit(sha,0,CID)
         var R=ECP.mapit(h)
@@ -347,7 +347,7 @@ final public class MPIN192
         var P=ECP.fromBytes(SEC)
         if P.is_infinity() {return INVALID_POINT}
     
-        let px=BIG.fromBytes(X)
+        var px=BIG.fromBytes(X)
         let py=BIG.fromBytes(Y)
         px.add(py)
         px.mod(r)
@@ -361,7 +361,7 @@ final public class MPIN192
     }
     
     // Implement step 1 on client side of MPin protocol
-    static public func CLIENT_1(_ sha:Int,_ date:Int32,_ CLIENT_ID:[UInt8],_ rng:RAND?,_ X:inout [UInt8],_ pin:Int32,_ TOKEN:[UInt8],_ SEC:inout [UInt8],_ xID:inout [UInt8]?,_ xCID:inout [UInt8]?,_ PERMIT:[UInt8]?) -> Int
+    static public func CLIENT_1(_ sha:Int,_ date:Int32,_ CLIENT_ID:[UInt8],_ rng: inout RAND?,_ X:inout [UInt8],_ pin:Int32,_ TOKEN:[UInt8],_ SEC:inout [UInt8],_ xID:inout [UInt8]?,_ xCID:inout [UInt8]?,_ PERMIT:[UInt8]?) -> Int
     {
 
         let r=BIG(ROM.CURVE_Order)
@@ -369,7 +369,7 @@ final public class MPIN192
         var x:BIG
         if rng != nil
         {
-            x=BIG.randomnum(r,rng!)
+            x=BIG.randomnum(r,&rng!)
             //if ROM.AES_S>0
             //{
              //   x.mod2m(2*ROM.AES_S)
@@ -385,7 +385,7 @@ final public class MPIN192
         var h=MPIN192.hashit(sha,0,CLIENT_ID)
         var P=ECP.mapit(h);
     
-        let T=ECP.fromBytes(TOKEN);
+        var T=ECP.fromBytes(TOKEN);
         if T.is_infinity() {return INVALID_POINT}
     
         var W=P.pinmul(pin%MPIN192.MAXPIN,MPIN192.PBLEN)
@@ -441,13 +441,13 @@ final public class MPIN192
     //if RNG != NULL the X is passed out
     //if type=0 W=x*G where G is point on the curve, else W=x*M(G), where M(G) is mapping of octet G to point on the curve
     
-    static public func GET_G1_MULTIPLE(_ rng:RAND?,_ type:Int,_ X:inout [UInt8],_ G:[UInt8],_ W:inout [UInt8]) -> Int
+    static public func GET_G1_MULTIPLE(_ rng: inout RAND?,_ type:Int,_ X:inout [UInt8],_ G:[UInt8],_ W:inout [UInt8]) -> Int
     {
         var x:BIG
         let r=BIG(ROM.CURVE_Order)
         if rng != nil
         {
-            x=BIG.randomnum(r,rng!)
+            x=BIG.randomnum(r,&rng!)
             //if ROM.AES_S>0
             //{
             //    x.mod2m(2*ROM.AES_S)
@@ -474,7 +474,8 @@ final public class MPIN192
     // CID is hashed externally
     static public func GET_CLIENT_SECRET(_ S:inout [UInt8],_ CID:[UInt8],_ CST:inout [UInt8]) -> Int
     {
-        return GET_G1_MULTIPLE(nil,1,&S,CID,&CST)
+        var RNG : RAND? = nil        
+        return GET_G1_MULTIPLE(&RNG,1,&S,CID,&CST)
     }
     // Time Permit CTT=S*(date|H(CID)) where S is master secret
     static public func GET_CLIENT_PERMIT(_ sha:Int,_ date:Int32,_ S:[UInt8],_ CID:[UInt8],_ CTT:inout [UInt8]) -> Int
@@ -491,9 +492,9 @@ final public class MPIN192
     static public func SERVER_1(_ sha:Int,_ date:Int32,_ CID:[UInt8],_ HID:inout [UInt8],_ HTID:inout [UInt8]?)
     {
         var h=MPIN192.hashit(sha,0,CID)
-        let P=ECP.mapit(h)
+        var P=ECP.mapit(h)
 
-    P.toBytes(&HID,false)
+        P.toBytes(&HID,false)
         if date != 0
         {
        //     if HID != nil {P.toBytes(&HID!,false)}
@@ -532,7 +533,7 @@ final public class MPIN192
         if P.is_infinity() {return INVALID_POINT}
     
         P=PAIR192.G1mul(P,y)
-        P.add(R); P.affine()
+        P.add(R); //P.affine()
         R=ECP.fromBytes(mSEC)
         if R.is_infinity() {return MPIN192.INVALID_POINT}
 
@@ -553,7 +554,7 @@ final public class MPIN192
                     if R.is_infinity() {return MPIN192.INVALID_POINT}
     
                     P=PAIR192.G1mul(P,y);
-                    P.add(R); P.affine()
+                    P.add(R); //P.affine()
                 }
                 g=PAIR192.ate(Q,P);
                 g=PAIR192.fexp(g);
@@ -567,10 +568,10 @@ final public class MPIN192
     // Pollards kangaroos used to return PIN error
     static public func KANGAROO(_ E:[UInt8]?,_ F:[UInt8]?) -> Int
     {
-        let ge=FP24.fromBytes(E!)
-        let gf=FP24.fromBytes(F!)
+        var ge=FP24.fromBytes(E!)
+        var gf=FP24.fromBytes(F!)
         var distance=[Int]();
-        let t=FP24(gf);
+        var t=FP24(gf);
         var table=[FP24]()
         
         var s:Int=1
@@ -586,7 +587,8 @@ final public class MPIN192
         var dn:Int=0
         for _ in 0 ..< TRAP
         {
-            let i=Int(t.geta().geta().geta().getA().lastbits(8))%TS
+            var lsbs=BIG(t.geta().geta().geta().getA())
+            let i=Int(lsbs.lastbits(8))%TS
             t.mul(table[i])
             dn+=distance[i]
         }
@@ -597,7 +599,8 @@ final public class MPIN192
         {
             steps += 1;
             if steps>4*TRAP {break}
-            let i=Int(ge.geta().geta().geta().getA().lastbits(8))%TS
+            var lsbs=BIG(ge.geta().geta().geta().getA())
+            let i=Int(lsbs.lastbits(8))%TS
             ge.mul(table[i])
             dm+=distance[i]
             if (ge.equals(t))
@@ -667,9 +670,9 @@ final public class MPIN192
     // wCID = w.(A+AT)
     static public func CLIENT_KEY(_ sha:Int,_ G1:[UInt8],_ G2:[UInt8],_ pin:Int32,_ R:[UInt8],_ X:[UInt8],_ H:[UInt8],_ wCID:[UInt8],_ CK:inout [UInt8]) -> Int
     {
-        let g1=FP24.fromBytes(G1)
-        let g2=FP24.fromBytes(G2)
-        let z=BIG.fromBytes(R)
+        var g1=FP24.fromBytes(G1)
+        var g2=FP24.fromBytes(G2)
+        var z=BIG.fromBytes(R)
         let x=BIG.fromBytes(X)
         let h=BIG.fromBytes(H)
     
@@ -728,7 +731,7 @@ final public class MPIN192
     
         let sQ=ECP4.fromBytes(SST)
         if sQ.is_infinity() {return INVALID_POINT}
-        let R=ECP.fromBytes(Z)
+        var R=ECP.fromBytes(Z)
         if R.is_infinity() {return INVALID_POINT}
         var A=ECP.fromBytes(HID)
         if A.is_infinity() {return INVALID_POINT}
@@ -744,7 +747,7 @@ final public class MPIN192
         let w=BIG.fromBytes(W)
         let h=BIG.fromBytes(H)
         A=PAIR192.G1mul(A,h)
-        R.add(A); R.affine()
+        R.add(A); //R.affine()
 
         U=PAIR192.G1mul(U,w)
         var g=PAIR192.ate(sQ,R)
@@ -770,7 +773,7 @@ final public class MPIN192
     static public func GET_Y(_ sha:Int,_ TimeValue:Int32,_ xCID:[UInt8],_ Y:inout [UInt8])
     {
         let h = MPIN192.hashit(sha,TimeValue,xCID)
-        let y = BIG.fromBytes(h)
+        var y = BIG.fromBytes(h)
         let q=BIG(ROM.CURVE_Order)
         y.mod(q)
     //if ROM.AES_S>0
@@ -780,12 +783,12 @@ final public class MPIN192
         y.toBytes(&Y)
     }
     // One pass MPIN Client
-    static public func CLIENT(_ sha:Int,_ date:Int32,_ CLIENT_ID:[UInt8],_ RNG:RAND?,_ X:inout [UInt8],_ pin:Int32,_ TOKEN:[UInt8],_  SEC:inout [UInt8],_ xID:inout [UInt8]?,_ xCID:inout [UInt8]?,_ PERMIT:[UInt8]?,_ TimeValue:Int32,_ Y:inout [UInt8]) -> Int
+    static public func CLIENT(_ sha:Int,_ date:Int32,_ CLIENT_ID:[UInt8],_ RNG: inout RAND?,_ X:inout [UInt8],_ pin:Int32,_ TOKEN:[UInt8],_  SEC:inout [UInt8],_ xID:inout [UInt8]?,_ xCID:inout [UInt8]?,_ PERMIT:[UInt8]?,_ TimeValue:Int32,_ Y:inout [UInt8]) -> Int
     {
         var rtn=0
         //var xID=xID 
   
-        rtn = MPIN192.CLIENT_1(sha,date,CLIENT_ID,RNG,&X,pin,TOKEN,&SEC,&xID,&xCID,PERMIT!)
+        rtn = MPIN192.CLIENT_1(sha,date,CLIENT_ID,&RNG,&X,pin,TOKEN,&SEC,&xID,&xCID,PERMIT!)
 
         if rtn != 0 {return rtn}
     

@@ -26,7 +26,7 @@
 //  Cryptographic strong random number generator
 
 /* Marsaglia & Zaman Random number generator constants */
-final public class RAND {
+public struct RAND {
     private static let NK:Int=21
     private static let NJ:Int=6
     private static let NV:Int=8
@@ -36,7 +36,7 @@ final public class RAND {
     private var pool_ptr:Int=0
     private var pool=[UInt8](repeating: 0,count: 32)
     
-    public func clean()
+    public mutating func clean()
     {
         pool_ptr=0
         rndptr=0
@@ -47,7 +47,7 @@ final public class RAND {
     
     public init() {clean()}
     
-    private func sbrand() -> UInt32
+    private mutating func sbrand() -> UInt32
     { /* Marsaglia & Zaman random number generator */
         rndptr+=1;
         if rndptr<RAND.NK {return ira[rndptr]}
@@ -66,7 +66,7 @@ final public class RAND {
         return ira[0]
     }
     
-    func sirand(_ seed: UInt32)
+    mutating func sirand(_ seed: UInt32)
     {
         var m:UInt32=1
         var s:UInt32=seed
@@ -84,15 +84,15 @@ final public class RAND {
         for _ in 0 ..< 10000 {_ = sbrand()}
     }
     
-    private func fill_pool()
+    private mutating func fill_pool()
     {
-        let sh=HASH256()
+        var sh=HASH256()
         for _ in 0 ..< 128 {sh.process(UInt8(sbrand()&0xff))}
         pool=sh.hash()
         pool_ptr=0
     }
     
-    private func pack(_ b: [UInt8]) -> UInt32
+    private mutating func pack(_ b: [UInt8]) -> UInt32
     {
 	var r=UInt32(b[3])<<24
 	r |=  UInt32(b[2])<<16
@@ -103,11 +103,11 @@ final public class RAND {
     }
   
 /* Initialize RNG with some real entropy from some external source */
-    public func seed(_ rawlen: Int,_ raw: [UInt8])
+    public mutating func seed(_ rawlen: Int,_ raw: [UInt8])
     { /* initialise from at least 128 byte string of raw random entropy */
         var digest=[UInt8]()
         var b=[UInt8](repeating: 0, count: 4)
-        let sh=HASH256()
+        var sh=HASH256()
         pool_ptr=0
         for i in 0 ..< RAND.NK {ira[i]=0}
         if rawlen>0
@@ -125,7 +125,7 @@ final public class RAND {
         fill_pool()
     }
     
-    public func getByte() -> UInt8
+    public mutating func getByte() -> UInt8
     {
         let r=pool[pool_ptr]; pool_ptr+=1
         if pool_ptr>=32 {fill_pool()}

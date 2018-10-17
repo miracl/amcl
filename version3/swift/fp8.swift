@@ -28,9 +28,9 @@
 
 /* FP8 elements are of the form a+ib, where i is sqrt(sqrt(-1+sqrt(-1)))  */
 
-final public class FP8 {
-    private final var a:FP4
-    private final var b:FP4
+public struct FP8 {
+    private var a:FP4
+    private var b:FP4
 
     /* constructors */
     init(_ c:Int)
@@ -57,13 +57,13 @@ final public class FP8 {
         b=FP4(0)
     }
     /* reduce all components of this mod Modulus */
-    func reduce()
+    mutating func reduce()
     {
         a.reduce()
         b.reduce()
     }
     /* normalise all components of this mod Modulus */
-    func norm()
+    mutating func norm()
     {
         a.norm()
         b.norm()
@@ -72,11 +72,11 @@ final public class FP8 {
     /* test this==0 ? */
     func iszilch() -> Bool
     {
-        reduce()
+        //reduce()
         return a.iszilch() && b.iszilch()
     }
 
-    func cmove(_ g:FP8,_ d:Int)
+    mutating func cmove(_ g:FP8,_ d:Int)
     {
         a.cmove(g.a,d)
         b.cmove(g.b,d)
@@ -117,29 +117,29 @@ final public class FP8 {
         return a.equals(x.a) && b.equals(x.b)
     }
     /* copy self=x */
-    func copy(_ x:FP8)
+    mutating func copy(_ x:FP8)
     {
         a.copy(x.a)
         b.copy(x.b)
     }
     /* set this=0 */
-    func zero()
+    mutating func zero()
     {
         a.zero()
         b.zero()
     }
     /* set this=1 */
-    func one()
+    mutating func one()
     {
         a.one()
         b.zero()
     }
     /* set self=-self */
-    func neg()
+    mutating func neg()
     {
-    norm()
-        let m=FP4(a)
-        let t=FP4(0)
+        norm()
+        var m=FP4(a)
+        var t=FP4(0)
         m.add(b)
         m.neg()
     //    m.norm()
@@ -150,69 +150,74 @@ final public class FP8 {
         norm()
     }
     /* self=conjugate(self) */
-    func conj()
+    mutating func conj()
     {
         b.neg(); norm()
     }
     /* this=-conjugate(this) */
-    func nconj()
+    mutating func nconj()
     {
         a.neg(); norm()
     }
+
+    mutating func adds(_ x: FP4)
+    {
+        a.add(x)
+    }
     /* self+=x */
-    func add(_ x:FP8)
+    mutating func add(_ x:FP8)
     {
         a.add(x.a)
         b.add(x.b)
     }
     /* self-=x */
-    func sub(_ x:FP8)
+    mutating func sub(_ x:FP8)
     {
-        let m=FP8(x)
+        var m=FP8(x)
         m.neg()
         add(m)
     }
 
     /* self-=x */
-    func rsub(_ x: FP8) {
+    mutating func rsub(_ x: FP8) {
         neg()
         add(x)
     }    
 
     /* self*=s where s is FP4 */
-    func pmul(_ s:FP4)
+    mutating func pmul(_ s:FP4)
     {
         a.mul(s)
         b.mul(s)
     }
 
     /* self*=s where s is FP2 */
-    func qmul(_ s:FP2) {
+    mutating func qmul(_ s:FP2) {
         a.pmul(s)
         b.pmul(s)
     }
 
     /* self*=s where s is FP */
-    func tmul(_ s:FP) {
+    mutating func tmul(_ s:FP) {
         a.qmul(s)
         b.qmul(s)
     }
 
     /* self*=c where c is int */
-    func imul(_ c:Int)
+    mutating func imul(_ c:Int)
     {
         a.imul(c)
         b.imul(c)
     }
 
     /* self*=self */
-    func sqr()
+    mutating func sqr()
     {
 //        norm();
     
-        let t1=FP4(a)
-        let t2=FP4(b)
-        let t3=FP4(a)
+        var t1=FP4(a)
+        var t2=FP4(b)
+        var t3=FP4(a)
     
         t3.mul(b)
         t1.add(b)
@@ -239,14 +244,14 @@ final public class FP8 {
     }
 
     /* self*=y */
-    func mul(_ y:FP8)
+    mutating func mul(_ y:FP8)
     {
     //    norm();
     
-        let t1=FP4(a)
-        let t2=FP4(b)
-        let t3=FP4(0)
-        let t4=FP4(b)
+        var t1=FP4(a)
+        var t2=FP4(b)
+        var t3=FP4(0)
+        var t4=FP4(b)
     
         t1.mul(y.a)
         t2.mul(y.b)
@@ -285,12 +290,12 @@ final public class FP8 {
         return ("["+a.toRawString()+","+b.toRawString()+"]")
     }
     /* self=1/self */
-    func inverse()
+    mutating func inverse()
     {
         norm();
     
-        let t1=FP4(a)
-        let t2=FP4(b)
+        var t1=FP4(a)
+        var t2=FP4(b)
     
         t1.sqr()
         t2.sqr()
@@ -303,9 +308,9 @@ final public class FP8 {
     }
 
     /* self*=i where i = sqrt(-1+sqrt(-1)) */
-    func times_i()
+    mutating func times_i()
     {
-        let s=FP4(b)
+        var s=FP4(b)
         let t=FP4(a)
         s.times_i()
         a.copy(s)
@@ -313,15 +318,15 @@ final public class FP8 {
         norm()
     }
 
-    func times_i2() {
+    mutating func times_i2() {
         a.times_i()
         b.times_i()
     }    
 
     /* self=self^p using Frobenius */
-    func frob(_ f:FP2)
+    mutating func frob(_ f:FP2)
     {
-        let ff=FP2(f); ff.sqr(); ff.mul_ip(); ff.norm()
+        var ff=FP2(f); ff.sqr(); ff.mul_ip(); ff.norm()
 
         a.frob(ff)
         b.frob(ff)
@@ -332,11 +337,12 @@ final public class FP8 {
     /* self=self^e */
     func pow(_ e:BIG) -> FP8
     {
-        norm()
-        e.norm()
-        let w=FP8(self)
-        let z=BIG(e)
-        let r=FP8(1)
+        
+        var w=FP8(self)
+        w.norm()
+        var z=BIG(e)
+        var r=FP8(1)
+        z.norm()
         while (true)
         {
             let bt=z.parity()
@@ -350,10 +356,10 @@ final public class FP8 {
     }
 
     /* XTR xtr_a function */
-    func xtr_A(_ w:FP8,_ y:FP8,_ z:FP8)
+    mutating func xtr_A(_ w:FP8,_ y:FP8,_ z:FP8)
     {
-        let r=FP8(w)
-        let t=FP8(w)
+        var r=FP8(w)
+        var t=FP8(w)
         r.sub(y); r.norm()
         r.pmul(a)
         t.add(y); t.norm()
@@ -367,9 +373,9 @@ final public class FP8 {
         norm()
     }
     /* XTR xtr_d function */
-    func xtr_D()
+    mutating func xtr_D()
     {
-        let w=FP8(self)
+        var w=FP8(self)
         sqr(); w.conj()
         w.add(w); w.norm();
         sub(w)
@@ -378,16 +384,17 @@ final public class FP8 {
     /* r=x^n using XTR method on traces of FP24s */
     func xtr_pow(_ n:BIG) -> FP8
     {
-        let a=FP8(3)
-        let b=FP8(self)
-        let c=FP8(b)
+        var a=FP8(3)
+        var b=FP8(self)
+        var c=FP8(b)
         c.xtr_D()
-        let t=FP8(0)
-        let r=FP8(0)
+        var t=FP8(0)
+        var r=FP8(0)
+        var sf=FP8(self)
     
-        n.norm();
+        //n.norm();
         let par=n.parity()
-        let v=BIG(n); v.fshr(1)
+        var v=BIG(n); v.norm(); v.fshr(1)
         if par==0 {v.dec(1); v.norm()}
     
         let nb=v.nbits()
@@ -399,10 +406,10 @@ final public class FP8 {
             if (v.bit(UInt(i)) != 1)
             {
                 t.copy(b)
-                conj()
+                sf.conj()
                 c.conj()
-                b.xtr_A(a,self,c)
-                conj()
+                b.xtr_A(a,sf,c)
+                sf.conj()
                 c.copy(t)
                 c.xtr_D()
                 a.xtr_D()
@@ -412,7 +419,7 @@ final public class FP8 {
                 t.copy(a); t.conj()
                 a.copy(b)
                 a.xtr_D()
-                b.xtr_A(c,self,t)
+                b.xtr_A(c,sf,t)
                 c.xtr_D()
             }
             i-=1
@@ -426,17 +433,19 @@ final public class FP8 {
     /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP24s. See Stam thesis. */
     func xtr_pow2(_ ck:FP8,_ ckml:FP8,_ ckm2l:FP8,_ a:BIG,_ b:BIG) -> FP8
     {
-        a.norm(); b.norm()
-        let e=BIG(a)
-        let d=BIG(b)
-        let w=BIG(0)
+ 
+        var e=BIG(a)
+        var d=BIG(b)
+        e.norm(); d.norm()
+               
+        var w=BIG(0)
     
-        let cu=FP8(ck)  // can probably be passed in w/o copying
-        let cv=FP8(self)
-        let cumv=FP8(ckml)
-        let cum2v=FP8(ckm2l)
+        var cu=FP8(ck)  // can probably be passed in w/o copying
+        var cv=FP8(self)
+        var cumv=FP8(ckml)
+        var cum2v=FP8(ckm2l)
         var r=FP8(0)
-        let t=FP8(0)
+        var t=FP8(0)
     
         var f2:Int=0
         while d.parity()==0 && e.parity()==0
@@ -568,27 +577,27 @@ final public class FP8 {
     
 
     /* self/=2 */
-    func div2() {
+    mutating func div2() {
         a.div2()
         b.div2()
     }
 
-    func div_i() {
-        let u=FP4(a)
+    mutating func div_i() {
+        var u=FP4(a)
         let v=FP4(b)
         u.div_i()
         a.copy(v)
         b.copy(u)
     }   
 
-    func div_i2() {
+    mutating func div_i2() {
         a.div_i()
         b.div_i()
     }
 
-    func div_2i() {
-        let u=FP4(a)
-        let v=FP4(b)
+    mutating func div_2i() {
+        var u=FP4(a)
+        var v=FP4(b)
         u.div_2i()
         v.add(v); v.norm()
         a.copy(v)
@@ -597,12 +606,12 @@ final public class FP8 {
 
 /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */
 /* returns true if this is QR */
-    func sqrt() -> Bool {
+    mutating func sqrt() -> Bool {
         if iszilch() {return true}
 
-        let aa=FP4(a)
-        let s=FP4(b)
-        let t=FP4(a)
+        var aa=FP4(a)
+        var s=FP4(b)
+        var t=FP4(a)
 
         if s.iszilch() {
             if t.sqrt() {

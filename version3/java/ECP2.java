@@ -35,6 +35,12 @@ public final class ECP2 {
 		z=new FP2(0);
 	}
 
+    public ECP2(ECP2 e) {
+        this.x = new FP2(e.x);
+        this.y = new FP2(e.y);
+        this.z = new FP2(e.z);
+    }
+
 /* Test this=O? */
 	public boolean is_infinity() {
 //		if (INF) return true;                    //******
@@ -144,14 +150,16 @@ public final class ECP2 {
 /* extract affine x as FP2 */
 	public FP2 getX()
 	{
-		affine();
-		return x;
+		ECP2 W=new ECP2(this);
+		W.affine();
+		return W.x;
 	}
 /* extract affine y as FP2 */
 	public FP2 getY()
 	{
-		affine();
-		return y;
+		ECP2 W=new ECP2(this);
+		W.affine();
+		return W.y;
 	}
 /* extract projective x */
 	public FP2 getx()
@@ -172,18 +180,19 @@ public final class ECP2 {
 	public void toBytes(byte[] b)
 	{
 		byte[] t=new byte[BIG.MODBYTES];
-		affine();
-		x.getA().toBytes(t);
+		ECP2 W=new ECP2(this);
+		W.affine();
+		W.x.getA().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++)
 			b[i]=t[i];
-		x.getB().toBytes(t);
+		W.x.getB().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++)
 			b[i+BIG.MODBYTES]=t[i];
 
-		y.getA().toBytes(t);
+		W.y.getA().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++)
 			b[i+2*BIG.MODBYTES]=t[i];
-		y.getB().toBytes(t);
+		W.y.getB().toBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++)
 			b[i+3*BIG.MODBYTES]=t[i];
 	}
@@ -210,14 +219,15 @@ public final class ECP2 {
 	}
 /* convert this to hex string */
 	public String toString() {
-		if (is_infinity()) return "infinity";
-		affine();
-		return "("+x.toString()+","+y.toString()+")";
+		ECP2 W=new ECP2(this);	
+		W.affine();
+		if (W.is_infinity()) return "infinity";
+		return "("+W.x.toString()+","+W.y.toString()+")";
 	}
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 	public static FP2 RHS(FP2 x) {
-		x.norm();
+		//x.norm();
 		FP2 r=new FP2(x);
 		r.sqr();
 		FP2 b=new FP2(new BIG(ROM.CURVE_B));
@@ -246,6 +256,7 @@ public final class ECP2 {
 		x=new FP2(ix);
 		y=new FP2(iy);
 		z=new FP2(1);
+		x.norm();
 		FP2 rhs=RHS(x);
 		FP2 y2=new FP2(y);
 		y2.sqr();
@@ -259,6 +270,7 @@ public final class ECP2 {
 		x=new FP2(ix);
 		y=new FP2(1);
 		z=new FP2(1);
+		x.norm();
 		FP2 rhs=RHS(x);
 		if (rhs.sqrt()) 
 		{
@@ -381,7 +393,7 @@ public final class ECP2 {
 		t2.imul(b); 	
 		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
 		{
-			t2.mul_ip();
+			t2.mul_ip(); t2.norm();
 		}
 		FP2 z3=new FP2(t1); z3.add(t2); z3.norm();
 		t1.sub(t2); t1.norm(); 
@@ -404,9 +416,12 @@ public final class ECP2 {
 
 /* set this-=Q */
 	public int sub(ECP2 Q) {
-		Q.neg();
-		int D=add(Q);
-		Q.neg();
+		ECP2 NQ=new ECP2(Q);
+		NQ.neg();
+		int D=add(NQ);
+		//Q.neg();
+		//int D=add(Q);
+		//Q.neg();
 		return D;
 	}
 /* set this*=q, where q is Modulus, using Frobenius */
@@ -441,7 +456,7 @@ public final class ECP2 {
 
 		if (is_infinity()) return new ECP2();
 
-		affine();
+		//affine();
 
 /* precompute table */
 		Q.copy(this);
@@ -511,7 +526,7 @@ public final class ECP2 {
 		{
 			t[i]=new BIG(u[i]);
 			t[i].norm();
-			Q[i].affine();
+			//Q[i].affine();
 		}
 
         T[0] = new ECP2(); T[0].copy(Q[0]);  // Q[0]

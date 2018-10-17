@@ -82,17 +82,18 @@ int OCT_comp(octet *x,octet *y)
     return 1;
 }
 
-/* check are first n bytes the same */
+/* check are first n bytes the same (in constant time) */
 
 int OCT_ncomp(octet *x,octet *y,int n)
 {
-    int i;
+    int i,res=0;
     if (n>y->len || n>x->len) return 0;
     for (i=0; i<n; i++)
     {
-        if (x->val[i]!=y->val[i]) return 0;
+        res|=(int)(x->val[i]^y->val[i]);
     }
-    return 1;
+    if (res==0) return 1;
+	return 0;
 }
 
 /* Shift octet to the left by n bytes. Leftmost bytes disappear  */

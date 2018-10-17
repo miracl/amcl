@@ -208,10 +208,11 @@ void YYY::FP_mod(BIG a,DBIG d)
 /* SU= 48 */
 int YYY::FP_iszilch(FP *x)
 {
-    BIG m;
+    BIG m,t;
     BIG_rcopy(m,Modulus);
-    BIG_mod(x->g,m);
-    return BIG_iszilch(x->g);
+	BIG_copy(t,x->g);
+    BIG_mod(t,m);
+    return BIG_iszilch(t);
 }
 
 void YYY::FP_copy(FP *y,FP *x)
@@ -257,8 +258,20 @@ void YYY::FP_zero(FP *x)
 
 int YYY::FP_equals(FP *x,FP *y)
 {
-	FP_reduce(x); FP_reduce(y);
-	if (BIG_comp(x->g,y->g)==0) return 1;
+//	int i;
+//	chunk res=0;
+	FP xg,yg;
+	FP_copy(&xg,x);
+	FP_copy(&yg,y);
+	FP_reduce(&xg); FP_reduce(&yg);
+
+//	for (i=0;i<NLEN_XXX;i++)
+//	{
+//		res |= xg.g[i]^yg.g[i];
+//	}
+//	return res;
+
+	if (BIG_comp(xg.g,yg.g)==0) return 1;
 	return 0;
 }
 
@@ -430,21 +443,6 @@ void YYY::FP_sub(FP *r,FP *a,FP *b)
     FP_add(r,a,&n);
 }
 
-/* SU= 48 */
-/* Fully reduce a mod Modulus */
-void YYY::FP_reduce(FP *a)
-{
-    BIG m;
-    BIG_rcopy(m,Modulus);
-    BIG_mod(a->g,m);
-	a->XES=1;
-}
-
-void YYY::FP_norm(FP *x)
-{
-	BIG_norm(x->g);
-}
-
 // https://graphics.stanford.edu/~seander/bithacks.html
 // constant time log to base 2 (or number of bits in)
 
@@ -463,6 +461,74 @@ static int logb2(unsign32 v)
     return r;
 }
 
+// find appoximation to quotient of a/m
+// Out by at most 2.
+// Note that MAXXES is bounded to be 2-bits less than half a word
+static int quo(BIG n,BIG m)
+{
+	int sh;
+	chunk num,den;
+	int hb=CHUNK/2;
+	if (TBITS_YYY<hb)
+	{
+		sh=hb-TBITS_YYY;
+		num=(n[NLEN_XXX-1]<<sh)|(n[NLEN_XXX-2]>>(BASEBITS_XXX-sh));
+		den=(m[NLEN_XXX-1]<<sh)|(m[NLEN_XXX-2]>>(BASEBITS_XXX-sh));
+	}
+	else
+	{
+		num=n[NLEN_XXX-1];
+		den=m[NLEN_XXX-1];
+	}
+	return (int)(num/(den+1));
+}
+
+/* SU= 48 */
+/* Fully reduce a mod Modulus */
+void YYY::FP_reduce(FP *a)
+{
+    BIG m,r;
+	int sr,sb,q;
+	chunk carry;
+
+    BIG_rcopy(m,Modulus);
+	BIG_norm(a->g);
+
+	if (a->XES>16)
+	{
+		q=quo(a->g,m);
+		carry=BIG_pmul(r,m,q);
+		r[NLEN_XXX-1]+=(carry<<BASEBITS_XXX); // correction - put any carry out back in again
+		BIG_sub(a->g,a->g,r);
+		BIG_norm(a->g);
+		sb=2;
+	}
+	else sb=logb2(a->XES-1);  // sb does not depend on the actual data
+
+	BIG_fshl(m,sb);
+	while (sb>0)
+	{
+// constant time...
+		sr=BIG_ssn(r,a->g,m);  // optimized combined shift, subtract and norm
+		BIG_cmove(a->g,r,1-sr);
+		sb--;
+	}
+/*
+    BIG_rcopy(m,Modulus);
+	if (BIG_comp(a->g,m)>0)
+	{
+		printf("NOT fully reduced q=%x %x %x %x\n",q,quo(a->g,m),FEXCESS_YYY,a->XES);
+		exit(0);
+	}
+*/
+	a->XES=1;
+}
+
+void YYY::FP_norm(FP *x)
+{
+	BIG_norm(x->g);
+}
+
 /* Set r=-a mod Modulus */
 /* SU= 64 */
 void YYY::FP_neg(FP *r,FP *a)
@@ -475,7 +541,7 @@ void YYY::FP_neg(FP *r,FP *a)
     sb=logb2(a->XES-1);
     BIG_fshl(m,sb);
     BIG_sub(r->g,m,a->g);
-	r->XES=((sign32)1<<sb);
+	r->XES=((sign32)1<<sb)+1;  // +1 to cover case where a is zero ?
 
     if (r->XES>FEXCESS_YYY)
     {

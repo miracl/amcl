@@ -92,8 +92,9 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	inb=int(nb)
 	inbt=int(nbt)
 	sh=ib*(1+((8*inb-1)//ib))-inbt
-	if sh > 30 :
-		sh=30
+
+	if sh > 6 :
+		sh=6
 	replace(fnameh,"@SH@",str(sh))
 
 	fnameh="config_curve_"+tc+".h"	

@@ -443,7 +443,7 @@ func ECDH_ECPVP_DSA(sha int,W []byte,F []byte,C []byte,D []byte) int {
 	d:=FromBytes(D)
 	f:=FromBytes(B[:])
      
-	if (c.iszilch() || comp(c,r)>=0 || d.iszilch() || comp(d,r)>=0) {
+	if (c.iszilch() || Comp(c,r)>=0 || d.iszilch() || Comp(d,r)>=0) {
             res=INVALID;
 	}
 
@@ -467,7 +467,7 @@ func ECDH_ECPVP_DSA(sha int,W []byte,F []byte,C []byte,D []byte) int {
 				d=P.GetX()
 				d.Mod(r)
 
-				if comp(d,c)!=0 {res=INVALID}
+				if Comp(d,c)!=0 {res=INVALID}
 			}
 		}
 	}
@@ -509,6 +509,16 @@ func ECDH_ECIES_ENCRYPT(sha int,P1 []byte,P2 []byte,RNG *amcl.RAND,W []byte,M []
 	return C
 }
 
+/* constant time n-byte compare */
+func ncomp(T1 []byte,T2 []byte,n int) bool {
+	res:=0
+	for i:=0;i<n;i++ {
+		res|=int(T1[i]^T2[i])
+	}
+	if res==0 {return true}
+	return false;
+}
+
 /* IEEE1363 ECIES decryption. Decryption of ciphertext V,C,T using private key U outputs plaintext M */
 func ECDH_ECIES_DECRYPT(sha int,P1 []byte,P2 []byte,V []byte,C []byte,T []byte,U []byte) []byte { 
 	var Z [EFS]byte
@@ -541,11 +551,13 @@ func ECDH_ECIES_DECRYPT(sha int,P1 []byte,P2 []byte,V []byte,C []byte,T []byte,U
 	
 	HMAC(sha,AC,K2[:],TAG)
 
-	same:=true
-	for i:=0;i<len(T);i++ {
-		if T[i]!=TAG[i] {same=false}
-	}
-	if !same {return nil}
+	if !ncomp(T,TAG,len(T)) {return nil}
+	
+//	same:=true
+//	for i:=0;i<len(T);i++ {
+//		if T[i]!=TAG[i] {same=false}
+//	}
+//	if !same {return nil}
 	
 	return M
 }

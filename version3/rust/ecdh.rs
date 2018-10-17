@@ -296,7 +296,7 @@ pub fn cbc_iv0_decrypt(k: &[u8],c: &[u8]) -> Option<Vec<u8>> { /* padding is rem
 	}
     
 	if !bad { 
-		for _ in 0..16-padlen {
+		for i in 0..16-padlen {
 			m.push(buff[i]);
 			//m[opt]=buff[j]; opt+=1;
 		}
@@ -331,7 +331,7 @@ pub fn key_pair_generate(rng: Option<&mut RAND>,s: &mut [u8],w: &mut [u8]) -> is
 	//}
 	sc.tobytes(s);
 
-	let mut WP=G.mul(&mut sc);
+	let WP=G.mul(&mut sc);
 
 	WP.tobytes(w,false);   // To use point compression on public keys, change to true 
 
@@ -539,6 +539,16 @@ pub fn ecies_encrypt(sha: usize,p1: &[u8],p2: &[u8],rng: &mut RAND,w: &[u8],m: &
 	return Some(c);
 }
 
+/* constant time n-byte compare */
+fn ncomp(t1: &[u8],t2: &[u8],n: usize) -> bool {
+	let mut res=0;
+	for i in 0..n {
+		res|=(t1[i]^t2[i]) as isize;
+	}
+	if res==0 {return true;}
+	return false;
+}
+
 /* IEEE1363 ECIES decryption. Decryption of ciphertext V,C,T using private key U outputs plaintext M */
 #[allow(non_snake_case)]
 pub fn ecies_decrypt(sha: usize,p1: &[u8],p2: &[u8],v: &[u8],c: &mut Vec<u8>,t: &[u8],u: &[u8]) -> Option<Vec<u8>>  { 
@@ -581,11 +591,13 @@ pub fn ecies_decrypt(sha: usize,p1: &[u8],p2: &[u8],v: &[u8],c: &mut Vec<u8>,t: 
 
 	for _ in 0..p2l+8 {c.pop();}
 
-	let mut same=true;
-	for i in 0..t.len() {
-		if t[i]!=tag[i] {same=false}
-	}
-	if !same {return None}
+	if !ncomp(&t,&tag,t.len()) {return None}
+
+	//let mut same=true;
+	//for i in 0..t.len() {
+	//	if t[i]!=tag[i] {same=false}
+	//}
+	//if !same {return None}
 	
 	return m;
 }

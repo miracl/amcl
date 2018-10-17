@@ -30,7 +30,7 @@ import amcl
 
 /* Elliptic Curve API high-level functions  */
 
-final public class ECDH
+public struct ECDH
 {
     static let INVALID_PUBLIC_KEY:Int = -2
     static let ERROR:Int = -3
@@ -66,21 +66,21 @@ final public class ECDH
         var R=[UInt8]()
         if sha==SHA256
         {
-            let H=HASH256()
+            var H=HASH256()
             H.process_array(A); if n>0 {H.process_num(n)}
                 if B != nil {H.process_array(B!)}
             R=H.hash()
         }
         if sha==SHA384
         {
-            let H=HASH384()
+            var H=HASH384()
             H.process_array(A); if n>0 {H.process_num(n)}
             if B != nil {H.process_array(B!)}
             R=H.hash()
         }
         if sha==SHA512
         {
-            let H=HASH512()
+            var H=HASH512()
             H.process_array(A); if n>0 {H.process_num(n)}
             if B != nil {H.process_array(B!)}
             R=H.hash()
@@ -222,7 +222,7 @@ final public class ECDH
     { /* AES CBC encryption, with Null IV and key K */
     /* Input is from an octet string M, output is to an octet string C */
     /* Input is padded as necessary to make up a full final block */
-        let a=AES();
+        var a=AES();
         var buff=[UInt8](repeating: 0,count: 16)
         let clen=16+(M.count/16)*16;
     
@@ -264,7 +264,7 @@ final public class ECDH
     /* returns plaintext if all consistent, else returns null string */
     static public func AES_CBC_IV0_DECRYPT(_ K:[UInt8],_ C:[UInt8]) -> [UInt8]
     { /* padding is removed */
-        let a=AES();
+        var a=AES();
         
         var buff=[UInt8](repeating: 0,count: 16)
         var MM=[UInt8](repeating: 0,count: C.count)
@@ -321,7 +321,7 @@ final public class ECDH
     * and G is fixed generator.
     * If RNG is NULL then the private key is provided externally in S
     * otherwise it is generated randomly internally */
-    @discardableResult  static public func KEY_PAIR_GENERATE(_ RNG:RAND?,_ S:inout [UInt8],_ W:inout [UInt8]) -> Int
+    @discardableResult  static public func KEY_PAIR_GENERATE(_ RNG: inout RAND?,_ S:inout [UInt8],_ W:inout [UInt8]) -> Int
     {
         let res=0;
      //   var T=[UInt8](count:ECDH.EFS,repeatedValue:0)
@@ -339,7 +339,7 @@ final public class ECDH
         }
         else
         {
-            s=BIG.randomnum(r,RNG!)
+            s=BIG.randomnum(r,&RNG!)
     
          //   s.toBytes(&T)
          //   for i in 0 ..< EGS {S[i]=T[i]}
@@ -373,7 +373,7 @@ final public class ECDH
 
             let q=BIG(ROM.Modulus)
             let nb=UInt(q.nbits())
-            let k=BIG(1); k.shl((nb+4)/2)
+            var k=BIG(1); k.shl((nb+4)/2)
             k.add(q)
             k.div(r)
 
@@ -394,7 +394,7 @@ final public class ECDH
         var res=0
         var T=[UInt8](repeating: 0,count: ECDH.EFS)
     
-        let s=BIG.fromBytes(S)
+        var s=BIG.fromBytes(S)
     
         var W=ECP.fromBytes(WD)
         if W.is_infinity() {res=ECDH.ERROR}
@@ -415,7 +415,7 @@ final public class ECDH
         return res;
     }
     /* IEEE ECDSA Signature, C and D are signature on F using private key S */
-    static public func ECPSP_DSA(_ sha:Int,_ RNG:RAND,_ S:[UInt8],_ F:[UInt8],_ C:inout [UInt8],_ D:inout [UInt8]) -> Int
+    static public func ECPSP_DSA(_ sha:Int,_ RNG: inout RAND,_ S:[UInt8],_ F:[UInt8],_ C:inout [UInt8],_ D:inout [UInt8]) -> Int
     {
         var T=[UInt8](repeating: 0,count: ECDH.EFS)
         let B=hashit(sha,F,0,nil,Int(BIG.MODBYTES))
@@ -426,13 +426,13 @@ final public class ECDH
         let s=BIG.fromBytes(S)
         let f=BIG.fromBytes(B)
     
-        let c=BIG(0)
-        let d=BIG(0)
+        var c=BIG(0)
+        var d=BIG(0)
         var V=ECP()
     
         repeat {
-            let u=BIG.randomnum(r,RNG);
-            let w=BIG.randomnum(r,RNG);  /* side channel masking */
+            var u=BIG.randomnum(r,&RNG);
+            let w=BIG.randomnum(r,&RNG);  /* side channel masking */
   	    //if ROM.AES_S>0
 	    //{
 		//u.mod2m(2*ROM.AES_S)
@@ -469,7 +469,7 @@ final public class ECDH
     
         let c=BIG.fromBytes(C)
         var d=BIG.fromBytes(D)
-        let f=BIG.fromBytes(B)
+        var f=BIG.fromBytes(B)
     
         if c.iszilch() || BIG.comp(c,r)>=0 || d.iszilch() || BIG.comp(d,r)>=0
             {res=ECDH.INVALID}
@@ -501,15 +501,16 @@ final public class ECDH
     }
     
     /* IEEE1363 ECIES encryption. Encryption of plaintext M uses public key W and produces ciphertext V,C,T */
-    static public func ECIES_ENCRYPT(_ sha:Int,_ P1:[UInt8],_ P2:[UInt8],_ RNG:RAND,_ W:[UInt8],_ M:[UInt8],_ V:inout [UInt8],_ T:inout [UInt8]) -> [UInt8]
+    static public func ECIES_ENCRYPT(_ sha:Int,_ P1:[UInt8],_ P2:[UInt8],_ RNG: inout RAND?,_ W:[UInt8],_ M:[UInt8],_ V:inout [UInt8],_ T:inout [UInt8]) -> [UInt8]
     {
         var Z=[UInt8](repeating: 0,count: ECDH.EFS)
         var VZ=[UInt8](repeating: 0,count: 3*ECDH.EFS+1)
         var K1=[UInt8](repeating: 0,count: ECP.AESKEY)
         var K2=[UInt8](repeating: 0,count: ECP.AESKEY)
         var U=[UInt8](repeating: 0,count: ECDH.EGS)
-    
-        if ECDH.KEY_PAIR_GENERATE(RNG,&U,&V) != 0 {return [UInt8]()}
+
+
+        if ECDH.KEY_PAIR_GENERATE(&RNG,&U,&V) != 0 {return [UInt8]()}
         if ECDH.ECPSVDP_DH(U,W,&Z) != 0 {return [UInt8]()}
     
         for i in 0 ..< 2*ECDH.EFS+1 {VZ[i]=V[i]}
@@ -533,6 +534,16 @@ final public class ECDH
         ECDH.HMAC(sha,AC,K2,&T)
     
         return C
+    }
+
+/* constant time n-byte compare */
+    static func ncomp(_ T1:[UInt8],_ T2:[UInt8],_ n:Int) -> Bool {
+	var res=0
+	for i in 0 ..< n {
+		res|=Int(T1[i]^T2[i])
+	}
+	if res==0 {return true}
+	return false
     }
 
     /* IEEE1363 ECIES decryption. Decryption of ciphertext V,C,T using private key U outputs plaintext M */
@@ -568,12 +579,14 @@ final public class ECDH
     
         ECDH.HMAC(sha,AC,K2,&TAG)
     
-        var same=true
-        for i in 0 ..< T.count
-        {
-            if T[i] != TAG[i] {same=false}
-        }
-        if !same {return [UInt8]()}
+	if !ncomp(T,TAG,T.count) {return [UInt8]()}	
+
+ //       var same=true
+ //       for i in 0 ..< T.count
+ //       {
+ //           if T[i] != TAG[i] {same=false}
+ //       }
+ //       if !same {return [UInt8]()}
     
         return M;
     

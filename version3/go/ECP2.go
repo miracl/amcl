@@ -133,13 +133,15 @@ func (E *ECP2) Affine() {
 
 /* extract affine x as FP2 */
 func (E *ECP2) GetX() *FP2 {
-	E.Affine()
-	return E.x
+	W:=NewECP2(); W.Copy(E)
+	W.Affine()
+	return W.x
 }
 /* extract affine y as FP2 */
 func (E *ECP2) GetY() *FP2 {
-	E.Affine();
-	return E.y;
+	W:=NewECP2(); W.Copy(E)
+	W.Affine()
+	return W.y;
 }
 /* extract projective x */
 func (E *ECP2) getx() *FP2 {
@@ -159,15 +161,17 @@ func (E *ECP2) ToBytes(b []byte) {
 	var t [int(MODBYTES)]byte
 	MB:=int(MODBYTES)
 
-	E.Affine()
-	E.x.GetA().ToBytes(t[:])
+	W:=NewECP2(); W.Copy(E);
+	W.Affine()
+
+	W.x.GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i]=t[i]}
-	E.x.GetB().ToBytes(t[:])
+	W.x.GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ { b[i+MB]=t[i]}
 
-	E.y.GetA().ToBytes(t[:])
+	W.y.GetA().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+2*MB]=t[i]}
-	E.y.GetB().ToBytes(t[:])
+	W.y.GetB().ToBytes(t[:])
 	for i:=0;i<MB;i++ {b[i+3*MB]=t[i]}
 }
 
@@ -192,15 +196,16 @@ func ECP2_fromBytes(b []byte) *ECP2 {
 }
 
 /* convert this to hex string */
-func (E *ECP2) toString() string {
-	if E.Is_infinity() {return "infinity"}
-	E.Affine()
-	return "("+E.x.toString()+","+E.y.toString()+")"
+func (E *ECP2) ToString() string {
+	W:=NewECP2(); W.Copy(E);
+	W.Affine()
+	if W.Is_infinity() {return "infinity"}
+	return "("+W.x.toString()+","+W.y.toString()+")"
 }
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 func RHS2(x *FP2) *FP2 {
-	x.norm()
+	//x.norm()
 	r:=NewFP2copy(x)
 	r.sqr()
 	b:=NewFP2big(NewBIGints(CURVE_B))
@@ -226,6 +231,7 @@ func NewECP2fp2s(ix *FP2,iy *FP2) *ECP2 {
 	E.x=NewFP2copy(ix)
 	E.y=NewFP2copy(iy)
 	E.z=NewFP2int(1)
+	E.x.norm()
 	rhs:=RHS2(E.x)
 	y2:=NewFP2copy(E.y)
 	y2.sqr()
@@ -241,6 +247,7 @@ func NewECP2fp2(ix *FP2) *ECP2 {
 	E.x=NewFP2copy(ix)
 	E.y=NewFP2int(1)
 	E.z=NewFP2int(1)
+	E.x.norm()
 	rhs:=RHS2(E.x)
 	if rhs.sqrt() {
 			E.y.copy(rhs)
@@ -354,7 +361,7 @@ func (E *ECP2) Add(Q *ECP2) int {
 	t0.add(x3); t0.norm()
 	t2.imul(b) 	
 	if SEXTIC_TWIST == M_TYPE {
-		t2.mul_ip()
+		t2.mul_ip(); t2.norm()
 	}
 	z3:=NewFP2copy(t1); z3.add(t2); z3.norm()
 	t1.sub(t2); t1.norm()
@@ -376,9 +383,10 @@ func (E *ECP2) Add(Q *ECP2) int {
 
 /* set this-=Q */
 func (E *ECP2) Sub(Q *ECP2) int {
-	Q.neg()
-	D:=E.Add(Q)
-	Q.neg()
+	NQ:=NewECP2(); NQ.Copy(Q)
+	NQ.neg()
+	D:=E.Add(NQ)
+	//Q.neg()
 	return D
 }
 /* set this*=q, where q is Modulus, using Frobenius */
@@ -409,7 +417,7 @@ func (E *ECP2) mul(e *BIG) *ECP2 {
 	var W []*ECP2
 	var w [1+(NLEN*int(BASEBITS)+3)/4]int8
 
-	E.Affine()
+	//E.Affine()
 
 /* precompute table */
 	Q.Copy(E)
@@ -476,7 +484,7 @@ func mul4(Q []*ECP2,u []*BIG) *ECP2 {
 
 	for i:=0;i<4;i++ {
 		t=append(t,NewBIGcopy(u[i]));
-		Q[i].Affine();
+		//Q[i].Affine();
 	}
 
 	T=append(T,NewECP2()); T[0].Copy(Q[0])	// Q[0]

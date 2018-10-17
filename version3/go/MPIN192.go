@@ -481,7 +481,7 @@ func MPIN_SERVER_2(date int,HID []byte,HTID []byte,Y []byte,SST []byte,xID []byt
 
 	P=G1mul(P,y)
 	P.Add(R)
-	P.Affine()
+	//P.Affine()
 	R=ECP_fromBytes(mSEC)
 	if R.Is_infinity() {return INVALID_POINT}
 
@@ -501,7 +501,7 @@ func MPIN_SERVER_2(date int,HID []byte,HTID []byte,Y []byte,SST []byte,xID []byt
 
 				P=G1mul(P,y)
 				P.Add(R)
-				P.Affine()
+				//P.Affine()
 			}
 			g=Ate(Q,P)
 			g=Fexp(g)
@@ -687,7 +687,7 @@ func MPIN_SERVER_KEY(sha int,Z []byte,SST []byte,W []byte,H []byte,HID []byte,xI
 	h:=FromBytes(H)
 	A=G1mul(A,h)	// new
 	R.Add(A)
-	R.Affine()
+	//R.Affine()
 
 	U=G1mul(U,w)
 	g:=Ate(sQ,R)

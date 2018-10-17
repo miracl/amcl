@@ -88,8 +88,8 @@ impl FP12 {
 	}	
 
 /* test self=0 ? */
-	pub fn iszilch(&mut self) -> bool {
-		self.reduce();
+	pub fn iszilch(&self) -> bool {
+		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch() && self.c.iszilch();
 	}	
 
@@ -130,14 +130,14 @@ impl FP12 {
 
 
 /* test self=1 ? */
-	pub fn isunity(&mut self) -> bool {
-		let mut one=FP4::new_int(1);
-		return self.a.equals(&mut one) && self.b.iszilch() && self.c.iszilch();
+	pub fn isunity(&self) -> bool {
+		let one=FP4::new_int(1);
+		return self.a.equals(&one) && self.b.iszilch() && self.c.iszilch();
 	}
 
 /* test self=x */
-	pub fn equals(&mut self,x:&mut FP12) -> bool {
-		return self.a.equals(&mut x.a) && self.b.equals(&mut x.b) && self.c.equals(&mut x.c);
+	pub fn equals(&self,x:&FP12) -> bool {
+		return self.a.equals(&x.a) && self.b.equals(&x.b) && self.c.equals(&x.c);
 	}
 
 	pub fn geta(&mut self) -> FP4 {

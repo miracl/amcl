@@ -273,9 +273,12 @@ int ZZZ::ECP_set(ECP *P,BIG x)
 /* Extract x coordinate as BIG */
 int ZZZ::ECP_get(BIG x,ECP *P)
 {
-    if (ECP_isinf(P)) return -1;
-    ECP_affine(P);
-    FP_redc(x,&(P->x));
+	ECP W;
+	ECP_copy(&W,P);
+	ECP_affine(W);
+    if (ECP_isinf(&W)) return -1;
+    //ECP_affine(P);
+    FP_redc(x,&(W.x));
     return 0;
 }
 
@@ -286,15 +289,15 @@ int ZZZ::ECP_get(BIG x,ECP *P)
 int ZZZ::ECP_get(BIG x,BIG y,ECP *P)
 {
     int s;
+	ECP W;
+	ECP_copy(&W,P);
+	ECP_affine(&W);
+    if (ECP_isinf(&W)) return -1;
 
-    if (ECP_isinf(P)) return -1;
-
-    ECP_affine(P);
-
-    FP_redc(y,&(P->y));
+    FP_redc(y,&(W.y));
     s=BIG_parity(y);
 
-    FP_redc(x,&(P->x));
+    FP_redc(x,&(W.x));
 
     return s;
 }
@@ -1098,9 +1101,12 @@ void ZZZ::ECP_add(ECP *P,ECP *Q)
 /* SU=16 */
 void  ZZZ::ECP_sub(ECP *P,ECP *Q)
 {
-    ECP_neg(Q);
-    ECP_add(P,Q);
-    ECP_neg(Q);
+	ECP NQ;
+	ECP_copy(&NQ,Q);
+	ECP_neg(&NQ);
+    //ECP_neg(Q);
+    ECP_add(P,&NQ);
+    //ECP_neg(Q);
 }
 
 #endif
@@ -1145,7 +1151,7 @@ void ZZZ::ECP_mul(ECP *P,BIG e)
         ECP_inf(P);
         return;
     }
-    ECP_affine(P);
+    //ECP_affine(P);
 
     ECP_copy(&R0,P);
     ECP_copy(&R1,P);
@@ -1182,7 +1188,7 @@ void ZZZ::ECP_mul(ECP *P,BIG e)
         return;
     }
 
-    ECP_affine(P);
+    //ECP_affine(P);
 
     /* precompute table */
 
@@ -1251,8 +1257,8 @@ void ZZZ::ECP_mul2(ECP *P,ECP *Q,BIG e,BIG f)
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+1)/2];
     int i,a,b,s,ns,nb;
 
-    ECP_affine(P);
-    ECP_affine(Q);
+    //ECP_affine(P);
+    //ECP_affine(Q);
 
     BIG_copy(te,e);
     BIG_copy(tf,f);
@@ -1345,7 +1351,7 @@ void ZZZ::ECP_cfp(ECP *P)
 	{
 		ECP_dbl(P);
 		ECP_dbl(P);
-		ECP_affine(P);
+		//ECP_affine(P);
 		return;
 	}
 	if (cf==8)
@@ -1353,7 +1359,7 @@ void ZZZ::ECP_cfp(ECP *P)
 		ECP_dbl(P);
 		ECP_dbl(P);
 		ECP_dbl(P);
-		ECP_affine(P);
+		//ECP_affine(P);
 		return;
 	}
 	BIG_rcopy(c,CURVE_Cof);

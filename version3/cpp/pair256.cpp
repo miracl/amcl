@@ -148,12 +148,13 @@ static void ZZZ::PAIR_line(FP48 *v,ECP8 *A,ECP8 *B,FP *Qx,FP *Qy)
 }
 
 /* Optimal R-ate pairing r=e(P,Q) */
-void ZZZ::PAIR_ate(FP48 *r,ECP8 *P,ECP *Q)
+void ZZZ::PAIR_ate(FP48 *r,ECP8 *P1,ECP *Q1)
 {
     BIG x,n,n3;
 	FP Qx,Qy;
     int i,j,nb,bt;
-    ECP8 A,NP;
+    ECP8 A,NP,P;
+	ECP Q;
     FP48 lv;
 
     BIG_rcopy(x,CURVE_Bnx);
@@ -164,12 +165,19 @@ void ZZZ::PAIR_ate(FP48 *r,ECP8 *P,ECP *Q)
 	BIG_pmul(n3,n,3);
 	BIG_norm(n3);
 
-    FP_copy(&Qx,&(Q->x));
-    FP_copy(&Qy,&(Q->y));
+	ECP8_copy(&P,P1);
+	ECP_copy(&Q,Q1);
 
-    ECP8_copy(&A,P);
+	ECP8_affine(&P);
+	ECP_affine(&Q);
 
-	ECP8_copy(&NP,P); ECP8_neg(&NP);
+
+    FP_copy(&Qx,&(Q.x));
+    FP_copy(&Qy,&(Q.y));
+
+    ECP8_copy(&A,&P);
+
+	ECP8_copy(&NP,&P); ECP8_neg(&NP);
 
     FP48_one(r);
     nb=BIG_nbits(n3);  // n3
@@ -188,7 +196,7 @@ void ZZZ::PAIR_ate(FP48 *r,ECP8 *P,ECP *Q)
         if (bt==1)
         {
 //printf("bt=1\n");
-            PAIR_line(&lv,&A,P,&Qx,&Qy);
+            PAIR_line(&lv,&A,&P,&Qx,&Qy);
             FP48_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
 		if (bt==-1)
@@ -209,12 +217,13 @@ void ZZZ::PAIR_ate(FP48 *r,ECP8 *P,ECP *Q)
 }
 
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-void ZZZ::PAIR_double_ate(FP48 *r,ECP8 *P,ECP *Q,ECP8 *R,ECP *S)
+void ZZZ::PAIR_double_ate(FP48 *r,ECP8 *P1,ECP *Q1,ECP8 *R1,ECP *S1)
 {
     BIG x,n,n3;
 	FP Qx,Qy,Sx,Sy;
     int i,nb,bt;
-    ECP8 A,B,NP,NR;
+    ECP8 A,B,NP,NR,P,R;
+	ECP Q,S;
     FP48 lv;
 
     BIG_rcopy(x,CURVE_Bnx);
@@ -224,17 +233,30 @@ void ZZZ::PAIR_double_ate(FP48 *r,ECP8 *P,ECP *Q,ECP8 *R,ECP *S)
 	BIG_pmul(n3,n,3);
 	BIG_norm(n3);
 
-    FP_copy(&Qx,&(Q->x));
-    FP_copy(&Qy,&(Q->y));
+	ECP8_copy(&P,P1);
+	ECP_copy(&Q,Q1);
 
-    FP_copy(&Sx,&(S->x));
-    FP_copy(&Sy,&(S->y));
+	ECP8_affine(&P);
+	ECP_affine(&Q);
 
-    ECP8_copy(&A,P);
-    ECP8_copy(&B,R);
+	ECP8_copy(&R,R1);
+	ECP_copy(&S,S1);
 
-	ECP8_copy(&NP,P); ECP8_neg(&NP);
-	ECP8_copy(&NR,R); ECP8_neg(&NR);
+	ECP8_affine(&R);
+	ECP_affine(&S);
+
+
+    FP_copy(&Qx,&(Q.x));
+    FP_copy(&Qy,&(Q.y));
+
+    FP_copy(&Sx,&(S.x));
+    FP_copy(&Sy,&(S.y));
+
+    ECP8_copy(&A,&P);
+    ECP8_copy(&B,&R);
+
+	ECP8_copy(&NP,&P); ECP8_neg(&NP);
+	ECP8_copy(&NR,&R); ECP8_neg(&NR);
 
 
     FP48_one(r);
@@ -253,10 +275,10 @@ void ZZZ::PAIR_double_ate(FP48 *r,ECP8 *P,ECP *Q,ECP8 *R,ECP *S)
 		bt=BIG_bit(n3,i)-BIG_bit(n,i); // bt=BIG_bit(n,i);
         if (bt==1)
         {
-            PAIR_line(&lv,&A,P,&Qx,&Qy);
+            PAIR_line(&lv,&A,&P,&Qx,&Qy);
             FP48_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
-            PAIR_line(&lv,&B,R,&Sx,&Sy);
+            PAIR_line(&lv,&B,&R,&Sx,&Sy);
             FP48_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
 		if (bt==-1)
@@ -564,8 +586,8 @@ void ZZZ::PAIR_G1mul(ECP *P,BIG e)
     BIG_rcopy(q,CURVE_Order);
     glv(u,e);
 
-    ECP_affine(P);
-    ECP_copy(&Q,P);
+    //ECP_affine(P);
+    ECP_copy(&Q,P); ECP_affine(&Q);
     FP_rcopy(&cru,CURVE_Cru);
     FP_mul(&(Q.x),&(Q.x),&cru);
 
@@ -611,7 +633,7 @@ void ZZZ::PAIR_G2mul(ECP8 *P,BIG e)
     BIG_rcopy(y,CURVE_Order);
     gs(u,e);
 
-    ECP8_affine(P);
+    //ECP8_affine(P);
 
     ECP8_copy(&Q[0],P);
     for (i=1; i<16; i++)
@@ -630,7 +652,8 @@ void ZZZ::PAIR_G2mul(ECP8 *P,BIG e)
             BIG_copy(u[i],x);
             ECP8_neg(&Q[i]);
         }
-        BIG_norm(u[i]);            
+        BIG_norm(u[i]);   
+		//ECP8_affine(&Q[i]);
     }
 
     ECP8_mul16(P,Q,u);

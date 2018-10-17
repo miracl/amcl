@@ -173,7 +173,7 @@ func (F *FF) lastbits(m int) int {
 /* compare x and y - must be normalised, and of same length */
 func ff_comp(a *FF,b *FF) int {
 	for i:=a.length-1;i>=0;i-- {
-		j:=comp(a.v[i],b.v[i])
+		j:=Comp(a.v[i],b.v[i])
 		if j!=0 {return j}
 	}
 	return 0
@@ -292,7 +292,7 @@ func (F *FF) toString() string {
 	F.norm()
 	s:=""
 	for i:=F.length-1;i>=0;i-- {
-		s+=F.v[i].toString()
+		s+=F.v[i].ToString()
 	}
 	return s
 }

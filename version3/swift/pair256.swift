@@ -26,119 +26,127 @@
 
 /* AMCL BLS Curve Pairing functions */
 
-final public class PAIR256 {
+public struct PAIR256 {
     
     // Line function
-    static func line(_ A:ECP8,_ B:ECP8,_ Qx:FP,_ Qy:FP) -> FP48
+    static func linedbl(_ A: inout ECP8,_ Qx:FP,_ Qy:FP) -> FP48
     {
         var a:FP16
         var b:FP16
         var c:FP16
 
-        if A===B
-        { /* Doubling */
-
-            let XX=FP8(A.getx())  //X
-            let YY=FP8(A.gety())  //Y
-            let ZZ=FP8(A.getz())  //Z
-            let YZ=FP8(YY)        //Y 
-            YZ.mul(ZZ)                //YZ
-            XX.sqr()                  //X^2
-            YY.sqr()                  //Y^2
-            ZZ.sqr()                  //Z^2
+        var XX=FP8(A.getx())  //X
+        var YY=FP8(A.gety())  //Y
+        var ZZ=FP8(A.getz())  //Z
+        var YZ=FP8(YY)        //Y 
+        YZ.mul(ZZ)                //YZ
+        XX.sqr()                  //X^2
+        YY.sqr()                  //Y^2
+        ZZ.sqr()                  //Z^2
             
-            YZ.imul(4)
-            YZ.neg(); YZ.norm()       //-2YZ
-            YZ.tmul(Qy)               //-2YZ.Ys
+        YZ.imul(4)
+        YZ.neg(); YZ.norm()       //-2YZ
+        YZ.tmul(Qy)               //-2YZ.Ys
 
-            XX.imul(6)               //3X^2
-            XX.tmul(Qx)              //3X^2.Xs
+        XX.imul(6)               //3X^2
+        XX.tmul(Qx)              //3X^2.Xs
 
-            let sb=3*ROM.CURVE_B_I
-            ZZ.imul(sb)  
-            if ECP.SEXTIC_TWIST == ECP.D_TYPE {             
-                ZZ.div_2i();  
-            }
-            if ECP.SEXTIC_TWIST == ECP.M_TYPE {
-                ZZ.times_i()
-                ZZ.add(ZZ)
-                YZ.times_i()
-            }              
-            ZZ.norm() // 3b.Z^2 
-
-            YY.add(YY)
-            ZZ.sub(YY); ZZ.norm()     // 3b.Z^2-Y^2
-
-            a=FP16(YZ,ZZ)          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
-            if ECP.SEXTIC_TWIST == ECP.D_TYPE {             
-                b=FP16(XX)            // L(0,1) | L(0,0) | L(1,0)
-                c=FP16(0)
-            } else { 
-                b=FP16(0)
-                c=FP16(XX); c.times_i()
-            }        
-            A.dbl()
+        let sb=3*ROM.CURVE_B_I
+        ZZ.imul(sb)  
+        if ECP.SEXTIC_TWIST == ECP.D_TYPE {             
+            ZZ.div_2i();  
         }
-        else
-        { // Addition
-            let X1=FP8(A.getx())    // X1
-            let Y1=FP8(A.gety())    // Y1
-            let T1=FP8(A.getz())    // Z1
-            let T2=FP8(A.getz())    // Z1
-            
-            T1.mul(B.gety())    // T1=Z1.Y2 
-            T2.mul(B.getx())    // T2=Z1.X2
+        if ECP.SEXTIC_TWIST == ECP.M_TYPE {
+            ZZ.times_i()
+            ZZ.add(ZZ)
+            YZ.times_i()
+        }              
+        ZZ.norm() // 3b.Z^2 
 
-            X1.sub(T2); X1.norm()  // X1=X1-Z1.X2
-            Y1.sub(T1); Y1.norm()  // Y1=Y1-Z1.Y2
+        YY.add(YY)
+        ZZ.sub(YY); ZZ.norm()     // 3b.Z^2-Y^2
 
-            T1.copy(X1)            // T1=X1-Z1.X2
-            X1.tmul(Qy)            // X1=(X1-Z1.X2).Ys
-            if ECP.SEXTIC_TWIST == ECP.M_TYPE {
-                X1.times_i()
-            }              
-            T1.mul(B.gety())       // T1=(X1-Z1.X2).Y2
+        a=FP16(YZ,ZZ)          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
+        if ECP.SEXTIC_TWIST == ECP.D_TYPE {             
+            b=FP16(XX)            // L(0,1) | L(0,0) | L(1,0)
+            c=FP16(0)
+        } else { 
+            b=FP16(0)
+            c=FP16(XX); c.times_i()
+        }        
+        A.dbl()
 
-            T2.copy(Y1)            // T2=Y1-Z1.Y2
-            T2.mul(B.getx())       // T2=(Y1-Z1.Y2).X2
-            T2.sub(T1); T2.norm()          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
-            Y1.tmul(Qx);  Y1.neg(); Y1.norm() // Y1=-(Y1-Z1.Y2).Xs
-
-            a=FP16(X1,T2)       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
-            if ECP.SEXTIC_TWIST == ECP.D_TYPE {              
-                b=FP16(Y1)
-                c=FP16(0)
-            } else {
-                b=FP16(0)
-                c=FP16(Y1); c.times_i()
-            }  
-            A.add(B)
-        }
         return FP48(a,b,c)
     }
 
+    static func lineadd(_ A: inout ECP8,_ B:ECP8,_ Qx:FP,_ Qy:FP) -> FP48
+    {
+        var a:FP16
+        var b:FP16
+        var c:FP16
+
+        var X1=FP8(A.getx())    // X1
+        var Y1=FP8(A.gety())    // Y1
+        var T1=FP8(A.getz())    // Z1
+        var T2=FP8(A.getz())    // Z1
+            
+        T1.mul(B.gety())    // T1=Z1.Y2 
+        T2.mul(B.getx())    // T2=Z1.X2
+
+        X1.sub(T2); X1.norm()  // X1=X1-Z1.X2
+        Y1.sub(T1); Y1.norm()  // Y1=Y1-Z1.Y2
+
+        T1.copy(X1)            // T1=X1-Z1.X2
+        X1.tmul(Qy)            // X1=(X1-Z1.X2).Ys
+        if ECP.SEXTIC_TWIST == ECP.M_TYPE {
+            X1.times_i()
+        }              
+        T1.mul(B.gety())       // T1=(X1-Z1.X2).Y2
+
+        T2.copy(Y1)            // T2=Y1-Z1.Y2
+        T2.mul(B.getx())       // T2=(Y1-Z1.Y2).X2
+        T2.sub(T1); T2.norm()          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
+        Y1.tmul(Qx);  Y1.neg(); Y1.norm() // Y1=-(Y1-Z1.Y2).Xs
+
+        a=FP16(X1,T2)       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
+        if ECP.SEXTIC_TWIST == ECP.D_TYPE {              
+            b=FP16(Y1)
+            c=FP16(0)
+        } else {
+            b=FP16(0)
+            c=FP16(Y1); c.times_i()
+        }  
+        A.add(B)
+
+        return FP48(a,b,c)
+    }
+
+
     // Optimal R-ate pairing
-    static public func ate(_ P:ECP8,_ Q:ECP) -> FP48
+    static public func ate(_ P1:ECP8,_ Q1:ECP) -> FP48
     {
         let x=BIG(ROM.CURVE_Bnx)
         let n=BIG(x)
         
         var lv:FP48
 
-        let n3=BIG(n)
+        var n3=BIG(n)
         n3.pmul(3)
         n3.norm()
+
+        var P=ECP8(); P.copy(P1); P.affine()
+        var Q=ECP(); Q.copy(Q1); Q.affine()
 
         let Qx=FP(Q.getx())
         let Qy=FP(Q.gety())
     
-        let A=ECP8()
-        let r=FP48(1)
+        var A=ECP8()
+        var r=FP48(1)
     
         A.copy(P)
-	let NP=ECP8()
-	NP.copy(P)
-	NP.neg()
+        var NP=ECP8()
+        NP.copy(P)
+        NP.neg()
 
         let nb=n3.nbits()
     
@@ -146,16 +154,16 @@ final public class PAIR256 {
         //for var i=nb-2;i>=1;i--
         {
             r.sqr()            
-            lv=line(A,A,Qx,Qy)
+            lv=linedbl(&A,Qx,Qy)
             r.smul(lv,ECP.SEXTIC_TWIST)
             let bt=n3.bit(UInt(i))-n.bit(UInt(i))
             if bt == 1 {
-              lv=line(A,P,Qx,Qy)
+              lv=lineadd(&A,P,Qx,Qy)
               r.smul(lv,ECP.SEXTIC_TWIST)
             }
             if bt == -1 {
                 //P.neg()
-                lv=line(A,NP,Qx,Qy)
+                lv=lineadd(&A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
                 //P.neg()
             }
@@ -169,60 +177,65 @@ final public class PAIR256 {
     }    
 
     // Optimal R-ate double pairing e(P,Q).e(R,S)
-    static public func ate2(_ P:ECP8,_ Q:ECP,_ R:ECP8,_ S:ECP) -> FP48
+    static public func ate2(_ P1:ECP8,_ Q1:ECP,_ R1:ECP8,_ S1:ECP) -> FP48
     {
         let x=BIG(ROM.CURVE_Bnx)
         let n=BIG(x)
         var lv:FP48
 
-        let n3=BIG(n)
+        var n3=BIG(n)
         n3.pmul(3)
         n3.norm()
     
+        var P=ECP8(); P.copy(P1); P.affine()
+        var Q=ECP(); Q.copy(Q1); Q.affine()
+        var R=ECP8(); R.copy(R1); R.affine()
+        var S=ECP(); S.copy(S1); S.affine()
+
+
         let Qx=FP(Q.getx())
         let Qy=FP(Q.gety())
         let Sx=FP(S.getx())
         let Sy=FP(S.gety())
     
-        let A=ECP8()
-        let B=ECP8()
-        let r=FP48(1)
+        var A=ECP8()
+        var B=ECP8()
+        var r=FP48(1)
     
         A.copy(P)
         B.copy(R)
-	let NP=ECP8()
-	NP.copy(P)
-	NP.neg()
-	let NR=ECP8()
-	NR.copy(R)
-	NR.neg()
-
+        var NP=ECP8()
+        NP.copy(P)
+        NP.neg()
+        var NR=ECP8()
+        NR.copy(R)
+        NR.neg()
 
         let nb=n3.nbits()
     
         for i in (1...nb-2).reversed()
         {
             r.sqr()            
-            lv=line(A,A,Qx,Qy)
+            lv=linedbl(&A,Qx,Qy)
             r.smul(lv,ECP.SEXTIC_TWIST)
-            lv=line(B,B,Sx,Sy)
+            lv=linedbl(&B,Sx,Sy)
             r.smul(lv,ECP.SEXTIC_TWIST)
             let bt=n3.bit(UInt(i))-n.bit(UInt(i))
 
             if bt == 1 {
-                lv=line(A,P,Qx,Qy)
+                lv=lineadd(&A,P,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-                lv=line(B,R,Sx,Sy)
+                lv=lineadd(&B,R,Sx,Sy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
             }
 
             if bt == -1 {
                 //P.neg(); 
-                lv=line(A,NP,Qx,Qy)
+                lv=lineadd(&A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
                 //P.neg(); 
                 //R.neg()
-                lv=line(B,NR,Sx,Sy)
+                lv=lineadd(&B,NR,Sx,Sy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
                 //R.neg()                
             }            
@@ -240,11 +253,11 @@ final public class PAIR256 {
     static public func fexp(_ m:FP48) -> FP48
     {
         let f=FP2(BIG(ROM.Fra),BIG(ROM.Frb));
-        let x=BIG(ROM.CURVE_Bnx)
-        let r=FP48(m)
+        var x=BIG(ROM.CURVE_Bnx)
+        var r=FP48(m)
     
     // Easy part of final exp
-        let lv=FP48(r)
+        var lv=FP48(r)
         lv.inverse()
         r.conj()
     
@@ -255,18 +268,18 @@ final public class PAIR256 {
         
     // Hard part of final exp
 
-        let t7=FP48(r); t7.usqr()
-        let t1=t7.pow(x)
+        var t7=FP48(r); t7.usqr()
+        var t1=t7.pow(x)
 
         x.fshr(1)
-        let t2=t1.pow(x)
+        var t2=t1.pow(x)
         x.fshl(1)
 
         if ECP.SIGN_OF_X==ECP.NEGATIVEX {
             t1.conj()
         }
 
-        let t3=FP48(t1); t3.conj()
+        var t3=FP48(t1); t3.conj()
         t2.mul(t3)
         t2.mul(r)
 
@@ -403,8 +416,8 @@ final public class PAIR256 {
     {
         var u=[BIG]();
         let q=BIG(ROM.CURVE_Order)
-        let x=BIG(ROM.CURVE_Bnx)
-        let x2=BIG.smul(x,x)
+        var x=BIG(ROM.CURVE_Bnx)
+        var x2=BIG.smul(x,x)
         x.copy(BIG.smul(x2,x2))
         x2.copy(BIG.smul(x,x))
         u.append(BIG(e))
@@ -422,7 +435,7 @@ final public class PAIR256 {
         var u=[BIG]();
         let q=BIG(ROM.CURVE_Order)        
         let x=BIG(ROM.CURVE_Bnx)
-        let w=BIG(e)
+        var w=BIG(e)
         for i in 0 ..< 15
         {
             u.append(BIG(w))
@@ -450,16 +463,16 @@ final public class PAIR256 {
         var R:ECP
         if (ROM.USE_GLV)
         {
-            P.affine()
+            //P.affine()
             R=ECP()
             R.copy(P)
-            let Q=ECP()
-            Q.copy(P)
+            var Q=ECP()
+            Q.copy(P); Q.affine()
             let q=BIG(ROM.CURVE_Order)
             let cru=FP(BIG(ROM.CURVE_Cru))
-            let t=BIG(0)
+            var t=BIG(0)
             var u=PAIR256.glv(e)
-            Q.getx().mul(cru);
+            Q.mulx(cru);            
     
             var np=u[0].nbits()
             t.copy(BIG.modneg(u[0],q))
@@ -500,8 +513,8 @@ final public class PAIR256 {
             let q=BIG(ROM.CURVE_Order);
             var u=PAIR256.gs(e);
     
-            let t=BIG(0)
-            P.affine()
+            var t=BIG(0)
+            //P.affine()
             Q.append(ECP8())
             Q[0].copy(P);
             for i in 1 ..< 16
@@ -541,7 +554,7 @@ final public class PAIR256 {
             var g=[FP48]()
             let f=FP2(BIG(ROM.Fra),BIG(ROM.Frb))
             let q=BIG(ROM.CURVE_Order)
-            let t=BIG(0)
+            var t=BIG(0)
         
             var u=gs(e)
             g.append(FP48(0))

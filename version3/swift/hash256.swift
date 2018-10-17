@@ -25,7 +25,7 @@
 //  SHA256 Implementation
 //
 
-final public class HASH256{
+public struct HASH256{
 
     private var length=[UInt32](repeating: 0,count: 2)
     private var h=[UInt32](repeating: 0,count: 8)
@@ -92,7 +92,7 @@ final public class HASH256{
         return (S(17,x)^S(19,x)^R(10,x))
     }
  
-    private func transform()
+    private mutating func transform()
     { /* basic transformation step */
         var a,b,c,d,e,f,g,hh,t1,t2 :UInt32
         for j in 16 ..< 64
@@ -118,7 +118,7 @@ final public class HASH256{
     }
     
     /* Re-Initialise Hash function */
-    func init_it()
+    mutating func init_it()
     { /* initialise */
         for i in 0 ..< 64 {w[i]=0}
         length[0]=0; length[1]=0
@@ -138,7 +138,7 @@ final public class HASH256{
     }
     
     /* process a single byte */
-    public func process(_ byt: UInt8)
+    public mutating func process(_ byt: UInt8)
     { /* process the next message byte */
         let cnt=Int((length[0]/32)%16)
         w[cnt]<<=8;
@@ -149,13 +149,13 @@ final public class HASH256{
     }
     
     /* process an array of bytes */
-    public func process_array(_ b: [UInt8])
+    public mutating func process_array(_ b: [UInt8])
     {
         for i in 0 ..< b.count {process((b[i]))}
     }
     
     /* process a 32-bit integer */
-    public func process_num(_ n:Int32)
+    public mutating func process_num(_ n:Int32)
     {
         process(UInt8((n>>24)&0xff))
         process(UInt8((n>>16)&0xff))
@@ -164,7 +164,7 @@ final public class HASH256{
     }
 
     /* Generate 32-byte Hash */
-    public func hash() -> [UInt8]
+    public mutating func hash() -> [UInt8]
     { /* pad message and finish - supply digest */
         var digest=[UInt8](repeating: 0,count: 32)
         

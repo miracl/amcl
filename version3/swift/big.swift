@@ -37,7 +37,7 @@ public typealias Chunk = Int64
 #endif
 
 
-final public class BIG{
+public struct BIG{
 #if D32
     static public let CHUNK:Int=32
     static let BASEBITS:UInt = @BASE32@    
@@ -84,15 +84,15 @@ final public class BIG{
     {
         return w[i]
     }
-    func set(_ i: Int,_ x: Chunk)
+    mutating func set(_ i: Int,_ x: Chunk)
     {
         w[i]=x
     }
-    func xortop(_ x: Chunk)
+    mutating func xortop(_ x: Chunk)
     {
         w[BIG.NLEN-1]^=x
     }
-    func ortop(_ x: Chunk)
+    mutating func ortop(_ x: Chunk)
     {
         w[BIG.NLEN-1]|=x
     }
@@ -142,12 +142,12 @@ final public class BIG{
         return true
     }
 /* set to zero */
-    func zero()
+    mutating func zero()
     {
         for i in 0 ..< BIG.NLEN {w[i] = 0}
     }
 /* set to one */
-    func one()
+    mutating func one()
     {
         w[0]=1
         for i in 1 ..< BIG.NLEN {w[i]=0}
@@ -160,16 +160,16 @@ final public class BIG{
         return true
     }
 /* Copy from another BIG */
-    func copy(_ x: BIG)
+    mutating func copy(_ x: BIG)
     {
         for i in 0 ..< BIG.NLEN {w[i] = x.w[i]}
     }
-    func copy(_ x: DBIG)
+    mutating func copy(_ x: DBIG)
     {
         for i in 0 ..< BIG.NLEN {w[i] = x.w[i]}
     }
 /* Conditional swap of two bigs depending on d using XOR - no branches */
-    func cswap(_ b: BIG,_ d: Int)
+    mutating func cswap(_ b: inout BIG,_ d: Int)
     {
         var c = Chunk(d)
         c = ~(c-1)
@@ -180,7 +180,7 @@ final public class BIG{
             b.w[i]^=t
         }
     }
-    func cmove(_ g: BIG,_ d: Int)
+    mutating func cmove(_ g: BIG,_ d: Int)
     {
         let b=Chunk(-d)
         for i in 0 ..< BIG.NLEN
@@ -189,7 +189,7 @@ final public class BIG{
         }
     }
 /* normalise BIG - force all digits < 2^BIG.BASEBITS */
-    @discardableResult func norm() -> Chunk
+    @discardableResult mutating func norm() -> Chunk
     {
         var carry=Chunk(0);
         for i in 0 ..< BIG.NLEN-1
@@ -202,7 +202,7 @@ final public class BIG{
         return (w[BIG.NLEN-1]>>Chunk((8*BIG.MODBYTES)%BIG.BASEBITS))
     }
 /* Shift right by less than a word */
-    @discardableResult func fshr(_ k: UInt) -> Int
+    @discardableResult mutating func fshr(_ k: UInt) -> Int
     {
         let kw=Chunk(k);
         let r=w[0]&((Chunk(1)<<kw)-1)
@@ -214,7 +214,7 @@ final public class BIG{
         return Int(r)
     }
 /* general shift right */
-    func shr(_ k: UInt)
+    mutating func shr(_ k: UInt)
     {
         let n=k%BIG.BASEBITS
         let m=Int(k/BIG.BASEBITS)
@@ -226,7 +226,7 @@ final public class BIG{
         for i in BIG.NLEN - m ..< BIG.NLEN {w[i]=0}
     }
 /* Shift right by less than a word */
-    @discardableResult func fshl(_ k: Int) -> Int
+    @discardableResult mutating func fshl(_ k: Int) -> Int
     {
         let kw=Chunk(k)
         w[BIG.NLEN-1]=((w[BIG.NLEN-1]<<kw))|(w[BIG.NLEN-2]>>(Chunk(BIG.BASEBITS)-kw))
@@ -238,7 +238,7 @@ final public class BIG{
         return Int(w[BIG.NLEN-1]>>Chunk((8*BIG.MODBYTES)%BIG.BASEBITS))
     }
 /* general shift left */
-    func shl(_ k: UInt)
+    mutating func shl(_ k: UInt)
     {
         let n=k%BIG.BASEBITS
         let m=Int(k/BIG.BASEBITS)
@@ -256,11 +256,12 @@ final public class BIG{
     func nbits() -> Int
     {
         var k=(BIG.NLEN-1)
-        norm()
-        while k>=0 && w[k]==0 {k -= 1}
+        var t=BIG(self)
+        t.norm()
+        while k>=0 && t.w[k]==0 {k -= 1}
         if k<0 {return 0}
         var bts=Int(BIG.BASEBITS)*k
-        var c=w[k];
+        var c=t.w[k];
         while c != 0 {c/=2; bts += 1}
         return bts
     }
@@ -291,7 +292,7 @@ final public class BIG{
 
         for i in (0...len-1).reversed()
         {
-            let b = BIG(self)
+            var b = BIG(self)
             b.shr(UInt(i*4))
             let n=String(b.w[0]&15,radix:16,uppercase:false)
             s+=n
@@ -302,7 +303,7 @@ final public class BIG{
 /* return this+x */
     func plus(_ x: BIG) -> BIG
     {
-        let s=BIG()
+        var s=BIG()
         for i in 0 ..< BIG.NLEN
         {
             s.w[i]=w[i]+x.w[i]
@@ -310,7 +311,7 @@ final public class BIG{
         return s
     }
 /* this+=x */
-    func add(_ x: BIG)
+    mutating func add(_ x: BIG)
     {
         for i in 0 ..< BIG.NLEN
         {
@@ -319,7 +320,7 @@ final public class BIG{
     }
 
 /* this|=x */
-    func or(_ x: BIG)
+    mutating func or(_ x: BIG)
     {
         for i in 0 ..< BIG.NLEN
         {
@@ -328,14 +329,14 @@ final public class BIG{
     }
 
 /* this+=x, where x is int */
-    func inc(_ x: Int) {
+    mutating func inc(_ x: Int) {
         norm();
         w[0]+=Chunk(x);
     }
 /* return this.x */
    	func minus(_ x: BIG) -> BIG
     {
-        let d=BIG();
+        var d=BIG();
         for i in 0 ..< BIG.NLEN
         {
             d.w[i]=w[i]-x.w[i];
@@ -343,7 +344,7 @@ final public class BIG{
         return d;
     }
 /* this-=x */
-    func sub(_ x: BIG)
+    mutating func sub(_ x: BIG)
     {
         for i in 0 ..< BIG.NLEN
         {
@@ -351,7 +352,7 @@ final public class BIG{
         }
     }
 /* reverse subtract this=x-this */
-    func rsub(_ x: BIG)
+    mutating func rsub(_ x: BIG)
     {
         for i in 0 ..< BIG.NLEN
         {
@@ -359,20 +360,21 @@ final public class BIG{
         }
     }
 /* this-=x where x is int */
-    func dec(_ x: Int) {
+    mutating func dec(_ x: Int) {
         norm();
         w[0]-=Chunk(x);
     }
 /* this*=x, where x is small int<NEXCESS */
-    func imul(_ c: Int)
+    mutating func imul(_ c: Int)
     {
         for i in 0 ..< BIG.NLEN {w[i]*=Chunk(c)}
     }
 /* convert this BIG to byte array */
     func tobytearray(_ b: inout [UInt8],_ n: Int)
     {
-        norm();
-        let c=BIG(self);
+        //norm();
+        var c=BIG(self);
+        c.norm()
         for i in (0...Int(BIG.MODBYTES)-1).reversed()
         {
             b[i+n]=UInt8(c.w[0]&0xff);
@@ -382,7 +384,7 @@ final public class BIG{
 /* convert from byte array to BIG */
     static func frombytearray(_ b: [UInt8],_ n: Int) -> BIG
     {
-        let m=BIG();
+        var m=BIG();
     
         for i in 0 ..< Int(BIG.MODBYTES)
         {
@@ -408,7 +410,7 @@ final public class BIG{
     } */
 
 /* this*=x, where x is >NEXCESS */
-    @discardableResult func pmul(_ c: Int) -> Chunk
+    @discardableResult mutating func pmul(_ c: Int) -> Chunk
     {
         var carry=Chunk(0);
         //norm();
@@ -417,27 +419,24 @@ final public class BIG{
             let ak=w[i]
             let (top,bot)=BIG.muladd(ak,Chunk(c),carry,Chunk(0))
             carry=top; w[i]=bot;
-            //carry=muladd(ak,Chunk(c),carry,i);
-            
         }
         return carry;
     }
 /* this*=c and catch overflow in DBIG */
-    func pxmul(_ c: Int) -> DBIG
+    mutating func pxmul(_ c: Int) -> DBIG
     {
-        let m=DBIG()
+        var m=DBIG()
         var carry=Chunk(0)
         for j in 0 ..< BIG.NLEN
         {
             let (top,bot)=BIG.muladd(w[j],Chunk(c),carry,m.w[j])
             carry=top; m.w[j]=bot
-  //          carry=m.muladd(w[j],c,carry,j)
         }
         m.w[BIG.NLEN]=carry
         return m;
     }
 /* divide by 3 */
-    func div3() -> Chunk
+    mutating func div3() -> Chunk
     {
         var carry=Chunk(0)
         norm();
@@ -453,7 +452,7 @@ final public class BIG{
 /* return a*b where result fits in a BIG */
     static func smul(_ a: BIG,_ b: BIG) -> BIG
     {
-        let c=BIG()
+        var c=BIG()
         for i in 0 ..< BIG.NLEN
         {
             var carry=Chunk(0)
@@ -480,7 +479,7 @@ final public class BIG{
         return 0;
     }
 /* set x = x mod 2^m */
-    func mod2m(_ m: UInt)
+    mutating func mod2m(_ m: UInt)
     {
         let wd=Int(m/BIG.BASEBITS)
         let bt=m%BIG.BASEBITS
@@ -537,18 +536,18 @@ final public class BIG{
     }
     
     /* return n last bits */
-    func lastbits(_ n: UInt) -> Int
+    mutating func lastbits(_ n: UInt) -> Int
     {
         let msk=(Chunk(1)<<Chunk(n))-1;
         norm();
         return Int((w[0])&msk)
     }
 /* a=1/a mod 2^256. This is very fast! */
-    func invmod2m()
+    mutating func invmod2m()
     {
-        let U=BIG()
+        var U=BIG()
         var b=BIG()
-        let c=BIG()
+        var c=BIG()
     
         U.inc(BIG.invmod256(lastbits(8)))
     
@@ -558,13 +557,13 @@ final public class BIG{
             U.norm();
             b.copy(self)
             b.mod2m(i)
-            let t1=BIG.smul(U,b)
+            var t1=BIG.smul(U,b)
             t1.shr(i)
             c.copy(self)
             c.shr(i)
             c.mod2m(i)
     
-            let t2=BIG.smul(U,c)
+            var t2=BIG.smul(U,c)
             t2.mod2m(i)
             t1.add(t2); t1.norm()
             b=BIG.smul(t1,U)
@@ -581,10 +580,11 @@ final public class BIG{
         self.norm()
     }
     /* reduce this mod m */
-    func mod(_ m: BIG)
+    mutating func mod(_ m1: BIG)
     {
         var k=0
-        let r=BIG(0)
+        var m=BIG(m1)
+        var r=BIG(0)
         norm()
         if (BIG.comp(self,m)<0) {return}
         repeat
@@ -611,13 +611,14 @@ final public class BIG{
         }
     }
     /* divide this by m */
-    func div(_ m: BIG)
+    mutating func div(_ m1: BIG)
     {
         var k=0
         norm()
-        let e=BIG(1)
-        let b=BIG(self)
-        let r=BIG(0)
+        var e=BIG(1)
+        var b=BIG(self)
+        var r=BIG(0)
+        var m=BIG(m1)
         zero()
     
         while (BIG.comp(b,m)>=0)
@@ -653,9 +654,9 @@ final public class BIG{
         }
     }
     /* get 8*BIG.MODBYTES size random number */
-    static func random(_ rng: RAND) -> BIG
+    static func random(_ rng: inout RAND) -> BIG
     {
-        let m=BIG();
+        var m=BIG();
         var j:Int=0
         var r:UInt8=0
         /* generate random BIG */
@@ -672,9 +673,9 @@ final public class BIG{
     }
     
     /* Create random BIG in portable way, one bit at a time, less than q */
-    static public func randomnum(_ q: BIG,_ rng: RAND) -> BIG
+    static public func randomnum(_ q: BIG,_ rng: inout RAND) -> BIG
     {
-        let d=DBIG(0);
+        var d=DBIG(0);
         var j:Int=0
         var r:UInt8=0
         
@@ -719,13 +720,13 @@ final public class BIG{
         }
     
         if ((n[0]%2 != 0) && (j != 0))
-        { /* backtrack */
+        { // backtrack 
             if (nb>0) {n[0]=(n[0]-1)/2}
             if (nb<0) {n[0]=(n[0]+1)/2}
             n[1] -= 1;
         }
         while (n[0]%2==0)
-        { /* remove trailing zeros */
+        { // remove trailing zeros 
             n[0]/=2
             n[2] += 1
             n[1] -= 1
@@ -734,14 +735,14 @@ final public class BIG{
     } */
     
     /* Jacobi Symbol (this/p). Returns 0, 1 or -1 */
-    func jacobi(_ p: BIG) -> Int
+    mutating func jacobi(_ p: BIG) -> Int
     {
         var n8:Int
         var k:Int
         var m:Int=0;
-        let t=BIG()
-        let x=BIG()
-        let n=BIG()
+        var t=BIG()
+        var x=BIG()
+        var n=BIG()
         let zilch=BIG()
         let one=BIG(1)
         if (p.parity()==0 || BIG.comp(self,zilch)==0 || BIG.comp(p,one)<=0) {return 0}
@@ -774,14 +775,14 @@ final public class BIG{
         else {return -1}
     }
     /* this=1/this mod p. Binary method */
-    func invmodp(_ p: BIG)
+    mutating func invmodp(_ p: BIG)
     {
         mod(p)
-        let u=BIG(self)
-        let v=BIG(p)
-        let x1=BIG(1)
-        let x2=BIG()
-        let t=BIG()
+        var u=BIG(self)
+        var v=BIG(p)
+        var x1=BIG(1)
+        var x2=BIG()
+        var t=BIG()
         let one=BIG(1)
     
         while ((BIG.comp(u,one) != 0 ) && (BIG.comp(v,one) != 0 ))
@@ -842,7 +843,7 @@ final public class BIG{
     {
         var t:DChunk
         var co:DChunk
-        let c=DBIG()
+        var c=DBIG()
         let RM:DChunk=DChunk(BIG.BMASK);
         let RB:DChunk=DChunk(BIG.BASEBITS)
    //     a.norm();
@@ -888,7 +889,7 @@ final public class BIG{
     {
         var t:DChunk
         var co:DChunk
-        let c=DBIG()
+        var c=DBIG()
         let RM:DChunk=DChunk(BIG.BMASK);
         let RB:DChunk=DChunk(BIG.BASEBITS)
    //     a.norm();
@@ -968,7 +969,7 @@ final public class BIG{
 */    
         return c;
     }
-    static func monty(_ md:BIG,_ mc:Chunk,_ d:DBIG) -> BIG
+    static func monty(_ md:BIG,_ mc:Chunk,_ d: inout DBIG) -> BIG
     {
     //    let md=BIG(ROM.Modulus);
         let RM:DChunk=DChunk(BIG.BMASK)
@@ -980,7 +981,7 @@ final public class BIG{
         var c:DChunk
         var dd=[DChunk](repeating: 0,count: BIG.NLEN)
         var v=[Chunk](repeating: 0,count: BIG.NLEN)
-        let b=BIG(0)
+        var b=BIG(0)
         
         t=DChunk(d.w[0]); v[0]=(Chunk(t&RM)&*mc)&BIG.BMASK; t+=DChunk(v[0])*DChunk(md.w[0]); c=DChunk(d.w[1])+(t>>RB); s=0
         for k in 1 ..< BIG.NLEN
@@ -1018,7 +1019,7 @@ final public class BIG{
 #if D64
     static func mul(_ a: BIG,_ b:BIG) -> DBIG
     {
-        let c=DBIG()
+        var c=DBIG()
         var carry:Chunk
         for i in 0 ..< BIG.NLEN {
             carry=0
@@ -1032,7 +1033,7 @@ final public class BIG{
     }
     static func sqr(_ a: BIG) -> DBIG
     {
-        let c=DBIG()
+        var c=DBIG()
         var carry:Chunk
         for i in 0 ..< BIG.NLEN {
             carry=0
@@ -1050,9 +1051,9 @@ final public class BIG{
         c.norm()
         return c
     }
-    static func monty(_ md:BIG,_ mc:Chunk,_ d:DBIG) -> BIG
+    static func monty(_ md:BIG,_ mc:Chunk,_ d: inout DBIG) -> BIG
     {
-        let b=BIG()
+        var b=BIG()
     //    let md=BIG(ROM.Modulus);
         var carry:Chunk
         var m:Chunk
@@ -1081,38 +1082,60 @@ final public class BIG{
     }
 #endif
 
+/* Optimized combined shift, subtract and norm */
+    static func ssn(_ r: inout BIG,_ a :BIG,_ m: inout BIG) -> Int
+    {
+        let n=BIG.NLEN-1
+        m.w[0]=(m.w[0]>>1)|((m.w[1]<<Chunk(BIG.BASEBITS-1))&BIG.BMASK)
+        r.w[0]=a.w[0]-m.w[0]
+        var carry=r.w[0]>>Chunk(BIG.BASEBITS)
+        r.w[0] &= BIG.BMASK
+        for i in 1 ..< n {
+            m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<Chunk(BIG.BASEBITS-1))&BIG.BMASK)
+            r.w[i]=a.w[i]-m.w[i]+carry
+            carry=r.w[i]>>Chunk(BIG.BASEBITS)
+            r.w[i] &= BIG.BMASK
+        }
+	   m.w[n]>>=1
+	   r.w[n]=a.w[n]-m.w[n]+carry
+	   return Int((r.w[n]>>Chunk(BIG.CHUNK-1))&Chunk(1))
+    }
     
     /* return a*b mod m */
-    static func modmul(_ a: BIG,_ b :BIG,_ m: BIG) -> BIG
+    static func modmul(_ a1: BIG,_ b1 :BIG,_ m: BIG) -> BIG
     {
+        var a=BIG(a1); var b=BIG(b1);
         a.mod(m)
         b.mod(m)
-        let d=mul(a,b)
+        var d=mul(a,b)
         return d.mod(m)
     }
     
     /* return a^2 mod m */
-    static func modsqr(_ a: BIG,_ m: BIG) -> BIG
+    static func modsqr(_ a1: BIG,_ m: BIG) -> BIG
     {
+        var a=BIG(a1)
         a.mod(m)
-        let d=sqr(a)
+        var d=sqr(a)
         return d.mod(m)
     }
     
     /* return -a mod m */
-    static func modneg(_ a: BIG,_ m: BIG) -> BIG
+    static func modneg(_ a1: BIG,_ m: BIG) -> BIG
     {
+        var a=BIG(a1)
         a.mod(m)
         return m.minus(a)
     }
     
     /* return this^e mod m */
-    func powmod(_ e: BIG,_ m: BIG) -> BIG
+    mutating func powmod(_ e1: BIG,_ m: BIG) -> BIG
     {
         norm();
+        var e=BIG(e1)
         e.norm();
         var a=BIG(1)
-        let z=BIG(e)
+        var z=BIG(e)
         var s=BIG(self)
         while (true)
         {

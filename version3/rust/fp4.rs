@@ -82,15 +82,15 @@ impl FP4 {
 	}	
 
 /* test self=0 ? */
-	pub fn iszilch(&mut self) -> bool {
-		self.reduce();
+	pub fn iszilch(&self) -> bool {
+		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch();
 	}	
 
 /* test self=1 ? */
-	pub fn isunity(&mut self) -> bool {
-		let mut one=FP2::new_int(1);
-		return self.a.equals(&mut one) && self.b.iszilch();
+	pub fn isunity(&self) -> bool {
+		let one=FP2::new_int(1);
+		return self.a.equals(&one) && self.b.iszilch();
 	}
 
 /* test is w real? That is in a+ib test b is zero */
@@ -114,8 +114,8 @@ impl FP4 {
 	}
 
 /* test self=x */
-	pub fn equals(&mut self,x:&mut FP4) -> bool {
-		return self.a.equals(&mut x.a) && self.b.equals(&mut x.b);
+	pub fn equals(&self,x:&FP4) -> bool {
+		return self.a.equals(&x.a) && self.b.equals(&x.b);
 	}
 /* copy self=x */
 	pub fn copy(&mut self,x :&FP4) {
@@ -321,12 +321,13 @@ impl FP4 {
 	}	
 
 /* self=self^e */
-	pub fn pow(&mut self,e: &mut BIG) -> FP4 {
-		self.norm();
-		e.norm();
+	pub fn pow(&self,e: &BIG) -> FP4 {
+		//self.norm();
 		let mut w=FP4::new_copy(self);
+		w.norm();
 		let mut z=BIG::new_copy(&e);
 		let mut r=FP4::new_int(1);
+		z.norm();
 		loop {
 			let bt=z.parity();
 			z.fshr(1);
@@ -366,27 +367,29 @@ impl FP4 {
 	}
 
 /* r=x^n using XTR method on traces of FP12s */
-	pub fn xtr_pow(&mut self,n: &mut BIG) -> FP4 {
+	pub fn xtr_pow(&self,n: &BIG) -> FP4 {
+		let mut sf=FP4::new_copy(self);
+		sf.norm();
 		let mut a=FP4::new_int(3);
-		let mut b=FP4::new_copy(self);
+		let mut b=FP4::new_copy(&sf);
 		let mut c=FP4::new_copy(&b);
 		c.xtr_d();
 		let mut t=FP4::new();
 		let mut r=FP4::new();
 
-		n.norm();
+		//n.norm();
 		let par=n.parity();
-		let mut v=BIG::new_copy(n); v.fshr(1);
+		let mut v=BIG::new_copy(n); v.norm(); v.fshr(1);
 		if par==0 {v.dec(1); v.norm(); }
 
 		let nb=v.nbits();
 		for i in (0..nb).rev() {
 			if v.bit(i)!=1 {
 				t.copy(&b);
-				self.conj();
+				sf.conj();
 				c.conj();
-				b.xtr_a(&a,self,&c);
-				self.conj();
+				b.xtr_a(&a,&sf,&c);
+				sf.conj();
 				c.copy(&t);
 				c.xtr_d();
 				a.xtr_d();
@@ -394,7 +397,7 @@ impl FP4 {
 				t.copy(&a); t.conj();
 				a.copy(&b);
 				a.xtr_d();
-				b.xtr_a(&c,self,&t);
+				b.xtr_a(&c,&sf,&t);
 				c.xtr_d();
 			}
 		}
@@ -406,11 +409,12 @@ impl FP4 {
 	}
 
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
-	pub fn xtr_pow2(&mut self,ck: &FP4,ckml: &FP4,ckm2l: &FP4,a: &mut BIG,b: &mut BIG) -> FP4 {
-		a.norm(); b.norm();
+	pub fn xtr_pow2(&mut self,ck: &FP4,ckml: &FP4,ckm2l: &FP4,a: &BIG,b: &BIG) -> FP4 {
+
 		let mut e=BIG::new_copy(a);
 		let mut d=BIG::new_copy(b);
 		let mut w=BIG::new();
+		e.norm(); d.norm();
 
 		let mut cu=FP4::new_copy(ck);  // can probably be passed in w/o copying
 		let mut cv=FP4::new_copy(self);

@@ -45,14 +45,14 @@ public func printBinary(_ array: [UInt8])
     print(" ");
 }
 
-public func TestRSA_2048(_ rng: RAND)
+public func TestRSA_2048(_ rng: inout RAND)
 {
     let RFS=RSA.RFS
 
     var message="Hello World\n"
 
-    let pub=rsa_public_key(Int(FF.FFLEN))
-    let priv=rsa_private_key(Int(FF.HFLEN))
+    var pub=rsa_public_key(Int(FF.FFLEN))
+    var priv=rsa_private_key(Int(FF.HFLEN))
 
     var ML=[UInt8](repeating: 0,count: RFS)
     var C=[UInt8](repeating: 0,count: RFS)
@@ -60,11 +60,11 @@ public func TestRSA_2048(_ rng: RAND)
  
 
     print("\nGenerating RSA public/private key pair")
-    RSA.KEY_PAIR(rng,65537,priv,pub)
+    RSA.KEY_PAIR(&rng,65537,&priv,&pub)
 
     let M=[UInt8](message.utf8)
     print("Encrypting test string\n");
-    let E=RSA.OAEP_ENCODE(RSA.HASH_TYPE,M,rng,nil); /* OAEP encode message m to e  */
+    let E=RSA.OAEP_ENCODE(RSA.HASH_TYPE,M,&rng,nil); /* OAEP encode message m to e  */
 
     RSA.ENCRYPT(pub,E,&C);     /* encrypt encoded message */
     print("Ciphertext= 0x", terminator: ""); printBinary(C)
@@ -106,7 +106,7 @@ public func TestRSA_2048(_ rng: RAND)
 }
 
 
-public func TestECDH_ed25519(_ rng: RAND)
+public func TestECDH_ed25519(_ rng: inout RAND)
 {
     let pp=String("M0ng00se");
     
@@ -130,7 +130,8 @@ public func TestECDH_ed25519(_ rng: RAND)
     var CS=[UInt8](repeating: 0,count: EGS)
     var DS=[UInt8](repeating: 0,count: EGS)
     
-   
+    var NULLRNG : RAND? = nil  
+    var REALRNG : RAND? = rng
     
     for i in 0 ..< 8 {SALT[i]=UInt8(i+1)}  // set Salt
     
@@ -145,8 +146,10 @@ public func TestECDH_ed25519(_ rng: RAND)
     var S0=ed25519.ECDH.PBKDF2(sha,PW,SALT,1000,EGS)
     print("Alice's private key= 0x",terminator: ""); printBinary(S0)
     
+
+
     /* Generate Key pair S/W */
-    ed25519.ECDH.KEY_PAIR_GENERATE(nil,&S0,&W0);
+    ed25519.ECDH.KEY_PAIR_GENERATE(&NULLRNG,&S0,&W0);
     
     print("Alice's public key= 0x",terminator: ""); printBinary(W0)
     
@@ -159,7 +162,7 @@ public func TestECDH_ed25519(_ rng: RAND)
     }
     
     /* Random private key for other party */
-    ed25519.ECDH.KEY_PAIR_GENERATE(rng,&S1,&W1)
+    ed25519.ECDH.KEY_PAIR_GENERATE(&REALRNG,&S1,&W1)
     
     print("Servers private key= 0x",terminator: ""); printBinary(S1)
     
@@ -203,7 +206,7 @@ public func TestECDH_ed25519(_ rng: RAND)
     
         for i in 0...16 {M[i]=UInt8(i&0xff)}
     
-        let C=ed25519.ECDH.ECIES_ENCRYPT(sha,P1,P2,rng,W1,M,&V,&T)
+        let C=ed25519.ECDH.ECIES_ENCRYPT(sha,P1,P2,&REALRNG,W1,M,&V,&T)
 
         print("Ciphertext= ")
         print("V= 0x",terminator: ""); printBinary(V)
@@ -218,11 +221,11 @@ public func TestECDH_ed25519(_ rng: RAND)
         }
         else {print("Decryption succeeded")}
     
-        print("Message is 0x"); printBinary(M)
+        print("Message is 0x",terminator: ""); printBinary(M)
     
         print("Testing ECDSA")
 
-        if ed25519.ECDH.ECPSP_DSA(sha,rng,S0,M,&CS,&DS) != 0
+        if ed25519.ECDH.ECPSP_DSA(sha,&rng,S0,M,&CS,&DS) != 0
         {
             print("***ECDSA Signature Failed")
             return
@@ -238,10 +241,11 @@ public func TestECDH_ed25519(_ rng: RAND)
         }
         else {print("ECDSA Signature/Verification succeeded ")}
     }
+    rng=REALRNG!    
 }
 
 
-public func TestECDH_nist256(_ rng: RAND)
+public func TestECDH_nist256(_ rng: inout RAND)
 {
     let pp=String("M0ng00se");
     
@@ -265,7 +269,8 @@ public func TestECDH_nist256(_ rng: RAND)
     var CS=[UInt8](repeating: 0,count: EGS)
     var DS=[UInt8](repeating: 0,count: EGS)
     
-   
+    var NULLRNG : RAND? = nil   
+    var REALRNG : RAND? = rng      
     
     for i in 0 ..< 8 {SALT[i]=UInt8(i+1)}  // set Salt
     
@@ -281,7 +286,7 @@ public func TestECDH_nist256(_ rng: RAND)
     print("Alice's private key= 0x",terminator: ""); printBinary(S0)
     
     /* Generate Key pair S/W */
-    nist256.ECDH.KEY_PAIR_GENERATE(nil,&S0,&W0);
+    nist256.ECDH.KEY_PAIR_GENERATE(&NULLRNG,&S0,&W0);
     
     print("Alice's public key= 0x",terminator: ""); printBinary(W0)
     
@@ -294,7 +299,7 @@ public func TestECDH_nist256(_ rng: RAND)
     }
     
     /* Random private key for other party */
-    nist256.ECDH.KEY_PAIR_GENERATE(rng,&S1,&W1)
+    nist256.ECDH.KEY_PAIR_GENERATE(&REALRNG,&S1,&W1)
     
     print("Servers private key= 0x",terminator: ""); printBinary(S1)
     
@@ -338,7 +343,7 @@ public func TestECDH_nist256(_ rng: RAND)
     
         for i in 0...16 {M[i]=UInt8(i&0xff)}
     
-        let C=nist256.ECDH.ECIES_ENCRYPT(sha,P1,P2,rng,W1,M,&V,&T)
+        let C=nist256.ECDH.ECIES_ENCRYPT(sha,P1,P2,&REALRNG,W1,M,&V,&T)
 
         print("Ciphertext= ")
         print("V= 0x",terminator: ""); printBinary(V)
@@ -353,11 +358,11 @@ public func TestECDH_nist256(_ rng: RAND)
         }
         else {print("Decryption succeeded")}
     
-        print("Message is 0x"); printBinary(M)
+        print("Message is 0x",terminator: ""); printBinary(M)
     
         print("Testing ECDSA")
 
-        if nist256.ECDH.ECPSP_DSA(sha,rng,S0,M,&CS,&DS) != 0
+        if nist256.ECDH.ECPSP_DSA(sha,&rng,S0,M,&CS,&DS) != 0
         {
             print("***ECDSA Signature Failed")
             return
@@ -373,9 +378,10 @@ public func TestECDH_nist256(_ rng: RAND)
         }
         else {print("ECDSA Signature/Verification succeeded ")}
     }
+    rng=REALRNG!    
 }
 
-public func TestECDH_goldilocks(_ rng: RAND)
+public func TestECDH_goldilocks(_ rng: inout RAND)
 {
     let pp=String("M0ng00se");
     
@@ -399,7 +405,8 @@ public func TestECDH_goldilocks(_ rng: RAND)
     var CS=[UInt8](repeating: 0,count: EGS)
     var DS=[UInt8](repeating: 0,count: EGS)
     
-   
+    var NULLRNG : RAND? = nil     
+    var REALRNG : RAND? = rng    
     
     for i in 0 ..< 8 {SALT[i]=UInt8(i+1)}  // set Salt
     
@@ -415,7 +422,7 @@ public func TestECDH_goldilocks(_ rng: RAND)
     print("Alice's private key= 0x",terminator: ""); printBinary(S0)
     
     /* Generate Key pair S/W */
-    goldilocks.ECDH.KEY_PAIR_GENERATE(nil,&S0,&W0);
+    goldilocks.ECDH.KEY_PAIR_GENERATE(&NULLRNG,&S0,&W0);
     
     print("Alice's public key= 0x",terminator: ""); printBinary(W0)
     
@@ -428,7 +435,7 @@ public func TestECDH_goldilocks(_ rng: RAND)
     }
     
     /* Random private key for other party */
-    goldilocks.ECDH.KEY_PAIR_GENERATE(rng,&S1,&W1)
+    goldilocks.ECDH.KEY_PAIR_GENERATE(&REALRNG,&S1,&W1)
     
     print("Servers private key= 0x",terminator: ""); printBinary(S1)
     
@@ -472,7 +479,7 @@ public func TestECDH_goldilocks(_ rng: RAND)
     
         for i in 0...16 {M[i]=UInt8(i&0xff)}
     
-        let C=goldilocks.ECDH.ECIES_ENCRYPT(sha,P1,P2,rng,W1,M,&V,&T)
+        let C=goldilocks.ECDH.ECIES_ENCRYPT(sha,P1,P2,&REALRNG,W1,M,&V,&T)
 
         print("Ciphertext= ")
         print("V= 0x",terminator: ""); printBinary(V)
@@ -487,11 +494,11 @@ public func TestECDH_goldilocks(_ rng: RAND)
         }
         else {print("Decryption succeeded")}
     
-        print("Message is 0x"); printBinary(M)
+        print("Message is 0x",terminator: ""); printBinary(M)
     
         print("Testing ECDSA")
 
-        if goldilocks.ECDH.ECPSP_DSA(sha,rng,S0,M,&CS,&DS) != 0
+        if goldilocks.ECDH.ECPSP_DSA(sha,&rng,S0,M,&CS,&DS) != 0
         {
             print("***ECDSA Signature Failed")
             return
@@ -507,11 +514,10 @@ public func TestECDH_goldilocks(_ rng: RAND)
         }
         else {print("ECDSA Signature/Verification succeeded ")}
     }
+    rng=REALRNG!    
 }
 
-
-
-public func TestMPIN_bn254(_ rng: RAND)
+public func TestMPIN_bn254(_ rng: inout RAND)
 {
     let PERMITS=true
     let PINERROR=true
@@ -554,7 +560,7 @@ public func TestMPIN_bn254(_ rng: RAND)
 
     // Trusted Authority set-up
     
-    bn254.MPIN.RANDOM_GENERATE(rng,&S)
+    bn254.MPIN.RANDOM_GENERATE(&rng,&S)
     print("\nMPIN Master Secret s: 0x",terminator: "");  printBinary(S)
     
     // Create Client Identity
@@ -594,7 +600,7 @@ public func TestMPIN_bn254(_ rng: RAND)
         print("Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
         
         // This encoding makes Time permit look random - Elligator squared
-        bn254.MPIN.ENCODING(rng,&PERMIT);
+        bn254.MPIN.ENCODING(&rng,&PERMIT);
         print("Encoded Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
         bn254.MPIN.DECODING(&PERMIT)
         print("Decoded Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
@@ -625,6 +631,8 @@ public func TestMPIN_bn254(_ rng: RAND)
     var pE:[UInt8]?=E
     var pF:[UInt8]?=F
     var pPERMIT:[UInt8]?=PERMIT
+
+    var REALRNG : RAND? = rng    
     
     if date != 0
     {
@@ -651,14 +659,14 @@ public func TestMPIN_bn254(_ rng: RAND)
         print("MPIN Single Pass")
         let timeValue = bn254.MPIN.GET_TIME()
 
-        rtn=bn254.MPIN.CLIENT(sha,date,CLIENT_ID,rng,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT,timeValue,&Y)
+        rtn=bn254.MPIN.CLIENT(sha,date,CLIENT_ID,&REALRNG,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT,timeValue,&Y)
         
         if rtn != 0 {print("FAILURE: CLIENT rtn: \(rtn)")}
         
         if (FULL)
         {
             HCID=bn254.MPIN.HASH_ID(sha,CLIENT_ID);
-            bn254.MPIN.GET_G1_MULTIPLE(rng,1,&R,HCID,&Z); // Also Send Z=r.ID to Server, remember random r
+            bn254.MPIN.GET_G1_MULTIPLE(&REALRNG,1,&R,HCID,&Z); // Also Send Z=r.ID to Server, remember random r
         }
         rtn=bn254.MPIN.SERVER(sha,date,&pHID,&pHTID,&Y,SST,pxID,pxCID!,SEC,&pE,&pF,CLIENT_ID,timeValue)
         if rtn != 0 {print("FAILURE: SERVER rtn: \(rtn)")}
@@ -666,8 +674,8 @@ public func TestMPIN_bn254(_ rng: RAND)
         if (FULL)
         { // Also send T=w.ID to client, remember random w
             HSID=bn254.MPIN.HASH_ID(sha,CLIENT_ID);   
-            if date != 0 {bn254.MPIN.GET_G1_MULTIPLE(rng,0,&W,pHTID!,&T)}
-            else {bn254.MPIN.GET_G1_MULTIPLE(rng,0,&W,pHID,&T)}
+            if date != 0 {bn254.MPIN.GET_G1_MULTIPLE(&REALRNG,0,&W,pHTID!,&T)}
+            else {bn254.MPIN.GET_G1_MULTIPLE(&REALRNG,0,&W,pHID,&T)}
             
         }
     }
@@ -675,24 +683,24 @@ public func TestMPIN_bn254(_ rng: RAND)
     {
         print("MPIN Multi Pass");
         // Send U=x.ID to server, and recreate secret from token and pin
-        rtn=bn254.MPIN.CLIENT_1(sha,date,CLIENT_ID,rng,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT)
+        rtn=bn254.MPIN.CLIENT_1(sha,date,CLIENT_ID,&REALRNG,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT)
         if rtn != 0 {print("FAILURE: CLIENT_1 rtn: \(rtn)")}
   
         if (FULL)
         {
             HCID=bn254.MPIN.HASH_ID(sha,CLIENT_ID);
-            bn254.MPIN.GET_G1_MULTIPLE(rng,1,&R,HCID,&Z);  // Also Send Z=r.ID to Server, remember random r
+            bn254.MPIN.GET_G1_MULTIPLE(&REALRNG,1,&R,HCID,&Z);  // Also Send Z=r.ID to Server, remember random r
         }      
         // Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp.
         bn254.MPIN.SERVER_1(sha,date,CLIENT_ID,&pHID,&pHTID);     
             // Server generates Random number Y and sends it to Client
-        bn254.MPIN.RANDOM_GENERATE(rng,&Y);
+        bn254.MPIN.RANDOM_GENERATE(&REALRNG!,&Y);
    
         if (FULL)
         { // Also send T=w.ID to client, remember random w
             HSID=bn254.MPIN.HASH_ID(sha,CLIENT_ID);
-            if date != 0 {bn254.MPIN.GET_G1_MULTIPLE(rng,0,&W,pHTID!,&T)}
-            else {bn254.MPIN.GET_G1_MULTIPLE(rng,0,&W,pHID,&T)}
+            if date != 0 {bn254.MPIN.GET_G1_MULTIPLE(&REALRNG,0,&W,pHTID!,&T)}
+            else {bn254.MPIN.GET_G1_MULTIPLE(&REALRNG,0,&W,pHID,&T)}
         }
       
         // Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC
@@ -728,10 +736,10 @@ public func TestMPIN_bn254(_ rng: RAND)
         bn254.MPIN.SERVER_KEY(sha,Z,SST,W,H,pHID,pxID!,pxCID,&SK);
         print("Server Key =  0x",terminator: "");  printBinary(SK)
     }
-    
+    rng=REALRNG!   
 }
 
-public func TestMPIN_bls383(_ rng: RAND)
+public func TestMPIN_bls383(_ rng: inout RAND)
 {
     let PERMITS=true
     let PINERROR=true
@@ -774,7 +782,7 @@ public func TestMPIN_bls383(_ rng: RAND)
 
     // Trusted Authority set-up
     
-    bls383.MPIN.RANDOM_GENERATE(rng,&S)
+    bls383.MPIN.RANDOM_GENERATE(&rng,&S)
     print("\nMPIN Master Secret s: 0x",terminator: "");  printBinary(S)
     
     // Create Client Identity
@@ -814,7 +822,7 @@ public func TestMPIN_bls383(_ rng: RAND)
         print("Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
         
         // This encoding makes Time permit look random - Elligator squared
-        bls383.MPIN.ENCODING(rng,&PERMIT);
+        bls383.MPIN.ENCODING(&rng,&PERMIT);
         print("Encoded Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
         bls383.MPIN.DECODING(&PERMIT)
         print("Decoded Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
@@ -846,6 +854,8 @@ public func TestMPIN_bls383(_ rng: RAND)
     var pF:[UInt8]?=F
     var pPERMIT:[UInt8]?=PERMIT
     
+    var REALRNG : RAND? = rng
+
     if date != 0
     {
         if (!PINERROR)
@@ -871,14 +881,14 @@ public func TestMPIN_bls383(_ rng: RAND)
         print("MPIN Single Pass")
         let timeValue = bls383.MPIN.GET_TIME()
 
-        rtn=bls383.MPIN.CLIENT(sha,date,CLIENT_ID,rng,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT,timeValue,&Y)
+        rtn=bls383.MPIN.CLIENT(sha,date,CLIENT_ID,&REALRNG,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT,timeValue,&Y)
         
         if rtn != 0 {print("FAILURE: CLIENT rtn: \(rtn)")}
         
         if (FULL)
         {
             HCID=bls383.MPIN.HASH_ID(sha,CLIENT_ID);
-            bls383.MPIN.GET_G1_MULTIPLE(rng,1,&R,HCID,&Z); // Also Send Z=r.ID to Server, remember random r
+            bls383.MPIN.GET_G1_MULTIPLE(&REALRNG,1,&R,HCID,&Z); // Also Send Z=r.ID to Server, remember random r
         }
         rtn=bls383.MPIN.SERVER(sha,date,&pHID,&pHTID,&Y,SST,pxID,pxCID!,SEC,&pE,&pF,CLIENT_ID,timeValue)
         if rtn != 0 {print("FAILURE: SERVER rtn: \(rtn)")}
@@ -886,8 +896,8 @@ public func TestMPIN_bls383(_ rng: RAND)
         if (FULL)
         { // Also send T=w.ID to client, remember random w
             HSID=bls383.MPIN.HASH_ID(sha,CLIENT_ID);   
-            if date != 0 {bls383.MPIN.GET_G1_MULTIPLE(rng,0,&W,pHTID!,&T)}
-            else {bls383.MPIN.GET_G1_MULTIPLE(rng,0,&W,pHID,&T)}
+            if date != 0 {bls383.MPIN.GET_G1_MULTIPLE(&REALRNG,0,&W,pHTID!,&T)}
+            else {bls383.MPIN.GET_G1_MULTIPLE(&REALRNG,0,&W,pHID,&T)}
             
         }
     }
@@ -895,24 +905,24 @@ public func TestMPIN_bls383(_ rng: RAND)
     {
         print("MPIN Multi Pass");
         // Send U=x.ID to server, and recreate secret from token and pin
-        rtn=bls383.MPIN.CLIENT_1(sha,date,CLIENT_ID,rng,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT)
+        rtn=bls383.MPIN.CLIENT_1(sha,date,CLIENT_ID,&REALRNG,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT)
         if rtn != 0 {print("FAILURE: CLIENT_1 rtn: \(rtn)")}
   
         if (FULL)
         {
             HCID=bls383.MPIN.HASH_ID(sha,CLIENT_ID);
-            bls383.MPIN.GET_G1_MULTIPLE(rng,1,&R,HCID,&Z);  // Also Send Z=r.ID to Server, remember random r
+            bls383.MPIN.GET_G1_MULTIPLE(&REALRNG,1,&R,HCID,&Z);  // Also Send Z=r.ID to Server, remember random r
         }      
         // Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp.
         bls383.MPIN.SERVER_1(sha,date,CLIENT_ID,&pHID,&pHTID);     
             // Server generates Random number Y and sends it to Client
-        bls383.MPIN.RANDOM_GENERATE(rng,&Y);
+        bls383.MPIN.RANDOM_GENERATE(&REALRNG!,&Y);
    
         if (FULL)
         { // Also send T=w.ID to client, remember random w
             HSID=bls383.MPIN.HASH_ID(sha,CLIENT_ID);
-            if date != 0 {bls383.MPIN.GET_G1_MULTIPLE(rng,0,&W,pHTID!,&T)}
-            else {bls383.MPIN.GET_G1_MULTIPLE(rng,0,&W,pHID,&T)}
+            if date != 0 {bls383.MPIN.GET_G1_MULTIPLE(&REALRNG,0,&W,pHTID!,&T)}
+            else {bls383.MPIN.GET_G1_MULTIPLE(&REALRNG,0,&W,pHID,&T)}
         }
       
         // Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC
@@ -948,11 +958,11 @@ public func TestMPIN_bls383(_ rng: RAND)
         bls383.MPIN.SERVER_KEY(sha,Z,SST,W,H,pHID,pxID!,pxCID,&SK);
         print("Server Key =  0x",terminator: "");  printBinary(SK)
     }
-    
+    rng=REALRNG!   
 }
 
 
-public func TestMPIN_bls24(_ rng: RAND)
+public func TestMPIN_bls24(_ rng: inout RAND)
 {
     let PERMITS=true
     let PINERROR=true
@@ -995,7 +1005,7 @@ public func TestMPIN_bls24(_ rng: RAND)
 
     // Trusted Authority set-up
     
-    MPIN192.RANDOM_GENERATE(rng,&S)
+    MPIN192.RANDOM_GENERATE(&rng,&S)
     print("\nMPIN Master Secret s: 0x",terminator: "");  printBinary(S)
     
     // Create Client Identity
@@ -1035,7 +1045,7 @@ public func TestMPIN_bls24(_ rng: RAND)
         print("Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
         
         // This encoding makes Time permit look random - Elligator squared
-        MPIN192.ENCODING(rng,&PERMIT);
+        MPIN192.ENCODING(&rng,&PERMIT);
         print("Encoded Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
         MPIN192.DECODING(&PERMIT)
         print("Decoded Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
@@ -1049,7 +1059,7 @@ public func TestMPIN_bls24(_ rng: RAND)
     
     // Set date=0 and PERMIT=null if time permits not in use
     
-    //Client First pass: Inputs CLIENT_ID, optional RNG, pin, TOKEN and PERMIT. Output xID =x .H(CLIENT_ID) and re-combined secret SEC
+    //Client First pass: Inputs CLIENT_ID, optional rng, pin, TOKEN and PERMIT. Output xID =x .H(CLIENT_ID) and re-combined secret SEC
     //If PERMITS are is use, then date!=0 and PERMIT is added to secret and xCID = x.(H(CLIENT_ID)+H(date|H(CLIENT_ID)))
     //Random value x is supplied externally if RNG=null, otherwise generated and passed out by RNG
     
@@ -1067,6 +1077,8 @@ public func TestMPIN_bls24(_ rng: RAND)
     var pF:[UInt8]?=F
     var pPERMIT:[UInt8]?=PERMIT
     
+    var REALRNG : RAND? = rng
+
     if date != 0
     {
         if (!PINERROR)
@@ -1092,14 +1104,14 @@ public func TestMPIN_bls24(_ rng: RAND)
         print("MPIN Single Pass")
         let timeValue = MPIN192.GET_TIME()
 
-        rtn=MPIN192.CLIENT(sha,date,CLIENT_ID,rng,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT,timeValue,&Y)
+        rtn=MPIN192.CLIENT(sha,date,CLIENT_ID,&REALRNG,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT,timeValue,&Y)
         
         if rtn != 0 {print("FAILURE: CLIENT rtn: \(rtn)")}
         
         if (FULL)
         {
             HCID=MPIN192.HASH_ID(sha,CLIENT_ID);
-            MPIN192.GET_G1_MULTIPLE(rng,1,&R,HCID,&Z); // Also Send Z=r.ID to Server, remember random r
+            MPIN192.GET_G1_MULTIPLE(&REALRNG,1,&R,HCID,&Z); // Also Send Z=r.ID to Server, remember random r
         }
         rtn=MPIN192.SERVER(sha,date,&pHID,&pHTID,&Y,SST,pxID,pxCID!,SEC,&pE,&pF,CLIENT_ID,timeValue)
         if rtn != 0 {print("FAILURE: SERVER rtn: \(rtn)")}
@@ -1107,8 +1119,8 @@ public func TestMPIN_bls24(_ rng: RAND)
         if (FULL)
         { // Also send T=w.ID to client, remember random w
             HSID=MPIN192.HASH_ID(sha,CLIENT_ID);   
-            if date != 0 {MPIN192.GET_G1_MULTIPLE(rng,0,&W,pHTID!,&T)}
-            else {MPIN192.GET_G1_MULTIPLE(rng,0,&W,pHID,&T)}
+            if date != 0 {MPIN192.GET_G1_MULTIPLE(&REALRNG,0,&W,pHTID!,&T)}
+            else {MPIN192.GET_G1_MULTIPLE(&REALRNG,0,&W,pHID,&T)}
             
         }
     }
@@ -1116,24 +1128,24 @@ public func TestMPIN_bls24(_ rng: RAND)
     {
         print("MPIN Multi Pass");
         // Send U=x.ID to server, and recreate secret from token and pin
-        rtn=MPIN192.CLIENT_1(sha,date,CLIENT_ID,rng,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT)
+        rtn=MPIN192.CLIENT_1(sha,date,CLIENT_ID,&REALRNG,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT)
         if rtn != 0 {print("FAILURE: CLIENT_1 rtn: \(rtn)")}
   
         if (FULL)
         {
             HCID=MPIN192.HASH_ID(sha,CLIENT_ID);
-            MPIN192.GET_G1_MULTIPLE(rng,1,&R,HCID,&Z);  // Also Send Z=r.ID to Server, remember random r
+            MPIN192.GET_G1_MULTIPLE(&REALRNG,1,&R,HCID,&Z);  // Also Send Z=r.ID to Server, remember random r
         }      
         // Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp.
         MPIN192.SERVER_1(sha,date,CLIENT_ID,&pHID,&pHTID);     
             // Server generates Random number Y and sends it to Client
-        MPIN192.RANDOM_GENERATE(rng,&Y);
+        MPIN192.RANDOM_GENERATE(&REALRNG!,&Y);
    
         if (FULL)
         { // Also send T=w.ID to client, remember random w
             HSID=MPIN192.HASH_ID(sha,CLIENT_ID);
-            if date != 0 {MPIN192.GET_G1_MULTIPLE(rng,0,&W,pHTID!,&T)}
-            else {MPIN192.GET_G1_MULTIPLE(rng,0,&W,pHID,&T)}
+            if date != 0 {MPIN192.GET_G1_MULTIPLE(&REALRNG,0,&W,pHTID!,&T)}
+            else {MPIN192.GET_G1_MULTIPLE(&REALRNG,0,&W,pHID,&T)}
         }
       
         // Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC
@@ -1169,10 +1181,10 @@ public func TestMPIN_bls24(_ rng: RAND)
         MPIN192.SERVER_KEY(sha,Z,SST,W,H,pHID,pxID!,pxCID,&SK);
         print("Server Key =  0x",terminator: "");  printBinary(SK)
     }
-    
+    rng=REALRNG!    
 }
 
-public func TestMPIN_bls48(_ rng: RAND)
+public func TestMPIN_bls48(_ rng: inout RAND)
 {
     let PERMITS=true
     let PINERROR=true
@@ -1215,7 +1227,7 @@ public func TestMPIN_bls48(_ rng: RAND)
 
     // Trusted Authority set-up
     
-    MPIN256.RANDOM_GENERATE(rng,&S)
+    MPIN256.RANDOM_GENERATE(&rng,&S)
     print("\nMPIN Master Secret s: 0x",terminator: "");  printBinary(S)
     
     // Create Client Identity
@@ -1255,7 +1267,7 @@ public func TestMPIN_bls48(_ rng: RAND)
         print("Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
         
         // This encoding makes Time permit look random - Elligator squared
-        MPIN256.ENCODING(rng,&PERMIT);
+        MPIN256.ENCODING(&rng,&PERMIT);
         print("Encoded Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
         MPIN256.DECODING(&PERMIT)
         print("Decoded Time Permit TP: 0x",terminator: "");  printBinary(PERMIT)
@@ -1269,7 +1281,7 @@ public func TestMPIN_bls48(_ rng: RAND)
     
     // Set date=0 and PERMIT=null if time permits not in use
     
-    //Client First pass: Inputs CLIENT_ID, optional RNG, pin, TOKEN and PERMIT. Output xID =x .H(CLIENT_ID) and re-combined secret SEC
+    //Client First pass: Inputs CLIENT_ID, optional rng, pin, TOKEN and PERMIT. Output xID =x .H(CLIENT_ID) and re-combined secret SEC
     //If PERMITS are is use, then date!=0 and PERMIT is added to secret and xCID = x.(H(CLIENT_ID)+H(date|H(CLIENT_ID)))
     //Random value x is supplied externally if RNG=null, otherwise generated and passed out by RNG
     
@@ -1287,6 +1299,8 @@ public func TestMPIN_bls48(_ rng: RAND)
     var pF:[UInt8]?=F
     var pPERMIT:[UInt8]?=PERMIT
     
+    var REALRNG : RAND? = rng
+
     if date != 0
     {
         if (!PINERROR)
@@ -1312,14 +1326,14 @@ public func TestMPIN_bls48(_ rng: RAND)
         print("MPIN Single Pass")
         let timeValue = MPIN256.GET_TIME()
 
-        rtn=MPIN256.CLIENT(sha,date,CLIENT_ID,rng,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT,timeValue,&Y)
+        rtn=MPIN256.CLIENT(sha,date,CLIENT_ID,&REALRNG,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT,timeValue,&Y)
         
         if rtn != 0 {print("FAILURE: CLIENT rtn: \(rtn)")}
         
         if (FULL)
         {
             HCID=MPIN256.HASH_ID(sha,CLIENT_ID);
-            MPIN256.GET_G1_MULTIPLE(rng,1,&R,HCID,&Z); // Also Send Z=r.ID to Server, remember random r
+            MPIN256.GET_G1_MULTIPLE(&REALRNG,1,&R,HCID,&Z); // Also Send Z=r.ID to Server, remember random r
         }
         rtn=MPIN256.SERVER(sha,date,&pHID,&pHTID,&Y,SST,pxID,pxCID!,SEC,&pE,&pF,CLIENT_ID,timeValue)
         if rtn != 0 {print("FAILURE: SERVER rtn: \(rtn)")}
@@ -1327,8 +1341,8 @@ public func TestMPIN_bls48(_ rng: RAND)
         if (FULL)
         { // Also send T=w.ID to client, remember random w
             HSID=MPIN256.HASH_ID(sha,CLIENT_ID);   
-            if date != 0 {MPIN256.GET_G1_MULTIPLE(rng,0,&W,pHTID!,&T)}
-            else {MPIN256.GET_G1_MULTIPLE(rng,0,&W,pHID,&T)}
+            if date != 0 {MPIN256.GET_G1_MULTIPLE(&REALRNG,0,&W,pHTID!,&T)}
+            else {MPIN256.GET_G1_MULTIPLE(&REALRNG,0,&W,pHID,&T)}
             
         }
     }
@@ -1336,24 +1350,24 @@ public func TestMPIN_bls48(_ rng: RAND)
     {
         print("MPIN Multi Pass");
         // Send U=x.ID to server, and recreate secret from token and pin
-        rtn=MPIN256.CLIENT_1(sha,date,CLIENT_ID,rng,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT)
+        rtn=MPIN256.CLIENT_1(sha,date,CLIENT_ID,&REALRNG,&X,pin,TOKEN,&SEC,&pxID,&pxCID,pPERMIT)
         if rtn != 0 {print("FAILURE: CLIENT_1 rtn: \(rtn)")}
   
         if (FULL)
         {
             HCID=MPIN256.HASH_ID(sha,CLIENT_ID);
-            MPIN256.GET_G1_MULTIPLE(rng,1,&R,HCID,&Z);  // Also Send Z=r.ID to Server, remember random r
+            MPIN256.GET_G1_MULTIPLE(&REALRNG,1,&R,HCID,&Z);  // Also Send Z=r.ID to Server, remember random r
         }      
         // Server calculates H(ID) and H(T|H(ID)) (if time permits enabled), and maps them to points on the curve HID and HTID resp.
         MPIN256.SERVER_1(sha,date,CLIENT_ID,&pHID,&pHTID);     
             // Server generates Random number Y and sends it to Client
-        MPIN256.RANDOM_GENERATE(rng,&Y);
+        MPIN256.RANDOM_GENERATE(&REALRNG!,&Y);
    
         if (FULL)
         { // Also send T=w.ID to client, remember random w
             HSID=MPIN256.HASH_ID(sha,CLIENT_ID);
-            if date != 0 {MPIN256.GET_G1_MULTIPLE(rng,0,&W,pHTID!,&T)}
-            else {MPIN256.GET_G1_MULTIPLE(rng,0,&W,pHID,&T)}
+            if date != 0 {MPIN256.GET_G1_MULTIPLE(&REALRNG,0,&W,pHTID!,&T)}
+            else {MPIN256.GET_G1_MULTIPLE(&REALRNG,0,&W,pHID,&T)}
         }
       
         // Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC
@@ -1389,23 +1403,23 @@ public func TestMPIN_bls48(_ rng: RAND)
         MPIN256.SERVER_KEY(sha,Z,SST,W,H,pHID,pxID!,pxCID,&SK);
         print("Server Key =  0x",terminator: "");  printBinary(SK)
     }
-    
+    rng=REALRNG!
 }
 
 
 var RAW=[UInt8](repeating: 0,count: 100)
-let rng=RAND()
+var rng=RAND()
     
 rng.clean();
 for i in 0 ..< 100 {RAW[i]=UInt8(i&0xff)}
 rng.seed(100,RAW)
 
 
-TestECDH_ed25519(rng)  
-TestECDH_nist256(rng) 
-TestECDH_goldilocks(rng) 
-TestRSA_2048(rng)
-TestMPIN_bn254(rng)
-TestMPIN_bls383(rng)
-TestMPIN_bls24(rng)
-TestMPIN_bls48(rng)
+TestECDH_ed25519(&rng)  
+TestECDH_nist256(&rng) 
+TestECDH_goldilocks(&rng) 
+TestRSA_2048(&rng)
+TestMPIN_bn254(&rng)
+TestMPIN_bls383(&rng)
+TestMPIN_bls24(&rng)
+TestMPIN_bls48(&rng)

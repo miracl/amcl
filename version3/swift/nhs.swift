@@ -190,7 +190,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 	private static func parse(_ seed: [UInt8],_ poly:inout [Int32]) {
 		var hash=[UInt8](repeating:0,count:4*DEGREE)
 
-		let sh=SHA3(SHA3.SHAKE128)
+		var sh=SHA3(SHA3.SHAKE128)
 
 		for i in 0..<32 {
 			sh.process(seed[i])
@@ -276,7 +276,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 	}
 /* generate centered binomial distribution */ 
 
-	private static func error(_ rng: RAND,_ poly:inout [Int32]) {
+	private static func error(_ rng: inout RAND,_ poly:inout [Int32]) {
 		var r: Int32
 		for i in 0..<DEGREE {
 			var n1=(Int32(rng.getByte())&0xff)+((Int32(rng.getByte())&0xff)<<8)
@@ -339,7 +339,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 	}
 /* API files */
 
-	public static func SERVER_1(_ rng: RAND,_ SB:inout [UInt8],_ S:inout [UInt8]) {
+	public static func SERVER_1(_ rng: inout RAND,_ SB:inout [UInt8],_ S:inout [UInt8]) {
 		var seed=[UInt8](repeating:0,count:32)
 		var array=[UInt8](repeating:0,count:1792)
 		var s=[Int32](repeating:0,count:DEGREE)
@@ -352,8 +352,8 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 
 		parse(seed,&b)
 	
-		error(rng,&e)
-		error(rng,&s)
+		error(&rng,&e)
+		error(&rng,&s)
 
 		ntt(&s)
 		ntt(&e)
@@ -380,7 +380,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 		}
 	}
 
-	public static func CLIENT(_ rng: RAND,_ SB: [UInt8],_ UC:inout [UInt8],_ KEY:inout [UInt8]) {
+	public static func CLIENT(_ rng: inout RAND,_ SB: [UInt8],_ UC:inout [UInt8],_ KEY:inout [UInt8]) {
 		var sh=SHA3(SHA3.HASH256)
 		var seed=[UInt8](repeating:0,count:32)
 		var array=[UInt8](repeating:0,count:1792)
@@ -393,8 +393,8 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 		var k=[Int32](repeating:0,count:DEGREE)
 		var c=[Int32](repeating:0,count:DEGREE)
 
-		error(rng,&sd)
-		error(rng,&ed)
+		error(&rng,&sd)
+		error(&rng,&ed)
 
 		ntt(&sd)
 		ntt(&ed)
@@ -429,7 +429,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 
 		poly_mul(&c,c,sd)
 		intt(&c)
-		error(rng,&ed)
+		error(&rng,&ed)
 		poly_add(&c,c,ed)
 		poly_add(&c,c,k)
 
@@ -458,7 +458,7 @@ static let iroots:[Int32] = [0x2ac8,0x452,0x297c,0x666,0xb4c,0x2b8,0x1a74,0xfd,0
 	}
 
 	public static func SERVER_2(_ S: [UInt8],_ UC: [UInt8],_ KEY:inout [UInt8]) {
-		let sh=SHA3(SHA3.HASH256)
+		var sh=SHA3(SHA3.HASH256)
 
 		var c=[Int32](repeating:0,count:DEGREE)
 		var k=[Int32](repeating:0,count:DEGREE)

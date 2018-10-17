@@ -262,11 +262,12 @@ func (r *DBIG) toString() string {
 /* return number of bits */
 func (r *DBIG) nbits() int {
 	k:=DNLEN-1
-	r.norm()
-	for (k>=0 && r.w[k]==0) {k--}
+	t:=NewDBIGcopy(r);
+	t.norm()
+	for (k>=0 && t.w[k]==0) {k--}
 	if k<0 {return 0}
 	bts:=int(BASEBITS)*k;
-	c:=r.w[k];
+	c:=t.w[k];
 	for c!=0 {c/=2; bts++}
 	return bts
 }

@@ -126,7 +126,7 @@ var PAIR256 = function(ctx) {
         },
 
         /* Optimal R-ate pairing */
-        ate: function(P, Q) {
+        ate: function(P1, Q1) {
             var x, n, n3, lv,
                 Qx, Qy, A, NP, r, nb, bt,
                 i;
@@ -138,6 +138,9 @@ var PAIR256 = function(ctx) {
             n3 = new ctx.BIG(n);
             n3.pmul(3);
             n3.norm();
+
+			var P=new ctx.ECP8(); P.copy(P1); P.affine();
+			var Q=new ctx.ECP(); Q.copy(Q1); Q.affine();
 
             //  P.affine();
             //  Q.affine();
@@ -183,7 +186,7 @@ var PAIR256 = function(ctx) {
         },
 
         /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-        ate2: function(P, Q, R, S) {
+        ate2: function(P1, Q1, R1, S1) {
             var x, n, n3, lv,
                 Qx, Qy, Sx, Sy, A, B, NP, NR, r, nb, bt,
                 i;
@@ -196,6 +199,12 @@ var PAIR256 = function(ctx) {
             n3 = new ctx.BIG(n);
             n3.pmul(3);
             n3.norm();
+
+			var P=new ctx.ECP8(); P.copy(P1); P.affine();
+			var Q=new ctx.ECP(); Q.copy(Q1); Q.affine();
+			var R=new ctx.ECP8(); R.copy(R1); R.affine();
+			var S=new ctx.ECP(); S.copy(S1); S.affine();
+
 
             Qx = new ctx.FP(Q.getx()); //Qx.copy(Q.getx());
             Qy = new ctx.FP(Q.gety()); //Qy.copy(Q.gety());
@@ -483,11 +492,11 @@ var PAIR256 = function(ctx) {
         var R, Q, q, bcru, cru, t, u, np, nn;
 
         if (ctx.ROM_CURVE.USE_GLV) {
-            P.affine();
+            //P.affine();
             R = new ctx.ECP();
             R.copy(P);
             Q = new ctx.ECP();
-            Q.copy(P);
+            Q.copy(P); Q.affine();
             q = new ctx.BIG(0);
             q.rcopy(ctx.ROM_CURVE.CURVE_Order);
             bcru = new ctx.BIG(0);
@@ -536,7 +545,7 @@ var PAIR256 = function(ctx) {
 
             u = PAIR256.gs(e);
             t = new ctx.BIG(0);
-            P.affine();
+            //P.affine();
             Q[0] = new ctx.ECP8();
             Q[0].copy(P);
 

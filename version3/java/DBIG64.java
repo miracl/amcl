@@ -74,12 +74,13 @@ public class DBIG {
 /* return number of bits in this */
 	public int nbits() {
 		int bts,k=BIG.DNLEN-1;
+		DBIG t=new DBIG(this);
 		long c;
-		norm();
-		while (w[k]==0 && k>=0) k--;
+		t.norm();
+		while (t.w[k]==0 && k>=0) k--;
 		if (k<0) return 0;
 		bts=BIG.BASEBITS*k;
-		c=w[k];
+		c=t.w[k];
 		while (c!=0) {c/=2; bts++;}
 		return bts;
 	}

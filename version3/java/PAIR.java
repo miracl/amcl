@@ -134,7 +134,7 @@ public final class PAIR {
 	}
 
 /* Optimal R-ate pairing */
-	public static FP12 ate(ECP2 P,ECP Q)
+	public static FP12 ate(ECP2 P1,ECP Q1)
 	{
 		FP2 f;
 		BIG x=new BIG(ROM.CURVE_Bnx);
@@ -142,6 +142,13 @@ public final class PAIR {
 		ECP2 K=new ECP2();
 		FP12 lv;
 		int bt;
+
+// P is needed in affine form for line function, Q for (Qx,Qy) extraction
+		ECP2 P=new ECP2(P1);
+		ECP Q=new ECP(Q1);
+
+		P.affine();
+		Q.affine();
 
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
@@ -226,7 +233,7 @@ public final class PAIR {
 	}
 
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-	public static FP12 ate2(ECP2 P,ECP Q,ECP2 R,ECP S)
+	public static FP12 ate2(ECP2 P1,ECP Q1,ECP2 R1,ECP S1)
 	{
 		FP2 f;
 		BIG x=new BIG(ROM.CURVE_Bnx);
@@ -234,6 +241,18 @@ public final class PAIR {
 		ECP2 K=new ECP2();
 		FP12 lv;
 		int bt;
+
+		ECP2 P=new ECP2(P1);
+		ECP Q=new ECP(Q1);
+
+		P.affine();
+		Q.affine();
+
+		ECP2 R=new ECP2(R1);
+		ECP S=new ECP(S1);
+
+		R.affine();
+		S.affine();
 
 		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
 		{
@@ -580,12 +599,12 @@ public final class PAIR {
 		ECP R;
 		if (USE_GLV)
 		{
-			P.affine();
+			//P.affine();
 			R=new ECP();
 			R.copy(P);
 			int i,np,nn;
 			ECP Q=new ECP();
-			Q.copy(P);
+			Q.copy(P); Q.affine();
 			BIG q=new BIG(ROM.CURVE_Order);
 			FP cru=new FP(new BIG(ROM.CURVE_Cru));
 			BIG t=new BIG(0);
@@ -641,7 +660,7 @@ public final class PAIR {
 
 			BIG t=new BIG(0);
 			int i,np,nn;
-			P.affine();
+			//P.affine();
 
 			Q[0]=new ECP2(); Q[0].copy(P);
 			for (i=1;i<4;i++)
@@ -660,6 +679,7 @@ public final class PAIR {
 					Q[i].neg();
 				}
 				u[i].norm();	
+				//Q[i].affine();
 			}
 
 			R=ECP2.mul4(Q,u);

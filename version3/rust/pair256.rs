@@ -127,13 +127,16 @@ fn lineadd(A: &mut ECP8,B: &ECP8,qx: &FP,qy: &FP) -> FP48 {
 
 #[allow(non_snake_case)]
 /* Optimal R-ate pairing */
-pub fn ate(P: &ECP8,Q: &ECP) -> FP48 {
+pub fn ate(P1: &ECP8,Q1: &ECP) -> FP48 {
 	let x = BIG::new_ints(&rom::CURVE_BNX);
 	let n = BIG::new_copy(&x);
 
 	let mut n3 = BIG::new_copy(&n);
 	n3.pmul(3);
 	n3.norm();
+
+	let mut P=ECP8::new(); P.copy(P1); P.affine();
+	let mut Q=ECP::new(); Q.copy(Q1); Q.affine();
 
 	let qx=FP::new_copy(&Q.getpx());
 	let qy=FP::new_copy(&Q.getpy());
@@ -154,7 +157,7 @@ pub fn ate(P: &ECP8,Q: &ECP) -> FP48 {
 		r.smul(&lv,ecp::SEXTIC_TWIST);
 		let bt=n3.bit(i)-n.bit(i);
 		if bt==1 {
-			lv=lineadd(&mut A,P,&qx,&qy);
+			lv=lineadd(&mut A,&P,&qx,&qy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}		
 		if bt == -1 {
@@ -174,7 +177,7 @@ pub fn ate(P: &ECP8,Q: &ECP) -> FP48 {
 
 #[allow(non_snake_case)]
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-pub fn ate2(P: &ECP8,Q: &ECP,R: &ECP8,S: &ECP) -> FP48 {
+pub fn ate2(P1: &ECP8,Q1: &ECP,R1: &ECP8,S1: &ECP) -> FP48 {
 	let x = BIG::new_ints(&rom::CURVE_BNX);
 	let n = BIG::new_copy(&x);
 	
@@ -182,6 +185,10 @@ pub fn ate2(P: &ECP8,Q: &ECP,R: &ECP8,S: &ECP) -> FP48 {
 	n3.pmul(3);
 	n3.norm();
 
+	let mut P=ECP8::new(); P.copy(P1); P.affine();
+	let mut Q=ECP::new(); Q.copy(Q1); Q.affine();
+	let mut R=ECP8::new(); R.copy(R1); R.affine();
+	let mut S=ECP::new(); S.copy(S1); S.affine();
 
 	let qx=FP::new_copy(&Q.getpx());
 	let qy=FP::new_copy(&Q.getpy());
@@ -213,9 +220,9 @@ pub fn ate2(P: &ECP8,Q: &ECP,R: &ECP8,S: &ECP) -> FP48 {
 		r.smul(&lv,ecp::SEXTIC_TWIST);
 		let bt=n3.bit(i)-n.bit(i);		
 		if bt == 1 {
-			lv=lineadd(&mut A,P,&qx,&qy);
+			lv=lineadd(&mut A,&P,&qx,&qy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
-			lv=lineadd(&mut B,R,&sx,&sy);
+			lv=lineadd(&mut B,&R,&sx,&sy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}
 		if bt == -1 {
@@ -460,7 +467,7 @@ pub fn g1mul(P: &ECP,e: &mut BIG) -> ECP {
 	//	P.affine();
 		R.copy(P);
 		let mut Q=ECP::new();
-		Q.copy(P);
+		Q.copy(P); Q.affine();
 		let q=BIG::new_ints(&rom::CURVE_ORDER);
 		let mut cru=FP::new_big(&BIG::new_ints(&rom::CURVE_CRU));
 		let mut u=glv(e);

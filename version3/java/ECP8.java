@@ -35,6 +35,12 @@ public final class ECP8 {
 		z=new FP8(0);
 	}
 
+    public ECP8(ECP8 e) {
+        this.x = new FP8(e.x);
+        this.y = new FP8(e.y);
+        this.z = new FP8(e.z);
+    }
+
 /* Test this=O? */
 	public boolean is_infinity() {
 //		if (INF) return true;                    //******
@@ -146,14 +152,16 @@ public final class ECP8 {
 /* extract affine x as FP8 */
 	public FP8 getX()
 	{
-		affine();
-		return x;
+		ECP8 W= new ECP8(this);
+		W.affine();
+		return W.x;
 	}
 /* extract affine y as FP8 */
 	public FP8 getY()
 	{
-		affine();
-		return y;
+		ECP8 W= new ECP8(this);
+		W.affine();
+		return W.y;
 	}
 /* extract projective x */
 	public FP8 getx()
@@ -175,44 +183,45 @@ public final class ECP8 {
 	public void toBytes(byte[] b)
 	{
 		byte[] t=new byte[BIG.MODBYTES];
-		affine();
+		ECP8 W=new ECP8(this);
+		W.affine();
 		int MB=BIG.MODBYTES;
 
-		x.geta().geta().getA().toBytes(t);
+		W.x.geta().geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i]=t[i];}
-		x.geta().geta().getB().toBytes(t);
+		W.x.geta().geta().getB().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+MB]=t[i];}
-		x.geta().getb().getA().toBytes(t);
+		W.x.geta().getb().getA().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+2*MB]=t[i];}
-		x.geta().getb().getB().toBytes(t);
+		W.x.geta().getb().getB().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+3*MB]=t[i];}
 
-		x.getb().geta().getA().toBytes(t);
+		W.x.getb().geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+4*MB]=t[i];}
-		x.getb().geta().getB().toBytes(t);
+		W.x.getb().geta().getB().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+5*MB]=t[i];}
-		x.getb().getb().getA().toBytes(t);
+		W.x.getb().getb().getA().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+6*MB]=t[i];}
-		x.getb().getb().getB().toBytes(t);
+		W.x.getb().getb().getB().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+7*MB]=t[i];}
 
 
-		y.geta().geta().getA().toBytes(t);
+		W.y.geta().geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+8*MB]=t[i];}
-		y.geta().geta().getB().toBytes(t);
+		W.y.geta().geta().getB().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+9*MB]=t[i];}
-		y.geta().getb().getA().toBytes(t);
+		W.y.geta().getb().getA().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+10*MB]=t[i];}
-		y.geta().getb().getB().toBytes(t);
+		W.y.geta().getb().getB().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+11*MB]=t[i];}
 	
-		y.getb().geta().getA().toBytes(t);
+		W.y.getb().geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+12*MB]=t[i];}
-		y.getb().geta().getB().toBytes(t);
+		W.y.getb().geta().getB().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+13*MB]=t[i];}
-		y.getb().getb().getA().toBytes(t);
+		W.y.getb().getb().getA().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+14*MB]=t[i];}
-		y.getb().getb().getB().toBytes(t);
+		W.y.getb().getb().getB().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i+15*MB]=t[i];}
 
 	}
@@ -300,14 +309,15 @@ public final class ECP8 {
 
 /* convert this to hex string */
 	public String toString() {
-		if (is_infinity()) return "infinity";
-		affine();
-		return "("+x.toString()+","+y.toString()+")";
+		ECP8 W=new ECP8(this);		
+		W.affine();
+		if (W.is_infinity()) return "infinity";
+		return "("+W.x.toString()+","+W.y.toString()+")";
 	}
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 	public static FP8 RHS(FP8 x) {
-		x.norm();
+		//x.norm();
 		FP8 r=new FP8(x);
 		r.sqr();
 		FP8 b=new FP8(new FP4(new FP2(new BIG(ROM.CURVE_B))));
@@ -334,6 +344,7 @@ public final class ECP8 {
 		x=new FP8(ix);
 		y=new FP8(iy);
 		z=new FP8(1);
+		x.norm();
 		FP8 rhs=RHS(x);
 		FP8 y2=new FP8(y);
 		y2.sqr();
@@ -347,6 +358,7 @@ public final class ECP8 {
 		x=new FP8(ix);
 		y=new FP8(1);
 		z=new FP8(1);
+		x.norm();
 		FP8 rhs=RHS(x);
 		if (rhs.sqrt()) 
 		{
@@ -492,9 +504,13 @@ public final class ECP8 {
 
 /* set this-=Q */
 	public int sub(ECP8 Q) {
-		Q.neg();
-		int D=add(Q);
-		Q.neg();
+		ECP8 NQ=new ECP8(Q);
+		NQ.neg();
+		int D=add(NQ);
+
+//		Q.neg();
+//		int D=add(Q);
+//		Q.neg();
 		return D;
 	}
 
@@ -566,7 +582,7 @@ public final class ECP8 {
 
 		if (is_infinity()) return new ECP8();
 
-		affine();
+		//affine();
 
 /* precompute table */
 		Q.copy(this);
@@ -644,7 +660,7 @@ public final class ECP8 {
 		for (i=0;i<16;i++)
 		{
 			t[i]=new BIG(u[i]);
-			Q[i].affine();
+			//Q[i].affine();
 			t[i].norm();
 		}
 

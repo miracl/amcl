@@ -220,6 +220,7 @@ var ECP = function(ctx) {
             this.y = new ctx.FP(0);
             this.y.bcopy(iy);
             this.z = new ctx.FP(1);
+			this.x.norm();
             rhs = ECP.RHS(this.x);
 
             if (ECP.CURVETYPE == ECP.MONTGOMERY) {
@@ -253,6 +254,7 @@ var ECP = function(ctx) {
 
             this.x = new ctx.FP(0);
             this.x.bcopy(ix);
+			this.x.norm();
             rhs = ECP.RHS(this.x);
             this.z = new ctx.FP(1);
 
@@ -274,6 +276,7 @@ var ECP = function(ctx) {
 
             this.x = new ctx.FP(0);
             this.x.bcopy(ix);
+			this.x.norm();
             rhs = ECP.RHS(this.x);
             this.z = new ctx.FP(1);
 
@@ -319,19 +322,21 @@ var ECP = function(ctx) {
 
         /* extract x as ctx.BIG */
         getX: function() {
-            this.affine();
-            return this.x.redc();
+			var W=new ECP(); W.copy(this); W.affine();
+            //this.affine();
+            return W.x.redc();
         },
 
         /* extract y as ctx.BIG */
         getY: function() {
-            this.affine();
-            return this.y.redc();
+			var W=new ECP(); W.copy(this); W.affine();
+            //this.affine();
+            return W.y.redc();
         },
 
         /* get sign of Y */
         getS: function() {
-            this.affine();
+            //this.affine();
             var y = this.getY();
             return y.parity();
         },
@@ -355,9 +360,9 @@ var ECP = function(ctx) {
         toBytes: function(b,compress) {
             var t = [],
                 i;
-
-            this.affine();
-            this.x.redc().toBytes(t);
+			var W=new ECP(); W.copy(this);
+            W.affine();
+            W.x.redc().toBytes(t);
 
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + 1] = t[i];
@@ -370,7 +375,7 @@ var ECP = function(ctx) {
 
             if (compress) {
                 b[0]=0x02;
-                if (this.y.redc().parity()==1) {
+                if (W.y.redc().parity()==1) {
                     b[0]=0x03;
                 }
                 return;
@@ -378,23 +383,24 @@ var ECP = function(ctx) {
 
             b[0]=0x04;
 
-            this.y.redc().toBytes(t);
+            W.y.redc().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + ctx.BIG.MODBYTES + 1] = t[i];
             }
         },
         /* convert to hex string */
         toString: function() {
-            if (this.is_infinity()) {
+			var W=new ECP(); W.copy(this);
+            if (W.is_infinity()) {
                 return "infinity";
             }
 
-            this.affine();
+            W.affine();
 
             if (ECP.CURVETYPE == ECP.MONTGOMERY) {
-                return "(" + this.x.redc().toString() + ")";
+                return "(" + W.x.redc().toString() + ")";
             } else {
-                return "(" + this.x.redc().toString() + "," + this.y.redc().toString() + ")";
+                return "(" + W.x.redc().toString() + "," + W.y.redc().toString() + ")";
             }
         },
 
@@ -976,9 +982,10 @@ var ECP = function(ctx) {
 
         /* this-=Q */
         sub: function(Q) {
-            Q.neg();
-            this.add(Q);
-            Q.neg();
+			var NQ = new ECP(); NQ.copy(Q);
+            NQ.neg();
+            this.add(NQ);
+            //Q.neg();
         },
 
         /* constant time multiply by small integer of length bts - use ladder */
@@ -1019,12 +1026,12 @@ var ECP = function(ctx) {
             }
             if (cf==4) {
                 this.dbl(); this.dbl();
-                this.affine();
+                //this.affine();
                 return;
             }
             if (cf==8) {
                 this.dbl(); this.dbl(); this.dbl();
-                this.affine();
+                //this.affine();
                 return;
             }
             c.rcopy(ctx.ROM_CURVE.CURVE_Cof);
@@ -1073,7 +1080,7 @@ var ECP = function(ctx) {
                 W = [];
                 w = [];
 
-                this.affine();
+                //this.affine();
 
                 // precompute table
                 Q.copy(this);
@@ -1142,8 +1149,8 @@ var ECP = function(ctx) {
                 i, s, ns, nb,
                 a, b;
 
-            this.affine();
-            Q.affine();
+            //this.affine();
+            //Q.affine();
 
             te.copy(e);
             tf.copy(f);
@@ -1311,7 +1318,7 @@ var ECP = function(ctx) {
         var r = new ctx.FP(0),
             b, cx, one, x3;
 
-        x.norm();
+        //x.norm();
         r.copy(x);
         r.sqr();
 

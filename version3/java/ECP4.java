@@ -35,6 +35,12 @@ public final class ECP4 {
 		z=new FP4(0);
 	}
 
+    public ECP4(ECP4 e) {
+        this.x = new FP4(e.x);
+        this.y = new FP4(e.y);
+        this.z = new FP4(e.z);
+    }
+
 /* Test this=O? */
 	public boolean is_infinity() {
 //		if (INF) return true;                    //******
@@ -145,14 +151,16 @@ public final class ECP4 {
 /* extract affine x as FP4 */
 	public FP4 getX()
 	{
-		affine();
-		return x;
+		ECP4 W= new ECP4(this);
+		W.affine();
+		return W.x;
 	}
 /* extract affine y as FP4 */
 	public FP4 getY()
 	{
-		affine();
-		return y;
+		ECP4 W= new ECP4(this);
+		W.affine();
+		return W.y;
 	}
 /* extract projective x */
 	public FP4 getx()
@@ -174,32 +182,33 @@ public final class ECP4 {
 	public void toBytes(byte[] b)
 	{
 		byte[] t=new byte[BIG.MODBYTES];
-		affine();
+		ECP4 W=new ECP4(this);
+		//affine();
 		int MB=BIG.MODBYTES;
 
-		x.geta().getA().toBytes(t);
+		W.x.geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i]=t[i];
-		x.geta().getB().toBytes(t);
+		W.x.geta().getB().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+MB]=t[i];
-		x.getb().getA().toBytes(t);
+		W.x.getb().getA().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+2*MB]=t[i];
-		x.getb().getB().toBytes(t);
+		W.x.getb().getB().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+3*MB]=t[i];
 
-		y.geta().getA().toBytes(t);
+		W.y.geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+4*MB]=t[i];
-		y.geta().getB().toBytes(t);
+		W.y.geta().getB().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+5*MB]=t[i];
-		y.getb().getA().toBytes(t);
+		W.y.getb().getA().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+6*MB]=t[i];
-		y.getb().getB().toBytes(t);
+		W.y.getb().getB().toBytes(t);
 		for (int i=0;i<MB;i++) 
 			b[i+7*MB]=t[i];
 
@@ -251,14 +260,15 @@ public final class ECP4 {
 
 /* convert this to hex string */
 	public String toString() {
-		if (is_infinity()) return "infinity";
-		affine();
-		return "("+x.toString()+","+y.toString()+")";
+		ECP4 W=new ECP4(this);	
+		W.affine();
+		if (W.is_infinity()) return "infinity";
+		return "("+W.x.toString()+","+W.y.toString()+")";
 	}
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 	public static FP4 RHS(FP4 x) {
-		x.norm();
+		//x.norm();
 		FP4 r=new FP4(x);
 		r.sqr();
 		FP4 b=new FP4(new FP2(new BIG(ROM.CURVE_B)));
@@ -285,6 +295,7 @@ public final class ECP4 {
 		x=new FP4(ix);
 		y=new FP4(iy);
 		z=new FP4(1);
+		x.norm();
 		FP4 rhs=RHS(x);
 		FP4 y2=new FP4(y);
 		y2.sqr();
@@ -298,6 +309,7 @@ public final class ECP4 {
 		x=new FP4(ix);
 		y=new FP4(1);
 		z=new FP4(1);
+		x.norm();
 		FP4 rhs=RHS(x);
 		if (rhs.sqrt()) 
 		{
@@ -443,9 +455,13 @@ public final class ECP4 {
 
 /* set this-=Q */
 	public int sub(ECP4 Q) {
-		Q.neg();
-		int D=add(Q);
-		Q.neg();
+		ECP4 NQ=new ECP4(Q);
+		NQ.neg();
+		int D=add(NQ);
+
+		//Q.neg();
+		//int D=add(Q);
+		//Q.neg();
 		return D;
 	}
 
@@ -504,7 +520,7 @@ public final class ECP4 {
 
 		if (is_infinity()) return new ECP4();
 
-		affine();
+		//affine();
 
 /* precompute table */
 		Q.copy(this);
@@ -577,7 +593,7 @@ public final class ECP4 {
 		for (i=0;i<8;i++)
 		{
 			t[i]=new BIG(u[i]);
-			Q[i].affine();
+			//Q[i].affine();
 			t[i].norm();
 		}
 

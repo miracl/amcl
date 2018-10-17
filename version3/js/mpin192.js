@@ -672,7 +672,7 @@ var MPIN192 = function(ctx) {
 
             P = ctx.PAIR192.G1mul(P, y);
             P.add(R);
-            P.affine();
+            //P.affine();
             R = ctx.ECP.fromBytes(mSEC);
             if (R.is_infinity()) {
                 return this.INVALID_POINT;
@@ -698,7 +698,7 @@ var MPIN192 = function(ctx) {
 
                         P = ctx.PAIR192.G1mul(P, y);
                         P.add(R);
-                        P.affine();
+                        //P.affine();
                     }
                     g = ctx.PAIR192.ate(Q, P);
                     g = ctx.PAIR192.fexp(g);
@@ -1002,7 +1002,7 @@ var MPIN192 = function(ctx) {
             h = ctx.BIG.fromBytes(H);
             A = ctx.PAIR192.G1mul(A, h);
             R.add(A);
-            R.affine();
+            //R.affine();
 
             U = ctx.PAIR192.G1mul(U, w);
             g = ctx.PAIR192.ate(sQ, R);

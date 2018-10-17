@@ -142,8 +142,8 @@ void BIG_XXX_toBytes(char *b,BIG_XXX a)
 {
     int i;
     BIG_XXX c;
-    BIG_XXX_norm(a);
     BIG_XXX_copy(c,a);
+	BIG_XXX_norm(c);
     for (i=MODBYTES_XXX-1; i>=0; i--)
     {
         b[i]=c[0]&0xff;
@@ -862,7 +862,7 @@ void BIG_XXX_dshl(DBIG_XXX a,int k)
 
 }
 
-/* General shift rightof a by k bits */
+/* General shift right of a by k bits */
 /* a MUST be normalised */
 /* SU= 32 */
 void BIG_XXX_shr(BIG_XXX a,int k)
@@ -875,6 +875,29 @@ void BIG_XXX_shr(BIG_XXX a,int k)
     if (NLEN_XXX>m)  a[NLEN_XXX-m-1]=a[NLEN_XXX-1]>>n;
     for (i=NLEN_XXX-m; i<NLEN_XXX; i++) a[i]=0;
 
+}
+
+/* Fast combined shift, subtract and norm. Return sign of result */
+int BIG_XXX_ssn(BIG_XXX r,BIG_XXX a,BIG_XXX m)
+{
+	int i,n=NLEN_XXX-1;
+	chunk carry;
+	m[0]=(m[0]>>1)|((m[1]<<(BASEBITS_XXX-1))&BMASK_XXX);
+	r[0]=a[0]-m[0];
+    carry=r[0]>>BASEBITS_XXX;
+    r[0]&=BMASK_XXX;
+    
+	for (i=1;i<n;i++)
+	{
+		m[i]=(m[i]>>1)|((m[i+1]<<(BASEBITS_XXX-1))&BMASK_XXX);
+		r[i]=a[i]-m[i]+carry;
+		carry=r[i]>>BASEBITS_XXX;
+		r[i]&=BMASK_XXX;
+	}
+	
+	m[n]>>=1;
+	r[n]=a[n]-m[n]+carry;
+	return ((r[n]>>(CHUNK-1))&1);
 }
 
 /* Faster shift right of a by k bits. Return shifted out part */
@@ -1018,12 +1041,14 @@ int BIG_XXX_dcomp(DBIG_XXX a,DBIG_XXX b)
 int BIG_XXX_nbits(BIG_XXX a)
 {
     int bts,k=NLEN_XXX-1;
+	BIG_XXX t;
     chunk c;
-    BIG_XXX_norm(a);
-    while (k>=0 && a[k]==0) k--;
+	BIG_XXX_copy(t,a);
+    BIG_XXX_norm(t);
+    while (k>=0 && t[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS_XXX*k;
-    c=a[k];
+    c=t[k];
     while (c!=0)
     {
         c/=2;
@@ -1036,12 +1061,14 @@ int BIG_XXX_nbits(BIG_XXX a)
 int BIG_XXX_dnbits(DBIG_XXX a)
 {
     int bts,k=DNLEN_XXX-1;
+	DBIG_XXX t;
     chunk c;
-    BIG_XXX_dnorm(a);
-    while (k>=0 && a[k]==0) k--;
+	BIG_XXX_dcopy(t,a);
+    BIG_XXX_dnorm(t);
+    while (k>=0 && t[k]==0) k--;
     if (k<0) return 0;
     bts=BASEBITS_XXX*k;
-    c=a[k];
+    c=t[k];
     while (c!=0)
     {
         c/=2;
@@ -1053,10 +1080,12 @@ int BIG_XXX_dnbits(DBIG_XXX a)
 
 /* Set b=b mod c */
 /* SU= 16 */
-void BIG_XXX_mod(BIG_XXX b,BIG_XXX c)
+void BIG_XXX_mod(BIG_XXX b,BIG_XXX c1)
 {
     int k=0;
     BIG_XXX r; /**/
+	BIG_XXX c;
+	BIG_XXX_copy(c,c1);
 
     BIG_XXX_norm(b);
     if (BIG_XXX_comp(b,c)<0)
@@ -1313,9 +1342,12 @@ void BIG_XXX_randomnum(BIG_XXX m,BIG_XXX q,csprng *rng)
 
 /* Set r=a*b mod m */
 /* SU= 96 */
-void BIG_XXX_modmul(BIG_XXX r,BIG_XXX a,BIG_XXX b,BIG_XXX m)
+void BIG_XXX_modmul(BIG_XXX r,BIG_XXX a1,BIG_XXX b1,BIG_XXX m)
 {
     DBIG_XXX d;
+	BIG_XXX a,b;
+	BIG_XXX_copy(a,a1);
+	BIG_XXX_copy(b,b1);
     BIG_XXX_mod(a,m);
     BIG_XXX_mod(b,m);
 
@@ -1325,9 +1357,11 @@ void BIG_XXX_modmul(BIG_XXX r,BIG_XXX a,BIG_XXX b,BIG_XXX m)
 
 /* Set a=a*a mod m */
 /* SU= 88 */
-void BIG_XXX_modsqr(BIG_XXX r,BIG_XXX a,BIG_XXX m)
+void BIG_XXX_modsqr(BIG_XXX r,BIG_XXX a1,BIG_XXX m)
 {
     DBIG_XXX d;
+	BIG_XXX a;
+	BIG_XXX_copy(a,a1);
     BIG_XXX_mod(a,m);
     BIG_XXX_sqr(d,a);
     BIG_XXX_dmod(r,d,m);
@@ -1335,8 +1369,10 @@ void BIG_XXX_modsqr(BIG_XXX r,BIG_XXX a,BIG_XXX m)
 
 /* Set r=-a mod m */
 /* SU= 16 */
-void BIG_XXX_modneg(BIG_XXX r,BIG_XXX a,BIG_XXX m)
+void BIG_XXX_modneg(BIG_XXX r,BIG_XXX a1,BIG_XXX m)
 {
+	BIG_XXX a;
+	BIG_XXX_copy(a,a1);
     BIG_XXX_mod(a,m);
     BIG_XXX_sub(r,m,a);
 //    BIG_XXX_mod(r,m);
@@ -1344,10 +1380,14 @@ void BIG_XXX_modneg(BIG_XXX r,BIG_XXX a,BIG_XXX m)
 
 /* Set a=a/b mod m */
 /* SU= 136 */
-void BIG_XXX_moddiv(BIG_XXX r,BIG_XXX a,BIG_XXX b,BIG_XXX m)
+void BIG_XXX_moddiv(BIG_XXX r,BIG_XXX a1,BIG_XXX b1,BIG_XXX m)
 {
     DBIG_XXX d;
     BIG_XXX z;
+	BIG_XXX a,b;
+	BIG_XXX_copy(a,a1);
+	BIG_XXX_copy(b,b1);
+
     BIG_XXX_mod(a,m);
     BIG_XXX_invmodp(z,b,m);
 

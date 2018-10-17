@@ -92,8 +92,9 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	inb=int(nb)
 	inbt=int(nbt)
 	sh=ib*(1+((8*inb-1)//ib))-inbt
-	if sh > 30 :
-		sh=30
+
+	if sh > 14 :
+		sh=14
 	replace(fnameh,"@SH@",str(sh))
 
 	fnameh="config_curve_"+tc+".h"	
@@ -498,7 +499,7 @@ while ptr<max:
 		curveset("256","F256PME","NUMS256E","32","29","256","3","PSEUDO_MERSENNE","EDWARDS","NOT","","","128")
 		curve_selected=True
 	if x==13:
-		curveset("384","F384PM","NUMS384W","48","29","284","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT","","","192")
+		curveset("384","F384PM","NUMS384W","48","29","384","3","PSEUDO_MERSENNE","WEIERSTRASS","NOT","","","192")
 		curve_selected=True
 	if x==14:
 		curveset("384","F384PM","NUMS384E","48","29","384","3","PSEUDO_MERSENNE","EDWARDS","NOT","","","192")

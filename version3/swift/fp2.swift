@@ -29,7 +29,7 @@
 /* FP2 elements are of the form a+ib, where i is sqrt(-1) */
 
 
-final public class FP2
+public struct FP2
 {
     private var a:FP
     private var b:FP
@@ -74,11 +74,11 @@ final public class FP2
     /* test this=0 ? */
     func iszilch() -> Bool
     {
-        reduce()
+        //reduce()
         return (a.iszilch() && b.iszilch())
     }
     
-    func cmove(_ g:FP2,_ d:Int)
+    mutating func cmove(_ g:FP2,_ d:Int)
     {
         a.cmove(g.a,d)
         b.cmove(g.b,d)
@@ -99,14 +99,14 @@ final public class FP2
     
     
     /* reduce components mod Modulus */
-    func reduce()
+    mutating func reduce()
     {
         a.reduce()
         b.reduce()
     }
     
     /* normalise components of w */
-    func norm()
+    mutating func norm()
     {
         a.norm()
         b.norm()
@@ -125,32 +125,32 @@ final public class FP2
     }
 
     /* copy self=x */
-    func copy(_ x:FP2)
+    mutating func copy(_ x:FP2)
     {
         a.copy(x.a)
         b.copy(x.b)
     }
     
     /* set self=0 */
-    func zero()
+    mutating func zero()
     {
         a.zero()
         b.zero()
     }
     
     /* set self=1 */
-    func one()
+    mutating func one()
     {
         a.one()
         b.zero()
     }
     
     /* negate self mod Modulus */
-    func neg()
+    mutating func neg()
     {
     //    norm();
-        let m=FP(a)
-        let t=FP(0)
+        var m=FP(a)
+        var t=FP(0)
     
         m.add(b)
         m.neg()
@@ -162,53 +162,53 @@ final public class FP2
     }
     
     /* set to a-ib */
-    func conj()
+    mutating func conj()
     {
         b.neg(); b.norm()
     }
 
     /* self+=a */
-    func add(_ x:FP2)
+    mutating func add(_ x:FP2)
     {
         a.add(x.a)
         b.add(x.b)
     }
     
     /* self-=a */
-    func sub(_ x:FP2)
+    mutating func sub(_ x:FP2)
     {
-        let m=FP2(x)
+        var m=FP2(x)
         m.neg()
         add(m)
     }
 
     /* self=a-self */
-    func rsub(_ x:FP2)
+    mutating func rsub(_ x:FP2)
     {
         self.neg()
         self.add(x)
     }
 
     /* self*=s, where s is an FP */
-    func pmul(_ s:FP)
+    mutating func pmul(_ s:FP)
     {
         a.mul(s)
         b.mul(s)
     }
     
     /* self*=i, where i is an int */
-    func imul(_ c:Int)
+    mutating func imul(_ c:Int)
     {
         a.imul(c);
         b.imul(c);
     }
     
     /* self*=self */
-    func sqr()
+    mutating func sqr()
     {
-        let w1=FP(a)
-        let w3=FP(a)
-        let mb=FP(b)
+        var w1=FP(a)
+        var w3=FP(a)
+        var mb=FP(b)
 
         w1.add(b)
 
@@ -226,7 +226,7 @@ final public class FP2
 
     }
     /* self*=y */
-    func mul(_ y:FP2)
+    mutating func mul(_ y:FP2)
     { 
         if Int64(a.xes+b.xes)*Int64(y.a.xes+y.b.xes) > Int64(FP.FEXCESS)
         {
@@ -234,33 +234,33 @@ final public class FP2
             if b.xes>1 {b.reduce()}       
         }
 
-        let pR=DBIG(0)
+        var pR=DBIG(0)
         pR.ucopy(FP.p)
 
-        let C=BIG(a.x)
-        let D=BIG(y.a.x)
+        var C=BIG(a.x)
+        var D=BIG(y.a.x)
 
-        let A=BIG.mul(a.x,y.a.x)
-        let B=BIG.mul(b.x,y.b.x)
+        var A=BIG.mul(a.x,y.a.x)
+        var B=BIG.mul(b.x,y.b.x)
 
         C.add(b.x); C.norm()
         D.add(y.b.x); D.norm()
 
-        let E=BIG.mul(C,D)
-        let F=DBIG(A); F.add(B);
+        var E=BIG.mul(C,D)
+        var F=DBIG(A); F.add(B);
         B.rsub(pR);
 
         A.add(B); A.norm()
         E.sub(F); E.norm()
 
-        a.x.copy(FP.mod(A)); a.xes=3
-        b.x.copy(FP.mod(E)); b.xes=2
+        a.x.copy(FP.mod(&A)); a.xes=3
+        b.x.copy(FP.mod(&E)); b.xes=2
     
     }
  
     /* sqrt(a+ib) = sqrt(a+sqrt(a*a-n*b*b)/2)+ib/(2*sqrt(a+sqrt(a*a-n*b*b)/2)) */
     /* returns true if this is QR */
-    func sqrt() -> Bool
+    mutating func sqrt() -> Bool
     {
         if iszilch() {return true}
         var w1=FP(b)
@@ -293,11 +293,11 @@ final public class FP2
     }
 
     /* self=1/self */
-    func inverse()
+    mutating func inverse()
     {
         norm();
-        let w1=FP(a)
-        let w2=FP(b)
+        var w1=FP(a)
+        var w2=FP(b)
     
         w1.sqr()
         w2.sqr()
@@ -309,14 +309,14 @@ final public class FP2
     }
 
     /* self/=2 */
-    func div2()
+    mutating func div2()
     {
         a.div2();
         b.div2();
     }
     
     /* self*=sqrt(-1) */
-    func times_i()
+    mutating func times_i()
     {
         let z=FP(a)
         a.copy(b); a.neg()
@@ -325,7 +325,7 @@ final public class FP2
 
     /* w*=(1+sqrt(-1)) */
     /* where X*2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
-    func mul_ip()
+    mutating func mul_ip()
     {
     //    norm();
         let t=FP2(self)
@@ -337,9 +337,9 @@ final public class FP2
     //    norm()
     }
     /* w/=(1+sqrt(-1)) */
-    func div_ip()
+    mutating func div_ip()
     {
-        let t=FP2(0)
+        var t=FP2(0)
         norm()
         t.a.copy(a); t.a.add(b)
         t.b.copy(b); t.b.sub(a)
@@ -347,9 +347,9 @@ final public class FP2
         div2()
     }
     
-    func div_ip2()
+    mutating func div_ip2()
     {
-        let t=FP2(0)
+        var t=FP2(0)
 	norm()
         t.a.copy(a); t.a.add(b)
         t.b.copy(b); t.b.sub(a)

@@ -140,7 +140,7 @@ fn ecdh_ed25519(mut rng: &mut RAND)
 			let mm=ecdh::ecies_decrypt(sha,&p1,&p2,&v,&mut c,&t,&s1);
 			if let Some(rm)=mm {
 				println!("Decryption succeeded");
-				println!("Message is 0x"); printbinary(&rm);				
+				print!("Message is 0x"); printbinary(&rm);				
 			}
 			else {
 				println!("*** ECIES Decryption Failed");
@@ -279,7 +279,7 @@ fn ecdh_nist256(mut rng: &mut RAND)
 			let mm=ecdh::ecies_decrypt(sha,&p1,&p2,&v,&mut c,&t,&s1);
 			if let Some(rm)=mm {
 				println!("Decryption succeeded");
-				println!("Message is 0x"); printbinary(&rm);				
+				print!("Message is 0x"); printbinary(&rm);				
 			}
 			else {
 				println!("*** ECIES Decryption Failed");
@@ -417,7 +417,7 @@ fn ecdh_goldilocks(mut rng: &mut RAND)
 			let mm=ecdh::ecies_decrypt(sha,&p1,&p2,&v,&mut c,&t,&s1);
 			if let Some(rm)=mm {
 				println!("Decryption succeeded");
-				println!("Message is 0x"); printbinary(&rm);				
+				print!("Message is 0x"); printbinary(&rm);				
 			}
 			else {
 				println!("*** ECIES Decryption Failed");

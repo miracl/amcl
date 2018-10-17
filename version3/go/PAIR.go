@@ -119,7 +119,7 @@ func line(A *ECP2,B *ECP2,Qx *FP,Qy *FP) *FP12 {
 }
 
 /* Optimal R-ate pairing */
-func Ate(P *ECP2,Q *ECP) *FP12 {
+func Ate(P1 *ECP2,Q1 *ECP) *FP12 {
 	f:=NewFP2bigs(NewBIGints(Fra),NewBIGints(Frb))
 	x:=NewBIGints(CURVE_Bnx)
 	n:=NewBIGcopy(x)
@@ -144,6 +144,10 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 	n3:=NewBIGcopy(n);
 	n3.pmul(3);
 	n3.norm();
+
+	P:=NewECP2(); P.Copy(P1); P.Affine()
+	Q:=NewECP(); Q.Copy(Q1); Q.Affine()
+
 
 	Qx:=NewFPcopy(Q.getx())
 	Qy:=NewFPcopy(Q.gety())
@@ -203,7 +207,7 @@ func Ate(P *ECP2,Q *ECP) *FP12 {
 }
 
 /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
+func Ate2(P1 *ECP2,Q1 *ECP,R1 *ECP2,S1 *ECP) *FP12 {
 	f:=NewFP2bigs(NewBIGints(Fra),NewBIGints(Frb))
 	x:=NewBIGints(CURVE_Bnx)
 	n:=NewBIGcopy(x)
@@ -228,6 +232,12 @@ func Ate2(P *ECP2,Q *ECP,R *ECP2,S *ECP) *FP12 {
 	n3:=NewBIGcopy(n);
 	n3.pmul(3);
 	n3.norm();
+
+	P:=NewECP2(); P.Copy(P1); P.Affine()
+	Q:=NewECP(); Q.Copy(Q1); Q.Affine()
+	R:=NewECP2(); R.Copy(R1); R.Affine()
+	S:=NewECP(); S.Copy(S1); S.Affine()
+
 
 	Qx:=NewFPcopy(Q.getx())
 	Qy:=NewFPcopy(Q.gety())
@@ -566,11 +576,11 @@ func gs(e *BIG) []*BIG {
 func G1mul(P *ECP,e *BIG) *ECP {
 	var R *ECP
 	if (USE_GLV) {
-		P.Affine()
+		//P.Affine()
 		R=NewECP()
 		R.Copy(P)
 		Q:=NewECP()
-		Q.Copy(P)
+		Q.Copy(P); Q.Affine()
 		q:=NewBIGints(CURVE_Order)
 		cru:=NewFPbig(NewBIGints(CURVE_Cru))
 		t:=NewBIGint(0)
@@ -618,7 +628,7 @@ func G2mul(P *ECP2,e *BIG) *ECP2 {
 		u:=gs(e)
 
 		t:=NewBIGint(0)
-		P.Affine()
+		//P.Affine()
 		Q=append(Q,NewECP2());  Q[0].Copy(P);
 		for i:=1;i<4;i++ {
 			Q=append(Q,NewECP2()); Q[i].Copy(Q[i-1])
@@ -712,9 +722,9 @@ func main() {
 	//r:=NewBIGints(CURVE_Order)
 	//xa:=NewBIGints(CURVE_Pxa)
 
-	fmt.Printf("P= "+P.toString())
+	fmt.Printf("P= "+P.ToString())
 	fmt.Printf("\n");
-	fmt.Printf("Q= "+Q.toString());
+	fmt.Printf("Q= "+Q.ToString());
 	fmt.Printf("\n");
 
 	//m:=NewBIGint(17)
@@ -723,21 +733,21 @@ func main() {
 	e=Fexp(e)
 	for i:=1;i<1000;i++ {
 		e=Ate(P,Q)
-//	fmt.Printf("\ne= "+e.toString())
+//	fmt.Printf("\ne= "+e.ToString())
 //	fmt.Printf("\n")
 
 		e=Fexp(e)
 	}
 	//	e=GTpow(e,m);
 
-	fmt.Printf("\ne= "+e.toString())
+	fmt.Printf("\ne= "+e.ToString())
 	fmt.Printf("\n");
 	GLV:=glv(r)
 
-	fmt.Printf("GLV[0]= "+GLV[0].toString())
+	fmt.Printf("GLV[0]= "+GLV[0].ToString())
 	fmt.Printf("\n")
 
-	fmt.Printf("GLV[0]= "+GLV[1].toString())
+	fmt.Printf("GLV[0]= "+GLV[1].ToString())
 	fmt.Printf("\n")
 
 	G:=NewECP(); G.Copy(Q)
@@ -748,20 +758,20 @@ func main() {
 	e=Fexp(e)
 
 	e=GTpow(e,xa)
-	fmt.Printf("\ne= "+e.toString());
+	fmt.Printf("\ne= "+e.ToString());
 	fmt.Printf("\n")
 
 	R=G2mul(R,xa)
 	e=Ate(R,G)
 	e=Fexp(e)
 
-	fmt.Printf("\ne= "+e.toString())
+	fmt.Printf("\ne= "+e.ToString())
 	fmt.Printf("\n")
 
 	G=G1mul(G,xa)
 	e=Ate(P,G)
 	e=Fexp(e)
-	fmt.Printf("\ne= "+e.toString())
+	fmt.Printf("\ne= "+e.ToString())
 	fmt.Printf("\n") 
 }
 */

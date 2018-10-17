@@ -158,14 +158,16 @@ var ECP4 = function(ctx) {
 
         /* extract affine x as ctx.FP4 */
         getX: function() {
-            this.affine();
-            return this.x;
+			var W=new ECP4(); W.copy(this); W.affine();
+            //this.affine();
+            return W.x;
         },
 
         /* extract affine y as ctx.FP4 */
         getY: function() {
-            this.affine();
-            return this.y;
+			var W=new ECP4(); W.copy(this); W.affine();
+            //this.affine();
+            return W.y;
         },
 
         /* extract projective x */
@@ -187,39 +189,39 @@ var ECP4 = function(ctx) {
         toBytes: function(b) {
             var t = [],
                 i;
-
-            this.affine();
-            this.x.geta().getA().toBytes(t);
+			var W=new ECP4(); W.copy(this);
+            W.affine();
+            W.x.geta().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i] = t[i];
             }
-            this.x.geta().getB().toBytes(t);
+            W.x.geta().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + ctx.BIG.MODBYTES] = t[i];
             }
-            this.x.getb().getA().toBytes(t);
+            W.x.getb().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + 2*ctx.BIG.MODBYTES] = t[i];
             }
-            this.x.getb().getB().toBytes(t);
+            W.x.getb().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + 3*ctx.BIG.MODBYTES] = t[i];
             }
 
 
-            this.y.geta().getA().toBytes(t);
+            W.y.geta().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + 4 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.y.geta().getB().toBytes(t);
+            W.y.geta().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + 5 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.y.getb().getA().toBytes(t);
+            W.y.getb().getA().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + 6 * ctx.BIG.MODBYTES] = t[i];
             }
-            this.y.getb().getB().toBytes(t);
+            W.y.getb().getB().toBytes(t);
             for (i = 0; i < ctx.BIG.MODBYTES; i++) {
                 b[i + 7 * ctx.BIG.MODBYTES] = t[i];
             }
@@ -227,11 +229,12 @@ var ECP4 = function(ctx) {
 
         /* convert this to hex string */
         toString: function() {
-            if (this.is_infinity()) {
+			var W=new ECP4(); W.copy(this);
+            if (W.is_infinity()) {
                 return "infinity";
             }
-            this.affine();
-            return "(" + this.x.toString() + "," + this.y.toString() + ")";
+            W.affine();
+            return "(" + W.x.toString() + "," + W.y.toString() + ")";
         },
 
         /* set this=(x,y) */
@@ -241,6 +244,7 @@ var ECP4 = function(ctx) {
             this.x.copy(ix);
             this.y.copy(iy);
             this.z.one();
+			this.x.norm();
 
             rhs = ECP4.RHS(this.x);
 
@@ -264,7 +268,7 @@ var ECP4 = function(ctx) {
 
             this.x.copy(ix);
             this.z.one();
-
+			this.x.norm();
             rhs = ECP4.RHS(this.x);
 
             if (rhs.sqrt()) {
@@ -474,9 +478,10 @@ var ECP4 = function(ctx) {
         sub: function(Q) {
             var D;
 
-            Q.neg();
-            D = this.add(Q);
-            Q.neg();
+			var NQ=new ECP4(); NQ.copy(Q);
+            NQ.neg();
+            D = this.add(NQ);
+            //Q.neg();
 
             return D;
         },
@@ -497,7 +502,7 @@ var ECP4 = function(ctx) {
                 return new ECP4();
             }
 
-            this.affine();
+            //this.affine();
 
             // precompute table
             Q.copy(this);
@@ -643,7 +648,7 @@ var ECP4 = function(ctx) {
     ECP4.RHS = function(x) {
         var r, c, b;
 
-        x.norm();
+        //x.norm();
         r = new ctx.FP4(x); //r.copy(x);
         r.sqr();
 
@@ -685,7 +690,7 @@ var ECP4 = function(ctx) {
 
         for (i = 0; i < 8; i++) {
             t[i] = new ctx.BIG(u[i]); t[i].norm();
-            Q[i].affine();
+            //Q[i].affine();
         }
 
         T1[0] = new ECP4(); T1[0].copy(Q[0]); // Q[0]

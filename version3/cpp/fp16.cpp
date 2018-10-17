@@ -225,9 +225,9 @@ void YYY::FP16_mul(FP16 *w,FP16 *x,FP16 *y)
 
 	FP8_norm(&t4); // 2
 	FP8_norm(&t3); // 2
-
+//printf("Into 16 mul 2\n");
     FP8_mul(&t4,&t4,&t3); /* (xa+xb)(ya+yb) */
-
+//printf("Into 16 mul 2a\n");
 	FP8_neg(&t3,&t1);  // 1
 	FP8_add(&t4,&t4,&t3);  //t4E=3
     FP8_norm(&t4);
@@ -329,11 +329,11 @@ void YYY::FP16_pow(FP16 *r,FP16* a,BIG b)
     int bt;
 
     BIG_zero(zilch);
-    BIG_norm(b);
+
     BIG_copy(z,b);
     FP16_copy(&w,a);
     FP16_one(r);
-
+    BIG_norm(z);
     while(1)
     {
         bt=BIG_parity(z);
@@ -395,8 +395,10 @@ void YYY::FP16_xtr_pow(FP16 *r,FP16 *x,BIG n)
     FP2 w2;
 	FP4 w4;
 	FP8 w8;
-    FP16 t,a,b,c;
+    FP16 t,a,b,c,sf;
 
+	FP16_copy(&sf,x);
+	FP16_norm(&sf);
     BIG_zero(v);
     BIG_inc(v,3);
 	BIG_norm(v);
@@ -405,12 +407,13 @@ void YYY::FP16_xtr_pow(FP16 *r,FP16 *x,BIG n)
 	FP8_from_FP4(&w8,&w4);
     FP16_from_FP8(&a,&w8);
 
-	FP16_copy(&b,x);
-    FP16_xtr_D(&c,x);
+	FP16_copy(&b,&sf);
+    FP16_xtr_D(&c,&sf);
 
-    BIG_norm(n);
+
     par=BIG_parity(n);
     BIG_copy(v,n);
+    BIG_norm(v);
     BIG_shr(v,1);
     if (par==0)
     {
@@ -424,10 +427,10 @@ void YYY::FP16_xtr_pow(FP16 *r,FP16 *x,BIG n)
         if (!BIG_bit(v,i))
         {
             FP16_copy(&t,&b);
-            FP16_conj(x,x);
+            FP16_conj(&sf,&sf);
             FP16_conj(&c,&c);
-            FP16_xtr_A(&b,&a,&b,x,&c);
-            FP16_conj(x,x);
+            FP16_xtr_A(&b,&a,&b,&sf,&c);
+            FP16_conj(&sf,&sf);
             FP16_xtr_D(&c,&t);
             FP16_xtr_D(&a,&a);
         }
@@ -435,7 +438,7 @@ void YYY::FP16_xtr_pow(FP16 *r,FP16 *x,BIG n)
         {
             FP16_conj(&t,&a);
             FP16_xtr_D(&a,&b);
-            FP16_xtr_A(&b,&c,&b,x,&t);
+            FP16_xtr_A(&b,&c,&b,&sf,&t);
             FP16_xtr_D(&c,&c);
         }
     }
@@ -452,10 +455,11 @@ void YYY::FP16_xtr_pow2(FP16 *r,FP16 *ck,FP16 *cl,FP16 *ckml,FP16 *ckm2l,BIG a,B
     BIG d,e,w;
     FP16 t,cu,cv,cumv,cum2v;
 
-    BIG_norm(a);
-	BIG_norm(b);
+
     BIG_copy(e,a);
     BIG_copy(d,b);
+    BIG_norm(d);
+	BIG_norm(e);
     FP16_copy(&cu,ck);
     FP16_copy(&cv,cl);
     FP16_copy(&cumv,ckml);

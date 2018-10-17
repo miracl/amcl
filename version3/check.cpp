@@ -32,9 +32,19 @@ using namespace std;
 
 Miracl precision=20;
 
+// calculate maximum excess given base, length in words, length in bits
+int maxxes(int b,int n,int m)
+{
+	int mx=n*b-m;
+	int tp=m%b;
+	if (mx >= tp)
+		mx=tp-1;
+	return mx;
+}
+
 int main(int argc, char *argv[])
 {
-	int p,w,b,n,s,t,e,ex;
+	int p,w,b,n,s,t,e,ex,mx;
 	Big lhs,rhs;
 
 	argc--; argv++;
@@ -47,11 +57,10 @@ int main(int argc, char *argv[])
        printf("Example:\n");
        printf("check 32 256\n");
 	   printf("Outputs choices for BASEBITS, number of words per Big, and number of spare bits\n");
-	   printf("Normally choose for minimum words per Big, and maximum spare bits\n");
-	   printf(">=5 spare bits for Edwards curves\n");
-	   printf(">=10 spare bits for Weierstrass curves\n");
-	   printf(">=23 spare bits for pairings\n");
-	   printf("But should be less than 32 bits\n");
+	   printf("Normally choose for minimum words per Big, and maximum excess bits\n");
+	   printf("Ideally >=5 excess bits for Edwards curves\n");
+	   printf("Ideally >=10 excess bits for Weierstrass curves\n");
+	   printf("Ideally >=23 excess bits for pairings\n");
        exit(0);
     }
 
@@ -81,23 +90,18 @@ int main(int argc, char *argv[])
 		lhs=(w+2)*pow((Big)2,2*b);  // sum of products plus carry plus one for redc
 
 		if (lhs>=rhs)    {printf("Stability violation for BASEBITS= %d\n",b); continue;}
-/*
-		ex=1;		
-		while (lhs<rhs)
-		{
-			ex*=2; lhs*=2;
-		}
-		ex/=2;
-*/
 
-// Top bits of Modulus must appear in top word of representation. Also at least 4 bits spare needed for field excess.  
-		if (s<4 || s>=b) {printf("Not enough Fp spare for BASEBITS= %d\n",b); continue;}
+		mx=s;
+		if (mx>(n-4)/2)
+			mx=(n-4)/2;
+
+// At least 4 bits spare needed for field excess.  
+		if (mx<4) {printf("Not enough Fp excess for BASEBITS= %d\n",b); continue;}
 // At least 2 spare bits needed for FF excess 
 		t=b*(1+(p-1)/b) - 8*(1+(p-1)/8);
-		if (t<2 || t>=b) {printf("Not enough FF spare for BASEBITS= %d\n",b);}
+		if (t<2 || t>=b) {printf("Not enough FF excess for BASEBITS= %d\n",b);}
 
-		printf("Solution for BASEBITS= %d, Words Per Big=%d, Fp spare bits= %d, FF spare bits= %d\n",b,w,s,t);
-		//break;
+		printf("Solution for BASEBITS= %d, Words Per Big=%d, Max excess= %d\n",b,w,mx);
 	}
 	
 	return 0;

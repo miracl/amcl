@@ -48,8 +48,8 @@ public class TesttimeRSA extends TestCase
 		byte[] M=new byte[RSA.RFS];
 		byte[] C=new byte[RSA.RFS];
 
-		System.out.println("Testing/Timing 2048-bit RSA");
-		System.out.println("Generating 2048-bit RSA public/private key pair");
+		System.out.println("Testing/Timing  RSA");
+		System.out.println("Generating RSA public/private key pair");
 
 		iterations=0;
 		start=System.currentTimeMillis();

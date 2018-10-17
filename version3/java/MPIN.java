@@ -160,7 +160,7 @@ public class MPIN
 		c.geta().getB().toBytes(w); for (int i=EFS;i<2*EFS;i++) t[i]=w[i-EFS];
 		c.getb().getA().toBytes(w); for (int i=2*EFS;i<3*EFS;i++) t[i]=w[i-2*EFS];
 		c.getb().getB().toBytes(w); for (int i=3*EFS;i<4*EFS;i++) t[i]=w[i-3*EFS];
-		
+
 		U.getX().toBytes(w); for (int i=4*EFS;i<5*EFS;i++) t[i]=w[i-4*EFS];
 		U.getY().toBytes(w); for (int i=5*EFS;i<6*EFS;i++) t[i]=w[i-5*EFS];
 		
@@ -247,7 +247,7 @@ public class MPIN
 		su=rng.getByte(); /*if (su<0) su=-su;*/ su%=2;
 		
 		ECP W=map(u,su);
-		P.sub(W);
+		P.sub(W); //P.affine();
 		sv=P.getS();
 		rn=unmap(v,P);
 		m=rng.getByte(); /*if (m<0) m=-m;*/ m%=rn;
@@ -277,7 +277,7 @@ public class MPIN
 		sv=(D[0]>>1)&1;
 		ECP W=map(u,su);
 		ECP P=map(v,sv);
-		P.add(W);
+		P.add(W); //P.affine();
 		u=P.getX();
 		v=P.getY();
 		D[0]=0x04;
@@ -297,7 +297,7 @@ public class MPIN
 
 		if (P.is_infinity() || Q.is_infinity()) return INVALID_POINT;
 
-		P.add(Q);
+		P.add(Q); //P.affine();
 
 		P.toBytes(R,false);
 		return 0;
@@ -311,7 +311,7 @@ public class MPIN
 
 		if (P.is_infinity() || Q.is_infinity()) return INVALID_POINT;
 
-		P.add(Q);
+		P.add(Q); //P.affine();
 	
 		P.toBytes(W);
 		return 0;
@@ -343,7 +343,7 @@ public class MPIN
 		pin%=MAXPIN;
 
 		R=R.pinmul(pin,PBLEN);
-		P.sub(R);
+		P.sub(R); //P.affine();
 
 		P.toBytes(TOKEN,false);
 
@@ -413,10 +413,11 @@ public class MPIN
 				P.toBytes(xID,false);
 				W=PAIR.G1mul(W,x);
 				P.add(W);
+				//P.affine();
 			}
 			else
 			{
-				P.add(W);
+				P.add(W); //P.affine();
 				P=PAIR.G1mul(P,x);
 			}
 			if (xCID!=null) P.toBytes(xCID,false);
@@ -430,7 +431,7 @@ public class MPIN
 			}
 		}
 
-
+		//T.affine();
 		T.toBytes(SEC,false);
 		return 0;
 	}
@@ -513,7 +514,7 @@ public class MPIN
 	//		if (HID!=null) P.toBytes(HID);
 			h=hashit(sha,date,h,EFS);
 			R=ECP.mapit(h);
-			P.add(R);
+			P.add(R); //P.affine();
 			P.toBytes(HTID,false);
 		}
 	//	else P.toBytes(HID,false);
@@ -550,7 +551,7 @@ public class MPIN
 		if (P.is_infinity()) return INVALID_POINT;
 
 		P=PAIR.G1mul(P,y);
-		P.add(R); P.affine();
+		P.add(R); //P.affine();
 		R=ECP.fromBytes(mSEC);
 		if (R.is_infinity()) return INVALID_POINT;
 
@@ -572,7 +573,7 @@ public class MPIN
 					if (R.is_infinity()) return INVALID_POINT;
 
 					P=PAIR.G1mul(P,y);
-					P.add(R); P.affine();
+					P.add(R); //P.affine();
 				}
 				g=PAIR.ate(Q,P);
 				g=PAIR.fexp(g);
@@ -745,7 +746,7 @@ public class MPIN
 		BIG w=BIG.fromBytes(W);
 		BIG h=BIG.fromBytes(H);
 		A=PAIR.G1mul(A,h);	// new
-		R.add(A); R.affine();
+		R.add(A); //R.affine();
 
 		U=PAIR.G1mul(U,w);
 		FP12 g=PAIR.ate(sQ,R);

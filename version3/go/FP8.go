@@ -73,7 +73,7 @@ func (F *FP8) norm() {
 
 /* test this==0 ? */
 func (F *FP8) iszilch() bool {
-	F.reduce()
+	//F.reduce()
 	return F.a.iszilch() && F.b.iszilch()
 }
 
@@ -311,11 +311,12 @@ func (F *FP8) frob(f *FP2) {
 
 /* this=this^e */
 func (F *FP8) pow(e *BIG) *FP8 {
-	F.norm()
-	e.norm()
+	//F.norm()
 	w:=NewFP8copy(F)
+	w.norm()
 	z:=NewBIGcopy(e)
 	r:=NewFP8int(1)
+	z.norm()
 	for true {
 		bt:=z.parity()
 		z.fshr(1)
@@ -362,20 +363,21 @@ func (F *FP8) xtr_pow(n *BIG) *FP8 {
 	c.xtr_D()
 	t:=NewFP8int(0)
 	r:=NewFP8int(0)
+	sf:=NewFP8copy(F)
+	sf.norm();
 
-	n.norm()
 	par:=n.parity()
-	v:=NewBIGcopy(n); v.fshr(1)
+	v:=NewBIGcopy(n); v.norm(); v.fshr(1)
 	if (par==0) {v.dec(1); v.norm()}
 
 	nb:=v.nbits();
 	for i:=nb-1;i>=0;i-- {
 		if v.bit(i)!=1 {
 			t.copy(b)
-			F.conj()
+			sf.conj()
 			c.conj()
-			b.xtr_A(a,F,c)
-			F.conj()
+			b.xtr_A(a,sf,c)
+			sf.conj()
 			c.copy(t)
 			c.xtr_D()
 			a.xtr_D()
@@ -383,7 +385,7 @@ func (F *FP8) xtr_pow(n *BIG) *FP8 {
 			t.copy(a); t.conj()
 			a.copy(b)
 			a.xtr_D()
-			b.xtr_A(c,F,t)
+			b.xtr_A(c,sf,t)
 			c.xtr_D()
 		}
 	}
@@ -396,11 +398,11 @@ func (F *FP8) xtr_pow(n *BIG) *FP8 {
 
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
 func (F *FP8) xtr_pow2(ck *FP8,ckml *FP8,ckm2l *FP8,a *BIG,b *BIG) *FP8 {
-	a.norm(); b.norm()
+
 	e:=NewBIGcopy(a)
 	d:=NewBIGcopy(b)
 	w:=NewBIGint(0)
-
+	e.norm(); d.norm()
 	cu:=NewFP8copy(ck)  // can probably be passed in w/o copying
 	cv:=NewFP8copy(F);
 	cumv:=NewFP8copy(ckml)
@@ -415,10 +417,10 @@ func (F *FP8) xtr_pow2(ck *FP8,ckml *FP8,ckm2l *FP8,a *BIG,b *BIG) *FP8 {
 		f2++
 	}
 
-	for comp(d,e)!=0 {
-		if comp(d,e)>0 {
+	for Comp(d,e)!=0 {
+		if Comp(d,e)>0 {
 			w.copy(e); w.imul(4); w.norm()
-			if comp(d,w)<=0 {
+			if Comp(d,w)<=0 {
 				w.copy(d); d.copy(e)
 				e.rsub(w); e.norm()
 
@@ -466,9 +468,9 @@ func (F *FP8) xtr_pow2(ck *FP8,ckml *FP8,ckm2l *FP8,a *BIG,b *BIG) *FP8 {
 				}
 			}
 		}
-		if comp(d,e)<0 {
+		if Comp(d,e)<0 {
 			w.copy(d); w.imul(4); w.norm()
-			if comp(e,w)<=0 {
+			if Comp(e,w)<=0 {
 				e.sub(d); e.norm()
 				t.copy(cv)
 				t.xtr_A(cu,cumv,cum2v)

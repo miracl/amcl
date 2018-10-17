@@ -40,7 +40,7 @@ public final class FP4 {
 	}
 /* test this==0 ? */
 	public boolean iszilch() {
-		reduce();
+		//reduce();
 		return (a.iszilch() && b.iszilch());
 	}
 
@@ -318,11 +318,11 @@ public final class FP4 {
 /* this=this^e */
 	public FP4 pow(BIG e)
 	{
-		norm();
-		e.norm();
 		FP4 w=new FP4(this);
+		w.norm();
 		BIG z=new BIG(e);
 		FP4 r=new FP4(1);
+		z.norm();
 		while (true)
 		{
 			int bt=z.parity();
@@ -367,16 +367,18 @@ public final class FP4 {
 
 /* r=x^n using XTR method on traces of FP12s */
 	public FP4 xtr_pow(BIG n) {
+		FP4 sf=new FP4(this);
+		sf.norm();
 		FP4 a=new FP4(3);
-		FP4 b=new FP4(this);
+		FP4 b=new FP4(sf);
 		FP4 c=new FP4(b);
 		c.xtr_D();
 		FP4 t=new FP4(0);
 		FP4 r=new FP4(0);
 
-		n.norm();
+		//n.norm();
 		int par=n.parity();
-		BIG v=new BIG(n); v.fshr(1);
+		BIG v=new BIG(n); v.norm(); v.fshr(1);
 		if (par==0) {v.dec(1); v.norm();}
 
 		int nb=v.nbits();
@@ -385,10 +387,10 @@ public final class FP4 {
 			if (v.bit(i)!=1)
 			{
 				t.copy(b);
-				conj();
+				sf.conj();
 				c.conj();
-				b.xtr_A(a,this,c);
-				conj();
+				b.xtr_A(a,sf,c);
+				sf.conj();
 				c.copy(t);
 				c.xtr_D();
 				a.xtr_D();
@@ -398,7 +400,7 @@ public final class FP4 {
 				t.copy(a); t.conj();
 				a.copy(b);
 				a.xtr_D();
-				b.xtr_A(c,this,t);
+				b.xtr_A(c,sf,t);
 				c.xtr_D();
 			}
 		}
@@ -411,10 +413,11 @@ public final class FP4 {
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
 	public FP4 xtr_pow2(FP4 ck,FP4 ckml,FP4 ckm2l,BIG a,BIG b)
 	{
-		a.norm(); b.norm();
+
 		BIG e=new BIG(a);
 		BIG d=new BIG(b);
 		BIG w=new BIG(0);
+		e.norm(); d.norm();
 
 		FP4 cu=new FP4(ck);  // can probably be passed in w/o copying
 		FP4 cv=new FP4(this);

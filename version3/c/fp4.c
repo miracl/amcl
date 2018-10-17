@@ -336,9 +336,11 @@ void FP4_YYY_pow(FP4_YYY *r,FP4_YYY* a,BIG_XXX b)
     int bt;
 
     BIG_XXX_zero(zilch);
-    BIG_XXX_norm(b);
+
     BIG_XXX_copy(z,b);
+    BIG_XXX_norm(z);
     FP4_YYY_copy(&w,a);
+	FP4_YYY_norm(&w);
     FP4_YYY_one(r);
 
     while(1)
@@ -395,7 +397,7 @@ void FP4_YYY_xtr_pow(FP4_YYY *r,FP4_YYY *x,BIG_XXX n)
     int i,par,nb;
     BIG_XXX v;
     FP2_YYY w;
-    FP4_YYY t,a,b,c;
+    FP4_YYY t,a,b,c,sf;
 
     BIG_XXX_zero(v);
     BIG_XXX_inc(v,3);
@@ -403,12 +405,15 @@ void FP4_YYY_xtr_pow(FP4_YYY *r,FP4_YYY *x,BIG_XXX n)
     FP2_YYY_from_BIG(&w,v);
     FP4_YYY_from_FP2(&a,&w);
 
-    FP4_YYY_copy(&b,x);
-    FP4_YYY_xtr_D(&c,x);
+	FP4_YYY_copy(&sf,x);
+	FP4_YYY_norm(&sf);
+    FP4_YYY_copy(&b,&sf);
+    FP4_YYY_xtr_D(&c,&sf);
 
-    BIG_XXX_norm(n);
+    //BIG_XXX_norm(n);
     par=BIG_XXX_parity(n);
     BIG_XXX_copy(v,n);
+	BIG_XXX_norm(v);
     BIG_XXX_shr(v,1);
     if (par==0)
     {
@@ -422,10 +427,10 @@ void FP4_YYY_xtr_pow(FP4_YYY *r,FP4_YYY *x,BIG_XXX n)
         if (!BIG_XXX_bit(v,i))
         {
             FP4_YYY_copy(&t,&b);
-            FP4_YYY_conj(x,x);
+            FP4_YYY_conj(&sf,&sf);
             FP4_YYY_conj(&c,&c);
-            FP4_YYY_xtr_A(&b,&a,&b,x,&c);
-            FP4_YYY_conj(x,x);
+            FP4_YYY_xtr_A(&b,&a,&b,&sf,&c);
+            FP4_YYY_conj(&sf,&sf);
             FP4_YYY_xtr_D(&c,&t);
             FP4_YYY_xtr_D(&a,&a);
         }
@@ -433,7 +438,7 @@ void FP4_YYY_xtr_pow(FP4_YYY *r,FP4_YYY *x,BIG_XXX n)
         {
             FP4_YYY_conj(&t,&a);
             FP4_YYY_xtr_D(&a,&b);
-            FP4_YYY_xtr_A(&b,&c,&b,x,&t);
+            FP4_YYY_xtr_A(&b,&c,&b,&sf,&t);
             FP4_YYY_xtr_D(&c,&c);
         }
     }
@@ -451,10 +456,11 @@ void FP4_YYY_xtr_pow2(FP4_YYY *r,FP4_YYY *ck,FP4_YYY *cl,FP4_YYY *ckml,FP4_YYY *
     BIG_XXX d,e,w;
     FP4_YYY t,cu,cv,cumv,cum2v;
 
-    BIG_XXX_norm(a);
-    BIG_XXX_norm(b);
+
     BIG_XXX_copy(e,a);
     BIG_XXX_copy(d,b);
+    BIG_XXX_norm(e);
+    BIG_XXX_norm(d);
     FP4_YYY_copy(&cu,ck);
     FP4_YYY_copy(&cv,cl);
     FP4_YYY_copy(&cumv,ckml);

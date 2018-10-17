@@ -9,7 +9,7 @@ using namespace amcl;
 #define MODBITS_YYY MBITS_YYY
 #define TBITS_YYY (MBITS_YYY%BASEBITS_XXX)                    /**< Number of active bits in top word */
 #define TMASK_YYY (((chunk)1<<TBITS_YYY)-1)               /**< Mask for active bits in top word */
-#define FEXCESS_YYY ((sign32)1<<MAXXES_YYY)				/**< 2^(BASEBITS*NLEN-MODBITS) - normalised BIG can be multiplied by more than this before reduction */
+#define FEXCESS_YYY (((sign32)1<<MAXXES_YYY)-1)				/**< 2^(BASEBITS*NLEN-MODBITS) - normalised BIG can be multiplied by less than this before reduction */
 #define OMASK_YYY (-((chunk)(1)<<TBITS_YYY))              /**<  for masking out overflow bits */
 
 namespace YYY {

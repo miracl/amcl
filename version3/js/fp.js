@@ -43,7 +43,7 @@ var FP = function(ctx) {
     FP.MOD8 = ctx.config["@M8"];
     FP.MODTYPE = ctx.config["@MT"];
 
-    FP.FEXCESS = (1 << ctx.config["@SH"]); // 2^(BASEBITS*NLEN-MODBITS)
+    FP.FEXCESS = ((1 << ctx.config["@SH"])-1); // 2^(BASEBITS*NLEN-MODBITS)-1
     FP.OMASK = (-1) << FP.TBITS;
     FP.TBITS = FP.MODBITS % ctx.BIG.BASEBITS;
     FP.TMASK = (1 << FP.TBITS) - 1;
@@ -137,15 +137,48 @@ var FP = function(ctx) {
 
         /* test this=0 */
         iszilch: function() {
-            this.reduce();
-            return this.f.iszilch();
+			var c=new FP(0); c.copy(this);
+            c.reduce();
+            return c.f.iszilch();
         },
 
         /* reduce this mod Modulus */
         reduce: function() {
-            var p = new ctx.BIG(0);
-            p.rcopy(ctx.ROM_FIELD.Modulus);
-            this.f.mod(p);
+            var q,carry,sr,sb,m = new ctx.BIG(0);
+            m.rcopy(ctx.ROM_FIELD.Modulus);
+			var r = new ctx.BIG(0);
+            r.rcopy(ctx.ROM_FIELD.Modulus);
+			this.f.norm();
+
+			if (this.XES>16)
+			{
+				q=FP.quo(this.f,m);
+				carry=r.pmul(q);
+				r.w[ctx.BIG.NLEN-1]+=(carry<<ctx.BIG.BASEBITS); // correction - put any carry out back in again
+				this.f.sub(r);
+				this.f.norm();
+				sb=2;
+			}
+			else {
+					sb=FP.logb2(this.XES-1);
+			}
+			m.fshl(sb);
+
+			while (sb>0)
+			{
+// constant time...
+				sr=ctx.BIG.ssn(r,this.f,m);  // optimized combined shift, subtract and norm
+				this.f.cmove(r,1-sr);
+				sb--;
+			}			
+/*
+    m.rcopy(ctx.ROM_FIELD.Modulus);
+	if (ctx.BIG.comp(this.f,m)>0)
+	{
+		alert("NOT fully reduced q= "+q+" carry= "+carry+" XES= "+this.XES+" FEXCESS= "+FP.FEXCESS+ " quo= "+FP.quo(this.f,m)+" FP.TBITS= "+FP.TBITS);
+	}
+*/
+
             this.XES = 1;
         },
 
@@ -260,7 +293,7 @@ var FP = function(ctx) {
             sb = FP.logb2(this.XES - 1);
 
             m.fshl(sb);
-            this.XES = (1 << sb);
+            this.XES = (1 << sb)+1;
             this.f.rsub(m);
 
             if (this.XES > FP.FEXCESS) {
@@ -331,10 +364,12 @@ var FP = function(ctx) {
 
         /* return TRUE if this==a */
         equals: function(a) {
-            a.reduce();
-            this.reduce();
+			var ft=new FP(0); ft.copy(this);
+			var sd=new FP(0); sd.copy(a);
+            ft.reduce();
+            sd.reduce();
 
-            if (ctx.BIG.comp(a.f, this.f) === 0) {
+            if (ctx.BIG.comp(ft.f, sd.f) === 0) {
                 return true;
             }
 
@@ -469,6 +504,20 @@ var FP = function(ctx) {
 
         return r;
     };
+
+	FP.quo = function(n,m) {
+		var num,den,hb=ctx.BIG.CHUNK>>1;
+		if (FP.TBITS<hb)
+		{
+			var sh=hb-FP.TBITS;
+			num=(n.w[ctx.BIG.NLEN-1]<<sh)|(n.w[ctx.BIG.NLEN-2]>>(ctx.BIG.BASEBITS-sh));
+			den=(m.w[ctx.BIG.NLEN-1]<<sh)|(m.w[ctx.BIG.NLEN-2]>>(ctx.BIG.BASEBITS-sh));
+		} else {
+			num=n.w[ctx.BIG.NLEN-1];
+			den=m.w[ctx.BIG.NLEN-1];			
+		}
+		return Math.floor(num/(den+1))
+	};
 
     /* calculate Field Excess
     FP.EXCESS=function(a)
