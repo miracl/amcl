@@ -971,7 +971,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
             
         b.zero();
             
-        let mut t=d.w[0] as DChunk; v[0]=(((t&rm) as Chunk)*rom::MCONST)&rom::BMASK; t+=(v[0] as DChunk)*(md.w[0] as DChunk); let mut c=(d.w[1] as DChunk)+(t>>rb); let mut s:DChunk=0;
+        let mut t=d.w[0] as DChunk; v[0]=(((t&rm) as Chunk).wrapping_mul(rom::MCONST))&rom::BMASK; t+=(v[0] as DChunk)*(md.w[0] as DChunk); let mut c=(d.w[1] as DChunk)+(t>>rb); let mut s:DChunk=0;
         for k in 1 ..rom::NLEN {
             t=c+s+(v[0] as DChunk)*(md.w[k] as DChunk);
             let mut i=1+k/2;
@@ -979,7 +979,7 @@ alise BIG - force all digits < 2^rom::BASEBITS */
                 t+=((v[k-i]-v[i]) as DChunk)*((md.w[i]-md.w[k-i]) as DChunk);
                 i+=1;
             }
-            v[k]=(((t&rm) as Chunk)*rom::MCONST)&rom::BMASK; t+=(v[k] as DChunk)*(md.w[0] as DChunk); c=(d.w[k+1] as DChunk)+(t>>rb);
+            v[k]=(((t&rm) as Chunk).wrapping_mul(rom::MCONST))&rom::BMASK; t+=(v[k] as DChunk)*(md.w[0] as DChunk); c=(d.w[k+1] as DChunk)+(t>>rb);
             dd[k]=(v[k] as DChunk)*(md.w[k] as DChunk); s+=dd[k];
         }
             
