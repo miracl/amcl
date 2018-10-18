@@ -975,7 +975,7 @@ BIG = function(ctx) {
     /* return a*b as ctx.DBIG */
     BIG.mul = function(a, b) {
         var c = new ctx.DBIG(0),
-            d = [],
+            d = new Array(BIG.NLEN), //[],
             n, s, t, i, k, co;
 
         //  a.norm();
@@ -1107,8 +1107,8 @@ BIG = function(ctx) {
 
     BIG.monty = function(m, nd, d) {
         var b = new BIG(0),
-            v = [],
-            dd = [],
+            v = new Array(BIG.NLEN),//[],
+            dd = new Array(BIG.NLEN),//[],
             s, c, t, i, k;
 
         t = d.w[0];
@@ -1224,7 +1224,7 @@ DBIG = function(ctx) {
 
     /* constructor */
     var DBIG = function(x) {
-        this.w = [];
+        this.w = new Array(BIG.DNLEN);
         this.zero();
         this.w[0] = x;
     };

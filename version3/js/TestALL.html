@@ -4,7 +4,7 @@
 <title>JavaScript Test ALL</title>
 </head>
 <body>
-<h1>JavaScript Test All Example</h1>
+<h1>JavaScript Test All Examples</h1>
 <script type="text/javascript"src=./rand.js></script>
 <script type="text/javascript"src=./rom_curve.js></script>
 <script type="text/javascript"src=./rom_field.js></script>
@@ -41,6 +41,16 @@
 <script type="text/javascript"src=./mpin192.js></script>
 <script type="text/javascript"src=./mpin256.js></script>
 
+<p><a id="myLink1" href="#" onclick="location.reload(false);ed25519();">ED25519 255-bit Edwards Elliptic Curve ECDH/ECIES/ECDSA</a></p>
+<p><a id="myLink2" href="#" onclick="location.reload(false);nist256();">NIST256 256-bit Weierstrass Elliptic Curve ECDH/ECIES/ECDSA</a></p>
+<p><a id="myLink3" href="#" onclick="location.reload(false);goldilocks();">GOLDILOCKS 448-bit Edwards Elliptic Curve ECDH/ECIES/ECDSA</a></p>
+<p><a id="myLink4" href="#" onclick="location.reload(false);bn254();">BN254 254-bit k=12 Pairing-Friendly BN Curve MPIN</a></p>
+<p><a id="myLink5" href="#" onclick="location.reload(false);bls383();">BLS383 383-bit k=12 Pairing-Friendly BLS Curve MPIN</a></p>
+<p><a id="myLink6" href="#" onclick="location.reload(false);bls24();">BLS24 479-bit k=24 Pairing-Friendly BLS Curve MPIN</a></p>
+<p><a id="myLink7" href="#" onclick="location.reload(false);bls48();">BLS48 556-bit k=48 Pairing-Friendly BLS Curve MPIN</a></p>
+<p><a id="myLink8" href="#" onclick="location.reload(false);rsa2048();">RSA2048 2048-bit RSA Key generation/Encryption/Decryption</a></p>
+
+
 <script>
 
 /* Test ECC */
@@ -50,7 +60,9 @@
 function ed25519() {
 	var ctx = new CTX('ED25519');
 
-	window.document.write("<br> ED25519 Curve "+  "<br>");
+	mywindow=window.open();
+
+	mywindow.document.write("<br> ED25519 Curve "+  "<br>");
 
 	var i,j=0,res;
 	var result;
@@ -85,17 +97,17 @@ function ed25519() {
 
 	for (i=0;i<8;i++) SALT[i]=(i+1);  // set Salt
 
-	window.document.write("Alice's Passphrase= " + pp + "<br>");
+	mywindow.document.write("Alice's Passphrase= " + pp + "<br>");
 
 	var PW=ctx.ECDH.stringtobytes(pp);
 /* private key S0 of size EGS bytes derived from Password and Salt */
 	var S0=ctx.ECDH.PBKDF2(sha,PW,SALT,1000,EGS);
 
-	window.document.write("Alice's private key= 0x"+ctx.ECDH.bytestostring(S0)+ "<br>");
+	mywindow.document.write("Alice's private key= 0x"+ctx.ECDH.bytestostring(S0)+ "<br>");
 /* Generate Key pair S/W */
 	ctx.ECDH.KEY_PAIR_GENERATE(null,S0,W0); 
 
-	window.document.write("Alice's public key= 0x"+ctx.ECDH.bytestostring(W0)+ "<br>");
+	mywindow.document.write("Alice's public key= 0x"+ctx.ECDH.bytestostring(W0)+ "<br>");
 
 	res=ctx.ECDH.PUBLIC_KEY_VALIDATE(W0);
 	if (res!=0)
@@ -103,8 +115,8 @@ function ed25519() {
 /* Random private key for other party */
 	ctx.ECDH.KEY_PAIR_GENERATE(rng,S1,W1);
 
-	window.document.write("Servers private key= 0x"+ctx.ECDH.bytestostring(S1)+ "<br>");
-	window.document.write("Servers public key= 0x"+ctx.ECDH.bytestostring(W1)+ "<br>");
+	mywindow.document.write("Servers private key= 0x"+ctx.ECDH.bytestostring(S1)+ "<br>");
+	mywindow.document.write("Servers public key= 0x"+ctx.ECDH.bytestostring(W1)+ "<br>");
 
 	res=ctx.ECDH.PUBLIC_KEY_VALIDATE(W1);
 	if (res!=0)
@@ -125,12 +137,12 @@ function ed25519() {
 
 	var KEY=ctx.ECDH.KDF2(sha,Z0,null,ctx.ECP.AESKEY);
 
-	window.document.write("Alice's ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
-	window.document.write("Servers ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
+	mywindow.document.write("Alice's ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
+	mywindow.document.write("Servers ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
 
 	if (ctx.ECP.CURVETYPE!=ctx.ECP.MONTGOMERY)
 	{
-		window.document.write("Testing ECIES"+ "<br>");
+		mywindow.document.write("Testing ECIES"+ "<br>");
 
 		P1[0]=0x0; P1[1]=0x1; P1[2]=0x2; 
 		P2[0]=0x0; P2[1]=0x1; P2[2]=0x2; P2[3]=0x3; 
@@ -139,31 +151,31 @@ function ed25519() {
 
 		var C=ctx.ECDH.ECIES_ENCRYPT(sha,P1,P2,rng,W1,M,V,T);
 
-		window.document.write("Ciphertext= "+ "<br>");
-		window.document.write("V= 0x"+ctx.ECDH.bytestostring(V)+ "<br>");
-		window.document.write("C= 0x"+ctx.ECDH.bytestostring(C)+ "<br>");
-		window.document.write("T= 0x"+ctx.ECDH.bytestostring(T)+ "<br>");
+		mywindow.document.write("Ciphertext= "+ "<br>");
+		mywindow.document.write("V= 0x"+ctx.ECDH.bytestostring(V)+ "<br>");
+		mywindow.document.write("C= 0x"+ctx.ECDH.bytestostring(C)+ "<br>");
+		mywindow.document.write("T= 0x"+ctx.ECDH.bytestostring(T)+ "<br>");
 
 
 		M=ctx.ECDH.ECIES_DECRYPT(sha,P1,P2,V,C,T,S1);
 		if (M.length==0)
 			alert("*** ECIES Decryption Failed ");
-		else window.document.write("Decryption succeeded"+ "<br>");
+		else mywindow.document.write("Decryption succeeded"+ "<br>");
 
-		window.document.write("Message is 0x"+ctx.ECDH.bytestostring(M)+ "<br>");
+		mywindow.document.write("Message is 0x"+ctx.ECDH.bytestostring(M)+ "<br>");
 
-		window.document.write("Testing ECDSA"+ "<br>");
+		mywindow.document.write("Testing ECDSA"+ "<br>");
 
 		if (ctx.ECDH.ECPSP_DSA(sha,rng,S0,M,CS,DS)!=0)
 			alert("***ECDSA Signature Failed");
 		
-		window.document.write("Signature= "+ "<br>");
-		window.document.write("C= 0x"+ctx.ECDH.bytestostring(CS)+ "<br>");
-		window.document.write("D= 0x"+ctx.ECDH.bytestostring(DS)+ "<br>");
+		mywindow.document.write("Signature= "+ "<br>");
+		mywindow.document.write("C= 0x"+ctx.ECDH.bytestostring(CS)+ "<br>");
+		mywindow.document.write("D= 0x"+ctx.ECDH.bytestostring(DS)+ "<br>");
 
 		if (ctx.ECDH.ECPVP_DSA(sha,W0,M,CS,DS)!=0)
 			alert("***ECDSA Verification Failed");
-		else window.document.write("ECDSA Signature/Verification succeeded "+  "<br>");
+		else mywindow.document.write("ECDSA Signature/Verification succeeded "+  "<br>");
 	}
 
 }
@@ -171,8 +183,9 @@ function ed25519() {
 
 function nist256() {
 	var ctx = new CTX('NIST256');
+	mywindow=window.open();
 
-	window.document.write("<br> NIST256 Curve "+  "<br>");
+	mywindow.document.write("<br> NIST256 Curve "+  "<br>");
 	var i,j=0,res;
 	var result;
 	var pp="M0ng00se";
@@ -207,17 +220,17 @@ function nist256() {
 
 	for (i=0;i<8;i++) SALT[i]=(i+1);  // set Salt
 
-	window.document.write("Alice's Passphrase= " + pp + "<br>");
+	mywindow.document.write("Alice's Passphrase= " + pp + "<br>");
 
 	var PW=ctx.ECDH.stringtobytes(pp);
 /* private key S0 of size EGS bytes derived from Password and Salt */
 	var S0=ctx.ECDH.PBKDF2(sha,PW,SALT,1000,EGS);
 
-	window.document.write("Alice's private key= 0x"+ctx.ECDH.bytestostring(S0)+ "<br>");
+	mywindow.document.write("Alice's private key= 0x"+ctx.ECDH.bytestostring(S0)+ "<br>");
 /* Generate Key pair S/W */
 	ctx.ECDH.KEY_PAIR_GENERATE(null,S0,W0); 
 
-	window.document.write("Alice's public key= 0x"+ctx.ECDH.bytestostring(W0)+ "<br>");
+	mywindow.document.write("Alice's public key= 0x"+ctx.ECDH.bytestostring(W0)+ "<br>");
 
 	res=ctx.ECDH.PUBLIC_KEY_VALIDATE(W0);
 	if (res!=0)
@@ -225,8 +238,8 @@ function nist256() {
 /* Random private key for other party */
 	ctx.ECDH.KEY_PAIR_GENERATE(rng,S1,W1);
 
-	window.document.write("Servers private key= 0x"+ctx.ECDH.bytestostring(S1)+ "<br>");
-	window.document.write("Servers public key= 0x"+ctx.ECDH.bytestostring(W1)+ "<br>");
+	mywindow.document.write("Servers private key= 0x"+ctx.ECDH.bytestostring(S1)+ "<br>");
+	mywindow.document.write("Servers public key= 0x"+ctx.ECDH.bytestostring(W1)+ "<br>");
 
 	res=ctx.ECDH.PUBLIC_KEY_VALIDATE(W1);
 	if (res!=0)
@@ -247,12 +260,12 @@ function nist256() {
 
 	var KEY=ctx.ECDH.KDF2(sha,Z0,null,ctx.ECP.AESKEY);
 
-	window.document.write("Alice's ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
-	window.document.write("Servers ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
+	mywindow.document.write("Alice's ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
+	mywindow.document.write("Servers ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
 
 	if (ctx.ECP.CURVETYPE!=ctx.ECP.MONTGOMERY)
 	{
-		window.document.write("Testing ECIES"+ "<br>");
+		mywindow.document.write("Testing ECIES"+ "<br>");
 
 		P1[0]=0x0; P1[1]=0x1; P1[2]=0x2; 
 		P2[0]=0x0; P2[1]=0x1; P2[2]=0x2; P2[3]=0x3; 
@@ -261,40 +274,42 @@ function nist256() {
 
 		var C=ctx.ECDH.ECIES_ENCRYPT(sha,P1,P2,rng,W1,M,V,T);
 
-		window.document.write("Ciphertext= "+ "<br>");
-		window.document.write("V= 0x"+ctx.ECDH.bytestostring(V)+ "<br>");
-		window.document.write("C= 0x"+ctx.ECDH.bytestostring(C)+ "<br>");
-		window.document.write("T= 0x"+ctx.ECDH.bytestostring(T)+ "<br>");
+		mywindow.document.write("Ciphertext= "+ "<br>");
+		mywindow.document.write("V= 0x"+ctx.ECDH.bytestostring(V)+ "<br>");
+		mywindow.document.write("C= 0x"+ctx.ECDH.bytestostring(C)+ "<br>");
+		mywindow.document.write("T= 0x"+ctx.ECDH.bytestostring(T)+ "<br>");
 
 
 		M=ctx.ECDH.ECIES_DECRYPT(sha,P1,P2,V,C,T,S1);
 		if (M.length==0)
 			alert("*** ECIES Decryption Failed ");
-		else window.document.write("Decryption succeeded"+ "<br>");
+		else mywindow.document.write("Decryption succeeded"+ "<br>");
 
-		window.document.write("Message is 0x"+ctx.ECDH.bytestostring(M)+ "<br>");
+		mywindow.document.write("Message is 0x"+ctx.ECDH.bytestostring(M)+ "<br>");
 
-		window.document.write("Testing ECDSA"+ "<br>");
+		mywindow.document.write("Testing ECDSA"+ "<br>");
 
 		if (ctx.ECDH.ECPSP_DSA(sha,rng,S0,M,CS,DS)!=0)
 			alert("***ECDSA Signature Failed");
 		
-		window.document.write("Signature= "+ "<br>");
-		window.document.write("C= 0x"+ctx.ECDH.bytestostring(CS)+ "<br>");
-		window.document.write("D= 0x"+ctx.ECDH.bytestostring(DS)+ "<br>");
+		mywindow.document.write("Signature= "+ "<br>");
+		mywindow.document.write("C= 0x"+ctx.ECDH.bytestostring(CS)+ "<br>");
+		mywindow.document.write("D= 0x"+ctx.ECDH.bytestostring(DS)+ "<br>");
 
 		if (ctx.ECDH.ECPVP_DSA(sha,W0,M,CS,DS)!=0)
 			alert("***ECDSA Verification Failed");
-		else window.document.write("ECDSA Signature/Verification succeeded "+  "<br>");
+		else mywindow.document.write("ECDSA Signature/Verification succeeded "+  "<br>");
 	}
+
 }
 
 
 // GOLDILOCKS context
 function goldilocks() {
 	var ctx = new CTX('GOLDILOCKS');
+	mywindow=window.open();
 
-	window.document.write("<br> GOLDILOCKS Curve "+  "<br>");
+	mywindow.document.write("<br> GOLDILOCKS Curve "+  "<br>");
 
 	var i,j=0,res;
 	var result;
@@ -331,17 +346,17 @@ function goldilocks() {
 
 	for (i=0;i<8;i++) SALT[i]=(i+1);  // set Salt
 
-	window.document.write("Alice's Passphrase= " + pp + "<br>");
+	mywindow.document.write("Alice's Passphrase= " + pp + "<br>");
 
 	var PW=ctx.ECDH.stringtobytes(pp);
 /* private key S0 of size EGS bytes derived from Password and Salt */
 	var S0=ctx.ECDH.PBKDF2(sha,PW,SALT,1000,EGS);
 
-	window.document.write("Alice's private key= 0x"+ctx.ECDH.bytestostring(S0)+ "<br>");
+	mywindow.document.write("Alice's private key= 0x"+ctx.ECDH.bytestostring(S0)+ "<br>");
 /* Generate Key pair S/W */
 	ctx.ECDH.KEY_PAIR_GENERATE(null,S0,W0); 
 
-	window.document.write("Alice's public key= 0x"+ctx.ECDH.bytestostring(W0)+ "<br>");
+	mywindow.document.write("Alice's public key= 0x"+ctx.ECDH.bytestostring(W0)+ "<br>");
 
 	res=ctx.ECDH.PUBLIC_KEY_VALIDATE(W0);
 	if (res!=0)
@@ -349,8 +364,8 @@ function goldilocks() {
 /* Random private key for other party */
 	ctx.ECDH.KEY_PAIR_GENERATE(rng,S1,W1);
 
-	window.document.write("Servers private key= 0x"+ctx.ECDH.bytestostring(S1)+ "<br>");
-	window.document.write("Servers public key= 0x"+ctx.ECDH.bytestostring(W1)+ "<br>");
+	mywindow.document.write("Servers private key= 0x"+ctx.ECDH.bytestostring(S1)+ "<br>");
+	mywindow.document.write("Servers public key= 0x"+ctx.ECDH.bytestostring(W1)+ "<br>");
 
 	res=ctx.ECDH.PUBLIC_KEY_VALIDATE(W1);
 	if (res!=0)
@@ -371,12 +386,12 @@ function goldilocks() {
 
 	var KEY=ctx.ECDH.KDF2(sha,Z0,null,ctx.ECP.AESKEY);
 
-	window.document.write("Alice's ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
-	window.document.write("Servers ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
+	mywindow.document.write("Alice's ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
+	mywindow.document.write("Servers ECDH Key=  0x"+ctx.ECDH.bytestostring(KEY)+ "<br>");
 
 	if (ctx.ECP.CURVETYPE!=ctx.ECP.MONTGOMERY)
 	{
-		window.document.write("Testing ECIES"+ "<br>");
+		mywindow.document.write("Testing ECIES"+ "<br>");
 
 		P1[0]=0x0; P1[1]=0x1; P1[2]=0x2; 
 		P2[0]=0x0; P2[1]=0x1; P2[2]=0x2; P2[3]=0x3; 
@@ -385,31 +400,31 @@ function goldilocks() {
 
 		var C=ctx.ECDH.ECIES_ENCRYPT(sha,P1,P2,rng,W1,M,V,T);
 
-		window.document.write("Ciphertext= "+ "<br>");
-		window.document.write("V= 0x"+ctx.ECDH.bytestostring(V)+ "<br>");
-		window.document.write("C= 0x"+ctx.ECDH.bytestostring(C)+ "<br>");
-		window.document.write("T= 0x"+ctx.ECDH.bytestostring(T)+ "<br>");
+		mywindow.document.write("Ciphertext= "+ "<br>");
+		mywindow.document.write("V= 0x"+ctx.ECDH.bytestostring(V)+ "<br>");
+		mywindow.document.write("C= 0x"+ctx.ECDH.bytestostring(C)+ "<br>");
+		mywindow.document.write("T= 0x"+ctx.ECDH.bytestostring(T)+ "<br>");
 
 
 		M=ctx.ECDH.ECIES_DECRYPT(sha,P1,P2,V,C,T,S1);
 		if (M.length==0)
 			alert("*** ECIES Decryption Failed ");
-		else window.document.write("Decryption succeeded"+ "<br>");
+		else mywindow.document.write("Decryption succeeded"+ "<br>");
 
-		window.document.write("Message is 0x"+ctx.ECDH.bytestostring(M)+ "<br>");
+		mywindow.document.write("Message is 0x"+ctx.ECDH.bytestostring(M)+ "<br>");
 
-		window.document.write("Testing ECDSA"+ "<br>");
+		mywindow.document.write("Testing ECDSA"+ "<br>");
 
 		if (ctx.ECDH.ECPSP_DSA(sha,rng,S0,M,CS,DS)!=0)
 			alert("***ECDSA Signature Failed");
 		
-		window.document.write("Signature= "+ "<br>");
-		window.document.write("C= 0x"+ctx.ECDH.bytestostring(CS)+ "<br>");
-		window.document.write("D= 0x"+ctx.ECDH.bytestostring(DS)+ "<br>");
+		mywindow.document.write("Signature= "+ "<br>");
+		mywindow.document.write("C= 0x"+ctx.ECDH.bytestostring(CS)+ "<br>");
+		mywindow.document.write("D= 0x"+ctx.ECDH.bytestostring(DS)+ "<br>");
 
 		if (ctx.ECDH.ECPVP_DSA(sha,W0,M,CS,DS)!=0)
 			alert("***ECDSA Verification Failed");
-		else window.document.write("ECDSA Signature/Verification succeeded "+  "<br>");
+		else mywindow.document.write("ECDSA Signature/Verification succeeded "+  "<br>");
 	}
 }
 
@@ -444,37 +459,38 @@ function rsa2048() {
 
 	rng.seed(100,RAW);
 
+	mywindow=window.open();
 
 	var start,end,time;
 	start=new Date().getTime();
-	window.document.write("<br> Generating RSA public/private key pair (slow!)  <br>");
+	mywindow.document.write("<br> Generating RSA public/private key pair (slow!)  <br>");
 	ctx.RSA.KEY_PAIR(rng,65537,priv,pub);
 	end=new Date().getTime();
 	time=end-start;
-	window.document.write("Time in ms= "+time+"<br>");
+	mywindow.document.write("Time in ms= "+time+"<br>");
 
 	var M=ctx.RSA.stringtobytes(message);  
-	window.document.write("Encrypting test string <br>");
+	mywindow.document.write("Encrypting test string <br>");
 
 	var E=ctx.RSA.OAEP_ENCODE(sha,M,rng,null); /* OAEP encode message m to e  */
-	window.document.write("Encoding= 0x" + ctx.RSA.bytestohex(E) + "<br>");  
+	mywindow.document.write("Encoding= 0x" + ctx.RSA.bytestohex(E) + "<br>");  
 
-	window.document.write("Public key= 0x"+pub.n.toString() + "<br>"); 
+	mywindow.document.write("Public key= 0x"+pub.n.toString() + "<br>"); 
 
 	start=new Date().getTime();	
 	ctx.RSA.ENCRYPT(pub,E,C);     /* encrypt encoded message */
 	end=new Date().getTime();	
 	time=end-start;
-	window.document.write("Time in ms= "+time+"<br>");
+	mywindow.document.write("Time in ms= "+time+"<br>");
 
-	window.document.write("Ciphertext= 0x" + ctx.RSA.bytestohex(C) + "<br>");  
+	mywindow.document.write("Ciphertext= 0x" + ctx.RSA.bytestohex(C) + "<br>");  
 
-	window.document.write("Decrypting test string <br>");
+	mywindow.document.write("Decrypting test string <br>");
 	start=new Date().getTime();	
 	ctx.RSA.DECRYPT(priv,C,ML); 
 	end=new Date().getTime();
 	time=end-start;
-	window.document.write("Time in ms= "+time+"<br>");
+	mywindow.document.write("Time in ms= "+time+"<br>");
 
 	var cmp=true;
 	if (E.length!=ML.length) cmp=false;
@@ -483,21 +499,21 @@ function rsa2048() {
 		for (var j=0;j<E.length;j++)
 			if (E[j]!=ML[j]) cmp=false;
 	}
-	if (cmp) window.document.write("Decryption is OK <br>");
-	else window.document.write("Decryption Failed <br>");
+	if (cmp) mywindow.document.write("Decryption is OK <br>");
+	else mywindow.document.write("Decryption Failed <br>");
 
 	var MS=ctx.RSA.OAEP_DECODE(sha,null,ML); /* OAEP decode message  */
-	window.document.write("Decoding= 0x" + ctx.RSA.bytestohex(MS) + "<br>");  
+	mywindow.document.write("Decoding= 0x" + ctx.RSA.bytestohex(MS) + "<br>");  
 
-	window.document.write("message= "+ctx.RSA.bytestostring(MS) + "<br>");  
+	mywindow.document.write("message= "+ctx.RSA.bytestostring(MS) + "<br>");  
 
 
-	window.document.write("Signing message <br>");
+	mywindow.document.write("Signing message <br>");
 	ctx.RSA.PKCS15(sha,M,C);
 
 	ctx.RSA.DECRYPT(priv,C,S); /* create signature in S */ 
 
-	window.document.write("Signature= 0x" + ctx.RSA.bytestohex(S) + "<br>");  
+	mywindow.document.write("Signature= 0x" + ctx.RSA.bytestohex(S) + "<br>");  
 
 	ctx.RSA.ENCRYPT(pub,S,ML); 
 
@@ -508,10 +524,12 @@ function rsa2048() {
 		for (var j=0;j<C.length;j++)
 			if (C[j]!=ML[j]) cmp=false;
 	}
-	if (cmp) window.document.write("Signature is valid <br>");
-	else window.document.write("Signature is INVALID <br>");
+	if (cmp) mywindow.document.write("Signature is valid <br>");
+	else mywindow.document.write("Signature is INVALID <br>");
 
 	ctx.RSA.PRIVATE_KEY_KILL(priv);
+
+
 }
 
 /* Test M-Pin */
@@ -519,8 +537,9 @@ function rsa2048() {
 // BN254 context
 function bn254() {
 	var ctx = new CTX('BN254');
+	mywindow=window.open();
 
-	window.document.write("<br> BN254 Pairing-Friendly Curve "+  "<br>");
+	mywindow.document.write("<br> BN254 Pairing-Friendly Curve "+  "<br>");
 
 	var i,res;
 	var result;
@@ -576,30 +595,30 @@ function bn254() {
 
 /* Trusted Authority set-up */
 	ctx.MPIN.RANDOM_GENERATE(rng,S);
-	window.document.write("M-Pin Master Secret s: 0x"+ctx.MPIN.bytestostring(S) + "<br>");
+	mywindow.document.write("M-Pin Master Secret s: 0x"+ctx.MPIN.bytestostring(S) + "<br>");
  
  /* Create Client Identity */
  	var IDstr = "testUser@miracl.com";
 	var CLIENT_ID = ctx.MPIN.stringtobytes(IDstr);  
 	HCID=ctx.MPIN.HASH_ID(sha,CLIENT_ID);  /* Either Client or TA calculates Hash(ID) - you decide! */
 		
-	window.document.write("Client ID= "+ctx.MPIN.bytestostring(CLIENT_ID) + "<br>");
+	mywindow.document.write("Client ID= "+ctx.MPIN.bytestostring(CLIENT_ID) + "<br>");
 
 /* Client and Server are issued secrets by DTA */
 	ctx.MPIN.GET_SERVER_SECRET(S,SST);
-	window.document.write("Server Secret SS: 0x"+ctx.MPIN.bytestostring(SST) + "<br>");
+	mywindow.document.write("Server Secret SS: 0x"+ctx.MPIN.bytestostring(SST) + "<br>");
 
 	ctx.MPIN.GET_CLIENT_SECRET(S,HCID,TOKEN);
-	window.document.write("Client Secret CS: 0x"+ctx.MPIN.bytestostring(TOKEN) + "<br>");     
+	mywindow.document.write("Client Secret CS: 0x"+ctx.MPIN.bytestostring(TOKEN) + "<br>");     
 	
 /* Client extracts PIN from secret to create Token */
 	var pin=1234;
-	window.document.write("Client extracts PIN= "+pin + "<br>"); 
+	mywindow.document.write("Client extracts PIN= "+pin + "<br>"); 
 	var rtn=ctx.MPIN.EXTRACT_PIN(sha,CLIENT_ID,pin,TOKEN);
 	if (rtn != 0)
-		window.document.write("Failed to extract PIN " + "<br>");  
+		mywindow.document.write("Failed to extract PIN " + "<br>");  
 
-	window.document.write("Client Token TK: 0x"+ctx.MPIN.bytestostring(TOKEN) + "<br>");        
+	mywindow.document.write("Client Token TK: 0x"+ctx.MPIN.bytestostring(TOKEN) + "<br>");        
 
 	if (FULL)
 	{
@@ -612,17 +631,17 @@ function bn254() {
 		date=ctx.MPIN.today();
 /* Client gets "Time Token" permit from DTA */ 	
 		ctx.MPIN.GET_CLIENT_PERMIT(sha,date,S,HCID,PERMIT);
-		window.document.write("Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
 
 /* This encoding makes Time permit look random - Elligator squared */
 		ctx.MPIN.ENCODING(rng,PERMIT);
-		window.document.write("Encoded Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Encoded Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
 		ctx.MPIN.DECODING(PERMIT);
-		window.document.write("Decoded Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Decoded Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
 	}
 	else date=0;
 
-	pin=parseInt(prompt("Enter PIN= "));
+	pin=parseInt(mywindow.prompt("Enter PIN= "));
 
 /* Set date=0 and PERMIT=null if time permits not in use
 
@@ -669,14 +688,14 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 
 	if (ONE_PASS)
 	{
-		window.document.write("MPIN Single Pass " + "<br>");   
+		mywindow.document.write("MPIN Single Pass " + "<br>");   
 		timeValue = ctx.MPIN.GET_TIME();
-		window.document.write("Epoch " + timeValue + "<br>");   
+		mywindow.document.write("Epoch " + timeValue + "<br>");   
 
 		rtn=ctx.MPIN.CLIENT(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT,timeValue,Y);
 
 		if (rtn != 0)
-		window.document.write("FAILURE: CLIENT rtn: " + rtn + "<br>");   
+		mywindow.document.write("FAILURE: CLIENT rtn: " + rtn + "<br>");   
 
 		if (FULL)
 		{
@@ -686,7 +705,7 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 
 		rtn=ctx.MPIN.SERVER(sha,date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF,CLIENT_ID,timeValue);
 		if (rtn != 0)
-			window.document.write("FAILURE: SERVER rtn: " + rtn+ "<br>");  
+			mywindow.document.write("FAILURE: SERVER rtn: " + rtn+ "<br>");  
 
 		if (FULL)
 		{
@@ -696,10 +715,10 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 	}
 	else 
 	{
-		window.document.write("MPIN Multi Pass " + "<br>");   
+		mywindow.document.write("MPIN Multi Pass " + "<br>");   
 		rtn=ctx.MPIN.CLIENT_1(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT);
 		if (rtn != 0)
-			window.document.write("FAILURE: CLIENT_1 rtn: " + rtn + "<br>");   
+			mywindow.document.write("FAILURE: CLIENT_1 rtn: " + rtn + "<br>");   
   
 		if (FULL)
 		{
@@ -722,47 +741,49 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
   /* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
 		rtn=ctx.MPIN.CLIENT_2(X,Y,SEC);
 		if (rtn != 0)
-			window.document.write("FAILURE: CLIENT_2 rtn: " + rtn + "<br>");  
+			mywindow.document.write("FAILURE: CLIENT_2 rtn: " + rtn + "<br>");  
   /* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
   /* If PIN error not required, set E and F = NULL */
 		rtn=ctx.MPIN.SERVER_2(date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF);
     
 		if (rtn != 0)
-			window.document.write("FAILURE: SERVER_2 rtn: " + rtn+ "<br>");  
+			mywindow.document.write("FAILURE: SERVER_2 rtn: " + rtn+ "<br>");  
     
 	}
     		  
 
 	if (rtn == ctx.MPIN.BAD_PIN)
 	{
-		window.document.write("Server says - Bad Pin. I don't know you. Feck off." + "<br>"); 
+		mywindow.document.write("Server says - Bad Pin. I don't know you. Feck off." + "<br>"); 
 		if (PINERROR)
 		{
 			var err=ctx.MPIN.KANGAROO(E,F);
-			if (err!=0) window.document.write("(Client PIN is out by "+err + ")<br>");
+			if (err!=0) mywindow.document.write("(Client PIN is out by "+err + ")<br>");
 		}
 	}
 	else 
 	{
-		window.document.write("Server says - PIN is good! You really are "+IDstr + "<br>"); 
+		mywindow.document.write("Server says - PIN is good! You really are "+IDstr + "<br>"); 
 		if (FULL)
 		{
 			H=ctx.MPIN.HASH_ALL(sha,HCID,pxID,pxCID,SEC,Y,Z,T);
 			ctx.MPIN.CLIENT_KEY(sha,G1,G2,pin,R,X,H,T,CK);
 			
-			window.document.write("Client Key =  0x"+ctx.MPIN.bytestostring(CK) + "<br>");    
+			mywindow.document.write("Client Key =  0x"+ctx.MPIN.bytestostring(CK) + "<br>");    
 			H=ctx.MPIN.HASH_ALL(sha,HSID,pxID,pxCID,SEC,Y,Z,T);
 			ctx.MPIN.SERVER_KEY(sha,Z,SST,W,H,pHID,pxID,pxCID,SK);
-			window.document.write("Server Key =  0x"+ctx.MPIN.bytestostring(SK) + "<br>");    
+			mywindow.document.write("Server Key =  0x"+ctx.MPIN.bytestostring(SK) + "<br>");    
 		}
 	}
+
 }
 
 // BLS383 context
 function bls383() {
 	var ctx = new CTX('BLS383');
+	mywindow=window.open();
 
-	window.document.write("<br> BLS383 Pairing-Friendly Curve "+  "<br>");
+	mywindow.document.write("<br> BLS383 Pairing-Friendly Curve "+  "<br>");
 
 	var i,res;
 	var result;
@@ -819,30 +840,30 @@ function bls383() {
 
 /* Trusted Authority set-up */
 	ctx.MPIN.RANDOM_GENERATE(rng,S);
-	window.document.write("M-Pin Master Secret s: 0x"+ctx.MPIN.bytestostring(S) + "<br>");
+	mywindow.document.write("M-Pin Master Secret s: 0x"+ctx.MPIN.bytestostring(S) + "<br>");
  
  /* Create Client Identity */
  	var IDstr = "testUser@miracl.com";
 	var CLIENT_ID = ctx.MPIN.stringtobytes(IDstr);  
 	HCID=ctx.MPIN.HASH_ID(sha,CLIENT_ID);  /* Either Client or TA calculates Hash(ID) - you decide! */
 		
-	window.document.write("Client ID= "+ctx.MPIN.bytestostring(CLIENT_ID) + "<br>");
+	mywindow.document.write("Client ID= "+ctx.MPIN.bytestostring(CLIENT_ID) + "<br>");
 
 /* Client and Server are issued secrets by DTA */
 	ctx.MPIN.GET_SERVER_SECRET(S,SST);
-	window.document.write("Server Secret SS: 0x"+ctx.MPIN.bytestostring(SST) + "<br>");
+	mywindow.document.write("Server Secret SS: 0x"+ctx.MPIN.bytestostring(SST) + "<br>");
 
 	ctx.MPIN.GET_CLIENT_SECRET(S,HCID,TOKEN);
-	window.document.write("Client Secret CS: 0x"+ctx.MPIN.bytestostring(TOKEN) + "<br>");     
+	mywindow.document.write("Client Secret CS: 0x"+ctx.MPIN.bytestostring(TOKEN) + "<br>");     
 	
 /* Client extracts PIN from secret to create Token */
 	var pin=1234;
-	window.document.write("Client extracts PIN= "+pin + "<br>"); 
+	mywindow.document.write("Client extracts PIN= "+pin + "<br>"); 
 	var rtn=ctx.MPIN.EXTRACT_PIN(sha,CLIENT_ID,pin,TOKEN);
 	if (rtn != 0)
-		window.document.write("Failed to extract PIN " + "<br>");  
+		mywindow.document.write("Failed to extract PIN " + "<br>");  
 
-	window.document.write("Client Token TK: 0x"+ctx.MPIN.bytestostring(TOKEN) + "<br>");        
+	mywindow.document.write("Client Token TK: 0x"+ctx.MPIN.bytestostring(TOKEN) + "<br>");        
 
 	if (FULL)
 	{
@@ -855,17 +876,17 @@ function bls383() {
 		date=ctx.MPIN.today();
 /* Client gets "Time Token" permit from DTA */ 	
 		ctx.MPIN.GET_CLIENT_PERMIT(sha,date,S,HCID,PERMIT);
-		window.document.write("Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
 
 /* This encoding makes Time permit look random - Elligator squared */
 		ctx.MPIN.ENCODING(rng,PERMIT);
-		window.document.write("Encoded Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Encoded Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
 		ctx.MPIN.DECODING(PERMIT);
-		window.document.write("Decoded Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Decoded Time Permit TP: 0x"+ctx.MPIN.bytestostring(PERMIT) + "<br>");   
 	}
 	else date=0;
 
-	pin=parseInt(prompt("Enter PIN= "));
+	pin=parseInt(mywindow.prompt("Enter PIN= "));
 
 /* Set date=0 and PERMIT=null if time permits not in use
 
@@ -912,14 +933,14 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 
 	if (ONE_PASS)
 	{
-		window.document.write("MPIN Single Pass " + "<br>");   
+		mywindow.document.write("MPIN Single Pass " + "<br>");   
 		timeValue = ctx.MPIN.GET_TIME();
-		window.document.write("Epoch " + timeValue + "<br>");   
+		mywindow.document.write("Epoch " + timeValue + "<br>");   
 
 		rtn=ctx.MPIN.CLIENT(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT,timeValue,Y);
 
 		if (rtn != 0)
-		window.document.write("FAILURE: CLIENT rtn: " + rtn + "<br>");   
+		mywindow.document.write("FAILURE: CLIENT rtn: " + rtn + "<br>");   
 
 		if (FULL)
 		{
@@ -929,7 +950,7 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 
 		rtn=ctx.MPIN.SERVER(sha,date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF,CLIENT_ID,timeValue);
 		if (rtn != 0)
-			window.document.write("FAILURE: SERVER rtn: " + rtn+ "<br>");  
+			mywindow.document.write("FAILURE: SERVER rtn: " + rtn+ "<br>");  
 
 		if (FULL)
 		{
@@ -939,10 +960,10 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 	}
 	else 
 	{
-		window.document.write("MPIN Multi Pass " + "<br>");   
+		mywindow.document.write("MPIN Multi Pass " + "<br>");   
 		rtn=ctx.MPIN.CLIENT_1(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT);
 		if (rtn != 0)
-			window.document.write("FAILURE: CLIENT_1 rtn: " + rtn + "<br>");   
+			mywindow.document.write("FAILURE: CLIENT_1 rtn: " + rtn + "<br>");   
   
 		if (FULL)
 		{
@@ -965,40 +986,41 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
   /* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
 		rtn=ctx.MPIN.CLIENT_2(X,Y,SEC);
 		if (rtn != 0)
-			window.document.write("FAILURE: CLIENT_2 rtn: " + rtn + "<br>");  
+			mywindow.document.write("FAILURE: CLIENT_2 rtn: " + rtn + "<br>");  
   /* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
   /* If PIN error not required, set E and F = NULL */
 		rtn=ctx.MPIN.SERVER_2(date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF);
     
 		if (rtn != 0)
-			window.document.write("FAILURE: SERVER_2 rtn: " + rtn+ "<br>");  
+			mywindow.document.write("FAILURE: SERVER_2 rtn: " + rtn+ "<br>");  
     
 	}
     		  
 
 	if (rtn == ctx.MPIN.BAD_PIN)
 	{
-		window.document.write("Server says - Bad Pin. I don't know you. Feck off." + "<br>"); 
+		mywindow.document.write("Server says - Bad Pin. I don't know you. Feck off." + "<br>"); 
 		if (PINERROR)
 		{
 			var err=ctx.MPIN.KANGAROO(E,F);
-			if (err!=0) window.document.write("(Client PIN is out by "+err + ")<br>");
+			if (err!=0) mywindow.document.write("(Client PIN is out by "+err + ")<br>");
 		}
 	}
 	else 
 	{
-		window.document.write("Server says - PIN is good! You really are "+IDstr + "<br>"); 
+		mywindow.document.write("Server says - PIN is good! You really are "+IDstr + "<br>"); 
 		if (FULL)
 		{
 			H=ctx.MPIN.HASH_ALL(sha,HCID,pxID,pxCID,SEC,Y,Z,T);
 			ctx.MPIN.CLIENT_KEY(sha,G1,G2,pin,R,X,H,T,CK);
 			
-			window.document.write("Client Key =  0x"+ctx.MPIN.bytestostring(CK) + "<br>");    
+			mywindow.document.write("Client Key =  0x"+ctx.MPIN.bytestostring(CK) + "<br>");    
 			H=ctx.MPIN.HASH_ALL(sha,HSID,pxID,pxCID,SEC,Y,Z,T);
 			ctx.MPIN.SERVER_KEY(sha,Z,SST,W,H,pHID,pxID,pxCID,SK);
-			window.document.write("Server Key =  0x"+ctx.MPIN.bytestostring(SK) + "<br>");    
+			mywindow.document.write("Server Key =  0x"+ctx.MPIN.bytestostring(SK) + "<br>");    
 		}
 	}
+
 }
 
 
@@ -1006,8 +1028,9 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 // BLS24 context
 function bls24() {
 	var ctx = new CTX('BLS24');
+	mywindow=window.open();
 
-	window.document.write("<br> BLS24 Pairing-Friendly Curve "+  "<br>");
+	mywindow.document.write("<br> BLS24 Pairing-Friendly Curve "+  "<br>");
 
 	var i,res;
 	var result;
@@ -1063,30 +1086,30 @@ function bls24() {
 
 /* Trusted Authority set-up */
 	ctx.MPIN192.RANDOM_GENERATE(rng,S);
-	window.document.write("M-Pin Master Secret s: 0x"+ctx.MPIN192.bytestostring(S) + "<br>");
+	mywindow.document.write("M-Pin Master Secret s: 0x"+ctx.MPIN192.bytestostring(S) + "<br>");
  
  /* Create Client Identity */
  	var IDstr = "testUser@miracl.com";
 	var CLIENT_ID = ctx.MPIN192.stringtobytes(IDstr);  
 	HCID=ctx.MPIN192.HASH_ID(sha,CLIENT_ID);  /* Either Client or TA calculates Hash(ID) - you decide! */
 		
-	window.document.write("Client ID= "+ctx.MPIN192.bytestostring(CLIENT_ID) + "<br>");
+	mywindow.document.write("Client ID= "+ctx.MPIN192.bytestostring(CLIENT_ID) + "<br>");
 
 /* Client and Server are issued secrets by DTA */
 	ctx.MPIN192.GET_SERVER_SECRET(S,SST);
-	window.document.write("Server Secret SS: 0x"+ctx.MPIN192.bytestostring(SST) + "<br>");
+	mywindow.document.write("Server Secret SS: 0x"+ctx.MPIN192.bytestostring(SST) + "<br>");
 
 	ctx.MPIN192.GET_CLIENT_SECRET(S,HCID,TOKEN);
-	window.document.write("Client Secret CS: 0x"+ctx.MPIN192.bytestostring(TOKEN) + "<br>");     
+	mywindow.document.write("Client Secret CS: 0x"+ctx.MPIN192.bytestostring(TOKEN) + "<br>");     
 	
 /* Client extracts PIN from secret to create Token */
 	var pin=1234;
-	window.document.write("Client extracts PIN= "+pin + "<br>"); 
+	mywindow.document.write("Client extracts PIN= "+pin + "<br>"); 
 	var rtn=ctx.MPIN192.EXTRACT_PIN(sha,CLIENT_ID,pin,TOKEN);
 	if (rtn != 0)
-		window.document.write("Failed to extract PIN " + "<br>");  
+		mywindow.document.write("Failed to extract PIN " + "<br>");  
 
-	window.document.write("Client Token TK: 0x"+ctx.MPIN192.bytestostring(TOKEN) + "<br>");        
+	mywindow.document.write("Client Token TK: 0x"+ctx.MPIN192.bytestostring(TOKEN) + "<br>");        
 
 	if (FULL)
 	{
@@ -1099,17 +1122,17 @@ function bls24() {
 		date=ctx.MPIN192.today();
 /* Client gets "Time Token" permit from DTA */ 	
 		ctx.MPIN192.GET_CLIENT_PERMIT(sha,date,S,HCID,PERMIT);
-		window.document.write("Time Permit TP: 0x"+ctx.MPIN192.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Time Permit TP: 0x"+ctx.MPIN192.bytestostring(PERMIT) + "<br>");   
 
 /* This encoding makes Time permit look random - Elligator squared */
 		ctx.MPIN192.ENCODING(rng,PERMIT);
-		window.document.write("Encoded Time Permit TP: 0x"+ctx.MPIN192.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Encoded Time Permit TP: 0x"+ctx.MPIN192.bytestostring(PERMIT) + "<br>");   
 		ctx.MPIN192.DECODING(PERMIT);
-		window.document.write("Decoded Time Permit TP: 0x"+ctx.MPIN192.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Decoded Time Permit TP: 0x"+ctx.MPIN192.bytestostring(PERMIT) + "<br>");   
 	}
 	else date=0;
 
-	pin=parseInt(prompt("Enter PIN= "));
+	pin=parseInt(mywindow.prompt("Enter PIN= "));
 
 /* Set date=0 and PERMIT=null if time permits not in use
 
@@ -1156,14 +1179,14 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 
 	if (ONE_PASS)
 	{
-		window.document.write("MPIN Single Pass " + "<br>");   
+		mywindow.document.write("MPIN Single Pass " + "<br>");   
 		timeValue = ctx.MPIN192.GET_TIME();
-		window.document.write("Epoch " + timeValue + "<br>");   
+		mywindow.document.write("Epoch " + timeValue + "<br>");   
 
 		rtn=ctx.MPIN192.CLIENT(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT,timeValue,Y);
 
 		if (rtn != 0)
-		window.document.write("FAILURE: CLIENT rtn: " + rtn + "<br>");   
+		mywindow.document.write("FAILURE: CLIENT rtn: " + rtn + "<br>");   
 
 		if (FULL)
 		{
@@ -1173,7 +1196,7 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 
 		rtn=ctx.MPIN192.SERVER(sha,date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF,CLIENT_ID,timeValue);
 		if (rtn != 0)
-			window.document.write("FAILURE: SERVER rtn: " + rtn+ "<br>");  
+			mywindow.document.write("FAILURE: SERVER rtn: " + rtn+ "<br>");  
 
 		if (FULL)
 		{
@@ -1183,10 +1206,10 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
 	}
 	else 
 	{
-		window.document.write("MPIN Multi Pass " + "<br>");   
+		mywindow.document.write("MPIN Multi Pass " + "<br>");   
 		rtn=ctx.MPIN192.CLIENT_1(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT);
 		if (rtn != 0)
-			window.document.write("FAILURE: CLIENT_1 rtn: " + rtn + "<br>");   
+			mywindow.document.write("FAILURE: CLIENT_1 rtn: " + rtn + "<br>");   
   
 		if (FULL)
 		{
@@ -1209,47 +1232,49 @@ If Time permits are ON, AND pin error detection is NOT required, set xID=null, H
   /* Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC */
 		rtn=ctx.MPIN192.CLIENT_2(X,Y,SEC);
 		if (rtn != 0)
-			window.document.write("FAILURE: CLIENT_2 rtn: " + rtn + "<br>");  
+			mywindow.document.write("FAILURE: CLIENT_2 rtn: " + rtn + "<br>");  
   /* Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. */
   /* If PIN error not required, set E and F = NULL */
 		rtn=ctx.MPIN192.SERVER_2(date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF);
     
 		if (rtn != 0)
-			window.document.write("FAILURE: SERVER_2 rtn: " + rtn+ "<br>");  
+			mywindow.document.write("FAILURE: SERVER_2 rtn: " + rtn+ "<br>");  
     
 	}
     		  
 
 	if (rtn == ctx.MPIN192.BAD_PIN)
 	{
-		window.document.write("Server says - Bad Pin. I don't know you. Feck off." + "<br>"); 
+		mywindow.document.write("Server says - Bad Pin. I don't know you. Feck off." + "<br>"); 
 		if (PINERROR)
 		{
 			var err=ctx.MPIN192.KANGAROO(E,F);
-			if (err!=0) window.document.write("(Client PIN is out by "+err + ")<br>");
+			if (err!=0) mywindow.document.write("(Client PIN is out by "+err + ")<br>");
 		}
 	}
 	else 
 	{
-		window.document.write("Server says - PIN is good! You really are "+IDstr + "<br>"); 
+		mywindow.document.write("Server says - PIN is good! You really are "+IDstr + "<br>"); 
 		if (FULL)
 		{
 			H=ctx.MPIN192.HASH_ALL(sha,HCID,pxID,pxCID,SEC,Y,Z,T);
 			ctx.MPIN192.CLIENT_KEY(sha,G1,G2,pin,R,X,H,T,CK);
 			
-			window.document.write("Client Key =  0x"+ctx.MPIN192.bytestostring(CK) + "<br>");    
+			mywindow.document.write("Client Key =  0x"+ctx.MPIN192.bytestostring(CK) + "<br>");    
 			H=ctx.MPIN192.HASH_ALL(sha,HSID,pxID,pxCID,SEC,Y,Z,T);
 			ctx.MPIN192.SERVER_KEY(sha,Z,SST,W,H,pHID,pxID,pxCID,SK);
-			window.document.write("Server Key =  0x"+ctx.MPIN192.bytestostring(SK) + "<br>");    
+			mywindow.document.write("Server Key =  0x"+ctx.MPIN192.bytestostring(SK) + "<br>");    
 		}
 	}
+
 } 
 
 // BLS48 context
 function bls48() {
 	var ctx = new CTX('BLS48');
+	mywindow=window.open();
 
-	window.document.write("<br> BLS48 Pairing-Friendly Curve "+  "<br>");
+	mywindow.document.write("<br> BLS48 Pairing-Friendly Curve "+  "<br>");
 
 	var i,res;
 	var result;
@@ -1306,29 +1331,29 @@ function bls48() {
 // Trusted Authority set-up 
 	ctx.MPIN256.RANDOM_GENERATE(rng,S);
 
-	window.document.write("M-Pin Master Secret s: 0x"+ctx.MPIN256.bytestostring(S) + "<br>");
+	mywindow.document.write("M-Pin Master Secret s: 0x"+ctx.MPIN256.bytestostring(S) + "<br>");
  // Create Client Identity 
  	var IDstr = "testUser@miracl.com";
 	var CLIENT_ID = ctx.MPIN256.stringtobytes(IDstr);  
 	HCID=ctx.MPIN256.HASH_ID(sha,CLIENT_ID);  // Either Client or TA calculates Hash(ID) - you decide! 
 		
-	window.document.write("Client ID= "+ctx.MPIN256.bytestostring(CLIENT_ID) + "<br>");
+	mywindow.document.write("Client ID= "+ctx.MPIN256.bytestostring(CLIENT_ID) + "<br>");
 
 // Client and Server are issued secrets by DTA 
 	ctx.MPIN256.GET_SERVER_SECRET(S,SST);
-	window.document.write("Server Secret SS: 0x"+ctx.MPIN256.bytestostring(SST) + "<br>");
+	mywindow.document.write("Server Secret SS: 0x"+ctx.MPIN256.bytestostring(SST) + "<br>");
 
 	ctx.MPIN256.GET_CLIENT_SECRET(S,HCID,TOKEN);
-	window.document.write("Client Secret CS: 0x"+ctx.MPIN256.bytestostring(TOKEN) + "<br>");     
+	mywindow.document.write("Client Secret CS: 0x"+ctx.MPIN256.bytestostring(TOKEN) + "<br>");     
 	
 // Client extracts PIN from secret to create Token 
 	var pin=1234;
-	window.document.write("Client extracts PIN= "+pin + "<br>"); 
+	mywindow.document.write("Client extracts PIN= "+pin + "<br>"); 
 	var rtn=ctx.MPIN256.EXTRACT_PIN(sha,CLIENT_ID,pin,TOKEN);
 	if (rtn != 0)
-		window.document.write("Failed to extract PIN " + "<br>");  
+		mywindow.document.write("Failed to extract PIN " + "<br>");  
 
-	window.document.write("Client Token TK: 0x"+ctx.MPIN256.bytestostring(TOKEN) + "<br>");        
+	mywindow.document.write("Client Token TK: 0x"+ctx.MPIN256.bytestostring(TOKEN) + "<br>");        
 
 	if (FULL)
 	{
@@ -1341,17 +1366,17 @@ function bls48() {
 		date=ctx.MPIN256.today();
 // Client gets "Time Token" permit from DTA  	
 		ctx.MPIN256.GET_CLIENT_PERMIT(sha,date,S,HCID,PERMIT);
-		window.document.write("Time Permit TP: 0x"+ctx.MPIN256.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Time Permit TP: 0x"+ctx.MPIN256.bytestostring(PERMIT) + "<br>");   
 
 // This encoding makes Time permit look random - Elligator squared 
 		ctx.MPIN256.ENCODING(rng,PERMIT);
-		window.document.write("Encoded Time Permit TP: 0x"+ctx.MPIN256.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Encoded Time Permit TP: 0x"+ctx.MPIN256.bytestostring(PERMIT) + "<br>");   
 		ctx.MPIN256.DECODING(PERMIT);
-		window.document.write("Decoded Time Permit TP: 0x"+ctx.MPIN256.bytestostring(PERMIT) + "<br>");   
+		mywindow.document.write("Decoded Time Permit TP: 0x"+ctx.MPIN256.bytestostring(PERMIT) + "<br>");   
 	}
 	else date=0;
 
-	pin=parseInt(prompt("Enter PIN= "));
+	pin=parseInt(mywindow.prompt("Enter PIN= "));
 
 // Set date=0 and PERMIT=null if time permits not in use
 
@@ -1397,14 +1422,14 @@ function bls48() {
 
 	if (ONE_PASS)
 	{
-		window.document.write("MPIN Single Pass " + "<br>");   
+		mywindow.document.write("MPIN Single Pass " + "<br>");   
 		timeValue = ctx.MPIN256.GET_TIME();
-		window.document.write("Epoch " + timeValue + "<br>");   
+		mywindow.document.write("Epoch " + timeValue + "<br>");   
 
 		rtn=ctx.MPIN256.CLIENT(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT,timeValue,Y);
 
 		if (rtn != 0)
-		window.document.write("FAILURE: CLIENT rtn: " + rtn + "<br>");   
+		mywindow.document.write("FAILURE: CLIENT rtn: " + rtn + "<br>");   
 
 		if (FULL)
 		{
@@ -1414,7 +1439,7 @@ function bls48() {
 
 		rtn=ctx.MPIN256.SERVER(sha,date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF,CLIENT_ID,timeValue);
 		if (rtn != 0)
-			window.document.write("FAILURE: SERVER rtn: " + rtn+ "<br>");  
+			mywindow.document.write("FAILURE: SERVER rtn: " + rtn+ "<br>");  
 
 		if (FULL)
 		{
@@ -1424,10 +1449,10 @@ function bls48() {
 	}
 	else 
 	{
-		window.document.write("MPIN Multi Pass " + "<br>");   
+		mywindow.document.write("MPIN Multi Pass " + "<br>");   
 		rtn=ctx.MPIN256.CLIENT_1(sha,date,CLIENT_ID,rng,X,pin,TOKEN,SEC,pxID,pxCID,pPERMIT);
 		if (rtn != 0)
-			window.document.write("FAILURE: CLIENT_1 rtn: " + rtn + "<br>");   
+			mywindow.document.write("FAILURE: CLIENT_1 rtn: " + rtn + "<br>");   
   
 		if (FULL)
 		{
@@ -1450,50 +1475,51 @@ function bls48() {
   // Client Second Pass: Inputs Client secret SEC, x and y. Outputs -(x+y)*SEC 
 		rtn=ctx.MPIN256.CLIENT_2(X,Y,SEC);
 		if (rtn != 0)
-			window.document.write("FAILURE: CLIENT_2 rtn: " + rtn + "<br>");  
+			mywindow.document.write("FAILURE: CLIENT_2 rtn: " + rtn + "<br>");  
   // Server Second pass. Inputs hashed client id, random Y, -(x+y)*SEC, xID and xCID and Server secret SST. E and F help kangaroos to find error. 
   // If PIN error not required, set E and F = NULL 
 		rtn=ctx.MPIN256.SERVER_2(date,pHID,pHTID,Y,SST,pxID,pxCID,SEC,pE,pF);
     
 		if (rtn != 0)
-			window.document.write("FAILURE: SERVER_2 rtn: " + rtn+ "<br>");  
+			mywindow.document.write("FAILURE: SERVER_2 rtn: " + rtn+ "<br>");  
     
 	}
     		  
 
 	if (rtn == ctx.MPIN256.BAD_PIN)
 	{
-		window.document.write("Server says - Bad Pin. I don't know you. Feck off." + "<br>"); 
+		mywindow.document.write("Server says - Bad Pin. I don't know you. Feck off." + "<br>"); 
 		if (PINERROR)
 		{
 			var err=ctx.MPIN256.KANGAROO(E,F);
-			if (err!=0) window.document.write("(Client PIN is out by "+err + ")<br>");
+			if (err!=0) mywindow.document.write("(Client PIN is out by "+err + ")<br>");
 		}
 	}
 	else 
 	{
-		window.document.write("Server says - PIN is good! You really are "+IDstr + "<br>"); 
+		mywindow.document.write("Server says - PIN is good! You really are "+IDstr + "<br>"); 
 		if (FULL)
 		{
 			H=ctx.MPIN256.HASH_ALL(sha,HCID,pxID,pxCID,SEC,Y,Z,T);
 			ctx.MPIN256.CLIENT_KEY(sha,G1,G2,pin,R,X,H,T,CK);
 			
-			window.document.write("Client Key =  0x"+ctx.MPIN256.bytestostring(CK) + "<br>");    
+			mywindow.document.write("Client Key =  0x"+ctx.MPIN256.bytestostring(CK) + "<br>");    
 			H=ctx.MPIN256.HASH_ALL(sha,HSID,pxID,pxCID,SEC,Y,Z,T);
 			ctx.MPIN256.SERVER_KEY(sha,Z,SST,W,H,pHID,pxID,pxCID,SK);
-			window.document.write("Server Key =  0x"+ctx.MPIN256.bytestostring(SK) + "<br>");    
+			mywindow.document.write("Server Key =  0x"+ctx.MPIN256.bytestostring(SK) + "<br>");    
 		}
 	}
+
 }
 
 
 //bls48();
 //bls24();
-bls383();
+//bls383();
 //bn254();
 //goldilocks();
 //nist256();
-ed25519();
+//ed25519();
 //rsa2048();
 
 </script>
