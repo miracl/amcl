@@ -397,17 +397,79 @@ impl FP {
     }
 /* self=1/self mod Modulus */
     pub fn inverse(&mut self) {
-/*        
-  		let mut p = BIG::new_ints(&rom::MODULUS);      	
-        let mut r=self.redc();
-        r.invmodp(&mut p);
-        self.x.copy(&r);
-        self.nres();
-*/
-        let mut m2 = BIG::new_ints(&rom::MODULUS); 
-        m2.dec(2); m2.norm();
-        let inv=self.pow(&mut m2);
-        self.copy(&inv);          
+	if MODTYPE==PSEUDO_MERSENNE {
+		let ac:[isize;11]=[1,2,3,6,12,15,30,60,120,240,255];
+		let mut xp:[FP;11]=[FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new()];
+// phase 1
+		let mut t=FP::new();
+		xp[0].copy(&self);  // 1
+		xp[1].copy(&self); xp[1].sqr(); // 2
+		t.copy(&xp[1]); xp[2].copy(&t); xp[2].mul(&self); // 3
+		t.copy(&xp[2]); xp[3].copy(&t); xp[3].sqr(); // 6
+		t.copy(&xp[3]); xp[4].copy(&t); xp[4].sqr(); // 12
+		t.copy(&xp[4]); t.mul(&xp[2]);  xp[5].copy(&t);  // 15
+		t.copy(&xp[5]); xp[6].copy(&t); xp[6].sqr(); // 30
+		t.copy(&xp[6]); xp[7].copy(&t); xp[7].sqr(); // 60
+		t.copy(&xp[7]); xp[8].copy(&t); xp[8].sqr(); // 120
+		t.copy(&xp[8]); xp[9].copy(&t); xp[9].sqr(); // 240
+		t.copy(&xp[9]); t.mul(&xp[5]); xp[10].copy(&t); // 255
+
+		let n=MODBITS as isize;
+		let c=rom::MCONST as isize;
+
+		let mut bw=0; let mut w=1; while w<c+2 {w*=2; bw+=1;}
+		let mut k=w-c-2;
+
+		let mut i=10; while ac[i]>k {i-=1;}
+		let mut key=FP::new_copy(&xp[i]); 
+		k-=ac[i];
+		while k != 0 {
+			i-=1;
+			if ac[i]>k {continue;}
+			key.mul(&xp[i]);
+			k-=ac[i]; 
+		}
+// phase 2
+		t.copy(&xp[2]); xp[1].copy(&t);
+		t.copy(&xp[5]); xp[2].copy(&t);
+		t.copy(&xp[10]); xp[3].copy(&t);
+
+		let mut j=3; let mut m=8;
+		let nw=n-bw;
+		let mut r=FP::new();
+
+		while 2*m<nw {
+			t.copy(&xp[j]); j+=1;
+			for _ in 0..m {t.sqr();} 
+			r.copy(&xp[j-1]);
+			r.mul(&t);
+			xp[j].copy(&r);
+			m*=2;
+		}
+		let mut lo=nw-m;
+		r.copy(&xp[j]);
+
+		while lo != 0 {
+			m/=2; j-=1;
+			if lo<m {continue;}
+			lo-=m;
+			t.copy(&r);
+			for _ in 0..m {t.sqr();}
+			r.copy(&t);
+			r.mul(&xp[j]);
+		}
+// phase 3
+		for _ in 0..bw {r.sqr();}
+
+		r.mul(&key);
+		self.copy(&r);
+
+        } else {
+		let mut m2 = BIG::new_ints(&rom::MODULUS); 
+		m2.dec(2); m2.norm();
+		let inv=self.pow(&mut m2);
+		self.copy(&inv);
+	}
     }
 
 /* return TRUE if self==a */

@@ -397,15 +397,78 @@ public struct FP {
 /* this=1/this mod Modulus */
     mutating func inverse()
     {
-/*        
-        let r=redc()
-        r.invmodp(FP.p)
-        x.copy(r)
-        nres()
-*/
-        var m2=BIG(ROM.Modulus);
-        m2.dec(2); m2.norm()
-        copy(pow(m2))
+        if FP.MODTYPE==FP.PSEUDO_MERSENNE {
+            var ac: [Int] = [1, 2, 3, 6, 12, 15, 30, 60, 120, 240, 255]
+            var xp=[FP]() 
+// phase 1
+            xp.append(FP(self))
+            xp.append(FP(self)); xp[1].sqr()
+            xp.append(FP(xp[1])); xp[2].mul(self)
+            xp.append(FP(xp[2])); xp[3].sqr()
+            xp.append(FP(xp[3])); xp[4].sqr()
+            xp.append(FP(xp[4])); xp[5].mul(xp[2])
+            xp.append(FP(xp[5])); xp[6].sqr()
+            xp.append(FP(xp[6])); xp[7].sqr()
+            xp.append(FP(xp[7])); xp[8].sqr()
+            xp.append(FP(xp[8])); xp[9].sqr()
+            xp.append(FP(xp[9])); xp[10].mul(xp[5])
+
+            let n=Int(FP.MODBITS)
+            let c=Int(ROM.MConst)
+
+            var bw=0; var w=1; while w<c+2 {w*=2; bw+=1}
+            var k=w-c-2
+
+            var i=10; while ac[i]>k {i-=1}
+            var key=FP(xp[i])
+            k-=ac[i]
+
+            while k != 0 {
+                i-=1
+                if ac[i]>k {continue}
+                key.mul(xp[i])
+                k-=ac[i] 
+            }
+
+// phase 2 
+            xp[1].copy(xp[2])
+            xp[2].copy(xp[5])
+            xp[3].copy(xp[10])
+
+            var j=3; var m=8
+            let nw=n-bw
+            var t=FP(0)
+
+            while 2*m<nw {
+                t.copy(xp[j]); j+=1
+                for _ in 0..<m {t.sqr()} 
+                xp[j].copy(xp[j-1])
+                xp[j].mul(t)
+                m*=2
+            }
+
+            var lo=nw-m
+            var r=FP(xp[j])
+
+	    while lo != 0 {
+                m/=2; j-=1
+                if lo<m {continue}
+                lo-=m
+                t.copy(r)
+                for _ in 0..<m {t.sqr()}
+                r.copy(t)
+                r.mul(xp[j])
+            }
+
+            for _ in 0..<bw {r.sqr()}
+
+            r.mul(key)
+            copy(r)
+        } else {
+            var m2=BIG(ROM.Modulus)
+            m2.dec(2); m2.norm()
+            copy(pow(m2))
+        }
 
     }
     

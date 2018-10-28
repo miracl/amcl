@@ -559,6 +559,83 @@ void FP_YYY_div2(FP_YYY *r,FP_YYY *a)
     }
 }
 
+#if MODTYPE_YYY == PSEUDO_MERSENNE
+
+// See eprint paper "On inversions modulo pseudo-Mersenne primes"
+void FP_YYY_inv(FP_YYY *r,FP_YYY *x)
+{
+	int i,j,k,bw,w,c,nw,lo,m,n;
+	FP_YYY xp[11],t,key;
+	const int ac[]={1,2,3,6,12,15,30,60,120,240,255};
+// phase 1
+	FP_YYY_copy(&xp[0],x);	// 1 
+	FP_YYY_sqr(&xp[1],x); // 2
+	FP_YYY_mul(&xp[2],&xp[1],x);  //3
+	FP_YYY_sqr(&xp[3],&xp[2]);  // 6 
+	FP_YYY_sqr(&xp[4],&xp[3]); // 12
+	FP_YYY_mul(&xp[5],&xp[4],&xp[2]); // 15
+	FP_YYY_sqr(&xp[6],&xp[5]); // 30
+	FP_YYY_sqr(&xp[7],&xp[6]); // 60
+	FP_YYY_sqr(&xp[8],&xp[7]); // 120
+	FP_YYY_sqr(&xp[9],&xp[8]); // 240
+	FP_YYY_mul(&xp[10],&xp[9],&xp[5]); // 255
+	
+	n=MODBITS_YYY;
+	c=MConst_YYY;
+
+	bw=0; w=1; while (w<c+2) {w*=2; bw+=1;}
+	k=w-c-2;
+
+	i=10; while (ac[i]>k) i--;
+	FP_YYY_copy(&key,&xp[i]); 
+	k-=ac[i];
+
+	while (k!=0)
+	{
+		i--;
+		if (ac[i]>k) continue;
+		FP_YYY_mul(&key,&key,&xp[i]);
+		k-=ac[i]; 
+	}
+
+// phase 2 
+	FP_YYY_copy(&xp[1],&xp[2]);
+	FP_YYY_copy(&xp[2],&xp[5]);
+	FP_YYY_copy(&xp[3],&xp[10]);
+
+	j=3; m=8;
+	nw=n-bw;
+	while (2*m<nw)
+	{
+		FP_YYY_copy(&t,&xp[j++]);
+		for (i=0;i<m;i++)
+			FP_YYY_sqr(&t,&t); 
+		FP_YYY_mul(&xp[j],&xp[j-1],&t); 
+		m*=2;
+	}
+
+	lo=nw-m;
+	FP_YYY_copy(r,&xp[j]);
+
+	while (lo!=0)
+	{
+		m/=2; j--;
+		if (lo<m) continue;
+		lo-=m;
+		FP_YYY_copy(&t,r);
+		for (i=0;i<m;i++)
+			FP_YYY_sqr(&t,&t);
+		FP_YYY_mul(r,&t,&xp[j]);
+	}
+// phase 3
+
+	for (i=0;i<bw;i++ )
+		FP_YYY_sqr(r,r);
+
+	FP_YYY_mul(r,r,&key); 
+}
+
+#else
 /* set w=1/x */
 void FP_YYY_inv(FP_YYY *w,FP_YYY *x)
 {
@@ -568,14 +645,8 @@ void FP_YYY_inv(FP_YYY *w,FP_YYY *x)
 	BIG_XXX_dec(m2,2);
 	BIG_XXX_norm(m2);
 	FP_YYY_pow(w,x,m2);
-
-/*
-    BIG_XXX m,b;
-    BIG_XXX_rcopy(m,Modulus_YYY);
-    FP_YYY_redc(b,x);
-    BIG_XXX_invmodp(b,b,m);
-    FP_YYY_nres(w,b); */
 }
+#endif
 
 /* SU=8 */
 /* set n=1 */

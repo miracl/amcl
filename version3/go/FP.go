@@ -345,17 +345,78 @@ func (F *FP) div2() {
 
 /* this=1/this mod Modulus */
 func (F *FP) inverse() {
-/*
-	p:=NewBIGints(Modulus);
-	r:=F.redc()
-	r.Invmodp(p)
-	F.x.copy(r)
-	F.nres()
-*/
 
-	m2:=NewBIGints(Modulus);
-	m2.dec(2); m2.norm()
-	F.copy(F.pow(m2))
+	if MODTYPE==PSEUDO_MERSENNE {
+		ac := [11]int{1, 2, 3, 6, 12, 15, 30, 60, 120, 240,255}
+		var xp []*FP
+// phase 1
+		xp=append(xp,NewFPcopy(F)); 
+		xp=append(xp,NewFPcopy(F)); xp[1].sqr()
+		xp=append(xp,NewFPcopy(xp[1])); xp[2].mul(F)
+		xp=append(xp,NewFPcopy(xp[2])); xp[3].sqr()
+		xp=append(xp,NewFPcopy(xp[3])); xp[4].sqr()
+		xp=append(xp,NewFPcopy(xp[4])); xp[5].mul(xp[2])
+		xp=append(xp,NewFPcopy(xp[5])); xp[6].sqr()
+		xp=append(xp,NewFPcopy(xp[6])); xp[7].sqr()
+		xp=append(xp,NewFPcopy(xp[7])); xp[8].sqr()
+		xp=append(xp,NewFPcopy(xp[8])); xp[9].sqr()
+		xp=append(xp,NewFPcopy(xp[9])); xp[10].mul(xp[5])
+
+		n:=int(MODBITS)
+		c:=int(MConst)
+
+		bw:=0; w:=1; for w<c+2 {w*=2; bw+=1}
+		k:=w-c-2
+
+		i:=10; for ac[i]>k {i--}
+		key:=NewFPcopy(xp[i])
+		k-=ac[i]
+
+		for k!=0 {
+			i--
+			if ac[i]>k {continue}
+			key.mul(xp[i])
+			k-=ac[i] 
+		}
+// phase 2 
+		xp[1].copy(xp[2])
+		xp[2].copy(xp[5])
+		xp[3].copy(xp[10])
+
+		j:=3; m:=8
+		nw:=n-bw
+		t:=NewFPint(0)
+		for 2*m<nw {
+			t.copy(xp[j]); j++
+			for i=0;i<m;i++ {t.sqr()} 
+			xp[j].copy(xp[j-1])
+			xp[j].mul(t)
+			m*=2
+		}
+		lo:=nw-m
+		r:=NewFPcopy(xp[j])
+
+		for lo!=0 {
+			m/=2; j--
+			if lo<m {continue}
+			lo-=m
+			t.copy(r)
+			for i=0;i<m;i++ {t.sqr()}
+			r.copy(t)
+			r.mul(xp[j])
+		}
+// phase 3
+		for i=0;i<bw;i++ {r.sqr()}
+
+		r.mul(key)
+		F.copy(r)
+
+	} else {
+
+		m2:=NewBIGints(Modulus);
+		m2.dec(2); m2.norm()
+		F.copy(F.pow(m2))
+	}
 
 }
 

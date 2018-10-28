@@ -574,6 +574,85 @@ void YYY::FP_div2(FP *r,FP *a)
     }
 }
 
+#if MODTYPE_YYY == PSEUDO_MERSENNE
+
+// See eprint paper "On inversions modulo pseudo-Mersenne primes"
+
+void YYY::FP_inv(FP *r,FP *x)
+{
+	int i,j,k,bw,w,c,nw,lo,m,n;
+	FP xp[11],t,key;
+	const int ac[]={1,2,3,6,12,15,30,60,120,240,255};
+// phase 1
+	FP_copy(&xp[0],x);	// 1 
+	FP_sqr(&xp[1],x); // 2
+	FP_mul(&xp[2],&xp[1],x);  //3
+	FP_sqr(&xp[3],&xp[2]);  // 6 
+	FP_sqr(&xp[4],&xp[3]); // 12
+	FP_mul(&xp[5],&xp[4],&xp[2]); // 15
+	FP_sqr(&xp[6],&xp[5]); // 30
+	FP_sqr(&xp[7],&xp[6]); // 60
+	FP_sqr(&xp[8],&xp[7]); // 120
+	FP_sqr(&xp[9],&xp[8]); // 240
+	FP_mul(&xp[10],&xp[9],&xp[5]); // 255
+	
+	n=MODBITS_YYY;
+	c=MConst;
+
+	bw=0; w=1; while (w<c+2) {w*=2; bw+=1;}
+	k=w-c-2;
+
+	i=10; while (ac[i]>k) i--;
+	FP_copy(&key,&xp[i]); 
+	k-=ac[i];
+
+	while (k!=0)
+	{
+		i--;
+		if (ac[i]>k) continue;
+		FP_mul(&key,&key,&xp[i]);
+		k-=ac[i]; 
+	}
+
+// phase 2 
+	FP_copy(&xp[1],&xp[2]);
+	FP_copy(&xp[2],&xp[5]);
+	FP_copy(&xp[3],&xp[10]);
+
+	j=3; m=8;
+	nw=n-bw;
+	while (2*m<nw)
+	{
+		FP_copy(&t,&xp[j++]);
+		for (i=0;i<m;i++)
+			FP_sqr(&t,&t); 
+		FP_mul(&xp[j],&xp[j-1],&t); 
+		m*=2;
+	}
+
+	lo=nw-m;
+	FP_copy(r,&xp[j]);
+
+	while (lo!=0)
+	{
+		m/=2; j--;
+		if (lo<m) continue;
+		lo-=m;
+		FP_copy(&t,r);
+		for (i=0;i<m;i++)
+			FP_sqr(&t,&t);
+		FP_mul(r,&t,&xp[j]);
+	}
+// phase 3
+
+	for (i=0;i<bw;i++ )
+		FP_sqr(r,r);
+
+	FP_mul(r,r,&key); 
+}
+
+#else
+
 /* set w=1/x */
 void YYY::FP_inv(FP *w,FP *x)
 {
@@ -583,15 +662,9 @@ void YYY::FP_inv(FP *w,FP *x)
 	BIG_dec(m2,2);
 	BIG_norm(m2);
 	FP_pow(w,x,m2);
-
-/*
-    BIG m,b;
-    BIG_rcopy(m,Modulus);
-    FP_redc(b,x);
-    BIG_invmodp(b,b,m);
-    FP_nres(w,b);
-*/
 }
+
+#endif
 
 /* SU=8 */
 /* set n=1 */
@@ -601,33 +674,6 @@ void YYY::FP_one(FP *n)
     BIG_one(b);
     FP_nres(n,b);
 }
-
-/* Set r=a^b mod Modulus */
-/* SU= 136 */
-/*
-void YYY::FP_pow(FP *r,FP *a,BIG b)
-{
-    BIG z,zilch;
-	FP w;
-    int bt;
-    BIG_zero(zilch);
-
-	FP_norm(a);
-    BIG_norm(b);
-    BIG_copy(z,b);
-    FP_copy(&w,a);
-    FP_one(r);
-    while(1)
-    {
-        bt=BIG_parity(z);
-        BIG_fshr(z,1);
-        if (bt) FP_mul(r,r,&w);
-        if (BIG_comp(z,zilch)==0) break;
-        FP_sqr(&w,&w);
-    }
-    FP_reduce(r);
-}
-*/
 
 void YYY::FP_pow(FP *r,FP *a,BIG b)
 {
