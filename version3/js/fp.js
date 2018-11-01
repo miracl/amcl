@@ -341,93 +341,119 @@ var FP = function(ctx) {
             return this;
         },
 
+// return this^(p-3)/4 or this^(p-5)/8
+// See https://eprint.iacr.org/2018/1038
+		fpow: function() {
+			var i,j,k,bw,w,c,nw,lo,m,n;
+			var xp=[];
+			var ac=[1,2,3,6,12,15,30,60,120,240,255];
+// phase 1
+			
+			xp[0]=new FP(this);	// 1 
+			xp[1]=new FP(this); xp[1].sqr(); // 2
+			xp[2]=new FP(xp[1]); xp[2].mul(this);  //3
+			xp[3]=new FP(xp[2]); xp[3].sqr();  // 6 
+			xp[4]=new FP(xp[3]); xp[4].sqr();  // 12
+			xp[5]=new FP(xp[4]); xp[5].mul(xp[2]);  // 15
+			xp[6]=new FP(xp[5]); xp[6].sqr();  // 30
+			xp[7]=new FP(xp[6]); xp[7].sqr();  // 60
+			xp[8]=new FP(xp[7]); xp[8].sqr();  // 120
+			xp[9]=new FP(xp[8]); xp[9].sqr();  // 240
+			xp[10]=new FP(xp[9]); xp[10].mul(xp[5]);  // 255		
+			
+			if (FP.MOD8==5)
+			{
+				n=FP.MODBITS-3;
+				c=(ctx.ROM_FIELD.MConst+5)/8;
+			} else {
+				n=FP.MODBITS-2;
+				c=(ctx.ROM_FIELD.MConst+3)/4;
+			}
+
+			bw=0; w=1; while (w<c) {w*=2; bw+=1;}
+			k=w-c;
+
+			i=10; var key=new FP(0);
+			if (k!=0)
+			{
+				while (ac[i]>k) i--;
+				key.copy(xp[i]); 
+				k-=ac[i];
+			}
+			while (k!=0)
+			{
+				i--;
+				if (ac[i]>k) continue;
+				key.mul(xp[i]);
+				k-=ac[i]; 
+			}
+
+// phase 2 
+			xp[1].copy(xp[2]);
+			xp[2].copy(xp[5]);
+			xp[3].copy(xp[10]);
+	
+			j=3; m=8;
+			nw=n-bw;
+			var t=new FP(0);
+			while (2*m<nw)
+			{
+				t.copy(xp[j++]);
+				for (i=0;i<m;i++)
+					t.sqr(); 
+				xp[j].copy(xp[j-1]);
+				xp[j].mul(t);
+				m*=2;
+			}
+			lo=nw-m;
+			var r=new FP(xp[j]);
+
+			while (lo!=0)
+			{
+				m/=2; j--;
+				if (lo<m) continue;
+				lo-=m;
+				t.copy(r);
+				for (i=0;i<m;i++)
+					t.sqr();
+				r.copy(t);
+				r.mul(xp[j]);
+			}
+
+// phase 3
+			for (i=0;i<bw;i++ )
+				r.sqr();
+
+			if (w-c!=0)
+				r.mul(key); 
+			return r;
+		},
+
         /* this=1/this mod Modulus */
         inverse: function() {
 
 			if (FP.MODTYPE == FP.PSEUDO_MERSENNE)
 			{
-				var i,j,k,bw,w,c,nw,lo,m,n;
-				var xp=[];
-				var ac=[1,2,3,6,12,15,30,60,120,240,255];
-// phase 1
-			
-				xp[0]=new FP(this);	// 1 
-				xp[1]=new FP(this); xp[1].sqr(); // 2
-				xp[2]=new FP(xp[1]); xp[2].mul(this);  //3
-				xp[3]=new FP(xp[2]); xp[3].sqr();  // 6 
-				xp[4]=new FP(xp[3]); xp[4].sqr();  // 12
-				xp[5]=new FP(xp[4]); xp[5].mul(xp[2]);  // 15
-				xp[6]=new FP(xp[5]); xp[6].sqr();  // 30
-				xp[7]=new FP(xp[6]); xp[7].sqr();  // 60
-				xp[8]=new FP(xp[7]); xp[8].sqr();  // 120
-				xp[9]=new FP(xp[8]); xp[9].sqr();  // 240
-				xp[10]=new FP(xp[9]); xp[10].mul(xp[5]);  // 255		
-			
-				n=FP.MODBITS;
-				c=ctx.ROM_FIELD.MConst
-
-				bw=0; w=1; while (w<c+2) {w*=2; bw+=1;}
-				k=w-c-2;
-
-				i=10; while (ac[i]>k) i--;
-				var key=new FP(xp[i]); 
-				k-=ac[i];
-
-				while (k!=0)
+				var y=this.fpow();
+				if (FP.MOD8==5)
 				{
-					i--;
-					if (ac[i]>k) continue;
-					key.mul(xp[i]);
-					k-=ac[i]; 
-				}
+					var t=new FP(this);
+					t.sqr();
+					this.mul(t);
+					y.sqr();
 
-// phase 2 
-				xp[1].copy(xp[2]);
-				xp[2].copy(xp[5]);
-				xp[3].copy(xp[10]);
-	
-				j=3; m=8;
-				nw=n-bw;
-				var t=new FP();
-				while (2*m<nw)
-				{
-					t.copy(xp[j++]);
-					for (i=0;i<m;i++)
-						t.sqr(); 
-					xp[j].copy(xp[j-1]);
-					xp[j].mul(t);
-					m*=2;
-				}
-				lo=nw-m;
-				var r=new FP(xp[j]);
-
-				while (lo!=0)
-				{
-					m/=2; j--;
-					if (lo<m) continue;
-					lo-=m;
-					t.copy(r);
-					for (i=0;i<m;i++)
-						t.sqr();
-					r.copy(t);
-					r.mul(xp[j]);
-				}
-
-// phase 3
-				for (i=0;i<bw;i++ )
-					r.sqr();
-
-				r.mul(key); 
-				this.copy(r);
-			} else { 
+				} 
+				y.sqr();
+				y.sqr();
+				this.mul(y);
+				return this;
+			} else {
 				var m2=new ctx.BIG(0);
-
 				m2.rcopy(ctx.ROM_FIELD.Modulus);
 				m2.dec(2); m2.norm();
 				this.copy(this.pow(m2));
 				return this;
 			}
-
         },
 
         /* return TRUE if this==a */
@@ -521,21 +547,23 @@ var FP = function(ctx) {
 
         /* return sqrt(this) mod Modulus */
         sqrt: function() {
-            var b = new ctx.BIG(0),
-                i, v, r;
+            var i, v, r;
 
             this.reduce();
-
-            b.rcopy(ctx.ROM_FIELD.Modulus);
-
             if (FP.MOD8 == 5) {
-                b.dec(5);
-                b.norm();
-                b.shr(3);
                 i = new FP(0);
                 i.copy(this);
                 i.f.shl(1);
-                v = i.pow(b);
+				if (FP.MODTYPE == FP.PSEUDO_MERSENNE) {
+					v=i.fpow();
+				} else {
+					var b = new ctx.BIG(0);
+					b.rcopy(ctx.ROM_FIELD.Modulus);
+					b.dec(5);
+					b.norm();
+					b.shr(3);
+					v = i.pow(b);
+				}
                 i.mul(v);
                 i.mul(v);
                 i.f.dec(1);
@@ -547,11 +575,18 @@ var FP = function(ctx) {
 
                 return r;
             } else {
-                b.inc(1);
-                b.norm();
-                b.shr(2);
-
-                return this.pow(b);
+				if (FP.MODTYPE == FP.PSEUDO_MERSENNE) {
+					var r=this.fpow();
+					r.mul(this);
+					return r;
+				} else {
+					var b = new ctx.BIG(0);
+					b.rcopy(ctx.ROM_FIELD.Modulus);
+					b.inc(1);
+					b.norm();
+					b.shr(2);
+					return this.pow(b);
+				}
             }
         }
 

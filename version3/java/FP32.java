@@ -424,86 +424,114 @@ public final class FP {
 		}
 	}
 
+// return this^(p-3)/4 or this^(p-5)/8
+	private FP fpow()
+	{
+		int i,j,k,bw,w,c,nw,lo,m,n;
+		FP [] xp=new FP[11];
+		int[]  ac={1,2,3,6,12,15,30,60,120,240,255};
+// phase 1
+			
+		xp[0]=new FP(this);	// 1 
+		xp[1]=new FP(this); xp[1].sqr(); // 2
+		xp[2]=new FP(xp[1]); xp[2].mul(this);  //3
+		xp[3]=new FP(xp[2]); xp[3].sqr();  // 6 
+		xp[4]=new FP(xp[3]); xp[4].sqr();  // 12
+		xp[5]=new FP(xp[4]); xp[5].mul(xp[2]);  // 15
+		xp[6]=new FP(xp[5]); xp[6].sqr();  // 30
+		xp[7]=new FP(xp[6]); xp[7].sqr();  // 60
+		xp[8]=new FP(xp[7]); xp[8].sqr();  // 120
+		xp[9]=new FP(xp[8]); xp[9].sqr();  // 240
+		xp[10]=new FP(xp[9]); xp[10].mul(xp[5]);  // 255		
+			
+		if (MOD8==5)
+		{
+			n=MODBITS-3;
+			c=(ROM.MConst+5)/8;
+		} else {
+			n=MODBITS-2;
+			c=(ROM.MConst+3)/4;
+		}
+
+		bw=0; w=1; while (w<c) {w*=2; bw+=1;}
+		k=w-c;
+
+		FP key=new FP(); i=10;
+		if (k!=0)
+		{
+			while (ac[i]>k) i--;
+			key.copy(xp[i]); 
+			k-=ac[i];
+		}
+		while (k!=0)
+		{
+			i--;
+			if (ac[i]>k) continue;
+			key.mul(xp[i]);
+			k-=ac[i]; 
+		}
+
+// phase 2 
+		xp[1].copy(xp[2]);
+		xp[2].copy(xp[5]);
+		xp[3].copy(xp[10]);
+
+		j=3; m=8;
+		nw=n-bw;
+		FP t=new FP();
+
+		while (2*m<nw)
+		{
+			t.copy(xp[j++]);
+			for (i=0;i<m;i++)
+				t.sqr(); 
+			xp[j].copy(xp[j-1]);
+			xp[j].mul(t);
+			m*=2;
+		}
+
+		lo=nw-m;
+		FP r=new FP(xp[j]);
+
+		while (lo!=0)
+		{
+			m/=2; j--;
+			if (lo<m) continue;
+			lo-=m;
+			t.copy(r);
+			for (i=0;i<m;i++)
+				t.sqr();
+			r.copy(t);
+			r.mul(xp[j]);
+		}
+
+// phase 3
+		for (i=0;i<bw;i++ )
+			r.sqr();
+
+		if (w-c!=0)
+			r.mul(key); 
+		return r;
+	}
+
 /* this=1/this mod Modulus */
 	public void inverse()
 	{
+
 		if (MODTYPE==PSEUDO_MERSENNE)
 		{
-			int i,j,k,bw,w,c,nw,lo,m,n;
-			FP [] xp=new FP[11];
-			int[]  ac={1,2,3,6,12,15,30,60,120,240,255};
-// phase 1
-			
-			xp[0]=new FP(this);	// 1 
-			xp[1]=new FP(this); xp[1].sqr(); // 2
-			xp[2]=new FP(xp[1]); xp[2].mul(this);  //3
-			xp[3]=new FP(xp[2]); xp[3].sqr();  // 6 
-			xp[4]=new FP(xp[3]); xp[4].sqr();  // 12
-			xp[5]=new FP(xp[4]); xp[5].mul(xp[2]);  // 15
-			xp[6]=new FP(xp[5]); xp[6].sqr();  // 30
-			xp[7]=new FP(xp[6]); xp[7].sqr();  // 60
-			xp[8]=new FP(xp[7]); xp[8].sqr();  // 120
-			xp[9]=new FP(xp[8]); xp[9].sqr();  // 240
-			xp[10]=new FP(xp[9]); xp[10].mul(xp[5]);  // 255		
-			
-			n=MODBITS;
-			c=ROM.MConst;
-
-			bw=0; w=1; while (w<c+2) {w*=2; bw+=1;}
-			k=w-c-2;
-
-			i=10; while (ac[i]>k) i--;
-			FP key=new FP(xp[i]); 
-			k-=ac[i];
-
-			while (k!=0)
+			FP y=fpow();
+			if (MOD8==5)
 			{
-				i--;
-				if (ac[i]>k) continue;
-				key.mul(xp[i]);
-				k-=ac[i]; 
-			}
+				FP t=new FP(this);
+				t.sqr();
+				mul(t);
+				y.sqr();
 
-// phase 2 
-			xp[1].copy(xp[2]);
-			xp[2].copy(xp[5]);
-			xp[3].copy(xp[10]);
-
-			j=3; m=8;
-			nw=n-bw;
-			FP t=new FP();
-
-			while (2*m<nw)
-			{
-				t.copy(xp[j++]);
-				for (i=0;i<m;i++)
-					t.sqr(); 
-				xp[j].copy(xp[j-1]);
-				xp[j].mul(t);
-				m*=2;
-			}
-
-			lo=nw-m;
-			FP r=new FP(xp[j]);
-
-			while (lo!=0)
-			{
-				m/=2; j--;
-				if (lo<m) continue;
-				lo-=m;
-				t.copy(r);
-				for (i=0;i<m;i++)
-					t.sqr();
-				r.copy(t);
-				r.mul(xp[j]);
-			}
-
-// phase 3
-			for (i=0;i<bw;i++ )
-				r.sqr();
-
-			r.mul(key); 
-			copy(r);
+			} 
+			y.sqr();
+			y.sqr();
+			mul(y);
 		} else {
 			BIG m2=new BIG(ROM.Modulus);
 			m2.dec(2); m2.norm();
@@ -522,7 +550,7 @@ public final class FP {
 		return false;
 	}
 
-	public FP pow(BIG e)
+	private FP pow(BIG e)
 	{
 		byte[] w=new byte[1+(BIG.NLEN*BIG.BASEBITS+3)/4];
 		FP [] tb=new FP[16];
@@ -582,12 +610,18 @@ public final class FP {
 	public FP sqrt()
 	{
 		reduce();
-		BIG b=new BIG(ROM.Modulus);
 		if (MOD8==5)
 		{
-			b.dec(5); b.norm(); b.shr(3);
 			FP i=new FP(this); i.x.shl(1);
-			FP v=i.pow(b);
+			FP v;
+			if (MODTYPE==PSEUDO_MERSENNE)
+			{
+				v=i.fpow();
+			} else {
+				BIG b=new BIG(ROM.Modulus);
+				b.dec(5); b.norm(); b.shr(3);
+				v=i.pow(b);
+			}
 			i.mul(v); i.mul(v);
 			i.x.dec(1);
 			FP r=new FP(this);
@@ -597,8 +631,16 @@ public final class FP {
 		}
 		else
 		{
-			b.inc(1); b.norm(); b.shr(2);
-			return pow(b);
+			if (MODTYPE==PSEUDO_MERSENNE)
+			{
+				FP r=fpow();
+				r.mul(this);
+				return r;
+			} else {
+				BIG b=new BIG(ROM.Modulus);
+				b.inc(1); b.norm(); b.shr(2);
+				return pow(b);
+			}
 		}
 	}
 

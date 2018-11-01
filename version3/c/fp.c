@@ -561,8 +561,10 @@ void FP_YYY_div2(FP_YYY *r,FP_YYY *a)
 
 #if MODTYPE_YYY == PSEUDO_MERSENNE
 
-// See eprint paper "On inversions modulo pseudo-Mersenne primes"
-void FP_YYY_inv(FP_YYY *r,FP_YYY *x)
+// See eprint paper "On inversion modulo pseudo-Mersenne primes"
+// If p=3 mod 4 r= x^{(p-3)/4}, if p=5 mod 8 r=x^{(p-5)/8}
+
+static void FP_YYY_fpow(FP_YYY *r,FP_YYY *x)
 {
 	int i,j,k,bw,w,c,nw,lo,m,n;
 	FP_YYY xp[11],t,key;
@@ -579,17 +581,25 @@ void FP_YYY_inv(FP_YYY *r,FP_YYY *x)
 	FP_YYY_sqr(&xp[8],&xp[7]); // 120
 	FP_YYY_sqr(&xp[9],&xp[8]); // 240
 	FP_YYY_mul(&xp[10],&xp[9],&xp[5]); // 255
-	
-	n=MODBITS_YYY;
-	c=MConst_YYY;
 
-	bw=0; w=1; while (w<c+2) {w*=2; bw+=1;}
-	k=w-c-2;
+	if (MOD8_YYY==5)
+    {
+		n=MODBITS_YYY-3;
+		c=(MConst_YYY+5)/8;
+	} else {
+		n=MODBITS_YYY-2;
+		c=(MConst_YYY+3)/4;
+	}
 
-	i=10; while (ac[i]>k) i--;
-	FP_YYY_copy(&key,&xp[i]); 
-	k-=ac[i];
+	bw=0; w=1; while (w<c) {w*=2; bw+=1;}
+	k=w-c;
 
+	if (k!=0)
+	{
+		i=10; while (ac[i]>k) i--;
+		FP_YYY_copy(&key,&xp[i]); 
+		k-=ac[i];
+	}
 	while (k!=0)
 	{
 		i--;
@@ -632,10 +642,68 @@ void FP_YYY_inv(FP_YYY *r,FP_YYY *x)
 	for (i=0;i<bw;i++ )
 		FP_YYY_sqr(r,r);
 
-	FP_YYY_mul(r,r,&key); 
+	if (w-c!=0)
+		FP_YYY_mul(r,r,&key); 
+}
+
+void FP_YYY_inv(FP_YYY *r,FP_YYY *x)
+{
+	FP_YYY y,t;
+	FP_YYY_fpow(&y,x);
+    if (MOD8_YYY==5)
+    { // r=x^3.y^8
+		FP_YYY_sqr(&t,x);
+		FP_YYY_mul(&t,&t,x);
+		FP_YYY_sqr(&y,&y);
+		FP_YYY_sqr(&y,&y);
+		FP_YYY_sqr(&y,&y);
+		FP_YYY_mul(r,&t,&y);
+	} else {
+		FP_YYY_sqr(&y,&y);
+		FP_YYY_sqr(&y,&y);
+		FP_YYY_mul(r,&y,x);
+	}
 }
 
 #else
+
+void FP_YYY_pow(FP_YYY *r,FP_YYY *a,BIG_XXX b)
+{
+	sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
+	FP_YYY tb[16];
+	BIG_XXX t;
+	int i,nb;
+
+	FP_YYY_norm(a);
+    BIG_XXX_norm(b);
+	BIG_XXX_copy(t,b);
+	nb=1+(BIG_XXX_nbits(t)+3)/4;
+    /* convert exponent to 4-bit window */
+    for (i=0; i<nb; i++)
+    {
+        w[i]=BIG_XXX_lastbits(t,4);
+        BIG_XXX_dec(t,w[i]);
+        BIG_XXX_norm(t);
+        BIG_XXX_fshr(t,4);
+    }	
+
+	FP_YYY_one(&tb[0]);
+	FP_YYY_copy(&tb[1],a);
+	for (i=2;i<16;i++)
+		FP_YYY_mul(&tb[i],&tb[i-1],a);
+	
+	FP_YYY_copy(r,&tb[w[nb-1]]);
+    for (i=nb-2; i>=0; i--)
+    {
+		FP_YYY_sqr(r,r);
+		FP_YYY_sqr(r,r);
+		FP_YYY_sqr(r,r);
+		FP_YYY_sqr(r,r);
+		FP_YYY_mul(r,r,&tb[w[i]]);
+	}
+    FP_YYY_reduce(r);
+}
+
 /* set w=1/x */
 void FP_YYY_inv(FP_YYY *w,FP_YYY *x)
 {
@@ -683,42 +751,7 @@ void FP_YYY_pow(FP_YYY *r,FP_YYY *a,BIG_XXX b)
 }
 */
 
-void FP_YYY_pow(FP_YYY *r,FP_YYY *a,BIG_XXX b)
-{
-	sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
-	FP_YYY tb[16];
-	BIG_XXX t;
-	int i,nb;
 
-	FP_YYY_norm(a);
-    BIG_XXX_norm(b);
-	BIG_XXX_copy(t,b);
-	nb=1+(BIG_XXX_nbits(t)+3)/4;
-    /* convert exponent to 4-bit window */
-    for (i=0; i<nb; i++)
-    {
-        w[i]=BIG_XXX_lastbits(t,4);
-        BIG_XXX_dec(t,w[i]);
-        BIG_XXX_norm(t);
-        BIG_XXX_fshr(t,4);
-    }	
-
-	FP_YYY_one(&tb[0]);
-	FP_YYY_copy(&tb[1],a);
-	for (i=2;i<16;i++)
-		FP_YYY_mul(&tb[i],&tb[i-1],a);
-	
-	FP_YYY_copy(r,&tb[w[nb-1]]);
-    for (i=nb-2; i>=0; i--)
-    {
-		FP_YYY_sqr(r,r);
-		FP_YYY_sqr(r,r);
-		FP_YYY_sqr(r,r);
-		FP_YYY_sqr(r,r);
-		FP_YYY_mul(r,r,&tb[w[i]]);
-	}
-    FP_YYY_reduce(r);
-}
 
 /* is r a QR? */
 int FP_YYY_qr(FP_YYY *r)
@@ -747,25 +780,34 @@ void FP_YYY_sqrt(FP_YYY *r,FP_YYY *a)
     BIG_XXX_copy(b,m);
     if (MOD8_YYY==5)
     {
+        FP_YYY_copy(&i,a); // i=x
+        BIG_XXX_fshl(i.g,1); // i=2x
+#if MODTYPE_YYY == PSEUDO_MERSENNE
+		FP_YYY_fpow(&v,&i);
+#else
         BIG_XXX_dec(b,5);
         BIG_XXX_norm(b);
-        BIG_XXX_fshr(b,3); /* (p-5)/8 */
-        FP_YYY_copy(&i,a);
-        BIG_XXX_fshl(i.g,1);
-        FP_YYY_pow(&v,&i,b);
-        FP_YYY_mul(&i,&i,&v);
-        FP_YYY_mul(&i,&i,&v);
-        BIG_XXX_dec(i.g,1);
-        FP_YYY_mul(r,a,&v);
+        BIG_XXX_fshr(b,3); // (p-5)/8 
+        FP_YYY_pow(&v,&i,b); // v=(2x)^(p-5)/8
+#endif
+        FP_YYY_mul(&i,&i,&v); // i=(2x)^(p+3)/8
+        FP_YYY_mul(&i,&i,&v); // i=(2x)^(p-1)/4
+        BIG_XXX_dec(i.g,1);  // i=(2x)^(p-1)/4 - 1
+        FP_YYY_mul(r,a,&v);  
         FP_YYY_mul(r,r,&i);
         FP_YYY_reduce(r);
     }
     if (MOD8_YYY==3 || MOD8_YYY==7)
     {
+#if MODTYPE_YYY == PSEUDO_MERSENNE
+		FP_YYY_fpow(r,a);
+		FP_YYY_mul(r,r,a);
+#else
         BIG_XXX_inc(b,1);
         BIG_XXX_norm(b);
         BIG_XXX_fshr(b,2); /* (p+1)/4 */
         FP_YYY_pow(r,a,b);
+#endif
     }
 }
 

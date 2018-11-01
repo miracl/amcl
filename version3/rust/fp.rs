@@ -395,74 +395,101 @@ impl FP {
             self.x.fshr(1);
         }
     }
+
+// return this^(p-3)/4 or this^(p-5)/8
+    pub fn fpow(&mut self) -> FP {
+	let ac:[isize;11]=[1,2,3,6,12,15,30,60,120,240,255];
+	let mut xp:[FP;11]=[FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new()];
+// phase 1
+	let mut t=FP::new();
+	xp[0].copy(&self);  // 1
+	xp[1].copy(&self); xp[1].sqr(); // 2
+	t.copy(&xp[1]); xp[2].copy(&t); xp[2].mul(&self); // 3
+	t.copy(&xp[2]); xp[3].copy(&t); xp[3].sqr(); // 6
+	t.copy(&xp[3]); xp[4].copy(&t); xp[4].sqr(); // 12
+	t.copy(&xp[4]); t.mul(&xp[2]);  xp[5].copy(&t);  // 15
+	t.copy(&xp[5]); xp[6].copy(&t); xp[6].sqr(); // 30
+	t.copy(&xp[6]); xp[7].copy(&t); xp[7].sqr(); // 60
+	t.copy(&xp[7]); xp[8].copy(&t); xp[8].sqr(); // 120
+	t.copy(&xp[8]); xp[9].copy(&t); xp[9].sqr(); // 240
+	t.copy(&xp[9]); t.mul(&xp[5]); xp[10].copy(&t); // 255
+
+	let n : isize;
+	let c : isize;
+
+	if MOD8==5 {
+		n=(MODBITS as isize)-3;
+		c=((rom::MCONST as isize)+5)/8;
+	} else {
+		n=(MODBITS as isize)-2;
+		c=((rom::MCONST as isize)+3)/4;
+
+	}
+	let mut bw=0; let mut w=1; while w<c {w*=2; bw+=1;}
+	let mut k=w-c;
+
+	let mut i=10; let mut key=FP::new();
+	if k != 0 {
+		while ac[i]>k {i-=1;}
+		key.copy(&xp[i]); 
+		k-=ac[i];
+	}
+	while k != 0 {
+		i-=1;
+		if ac[i]>k {continue;}
+		key.mul(&xp[i]);
+		k-=ac[i]; 
+	}
+// phase 2
+	t.copy(&xp[2]); xp[1].copy(&t);
+	t.copy(&xp[5]); xp[2].copy(&t);
+	t.copy(&xp[10]); xp[3].copy(&t);
+
+	let mut j=3; let mut m=8;
+	let nw=n-bw;
+	let mut r=FP::new();
+
+	while 2*m<nw {
+		t.copy(&xp[j]); j+=1;
+		for _ in 0..m {t.sqr();} 
+		r.copy(&xp[j-1]);
+		r.mul(&t);
+		xp[j].copy(&r);
+		m*=2;
+	}
+	let mut lo=nw-m;
+	r.copy(&xp[j]);
+
+	while lo != 0 {
+		m/=2; j-=1;
+		if lo<m {continue;}
+		lo-=m;
+		t.copy(&r);
+		for _ in 0..m {t.sqr();}
+		r.copy(&t);
+		r.mul(&xp[j]);
+	}
+// phase 3
+	for _ in 0..bw {r.sqr();}
+
+	if w-c != 0 {
+		r.mul(&key);
+	}
+	return r;
+    }
 /* self=1/self mod Modulus */
     pub fn inverse(&mut self) {
 	if MODTYPE==PSEUDO_MERSENNE {
-		let ac:[isize;11]=[1,2,3,6,12,15,30,60,120,240,255];
-		let mut xp:[FP;11]=[FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new(),FP::new()];
-// phase 1
-		let mut t=FP::new();
-		xp[0].copy(&self);  // 1
-		xp[1].copy(&self); xp[1].sqr(); // 2
-		t.copy(&xp[1]); xp[2].copy(&t); xp[2].mul(&self); // 3
-		t.copy(&xp[2]); xp[3].copy(&t); xp[3].sqr(); // 6
-		t.copy(&xp[3]); xp[4].copy(&t); xp[4].sqr(); // 12
-		t.copy(&xp[4]); t.mul(&xp[2]);  xp[5].copy(&t);  // 15
-		t.copy(&xp[5]); xp[6].copy(&t); xp[6].sqr(); // 30
-		t.copy(&xp[6]); xp[7].copy(&t); xp[7].sqr(); // 60
-		t.copy(&xp[7]); xp[8].copy(&t); xp[8].sqr(); // 120
-		t.copy(&xp[8]); xp[9].copy(&t); xp[9].sqr(); // 240
-		t.copy(&xp[9]); t.mul(&xp[5]); xp[10].copy(&t); // 255
-
-		let n=MODBITS as isize;
-		let c=rom::MCONST as isize;
-
-		let mut bw=0; let mut w=1; while w<c+2 {w*=2; bw+=1;}
-		let mut k=w-c-2;
-
-		let mut i=10; while ac[i]>k {i-=1;}
-		let mut key=FP::new_copy(&xp[i]); 
-		k-=ac[i];
-		while k != 0 {
-			i-=1;
-			if ac[i]>k {continue;}
-			key.mul(&xp[i]);
-			k-=ac[i]; 
-		}
-// phase 2
-		t.copy(&xp[2]); xp[1].copy(&t);
-		t.copy(&xp[5]); xp[2].copy(&t);
-		t.copy(&xp[10]); xp[3].copy(&t);
-
-		let mut j=3; let mut m=8;
-		let nw=n-bw;
-		let mut r=FP::new();
-
-		while 2*m<nw {
-			t.copy(&xp[j]); j+=1;
-			for _ in 0..m {t.sqr();} 
-			r.copy(&xp[j-1]);
-			r.mul(&t);
-			xp[j].copy(&r);
-			m*=2;
-		}
-		let mut lo=nw-m;
-		r.copy(&xp[j]);
-
-		while lo != 0 {
-			m/=2; j-=1;
-			if lo<m {continue;}
-			lo-=m;
-			t.copy(&r);
-			for _ in 0..m {t.sqr();}
-			r.copy(&t);
-			r.mul(&xp[j]);
-		}
-// phase 3
-		for _ in 0..bw {r.sqr();}
-
-		r.mul(&key);
-		self.copy(&r);
+		let mut y=self.fpow();
+		if MOD8==5 {
+			let mut t=FP::new_copy(self);
+			t.sqr();
+			self.mul(&t);
+			y.sqr();
+		} 
+		y.sqr();
+		y.sqr();
+		self.mul(&y);	
 
         } else {
 		let mut m2 = BIG::new_ints(&rom::MODULUS); 
@@ -543,11 +570,17 @@ impl FP {
 /* return sqrt(this) mod Modulus */
     pub fn sqrt(&mut self) -> FP {
         self.reduce();
-      	let mut p = BIG::new_ints(&rom::MODULUS);  
+
         if MOD8==5 {
-            p.dec(5); p.norm(); p.shr(3);
+	    let v : FP;
             let mut i=FP::new_copy(self); i.x.shl(1);
-            let v=i.pow(&mut p);
+	    if MODTYPE==PSEUDO_MERSENNE {
+		v=i.fpow();
+	    } else {
+      		let mut p = BIG::new_ints(&rom::MODULUS);  
+		p.dec(5); p.norm(); p.shr(3);
+		v=i.pow(&mut p);
+	    }
             i.mul(&v); i.mul(&v);
             i.x.dec(1);
             let mut r=FP::new_copy(self);
@@ -557,8 +590,16 @@ impl FP {
         }
         else
         {
-            p.inc(1); p.norm(); p.shr(2);
-            return self.pow(&mut p);
+	    let mut r : FP;
+	    if MODTYPE==PSEUDO_MERSENNE {
+		r=self.fpow();
+		r.mul(self);
+	    } else {
+     		let mut p = BIG::new_ints(&rom::MODULUS);  
+		p.inc(1); p.norm(); p.shr(2);
+		r=self.pow(&mut p);
+	    }
+	    return r;
         }
     }
 /* return jacobi symbol (this/Modulus) */

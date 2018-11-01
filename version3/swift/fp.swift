@@ -395,75 +395,107 @@ public struct FP {
         }
     }
 /* this=1/this mod Modulus */
+
+    mutating func fpow() -> FP 
+    {
+        var ac: [Int] = [1, 2, 3, 6, 12, 15, 30, 60, 120, 240, 255]
+        var xp=[FP]() 
+// phase 1
+        xp.append(FP(self))
+        xp.append(FP(self)); xp[1].sqr()
+        xp.append(FP(xp[1])); xp[2].mul(self)
+        xp.append(FP(xp[2])); xp[3].sqr()
+        xp.append(FP(xp[3])); xp[4].sqr()
+        xp.append(FP(xp[4])); xp[5].mul(xp[2])
+        xp.append(FP(xp[5])); xp[6].sqr()
+        xp.append(FP(xp[6])); xp[7].sqr()
+        xp.append(FP(xp[7])); xp[8].sqr()
+        xp.append(FP(xp[8])); xp[9].sqr()
+        xp.append(FP(xp[9])); xp[10].mul(xp[5])
+
+        var n: Int
+        var c: Int
+
+        if (FP.MOD8==5)
+        {
+            n=Int(FP.MODBITS)-3
+            c=(Int(ROM.MConst)+5)/8
+        } else {
+            n=Int(FP.MODBITS)-2
+            c=(Int(ROM.MConst)+3)/4            
+        }
+
+
+        var bw=0; var w=1; while w<c {w*=2; bw+=1}
+        var k=w-c
+
+        var i=10; var key=FP(0)
+
+        if k != 0 {
+            while ac[i]>k {i-=1}
+            key.copy(xp[i])
+            k-=ac[i]
+        }
+        while k != 0 {
+            i-=1
+            if ac[i]>k {continue}
+            key.mul(xp[i])
+            k-=ac[i] 
+        }
+
+// phase 2 
+        xp[1].copy(xp[2])
+        xp[2].copy(xp[5])
+        xp[3].copy(xp[10])
+
+        var j=3; var m=8
+        let nw=n-bw
+        var t=FP(0)
+
+        while 2*m<nw {
+            t.copy(xp[j]); j+=1
+            for _ in 0..<m {t.sqr()} 
+            xp[j].copy(xp[j-1])
+            xp[j].mul(t)
+            m*=2
+        }
+
+        var lo=nw-m
+        var r=FP(xp[j])
+
+        while lo != 0 {
+            m/=2; j-=1
+            if lo<m {continue}
+            lo-=m
+            t.copy(r)
+            for _ in 0..<m {t.sqr()}
+            r.copy(t)
+            r.mul(xp[j])
+        }
+
+        for _ in 0..<bw {r.sqr()}
+
+        if w-c != 0 {
+            r.mul(key)
+        }
+        return r        
+    }
+
     mutating func inverse()
     {
         if FP.MODTYPE==FP.PSEUDO_MERSENNE {
-            var ac: [Int] = [1, 2, 3, 6, 12, 15, 30, 60, 120, 240, 255]
-            var xp=[FP]() 
-// phase 1
-            xp.append(FP(self))
-            xp.append(FP(self)); xp[1].sqr()
-            xp.append(FP(xp[1])); xp[2].mul(self)
-            xp.append(FP(xp[2])); xp[3].sqr()
-            xp.append(FP(xp[3])); xp[4].sqr()
-            xp.append(FP(xp[4])); xp[5].mul(xp[2])
-            xp.append(FP(xp[5])); xp[6].sqr()
-            xp.append(FP(xp[6])); xp[7].sqr()
-            xp.append(FP(xp[7])); xp[8].sqr()
-            xp.append(FP(xp[8])); xp[9].sqr()
-            xp.append(FP(xp[9])); xp[10].mul(xp[5])
+            var y=fpow()
+            if (FP.MOD8==5)
+            {
+                var t=FP(self)
+                t.sqr()
+                mul(t)
+                y.sqr()
 
-            let n=Int(FP.MODBITS)
-            let c=Int(ROM.MConst)
-
-            var bw=0; var w=1; while w<c+2 {w*=2; bw+=1}
-            var k=w-c-2
-
-            var i=10; while ac[i]>k {i-=1}
-            var key=FP(xp[i])
-            k-=ac[i]
-
-            while k != 0 {
-                i-=1
-                if ac[i]>k {continue}
-                key.mul(xp[i])
-                k-=ac[i] 
-            }
-
-// phase 2 
-            xp[1].copy(xp[2])
-            xp[2].copy(xp[5])
-            xp[3].copy(xp[10])
-
-            var j=3; var m=8
-            let nw=n-bw
-            var t=FP(0)
-
-            while 2*m<nw {
-                t.copy(xp[j]); j+=1
-                for _ in 0..<m {t.sqr()} 
-                xp[j].copy(xp[j-1])
-                xp[j].mul(t)
-                m*=2
-            }
-
-            var lo=nw-m
-            var r=FP(xp[j])
-
-	    while lo != 0 {
-                m/=2; j-=1
-                if lo<m {continue}
-                lo-=m
-                t.copy(r)
-                for _ in 0..<m {t.sqr()}
-                r.copy(t)
-                r.mul(xp[j])
-            }
-
-            for _ in 0..<bw {r.sqr()}
-
-            r.mul(key)
-            copy(r)
+            } 
+            y.sqr()
+            y.sqr()
+            mul(y)
         } else {
             var m2=BIG(ROM.Modulus)
             m2.dec(2); m2.norm()
@@ -543,12 +575,17 @@ public struct FP {
     mutating func sqrt() -> FP
     {
         reduce();
-        var b=BIG(FP.p)
         if (FP.MOD8==5)
         {
-            b.dec(5); b.norm(); b.shr(3)
+            var v: FP
             var i=FP(self); i.x.shl(1)
-            let v=i.pow(b)
+            if FP.MODTYPE==FP.PSEUDO_MERSENNE {
+                v=i.fpow()
+            } else {       
+                var b=BIG(FP.p)
+                b.dec(5); b.norm(); b.shr(3)
+                v=i.pow(b)
+            }
             i.mul(v); i.mul(v)
             i.x.dec(1)
             var r=FP(self)
@@ -558,8 +595,15 @@ public struct FP {
         }
         else
         {
-            b.inc(1); b.norm(); b.shr(2)
-            return pow(b)
+           if FP.MODTYPE==FP.PSEUDO_MERSENNE {
+                var r=fpow()
+                r.mul(self)
+                return r
+            } else {                   
+                var b=BIG(FP.p)
+                b.inc(1); b.norm(); b.shr(2)
+                return pow(b)
+            }
         }
     }
 /* return jacobi symbol (this/Modulus) */

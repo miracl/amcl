@@ -216,6 +216,12 @@ extern int FP_qr(FP *x);
  */
 extern void FP_inv(FP *x,FP *y);
 
+/**	@brief Special exponent of an FP, mod Modulus
+ *
+	@param x FP number, on exit = x^s mod Modulus
+	@param y FP number
+ */
+extern void FP_fpow(FP *x,FP *y);
 
 }
 
