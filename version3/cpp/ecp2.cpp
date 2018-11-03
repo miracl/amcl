@@ -395,7 +395,6 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 */
 
 
-
 	//FP2_copy(&t0,&(P->x));		//FP2 t0=new FP2(x);
 	FP2_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
 	//FP2_copy(&t1,&(P->y));		//FP2 t1=new FP2(y);
@@ -404,12 +403,14 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 	//FP2_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
 	FP2_mul(&t2,&(P->z),&(Q->z));	//t2.mul(Q.z);
 	//FP2_copy(&t3,&(P->x));		//FP2 t3=new FP2(x);
+
 	FP2_add(&t3,&(P->x),&(P->y));	//t3.add(y); 
 	FP2_norm(&t3);				//t3.norm();          //t3=X1+Y1
 	//FP2_copy(&t4,&(Q->x));		//FP2 t4=new FP2(Q.x);            
 	FP2_add(&t4,&(Q->x),&(Q->y));	//t4.add(Q.y); 
 	FP2_norm(&t4);				//t4.norm();			//t4=X2+Y2
 	FP2_mul(&t3,&t3,&t4);		//t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
+
 	//FP2_copy(&t4,&t0);			//t4.copy(t0); 
 	FP2_add(&t4,&t0,&t1);		//t4.add(t1);		//t4=X1.X2+Y1.Y2
 
@@ -584,15 +585,15 @@ void ZZZ::ECP2_frob(ECP2 *P,FP2 *X)
     FP2_sqr(&X2,X);
 //printf("Into frob  %d\n",(P->z).b.XES);
     FP2_conj(&(P->x),&(P->x));
+//printf("x\n");
     FP2_conj(&(P->y),&(P->y));
+//printf("za = %d zb= %d\n",(P->z).a.g[MPV_XXX],(P->z).b.g[MPV_XXX]);
     FP2_conj(&(P->z),&(P->z));
 //printf("Into frob  %d\n",(P->z).b.XES);
     FP2_reduce(&(P->z));
-//printf("Into frob 2 \n");
     FP2_mul(&(P->x),&X2,&(P->x));
     FP2_mul(&(P->y),&X2,&(P->y));
     FP2_mul(&(P->y),X,&(P->y));
-//printf("Into frob 3 \n");
 }
 
 // Bos & Costello https://eprint.iacr.org/2013/458.pdf

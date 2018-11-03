@@ -148,7 +148,7 @@ void YYY::FP2_neg(FP2 *w,FP2 *x)
 void YYY::FP2_conj(FP2 *w,FP2 *x)
 {
     FP_copy(&(w->a),&(x->a));
-//	BIG_norm(x->b);
+	//FP_norm(&(x->b));
     FP_neg(&(w->b),&(x->b));
 	FP_norm(&(w->b));
 }

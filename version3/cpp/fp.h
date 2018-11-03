@@ -28,6 +28,7 @@ typedef struct
 extern const XXX::BIG Modulus;	/**< Actual Modulus set in romf.c */
 extern const XXX::BIG R2modp;	/**< Montgomery constant */
 extern const chunk MConst;		/**< Constant associated with Modulus - for Montgomery = 1/p mod 2^BASEBITS */
+extern const int BTset;			/**< Set Bit in Generalised Mersenne */
 extern const XXX::BIG Fra; /**< real part of BN curve Frobenius Constant */
 extern const XXX::BIG Frb; /**< imaginary part of BN curve Frobenius Constant */
 

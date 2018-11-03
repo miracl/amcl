@@ -879,6 +879,9 @@ int XXX::BIG_ssn(BIG r,BIG a,BIG m)
 	
 	m[n]>>=1;
 	r[n]=a[n]-m[n]+carry;
+#ifdef DEBUG_NORM
+	r[MPV_XXX]=1; r[MNV_XXX]=0;
+#endif
 	return ((r[n]>>(CHUNK-1))&1);
 }
 

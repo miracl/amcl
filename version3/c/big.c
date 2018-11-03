@@ -897,6 +897,10 @@ int BIG_XXX_ssn(BIG_XXX r,BIG_XXX a,BIG_XXX m)
 	
 	m[n]>>=1;
 	r[n]=a[n]-m[n]+carry;
+#ifdef DEBUG_NORM
+    r[MPV_XXX]=1;
+    r[MNV_XXX]=0;
+#endif
 	return ((r[n]>>(CHUNK-1))&1);
 }
 
