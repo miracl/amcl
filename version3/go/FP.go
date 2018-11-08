@@ -343,7 +343,7 @@ func (F *FP) div2() {
 	}
 }
 
-
+// See https://eprint.iacr.org/2018/1038
 // return this^(p-3)/4 or this^(p-5)/8
 func (F *FP) fpow() *FP {
 	ac := [11]int{1, 2, 3, 6, 12, 15, 30, 60, 120, 240,255}
@@ -362,11 +362,15 @@ func (F *FP) fpow() *FP {
 	xp=append(xp,NewFPcopy(xp[9])); xp[10].mul(xp[5])
 	var n,c int
 		
+	n=int(MODBITS)
+	if MODTYPE==GENERALISED_MERSENNE {    // Goldilocks ONLY
+		n/=2;
+	}
 	if MOD8==5 {
-		n=int(MODBITS)-3
+		n-=3
 		c=(int(MConst)+5)/8
 	} else {
-		n=int(MODBITS)-2
+		n-=2
 		c=(int(MConst)+3)/4
 
 	}
@@ -416,9 +420,16 @@ func (F *FP) fpow() *FP {
 		r.mul(xp[j])
 	}
 // phase 3
-	for i=0;i<bw;i++ {r.sqr()}
+	if bw!=0 {
+		for i=0;i<bw;i++ {r.sqr()}
+		r.mul(key)
+	}
 
-	if w-c != 0 {
+	if MODTYPE==GENERALISED_MERSENNE {     // Goldilocks ONLY
+		key.copy(r)
+		r.sqr()
+		r.mul(F)
+		for i=0;i<n+1;i++ {r.sqr()}
 		r.mul(key)
 	}
 
@@ -430,7 +441,7 @@ func (F *FP) fpow() *FP {
 /* this=1/this mod Modulus */
 func (F *FP) inverse() {
 
-	if MODTYPE==PSEUDO_MERSENNE {
+	if MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE {
 		y:=F.fpow()
 		if MOD8==5 {
 			t:=NewFPcopy(F)
@@ -520,7 +531,7 @@ func (F *FP) sqrt() *FP {
 	if MOD8==5 {
 		var v *FP
 		i:=NewFPcopy(F); i.x.shl(1)
-		if MODTYPE==PSEUDO_MERSENNE {
+		if MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE {
 			v=i.fpow()
 		} else {
 			b:=NewBIGints(Modulus);
@@ -536,7 +547,7 @@ func (F *FP) sqrt() *FP {
 		return r
 	} else {
 		var r *FP
-		if MODTYPE==PSEUDO_MERSENNE {
+		if MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE {
 			r=F.fpow()
 			r.mul(F)
 		} else {

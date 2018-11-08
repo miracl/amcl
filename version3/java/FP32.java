@@ -424,6 +424,7 @@ public final class FP {
 		}
 	}
 
+// See eprint paper https://eprint.iacr.org/2018/1038
 // return this^(p-3)/4 or this^(p-5)/8
 	private FP fpow()
 	{
@@ -444,12 +445,17 @@ public final class FP {
 		xp[9]=new FP(xp[8]); xp[9].sqr();  // 240
 		xp[10]=new FP(xp[9]); xp[10].mul(xp[5]);  // 255		
 			
+
+		n=MODBITS;
+		if (MODTYPE==GENERALISED_MERSENNE)  // Goldilocks ONLY
+			n/=2;
+
 		if (MOD8==5)
 		{
-			n=MODBITS-3;
+			n-=3;
 			c=(ROM.MConst+5)/8;
 		} else {
-			n=MODBITS-2;
+			n-=2;
 			c=(ROM.MConst+3)/4;
 		}
 
@@ -506,11 +512,22 @@ public final class FP {
 		}
 
 // phase 3
-		for (i=0;i<bw;i++ )
-			r.sqr();
-
-		if (w-c!=0)
+		if (bw!=0)
+		{
+			for (i=0;i<bw;i++ )
+				r.sqr();
 			r.mul(key); 
+		}
+
+		if (MODTYPE==GENERALISED_MERSENNE)  // Goldilocks ONLY
+		{
+			key.copy(r);
+			r.sqr();
+			r.mul(this);
+			for (i=0;i<n+1;i++)
+				r.sqr();
+			r.mul(key);
+		}
 		return r;
 	}
 
@@ -518,7 +535,7 @@ public final class FP {
 	public void inverse()
 	{
 
-		if (MODTYPE==PSEUDO_MERSENNE)
+		if (MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE)
 		{
 			FP y=fpow();
 			if (MOD8==5)
@@ -614,7 +631,7 @@ public final class FP {
 		{
 			FP i=new FP(this); i.x.shl(1);
 			FP v;
-			if (MODTYPE==PSEUDO_MERSENNE)
+			if (MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE)
 			{
 				v=i.fpow();
 			} else {
@@ -631,7 +648,7 @@ public final class FP {
 		}
 		else
 		{
-			if (MODTYPE==PSEUDO_MERSENNE)
+			if (MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE)
 			{
 				FP r=fpow();
 				r.mul(this);

@@ -46,6 +46,24 @@ int ED_25519(csprng *RNG)
 	printf("Montgomery parameterization\n");
 #endif
 
+
+#if MODTYPE_F25519 == PSEUDO_MERSENNE
+	printf("Pseudo-Mersenne Modulus\n");
+#endif
+
+#if MODTYPE_F25519 == GENERALISED_MERSENNE
+	printf("Generalised-Mersenne Modulus\n");
+#endif
+
+#if MODTYPE_F25519 == MONTGOMERY_FRIENDLY
+	printf("Montgomery Friendly Modulus\n");
+#endif
+
+#if MODTYPE_F25519 == NOT_SPECIAL
+	printf("Not special Modulus\n");
+#endif
+
+
 #if CHUNK==16
 	printf("16-bit Build\n");
 #endif
@@ -108,6 +126,23 @@ int NIST_256(csprng *RNG)
 	printf("Montgomery parameterization\n");
 #endif
 
+
+#if MODTYPE_NIST256 == PSEUDO_MERSENNE
+	printf("Pseudo-Mersenne Modulus\n");
+#endif
+
+#if MODTYPE_NIST256 == GENERALISED_MERSENNE
+	printf("Generalised-Mersenne Modulus\n");
+#endif
+
+#if MODTYPE_NIST256 == MONTGOMERY_FRIENDLY
+	printf("Montgomery Friendly Modulus\n");
+#endif
+
+#if MODTYPE_NIST256 == NOT_SPECIAL
+	printf("Not special Modulus\n");
+#endif
+
 #if CHUNK==16
 	printf("16-bit Build\n");
 #endif
@@ -167,6 +202,22 @@ int GOLDI_LOCKS(csprng *RNG)
 #endif
 #if CURVETYPE_GOLDILOCKS==MONTGOMERY
 	printf("Montgomery parameterization\n");
+#endif
+
+#if MODTYPE_GOLDILOCKS == PSEUDO_MERSENNE
+	printf("Pseudo-Mersenne Modulus\n");
+#endif
+
+#if MODTYPE_GOLDILOCKS == GENERALISED_MERSENNE
+	printf("Generalised-Mersenne Modulus\n");
+#endif
+
+#if MODTYPE_GOLDILOCKS == MONTGOMERY_FRIENDLY
+	printf("Montgomery Friendly Modulus\n");
+#endif
+
+#if MODTYPE_GOLDILOCKS == NOT_SPECIAL
+	printf("Not special Modulus\n");
 #endif
 
 #if CHUNK==16

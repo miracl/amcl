@@ -555,7 +555,7 @@ void ZZZ::ECP_dbl(ECP *P)
 //    if (ECP_isinf(P)) return;
 
 	if (CURVE_A==0)
-	{
+	{  // 2S + 6M
 		//FP_copy(&t0,&(P->y));				//FP t0=new FP(y);     
 		FP_sqr(&t0,&(P->y));					//t0.sqr();
 		//FP_copy(&t1,&(P->y));				//FP t1=new FP(y);
@@ -598,7 +598,7 @@ void ZZZ::ECP_dbl(ECP *P)
 		FP_norm(&(P->y));					//y.norm();
 	}
 	else // its -3
-	{
+	{  // 3S+10M
 		//FP_copy(&t0,&(P->x));				//FP t0=new FP(x);
 		//FP_copy(&t1,&(P->y));				//FP t1=new FP(y);
 		//FP_copy(&t2,&(P->z));				//FP t2=new FP(z);

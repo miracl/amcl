@@ -361,12 +361,16 @@ var FP = function(ctx) {
 			xp[9]=new FP(xp[8]); xp[9].sqr();  // 240
 			xp[10]=new FP(xp[9]); xp[10].mul(xp[5]);  // 255		
 			
+
+			n=FP.MODBITS;
+			if (FP.MODTYPE == FP.GENERALISED_MERSENNE)   // Goldilocks ONLY
+				n/=2;
 			if (FP.MOD8==5)
 			{
-				n=FP.MODBITS-3;
+				n-=3;
 				c=(ctx.ROM_FIELD.MConst+5)/8;
 			} else {
-				n=FP.MODBITS-2;
+				n-=2;
 				c=(ctx.ROM_FIELD.MConst+3)/4;
 			}
 
@@ -421,18 +425,29 @@ var FP = function(ctx) {
 			}
 
 // phase 3
-			for (i=0;i<bw;i++ )
-				r.sqr();
-
-			if (w-c!=0)
+			if (bw!=0)
+			{
+				for (i=0;i<bw;i++ )
+					r.sqr();
 				r.mul(key); 
+			}
+
+			if (FP.MODTYPE == FP.GENERALISED_MERSENNE)   // Goldilocks ONLY
+			{
+				key.copy(r);
+				r.sqr();
+				r.mul(this);
+				for (i=0;i<n+1;i++)
+					r.sqr();
+				r.mul(key);
+			}
 			return r;
 		},
 
         /* this=1/this mod Modulus */
         inverse: function() {
 
-			if (FP.MODTYPE == FP.PSEUDO_MERSENNE)
+			if (FP.MODTYPE == FP.PSEUDO_MERSENNE || FP.MODTYPE == FP.GENERALISED_MERSENNE)
 			{
 				var y=this.fpow();
 				if (FP.MOD8==5)
@@ -554,7 +569,7 @@ var FP = function(ctx) {
                 i = new FP(0);
                 i.copy(this);
                 i.f.shl(1);
-				if (FP.MODTYPE == FP.PSEUDO_MERSENNE) {
+				if (FP.MODTYPE == FP.PSEUDO_MERSENNE || FP.MODTYPE == FP.GENERALISED_MERSENNE) {
 					v=i.fpow();
 				} else {
 					var b = new ctx.BIG(0);
@@ -575,7 +590,7 @@ var FP = function(ctx) {
 
                 return r;
             } else {
-				if (FP.MODTYPE == FP.PSEUDO_MERSENNE) {
+				if (FP.MODTYPE == FP.PSEUDO_MERSENNE || FP.MODTYPE == FP.GENERALISED_MERSENNE) {
 					var r=this.fpow();
 					r.mul(this);
 					return r;

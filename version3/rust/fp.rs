@@ -396,6 +396,7 @@ impl FP {
         }
     }
 
+// See eprint paper https://eprint.iacr.org/2018/1038
 // return this^(p-3)/4 or this^(p-5)/8
     pub fn fpow(&mut self) -> FP {
 	let ac:[isize;11]=[1,2,3,6,12,15,30,60,120,240,255];
@@ -414,14 +415,18 @@ impl FP {
 	t.copy(&xp[8]); xp[9].copy(&t); xp[9].sqr(); // 240
 	t.copy(&xp[9]); t.mul(&xp[5]); xp[10].copy(&t); // 255
 
-	let n : isize;
+	let mut n = MODBITS as isize;
 	let c : isize;
 
+	if MODTYPE==GENERALISED_MERSENNE {   // Goldilocks ONLY
+		n/=2;
+	}
+
 	if MOD8==5 {
-		n=(MODBITS as isize)-3;
+		n-=3;
 		c=((rom::MCONST as isize)+5)/8;
 	} else {
-		n=(MODBITS as isize)-2;
+		n-=2;
 		c=((rom::MCONST as isize)+3)/4;
 
 	}
@@ -470,16 +475,22 @@ impl FP {
 		r.mul(&xp[j]);
 	}
 // phase 3
-	for _ in 0..bw {r.sqr();}
-
-	if w-c != 0 {
+	if bw != 0 {
+		for _ in 0..bw {r.sqr();}
 		r.mul(&key);
+	}
+	if MODTYPE==GENERALISED_MERSENNE {   // Goldilocks ONLY
+		key.copy(&r);
+		r.sqr();
+		r.mul(&self);
+		for _ in 0..n+1 {r.sqr();}
+		r.mul(&key);		
 	}
 	return r;
     }
 /* self=1/self mod Modulus */
     pub fn inverse(&mut self) {
-	if MODTYPE==PSEUDO_MERSENNE {
+	if MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE {
 		let mut y=self.fpow();
 		if MOD8==5 {
 			let mut t=FP::new_copy(self);
@@ -574,7 +585,7 @@ impl FP {
         if MOD8==5 {
 	    let v : FP;
             let mut i=FP::new_copy(self); i.x.shl(1);
-	    if MODTYPE==PSEUDO_MERSENNE {
+	    if MODTYPE==PSEUDO_MERSENNE  || MODTYPE==GENERALISED_MERSENNE {
 		v=i.fpow();
 	    } else {
       		let mut p = BIG::new_ints(&rom::MODULUS);  
@@ -591,7 +602,7 @@ impl FP {
         else
         {
 	    let mut r : FP;
-	    if MODTYPE==PSEUDO_MERSENNE {
+	    if MODTYPE==PSEUDO_MERSENNE  || MODTYPE==GENERALISED_MERSENNE {
 		r=self.fpow();
 		r.mul(self);
 	    } else {

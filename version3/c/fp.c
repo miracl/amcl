@@ -559,9 +559,9 @@ void FP_YYY_div2(FP_YYY *r,FP_YYY *a)
     }
 }
 
-#if MODTYPE_YYY == PSEUDO_MERSENNE
+#if MODTYPE_YYY == PSEUDO_MERSENNE || MODTYPE_YYY==GENERALISED_MERSENNE
 
-// See eprint paper "On inversion modulo pseudo-Mersenne primes"
+// See eprint paper https://eprint.iacr.org/2018/1038
 // If p=3 mod 4 r= x^{(p-3)/4}, if p=5 mod 8 r=x^{(p-5)/8}
 
 static void FP_YYY_fpow(FP_YYY *r,FP_YYY *x)
@@ -582,12 +582,19 @@ static void FP_YYY_fpow(FP_YYY *r,FP_YYY *x)
 	FP_YYY_sqr(&xp[9],&xp[8]); // 240
 	FP_YYY_mul(&xp[10],&xp[9],&xp[5]); // 255
 
+#if MODTYPE_YYY==PSEUDO_MERSENNE 
+	n=MODBITS_YYY;
+#endif
+#if MODTYPE_YYY==GENERALISED_MERSENNE  // Goldilocks ONLY
+	n=MODBITS_YYY/2;
+#endif
+
 	if (MOD8_YYY==5)
     {
-		n=MODBITS_YYY-3;
+		n-=3;
 		c=(MConst_YYY+5)/8;
 	} else {
-		n=MODBITS_YYY-2;
+		n-=2;
 		c=(MConst_YYY+3)/4;
 	}
 
@@ -639,11 +646,20 @@ static void FP_YYY_fpow(FP_YYY *r,FP_YYY *x)
 	}
 // phase 3
 
-	for (i=0;i<bw;i++ )
+	if (bw!=0)
+	{
+		for (i=0;i<bw;i++ )
+			FP_YYY_sqr(r,r);
+		FP_YYY_mul(r,r,&key);
+	}
+#if MODTYPE_YYY==GENERALISED_MERSENNE  // Goldilocks ONLY
+	FP_YYY_copy(&key,r);
+	FP_YYY_sqr(&t,&key);
+	FP_YYY_mul(r,&t,x);
+	for (i=0;i<n+1;i++)
 		FP_YYY_sqr(r,r);
-
-	if (w-c!=0)
-		FP_YYY_mul(r,r,&key); 
+	FP_YYY_mul(r,r,&key);
+#endif
 }
 
 void FP_YYY_inv(FP_YYY *r,FP_YYY *x)
@@ -782,7 +798,7 @@ void FP_YYY_sqrt(FP_YYY *r,FP_YYY *a)
     {
         FP_YYY_copy(&i,a); // i=x
         BIG_XXX_fshl(i.g,1); // i=2x
-#if MODTYPE_YYY == PSEUDO_MERSENNE
+#if MODTYPE_YYY == PSEUDO_MERSENNE   || MODTYPE_YYY==GENERALISED_MERSENNE
 		FP_YYY_fpow(&v,&i);
 #else
         BIG_XXX_dec(b,5);
@@ -799,7 +815,7 @@ void FP_YYY_sqrt(FP_YYY *r,FP_YYY *a)
     }
     if (MOD8_YYY==3 || MOD8_YYY==7)
     {
-#if MODTYPE_YYY == PSEUDO_MERSENNE
+#if MODTYPE_YYY == PSEUDO_MERSENNE   || MODTYPE_YYY==GENERALISED_MERSENNE
 		FP_YYY_fpow(r,a);
 		FP_YYY_mul(r,r,a);
 #else

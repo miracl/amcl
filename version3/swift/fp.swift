@@ -394,8 +394,9 @@ public struct FP {
             x.fshr(1)
         }
     }
-/* this=1/this mod Modulus */
 
+// See eprint paper https://eprint.iacr.org/2018/1038
+// return this^(p-3)/4 or this^(p-5)/8
     mutating func fpow() -> FP 
     {
         var ac: [Int] = [1, 2, 3, 6, 12, 15, 30, 60, 120, 240, 255]
@@ -413,15 +414,18 @@ public struct FP {
         xp.append(FP(xp[8])); xp[9].sqr()
         xp.append(FP(xp[9])); xp[10].mul(xp[5])
 
-        var n: Int
+        var n=Int(FP.MODBITS)
         var c: Int
+        if FP.MODTYPE==FP.GENERALISED_MERSENNE {   // Goldilocks ONLY
+            n=n/2
+        }
 
         if (FP.MOD8==5)
         {
-            n=Int(FP.MODBITS)-3
+            n=n-3
             c=(Int(ROM.MConst)+5)/8
         } else {
-            n=Int(FP.MODBITS)-2
+            n=n-2
             c=(Int(ROM.MConst)+3)/4            
         }
 
@@ -473,17 +477,24 @@ public struct FP {
             r.mul(xp[j])
         }
 
-        for _ in 0..<bw {r.sqr()}
-
-        if w-c != 0 {
+        if bw != 0 {
+            for _ in 0..<bw {r.sqr()}
             r.mul(key)
         }
+        if FP.MODTYPE==FP.GENERALISED_MERSENNE {   // Goldilocks ONLY
+            key.copy(r)
+            r.sqr()
+            r.mul(self)
+            for _ in 0..<n+1 {r.sqr()}
+            r.mul(key)         
+        }        
         return r        
     }
 
+/* this=1/this mod Modulus */
     mutating func inverse()
     {
-        if FP.MODTYPE==FP.PSEUDO_MERSENNE {
+        if FP.MODTYPE==FP.PSEUDO_MERSENNE || FP.MODTYPE==FP.GENERALISED_MERSENNE {
             var y=fpow()
             if (FP.MOD8==5)
             {
@@ -579,7 +590,7 @@ public struct FP {
         {
             var v: FP
             var i=FP(self); i.x.shl(1)
-            if FP.MODTYPE==FP.PSEUDO_MERSENNE {
+            if FP.MODTYPE==FP.PSEUDO_MERSENNE  || FP.MODTYPE==FP.GENERALISED_MERSENNE {
                 v=i.fpow()
             } else {       
                 var b=BIG(FP.p)
@@ -595,7 +606,7 @@ public struct FP {
         }
         else
         {
-           if FP.MODTYPE==FP.PSEUDO_MERSENNE {
+           if FP.MODTYPE==FP.PSEUDO_MERSENNE  || FP.MODTYPE==FP.GENERALISED_MERSENNE {
                 var r=fpow()
                 r.mul(self)
                 return r

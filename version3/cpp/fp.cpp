@@ -101,44 +101,44 @@ void YYY::FP_redc(BIG x,FP *y)
 	BIG_copy(x,y->g);
 }
 
-/* reduce a DBIG to a BIG exploiting the special form of the modulus */
+/* reduce a DBIG to a BIG exploiting the special form of a modulus 2^m - 2^n -c */
 void YYY::FP_mod(BIG r,DBIG d)
 {
     BIG t,b,t2,b2;
+	int BTset=MBITS_YYY/2;
     chunk carry;
     BIG_split(t,b,d,MBITS_YYY);
 
     //BIG_add(r,t,b);
 
     BIG_dscopy(d,t);
-    BIG_dshl(d,BTset);
+    BIG_dshl(d,BTset);   
 
     BIG_split(t2,b2,d,MBITS_YYY);
 
-	BIG_add(b,b,b2);
-	BIG_add(t,t,t2);
+	BIG_add(b,b,b2);  // 2
+	BIG_add(t,t,t2);  // 2
 
-    //BIG_add(r,r,t2);
-    //BIG_add(r,r,b2);
-	//BIG_add(r,t,b);
-    //BIG_norm(r);
     BIG_shl(t2,BTset);
 
-	BIG_add(b,b,t2);
-    BIG_norm(b);
+	BIG_add(b,b,t2); // 3
+    BIG_norm(t);
 
-// Now multiply t by MConst..(?) 
+//	carry=0;
+// Now multiply t by MConst..(?) and extract carry
+//	if (MConst!=1)
+//		carry=BIG_pmul(t,t,MConst);
 
 	BIG_add(r,t,b);
-    BIG_norm(r);
-    //BIG_add(r,r,t2);
+	BIG_norm(r);
 
-    carry=r[NLEN_XXX-1]>>TBITS_YYY;
-
+    carry=r[NLEN_XXX-1]>>TBITS_YYY;// + (carry<<(BASEBITS_XXX-TBITS_YYY));
     r[NLEN_XXX-1]&=TMASK_YYY;
-    r[0]+=carry;
 
     r[BTset/BASEBITS_XXX]+=carry<<(BTset%BASEBITS_XXX); /* need to check that this falls mid-word */
+//	if (MConst!=1) carry*=MConst;
+	r[0]+=carry;
+
     BIG_norm(r);
 }
 
@@ -585,9 +585,9 @@ void YYY::FP_div2(FP *r,FP *a)
     }
 }
 
-#if MODTYPE_YYY == PSEUDO_MERSENNE
+#if MODTYPE_YYY==PSEUDO_MERSENNE  || MODTYPE_YYY==GENERALISED_MERSENNE
 
-// See eprint paper "On inversion modulo pseudo-Mersenne primes"
+// See eprint paper https://eprint.iacr.org/2018/1038
 // If p=3 mod 4 r= x^{(p-3)/4}, if p=5 mod 8 r=x^{(p-5)/8}
 
 void YYY::FP_fpow(FP *r,FP *x)
@@ -608,15 +608,21 @@ void YYY::FP_fpow(FP *r,FP *x)
 	FP_sqr(&xp[9],&xp[8]); // 240
 	FP_mul(&xp[10],&xp[9],&xp[5]); // 255
 
+#if MODTYPE_YYY==PSEUDO_MERSENNE 
+	n=MODBITS_YYY;
+#endif
+#if MODTYPE_YYY==GENERALISED_MERSENNE  // Goldilocks ONLY
+	n=MODBITS_YYY/2;
+#endif
+
     if (MOD8_YYY==5)
     {
-		n=MODBITS_YYY-3;
+		n-=3;
 		c=(MConst+5)/8;
 	} else {
-		n=MODBITS_YYY-2;
+		n-=2;
 		c=(MConst+3)/4;
 	}
-
 
 	bw=0; w=1; while (w<c) {w*=2; bw+=1;}
 	k=w-c;
@@ -666,10 +672,22 @@ void YYY::FP_fpow(FP *r,FP *x)
 	}
 // phase 3
 
-	for (i=0;i<bw;i++ )
+	if (bw!=0)
+	{
+		for (i=0;i<bw;i++ )
+			FP_sqr(r,r);
+		FP_mul(r,r,&key);
+	}
+
+#if MODTYPE_YYY==GENERALISED_MERSENNE  // Goldilocks ONLY
+	FP_copy(&key,r);
+	FP_sqr(&t,&key);
+	FP_mul(r,&t,x);
+	for (i=0;i<n+1;i++)
 		FP_sqr(r,r);
-	if (w-c!=0)
-		FP_mul(r,r,&key); 
+	FP_mul(r,r,&key);
+#endif
+
 }
 
 void YYY::FP_inv(FP *r,FP *x)
@@ -782,7 +800,7 @@ void YYY::FP_sqrt(FP *r,FP *a)
     {
         FP_copy(&i,a);
         BIG_fshl(i.g,1);
-#if MODTYPE_YYY == PSEUDO_MERSENNE
+#if MODTYPE_YYY == PSEUDO_MERSENNE   || MODTYPE_YYY==GENERALISED_MERSENNE
 		FP_fpow(&v,&i);
 #else
         BIG_dec(b,5);
@@ -799,7 +817,7 @@ void YYY::FP_sqrt(FP *r,FP *a)
     }
     if (MOD8_YYY==3 || MOD8_YYY==7)
     {
-#if MODTYPE_YYY == PSEUDO_MERSENNE
+#if MODTYPE_YYY == PSEUDO_MERSENNE   || MODTYPE_YYY==GENERALISED_MERSENNE
 		FP_fpow(r,a);
 		FP_mul(r,r,a);
 #else
