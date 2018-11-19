@@ -55,9 +55,7 @@ var ECP = function(ctx) {
     ECP.prototype = {
         /* test this=O point-at-infinity */
         is_infinity: function() {
-            // if (this.INF) {
-            //    return true;
-            // }
+  
             this.x.reduce();
             this.z.reduce();
 
@@ -78,7 +76,6 @@ var ECP = function(ctx) {
 
         /* conditional swap of this and Q dependant on d */
         cswap: function(Q, d) {
-            // var bd;
 
             this.x.cswap(Q.x, d);
             if (ECP.CURVETYPE != ECP.MONTGOMERY) {
@@ -86,16 +83,10 @@ var ECP = function(ctx) {
             }
             this.z.cswap(Q.z, d);
 
-            // bd = (d !== 0) ? true : false;
-            // bd = bd & (this.INF ^ Q.INF);
-            // this.INF ^= bd;
-            // Q.INF ^= bd;
-
         },
 
         /* conditional move of Q to P dependant on d */
         cmove: function(Q, d) {
-            // var bd;
 
             this.x.cmove(Q.x, d);
             if (ECP.CURVETYPE != ECP.MONTGOMERY) {
@@ -103,8 +94,6 @@ var ECP = function(ctx) {
             }
             this.z.cmove(Q.z, d);
 
-            // bd = (d !== 0) ? true : false;
-            // this.INF ^= (this.INF ^ Q.INF) & bd;
         },
 
         /* Constant time select from pre-computed table */
@@ -133,14 +122,6 @@ var ECP = function(ctx) {
 
         equals: function(Q) {
             var a, b;
-
-            // if (this.is_infinity() && Q.is_infinity()) {
-            //    return true;
-            // }
-
-            // if (this.is_infinity() || Q.is_infinity()) {
-            //    return false;
-            // }
 
             a = new ctx.FP(0);
             b = new ctx.FP(0);
@@ -177,12 +158,10 @@ var ECP = function(ctx) {
                 this.y.copy(P.y);
             }
             this.z.copy(P.z);
-            // this.INF = P.INF;
         },
 
         /* this=-this */
         neg: function() {
-            // if (this.is_infinity()) return;
             if (ECP.CURVETYPE == ECP.WEIERSTRASS) {
                 this.y.neg();
                 this.y.norm();
@@ -196,7 +175,6 @@ var ECP = function(ctx) {
 
         /* set this=O */
         inf: function() {
-            // this.INF = true;
             this.x.zero();
 
             if (ECP.CURVETYPE != ECP.MONTGOMERY) {
@@ -227,11 +205,7 @@ var ECP = function(ctx) {
                 if (rhs.jacobi() != 1) {
                     this.inf();
                 }
-                // if (rhs.jacobi() == 1) {
-                //    this.INF = false;
-                // } else {
-                //    this.inf();
-                // }
+ 
             } else {
                 y2 = new ctx.FP(0);
                 y2.copy(this.y);
@@ -240,11 +214,6 @@ var ECP = function(ctx) {
                 if (!y2.equals(rhs)) {
                     this.inf();
                 }
-                // if (y2.equals(rhs)) {
-                //    this.INF = false;
-                // } else {
-                //    this.inf();
-                // }
             }
         },
 
@@ -264,7 +233,6 @@ var ECP = function(ctx) {
                     ny.neg();
                 }
                 this.y = ny;
-                // this.INF = false;
             } else {
                 this.inf();
             }
@@ -284,7 +252,6 @@ var ECP = function(ctx) {
                 if (ECP.CURVETYPE != ECP.MONTGOMERY) {
                     this.y = rhs.sqrt();
                 }
-            // this.INF = false;
             } else {
                 this.inf();
             }
@@ -323,20 +290,17 @@ var ECP = function(ctx) {
         /* extract x as ctx.BIG */
         getX: function() {
 			var W=new ECP(); W.copy(this); W.affine();
-            //this.affine();
             return W.x.redc();
         },
 
         /* extract y as ctx.BIG */
         getY: function() {
 			var W=new ECP(); W.copy(this); W.affine();
-            //this.affine();
             return W.y.redc();
         },
 
         /* get sign of Y */
         getS: function() {
-            //this.affine();
             var y = this.getY();
             return y.parity();
         },
@@ -411,19 +375,16 @@ var ECP = function(ctx) {
                 A, B, AA, BB;
 
             if (ECP.CURVETYPE == ECP.WEIERSTRASS) {
-                // if (this.INF) {
-                //     return;
-                // }
 
                 if (ctx.ROM_CURVE.CURVE_A == 0) {
                     t0 = new ctx.FP(0);
-                    t0.copy(this.y); //FP t0=new FP(y);                      /*** Change ***/    // Edits made
+                    t0.copy(this.y);                    
                     t0.sqr();
                     t1 = new ctx.FP(0);
-                    t1.copy(this.y); //FP t1=new FP(y);
+                    t1.copy(this.y); 
                     t1.mul(this.z);
                     t2 = new ctx.FP(0);
-                    t2.copy(this.z); //FP t2=new FP(z);
+                    t2.copy(this.z); 
                     t2.sqr();
 
                     this.z.copy(t0);
@@ -436,10 +397,10 @@ var ECP = function(ctx) {
                     t2.imul(3 * ctx.ROM_CURVE.CURVE_B_I);
 
                     x3 = new ctx.FP(0);
-                    x3.copy(t2); //FP x3=new FP(t2);
+                    x3.copy(t2); 
                     x3.mul(this.z);
                     y3 = new ctx.FP(0);
-                    y3.copy(t0); //FP y3=new FP(t0);
+                    y3.copy(t0); 
                     y3.add(t2);
                     y3.norm();
                     this.z.mul(t1);
@@ -462,23 +423,23 @@ var ECP = function(ctx) {
                     this.y.norm();
                 } else {
                     t0 = new ctx.FP(0);
-                    t0.copy(this.x); //FP t0=new FP(x);
+                    t0.copy(this.x); 
                     t1 = new ctx.FP(0);
-                    t1.copy(this.y); //FP t1=new FP(y);
+                    t1.copy(this.y); 
                     t2 = new ctx.FP(0);
-                    t2.copy(this.z); //FP t2=new FP(z);
+                    t2.copy(this.z); 
                     t3 = new ctx.FP(0);
-                    t3.copy(this.x); //FP t3=new FP(x);
+                    t3.copy(this.x); 
                     z3 = new ctx.FP(0);
-                    z3.copy(this.z); //FP z3=new FP(z);
-                    y3 = new ctx.FP(0); //FP y3=new FP(0);
-                    x3 = new ctx.FP(0); //FP x3=new FP(0);
-                    b = new ctx.FP(0); //FP b=new FP(0);
-                    // System.out.println("Into dbl");
+                    z3.copy(this.z); 
+                    y3 = new ctx.FP(0); 
+                    x3 = new ctx.FP(0); 
+                    b = new ctx.FP(0); 
+                    
                     if (ctx.ROM_CURVE.CURVE_B_I == 0) {
                         b.rcopy(ctx.ROM_CURVE.CURVE_B);
                     }
-                    // System.out.println("b= "+b.toString());
+                   
                     t0.sqr(); //1    x^2
                     t1.sqr(); //2    y^2
                     t2.sqr(); //3
@@ -497,12 +458,12 @@ var ECP = function(ctx) {
                         y3.imul(ctx.ROM_CURVE.CURVE_B_I);
                     }
 
-                    y3.sub(z3); //y3.norm(); //9  ***
+                    y3.sub(z3); //9  ***
                     x3.copy(y3);
                     x3.add(y3);
                     x3.norm(); //10
 
-                    y3.add(x3); //y3.norm();//11
+                    y3.add(x3); //11
                     x3.copy(t1);
                     x3.sub(y3);
                     x3.norm(); //12
@@ -511,8 +472,8 @@ var ECP = function(ctx) {
                     y3.mul(x3); //14
                     x3.mul(t3); //15
                     t3.copy(t2);
-                    t3.add(t2); //t3.norm(); //16
-                    t2.add(t3); //t2.norm(); //17
+                    t3.add(t2);  //16
+                    t2.add(t3);  //17
 
                     if (ctx.ROM_CURVE.CURVE_B_I == 0) {
                         z3.mul(b); //18
@@ -520,35 +481,35 @@ var ECP = function(ctx) {
                         z3.imul(ctx.ROM_CURVE.CURVE_B_I);
                     }
 
-                    z3.sub(t2); //z3.norm();//19
+                    z3.sub(t2); //19
                     z3.sub(t0);
                     z3.norm(); //20  ***
                     t3.copy(z3);
-                    t3.add(z3); //t3.norm();//21
+                    t3.add(z3); //21
 
                     z3.add(t3);
                     z3.norm(); //22
                     t3.copy(t0);
-                    t3.add(t0); //t3.norm(); //23
-                    t0.add(t3); //t0.norm();//24
+                    t3.add(t0); //23
+                    t0.add(t3); //24
                     t0.sub(t2);
                     t0.norm(); //25
 
                     t0.mul(z3); //26
-                    y3.add(t0); //y3.norm();//27
+                    y3.add(t0); //27
                     t0.copy(this.y);
                     t0.mul(this.z); //28
                     t0.add(t0);
                     t0.norm(); //29
                     z3.mul(t0); //30
-                    x3.sub(z3); //x3.norm();//31
+                    x3.sub(z3); //31
                     t0.add(t0);
                     t0.norm(); //32
                     t1.add(t1);
                     t1.norm(); //33
                     z3.copy(t0);
                     z3.mul(t1); //34
-                    // System.out.println("Out of dbl");
+                  
                     this.x.copy(x3);
                     this.x.norm();
                     this.y.copy(y3);
@@ -560,13 +521,13 @@ var ECP = function(ctx) {
 
             if (ECP.CURVETYPE == ECP.EDWARDS) {
                 C = new ctx.FP(0);
-                C.copy(this.x); //FP C=new FP(x);
+                C.copy(this.x); 
                 D = new ctx.FP(0);
-                D.copy(this.y); //FP D=new FP(y);
+                D.copy(this.y); 
                 H = new ctx.FP(0);
-                H.copy(this.z); //FP H=new FP(z);
-                J = new ctx.FP(0); //FP J=new FP(0);
-                // System.out.println("Into dbl");
+                H.copy(this.z); 
+                J = new ctx.FP(0); 
+               
                 this.x.mul(this.y);
                 this.x.add(this.x);
                 this.x.norm();
@@ -593,17 +554,16 @@ var ECP = function(ctx) {
                 C.norm();
                 this.y.mul(C);
                 this.z.mul(J);
-                // System.out.println("Out of dbl");
             }
 
             if (ECP.CURVETYPE == ECP.MONTGOMERY) {
                 A = new ctx.FP(0);
-                A.copy(this.x); //FP A=new FP(x);
+                A.copy(this.x); 
                 B = new ctx.FP(0);
-                B.copy(this.x); //FP B=new FP(x);
-                AA = new ctx.FP(0); //FP AA=new FP(0);
-                BB = new ctx.FP(0); //FP BB=new FP(0);
-                C = new ctx.FP(0); //FP C=new FP(0);
+                B.copy(this.x); 
+                AA = new ctx.FP(0); 
+                BB = new ctx.FP(0); 
+                C = new ctx.FP(0); 
 
                 A.add(this.z);
                 A.norm();
@@ -636,36 +596,25 @@ var ECP = function(ctx) {
             var b, t0, t1, t2, t3, t4, x3, y3, z3,
                 A, B, C, D, E, F, G;
 
-            // if (this.INF) {
-            //     this.copy(Q);
-            //     return;
-            // }
-
-            // if (Q.INF) {
-            //     return;
-            // }
-
             if (ECP.CURVETYPE == ECP.WEIERSTRASS) {
-                // System.out.println("Into add");
                 if (ctx.ROM_CURVE.CURVE_A == 0) {
-                    //  System.out.println("Into add");                      // Edits made
 
                     b = 3 * ctx.ROM_CURVE.CURVE_B_I;
                     t0 = new ctx.FP(0);
-                    t0.copy(this.x); //FP t0=new FP(x);
+                    t0.copy(this.x); 
                     t0.mul(Q.x);
                     t1 = new ctx.FP(0);
-                    t1.copy(this.y); //FP t1=new FP(y);
+                    t1.copy(this.y); 
                     t1.mul(Q.y);
                     t2 = new ctx.FP(0);
-                    t2.copy(this.z); //FP t2=new FP(z);
+                    t2.copy(this.z); 
                     t2.mul(Q.z);
                     t3 = new ctx.FP(0);
-                    t3.copy(this.x); //FP t3=new FP(x);
+                    t3.copy(this.x); 
                     t3.add(this.y);
                     t3.norm();
                     t4 = new ctx.FP(0);
-                    t4.copy(Q.x); //FP t4=new FP(Q.x);
+                    t4.copy(Q.x); 
                     t4.add(Q.y);
                     t4.norm();
                     t3.mul(t4);
@@ -678,7 +627,7 @@ var ECP = function(ctx) {
                     t4.add(this.z);
                     t4.norm();
                     x3 = new ctx.FP(0);
-                    x3.copy(Q.y); //FP x3=new FP(Q.y);
+                    x3.copy(Q.y); 
                     x3.add(Q.z);
                     x3.norm();
 
@@ -692,7 +641,7 @@ var ECP = function(ctx) {
                     x3.add(this.z);
                     x3.norm();
                     y3 = new ctx.FP(0);
-                    y3.copy(Q.x); //FP y3=new FP(Q.x);
+                    y3.copy(Q.x); 
                     y3.add(Q.z);
                     y3.norm();
                     x3.mul(y3);
@@ -707,7 +656,7 @@ var ECP = function(ctx) {
                     t2.imul(b);
 
                     z3 = new ctx.FP(0);
-                    z3.copy(t1); //FP z3=new FP(t1);
+                    z3.copy(t1); 
                     z3.add(t2);
                     z3.norm();
                     t1.sub(t2);
@@ -726,8 +675,6 @@ var ECP = function(ctx) {
                     z3.mul(t4);
                     z3.add(t0);
 
-                    // System.out.println("Out of add");
-
                     this.x.copy(x3);
                     this.x.norm();
                     this.y.copy(y3);
@@ -736,21 +683,21 @@ var ECP = function(ctx) {
                     this.z.norm();
                 } else {
                     t0 = new ctx.FP(0);
-                    t0.copy(this.x); //FP t0=new FP(x);
+                    t0.copy(this.x); 
                     t1 = new ctx.FP(0);
-                    t1.copy(this.y); //FP t1=new FP(y);
+                    t1.copy(this.y); 
                     t2 = new ctx.FP(0);
-                    t2.copy(this.z); //FP t2=new FP(z);
+                    t2.copy(this.z); 
                     t3 = new ctx.FP(0);
-                    t3.copy(this.x); //FP t3=new FP(x);
+                    t3.copy(this.x); 
                     t4 = new ctx.FP(0);
-                    t4.copy(Q.x); //FP t4=new FP(Q.x);
-                    z3 = new ctx.FP(0); //FP z3=new FP(0);
+                    t4.copy(Q.x); 
+                    z3 = new ctx.FP(0); 
                     y3 = new ctx.FP(0);
-                    y3.copy(Q.x); //FP y3=new FP(Q.x);
+                    y3.copy(Q.x); 
                     x3 = new ctx.FP(0);
-                    x3.copy(Q.y); //FP x3=new FP(Q.y);
-                    b = new ctx.FP(0); //FP b=new FP(0);
+                    x3.copy(Q.y); 
+                    b = new ctx.FP(0); 
 
                     if (ctx.ROM_CURVE.CURVE_B_I == 0) {
                         b.rcopy(ctx.ROM_CURVE.CURVE_B);
@@ -765,7 +712,7 @@ var ECP = function(ctx) {
                     t4.norm(); //5
                     t3.mul(t4); //6
                     t4.copy(t0);
-                    t4.add(t1); //t4.norm(); //7
+                    t4.add(t1);  //7
                     t3.sub(t4);
                     t3.norm(); //8
                     t4.copy(this.y);
@@ -775,7 +722,7 @@ var ECP = function(ctx) {
                     x3.norm(); //10
                     t4.mul(x3); //11
                     x3.copy(t1);
-                    x3.add(t2); //x3.norm();//12
+                    x3.add(t2); //12
 
                     t4.sub(x3);
                     t4.norm(); //13
@@ -787,7 +734,7 @@ var ECP = function(ctx) {
 
                     x3.mul(y3); //16
                     y3.copy(t0);
-                    y3.add(t2); //y3.norm();//17
+                    y3.add(t2); //17
 
                     y3.rsub(x3);
                     y3.norm(); //18
@@ -803,9 +750,9 @@ var ECP = function(ctx) {
                     x3.sub(z3);
                     x3.norm(); //20
                     z3.copy(x3);
-                    z3.add(x3); //z3.norm(); //21
+                    z3.add(x3);  //21
 
-                    x3.add(z3); //x3.norm(); //22
+                    x3.add(z3);  //22
                     z3.copy(t1);
                     z3.sub(x3);
                     z3.norm(); //23
@@ -819,21 +766,21 @@ var ECP = function(ctx) {
                     }
 
                     t1.copy(t2);
-                    t1.add(t2); //t1.norm();//26
-                    t2.add(t1); //t2.norm();//27
+                    t1.add(t2); //26
+                    t2.add(t1); //27
 
-                    y3.sub(t2); //y3.norm(); //28
+                    y3.sub(t2);  //28
 
                     y3.sub(t0);
                     y3.norm(); //29
                     t1.copy(y3);
-                    t1.add(y3); //t1.norm();//30
+                    t1.add(y3); //30
                     y3.add(t1);
                     y3.norm(); //31
 
                     t1.copy(t0);
-                    t1.add(t0); //t1.norm(); //32
-                    t0.add(t1); //t0.norm();//33
+                    t1.add(t0); //32
+                    t0.add(t1); //33
                     t0.sub(t2);
                     t0.norm(); //34
                     t1.copy(t4);
@@ -842,14 +789,14 @@ var ECP = function(ctx) {
                     t2.mul(y3); //36
                     y3.copy(x3);
                     y3.mul(z3); //37
-                    y3.add(t2); //y3.norm();//38
+                    y3.add(t2); //38
                     x3.mul(t3); //39
                     x3.sub(t1); //40
                     z3.mul(t4); //41
                     t1.copy(t3);
                     t1.mul(t0); //42
-                    z3.add(t1); //z3.norm();
-                    //System.out.println("Out of add");
+                    z3.add(t1); 
+           
                     this.x.copy(x3);
                     this.x.norm();
                     this.y.copy(y3);
@@ -861,15 +808,15 @@ var ECP = function(ctx) {
 
             if (ECP.CURVETYPE == ECP.EDWARDS) {
                 A = new ctx.FP(0);
-                A.copy(this.z); //FP A=new FP(z);
-                B = new ctx.FP(0); //FP B=new FP(0);
+                A.copy(this.z); 
+                B = new ctx.FP(0); 
                 C = new ctx.FP(0);
-                C.copy(this.x); //FP C=new FP(x);
+                C.copy(this.x); 
                 D = new ctx.FP(0);
-                D.copy(this.y); //FP D=new FP(y);
-                E = new ctx.FP(0); //FP E=new FP(0);
-                F = new ctx.FP(0); //FP F=new FP(0);
-                G = new ctx.FP(0); //FP G=new FP(0);
+                D.copy(this.y); 
+                E = new ctx.FP(0); 
+                F = new ctx.FP(0); 
+                G = new ctx.FP(0); 
 
                 A.mul(Q.z); //A=2
                 B.copy(A);
@@ -985,7 +932,6 @@ var ECP = function(ctx) {
 			var NQ = new ECP(); NQ.copy(Q);
             NQ.neg();
             this.add(NQ);
-            //Q.neg();
         },
 
         /* constant time multiply by small integer of length bts - use ladder */
@@ -1026,12 +972,10 @@ var ECP = function(ctx) {
             }
             if (cf==4) {
                 this.dbl(); this.dbl();
-                //this.affine();
                 return;
             }
             if (cf==8) {
                 this.dbl(); this.dbl(); this.dbl();
-                //this.affine();
                 return;
             }
             c.rcopy(ctx.ROM_CURVE.CURVE_Cof);
@@ -1079,8 +1023,6 @@ var ECP = function(ctx) {
                 C = new ECP();
                 W = [];
                 w = [];
-
-                //this.affine();
 
                 // precompute table
                 Q.copy(this);
@@ -1148,9 +1090,6 @@ var ECP = function(ctx) {
                 w = [],
                 i, s, ns, nb,
                 a, b;
-
-            //this.affine();
-            //Q.affine();
 
             te.copy(e);
             tf.copy(f);

@@ -27,16 +27,11 @@ var ECP4 = function(ctx) {
         this.x = new ctx.FP4(0);
         this.y = new ctx.FP4(1);
         this.z = new ctx.FP4(0);
-        // this.INF = true;
     };
 
     ECP4.prototype = {
         /* Test this=O? */
         is_infinity: function() {
-            // if (this.INF) {
-            //     return true;
-            // }
-
             this.x.reduce();
             this.y.reduce();
             this.z.reduce();
@@ -48,12 +43,10 @@ var ECP4 = function(ctx) {
             this.x.copy(P.x);
             this.y.copy(P.y);
             this.z.copy(P.z);
-            // this.INF = P.INF;
         },
 
         /* set this=O */
         inf: function() {
-            // this.INF = true;
             this.x.zero();
             this.y.one();
             this.z.zero();
@@ -65,8 +58,6 @@ var ECP4 = function(ctx) {
             this.y.cmove(Q.y, d);
             this.z.cmove(Q.z, d);
 
-            // bd = (d !== 0) ? true : false;
-            // this.INF ^= (this.INF ^ Q.INF) & bd;
         },
 
         /* Constant time select from pre-computed table */
@@ -94,14 +85,6 @@ var ECP4 = function(ctx) {
         /* Test P == Q */
         equals: function(Q) {
             var a, b;
-
-            // if (this.is_infinity() && Q.is_infinity()) {
-            //    return true;
-            // }
-
-            // if (this.is_infinity() || Q.is_infinity()) {
-            //    return false;
-            // }
 
             a = new ctx.FP4(this.x);
             b = new ctx.FP4(Q.x);
@@ -159,14 +142,12 @@ var ECP4 = function(ctx) {
         /* extract affine x as ctx.FP4 */
         getX: function() {
 			var W=new ECP4(); W.copy(this); W.affine();
-            //this.affine();
             return W.x;
         },
 
         /* extract affine y as ctx.FP4 */
         getY: function() {
 			var W=new ECP4(); W.copy(this); W.affine();
-            //this.affine();
             return W.y;
         },
 
@@ -255,11 +236,6 @@ var ECP4 = function(ctx) {
                 this.inf();
             }
 
-            // if (y2.equals(rhs)) {
-            //     this.INF = false;
-            // } else {
-            //     this.inf();
-            // }
         },
 
         /* set this=(x,.) */
@@ -273,7 +249,6 @@ var ECP4 = function(ctx) {
 
             if (rhs.sqrt()) {
                 this.y.copy(rhs);
-                // this.INF = false;
             } else {
                 this.inf();
             }
@@ -281,9 +256,6 @@ var ECP4 = function(ctx) {
 
         /* set this*=q, where q is Modulus, using Frobenius */
         frob: function(F,n) {
-            // if (this.INF) {
-            //    return;
-            // }
             for (var i=0;i<n;i++) {
                 this.x.frob(F[2]);
                 this.x.pmul(F[0]);
@@ -299,10 +271,6 @@ var ECP4 = function(ctx) {
         /* this+=this */
         dbl: function() {
             var iy, t0, t1, t2, x3, y3;
-
-            // if (this.INF) {
-            //    return -1;
-            // }
 
             iy = new ctx.FP4(this.y);
             if (ctx.ECP.SEXTIC_TWIST == ctx.ECP.D_TYPE) {
@@ -365,15 +333,6 @@ var ECP4 = function(ctx) {
         /* this+=Q */
         add: function(Q) {
             var b, t0, t1, t2, t3, t4, x3, y3, z3;
-
-            // if (this.INF) {
-            //    this.copy(Q);
-            //    return -1;
-            // }
-
-            // if (Q.INF) {
-            //    return -1;
-            // }
 
             b = 3 * ctx.ROM_CURVE.CURVE_B_I;
             t0 = new ctx.FP4(this.x);
@@ -477,12 +436,9 @@ var ECP4 = function(ctx) {
         /* this-=Q */
         sub: function(Q) {
             var D;
-
 			var NQ=new ECP4(); NQ.copy(Q);
             NQ.neg();
             D = this.add(NQ);
-            //Q.neg();
-
             return D;
         },
 
@@ -501,8 +457,6 @@ var ECP4 = function(ctx) {
             if (this.is_infinity()) {
                 return new ECP4();
             }
-
-            //this.affine();
 
             // precompute table
             Q.copy(this);

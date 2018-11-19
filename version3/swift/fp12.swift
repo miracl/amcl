@@ -78,7 +78,6 @@ public struct FP12
     /* test x==0 ? */
     func iszilch() -> Bool
     {
-        //reduce();
         return a.iszilch() && b.iszilch() && c.iszilch()
     }
 
@@ -317,7 +316,6 @@ public struct FP12
             z2.pmul(y.b.real())
             b.add(a)
             t1.adds(y.b.real())
-            //t1.real().add(y.b.real())
     
             b.norm(); t1.norm()
 
@@ -356,16 +354,16 @@ public struct FP12
 
             z1.copy(t0); z1.mul(y.a)
             t0.copy(b); t0.add(c)
-            t0.norm();
+            t0.norm()
 
-            z3.copy(t0); //z3.mul(y.c);
+            z3.copy(t0)
             z3.pmul(y.c.getb())
             z3.times_i()
 
             t0.copy(z0); t0.neg()
 
             z1.add(t0)
-            b.copy(z1);
+            b.copy(z1)
             z2.copy(t0)
 
             t0.copy(a); t0.add(c)
@@ -388,7 +386,7 @@ public struct FP12
             z3.add(t1)
             t0.times_i()
             b.add(t0)
-            z3.norm();
+            z3.norm()
             z3.times_i()
             a.copy(z0); a.add(z3)      
         }
@@ -586,7 +584,6 @@ public struct FP12
         R.append(FP12(1))
         R.append(FP12(self))
 
-        //for var i=bts-1;i>=0;i--
         for i in (0...bts-1).reversed()
         {
             let b=Int((e>>i)&1)
@@ -615,11 +612,11 @@ public struct FP12
     
         var c=g1.trace()
 
-	if b.iszilch() 
-	{
-		c=c.xtr_pow(e)
-		return c
-	}
+        if b.iszilch() 
+        {
+            c=c.xtr_pow(e)
+            return c
+        }
 
         g2.frob(f)
         let cp=g2.trace()
@@ -719,97 +716,4 @@ public struct FP12
         p.reduce()
         return p
     }
-
-    /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
-    /* Timing attack secure, but not cache attack secure */
-/*    
-    static func pow4(_ q:[FP12],_ u:[BIG]) -> FP12
-    {
-        var a=[Int32](repeating: 0,count: 4)
-        var g=[FP12]();
-        
-        for _ in 0 ..< 8 {g.append(FP12(0))}
-        var s=[FP12]();
-        for _ in 0 ..< 2 {s.append(FP12(0))}
-        
-        let c=FP12(1)
-        let p=FP12(0)
-        
-        var t=[BIG]()
-        for i in 0 ..< 4
-            {t.append(BIG(u[i]))}
-        
-        let mt=BIG(0);
-        var w=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)
-    
-        g[0].copy(q[0]); s[0].copy(q[1]); s[0].conj(); g[0].mul(s[0])
-        g[1].copy(g[0])
-        g[2].copy(g[0])
-        g[3].copy(g[0])
-        g[4].copy(q[0]); g[4].mul(q[1])
-        g[5].copy(g[4])
-        g[6].copy(g[4])
-        g[7].copy(g[4])
-    
-        s[1].copy(q[2]); s[0].copy(q[3]); s[0].conj(); s[1].mul(s[0])
-        s[0].copy(s[1]); s[0].conj(); g[1].mul(s[0])
-        g[2].mul(s[1])
-        g[5].mul(s[0])
-        g[6].mul(s[1])
-        s[1].copy(q[2]); s[1].mul(q[3])
-        s[0].copy(s[1]); s[0].conj(); g[0].mul(s[0])
-        g[3].mul(s[1])
-        g[4].mul(s[0])
-        g[7].mul(s[1])
-
-    // if power is even add 1 to power, and add q to correction 
-    
-        for i in 0 ..< 4
-        {
-            if t[i].parity()==0
-            {
-				t[i].inc(1); t[i].norm()
-				c.mul(q[i])
-            }
-            mt.add(t[i]); mt.norm()
-        }
-        c.conj();
-        let nb=1+mt.nbits();
-    
-    // convert exponent to signed 1-bit window 
-        for j in 0 ..< nb
-        {
-            	for i in 0 ..< 4
-            	{
-			a[i]=Int32(t[i].lastbits(2)-2)
-			t[i].dec(Int(a[i]));
-                	t[i].norm()
-			t[i].fshr(1)
-            	}
-		let sum=8*a[0]+4*a[1]+2*a[2]+a[3]
-  		w[j]=Int8(sum)
-        }
-        w[nb]=Int8(8*t[0].lastbits(2)+4*t[1].lastbits(2))
-        w[nb]+=Int8(2*t[2].lastbits(2)+t[3].lastbits(2))
-        p.copy(g[Int(w[nb]-1)/2])
-    
-        //for var i=nb-1;i>=0;i--
-        for i in (0...nb-1).reversed()
-        {
-            let m=w[i]>>7
-            let j=(w[i]^m)-m  // j=abs(w[i]) 
-            let k=Int((j-1)/2)
-            s[0].copy(g[k]); s[1].copy(g[k]); s[1].conj()
-            p.usqr()
-            p.mul(s[Int(m&1)])
-        }
-        p.mul(c)  // apply correction 
-        p.reduce()
-        return p
-    }
-    
-*/    
-    
-    
-
 }

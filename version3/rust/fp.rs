@@ -24,9 +24,6 @@ use xxx::rom;
 use arch::Chunk;
 use arch;
 
-//#[cfg(D32)]
-//use arch::DChunk;
-
 #[derive(Copy, Clone)]
 pub struct FP {
  	pub x:BIG,
@@ -318,7 +315,6 @@ impl FP {
     /* this*=c mod Modulus, where c is a small int */
     pub fn imul(&mut self,c: isize) {
         let mut cc=c;
-    //    self.norm();
         let mut s=false;
         if cc<0 {
             cc = -cc;
@@ -345,9 +341,7 @@ impl FP {
 
 /* self*=self mod Modulus */
     pub fn sqr(&mut self) {
-    //    self.norm();
         if (self.xes as i64)*(self.xes as i64) > FEXCESS as i64 {self.reduce()}
-
 
         let mut d=BIG::sqr(&(self.x));
         self.x.copy(&FP::modulo(&mut d));
@@ -385,7 +379,6 @@ impl FP {
 
 /* self/=2 mod Modulus */
     pub fn div2(&mut self) {
-    //    self.x.norm();
         if self.x.parity()==0 {
         	self.x.fshr(1);
         } else {
@@ -560,24 +553,6 @@ impl FP {
         return r;
 }
 
-/* return self^e mod Modulus 
-    pub fn pow(&mut self,e: &mut BIG) -> FP {
-      	let p = BIG::new_ints(&rom::MODULUS);   	
-        let mut r=FP::new_int(1);
-        e.norm();
-        self.x.norm();
-		let mut m=FP::new_copy(self);
-        loop {
-            let bt=e.parity();
-            e.fshr(1);
-            if bt==1 {r.mul(&m)}
-            if e.iszilch() {break}
-            m.sqr();
-        }
-        r.x.rmod(&p);
-        return r;
-    } */
-
 /* return sqrt(this) mod Modulus */
     pub fn sqrt(&mut self) -> FP {
         self.reduce();
@@ -622,15 +597,4 @@ impl FP {
     }
 
 }
-/*
-fn main() {
-    let p = BIG::new_ints(&rom::MODULUS);  
-	let mut e = BIG::new_copy(&p);
-	e.dec(1);
 
-    let mut x = FP::new_int(3);
-    let mut s=x.pow(&mut e);
-
-    println!("s= {}",s.tostring());
-}
-*/

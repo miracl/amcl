@@ -38,10 +38,7 @@ public final class FP {
 	public static final int TBITS=MODBITS%BIG.BASEBITS; // Number of active bits in top word 
 	public static final int TMASK=((int)1<<TBITS)-1;
 
-
 	public final BIG x;
-	//public BIG p=new BIG(ROM.Modulus);
-	//public BIG r2modp=new BIG(ROM.R2modp);   /*** Change ***/
 	public int XES;
 
 /**************** 32-bit specific ************************/
@@ -328,20 +325,6 @@ public final class FP {
 			}
 		}
 				
-
-/*
-		if (c<=BIG.NEXCESS && XES*c<=FEXCESS)
-		{
-			x.imul(c);
-			XES*=c;
-			x.norm();
-		}
-		else
-		{
-			DBIG d=x.pxmul(c);
-			x.copy(mod(d));
-			XES=2;
-		} */
 		if (s) {neg(); norm();}
 	}
 
@@ -603,26 +586,6 @@ public final class FP {
 		return r;
 	}
 
-/* return this^e mod Modulus 
-	public FP pow(BIG e)
-	{
-		int bt;
-		FP r=new FP(1);
-		e.norm();
-		x.norm();
-		FP m=new FP(this);
-		while (true)
-		{
-			bt=e.parity();
-			e.fshr(1);
-			if (bt==1) r.mul(m);
-			if (e.iszilch()) break;
-			m.sqr();
-		}
-		r.x.mod(p);
-		return r;
-	} */
-
 /* return sqrt(this) mod Modulus */
 	public FP sqrt()
 	{
@@ -667,29 +630,5 @@ public final class FP {
 		BIG w=redc();
 		return w.jacobi(new BIG(ROM.Modulus));
 	}
-/*
-	public static void main(String[] args) {
-		BIG m=new BIG(ROM.Modulus);
-		BIG x=new BIG(3);
-		BIG e=new BIG(m);
-		e.dec(1);
 
-		System.out.println("m= "+m.nbits());	
-
-
-		BIG r=x.powmod(e,m);
-
-		System.out.println("m= "+m.toString());	
-		System.out.println("r= "+r.toString());	
-
-		BIG.cswap(m,r,0);
-
-		System.out.println("m= "+m.toString());	
-		System.out.println("r= "+r.toString());	
-
-//		FP y=new FP(3);
-//		FP s=y.pow(e);
-//		System.out.println("s= "+s.toString());	
-
-	} */
 }

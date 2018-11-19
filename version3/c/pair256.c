@@ -26,8 +26,6 @@ under the License.
 /* Line function */
 static void PAIR_ZZZ_line(FP48_YYY *v,ECP8_ZZZ *A,ECP8_ZZZ *B,FP_YYY *Qx,FP_YYY *Qy)
 {
-	//FP2_YYY t;
-
 	FP8_YYY X1,Y1,T1,T2;
 	FP8_YYY XX,YY,ZZ,YZ;
     FP16_YYY a,b,c;
@@ -51,11 +49,9 @@ static void PAIR_ZZZ_line(FP48_YYY *v,ECP8_ZZZ *A,ECP8_ZZZ *B,FP_YYY *Qx,FP_YYY 
 		FP8_YYY_norm(&YZ);			//YZ.norm();       //-4YZ
 
 		FP8_YYY_imul(&XX,&XX,6);					//6X^2
-		//FP2_YYY_from_FP(&t,Qx);
 		FP8_YYY_tmul(&XX,&XX,Qx);	               //6X^2.Xs
 
 		FP8_YYY_imul(&ZZ,&ZZ,3*CURVE_B_I_ZZZ);	//3Bz^2 
-		//FP2_YYY_from_FP(&t,Qy);
 		FP8_YYY_tmul(&YZ,&YZ,Qy);	//-4YZ.Ys
 
 #if SEXTIC_TWIST_ZZZ==D_TYPE
@@ -104,7 +100,6 @@ static void PAIR_ZZZ_line(FP48_YYY *v,ECP8_ZZZ *A,ECP8_ZZZ *B,FP_YYY *Qx,FP_YYY 
 		FP8_YYY_norm(&Y1);				//Y1.norm();  // Y1=Y1-Z1.Y2
 
 		FP8_YYY_copy(&T1,&X1);			//T1.copy(X1);            // T1=X1-Z1.X2
-		//FP2_YYY_from_FP(&t,Qy);
 		FP8_YYY_tmul(&X1,&X1,Qy);		//X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
 #if SEXTIC_TWIST_ZZZ==M_TYPE
 		FP8_YYY_times_i(&X1);
@@ -117,7 +112,6 @@ static void PAIR_ZZZ_line(FP48_YYY *v,ECP8_ZZZ *A,ECP8_ZZZ *B,FP_YYY *Qx,FP_YYY 
 		FP8_YYY_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());       // T2=(Y1-Z1.Y2).X2
 		FP8_YYY_sub(&T2,&T2,&T1);		//T2.sub(T1); 
 		FP8_YYY_norm(&T2);				//T2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
-		//FP2_YYY_from_FP(&t,Qx);
 		FP8_YYY_tmul(&Y1,&Y1,Qx);		//Y1.pmul(Qx);  
 		FP8_YYY_neg(&Y1,&Y1);			//Y1.neg(); 
 		FP8_YYY_norm(&Y1);				//Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
@@ -151,7 +145,6 @@ void PAIR_ZZZ_ate(FP48_YYY *r,ECP8_ZZZ *P1,ECP_ZZZ *Q1)
 
     BIG_XXX_copy(n,x);
 
-    //BIG_XXX_norm(n);
 	BIG_XXX_pmul(n3,n,3);
 	BIG_XXX_norm(n3);
 
@@ -179,22 +172,17 @@ void PAIR_ZZZ_ate(FP48_YYY *r,ECP8_ZZZ *P1,ECP_ZZZ *Q1)
 		FP48_YYY_sqr(r,r);
         PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
         FP48_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-//printf("r= "); FP48_YYY_output(r); printf("\n");
-//if (j>3) exit(0);
-		bt= BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i);  // BIG_XXX_bit(n,i); 
+
+		bt= BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i); 
         if (bt==1)
         {
-//printf("bt=1\n");
             PAIR_ZZZ_line(&lv,&A,&P,&Qx,&Qy);
             FP48_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
 		if (bt==-1)
 		{
-//printf("bt=-1\n");
-			//ECP8_ZZZ_neg(P);
             PAIR_ZZZ_line(&lv,&A,&NP,&Qx,&Qy);
             FP48_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			//ECP8_ZZZ_neg(P);
 		}
 
     }
@@ -218,7 +206,6 @@ void PAIR_ZZZ_double_ate(FP48_YYY *r,ECP8_ZZZ *P1,ECP_ZZZ *Q1,ECP8_ZZZ *R1,ECP_Z
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
     BIG_XXX_copy(n,x);
 
-    //BIG_XXX_norm(n);
 	BIG_XXX_pmul(n3,n,3);
 	BIG_XXX_norm(n3);
 
@@ -259,7 +246,7 @@ void PAIR_ZZZ_double_ate(FP48_YYY *r,ECP8_ZZZ *P1,ECP_ZZZ *Q1,ECP8_ZZZ *R1,ECP_Z
         PAIR_ZZZ_line(&lv,&B,&B,&Sx,&Sy);
         FP48_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
-		bt=BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i); // bt=BIG_XXX_bit(n,i);
+		bt=BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i); 
         if (bt==1)
         {
             PAIR_ZZZ_line(&lv,&A,&P,&Qx,&Qy);
@@ -270,18 +257,12 @@ void PAIR_ZZZ_double_ate(FP48_YYY *r,ECP8_ZZZ *P1,ECP_ZZZ *Q1,ECP8_ZZZ *R1,ECP_Z
         }
 		if (bt==-1)
 		{
-			//ECP8_ZZZ_neg(P); 
             PAIR_ZZZ_line(&lv,&A,&NP,&Qx,&Qy);
             FP48_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			//ECP8_ZZZ_neg(P); 
-			//ECP8_ZZZ_neg(R);
             PAIR_ZZZ_line(&lv,&B,&NR,&Sx,&Sy);
             FP48_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			//ECP8_ZZZ_neg(R);
 		}
 	}
-
-
 
 #if SIGN_OF_X_ZZZ==NEGATIVEX
     FP48_YYY_conj(r,r);
@@ -314,42 +295,6 @@ void PAIR_ZZZ_fexp(FP48_YYY *r)
     FP48_YYY_frob(r,&X,8);
 
     FP48_YYY_mul(r,&t7);
-
-// Ghamman & Fouotsa Method for hard part of fexp - r^e1 . r^p^e2 . r^p^2^e3 ..
-
-// e0 = u^17 - 2*u^16 + u^15 - u^9 + 2*u^8 - u^7 + 3	// .p^0
-// e1 = u^16 - 2*u^15 + u^14 - u^8 + 2*u^7 - u^6		// .p^1
-// e2 = u^15 - 2*u^14 + u^13 - u^7 + 2*u^6 - u^5
-// e3 = u^14 - 2*u^13 + u^12 - u^6 + 2*u^5 - u^4
-// e4 = u^13 - 2*u^12 + u^11 - u^5 + 2*u^4 - u^3
-// e5 = u^12 - 2*u^11 + u^10 - u^4 + 2*u^3 - u^2
-// e6 = u^11 - 2*u^10 + u^9 - u^3 + 2*u^2 - u
-// e7 =  u^10 - 2*u^9 + u^8 - u^2 + 2*u - 1
-// e8 =  u^9 - 2*u^8 + u^7
-// e9 =  u^8 - 2*u^7 + u^6
-// e10 = u^7 - 2*u^6 + u^5
-// e11 = u^6 - 2*u^5 + u^4
-// e12 = u^5 - 2*u^4 + u^3
-// e13 = u^4 - 2*u^3 + u^2
-// e14 = u^3 - 2*u^2 + u
-// e15 = u^2 - 2*u + 1
-
-// e15 = u^2-2*u+1
-// e14 = u.e15
-// e13 = u.e14
-// e12 = u.e13
-// e11 = u.e12
-// e10 = u.e11
-// e9 =  u.e10
-// e8 =  u.e9
-// e7 =  u.e8 - e15
-// e6 =  u.e7
-// e5 =  u.e6
-// e4 =  u.e5
-// e3 =  u.e4
-// e2 =  u.e3
-// e1 =  u.e2
-// e0 =  u.e1 + 3
 
 // f^e0.f^e1^p.f^e2^p^2.. .. f^e14^p^14.f^e15^p^15
 
@@ -572,7 +517,6 @@ void PAIR_ZZZ_G1mul(ECP_ZZZ *P,BIG_XXX e)
     BIG_XXX_rcopy(q,CURVE_Order_ZZZ);
     glv(u,e);
 
-    //ECP_ZZZ_affine(P);
     ECP_ZZZ_copy(&Q,P); ECP_ZZZ_affine(&Q);
     FP_YYY_rcopy(&cru,CURVE_Cru_ZZZ);
     FP_YYY_mul(&(Q.x),&(Q.x),&cru);
@@ -619,8 +563,6 @@ void PAIR_ZZZ_G2mul(ECP8_ZZZ *P,BIG_XXX e)
     BIG_XXX_rcopy(y,CURVE_Order_ZZZ);
     gs(u,e);
 
-    //ECP8_ZZZ_affine(P);
-
     ECP8_ZZZ_copy(&Q[0],P);
     for (i=1; i<16; i++)
     {
@@ -639,7 +581,6 @@ void PAIR_ZZZ_G2mul(ECP8_ZZZ *P,BIG_XXX e)
             ECP8_ZZZ_neg(&Q[i]);
         }
         BIG_XXX_norm(u[i]);  
-		//ECP8_ZZZ_affine(&Q[i]);
     }
 
     ECP8_ZZZ_mul16(P,Q,u);
@@ -693,47 +634,6 @@ void PAIR_ZZZ_GTpow(FP48_YYY *f,BIG_XXX e)
 #endif
 }
 
-/* test group membership test - no longer needed */
-/* with GT-Strong curve, now only check that m!=1, conj(m)*m==1, and m.m^{p^4}=m^{p^2} */
-
-/*
-int PAIR_ZZZ_GTmember(FP48_YYY *m)
-{
-	BIG_XXX a,b;
-	FP2_YYY X;
-	FP48_YYY r,w;
-	if (FP48_YYY_isunity(m)) return 0;
-	FP48_YYY_conj(&r,m);
-	FP48_YYY_mul(&r,m);
-	if (!FP48_YYY_isunity(&r)) return 0;
-
-	BIG_XXX_rcopy(a,CURVE_Fra);
-	BIG_XXX_rcopy(b,CURVE_Frb);
-	FP2_YYY_from_BIG_XXXs(&X,a,b);
-
-
-	FP48_YYY_copy(&r,m); FP48_YYY_frob(&r,&X); FP48_YYY_frob(&r,&X);
-	FP48_YYY_copy(&w,&r); FP48_YYY_frob(&w,&X); FP48_YYY_frob(&w,&X);
-	FP48_YYY_mul(&w,m);
-
-
-#ifndef GT_STRONG
-	if (!FP48_YYY_equals(&w,&r)) return 0;
-
-	BIG_XXX_rcopy(a,CURVE_Bnx);
-
-	FP48_YYY_copy(&r,m); FP48_YYY_pow(&w,&r,a); FP48_YYY_pow(&w,&w,a);
-	FP48_YYY_sqr(&r,&w); FP48_YYY_mul(&r,&w); FP48_YYY_sqr(&r,&r);
-
-	FP48_YYY_copy(&w,m); FP48_YYY_frob(&w,&X);
- #endif
-
-	return FP48_YYY_equals(&w,&r);
-}
-
-*/
-
-
 #ifdef HAS_MAIN
 
 using namespace std;
@@ -784,9 +684,6 @@ int main()
     BIG_rcopy(b,Frb);
     FP2_from_BIGs(&f,a,b);
 
-
-//exit(0);
-
     PAIR_ZZZ_ate(&g,&P,&Q);
 
 	printf("gb= ");
@@ -797,12 +694,6 @@ int main()
     printf("g= ");
     FP48_output(&g);
     printf("\n");
-
-	//FP48_pow(&g,&g,r);
-
-   // printf("g^r= ");
-    //FP48_output(&g);
-    //printf("\n");
 
 	ECP_ZZZ_copy(&R,&Q);
 	ECP8_copy(&G,&P);
@@ -832,7 +723,6 @@ int main()
 	PAIR_ZZZ_G2mul(&P,r);
 	printf("rP= ");ECP8_output(&P); printf("\n");
 
-	//FP48_pow(&g,&g,r);
 	PAIR_ZZZ_GTpow(&g,r);
 	printf("g^r= ");FP48_output(&g); printf("\n");
 
@@ -851,14 +741,6 @@ int main()
 
 	printf("t(g)= "); FP16_output(&t); printf("\n");
 
-//    PAIR_ZZZ_ate(&g,&P,&R);
-//    PAIR_ZZZ_fexp(&g);
-
-//    printf("g= ");
-//    FP48_output(&g);
-//    printf("\n");
-
-//	PAIR_ZZZ_GTpow(&g,xa);
 }
 
 #endif

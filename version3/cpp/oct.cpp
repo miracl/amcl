@@ -51,7 +51,6 @@ void amcl::OCT_output_string(octet *w)
         ch=w->val[i];
         printf("%c",ch);
     }
-    /*  printf("\n"); */
 }
 
 /* Convert C string to octet format - truncates if no room  */
@@ -269,7 +268,6 @@ void amcl::OCT_frombase64(octet *w,char *b)
 {
     int i,j,k,pads,len=(int)strlen(b);
     int c,ch[4],ptr[3];
-    /* int lead=1; */
     j=k=0;
     while (j<len && k<w->max)
     {
@@ -296,9 +294,7 @@ void amcl::OCT_frombase64(octet *w,char *b)
         for (i=0; i<3-pads && k<w->max; i++)
         {
             /* don't put in leading zeros */
-            /* if (lead && ptr[i]==0) continue; */
             w->val[k++]=ptr[i];
-            /* lead=0; */
         }
 
     }
@@ -404,28 +400,3 @@ void amcl::OCT_toStr(octet *src,char *dst)
         sprintf(&dst[i],"%c", ch);
     }
 }
-
-/* Test program
-#include <stdio.h>
-#include "amcl.h"
-
-char test[]="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-
-int main()
-{
-	char gm[100],gn[100],t[100];
-    octet m={0,sizeof(gm),gm};
-    octet n={0,sizeof(gn),gn};
-
-	OCT_jbytes(&m,test,strlen(test));
-	OCT_output(&m);
-
-	OCT_tobase64(t,&m);
-	printf(t); printf("\n");
-
-	OCT_frombase64(&n,t);
-	OCT_output(&n);
-
-    return 0;
-}
-*/

@@ -105,15 +105,6 @@ void BIG_XXX_invmod2m(BIG_XXX a)
     BIG_XXX_mod2m(a,BIGBITS_XXX);
 }
 
-/*
-void FF_rcopy(BIG x[],const BIG y[],int n)
-{
-	int i;
-	for (i=0;i<n;i++)
-		BIG_rcopy(x[i],y[i]);
-}
-*/
-
 /* x=y */
 void FF_WWW_copy(BIG_XXX x[],BIG_XXX y[],int n)
 {
@@ -254,16 +245,6 @@ static void FF_WWW_rinc(BIG_XXX z[],int zp,BIG_XXX y[],int yp,int n)
     for (i=0; i<n; i++)
         BIG_XXX_add(z[zp+i],z[zp+i],y[yp+i]);
 }
-
-/* recursive sub */
-/*
-static void FF_rsub(BIG z[],int zp,BIG x[],int xp,BIG y[],int yp,int n)
-{
-	int i;
-	for (i=0;i<n;i++)
-		BIG_sub(z[zp+i],x[xp+i],y[yp+i]);
-}
-*/
 
 /* recursive dec */
 static void FF_WWW_rdec(BIG_XXX z[],int zp,BIG_XXX y[],int yp,int n)
@@ -509,8 +490,6 @@ void FF_WWW_mul(BIG_XXX z[],BIG_XXX x[],BIG_XXX y[],int n)
 #else
     BIG_XXX t[2*n];
 #endif
-//	FF_norm(x,n); /* change here */
-//	FF_norm(y,n); /* change here */
     FF_WWW_karmul(z,0,x,0,y,0,t,0,n);
 }
 
@@ -522,8 +501,6 @@ static void FF_WWW_lmul(BIG_XXX z[],BIG_XXX x[],BIG_XXX y[],int n)
 #else
     BIG_XXX t[2*n];
 #endif
-//	FF_norm(x,n); /* change here */
-//	FF_norm(y,n); /* change here */
     FF_WWW_karmul_lower(z,0,x,0,y,0,t,0,n);
 }
 
@@ -562,7 +539,6 @@ void FF_WWW_sqr(BIG_XXX z[],BIG_XXX x[],int n)
 #else
     BIG_XXX t[2*n];
 #endif
-//	FF_norm(x,n); /* change here */
     FF_WWW_karsqr(z,0,x,0,t,0,n);
 }
 
@@ -578,10 +554,8 @@ static void FF_WWW_reduce(BIG_XXX r[],BIG_XXX T[],BIG_XXX N[],BIG_XXX ND[],int n
     BIG_XXX m[n];
 #endif
     FF_WWW_sducopy(r,T,n);  /* keep top half of T */
-    //FF_norm(T,n); /* change here */
     FF_WWW_karmul_lower(m,0,T,0,ND,0,t,0,n);  /* m=T.(1/N) mod R */
 
-    //FF_norm(N,n);  /* change here */
     FF_WWW_karmul_upper(T,N,m,t,n);  /* T=mN */
     FF_WWW_sducopy(m,T,n);
 
@@ -1055,7 +1029,6 @@ int FF_WWW_cfactor(BIG_XXX w[],sign32 s,int n)
     FF_WWW_copy(x,w,n);
     FF_WWW_norm(x,n);
 
-//	if (FF_parity(x)==0) return 1;
     do
     {
         FF_WWW_sub(x,x,y,n);
@@ -1121,35 +1094,3 @@ int FF_WWW_prime(BIG_XXX p[],csprng *rng,int n)
 
     return 1;
 }
-
-/*
-BIG P[4]= {{0x1670957,0x1568CD3C,0x2595E5,0xEED4F38,0x1FC9A971,0x14EF7E62,0xA503883,0x9E1E05E,0xBF59E3},{0x1844C908,0x1B44A798,0x3A0B1E7,0xD1B5B4E,0x1836046F,0x87E94F9,0x1D34C537,0xF7183B0,0x46D07},{0x17813331,0x19E28A90,0x1473A4D6,0x1CACD01F,0x1EEA8838,0xAF2AE29,0x1F85292A,0x1632585E,0xD945E5},{0x919F5EF,0x1567B39F,0x19F6AD11,0x16CE47CF,0x9B36EB1,0x35B7D3,0x483B28C,0xCBEFA27,0xB5FC21}};
-
-int main()
-{
-	int i;
-	BIG p[4],e[4],x[4],r[4];
-	csprng rng;
-	char raw[100];
-	for (i=0;i<100;i++) raw[i]=i;
-    RAND_seed(&rng,100,raw);
-
-
-	FF_init(x,3,4);
-
-	FF_copy(p,P,4);
-	FF_copy(e,p,4);
-	FF_dec(e,1,4);
-	FF_norm(e,4);
-
-
-
-	printf("p= ");FF_output(p,4); printf("\n");
-	if (FF_prime(p,&rng,4)) printf("p is a prime\n");
-	printf("e= ");FF_output(e,4); printf("\n");
-
-	FF_skpow(r,x,e,p,4);
-	printf("r= ");FF_output(r,4); printf("\n");
-}
-
-*/

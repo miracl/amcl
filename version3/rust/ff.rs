@@ -18,13 +18,11 @@ under the License.
 */
 
 use xxx::big;
-//use WWW::big::{BIG::muladd};
 use xxx::dbig::DBIG;
 use xxx::big::BIG;
 use arch::Chunk;
 use rand::RAND;
 
-//#[cfg(D32)]
 use arch::DChunk;
 
 /* Finite field support - for RSA, DH etc. */
@@ -41,13 +39,10 @@ pub const P_FEXCESS: Chunk=(1<<(big::BASEBITS*big::NLEN-P_MBITS-1));
 pub const P_TBITS: usize=(P_MBITS%big::BASEBITS);
 
 
-//#[derive(Copy, Clone)]
 pub struct FF {
 	v:Vec<BIG>,
 	length:usize
 }
-
-//static mut debug:bool=false;
 
 impl FF { 
 
@@ -56,8 +51,6 @@ impl FF {
         return ((a.w[big::NLEN-1]&P_OMASK)>>(P_TBITS))+1;
     }
 
-
-//#[cfg(D32)]
     pub fn pexceed(a: &BIG,b: &BIG) -> bool {
         let ea=FF::excess(a);
         let eb=FF::excess(b);
@@ -65,28 +58,11 @@ impl FF {
         return false;
     }
 
-//#[cfg(D32)]
     pub fn sexceed(a: &BIG) -> bool {
         let ea=FF::excess(a);
         if ((ea+1) as DChunk)*((ea+1) as DChunk) > P_FEXCESS as DChunk {return true}
         return false;
     }
-/*
-#[cfg(D64)]
-    pub fn pexceed(a: &BIG,b: &BIG) -> bool {
-        let ea=FF::excess(a);
-        let eb=FF::excess(b);
-        if (ea+1) > P_FEXCESS/(eb+1) {return true}
-        return false;
-    }
-
-#[cfg(D64)]
-    pub fn sexceed(a: &BIG) -> bool {
-        let ea=FF::excess(a);
-        if (ea+1) > P_FEXCESS/(ea+1) {return true}
-        return false;
-    }    
-*/
 
 /* Constructors */
 	pub fn new_int(n:usize) -> FF {
@@ -97,16 +73,7 @@ impl FF {
 		f.length=n;
 		return f;
 	}
-/*
-	pub fn new_ints(x: &[&[i32];big::NLEN],n: usize) -> FF {
-		let mut f=FF{v:Vec::new(),length:0};
-		for i in 0..n {
-			f.v.push(BIG::new_ints(x[i]));
-		}
-		f.length=n;
-		return f;
-	}
-*/
+
 	pub fn zero(&mut self) {
 		for i in 0..self.length {
 			self.v[i].zero();
@@ -281,7 +248,7 @@ impl FF {
 		for i in 0..nn-1 {
 			carry=self.v[vp+i].norm();
 			self.v[vp+i].xortop(carry<<P_TBITS);
-			self.v[vp+i+1].w[0]+=carry; //incl(carry);
+			self.v[vp+i+1].w[0]+=carry; 
 		}
 		carry=self.v[vp+nn-1].norm();
 		if trunc {
@@ -342,23 +309,6 @@ impl FF {
 		}
 		return s;
 	}
-
-/* Convert to Hex String 
-	pub fn tostr(&mut self,n:usize) -> String {
-		let mut t=FF::new_int(n);
-		for i in 0..n {
-			t.v[i].copy(&self.v[i]);
-		}
-		t.norm();
-		let mut s = String::new();
-		let mut i:usize=t.length-1;
-		loop {
-			s=s+t.v[i].tostring().as_ref();
-			if i==0 {break}
-			i-=1;
-		}
-		return s;
-	}*/
 
 /* Convert FFs to/from byte arrays */
 	pub fn tobytes(&mut self,b: &mut [u8]) {
@@ -481,7 +431,6 @@ impl FF {
 		let n=x.length;
 		let mut z=FF::new_int(2*n);
 		let mut t=FF::new_int(2*n);
-	//	x.norm(); y.norm();
 		z.karmul(0,&x,0,&y,0,&mut t,0,n);
 		return z;
 	}
@@ -490,8 +439,7 @@ impl FF {
 	pub fn lmul(&mut self,y: &FF) {
 		let n=self.length;
 		let mut t=FF::new_int(2*n);
-		let mut x=FF::new_int(n); x.copy(&self);
-	//	x.norm(); y.norm();		
+		let mut x=FF::new_int(n); x.copy(&self);	
 		self.karmul_lower(0,&x,0,&y,0,&mut t,0,n);
 	}
 
@@ -525,7 +473,6 @@ impl FF {
 		let n=x.length;
 		let mut z=FF::new_int(2*n);
 		let mut t=FF::new_int(2*n);
-	//	x.norm();
 		z.karsqr(0,&x,0,&mut t,0,n);
 		return z;
 	}
@@ -1004,15 +951,4 @@ impl FF {
 	}
 
 }
-/*
-fn main()
-{
-	let mut x=FF::new_int(4);
-	let mut y=FF::new_int(4);
 
-	x.one(); y.one();
-	let mut z=FF::mul(&mut x,&mut y);
-
-	println!("z= {}",z.tostring());
-}
-*/

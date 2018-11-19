@@ -34,7 +34,6 @@ const DNLEN int=2*NLEN
 const BMASK Chunk= ((Chunk(1)<<BASEBITS)-1)
 const HBITS uint=(BASEBITS/2)
 const HMASK Chunk= ((Chunk(1)<<HBITS)-1)
-//const NEXCESS int=4
 const NEXCESS int=(1<<(uint(CHUNK)-BASEBITS-1));
 
 const BIGBITS int=int(MODBYTES*8)
@@ -147,7 +146,6 @@ func monty(m* BIG, mc Chunk,d* DBIG) *BIG {
 		b.w[k-NLEN]=Chunk(t)&BMASK; c=(t>>BASEBITS)+DChunk(d.w[k+1]); s-=dd[k-NLEN+1]
 	}
 	b.w[NLEN-1]=Chunk(c)&BMASK;	
-//	b.norm()
 	return b
 }
 
@@ -515,7 +513,6 @@ func smul(a *BIG,b *BIG) *BIG {
 		for j:=0;j<NLEN;j++ {
 			if i+j<NLEN {
 				carry,c.w[i+j]=muladd(a.w[i],b.w[j],carry,c.w[i+j])
-				//carry=c.muladd(a.w[i],b.w[j],carry,i+j)
 			}
 		}
 	}
@@ -604,22 +601,17 @@ func (r *BIG) Mod(m1 *BIG) {
 
 	for Comp(r,m)>=0 {
 		m.fshl(1)
-		k++;
+		k++
 	}
 
 	for k>0 {
-		m.fshr(1);
+		m.fshr(1)
 
-			sr.copy(r)
-			sr.sub(m)
-			sr.norm()
-			r.cmove(sr,int(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1)));
-/*
-		if Comp(r,m)>=0 {
-			r.sub(m)
-			r.norm()
-		} */
-		k--;
+		sr.copy(r)
+		sr.sub(m)
+		sr.norm()
+		r.cmove(sr,int(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1)))
+		k--
 	}
 }
 
@@ -644,22 +636,15 @@ func (r *BIG) div(m1 *BIG) {
 		m.fshr(1)
 		e.fshr(1)
 
-		sr.copy(b);
-		sr.sub(m);
-		sr.norm();
-		d=int(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1));
-		b.cmove(sr,d);
-		sr.copy(r);
-		sr.add(e);
-		sr.norm();
-		r.cmove(sr,d);
-/*
-		if Comp(b,m)>=0 {
-			r.add(e)
-			r.norm()
-			b.sub(m)
-			b.norm()
-		} */
+		sr.copy(b)
+		sr.sub(m)
+		sr.norm()
+		d=int(1-((sr.w[NLEN-1]>>uint(CHUNK-1))&1))
+		b.cmove(sr,d)
+		sr.copy(r)
+		sr.add(e)
+		sr.norm()
+		r.cmove(sr,d)
 		k--
 	}
 }
@@ -676,7 +661,7 @@ func random(rng *amcl.RAND) *BIG {
 		} else {r>>=1}
 
 		b:=Chunk(int(r&1))
-		m.shl(1); m.w[0]+=b// m.inc(b)
+		m.shl(1); m.w[0]+=b
 		j++; j&=7; 
 	}
 	return m;
@@ -693,53 +678,12 @@ func Randomnum(q *BIG,rng *amcl.RAND) *BIG {
 		} else {r>>=1}
 
 		b:=Chunk(int(r&1))
-		d.shl(1); d.w[0]+=b// m.inc(b);
+		d.shl(1); d.w[0]+=b
 		j++; j&=7 
 	}
 	m:=d.mod(q)
 	return m;
 }
-
-
-/* return NAF value as +/- 1, 3 or 5. x and x3 should be normed. 
-nbs is number of bits processed, and nzs is number of trailing 0s detected */
-/*
-func nafbits(x *BIG,x3 *BIG ,i int) [3]int {
-	var n [3]int
-	var j int
-	nb:=x3.bit(i)-x.bit(i)
-
-
-	n[1]=1
-	n[0]=0
-	if nb==0 {n[0]=0; return n}
-	if i==0 {n[0]=nb; return n}
-	if nb>0 {
-		n[0]=1;
-	} else  {n[0]=(-1)}
-
-	for j=i-1;j>0;j-- {
-		n[1]++
-		n[0]*=2
-		nb=x3.bit(j)-x.bit(j)
-		if nb>0 {n[0]+=1}
-		if nb<0 {n[0]-=1}
-		if (n[0]>5 || n[0] < -5) {break}
-	}
-
-	if n[0]%2!=0 && j!=0 { // backtrack 
-		if nb>0 {n[0]=(n[0]-1)/2}
-		if nb<0 {n[0]=(n[0]+1)/2}
-		n[1]--
-	}
-	for n[0]%2==0 { // remove trailing zeros 
-		n[0]/=2
-		n[2]++
-		n[1]--
-	}
-	return n;
-}
-*/
 
 /* return a*b mod m */
 func Modmul(a1,b1,m *BIG) *BIG {
@@ -942,20 +886,3 @@ func ssn(r *BIG,a *BIG,m *BIG) int {
 	return int((r.w[n]>>uint(CHUNK-1))&1)
 }
 
-/*
-func main() {
-	a := NewBIGint(3)
-	m := NewBIGints(Modulus)
-
-	fmt.Printf("Modulus= "+m.ToString())
-	fmt.Printf("\n")
-
-
-	e := NewBIGcopy(m);
-	e.dec(1); e.norm();
-	fmt.Printf("Exponent= "+e.ToString())
-	fmt.Printf("\n")
-	a=a.Powmod(e,m);
-	fmt.Printf("Result= "+a.ToString())
-}
-*/

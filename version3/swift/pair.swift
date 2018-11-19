@@ -184,10 +184,8 @@ public struct PAIR {
 		      r.smul(lv,ECP.SEXTIC_TWIST)
             }
             if bt == -1 {
-                //P.neg()
                 lv=lineadd(&A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-                //P.neg()
             }
         }
     
@@ -199,7 +197,6 @@ public struct PAIR {
 
 	   if ECP.CURVE_PAIRING_TYPE == ECP.BN {
             if ECP.SIGN_OF_X == ECP.NEGATIVEX {
-                //r.conj()
                 A.neg()
             }           
             K.copy(P)
@@ -269,7 +266,6 @@ public struct PAIR {
         let nb=n3.nbits()
     
         for i in (1...nb-2).reversed()
-        //for var i=nb-2;i>=1;i--
         {
             r.sqr()            
             lv=linedbl(&A,Qx,Qy)
@@ -286,14 +282,10 @@ public struct PAIR {
             }
 
             if bt == -1 {
-                //P.neg(); 
                 lv=lineadd(&A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-		//P.neg(); 
-		//R.neg()
                 lv=lineadd(&B,NR,Sx,Sy)
-                r.smul(lv,ECP.SEXTIC_TWIST)
-                //R.neg()                
+                r.smul(lv,ECP.SEXTIC_TWIST)              
             }            
 
         }
@@ -306,7 +298,6 @@ public struct PAIR {
 
 	   if ECP.CURVE_PAIRING_TYPE == ECP.BN {
             if ECP.SIGN_OF_X == ECP.NEGATIVEX {
-                //r.conj()
                 A.neg()                
                 B.neg()
             }
@@ -412,7 +403,7 @@ public struct PAIR {
 		lv.frob(f); lv.frob(f)
 		x1.mul(lv)
 
-		r.copy(r.pow(x))  //r=r.pow(x);
+		r.copy(r.pow(x)) 
         if ECP.SIGN_OF_X == ECP.NEGATIVEX {
             r.conj()
         }          
@@ -568,7 +559,6 @@ public struct PAIR {
         var R:ECP
         if (ROM.USE_GLV)
         {
-            //P.affine()
             R=ECP()
             R.copy(P)
             var Q=ECP()
@@ -624,7 +614,6 @@ public struct PAIR {
             }
 
             var t=BIG(0)
-            //P.affine()
             Q.append(ECP2())
             Q[0].copy(P);
             for i in 1 ..< 4
@@ -693,32 +682,5 @@ public struct PAIR {
         }
         return r
     }
-    // test group membership - no longer needed
-    // with GT-Strong curve, now only check that m!=1, conj(m)*m==1, and m.m^{p^4}=m^{p^2}
-/*
-    static func GTmember(m:FP12) -> Bool
-    {
-        if m.isunity() {return false}
-        let r=FP12(m)
-        r.conj()
-        r.mul(m)
-        if !r.isunity() {return false}
-    
-        let f=FP2(BIG(ROM.Fra),BIG(ROM.Frb))
-    
-        r.copy(m); r.frob(f); r.frob(f)
-        var w=FP12(r); w.frob(f); w.frob(f)
-        w.mul(m)
-        if !ROM.GT_STRONG
-        {
-            if !w.equals(r) {return false}
-            let x=BIG(ROM.CURVE_Bnx)
-            r.copy(m); w=r.pow(x); w=w.pow(x)
-            r.copy(w); r.sqr(); r.mul(w); r.sqr()
-            w.copy(m); w.frob(f)
-        }
-        return w.equals(r)
-    }
-*/   
 }
 

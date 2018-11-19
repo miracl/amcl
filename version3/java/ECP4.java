@@ -25,11 +25,9 @@ public final class ECP4 {
 	private FP4 x;
 	private FP4 y;
 	private FP4 z;
-//	private boolean INF;
 
 /* Constructor - set this=O */
 	public ECP4() {
-//		INF=true;
 		x=new FP4(0);
 		y=new FP4(1);
 		z=new FP4(0);
@@ -43,7 +41,6 @@ public final class ECP4 {
 
 /* Test this=O? */
 	public boolean is_infinity() {
-//		if (INF) return true;                    //******
 		return (x.iszilch() && z.iszilch());
 	}
 /* copy this=P */
@@ -52,11 +49,9 @@ public final class ECP4 {
 		x.copy(P.x);
 		y.copy(P.y);
 		z.copy(P.z);
-//		INF=P.INF;
 	}
 /* set this=O */
 	public void inf() {
-//		INF=true;
 		x.zero();
 		y.one();
 		z.zero();
@@ -68,11 +63,6 @@ public final class ECP4 {
 		x.cmove(Q.x,d);
 		y.cmove(Q.y,d);
 		z.cmove(Q.z,d);
-
-//		boolean bd;
-//		if (d==0) bd=false;
-//		else bd=true;
-//		INF^=(INF^Q.INF)&bd;
 	}
 
 /* return 1 if b==c, no branching */
@@ -108,9 +98,6 @@ public final class ECP4 {
 
 /* Test if P == Q */
 	public boolean equals(ECP4 Q) {
-//		if (is_infinity() && Q.is_infinity()) return true;
-//		if (is_infinity() || Q.is_infinity()) return false;
-
 
 		FP4 a=new FP4(x);                            // *****
 		FP4 b=new FP4(Q.x);
@@ -183,7 +170,6 @@ public final class ECP4 {
 	{
 		byte[] t=new byte[BIG.MODBYTES];
 		ECP4 W=new ECP4(this);
-		//affine();
 		int MB=BIG.MODBYTES;
 
 		W.x.geta().getA().toBytes(t);
@@ -212,7 +198,6 @@ public final class ECP4 {
 		for (int i=0;i<MB;i++) 
 			b[i+7*MB]=t[i];
 
-	
 	}
 
 /* convert from byte array to point */
@@ -268,7 +253,6 @@ public final class ECP4 {
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 	public static FP4 RHS(FP4 x) {
-		//x.norm();
 		FP4 r=new FP4(x);
 		r.sqr();
 		FP4 b=new FP4(new FP2(new BIG(ROM.CURVE_B)));
@@ -281,7 +265,6 @@ public final class ECP4 {
 		{
 			b.times_i();
 		}
-
 
 		r.mul(x);
 		r.add(b);
@@ -300,8 +283,6 @@ public final class ECP4 {
 		FP4 y2=new FP4(y);
 		y2.sqr();
 		if (!y2.equals(rhs)) inf();
-		//if (y2.equals(rhs)) INF=false;
-		//else {x.zero();INF=true;}
 	}
 
 /* construct this from x - but set to O if not on curve */
@@ -314,19 +295,17 @@ public final class ECP4 {
 		if (rhs.sqrt()) 
 		{
 			y.copy(rhs);
-			//INF=false;
 		}
-		else {inf(); /*x.zero();INF=true;*/}
+		else {inf(); }
 	}
 
 /* this+=this */
-	public int dbl() {
-//		if (INF) return -1;      
+	public int dbl() {    
 
 		FP4 iy=new FP4(y);
 		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
 		{
-			iy.times_i(); //iy.norm();
+			iy.times_i(); 
 		}
 		FP4 t0=new FP4(y);                  //***** Change 
 		t0.sqr();            
@@ -373,12 +352,6 @@ public final class ECP4 {
 
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
 	public int add(ECP4 Q) {
-//		if (INF)
-//		{
-//			copy(Q);
-//			return -1;
-//		}
-//		if (Q.INF) return -1;
 
 		int b=3*ROM.CURVE_B_I;
 		FP4 t0=new FP4(x);
@@ -398,7 +371,7 @@ public final class ECP4 {
 		t3.sub(t4); t3.norm(); 
 		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
 		{		
-			t3.times_i();  //t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+			t3.times_i();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 		}
 		t4.copy(y);                    
 		t4.add(z); t4.norm();			//t4=Y1+Z1
@@ -412,7 +385,7 @@ public final class ECP4 {
 		t4.sub(x3); t4.norm(); 
 		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
 		{	
-			t4.times_i(); //t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+			t4.times_i();           //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 		}
 		x3.copy(x); x3.add(z); x3.norm();	// x3=X1+Z1
 		FP4 y3=new FP4(Q.x);				
@@ -424,8 +397,8 @@ public final class ECP4 {
 
 		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
 		{
-			t0.times_i(); //t0.norm(); // x.Q.x
-			t1.times_i(); //t1.norm(); // y.Q.y
+			t0.times_i(); // x.Q.x
+			t1.times_i(); // y.Q.y
 		}
 		x3.copy(t0); x3.add(t0); 
 		t0.add(x3); t0.norm();
@@ -440,7 +413,6 @@ public final class ECP4 {
 		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
 		{
 			y3.times_i(); 
-			//y3.norm();
 		}
 		x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2);
 		y3.mul(t0); t1.mul(z3); y3.add(t1);
@@ -459,9 +431,6 @@ public final class ECP4 {
 		NQ.neg();
 		int D=add(NQ);
 
-		//Q.neg();
-		//int D=add(Q);
-		//Q.neg();
 		return D;
 	}
 
@@ -492,7 +461,6 @@ public final class ECP4 {
 /* set this*=q, where q is Modulus, using Frobenius */
 	public void frob(FP2 F[],int n)
 	{
-//		if (INF) return;
 		for (int i=0;i<n;i++) {
 			x.frob(F[2]);
 			x.pmul(F[0]);
@@ -519,8 +487,6 @@ public final class ECP4 {
 		byte[] w=new byte[1+(BIG.NLEN*BIG.BASEBITS+3)/4];
 
 		if (is_infinity()) return new ECP4();
-
-		//affine();
 
 /* precompute table */
 		Q.copy(this);

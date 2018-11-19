@@ -43,7 +43,6 @@ public final class FP48 {
 	}
 /* test x==0 ? */
 	public boolean iszilch() {
-		//reduce();
 		return (a.iszilch() && b.iszilch() && c.iszilch());
 	}
 
@@ -273,7 +272,6 @@ public final class FP48 {
 		t1.copy(z2); t1.neg();
 
 		z1.add(t0);
-		//z1.norm();
 		b.copy(z1); b.add(t1);
 
 		z3.add(t1);
@@ -359,7 +357,7 @@ public final class FP48 {
 			t0.copy(b); t0.add(c);
 			t0.norm();
 
-			z3.copy(t0); //z3.mul(y.c);
+			z3.copy(t0); 
 			z3.pmul(y.c.getb());
 			z3.times_i();
 
@@ -404,7 +402,7 @@ public final class FP48 {
 		FP16 f2=new FP16(a);
 		FP16 f3=new FP16(0);
 
-		norm();
+		//norm();
 		f0.sqr();
 		f1.mul(c);
 		f1.times_i();

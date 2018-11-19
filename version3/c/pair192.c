@@ -148,7 +148,6 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P1,ECP_ZZZ *Q1)
 
     BIG_XXX_copy(n,x);
 
-    //BIG_XXX_norm(n);
 	BIG_XXX_pmul(n3,n,3);
 	BIG_XXX_norm(n3);
 
@@ -176,22 +175,17 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P1,ECP_ZZZ *Q1)
 		FP24_YYY_sqr(r,r);
         PAIR_ZZZ_line(&lv,&A,&A,&Qx,&Qy);
         FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-//printf("r= "); FP24_YYY_output(r); printf("\n");
-//if (j>3) exit(0);
-		bt= BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i);  // BIG_XXX_bit(n,i); 
+
+		bt= BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i);  
         if (bt==1)
         {
-//printf("bt=1\n");
             PAIR_ZZZ_line(&lv,&A,&P,&Qx,&Qy);
             FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
 		if (bt==-1)
 		{
-//printf("bt=-1\n");
-			//ECP4_ZZZ_neg(P);
             PAIR_ZZZ_line(&lv,&A,&NP,&Qx,&Qy);
             FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			//ECP4_ZZZ_neg(P);
 		}
 
     }
@@ -215,7 +209,6 @@ void PAIR_ZZZ_double_ate(FP24_YYY *r,ECP4_ZZZ *P1,ECP_ZZZ *Q1,ECP4_ZZZ *R1,ECP_Z
     BIG_XXX_rcopy(x,CURVE_Bnx_ZZZ);
     BIG_XXX_copy(n,x);
 
-    //BIG_XXX_norm(n);
 	BIG_XXX_pmul(n3,n,3);
 	BIG_XXX_norm(n3);
 
@@ -257,7 +250,7 @@ void PAIR_ZZZ_double_ate(FP24_YYY *r,ECP4_ZZZ *P1,ECP_ZZZ *Q1,ECP4_ZZZ *R1,ECP_Z
         PAIR_ZZZ_line(&lv,&B,&B,&Sx,&Sy);
         FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
 
-		bt=BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i); // bt=BIG_XXX_bit(n,i);
+		bt=BIG_XXX_bit(n3,i)-BIG_XXX_bit(n,i); 
         if (bt==1)
         {
             PAIR_ZZZ_line(&lv,&A,&P,&Qx,&Qy);
@@ -268,14 +261,10 @@ void PAIR_ZZZ_double_ate(FP24_YYY *r,ECP4_ZZZ *P1,ECP_ZZZ *Q1,ECP4_ZZZ *R1,ECP_Z
         }
 		if (bt==-1)
 		{
-			//ECP4_ZZZ_neg(P); 
             PAIR_ZZZ_line(&lv,&A,&NP,&Qx,&Qy);
             FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			//ECP4_ZZZ_neg(P); 
-			//ECP4_ZZZ_neg(R);
             PAIR_ZZZ_line(&lv,&B,&NR,&Sx,&Sy);
             FP24_YYY_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			//ECP4_ZZZ_neg(R);
 		}
 	}
 
@@ -461,7 +450,6 @@ void PAIR_ZZZ_G1mul(ECP_ZZZ *P,BIG_XXX e)
     BIG_XXX_rcopy(q,CURVE_Order_ZZZ);
     glv(u,e);
 
-   // ECP_ZZZ_affine(P);
     ECP_ZZZ_copy(&Q,P); ECP_ZZZ_affine(&Q);
     FP_YYY_rcopy(&cru,CURVE_Cru_ZZZ);
     FP_YYY_mul(&(Q.x),&(Q.x),&cru);
@@ -508,8 +496,6 @@ void PAIR_ZZZ_G2mul(ECP4_ZZZ *P,BIG_XXX e)
     BIG_XXX_rcopy(y,CURVE_Order_ZZZ);
     gs(u,e);
 
-    //ECP4_ZZZ_affine(P);
-
     ECP4_ZZZ_copy(&Q[0],P);
     for (i=1; i<8; i++)
     {
@@ -528,7 +514,6 @@ void PAIR_ZZZ_G2mul(ECP4_ZZZ *P,BIG_XXX e)
             ECP4_ZZZ_neg(&Q[i]);
         }
         BIG_XXX_norm(u[i]);   
-		//ECP4_ZZZ_affine(&Q[i]);
     }
 
     ECP4_ZZZ_mul8(P,Q,u);
@@ -582,46 +567,6 @@ void PAIR_ZZZ_GTpow(FP24_YYY *f,BIG_XXX e)
 #endif
 }
 
-/* test group membership test - no longer needed */
-/* with GT-Strong curve, now only check that m!=1, conj(m)*m==1, and m.m^{p^4}=m^{p^2} */
-
-/*
-int PAIR_GTmember(FP24_YYY *m)
-{
-	BIG_XXX a,b;
-	FP2_YYY X;
-	FP24_YYY r,w;
-	if (FP24_YYY_isunity(m)) return 0;
-	FP24_YYY_conj(&r,m);
-	FP24_YYY_mul(&r,m);
-	if (!FP24_YYY_isunity(&r)) return 0;
-
-	BIG_XXX_rcopy(a,CURVE_Fra);
-	BIG_XXX_rcopy(b,CURVE_Frb);
-	FP2_YYY from_BIGs(&X,a,b);
-
-
-	FP24_YYY_copy(&r,m); FP24_YYY_frob(&r,&X); FP24_YYY_frob(&r,&X);
-	FP24_YYY_copy(&w,&r); FP24_YYY_frob(&w,&X); FP24_YYY_frob(&w,&X);
-	FP24_YYY_mul(&w,m);
-
-
-#ifndef GT_STRONG
-	if (!FP24_YYY_equals(&w,&r)) return 0;
-
-	BIG_XXX_rcopy(a,CURVE_Bnx);
-
-	FP24_YYY_copy(&r,m); FP24_YYY_pow(&w,&r,a); FP24_YYY_pow(&w,&w,a);
-	FP24_YYY_sqr(&r,&w); FP24_YYY_mul(&r,&w); FP24_YYY_sqr(&r,&r);
-
-	FP24_YYY_copy(&w,m); FP24_YYY_frob(&w,&X);
- #endif
-
-	return FP24_YYY_equals(&w,&r);
-}
-
-*/
-
 
 #ifdef HAS_MAIN
 
@@ -673,9 +618,6 @@ int main()
     BIG_XXX_rcopy(b,Frb);
     FP2_YYY from_BIGs(&f,a,b);
 
-
-//exit(0);
-
     PAIR_ate(&g,&P,&Q);
 
 	printf("gb= ");
@@ -686,12 +628,6 @@ int main()
     printf("g= ");
     FP24_output(&g);
     printf("\n");
-
-	//FP24_pow(&g,&g,r);
-
-   // printf("g^r= ");
-    //FP24_output(&g);
-    //printf("\n");
 
 	ECP_copy(&R,&Q);
 	ECP4_ZZZ_copy(&G,&P);
@@ -721,10 +657,6 @@ int main()
 	PAIR_G2mul(&P,r);
 	printf("rP= ");ECP4_ZZZ_output(&P); printf("\n");
 
-	//PAIR_GTpow(&g,r);
-	//printf("g^r= ");FP24_output(&g); printf("\n");
-
-
 	BIG_XXX_randomnum(w,r,&rng);
 
 	FP24_copy(&gp,&g);
@@ -739,14 +671,6 @@ int main()
 
 	printf("t(g)= "); FP8_output(&t); printf("\n");
 
-//    PAIR_ate(&g,&P,&R);
-//    PAIR_fexp(&g);
-
-//    printf("g= ");
-//    FP24_output(&g);
-//    printf("\n");
-
-//	PAIR_GTpow(&g,xa);
 }
 
 #endif

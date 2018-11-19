@@ -38,10 +38,7 @@ public class BIG {
 	public static final int NEXCESS = ((int)1<<(CHUNK-BASEBITS-1));
 	public static final int BIGBITS=(MODBYTES*8);
 
-
 	protected int[] w=new int[NLEN];
-
-
 
 /* Constructors */
 

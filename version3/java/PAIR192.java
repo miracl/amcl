@@ -32,9 +32,7 @@ public final class PAIR192 {
 /* Line function */
 	public static FP24 line(ECP4 A,ECP4 B,FP Qx,FP Qy)
 	{
-//System.out.println("Into line");
-		FP8 a,b,c;                            // Edits here
-//		c=new FP8(0);
+		FP8 a,b,c;                            
 		if (A==B)
 		{ // Doubling
 			FP4 XX=new FP4(A.getx());  //X
@@ -129,7 +127,6 @@ public final class PAIR192 {
 			}
 			A.add(B);
 		}
-//System.out.println("Out of line");
 		return new FP24(a,b,c);
 	}
 
@@ -170,7 +167,7 @@ public final class PAIR192 {
 			lv=line(A,A,Qx,Qy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 
-			bt=n3.bit(i)-n.bit(i); // bt=n.bit(i);
+			bt=n3.bit(i)-n.bit(i); 
 			if (bt==1)
 			{
 				lv=line(A,P,Qx,Qy);
@@ -178,10 +175,8 @@ public final class PAIR192 {
 			}
 			if (bt==-1)
 			{
-				//P.neg();
 				lv=line(A,MP,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				//P.neg();
 			}
 		}
 
@@ -258,14 +253,10 @@ public final class PAIR192 {
 			}
 			if (bt==-1)
 			{
-				//P.neg(); 
 				lv=line(A,MP,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				//P.neg(); 
-				//R.neg();
 				lv=line(B,MR,Sx,Sy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				//R.neg();
 			}
 		}
 
@@ -419,7 +410,6 @@ public final class PAIR192 {
 		ECP R;
 		if (USE_GLV)
 		{
-			//P.affine();
 			R=new ECP();
 			R.copy(P);
 			int i,np,nn;
@@ -474,7 +464,6 @@ public final class PAIR192 {
 
 			BIG t=new BIG(0);
 			int i,np,nn;
-			//P.affine();
 
 			Q[0]=new ECP4(); Q[0].copy(P);
 			for (i=1;i<8;i++)
@@ -492,8 +481,7 @@ public final class PAIR192 {
 					u[i].copy(t);
 					Q[i].neg();
 				}
-				u[i].norm();	
-				//Q[i].affine();
+				u[i].norm();
 			}
 
 			R=ECP4.mul8(Q,u);

@@ -37,13 +37,9 @@ public struct ECDH
     static let INVALID:Int = -4
     static public let EFS=Int(BIG.MODBYTES);
     static public let EGS=Int(BIG.MODBYTES);
-    //static public let EAS=16;
-    //static public let EBS=16;
     static public let SHA256=32
     static public let SHA384=48
     static public let SHA512=64
-    
-    //static public let HASH_TYPE=SHA512
 
     /* Convert Integer to n-byte array */
     private static func inttoBytes(_ n: Int,_ len:Int) -> [UInt8]
@@ -93,9 +89,7 @@ public struct ECDH
         }
         else
         {
-	    for i in 0 ..< sha {W[i+pad-sha]=R[i]}
-
-            //for i in 0 ..< sha {W[i]=R[i]}
+            for i in 0 ..< sha {W[i+pad-sha]=R[i]}
         }
         return W
     }
@@ -159,8 +153,6 @@ public struct ECDH
             for j in 0 ..< Salt.count {S[j]=Salt[j]}
             var N=ECDH.inttoBytes(i,4);
             for j in 0 ..< 4 {S[Salt.count+j]=N[j]}
-    
-            //printBinary(Pass);
             
             ECDH.HMAC(sha,S,Pass,&F);
              
@@ -190,11 +182,10 @@ public struct ECDH
         let olen=tag.count;
         var B=[UInt8]();
         
-        if olen<4 /*|| olen>HASH.len*/ {return 0}
+        if olen<4 {return 0}
     
         if (K.count > b)
         {
-            //H.process_array(K); var B=H.hash();
             B=hashit(sha,K,0,nil,0)
             for i in 0 ..< sha {K0[i]=B[i]}
         }
@@ -203,12 +194,8 @@ public struct ECDH
             for i in 0 ..< K.count {K0[i]=K[i]}
         }
         for i in 0 ..< b {K0[i]^=0x36}
-  
- //       printBinary(K0)
         
         B=hashit(sha,K0,0,M,0)
-        
- //       printBinary(B);
     
         for i in 0 ..< b {K0[i]^=0x6a}
         B=hashit(sha,K0,0,B,olen)
@@ -324,7 +311,6 @@ public struct ECDH
     @discardableResult  static public func KEY_PAIR_GENERATE(_ RNG: inout RAND?,_ S:inout [UInt8],_ W:inout [UInt8]) -> Int
     {
         let res=0;
-     //   var T=[UInt8](count:ECDH.EFS,repeatedValue:0)
         var s:BIG
         var G:ECP
 
@@ -340,15 +326,8 @@ public struct ECDH
         else
         {
             s=BIG.randomnum(r,&RNG!)
-    
-         //   s.toBytes(&T)
-         //   for i in 0 ..< EGS {S[i]=T[i]}
         }
     
-	//if (ROM.AES_S>0)
-	//{
-	//    s.mod2m(2*ROM.AES_S)
-	//}
         s.toBytes(&S)
 
         let WP=G.mul(s)
@@ -433,10 +412,7 @@ public struct ECDH
         repeat {
             var u=BIG.randomnum(r,&RNG);
             let w=BIG.randomnum(r,&RNG);  /* side channel masking */
-  	    //if ROM.AES_S>0
-	    //{
-		//u.mod2m(2*ROM.AES_S)
-	    //}  
+
             V.copy(G)
             V=V.mul(u)
             let vx=V.getX()
@@ -579,17 +555,9 @@ public struct ECDH
     
         ECDH.HMAC(sha,AC,K2,&TAG)
     
-	if !ncomp(T,TAG,T.count) {return [UInt8]()}	
-
- //       var same=true
- //       for i in 0 ..< T.count
- //       {
- //           if T[i] != TAG[i] {same=false}
- //       }
- //       if !same {return [UInt8]()}
+        if !ncomp(T,TAG,T.count) {return [UInt8]()}	
     
         return M;
-    
     }
     
 }

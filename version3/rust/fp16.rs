@@ -83,7 +83,6 @@ impl FP16 {
 
 /* test self=0 ? */
 	pub fn iszilch(&self) -> bool {
-		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch();
 	}	
 
@@ -143,7 +142,6 @@ impl FP16 {
 
 		m.add(&self.b);
 		m.neg();
-	//	m.norm();
 		t.copy(&m); t.add(&self.b);
 		self.b.copy(&m);
 		self.b.add(&self.a);
@@ -211,8 +209,6 @@ impl FP16 {
 
 /* self*=self */	
 	pub fn sqr(&mut self) {
-	//	self.norm();
-
 		let mut t1=FP8::new_copy(&self.a);
 		let mut t2=FP8::new_copy(&self.b);
 		let mut t3=FP8::new_copy(&self.a);
@@ -245,8 +241,6 @@ impl FP16 {
 
 /* self*=y */
 	pub fn mul(&mut self,y :&FP16) {
-		self.norm();
-
 		let mut t1=FP8::new_copy(&self.a);
 		let mut t2=FP8::new_copy(&self.b);
 		let mut t3=FP8::new();
@@ -286,8 +280,6 @@ impl FP16 {
 
 /* self=1/self */
 	pub fn inverse(&mut self) {
-		self.norm();
-
 		let mut t1=FP8::new_copy(&self.a);
 		let mut t2=FP8::new_copy(&self.b);
 
@@ -303,7 +295,6 @@ impl FP16 {
 
 /* self*=i where i = sqrt(-1+sqrt(-1)) */
 	pub fn times_i(&mut self) {
-	//	self.norm();
 		let mut s=FP8::new_copy(&self.b);
 		let t=FP8::new_copy(&self.a);
 		s.times_i();
@@ -356,7 +347,6 @@ impl FP16 {
 	pub fn xtr_a(&mut self,w:&FP16,y:&FP16,z:&FP16) {
 		let mut r=FP16::new_copy(w);
 		let mut t=FP16::new_copy(w);
-	//	y.norm();
 		r.sub(y); r.norm();
 		r.pmul(&self.a);
 		t.add(y); t.norm();

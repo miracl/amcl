@@ -29,12 +29,10 @@ public struct ECP2 {
     private var x:FP2
     private var y:FP2
     private var z:FP2
- //   private var INF:Bool
     
     /* Constructor - set self=O */
     init()
     {
-    //    INF=true
         x=FP2(0)
         y=FP2(1)
         z=FP2(0)
@@ -42,7 +40,6 @@ public struct ECP2 {
     /* Test self=O? */
     public func is_infinity() -> Bool
     {
-    //    if INF {return true}
         return x.iszilch() && z.iszilch()
     }
     /* copy self=P */
@@ -51,11 +48,9 @@ public struct ECP2 {
         x.copy(P.x)
         y.copy(P.y)
         z.copy(P.z)
-    //    INF=P.INF
     }
     /* set self=O */
     mutating func inf() {
-    //    INF=true
         x.zero()
         y.one()
         z.zero()
@@ -66,11 +61,6 @@ public struct ECP2 {
         x.cmove(Q.x,d);
         y.cmove(Q.y,d);
         z.cmove(Q.z,d);
-    /*
-        var bd:Bool
-        if d==0 {bd=false}
-        else {bd=true}
-        INF = (INF != ((INF != Q.INF) && bd)) */
     }
     
     /* return 1 if b==c, no branching */
@@ -106,10 +96,8 @@ public struct ECP2 {
     /* Test if P == Q */
     func equals(_ Q:ECP2) -> Bool
     {
-    //    if is_infinity() && Q.is_infinity() {return true}
-    //    if is_infinity() || Q.is_infinity() {return false}
     
-        var a=FP2(x)                            // *****
+        var a=FP2(x)  
         var b=FP2(Q.x)
         a.mul(Q.z); b.mul(z) 
         if !a.equals(b) {return false}
@@ -122,7 +110,6 @@ public struct ECP2 {
     /* set self=-self */
     mutating func neg()
     {
-    //    if is_infinity() {return}
         y.norm(); y.neg(); y.norm()
         return
     }
@@ -224,7 +211,6 @@ public struct ECP2 {
 /* Calculate RHS of twisted curve equation x^3+B/i */
     static func RHS(_ x:FP2) -> FP2
     {
-        //x.norm()
         var r=FP2(x)
         r.sqr()
         var b=FP2(BIG(ROM.CURVE_B))
@@ -265,7 +251,6 @@ public struct ECP2 {
         if rhs.sqrt()
         {
             y.copy(rhs);
-        //    INF=false;
         }
         else {inf()}
     }
@@ -273,7 +258,6 @@ public struct ECP2 {
     /* this+=this */
     @discardableResult mutating func dbl() -> Int
     {
-    //    if (INF) {return -1}
         if y.iszilch()
         {
             inf();
@@ -326,12 +310,6 @@ public struct ECP2 {
 /* this+=Q - return 0 for add, 1 for double, -1 for O */
     @discardableResult mutating func add(_ Q:ECP2) -> Int
     {
-    /*    if INF
-        {
-            copy(Q)
-            return -1
-        }
-        if Q.INF {return -1} */
 
         let b=3*ROM.CURVE_B_I
         var t0=FP2(x)
@@ -406,13 +384,11 @@ public struct ECP2 {
         var NQ=ECP2(); NQ.copy(Q)
         NQ.neg()
         let D=add(NQ)
-        //Q.neg()
         return D
     }
 /* set self*=q, where q is Modulus, using Frobenius */
     mutating func frob(_ X:FP2)
     {
-    //    if INF {return}
         var X2=FP2(X)
         X2.sqr()
         x.conj()
@@ -440,8 +416,6 @@ public struct ECP2 {
         var w=[Int8](repeating: 0,count: 1+(BIG.NLEN*Int(BIG.BASEBITS)+3)/4)
     
         if is_infinity() {return ECP2()}
-    
-        //affine()
     
     /* precompute table */
         Q.copy(self)
@@ -474,7 +448,6 @@ public struct ECP2 {
     
         P.copy(W[Int(w[nb]-1)/2])
         for i in (0...nb-1).reversed()
-        //for var i=nb-1;i>=0;i--
         {
             Q.select(W,Int32(w[i]))
             P.dbl()
@@ -511,7 +484,6 @@ public struct ECP2 {
         {
             t.append(BIG(u[i]))
             t[i].norm()
-            //Q[i].affine()
         }
 
     // precompute table 
@@ -575,94 +547,6 @@ public struct ECP2 {
         return P
     }
 
-    /* P=u0.Q0+u1*Q1+u2*Q2+u3*Q3 */
-/*    
-    static func mul4(_ Q:[ECP2],_ u:[BIG]) -> ECP2
-    {
-        var a=[Int32](repeating: 0,count: 4)
-        let T=ECP2()
-        let C=ECP2()
-        let P=ECP2()
-        
-        var W=[ECP2]();
-        for _ in 0 ..< 8 {W.append(ECP2())}
-    
-        let mt=BIG()
-        var t=[BIG]()
-    
-        var w=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)
-    
-        for i in 0 ..< 4
-        {
-            t.append(BIG(u[i]))
-            //Q[i].affine()
-        }
-    
-    // precompute table 
-    
-        W[0].copy(Q[0]); W[0].sub(Q[1])
-        W[1].copy(W[0])
-        W[2].copy(W[0])
-        W[3].copy(W[0])
-        W[4].copy(Q[0]); W[4].add(Q[1])
-        W[5].copy(W[4])
-        W[6].copy(W[4])
-        W[7].copy(W[4])
-        T.copy(Q[2]); T.sub(Q[3])
-        W[1].sub(T)
-        W[2].add(T)
-        W[5].sub(T)
-        W[6].add(T)
-        T.copy(Q[2]); T.add(Q[3])
-        W[0].sub(T)
-        W[3].add(T)
-        W[4].sub(T)
-        W[7].add(T)
-    
-    // if multiplier is even add 1 to multiplier, and add P to correction 
-        mt.zero(); C.inf()
-        for i in 0 ..< 4
-        {
-            if (t[i].parity()==0)
-            {
-				t[i].inc(1); t[i].norm()
-                C.add(Q[i])
-            }
-            mt.add(t[i]); mt.norm()
-        }
-    
-        let nb=1+mt.nbits();
-    
-    // convert exponent to signed 1-bit window 
-        for j in 0 ..< nb
-        {
-            	for i in 0 ..< 4 {
-			a[i]=Int32(t[i].lastbits(2)-2)
-                
-			t[i].dec(Int(a[i]))
-                	t[i].norm()
-			t[i].fshr(1)
-            	}
-		let sum=8*a[0]+4*a[1]+2*a[2]+a[3]
-            	w[j]=Int8(sum)
-        }
-        w[nb]=Int8(8*t[0].lastbits(2)+4*t[1].lastbits(2))
-        w[nb]+=Int8(2*t[2].lastbits(2)+t[3].lastbits(2))
-    
-        P.copy(W[Int(w[nb]-1)/2])
-        for i in (0...nb-1).reversed()
-        //for var i=nb-1;i>=0;i--
-        {
-            T.select(W,Int32(w[i]))
-            P.dbl()
-            P.add(T)
-        }
-        P.sub(C) // apply correction 
-    
-        P.affine()
-        return P
-    }
-*/    
      // needed for SOK
     static func mapit(_ h:[UInt8]) -> ECP2
     {
@@ -673,28 +557,28 @@ public struct ECP2 {
         x.mod(q);
         while (true)
         {
-            let X=FP2(one,x);
-            Q=ECP2(X);
+            let X=FP2(one,x)
+            Q=ECP2(X)
             if !Q.is_infinity() {break}
-            x.inc(1); x.norm();
+            x.inc(1); x.norm()
         }
     // Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez
-        let Fra=BIG(ROM.Fra);
-        let Frb=BIG(ROM.Frb);
-        var X=FP2(Fra,Frb);
+        let Fra=BIG(ROM.Fra)
+        let Frb=BIG(ROM.Frb)
+        var X=FP2(Fra,Frb)
         if ECP.SEXTIC_TWIST == ECP.M_TYPE { 
             X.inverse()
             X.norm()
         }         
-        x=BIG(ROM.CURVE_Bnx);
+        x=BIG(ROM.CURVE_Bnx)
     
         if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-            var T=Q.mul(x); 
+            var T=Q.mul(x)
             if ECP.SIGN_OF_X == ECP.NEGATIVEX {
                 T.neg()
             }
             var K=ECP2(); K.copy(T)
-            K.dbl(); K.add(T); //K.affine()
+            K.dbl(); K.add(T)
     
             K.frob(X)
             Q.frob(X); Q.frob(X); Q.frob(X)

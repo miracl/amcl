@@ -23,8 +23,6 @@ package XXX
 //import "os"
 import "github.com/milagro-crypto/amcl/version3/go/amcl"
 
-//var debug bool = false
-
 const FFLEN int=@ML@
 
 const FF_BITS int=(BIGBITS*FFLEN) /* Finite Field Size in bits - must be 256.2^n */
@@ -71,24 +69,13 @@ func NewFFint(n int) *FF {
 	F.length=n
 	return F
 }
-/*
-func NewFFints(x [][NLEN]int64,n int) *FF {
-	F:=new(FF)
-	for i:=0;i<n;i++ {
-		F.v=append(F.v,NewBIGints(x[i]))
-	}
-	F.length=n
-	return F
-}
-*/
+
 /* set to zero */
 func (F *FF) zero() {
 	for i:=0;i<F.length;i++ {
 		F.v[i].zero()
 	}
 }
-
-
 
 func (F *FF) getlen() int {
 		return F.length
@@ -241,7 +228,7 @@ func (F *FF) rnorm(vp int,n int) {
 	for i:=0;i<n-1;i++ {
 		carry=F.v[vp+i].norm()
 		F.v[vp+i].xortop(carry<<P_TBITS)
-		F.v[vp+i+1].w[0]+=carry; // inc(carry)
+		F.v[vp+i+1].w[0]+=carry; 
 	}
 	carry=F.v[vp+n-1].norm()
 	if trunc {
@@ -746,7 +733,7 @@ func (F *FF) power(e int,p *FF) {
 
 	w.copy(F)
 	w.nres(p)
-//i:=0;
+
 	if e==2 {
 		F.copy(w)
 		F.modsqr(p,ND)
@@ -761,13 +748,7 @@ func (F *FF) power(e int,p *FF) {
 			}
 			e>>=1
 			if e==0 {break}
-//fmt.Printf("wb= "+w.toString()+"\n");
-//debug=true;
 			w.modsqr(p,ND)
-//debug=false;
-//fmt.Printf("wa= "+w.toString()+"\n");
-//i+=1;
-//os.Exit(0);
 		}
 	}
 
@@ -780,7 +761,6 @@ func (F *FF) pow(e *FF,p *FF) {
 	n:=p.length
 	w:=NewFFint(n)
 	ND:=p.invmod2m()
-//fmt.Printf("ND= "+ND.toString() +"\n");
 	w.copy(F)
 	F.one()
 	F.nres(p)
@@ -905,39 +885,3 @@ func prime(p *FF,rng *amcl.RAND) bool {
 
 	return true
 }
-/*
-func main() {
-
-	var P = [4][5]int64 {{0xAD19A781670957,0x76A79C00965796,0xDEFCC5FC9A9717,0xF02F2940E20E9,0xBF59E34F},{0x6894F31844C908,0x8DADA70E82C79F,0xFD29F3836046F6,0x8C1D874D314DD0,0x46D077B},{0x3C515217813331,0x56680FD1CE935B,0xE55C53EEA8838E,0x92C2F7E14A4A95,0xD945E5B1},{0xACF673E919F5EF,0x6723E7E7DAB446,0x6B6FA69B36EB1B,0xF7D13920ECA300,0xB5FC2165}}
-
-	fmt.Printf("Testing FF\n")
-	var raw [100]byte
-	rng:=NewRAND()
-
-	rng.Clean()
-	for i:=0;i<100;i++ {
-		raw[i]=byte(i)
-	}
-
-	rng.Seed(100,raw[:])
-
-	n:=4
-
-	x:=NewFFint(n)
-	x.set(3)
-
-	p:=NewFFints(P[:],n)
-
-	if prime(p,rng) {fmt.Printf("p is a prime\n"); fmt.Printf("\n")}
-
-	e:=NewFFint(n)
-	e.copy(p)
-	e.dec(1); e.norm()
-
-	fmt.Printf("e= "+e.toString())
-	fmt.Printf("\n")
-	x.skpow(e,p)
-	fmt.Printf("x= "+x.toString())
-	fmt.Printf("\n")
-}
-*/

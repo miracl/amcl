@@ -52,7 +52,6 @@ int ECP_ZZZ_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
 
 #ifdef AES_S
     BIG_XXX_mod2m(s,2*AES_S);
-//	BIG_toBytes(S->val,s);
 #endif
 
     S->len=EGS_ZZZ;
@@ -61,27 +60,7 @@ int ECP_ZZZ_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
     ECP_ZZZ_mul(&G,s);
 
 	ECP_ZZZ_toOctet(W,&G,false);  /* To use point compression on public keys, change to true */
-/*
-#if CURVETYPE_ZZZ!=MONTGOMERY
-    ECP_ZZZ_get(gx,gy,&G);
-#else
-    ECP_ZZZ_get(gx,&G);
 
-#endif
-
-
-
-#if CURVETYPE_ZZZ!=MONTGOMERY
-    W->len=2*EFS_ZZZ+1;
-    W->val[0]=4;
-    BIG_XXX_toBytes(&(W->val[1]),gx);
-    BIG_XXX_toBytes(&(W->val[EFS_ZZZ+1]),gy);
-#else
-    W->len=EFS_ZZZ+1;
-    W->val[0]=2;
-    BIG_XXX_toBytes(&(W->val[1]),gx);
-#endif
-*/
     return res;
 }
 
@@ -99,42 +78,22 @@ int ECP_ZZZ_PUBLIC_KEY_VALIDATE(octet *W)
 	valid=ECP_ZZZ_fromOctet(&WP,W);
 	if (!valid) res=ECDH_INVALID_PUBLIC_KEY;
 
-/*
-    BIG_XXX_fromBytes(wx,&(W->val[1]));
-    if (BIG_XXX_comp(wx,q)>=0) res=ECDH_INVALID_PUBLIC_KEY;
-#if CURVETYPE_ZZZ!=MONTGOMERY
-    BIG_XXX wy;
-    BIG_XXX_fromBytes(wy,&(W->val[EFS_ZZZ+1]));
-    if (BIG_XXX_comp(wy,q)>=0) res=ECDH_INVALID_PUBLIC_KEY;
-#endif
-*/
     if (res==0)
-    {
+    { /* Check point is not in wrong group */
+        nb=BIG_XXX_nbits(q);
+        BIG_XXX_one(k);
+        BIG_XXX_shl(k,(nb+4)/2);
+        BIG_XXX_add(k,q,k);
+        BIG_XXX_sdiv(k,r); /* get co-factor */
 
-//#if CURVETYPE_ZZZ!=MONTGOMERY
-//        valid=ECP_ZZZ_set(&WP,wx,wy);
-//#else
-//        valid=ECP_ZZZ_set(&WP,wx);
-//#endif
-//        if (!valid || ECP_ZZZ_isinf(&WP)) res=ECDH_INVALID_PUBLIC_KEY;
-//        if (res==0 )
-//        {
-            /* Check point is not in wrong group */
-            nb=BIG_XXX_nbits(q);
-            BIG_XXX_one(k);
-            BIG_XXX_shl(k,(nb+4)/2);
-            BIG_XXX_add(k,q,k);
-            BIG_XXX_sdiv(k,r); /* get co-factor */
+        while (BIG_XXX_parity(k)==0)
+        {
+            ECP_ZZZ_dbl(&WP);
+            BIG_XXX_fshr(k,1);
+        }
 
-            while (BIG_XXX_parity(k)==0)
-            {
-                ECP_ZZZ_dbl(&WP);
-                BIG_XXX_fshr(k,1);
-            }
-
-            if (!BIG_XXX_isunity(k)) ECP_ZZZ_mul(&WP,k);
-            if (ECP_ZZZ_isinf(&WP)) res=ECDH_INVALID_PUBLIC_KEY;
-//        }
+        if (!BIG_XXX_isunity(k)) ECP_ZZZ_mul(&WP,k);
+        if (ECP_ZZZ_isinf(&WP)) res=ECDH_INVALID_PUBLIC_KEY;
     }
 
     return res;
@@ -151,16 +110,7 @@ int ECP_ZZZ_SVDP_DH(octet *S,octet *WD,octet *Z)
     BIG_XXX_fromBytes(s,S->val);
 
 	valid=ECP_ZZZ_fromOctet(&W,WD);
-/*
-    BIG_XXX_fromBytes(wx,&(WD->val[1]));
-#if CURVETYPE_ZZZ!=MONTGOMERY
-    BIG_XXX wy;
-    BIG_XXX_fromBytes(wy,&(WD->val[EFS_ZZZ+1]));
-    valid=ECP_ZZZ_set(&W,wx,wy);
-#else
-    valid=ECP_ZZZ_set(&W,wx);
-#endif
-*/
+
     if (!valid) res=ECDH_ERROR;
     if (res==0)
     {
@@ -210,7 +160,6 @@ int ECP_ZZZ_SP_DSA(int sha,csprng *RNG,octet *K,octet *S,octet *F,octet *C,octet
 	{
 		do
 		{
-       
             BIG_XXX_randomnum(u,r,RNG);
             BIG_XXX_randomnum(w,r,RNG); /* side channel masking */
 
@@ -313,12 +262,7 @@ int ECP_ZZZ_VP_DSA(int sha,octet *W,octet *F, octet *C,octet *D)
         BIG_XXX_modmul(h2,c,d,r);
 
 		valid=ECP_ZZZ_fromOctet(&WP,W);
-/*
-        BIG_XXX_fromBytes(wx,&(W->val[1]));
-        BIG_XXX_fromBytes(wy,&(W->val[EFS_ZZZ+1]));
 
-        valid=ECP_ZZZ_set(&WP,wx,wy);
-*/
         if (!valid) res=ECDH_ERROR;
         else
         {

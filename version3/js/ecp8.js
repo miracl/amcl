@@ -27,15 +27,11 @@ var ECP8 = function(ctx) {
         this.x = new ctx.FP8(0);
         this.y = new ctx.FP8(1);
         this.z = new ctx.FP8(0);
-        // this.INF = true;
     };
 
     ECP8.prototype = {
         /* Test this=O? */
         is_infinity: function() {
-            // if (this.INF) {
-            //     return true;
-            // }
 
             this.x.reduce();
             this.y.reduce();
@@ -48,12 +44,10 @@ var ECP8 = function(ctx) {
             this.x.copy(P.x);
             this.y.copy(P.y);
             this.z.copy(P.z);
-            // this.INF = P.INF;
         },
 
         /* set this=O */
         inf: function() {
-            // this.INF = true;
             this.x.zero();
             this.y.one();
             this.z.zero();
@@ -64,9 +58,6 @@ var ECP8 = function(ctx) {
             this.x.cmove(Q.x, d);
             this.y.cmove(Q.y, d);
             this.z.cmove(Q.z, d);
-
-            // bd = (d !== 0) ? true : false;
-            // this.INF ^= (this.INF ^ Q.INF) & bd;
         },
 
         /* Constant time select from pre-computed table */
@@ -150,14 +141,12 @@ var ECP8 = function(ctx) {
         /* extract affine x as ctx.FP8 */
         getX: function() {
 			var W=new ECP8(); W.copy(this); W.affine();
-            //this.affine();
             return W.x;
         },
 
         /* extract affine y as ctx.FP8 */
         getY: function() {
 			var W=new ECP8(); W.copy(this); W.affine();
-            //this.affine();
             return W.y;
         },
 
@@ -489,12 +478,9 @@ var ECP8 = function(ctx) {
         /* this-=Q */
         sub: function(Q) {
             var D;
-
 			var NQ=new ECP8(); NQ.copy(Q);
             NQ.neg();
             D = this.add(NQ);
-            //Q.neg();
-
             return D;
         },
 
@@ -513,8 +499,6 @@ var ECP8 = function(ctx) {
             if (this.is_infinity()) {
                 return new ECP8();
             }
-
-            //this.affine();
 
             // precompute table
             Q.copy(this);

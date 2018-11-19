@@ -29,12 +29,10 @@ public struct ECP8 {
     private var x:FP8
     private var y:FP8
     private var z:FP8
- //   private var INF:Bool
     
     /* Constructor - set self=O */
     init()
     {
-    //    INF=true
         x=FP8(0)
         y=FP8(1)
         z=FP8(0)
@@ -42,7 +40,6 @@ public struct ECP8 {
     /* Test self=O? */
     public func is_infinity() -> Bool
     {
-    //    if INF {return true}
         return x.iszilch() && z.iszilch()
     }
     /* copy self=P */
@@ -51,11 +48,9 @@ public struct ECP8 {
         x.copy(P.x)
         y.copy(P.y)
         z.copy(P.z)
-    //    INF=P.INF
     }
     /* set self=O */
     mutating func inf() {
-    //    INF=true
         x.zero()
         y.one()
         z.zero()
@@ -271,8 +266,6 @@ public struct ECP8 {
         var rb4=FP4(ra2,rb2)
 
         let rx=FP8(ra4,rb4)
-
-
 
     
         for i in 0 ..< RM {t[i]=b[i+8*RM]}
@@ -494,7 +487,6 @@ public struct ECP8 {
         var NQ=ECP8(); NQ.copy(Q)
         NQ.neg()
         let D=add(NQ)
-        //Q.neg()
         return D
     }
 
@@ -569,8 +561,6 @@ public struct ECP8 {
         var w=[Int8](repeating: 0,count: 1+(BIG.NLEN*Int(BIG.BASEBITS)+3)/4)
     
         if is_infinity() {return ECP8()}
-    
-        //affine()
     
     /* precompute table */
         Q.copy(self)
@@ -658,7 +648,6 @@ public struct ECP8 {
         {
             t.append(BIG(u[i]))
             t[i].norm()
-            //Q[i].affine()
         }
 
     // precompute table 

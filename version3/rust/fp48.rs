@@ -91,7 +91,6 @@ impl FP48 {
 
 /* test self=0 ? */
 	pub fn iszilch(&self) -> bool {
-		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch() && self.c.iszilch();
 	}	
 
@@ -282,7 +281,6 @@ impl FP48 {
 		t1.copy(&z2); t1.neg();
 
 		z1.add(&t0);
-		//z1.norm();
 		self.b.copy(&z1); self.b.add(&t1);
 
 		z3.add(&t1);
@@ -295,7 +293,6 @@ impl FP48 {
 
 		t0.copy(&self.c); t0.mul(&y.c);
 		t1.copy(&t0); t1.neg();
-
 
 		self.c.copy(&z2); self.c.add(&t1);
 		z3.add(&t1);
@@ -333,8 +330,6 @@ impl FP48 {
 			t1.copy(&z2); t1.neg();
 	
 			self.b.add(&t0);
-		//self.b.norm();
-
 			self.b.add(&t1);
 			z3.add(&t1);
 			z2.add(&t0);
@@ -364,7 +359,7 @@ impl FP48 {
 			t0.copy(&self.b); t0.add(&self.c);
 			t0.norm();
 
-			z3.copy(&t0); //z3.mul(y.c);
+			z3.copy(&t0);
 			z3.pmul(&y.c.getb());
 			z3.times_i();
 
@@ -408,7 +403,7 @@ impl FP48 {
 		let mut f2=FP16::new_copy(&self.a);
 		let mut f3=FP16::new();
 
-		self.norm();
+		//self.norm();
 		f0.sqr();
 		f1.mul(&self.c);
 		f1.times_i();
@@ -535,9 +530,6 @@ impl FP48 {
 		let e=FP16::new_fp8s(&ea8,&eb8);
 
 
-
-
-
 		for i in 0..mb {t[i]=w[i+16*mb]}
 		a.copy(&BIG::frombytes(&t));
 		for i in 0..mb {t[i]=w[i+17*mb]}
@@ -601,7 +593,6 @@ impl FP48 {
 
 
 		let f=FP16::new_fp8s(&ea8,&eb8);
-
 
 
 		for i in 0..mb {t[i]=w[i+32*mb]}
@@ -717,10 +708,6 @@ impl FP48 {
 		for i in 0..mb {w[i+15*mb]=t[i]}
 
 
-
-
-
-
 		self.b.geta().geta().geta().geta().tobytes(&mut t);
 		for i in 0..mb {w[i+16*mb]=t[i]}
 		self.b.geta().geta().geta().getb().tobytes(&mut t);
@@ -757,8 +744,6 @@ impl FP48 {
 		for i in 0..mb {w[i+30*mb]=t[i]}
 		self.b.getb().getb().getb().getb().tobytes(&mut t);
 		for i in 0..mb {w[i+31*mb]=t[i]}
-
-
 
 
 

@@ -243,9 +243,7 @@ void FP12_YYY_mul(FP12_YYY *w,FP12_YYY *y)
     FP4_YYY_neg(&t1,&z2);
 
     FP4_YYY_add(&z1,&z1,&t0);   // z1=z1-z0
-//    FP4_YYY_norm(&z1);
-    FP4_YYY_add(&(w->b),&z1,&t1);
-// z1=z1-z2
+    FP4_YYY_add(&(w->b),&z1,&t1); // z1=z1-z2
     FP4_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
     FP4_YYY_add(&z2,&z2,&t0);        // z2=z2-z0
 
@@ -302,7 +300,6 @@ void FP12_YYY_smul(FP12_YYY *w,FP12_YYY *y,int type)
         FP4_YYY_neg(&t1,&z2);
 
         FP4_YYY_add(&(w->b),&(w->b),&t0);   // z1=z1-z0
-//    FP4_YYY_norm(&(w->b));
         FP4_YYY_add(&(w->b),&(w->b),&t1);   // z1=z1-z2
 
         FP4_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
@@ -371,7 +368,6 @@ void FP12_YYY_smul(FP12_YYY *w,FP12_YYY *y,int type)
 void FP12_YYY_inv(FP12_YYY *w,FP12_YYY *x)
 {
     FP4_YYY f0,f1,f2,f3;
-//    FP12_YYY_norm(x);
 
     FP4_YYY_sqr(&f0,&(x->a));
     FP4_YYY_mul(&f1,&(x->b),&(x->c));
@@ -462,7 +458,6 @@ void FP12_YYY_compow(FP4_YYY *c,FP12_YYY *x,BIG_XXX e,BIG_XXX r)
         return;
     }
 
-
     FP12_YYY_frob(&g2,&f);
     FP12_YYY_trace(&cp,&g2);
 
@@ -473,7 +468,6 @@ void FP12_YYY_compow(FP4_YYY *c,FP12_YYY *x,BIG_XXX e,BIG_XXX r)
     FP12_YYY_trace(&cpm2,&g2);
 
     FP4_YYY_xtr_pow2(c,&cp,c,&cpm1,&cpm2,a,b);
-
 }
 
 
@@ -513,19 +507,6 @@ void FP12_YYY_pow(FP12_YYY *r,FP12_YYY *a,BIG_XXX b)
 
     FP12_YYY_copy(r,&w);
     FP12_YYY_reduce(r);
-
-    /*
-        while(1)
-        {
-            bt=BIG_XXX_parity(z);
-            BIG_XXX_shr(z,1);
-            if (bt)
-                FP12_YYY_mul(r,&w);
-            if (BIG_XXX_comp(z,zilch)==0) break;
-            FP12_YYY_usqr(&w,&w);
-        }
-
-        FP12_YYY_reduce(r); */
 }
 
 /* p=q0^u0.q1^u1.q2^u2.q3^u3 */
@@ -616,95 +597,6 @@ void FP12_YYY_pow4(FP12_YYY *p,FP12_YYY *q,BIG_XXX u[4])
 	FP12_YYY_reduce(p);
 }
 
-/* p=q0^u0.q1^u1.q2^u2.q3^u3 */
-/* Timing attack secure, but not cache attack secure */
-/*
-void FP12_YYY_pow4(FP12_YYY *p,FP12_YYY *q,BIG_XXX u[4])
-{
-    int i,j,a[4],nb,m;
-    FP12_YYY g[8],c,s[2];
-    BIG_XXX t[4],mt;
-    sign8 w[NLEN_XXX*BASEBITS_XXX+1];
-
-    for (i=0; i<4; i++)
-        BIG_XXX_copy(t[i],u[i]);
-
-    FP12_YYY_copy(&g[0],&q[0]);
-    FP12_YYY_conj(&s[0],&q[1]);
-    FP12_YYY_mul(&g[0],&s[0]);  // P/Q 
-    FP12_YYY_copy(&g[1],&g[0]);
-    FP12_YYY_copy(&g[2],&g[0]);
-    FP12_YYY_copy(&g[3],&g[0]);
-    FP12_YYY_copy(&g[4],&q[0]);
-    FP12_YYY_mul(&g[4],&q[1]);  // P*Q 
-    FP12_YYY_copy(&g[5],&g[4]);
-    FP12_YYY_copy(&g[6],&g[4]);
-    FP12_YYY_copy(&g[7],&g[4]);
-
-    FP12_YYY_copy(&s[1],&q[2]);
-    FP12_YYY_conj(&s[0],&q[3]);
-    FP12_YYY_mul(&s[1],&s[0]);       // R/S 
-    FP12_YYY_conj(&s[0],&s[1]);
-    FP12_YYY_mul(&g[1],&s[0]);
-    FP12_YYY_mul(&g[2],&s[1]);
-    FP12_YYY_mul(&g[5],&s[0]);
-    FP12_YYY_mul(&g[6],&s[1]);
-    FP12_YYY_copy(&s[1],&q[2]);
-    FP12_YYY_mul(&s[1],&q[3]);      // R*S 
-    FP12_YYY_conj(&s[0],&s[1]);
-    FP12_YYY_mul(&g[0],&s[0]);
-    FP12_YYY_mul(&g[3],&s[1]);
-    FP12_YYY_mul(&g[4],&s[0]);
-    FP12_YYY_mul(&g[7],&s[1]);
-
-    // if power is even add 1 to power, and add q to correction 
-    FP12_YYY_one(&c);
-
-    BIG_XXX_zero(mt);
-    for (i=0; i<4; i++)
-    {
-        if (BIG_XXX_parity(t[i])==0)
-        {
-            BIG_XXX_inc(t[i],1);
-            BIG_XXX_norm(t[i]);
-            FP12_YYY_mul(&c,&q[i]);
-        }
-        BIG_XXX_add(mt,mt,t[i]);
-        BIG_XXX_norm(mt);
-    }
-
-    FP12_YYY_conj(&c,&c);
-    nb=1+BIG_XXX_nbits(mt);
-
-    // convert exponent to signed 1-bit window 
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_XXX_lastbits(t[i],2)-2;
-            BIG_XXX_dec(t[i],a[i]);
-            BIG_XXX_norm(t[i]);
-            BIG_XXX_fshr(t[i],1);
-        }
-        w[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    w[nb]=8*BIG_XXX_lastbits(t[0],2)+4*BIG_XXX_lastbits(t[1],2)+2*BIG_XXX_lastbits(t[2],2)+BIG_XXX_lastbits(t[3],2);
-    FP12_YYY_copy(p,&g[(w[nb]-1)/2]);
-
-    for (i=nb-1; i>=0; i--)
-    {
-        m=w[i]>>7;
-        j=(w[i]^m)-m;  // j=abs(w[i]) 
-        j=(j-1)/2;
-        FP12_YYY_copy(&s[0],&g[j]);
-        FP12_YYY_conj(&s[1],&g[j]);
-        FP12_YYY_usqr(p,p);
-        FP12_YYY_mul(p,&s[m&1]);
-    }
-    FP12_YYY_mul(p,&c); // apply correction 
-    FP12_YYY_reduce(p);
-}
-*/
 /* Set w=w^p using Frobenius */
 /* SU= 160 */
 void FP12_YYY_frob(FP12_YYY *w,FP2_YYY *f)
@@ -832,153 +724,3 @@ void FP12_YYY_cmove(FP12_YYY *f,FP12_YYY *g,int d)
     FP4_YYY_cmove(&(f->c),&(g->c),d);
 }
 
-
-/*
-int main(){
-		FP2_YYY f,w0,w1;
-		FP4_YYY t0,t1,t2;
-		FP12_YYY w,t,lv;
-		BIG_XXX a,b;
-		BIG_XXX p;
-
-		//Test w^(P^4) = w mod p^2
-//		BIG_XXX_randomnum(a);
-//		BIG_XXX_randomnum(b);
-//		BIG_XXX_mod(a,Modulus); BIG_XXX_mod(b,Modulus);
-	BIG_XXX_zero(a); BIG_XXX_zero(b); BIG_XXX_inc(a,1); BIG_XXX_inc(b,2); FP_YYY_nres(a); FP_YYY_nres(b);
-		FP2_YYY_from_zps(&w0,a,b);
-
-//		BIG_XXX_randomnum(a); BIG_XXX_randomnum(b);
-//		BIG_XXX_mod(a,Modulus); BIG_XXX_mod(b,Modulus);
-	BIG_XXX_zero(a); BIG_XXX_zero(b); BIG_XXX_inc(a,3); BIG_XXX_inc(b,4); FP_YYY_nres(a); FP_YYY_nres(b);
-		FP2_YYY_from_zps(&w1,a,b);
-
-		FP4_YYY_from_FP2s(&t0,&w0,&w1);
-		FP4_YYY_reduce(&t0);
-
-//		BIG_XXX_randomnum(a);
-//		BIG_XXX_randomnum(b);
-//		BIG_XXX_mod(a,Modulus); BIG_XXX_mod(b,Modulus);
-		BIG_XXX_zero(a); BIG_XXX_zero(b); BIG_XXX_inc(a,5); BIG_XXX_inc(b,6); FP_YYY_nres(a); FP_YYY_nres(b);
-		FP2_YYY_from_zps(&w0,a,b);
-
-//		BIG_XXX_randomnum(a); BIG_XXX_randomnum(b);
-//		BIG_XXX_mod(a,Modulus); BIG_XXX_mod(b,Modulus);
-
-		BIG_XXX_zero(a); BIG_XXX_zero(b); BIG_XXX_inc(a,7); BIG_XXX_inc(b,8); FP_YYY_nres(a); FP_YYY_nres(b);
-		FP2_YYY_from_zps(&w1,a,b);
-
-		FP4_YYY_from_FP2s(&t1,&w0,&w1);
-		FP4_YYY_reduce(&t1);
-
-//		BIG_XXX_randomnum(a);
-//		BIG_XXX_randomnum(b);
-//		BIG_XXX_mod(a,Modulus); BIG_XXX_mod(b,Modulus);
-		BIG_XXX_zero(a); BIG_XXX_zero(b); BIG_XXX_inc(a,9); BIG_XXX_inc(b,10); FP_YYY_nres(a); FP_YYY_nres(b);
-		FP2_YYY_from_zps(&w0,a,b);
-
-//		BIG_XXX_randomnum(a); BIG_XXX_randomnum(b);
-//		BIG_XXX_mod(a,Modulus); BIG_XXX_mod(b,Modulus);
-		BIG_XXX_zero(a); BIG_XXX_zero(b); BIG_XXX_inc(a,11); BIG_XXX_inc(b,12); FP_YYY_nres(a); FP_YYY_nres(b);
-		FP2_YYY_from_zps(&w1,a,b);
-
-		FP4_YYY_from_FP2s(&t2,&w0,&w1);
-		FP4_YYY_reduce(&t2);
-
-		FP12_YYY_from_FP4s(&w,&t0,&t1,&t2);
-
-		FP12_YYY_copy(&t,&w);
-
-		printf("w= ");
-		FP12_YYY_output(&w);
-		printf("\n");
-
-		BIG_XXX_rcopy(p,Modulus);
-		//BIG_XXX_zero(p); BIG_XXX_inc(p,7);
-
-		FP12_YYY_pow(&w,&w,p);
-
-		printf("w^p= ");
-		FP12_YYY_output(&w);
-		printf("\n");
-
-		FP2_YYY_gfc(&f,12);
-		FP12_YYY_frob(&t,&f);
-		printf("w^p= ");
-		FP12_YYY_output(&t);
-		printf("\n");
-
-//exit(0);
-
-		FP12_YYY_pow(&w,&w,p);
-		//printf("w^p^2= ");
-		//FP12_YYY_output(&w);
-		//printf("\n");
-		FP12_YYY_pow(&w,&w,p);
-		//printf("w^p^3= ");
-		//FP12_YYY_output(&w);
-		//printf("\n");
-		FP12_YYY_pow(&w,&w,p);
-		FP12_YYY_pow(&w,&w,p);
-		FP12_YYY_pow(&w,&w,p);
-		printf("w^p^6= ");
-		FP12_YYY_output(&w);
-		printf("\n");
-		FP12_YYY_pow(&w,&w,p);
-		FP12_YYY_pow(&w,&w,p);
-		printf("w^p^8= ");
-		FP12_YYY_output(&w);
-		printf("\n");
-		FP12_YYY_pow(&w,&w,p);
-		FP12_YYY_pow(&w,&w,p);
-		FP12_YYY_pow(&w,&w,p);
-		printf("w^p^11= ");
-		FP12_YYY_output(&w);
-		printf("\n");
-
-	//	BIG_XXX_zero(p); BIG_XXX_inc(p,7); BIG_XXX_norm(p);
-		FP12_YYY_pow(&w,&w,p);
-
-		printf("w^p12= ");
-		FP12_YYY_output(&w);
-		printf("\n");
-//exit(0);
-
-		FP12_YYY_inv(&t,&w);
-		printf("1/w mod p^4 = ");
-		FP12_YYY_output(&t);
-		printf("\n");
-
-		FP12_YYY_inv(&w,&t);
-		printf("1/(1/w) mod p^4 = ");
-		FP12_YYY_output(&w);
-		printf("\n");
-
-
-
-	FP12_YYY_inv(&lv,&w);
-//printf("w= "); FP12_YYY_output(&w); printf("\n");
-	FP12_YYY_conj(&w,&w);
-//printf("w= "); FP12_YYY_output(&w); printf("\n");
-//exit(0);
-	FP12_YYY_mul(&w,&w,&lv);
-//printf("w= "); FP12_YYY_output(&w); printf("\n");
-	FP12_YYY_copy(&lv,&w);
-	FP12_YYY_frob(&w,&f);
-	FP12_YYY_frob(&w,&f);
-	FP12_YYY_mul(&w,&w,&lv);
-
-//printf("w= "); FP12_YYY_output(&w); printf("\n");
-//exit(0);
-
-w.unitary=0;
-FP12_YYY_conj(&lv,&w);
-	printf("rx= "); FP12_YYY_output(&lv); printf("\n");
-FP12_YYY_inv(&lv,&w);
-	printf("ry= "); FP12_YYY_output(&lv); printf("\n");
-
-
-		return 0;
-}
-
-*/

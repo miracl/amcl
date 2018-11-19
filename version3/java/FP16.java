@@ -40,7 +40,6 @@ public final class FP16 {
 	}
 /* test this==0 ? */
 	public boolean iszilch() {
-		//reduce();
 		return (a.iszilch() && b.iszilch());
 	}
 
@@ -136,7 +135,7 @@ public final class FP16 {
 		b.copy(m);
 		b.add(a);
 		a.copy(t);
-	norm();
+		norm();
 	}
 
 /* this=conjugate(this) */
@@ -193,8 +192,6 @@ public final class FP16 {
 /* this*=this */	
 	public void sqr()
 	{
-//		norm();
-
 		FP8 t1=new FP8(a);
 		FP8 t2=new FP8(b);
 		FP8 t3=new FP8(a);
@@ -228,8 +225,6 @@ public final class FP16 {
 /* this*=y */
 	public void mul(FP16 y)
 	{
-//		norm();
-
 		FP8 t1=new FP8(a);
 		FP8 t2=new FP8(b);
 		FP8 t3=new FP8(0);
@@ -272,8 +267,6 @@ public final class FP16 {
 /* this=1/this */
 	public void inverse()
 	{
-//		norm();
-
 		FP8 t1=new FP8(a);
 		FP8 t2=new FP8(b);
 
@@ -292,7 +285,6 @@ public final class FP16 {
 /* this*=i where i = sqrt(-1+sqrt(-1)) */
 	public void times_i()
 	{
-//		norm();
 		FP8 s=new FP8(b);
 		FP8 t=new FP8(a);
 		s.times_i();
@@ -423,7 +415,6 @@ public final class FP16 {
 /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
 	public FP16 xtr_pow2(FP16 ck,FP16 ckml,FP16 ckm2l,BIG a,BIG b)
 	{
-
 		BIG e=new BIG(a);
 		BIG d=new BIG(b);
 		BIG w=new BIG(0);

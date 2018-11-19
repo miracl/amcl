@@ -212,7 +212,6 @@ static void parse(byte *seed,sign32 *poly)
 		n+=hash[j+2]; n<<=8;
 		n+=hash[j+3]; j+=4;
 		poly[i]=nres(n);
-		//poly[i]=modmul(n,RLWE_ONE); // reduce 31-bit random number mod q
 	}
 } 
 
@@ -251,8 +250,6 @@ static void NHSunpack(byte *array,sign32 *poly)
 		poly[i++]=(f>>2)|(g<<6);
 	}
 }
-
-
 
 /* See https://eprint.iacr.org/2016/1157.pdf */ 
 

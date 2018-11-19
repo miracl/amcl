@@ -111,22 +111,10 @@ public struct BIG{
 
     static func muladd(_ a: Chunk,_ b: Chunk,_ c: Chunk,_ r: Chunk) -> (Chunk,Chunk)
     {
-	let (tp,bt)=a.multipliedFullWidth(by: b)
-	var bot = Chunk(bt)&BIG.BMASK
-	var top = (tp << Chunk(64-BIG.BASEBITS)) | Chunk(bt >> BIG.BASEBITS)
-/*
-        let x0=a&BIG.HMASK;
-        let x1=(a>>Chunk(BIG.HBITS))
-        let y0=b&BIG.HMASK;
-        let y1=(b>>Chunk(BIG.HBITS))
-        var bot=x0*y0
-        var top=x1*y1
-        let mid=x0*y1+x1*y0
-        let u0=mid&BIG.HMASK
-        let u1=(mid>>Chunk(BIG.HBITS))
-        bot=bot+(u0<<Chunk(BIG.HBITS))
-	top+=u1
-*/
+        let (tp,bt)=a.multipliedFullWidth(by: b)
+        var bot = Chunk(bt)&BIG.BMASK
+        var top = (tp << Chunk(64-BIG.BASEBITS)) | Chunk(bt >> BIG.BASEBITS)
+
         bot+=c; bot+=r
         let carry=bot>>Chunk(BIG.BASEBITS)
         bot &= BIG.BMASK
@@ -389,7 +377,7 @@ public struct BIG{
         for i in 0 ..< Int(BIG.MODBYTES)
         {
             m.fshl(8)
-            m.w[0]+=Chunk(b[i+n])&0xff    //(int)b[i+n]&0xff;
+            m.w[0]+=Chunk(b[i+n])&0xff   
         }
         return m;
     }
@@ -401,13 +389,6 @@ public struct BIG{
     {
         return frombytearray(b,0)
     }
-/* set this[i]+=x*y+c, and return high part
-    func muladd(_ x: Int32,_ y: Int32,_ c: Int32,_ i: Int) -> Int32
-    {
-        let prod:DChunk = DChunk(x)*DChunk(y)+DChunk(c)+DChunk(w[i])
-        w[i]=Int32(prod&DChunk(BIG.BMASK))
-        return Int32(prod>>DChunk(BIG.BASEBITS))
-    } */
 
 /* this*=x, where x is >NEXCESS */
     @discardableResult mutating func pmul(_ c: Int) -> Chunk
@@ -461,7 +442,6 @@ public struct BIG{
                 if (i+j<BIG.NLEN) {
                     let (top,bot)=BIG.muladd(a.w[i],b.w[j],carry,c.w[i+j])
                     carry=top; c.w[i+j]=bot
-                    //carry=c.muladd(a.w[i],b.w[j],carry,i+j)
                 }
             }
         }
@@ -597,16 +577,11 @@ public struct BIG{
         {
             m.fshr(1)
 
-		r.copy(self)
-		r.sub(m)
-		r.norm()
-		cmove(r,Int(1-((r.w[BIG.NLEN-1]>>Chunk(BIG.CHUNK-1))&1)))
-/*
-            if (BIG.comp(self,m)>=0)
-            {
-				sub(m)
-				norm()
-            } */
+            r.copy(self)
+            r.sub(m)
+            r.norm()
+            cmove(r,Int(1-((r.w[BIG.NLEN-1]>>Chunk(BIG.CHUNK-1))&1)))
+
             k -= 1
         }
     }
@@ -633,24 +608,17 @@ public struct BIG{
             m.fshr(1)
             e.fshr(1)
 
-		r.copy(b)
-		r.sub(m)
-		r.norm()
-		let d=Int(1-((r.w[BIG.NLEN-1]>>Chunk(BIG.CHUNK-1))&1))
-		b.cmove(r,d)
-		r.copy(self)
-		r.add(e)
-		r.norm()
-		cmove(r,d)
-/*
-            if (BIG.comp(b,m)>=0)
-            {
-				add(e)
-				norm()
-				b.sub(m)
-				b.norm()
-            } */
-            k -= 1;
+            r.copy(b)
+            r.sub(m)
+            r.norm()
+            let d=Int(1-((r.w[BIG.NLEN-1]>>Chunk(BIG.CHUNK-1))&1))
+            b.cmove(r,d)
+            r.copy(self)
+            r.add(e)
+            r.norm()
+            cmove(r,d)
+
+            k -= 1
         }
     }
     /* get 8*BIG.MODBYTES size random number */
@@ -665,11 +633,11 @@ public struct BIG{
             if (j==0) {r=rng.getByte()}
             else {r>>=1}
     
-            let b=Chunk(r&1);
-            m.shl(1); m.w[0]+=b;// m.inc(b);
-            j += 1; j&=7;
+            let b=Chunk(r&1)
+            m.shl(1); m.w[0]+=b
+            j += 1; j&=7
         }
-        return m;
+        return m
     }
     
     /* Create random BIG in portable way, one bit at a time, less than q */
@@ -684,55 +652,13 @@ public struct BIG{
             if (j==0) {r=rng.getByte()}
             else {r>>=1}
     
-            let b=Chunk(r&1);
-            d.shl(1); d.w[0]+=b; // m.inc(b);
-            j += 1; j&=7;
+            let b=Chunk(r&1)
+            d.shl(1); d.w[0]+=b
+            j += 1; j&=7
         }
-        let m=d.mod(q);
-        return m;
+        let m=d.mod(q)
+        return m
     }
-    
-    /* return NAF value as +/- 1, 3 or 5. x and x3 should be normed.
-    nbs is number of bits processed, and nzs is number of trailing 0s detected
-    static func nafbits(_ x: BIG,_ x3:BIG ,i:Int) -> [Chunk]
-    {
-        var j:Int
-        var n=[Chunk](repeating: 0,count: 3)
-        var nb=x3.bit(UInt(i))-x.bit(UInt(i))
-        n[1]=1;
-        n[0]=0;
-        if (nb==0) {n[0]=0; return n}
-        if (i==0) {n[0]=Chunk(nb); return n}
-        if (nb>0) {n[0]=1}
-        else      {n[0]=(-1)}
-    
-        j=i-1
-        while (true)
-        {
-            n[1] += 1
-            n[0]*=2
-            nb=x3.bit(UInt(j))-x.bit(UInt(j))
-            if (nb>0) {n[0]+=1}
-            if (nb<0) {n[0]-=1}
-            if (n[0]>5 || n[0] < -5) {break}
-            j-=1
-            if j==0 {break}
-        }
-    
-        if ((n[0]%2 != 0) && (j != 0))
-        { // backtrack 
-            if (nb>0) {n[0]=(n[0]-1)/2}
-            if (nb<0) {n[0]=(n[0]+1)/2}
-            n[1] -= 1;
-        }
-        while (n[0]%2==0)
-        { // remove trailing zeros 
-            n[0]/=2
-            n[2] += 1
-            n[1] -= 1
-        }
-        return n;
-    } */
     
     /* Jacobi Symbol (this/p). Returns 0, 1 or -1 */
     mutating func jacobi(_ p: BIG) -> Int
@@ -846,8 +772,6 @@ public struct BIG{
         var c=DBIG()
         let RM:DChunk=DChunk(BIG.BMASK);
         let RB:DChunk=DChunk(BIG.BASEBITS)
-   //     a.norm();
-   //     b.norm();
         
         var d=[DChunk](repeating: 0,count: BIG.NLEN)
         var s:DChunk
@@ -868,10 +792,8 @@ public struct BIG{
         {
             s-=d[k-BIG.NLEN]; t=co+s;
   
-            //for var i=BIG.NLEN-1;i>=1+k/2;i--
             var i=1+k/2
             while i<BIG.NLEN
-            //for i in 1+k/2...BIG.NLEN-1
             {
                 t+=DChunk(a.w[i]-a.w[k-i])*DChunk(b.w[k-i]-b.w[i])
                 i+=1
@@ -892,7 +814,6 @@ public struct BIG{
         var c=DBIG()
         let RM:DChunk=DChunk(BIG.BMASK);
         let RB:DChunk=DChunk(BIG.BASEBITS)
-   //     a.norm();
 
         t=DChunk(a.w[0])*DChunk(a.w[0])
         c.w[0]=Chunk(t&RM); co=t>>RB
@@ -927,51 +848,10 @@ public struct BIG{
         c.w[BIG.DNLEN-2]=Chunk(t&RM); co=t>>RB
         c.w[BIG.DNLEN-1]=Chunk(co)
 
-
-/*
-
-        t=DChunk(a.w[0])*DChunk(a.w[0])
-        c.w[0]=Chunk(t&RM); co=t>>RB
-        t=DChunk(a.w[1])*DChunk(a.w[0]); t+=t; t+=co
-        c.w[1]=Chunk(t&RM); co=t>>RB
-        
-        var j:Int
-        let last=BIG.NLEN-(BIG.NLEN%2)
-        j=2
-        //for j=2;j<last;j+=2
-        while (j<last)
-        {
-            t=DChunk(a.w[j])*DChunk(a.w[0]); for i in 1 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])} ; t+=t; t+=co; t+=DChunk(a.w[j/2])*DChunk(a.w[j/2])
-            c.w[j]=Chunk(t&RM); co=t>>RB
-            t=DChunk(a.w[j+1])*DChunk(a.w[0]); for i in 1 ..< (j+2)/2 {t+=DChunk(a.w[j+1-i])*DChunk(a.w[i])} ; t+=t; t+=co
-            c.w[j+1]=Chunk(t&RM); co=t>>RB
-            j+=2
-        }
-        j=last
-        if (BIG.NLEN%2)==1
-        {
-            t=DChunk(a.w[j])*DChunk(a.w[0]); for i in 1 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])} ; t+=t; t+=co; t+=DChunk(a.w[j/2])*DChunk(a.w[j/2])
-            c.w[j]=Chunk(t&RM); co=t>>RB; j += 1
-            t=DChunk(a.w[BIG.NLEN-1])*DChunk(a.w[j-BIG.NLEN+1]); for i in j-BIG.NLEN+2 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])}; t+=t; t+=co
-            c.w[j]=Chunk(t&RM); co=t>>RB; j += 1
-        }
-        while (j<BIG.DNLEN-2)
-        {
-            t=DChunk(a.w[BIG.NLEN-1])*DChunk(a.w[j-BIG.NLEN+1]); for i in j-BIG.NLEN+2 ..< (j+1)/2 {t+=DChunk(a.w[j-i])*DChunk(a.w[i])} ; t+=t; t+=co; t+=DChunk(a.w[j/2])*DChunk(a.w[j/2])
-            c.w[j]=Chunk(t&RM); co=t>>RB
-            t=DChunk(a.w[BIG.NLEN-1])*DChunk(a.w[j-BIG.NLEN+2]); for i in j-BIG.NLEN+3 ..< (j+2)/2 {t+=DChunk(a.w[j+1-i])*DChunk(a.w[i])} ; t+=t; t+=co
-            c.w[j+1]=Chunk(t&RM); co=t>>RB
-            j+=2
-        }
-        t=DChunk(a.w[BIG.NLEN-1])*DChunk(a.w[BIG.NLEN-1])+co
-        c.w[BIG.DNLEN-2]=Chunk(t&RM); co=t>>RB
-        c.w[BIG.DNLEN-1]=Chunk(co)
-*/    
-        return c;
+        return c
     }
     static func monty(_ md:BIG,_ mc:Chunk,_ d: inout DBIG) -> BIG
     {
-    //    let md=BIG(ROM.Modulus);
         let RM:DChunk=DChunk(BIG.BMASK)
         let RB:DChunk=DChunk(BIG.BASEBITS)
         
@@ -987,8 +867,6 @@ public struct BIG{
         for k in 1 ..< BIG.NLEN
         {
             t=c+s+DChunk(v[0])*DChunk(md.w[k])
-            //for i in 1+k/2...k-1
-            //for var i=k-1;i>k/2;i--
             var i=1+k/2
             while i<k
             {
@@ -1000,9 +878,7 @@ public struct BIG{
         }
         for k in BIG.NLEN ..< 2*BIG.NLEN-1
         {
-            t=c+s;
-            //for i in 1+k/2...BIG.NLEN-1
-            //for var i=BIG.NLEN-1;i>=1+k/2;i--
+            t=c+s
             var i=1+k/2
             while i<BIG.NLEN
             {
@@ -1012,7 +888,6 @@ public struct BIG{
             b.w[k-BIG.NLEN]=Chunk(t&RM); c=DChunk(d.w[k+1])+(t>>RB); s-=dd[k-BIG.NLEN+1]
         }
         b.w[BIG.NLEN-1]=Chunk(c&RM)
-     //   b.norm()
         return b;
     }
 #endif
@@ -1054,7 +929,6 @@ public struct BIG{
     static func monty(_ md:BIG,_ mc:Chunk,_ d: inout DBIG) -> BIG
     {
         var b=BIG()
-    //    let md=BIG(ROM.Modulus);
         var carry:Chunk
         var m:Chunk
         for i in 0 ..< BIG.NLEN {

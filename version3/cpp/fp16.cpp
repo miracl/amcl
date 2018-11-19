@@ -225,9 +225,8 @@ void YYY::FP16_mul(FP16 *w,FP16 *x,FP16 *y)
 
 	FP8_norm(&t4); // 2
 	FP8_norm(&t3); // 2
-//printf("Into 16 mul 2\n");
+
     FP8_mul(&t4,&t4,&t3); /* (xa+xb)(ya+yb) */
-//printf("Into 16 mul 2a\n");
 	FP8_neg(&t3,&t1);  // 1
 	FP8_add(&t4,&t4,&t3);  //t4E=3
     FP8_norm(&t4);
@@ -308,14 +307,11 @@ void YYY::FP16_times_i4(FP16 *w)
 void YYY::FP16_frob(FP16 *w,FP2 *f)
 { // f=(i+1)^(p-3)/8
 	FP2 ff;
-	//FP4 f4;
 	FP2_sqr(&ff,f);  // (i+1)^(p-3)/4
 	FP2_norm(&ff);
 
 	FP8_frob(&(w->a),&ff);
 	FP8_frob(&(w->b),&ff);
-
-	//FP4_from_FP2(&f4,f); // (1+i)^(p-3)/8
 
 	FP8_qmul(&(w->b),&(w->b),f);  // times (1+i)^(p-3)/8
 	FP8_times_i(&(w->b));		// (i+1)^(p-1)/8
@@ -582,116 +578,3 @@ void YYY::FP16_xtr_pow2(FP16 *r,FP16 *ck,FP16 *cl,FP16 *ckml,FP16 *ckm2l,BIG a,B
 }
 
 #endif
-
-
-
-/*
-int main(){
-		FP2 w0,w1,f;
-		FP8 w,t;
-		FP8 c1,c2,c3,c4,cr;
-		BIG a,b;
-		BIG e,e1,e2;
-		BIG p,md;
-
-
-		BIG_rcopy(md,Modulus);
-		//Test w^(P^4) = w mod p^2
-		BIG_zero(a); BIG_inc(a,27);
-		BIG_zero(b); BIG_inc(b,45);
-		FP2_from_BIGs(&w0,a,b);
-
-		BIG_zero(a); BIG_inc(a,33);
-		BIG_zero(b); BIG_inc(b,54);
-		FP2_from_BIGs(&w1,a,b);
-
-		FP8_from_FP2s(&w,&w0,&w1);
-		FP8_reduce(&w);
-
-		printf("w= ");
-		FP8_output(&w);
-		printf("\n");
-
-
-		FP8_copy(&t,&w);
-
-
-		BIG_copy(p,md);
-		FP8_pow(&w,&w,p);
-
-		printf("w^p= ");
-		FP8_output(&w);
-		printf("\n");
-//exit(0);
-
-		BIG_rcopy(a,CURVE_Fra);
-		BIG_rcopy(b,CURVE_Frb);
-		FP2_from_BIGs(&f,a,b);
-
-		FP8_frob(&t,&f);
-		printf("w^p= ");
-		FP8_output(&t);
-		printf("\n");
-
-		FP8_pow(&w,&w,p);
-		FP8_pow(&w,&w,p);
-		FP8_pow(&w,&w,p);
-		printf("w^p4= ");
-		FP8_output(&w);
-		printf("\n");
-
-// Test 1/(1/x) = x mod p^4
-		FP8_from_FP2s(&w,&w0,&w1);
-		printf("Test Inversion \nw= ");
-		FP8_output(&w);
-		printf("\n");
-
-		FP8_inv(&w,&w);
-		printf("1/w mod p^4 = ");
-		FP8_output(&w);
-		printf("\n");
-
-		FP8_inv(&w,&w);
-		printf("1/(1/w) mod p^4 = ");
-		FP8_output(&w);
-		printf("\n");
-
-		BIG_zero(e); BIG_inc(e,12);
-
-
-
-	//	FP8_xtr_A(&w,&t,&w,&t,&t);
-		FP8_xtr_pow(&w,&w,e);
-
-		printf("w^e= ");
-		FP8_output(&w);
-		printf("\n");
-
-
-		BIG_zero(a); BIG_inc(a,37);
-		BIG_zero(b); BIG_inc(b,17);
-		FP2_from_BIGs(&w0,a,b);
-
-		BIG_zero(a); BIG_inc(a,49);
-		BIG_zero(b); BIG_inc(b,31);
-		FP2_from_BIGs(&w1,a,b);
-
-		FP8_from_FP2s(&c1,&w0,&w1);
-		FP8_from_FP2s(&c2,&w0,&w1);
-		FP8_from_FP2s(&c3,&w0,&w1);
-		FP8_from_FP2s(&c4,&w0,&w1);
-
-		BIG_zero(e1); BIG_inc(e1,3331);
-		BIG_zero(e2); BIG_inc(e2,3372);
-
-		FP8_xtr_pow2(&w,&c1,&w,&c2,&c3,e1,e2);
-
-		printf("c^e= ");
-		FP8_output(&w);
-		printf("\n");
-
-
-		return 0;
-}
-*/
-

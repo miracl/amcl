@@ -43,7 +43,6 @@ public final class FP24 {
 	}
 /* test x==0 ? */
 	public boolean iszilch() {
-		//reduce();
 		return (a.iszilch() && b.iszilch() && c.iszilch());
 	}
 
@@ -163,7 +162,6 @@ public final class FP24 {
 /* Granger-Scott Unitary Squaring */
 	public void usqr()
 	{
-//System.out.println("Into usqr");
 		FP8 A=new FP8(a);
 		FP8 B=new FP8(c);
 		FP8 C=new FP8(b);
@@ -211,14 +209,14 @@ public final class FP24 {
 		A.sqr();
 		B.mul(c);
 		B.add(B);
-	B.norm();
+		B.norm();
 		C.sqr();
 		D.mul(b);
 		D.add(D);
 
 		c.add(a);
 		c.add(b);
-	c.norm();
+		c.norm();
 		c.sqr();
 
 		a.copy(A);
@@ -244,7 +242,6 @@ public final class FP24 {
 /* FP12 full multiplication this=this*y */
 	public void mul(FP24 y)
 	{
-//System.out.println("Into mul");
 		FP8 z0=new FP8(a);
 		FP8 z1=new FP8(0);
 		FP8 z2=new FP8(b);
@@ -258,16 +255,16 @@ public final class FP24 {
 		t0.add(b);
 		t1.add(y.b);
 
-	t0.norm();
-	t1.norm();
+		t0.norm();
+		t1.norm();
 
 		z1.copy(t0); z1.mul(t1);
 		t0.copy(b); t0.add(c);
 
 		t1.copy(y.b); t1.add(y.c);
 
-	t0.norm();
-	t1.norm();
+		t0.norm();
+		t1.norm();
 
 		z3.copy(t0); z3.mul(t1);
 
@@ -275,7 +272,6 @@ public final class FP24 {
 		t1.copy(z2); t1.neg();
 
 		z1.add(t0);
-		//z1.norm();
 		b.copy(z1); b.add(t1);
 
 		z3.add(t1);
@@ -284,8 +280,8 @@ public final class FP24 {
 		t0.copy(a); t0.add(c);
 		t1.copy(y.a); t1.add(y.c);
 
-t0.norm();
-t1.norm();
+		t0.norm();
+		t1.norm();
 	
 		t0.mul(t1);
 		z2.add(t0);
@@ -297,7 +293,7 @@ t1.norm();
 		z3.add(t1);
 		t0.times_i();
 		b.add(t0);
-	z3.norm();
+		z3.norm();
 		z3.times_i();
 		a.copy(z0); a.add(z3);
 		norm();
@@ -361,7 +357,7 @@ t1.norm();
 			t0.copy(b); t0.add(c);
 			t0.norm();
 
-			z3.copy(t0); //z3.mul(y.c);
+			z3.copy(t0); 
 			z3.pmul(y.c.getb());
 			z3.times_i();
 
@@ -406,7 +402,7 @@ t1.norm();
 		FP8 f2=new FP8(a);
 		FP8 f3=new FP8(0);
 
-		norm();
+		//norm();
 		f0.sqr();
 		f1.mul(c);
 		f1.times_i();

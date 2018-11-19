@@ -78,7 +78,6 @@ public struct FP48
     /* test x==0 ? */
     func iszilch() -> Bool
     {
-        //reduce();
         return a.iszilch() && b.iszilch() && c.iszilch()
     }
 
@@ -360,7 +359,7 @@ public struct FP48
             t0.copy(b); t0.add(c)
             t0.norm();
 
-            z3.copy(t0); //z3.mul(y.c);
+            z3.copy(t0); 
             z3.pmul(y.c.getb())
             z3.times_i()
 
@@ -404,7 +403,7 @@ public struct FP48
         var f2=FP16(a)
         var f3=FP16(0)
     
-        norm()
+        //norm()
         f0.sqr()
         f1.mul(c)
         f1.times_i()
@@ -713,7 +712,6 @@ public struct FP48
         for i in 0 ..< RM {w[i+15*RM]=t[i]}
 
 
-
         b.geta().geta().geta().getA().toBytes(&t)
         for i in 0 ..< RM {w[i+16*RM]=t[i]}
         b.geta().geta().geta().getB().toBytes(&t)
@@ -833,7 +831,6 @@ public struct FP48
         R.append(FP48(1))
         R.append(FP48(self))
 
-        //for var i=bts-1;i>=0;i--
         for i in (0...bts-1).reversed()
         {
             let b=Int((e>>i)&1)

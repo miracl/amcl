@@ -71,7 +71,6 @@ public struct FP4 {
     /* test this==0 ? */
     func iszilch() -> Bool
     {
-        //reduce()
         return a.iszilch() && b.iszilch()
     }
 
@@ -139,7 +138,6 @@ public struct FP4 {
         var t=FP2(0)
         m.add(b)
         m.neg()
-    //    m.norm()
         t.copy(m); t.add(b)
         b.copy(m)
         b.add(a)
@@ -204,8 +202,6 @@ public struct FP4 {
     /* self*=self */
     mutating func sqr()
     {
-//        norm();
-    
         var t1=FP2(a)
         var t2=FP2(b)
         var t3=FP2(a)
@@ -236,8 +232,6 @@ public struct FP4 {
     /* self*=y */
     mutating func mul(_ y:FP4)
     {
-    //    norm();
-    
         var t1=FP2(a)
         var t2=FP2(b)
         var t3=FP2(0)
@@ -282,7 +276,7 @@ public struct FP4 {
     /* self=1/self */
     mutating func inverse()
     {
-        norm();
+        //norm();
     
         var t1=FP2(a)
         var t2=FP2(b)
@@ -300,12 +294,10 @@ public struct FP4 {
     /* self*=i where i = sqrt(-1+sqrt(-1)) */
     mutating func times_i()
     {
-    //    norm();
         var s=FP2(b)
         var t=FP2(b)
         s.times_i()
         t.add(s)
-    //    t.norm()
         b.copy(a)
         a.copy(t)
         norm()
@@ -374,15 +366,12 @@ public struct FP4 {
         var r=FP4(0)
         var sf=FP4(self)
     
-        //n.norm();
         let par=n.parity()
         var v=BIG(n); v.norm(); v.fshr(1)
         if par==0 {v.dec(1); v.norm()}
     
         let nb=v.nbits()
-        //for i in (0...nb-1).reverse()
         var i=nb-1
-        //for var i=nb-1;i>=0;i--
         while i>=0
         {
             if (v.bit(UInt(i)) != 1)

@@ -77,7 +77,6 @@ func (F *FP48) norm() {
 }
 /* test x==0 ? */
 func (F *FP48) iszilch() bool {
-	//F.reduce()
 	return (F.a.iszilch() && F.b.iszilch() && F.c.iszilch())
 }
 
@@ -299,8 +298,6 @@ func (F *FP48) smul(y *FP48,twist int ) {
 		t1.copy(z2); t1.neg()
 
 		F.b.add(t0)
-	//F.b.norm();
-
 		F.b.add(t1)
 		z3.add(t1); z3.norm()
 		z2.add(t0)
@@ -328,7 +325,7 @@ func (F *FP48) smul(y *FP48,twist int ) {
 		t0.copy(F.b); t0.add(F.c)
 		t0.norm()
 
-		z3.copy(t0) //z3.mul(y.c);
+		z3.copy(t0)
 		z3.pmul(y.c.getb())
 		z3.times_i()
 
@@ -372,7 +369,7 @@ func (F *FP48) Inverse() {
 	f2:=NewFP16copy(F.a)
 	f3:=NewFP16int(0)
 
-	F.norm()
+	//F.norm()
 	f0.sqr()
 	f1.mul(F.c)
 	f1.times_i()
@@ -497,7 +494,6 @@ func FP48_fromBytes(w []byte) *FP48 {
 	f:=NewFP8fp4s(ea,eb)
 
 	g:=NewFP16fp8s(e,f)
-
 
 
 	for i:=0;i<MB;i++ {t[i]=w[i+16*MB]}

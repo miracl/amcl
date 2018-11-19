@@ -426,7 +426,6 @@ BIG = function(ctx) {
             var c = new BIG(0),
                 i;
 
-            //this.norm();
             c.copy(this);
 			c.norm();
 
@@ -454,8 +453,6 @@ BIG = function(ctx) {
         pmul: function(c) {
             var carry = 0,
                 ak, i;
-
-            //  this.norm();
 
             for (i = 0; i < BIG.NLEN; i++) {
                 ak = this.w[i];
@@ -576,12 +573,6 @@ BIG = function(ctx) {
                 r.norm();
                 this.cmove(r, (1 - ((r.w[BIG.NLEN - 1] >> (BIG.CHUNK - 1)) & 1)));
 
-                // if (BIG.comp(this,m)>=0)
-                // {
-                //     this.sub(m);
-                //     this.norm();
-                // }
-
                 k--;
             }
         },
@@ -617,14 +608,6 @@ BIG = function(ctx) {
                 r.add(e);
                 r.norm();
                 this.cmove(r, d);
-
-                // if (BIG.comp(b,m)>=0)
-                // {
-                //     this.add(e);
-                //     this.norm();
-                //     b.sub(m);
-                //     b.norm();
-                // }
 
                 k--;
             }
@@ -834,7 +817,6 @@ BIG = function(ctx) {
         for (i = 0; i < BIG.MODBYTES; i++) {
             m.fshl(8);
             m.w[0] += b[i + n] & 0xff;
-            //m.inc(b[i]&0xff);
         }
 
         return m;
@@ -931,58 +913,11 @@ BIG = function(ctx) {
         return m;
     };
 
-    /* return NAF value as +/- 1, 3 or 5. x and x3 should be normed.
-    nbs is number of bits processed, and nzs is number of trailing 0s detected */
-    /*
-    BIG.nafbits=function(x,x3,i)
-    {
-        var n=[];
-        var nb=x3.bit(i)-x.bit(i);
-        var j;
-        n[1]=1;
-        n[0]=0;
-        if (nb===0) {n[0]=0; return n;}
-        if (i===0) {n[0]=nb; return n;}
-        if (nb>0) n[0]=1;
-        else      n[0]=(-1);
-
-        for (j=i-1;j>0;j--)
-        {
-            n[1]++;
-            n[0]*=2;
-            nb=x3.bit(j)-x.bit(j);
-            if (nb>0) n[0]+=1;
-            if (nb<0) n[0]-=1;
-            if (n[0]>5 || n[0]<-5) break;
-        }
-
-        if (n[0]%2!==0 && j!==0)
-        { // backtrack
-            if (nb>0) n[0]=(n[0]-1)/2;
-            if (nb<0) n[0]=(n[0]+1)/2;
-            n[1]--;
-        }
-        while (n[0]%2===0)
-        { // remove trailing zeros
-            n[0]/=2;
-            n[2]++;
-            n[1]--;
-        }
-        return n;
-    };
-    */
-
     /* return a*b as ctx.DBIG */
     BIG.mul = function(a, b) {
         var c = new ctx.DBIG(0),
             d = new Array(BIG.NLEN), //[],
             n, s, t, i, k, co;
-
-        //  a.norm();
-        //  b.norm();
-
-        //if (!a.isok()) alert("Problem in mul a");
-        //if (!b.isok()) alert("Problem in mul b");
 
         for (i = 0; i < BIG.NLEN; i++) {
             d[i] = a.w[i] * b.w[i];
@@ -1017,27 +952,6 @@ BIG = function(ctx) {
         }
         c.w[BIG.DNLEN - 1] = co;
 
-        // for (var j=0;j<BIG.NLEN;j++)
-        // {
-        //     t=0; for (var i=0;i<=j;i++) t+=a.w[j-i]*b.w[i];
-        //     c.w[j]=t;
-        // }
-        // for (var j=BIG.NLEN;j<BIG.DNLEN-2;j++)
-        // {
-        //     t=0; for (var i=j-BIG.NLEN+1;i<BIG.NLEN;i++) t+=a.w[j-i]*b.w[i];
-        //     c.w[j]=t;
-        // }
-        // t=a.w[BIG.NLEN-1]*b.w[BIG.NLEN-1];
-        // c.w[BIG.DNLEN-2]=t;
-        // var co=0;
-        // for (var i=0;i<BIG.DNLEN-1;i++)
-        // {
-        //     n=c.w[i]+co;
-        //     c.w[i]=n&BIG.BMASK;
-        //     co=(n-c.w[i])*BIG.MODINV;
-        // }
-        // c.w[BIG.DNLEN-1]=co;
-
         return c;
     };
 
@@ -1045,10 +959,7 @@ BIG = function(ctx) {
     BIG.sqr = function(a) {
         var c = new ctx.DBIG(0),
             n, t, j, i, co;
-        //  a.norm();
-
-        //if (!a.isok()) alert("Problem in sqr");
-
+ 
         c.w[0] = a.w[0] * a.w[0];
 
         for (j = 1; j < BIG.NLEN - 1;) {
@@ -1107,8 +1018,8 @@ BIG = function(ctx) {
 
     BIG.monty = function(m, nd, d) {
         var b = new BIG(0),
-            v = new Array(BIG.NLEN),//[],
-            dd = new Array(BIG.NLEN),//[],
+            v = new Array(BIG.NLEN),
+            dd = new Array(BIG.NLEN),
             s, c, t, i, k;
 
         t = d.w[0];
@@ -1448,13 +1359,6 @@ DBIG = function(ctx) {
                 dr.sub(m);
                 dr.norm();
                 this.cmove(dr, (1 - ((dr.w[ctx.BIG.DNLEN - 1] >> (ctx.BIG.CHUNK - 1)) & 1)));
-
-                // if (DBIG.comp(this,m)>=0)
-                // {
-                //     this.sub(m);
-                //     this.norm();
-                // }
-
                 k--;
             }
 
@@ -1495,14 +1399,6 @@ DBIG = function(ctx) {
                 r.add(e);
                 r.norm();
                 a.cmove(r, d);
-
-                // if (DBIG.comp(this,m)>0)
-                // {
-                //     a.add(e);
-                //     a.norm();
-                //     this.sub(m);
-                //     this.norm();
-                // }
 
                 k--;
             }

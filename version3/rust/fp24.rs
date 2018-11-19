@@ -90,7 +90,6 @@ impl FP24 {
 
 /* test self=0 ? */
 	pub fn iszilch(&self) -> bool {
-		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch() && self.c.iszilch();
 	}	
 
@@ -332,7 +331,6 @@ impl FP24 {
 			t1.copy(&z2); t1.neg();
 	
 			self.b.add(&t0);
-		//self.b.norm();
 
 			self.b.add(&t1);
 			z3.add(&t1);
@@ -363,7 +361,7 @@ impl FP24 {
 			t0.copy(&self.b); t0.add(&self.c);
 			t0.norm();
 
-			z3.copy(&t0); //z3.mul(y.c);
+			z3.copy(&t0); 
 			z3.pmul(&y.c.getb());
 			z3.times_i();
 
@@ -407,7 +405,7 @@ impl FP24 {
 		let mut f2=FP8::new_copy(&self.a);
 		let mut f3=FP8::new();
 
-		self.norm();
+		//self.norm();
 		f0.sqr();
 		f1.mul(&self.c);
 		f1.times_i();

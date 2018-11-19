@@ -94,7 +94,6 @@ impl FP2 {
 
 /* test self=0 ? */
 	pub fn iszilch(&self) -> bool {
-		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch();
 	}	
 
@@ -144,13 +143,11 @@ impl FP2 {
 
 /* negate self mod Modulus */
 	pub fn neg(&mut self) {
-	//	self.norm();
 		let mut m=FP::new_copy(&self.a);
 		let mut t=FP::new();
 
 		m.add(&self.b);
 		m.neg();
-	//	m.norm();
 		t.copy(&m); t.add(&self.b);
 		self.b.copy(&m);
 		self.b.add(&self.a);
@@ -205,7 +202,6 @@ impl FP2 {
 		let mut w3=FP::new_copy(&self.a);
 		let mut mb=FP::new_copy(&self.b);
 
-	//	w3.mul(&self.b);
 		w1.add(&self.b);
 
 		w3.add(&self.a);
@@ -224,12 +220,10 @@ impl FP2 {
 /* this*=y */
 	pub fn mul(&mut self,y :&FP2) {
 
-
 		if ((self.a.xes+self.b.xes) as i64)*((y.a.xes+y.b.xes) as i64) > fp::FEXCESS as i64 {
 			if self.a.xes>1 {self.a.reduce()}
 			if self.b.xes>1 {self.b.reduce()}
 		}
-
 
   		let p = BIG::new_ints(&rom::MODULUS);    
   		let mut pr=DBIG::new();
@@ -307,7 +301,6 @@ impl FP2 {
 
 /* self*=sqrt(-1) */
 	pub fn times_i(&mut self) {
-	//	a.norm();
 		let z=FP::new_copy(&self.a);
 		self.a.copy(&self.b); self.a.neg();
 		self.b.copy(&z);
@@ -316,14 +309,12 @@ impl FP2 {
 /* w*=(1+sqrt(-1)) */
 /* where X*2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
 	pub fn mul_ip(&mut self) {
-	//	self.norm();
 		let t=FP2::new_copy(self);
 		let z=FP::new_copy(&self.a);
 		self.a.copy(&self.b);
 		self.a.neg();
 		self.b.copy(&z);
 		self.add(&t);
-	//	self.norm();
 	}
 
 	pub fn div_ip2(&mut self) {
@@ -345,9 +336,4 @@ impl FP2 {
 	}
 
 }
-/*
-fn main()
-{
-	let mut x=FP2::new();
-}
-*/
+

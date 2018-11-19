@@ -160,7 +160,6 @@ void BIG_XXX_fromBytes(BIG_XXX a,char *b)
     {
         BIG_XXX_fshl(a,8);
         a[0]+=(int)(unsigned char)b[i];
-        //BIG_XXX_inc(a,(int)(unsigned char)b[i]); BIG_XXX_norm(a);
     }
 #ifdef DEBUG_NORM
     a[MPV_XXX]=1;
@@ -467,7 +466,6 @@ chunk BIG_XXX_pmul(BIG_XXX r,BIG_XXX a,int c)
 {
     int i;
     chunk ak,carry=0;
-//    BIG_XXX_norm(a);
     for (i=0; i<NLEN_XXX; i++)
     {
         ak=a[i];
@@ -521,8 +519,6 @@ void BIG_XXX_smul(BIG_XXX c,BIG_XXX a,BIG_XXX b)
 {
     int i,j;
     chunk carry;
-//    BIG_XXX_norm(a);
-//    BIG_XXX_norm(b);
 
     BIG_XXX_zero(c);
     for (i=0; i<NLEN_XXX; i++)
@@ -938,7 +934,6 @@ chunk BIG_XXX_split(BIG_XXX t,BIG_XXX b,DBIG_XXX d,int n)
     int i;
     chunk nw,carry=0;
     int m=n%BASEBITS_XXX;
-//	BIG_dnorm(d);
 
     if (m==0)
     {
@@ -1240,50 +1235,6 @@ int BIG_XXX_bit(BIG_XXX a,int n)
     else return 0;
 }
 
-/* return NAF value as +/- 1, 3 or 5. x and x3 should be normed.
-nbs is number of bits processed, and nzs is number of trailing 0s detected */
-/* SU= 32 */
-/*
-int BIG_nafbits(BIG x,BIG x3,int i,int *nbs,int *nzs)
-{
-	int j,r,nb;
-
-	nb=BIG_bit(x3,i)-BIG_bit(x,i);
-	*nbs=1;
-	*nzs=0;
-	if (nb==0) return 0;
-	if (i==0) return nb;
-
-    if (nb>0) r=1;
-    else      r=(-1);
-
-    for (j=i-1;j>0;j--)
-    {
-        (*nbs)++;
-        r*=2;
-        nb=BIG_bit(x3,j)-BIG_bit(x,j);
-        if (nb>0) r+=1;
-        if (nb<0) r-=1;
-        if (abs(r)>5) break;
-    }
-
-	if (r%2!=0 && j!=0)
-    { // backtrack
-        if (nb>0) r=(r-1)/2;
-        if (nb<0) r=(r+1)/2;
-        (*nbs)--;
-    }
-
-    while (r%2==0)
-    { // remove trailing zeros
-        r/=2;
-        (*nzs)++;
-        (*nbs)--;
-    }
-    return r;
-}
-*/
-
 /* return last n bits of a, where n is small < BASEBITS */
 /* SU= 16 */
 int BIG_XXX_lastbits(BIG_XXX a,int n)
@@ -1379,7 +1330,6 @@ void BIG_XXX_modneg(BIG_XXX r,BIG_XXX a1,BIG_XXX m)
 	BIG_XXX_copy(a,a1);
     BIG_XXX_mod(a,m);
     BIG_XXX_sub(r,m,a);
-//    BIG_XXX_mod(r,m);
 }
 
 /* Set a=a/b mod m */
@@ -1508,7 +1458,7 @@ void BIG_XXX_mod2m(BIG_XXX x,int m)
     int i,wd,bt;
     chunk msk;
     BIG_XXX_norm(x);
-//	if (m>=MODBITS) return;
+
     wd=m/BASEBITS_XXX;
     bt=m%BASEBITS_XXX;
     msk=((chunk)1<<bt)-1;

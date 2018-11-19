@@ -78,7 +78,6 @@ public struct FP24
     /* test x==0 ? */
     func iszilch() -> Bool
     {
-        //reduce();
         return a.iszilch() && b.iszilch() && c.iszilch()
     }
 
@@ -404,7 +403,7 @@ public struct FP24
         var f2=FP8(a)
         var f3=FP8(0)
     
-        norm()
+        //norm()
         f0.sqr()
         f1.mul(c)
         f1.times_i()
@@ -678,7 +677,6 @@ public struct FP24
         R.append(FP24(1))
         R.append(FP24(self))
 
-        //for var i=bts-1;i>=0;i--
         for i in (0...bts-1).reversed()
         {
             let b=Int((e>>i)&1)

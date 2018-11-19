@@ -20,7 +20,6 @@ under the License.
 use arch;
 use arch::Chunk;
 
-//#[cfg(D32)]
 use arch::DChunk;
 
 use xxx::dbig::DBIG;
@@ -46,12 +45,6 @@ pub struct BIG {
 impl Clone for BIG {
     fn clone(&self) -> BIG { *self }
 }
-/*
-#[derive(Copy, Clone)]
-pub struct BIG {
-    pub w: [Chunk; NLEN]
-}
-*/
 
 impl BIG {
 
@@ -153,35 +146,12 @@ impl BIG {
 
 
 /* Get top and bottom half of =x*y+c+r */
-//#[cfg(D32)]
     pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
         let prod:DChunk = (a as DChunk)*(b as DChunk)+(c as DChunk)+(r as DChunk);
         let bot=(prod&(BMASK as DChunk)) as Chunk;
         let top=(prod>>BASEBITS) as Chunk;   
         return (top,bot);     
     }
-
-/*
-#[cfg(D64)]
-    pub fn muladd(a: Chunk,b: Chunk,c: Chunk,r: Chunk) -> (Chunk,Chunk) {
-        let x0=a&HMASK;
-        let x1=a>>HBITS;
-        let y0=b&HMASK;
-        let y1=b>>HBITS;
-        let mut bot=x0*y0;
-        let mut top=x1*y1;
-        let mid=x0*y1+x1*y0;
-        let u0=mid&HMASK;
-        let u1=mid>>HBITS;
-        bot+= u0<<HBITS;
-        bot+=c; bot+=r;
-        top+=u1;
-        let carry=bot>>BASEBITS;
-        bot&=BMASK;
-        top+=carry;
-        return (top,bot);
-    }
-*/
 
 /* normalise BIG - force all digits < 2^BASEBITS */
     pub fn norm(&mut self) -> Chunk
@@ -330,11 +300,6 @@ impl BIG {
     	self.w[0]+=x as Chunk; 
     }
 
-//    pub fn incl(&mut self,x:Chunk) {
-//        self.norm();
-//        self.w[0]+=x; 
-//    }
-
 /* return self-x */
 	pub fn minus(&self,x:& BIG) -> BIG {
 		let mut d=BIG::new();
@@ -373,7 +338,6 @@ impl BIG {
 
 /* convert this BIG to byte array */
 	pub fn tobytearray(&mut self,b: &mut [u8],n:usize) {
-		//self.norm();
 		let mut c=BIG::new_copy(self);
 		c.norm();
 
@@ -404,7 +368,6 @@ impl BIG {
 /* self*=x, where x is >NEXCESS */
     pub fn pmul(&mut self,c: isize) -> Chunk {
         let mut carry=0 as Chunk;
-        //self.norm();
         for i in 0 ..NLEN {
             let ak=self.w[i];
             let tuple=BIG::muladd(ak,c as Chunk,carry,0 as Chunk);
@@ -579,18 +542,13 @@ impl BIG {
         }
     
         while k>0 {
-            m.fshr(1);
+		m.fshr(1);
 
 		r.copy(self);
 		r.sub(&m);
 		r.norm();
 		self.cmove(&r,(1-((r.w[NLEN-1]>>(arch::CHUNK-1))&1)) as isize);
-/*
-            if BIG::comp(self,&m)>=0 {
-				self.sub(&m);
-				self.norm();
-            } */
-            k -= 1;
+		k -= 1;
         }
     }
 
@@ -623,13 +581,6 @@ impl BIG {
 		r.add(&e);
 		r.norm();
 		self.cmove(&r,d);
-/*
-            if BIG::comp(&b,&m)>=0 {
-				self.add(&e);
-				self.norm();
-				b.sub(&m);
-				b.norm();
-            } */
             k -= 1;
         }
     }
@@ -646,7 +597,7 @@ impl BIG {
             } else {r>>=1}
 
             let b= (r as Chunk)&1; 
-            m.shl(1); m.w[0]+=b;// m.inc(b)
+            m.shl(1); m.w[0]+=b;
             j+=1; j&=7; 
         }
         return m;
@@ -664,7 +615,7 @@ impl BIG {
             } else {r>>=1}
 
             let b= (r as Chunk)&1;
-            d.shl(1); d.w[0]+=b; // m.inc(b);
+            d.shl(1); d.w[0]+=b; 
             j+=1; j&=7; 
         }
         let m=d.dmod(q);
@@ -764,23 +715,13 @@ impl BIG {
         if BIG::comp(&u,&one)==0 {self.copy(&x1)}
         else {self.copy(&x2)}
     }
-/*
-    pub fn isok(&self) ->bool {
-        let mut ok=true;
-        for i in 0 ..NLEN {
-            if (self.w[i]>>BASEBITS)!=0 {ok=false;}
-        }
-        return ok;
-    }
-*/
+
    /* return a*b as DBIG */
-//#[cfg(D32)]
+
     pub fn mul(a: &BIG,b: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let rm=BMASK as DChunk;
         let rb=BASEBITS;
-     //if !a.isok() {println!("a not normalised in mul");}
-     //if !b.isok() {println!("b not normalised in mul");}
 
         let mut d: [DChunk; DNLEN] = [0; DNLEN];
         for i in 0 ..NLEN {
@@ -810,14 +751,11 @@ impl BIG {
     }
 
 /* return a^2 as DBIG */
-//#[cfg(D32)]  
     pub fn sqr(a: &BIG) -> DBIG {
         let mut c=DBIG::new();
         let rm=BMASK as DChunk;
         let rb=BASEBITS;
  
-        //if !a.isok() {println!("a not normalised in sqr");}
-
         let mut t=(a.w[0] as DChunk)*(a.w[0] as DChunk); 
         c.w[0]=(t&rm) as Chunk; let mut co=t>>rb;
 
@@ -854,8 +792,6 @@ impl BIG {
         return c;
     }
 
-
-//#[cfg(D32)]
     pub fn monty(md: &BIG,mc: Chunk,d: &mut DBIG) -> BIG {
         let mut b=BIG::new();           
         let rm=BMASK as DChunk;
@@ -891,91 +827,9 @@ impl BIG {
             b.w[k-NLEN]=(t&rm) as Chunk; c=(d.w[k+1] as DChunk)+(t>>rb); s-=dd[k+1-NLEN];
         }
         b.w[NLEN-1]=(c&rm) as Chunk;  
-   //     b.norm();
         return b;
     }
     
-
-
-/* return a*b as DBIG 
-#[cfg(D64)]
-    pub fn mul(a: &BIG,b: &BIG) -> DBIG {
-        let mut c=DBIG::new();
-        //let mut carry = 0 as Chunk;
-        let mut carry:Chunk;
-        for i in 0 ..NLEN {
-            carry=0;
-            for j in 0 ..NLEN {
-                let tuple=BIG::muladd(a.w[i],b.w[j],carry,c.w[i+j]);
-                carry=tuple.0; c.w[i+j]=tuple.1;
-            }
-            c.w[NLEN+i]=carry;
-        }
-        return c;
-    } 
-
-// return a^2 as DBIG 
-#[cfg(D64)]
-    pub fn sqr(a: &BIG) -> DBIG {
-        let mut c=DBIG::new();
-        //let mut carry = 0 as Chunk;
-        let mut carry:Chunk;
-        for i in 0 ..NLEN {
-            carry=0;
-            for j in i+1 ..NLEN {
-                let tuple=BIG::muladd(2*a.w[i],a.w[j],carry,c.w[i+j]);
-                carry=tuple.0; c.w[i+j]=tuple.1;
-            //carry,c.w[i+j]=muladd(2*a.w[i],a.w[j],carry,c.w[i+j])
-            //carry=c.muladd(2*a.w[i],a.w[j],carry,i+j)
-            }
-            c.w[NLEN+i]=carry;
-        }
-
-        for i in 0 ..NLEN {
-            let tuple=BIG::muladd(a.w[i],a.w[i],0,c.w[2*i]);
-            c.w[2*i]=tuple.1;
-            c.w[2*i+1]+=tuple.0;
-        //c.w[2*i+1]+=c.muladd(a.w[i],a.w[i],0,2*i)
-        }
-        c.norm();
-        return c;
-    } 
-
-#[cfg(D64)]
-    pub fn monty(md: &BIG,mc: Chunk,d: &mut DBIG) -> BIG {
-        let mut b=BIG::new();     
-        //let mut carry=0 as Chunk; 
-        let mut carry:Chunk;
-        //let mut m=0 as Chunk;
-        let mut m:Chunk;
-        for i in 0 ..NLEN {
-            if mc==-1 { 
-                m=(-d.w[i])&BMASK;
-            } else {
-                if mc==1 {
-                    m=d.w[i];
-                } else {
-                    m=(mc*d.w[i])&BMASK;
-                }
-            }
-
-            carry=0;
-            for j in 0 ..NLEN {
-                let tuple=BIG::muladd(m,md.w[j],carry,d.w[i+j]);
-                carry=tuple.0; d.w[i+j]=tuple.1;
-            }
-            d.w[NLEN+i]+=carry;
-        }
-
-        for i in 0 ..NLEN {
-            b.w[i]=d.w[NLEN+i];
-        } 
-        b.norm();
-        return b;  
-    }
-
-*/
-
     pub fn ssn(r: &mut BIG,a: &BIG,m: &mut BIG) -> isize {
         let n=NLEN-1;
         m.w[0]=(m.w[0]>>1)|((m.w[1]<<(BASEBITS-1))&BMASK);
@@ -1037,42 +891,4 @@ impl BIG {
     }
 
 }
- 
-/*
-fn main() {
-	let fd: [i32; NLEN as usize] = [1, 2, 3, 4, 5, 6, 7, 8, 9];	
-	let mut x= BIG::new();
-	x.inc(3);
- 	println!("{}", x.w[0]);	
- 	let mut y= BIG::new_int(7);
- 	println!("{}", y.w[0]);	
- 	y=BIG::new_copy(&x);
-	println!("{}", y.w[0]); 	
-	x.add(&y);
-	x.add(&y);
-	println!("{}", x.w[0]); 	
-	let mut z= BIG::new_ints(&fd);
-	println!("{}", z.w[0]); 	
-	z.shr(3);
-	z.norm();
-	println!("{:X}", z.w[0]); 	
 
-	println!("{}",z.tostring());
-
-    let mut a = BIG::new_int(3);
-    let mut m = BIG::new_ints(&MODULUS);
-
-    println!("rom::MODULUS= {}",m.tostring());
-
-    let mut e = BIG::new_copy(&m);
-    e.dec(1); e.norm();
-    println!("Exponent= {}",e.tostring());
-//    for i in 0..20
-//    {
-        a=a.powmod(&mut e,&mut m);
-//        a.inc(2);
-//    }
-    println!("Result= {}",a.tostring());
-
-}
-*/

@@ -74,7 +74,6 @@ public struct FP2
     /* test this=0 ? */
     func iszilch() -> Bool
     {
-        //reduce()
         return (a.iszilch() && b.iszilch())
     }
     
@@ -148,13 +147,11 @@ public struct FP2
     /* negate self mod Modulus */
     mutating func neg()
     {
-    //    norm();
         var m=FP(a)
         var t=FP(0)
     
         m.add(b)
         m.neg()
-    //    m.norm()
         t.copy(m); t.add(b)
         b.copy(m)
         b.add(a)
@@ -327,14 +324,12 @@ public struct FP2
     /* where X*2-(1+sqrt(-1)) is irreducible for FP4, assumes p=3 mod 8 */
     mutating func mul_ip()
     {
-    //    norm();
         let t=FP2(self)
         let z=FP(a)
         a.copy(b)
         a.neg()
         b.copy(z)
         add(t)
-    //    norm()
     }
     /* w/=(1+sqrt(-1)) */
     mutating func div_ip()
@@ -350,7 +345,7 @@ public struct FP2
     mutating func div_ip2()
     {
         var t=FP2(0)
-	norm()
+        norm()
         t.a.copy(a); t.a.add(b)
         t.b.copy(b); t.b.sub(a)
         copy(t); norm()

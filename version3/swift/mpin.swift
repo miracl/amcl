@@ -31,7 +31,6 @@ public struct MPIN
 {
     static public let EFS=Int(BIG.MODBYTES)
     static public let EGS=Int(BIG.MODBYTES)
-    //static public let PAS:Int=16
     static let INVALID_POINT:Int = -14
     static let BAD_PARAMS:Int = -11
     static let WRONG_ORDER:Int = -18
@@ -46,8 +45,6 @@ public struct MPIN
     static let PBLEN:Int32 = 14      // Number of bits in PIN
     static let TS:Int = 10         // 10 for 4 digit PIN, 14 for 6-digit PIN - 2^TS/TS approx = sqrt(MAXPIN)
     static let TRAP:Int = 200      // 200 for 4 digit PIN, 2000 for 6-digit PIN  - approx 2*sqrt(MAXPIN)
-
-    //static public let HASH_TYPE=SHA256
     
     private static func mpin_hash(_ sha:Int,_ c: FP4,_ U: ECP) -> [UInt8]
     {
@@ -123,9 +120,7 @@ public struct MPIN
         }
         else
         {
-	    for i in 0 ..< sha {W[i+RM-sha]=R[i]}
-
-            //for i in 0 ..< sha {W[i]=R[i]}
+            for i in 0 ..< sha {W[i+RM-sha]=R[i]}
         }
         return W
     }
@@ -272,10 +267,6 @@ public struct MPIN
     {
         let r=BIG(ROM.CURVE_Order)
         let s=BIG.randomnum(r,&rng)
-	//if ROM.AES_S>0
-	//{
-	//	s.mod2m(2*ROM.AES_S)
-	//}    
         s.toBytes(&S);
         return 0;
     }
@@ -318,24 +309,6 @@ public struct MPIN
         return 0
     }    
 
-    // Extract PIN from TOKEN for identity CID
-    /*
-    static public func EXTRACT_PIN(_ sha:Int,_ CID:[UInt8],_ pin:Int32,_ TOKEN:inout [UInt8]) -> Int
-    {
-        let P=ECP.fromBytes(TOKEN)
-        if P.is_infinity() {return INVALID_POINT}
-        let h=MPIN.hashit(sha,0,CID)
-        var R=ECP.mapit(h)
-
-        R=R.pinmul(pin%MAXPIN,MPIN.PBLEN)
-        P.sub(R)
-    
-        P.toBytes(&TOKEN,false)
-    
-        return 0
-    }*/
-
-
     // Implement step 2 on client side of MPin protocol
     static public func CLIENT_2(_ X:[UInt8],_ Y:[UInt8],_ SEC:inout [UInt8]) -> Int
     {
@@ -347,12 +320,11 @@ public struct MPIN
         let py=BIG.fromBytes(Y)
         px.add(py)
         px.mod(r)
-     //   px.rsub(r)
 
         P=PAIR.G1mul(P,px)
         P.neg()
         P.toBytes(&SEC,false);
-      //  PAIR.G1mul(P,px).toBytes(&SEC,false)
+
         return 0
     }
     
@@ -361,22 +333,16 @@ public struct MPIN
     {
 
         let r=BIG(ROM.CURVE_Order)
-   //     let q=BIG(ROM.Modulus)
         var x:BIG
         if rng != nil
         {
             x=BIG.randomnum(r,&rng!)
-            //if ROM.AES_S>0
-            //{
-             //   x.mod2m(2*ROM.AES_S)
-            //}
             x.toBytes(&X);
         }
         else
         {
             x=BIG.fromBytes(X);
         }
-    //    var t=[UInt8](count:EFS,repeatedValue:0)
 
         var h=MPIN.hashit(sha,0,CLIENT_ID)
         var P=ECP.mapit(h);
@@ -444,10 +410,6 @@ public struct MPIN
         if rng != nil
         {
             x=BIG.randomnum(r,&rng!)
-            //if ROM.AES_S>0
-            //{
-            //    x.mod2m(2*ROM.AES_S)
-            //}
             x.toBytes(&X)
         }
         else
@@ -493,18 +455,15 @@ public struct MPIN
 	P.toBytes(&HID,false)
         if date != 0
         {
-       //     if HID != nil {P.toBytes(&HID!,false)}
             h=hashit(sha,date,h)
             let R=ECP.mapit(h)
             P.add(R)
             P.toBytes(&HTID!,false)
         }
-        //else {P.toBytes(&HID!,false)}
     }
     // Implement step 2 of MPin protocol on server side
     static public func SERVER_2(_ date:Int32,_ HID:[UInt8]?,_ HTID:[UInt8]?,_ Y:[UInt8],_ SST:[UInt8],_ xID:[UInt8]?,_ xCID:[UInt8]?,_ mSEC:[UInt8],_ E:inout [UInt8]?,_ F:inout [UInt8]?) -> Int
     { 
-      //  _=BIG(ROM.Modulus);
         let Q=ECP2.generator();
         let sQ=ECP2.fromBytes(SST)
         if sQ.is_infinity() {return INVALID_POINT}
@@ -529,7 +488,7 @@ public struct MPIN
         if P.is_infinity() {return INVALID_POINT}
     
         P=PAIR.G1mul(P,y)
-        P.add(R); //P.affine()
+        P.add(R); 
         R=ECP.fromBytes(mSEC)
         if R.is_infinity() {return MPIN.INVALID_POINT}
 
@@ -550,7 +509,7 @@ public struct MPIN
                     if R.is_infinity() {return MPIN.INVALID_POINT}
     
                     P=PAIR.G1mul(P,y);
-                    P.add(R); //P.affine()
+                    P.add(R); 
 				}
 				g=PAIR.ate(Q,P);
 				g=PAIR.fexp(g);
@@ -677,9 +636,7 @@ public struct MPIN
     
         W=PAIR.G1mul(W,x)
     
-     //   let f=FP2(BIG(ROM.Fra),BIG(ROM.Frb))
         let r=BIG(ROM.CURVE_Order)
-     //   let q=BIG(ROM.Modulus)
     
         z.add(h)   // new
         z.mod(r)
@@ -688,30 +645,7 @@ public struct MPIN
         g1.mul(g2)
 
         let c=g1.compow(z,r)
-/*
-        let m=BIG(q)
-        m.mod(r)
-    
-        let a=BIG(z)
-        a.mod(m)
-    
-        let b=BIG(z)
-        b.div(m);
-    
 
-    
-        var c=g1.trace()
-//        g2.copy(g1)
-        g2.frob(f)
-        let cp=g2.trace()
-        g1.conj()
-        g2.mul(g1)
-        let cpm1=g2.trace()
-        g2.mul(g1)
-        let cpm2=g2.trace()
-    
-        c=c.xtr_pow2(cp,cpm1,cpm2,a,b)
- */     
         let t=mpin_hash(sha,c,W)
 
         for i in 0 ..< ECP.AESKEY {CK[i]=t[i]}
@@ -743,7 +677,7 @@ public struct MPIN
         let w=BIG.fromBytes(W)
         let h=BIG.fromBytes(H)
         A=PAIR.G1mul(A,h)
-        R.add(A); //R.affine()
+        R.add(A); 
 
         U=PAIR.G1mul(U,w)
         var g=PAIR.ate(sQ,R)
@@ -772,17 +706,12 @@ public struct MPIN
         var y = BIG.fromBytes(h)
         let q=BIG(ROM.CURVE_Order)
         y.mod(q)
-	//if ROM.AES_S>0
-	//{
-	//	y.mod2m(2*ROM.AES_S)
-	//}
         y.toBytes(&Y)
     }
     // One pass MPIN Client
     static public func CLIENT(_ sha:Int,_ date:Int32,_ CLIENT_ID:[UInt8],_ RNG: inout RAND?,_ X:inout [UInt8],_ pin:Int32,_ TOKEN:[UInt8],_  SEC:inout [UInt8],_ xID:inout [UInt8]?,_ xCID:inout [UInt8]?,_ PERMIT:[UInt8]?,_ TimeValue:Int32,_ Y:inout [UInt8]) -> Int
     {
         var rtn=0
-        //var xID=xID 
   
         rtn = MPIN.CLIENT_1(sha,date,CLIENT_ID,&RNG,&X,pin,TOKEN,&SEC,&xID,&xCID,PERMIT!)
 

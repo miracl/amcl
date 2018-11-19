@@ -31,14 +31,8 @@ import org.apache.milagro.amcl.AES;
 
 public class MPIN
 {
-
-//	public static final int SHA256=32;
-//	public static final int SHA384=48;
-//	public static final int SHA512=64;
-
 	public static final int EFS=BIG.MODBYTES;
 	public static final int EGS=BIG.MODBYTES;
-//	public static final int PAS=16;
 	public static final int INVALID_POINT=-14;
 	public static final int BAD_PARAMS=-11;
 	public static final int WRONG_ORDER=-18;
@@ -91,9 +85,6 @@ public class MPIN
 		{
 			for (int i=0;i<sha;i++) W[i+len-sha]=R[i];
             for (int i=0;i<len-sha;i++) W[i]=0;
-
-			//for (int i=0;i<sha;i++) W[i]=R[i];
-			//for (int i=sha;i<len;i++) W[i]=0;
 		}
 		return W;
 	}
@@ -244,13 +235,13 @@ public class MPIN
 		BIG p=new BIG(ROM.Modulus);
 		u=BIG.randomnum(p,rng);
 
-		su=rng.getByte(); /*if (su<0) su=-su;*/ su%=2;
+		su=rng.getByte();  su%=2;
 		
 		ECP W=map(u,su);
-		P.sub(W); //P.affine();
+		P.sub(W); 
 		sv=P.getS();
 		rn=unmap(v,P);
-		m=rng.getByte(); /*if (m<0) m=-m;*/ m%=rn;
+		m=rng.getByte();  m%=rn;
 		v.inc(m+1);
 		E[0]=(byte)(su+2*sv);
 		u.toBytes(T);
@@ -277,7 +268,7 @@ public class MPIN
 		sv=(D[0]>>1)&1;
 		ECP W=map(u,su);
 		ECP P=map(v,sv);
-		P.add(W); //P.affine();
+		P.add(W); 
 		u=P.getX();
 		v=P.getY();
 		D[0]=0x04;
@@ -297,7 +288,7 @@ public class MPIN
 
 		if (P.is_infinity() || Q.is_infinity()) return INVALID_POINT;
 
-		P.add(Q); //P.affine();
+		P.add(Q); 
 
 		P.toBytes(R,false);
 		return 0;
@@ -311,7 +302,7 @@ public class MPIN
 
 		if (P.is_infinity() || Q.is_infinity()) return INVALID_POINT;
 
-		P.add(Q); //P.affine();
+		P.add(Q); 
 	
 		P.toBytes(W);
 		return 0;
@@ -323,10 +314,6 @@ public class MPIN
 		BIG s;
 		BIG r=new BIG(ROM.CURVE_Order);
 		s=BIG.randomnum(r,rng);
-		//if (ROM.AES_S>0)
-		//{
-		//	s.mod2m(2*ROM.AES_S);
-		//}
 		s.toBytes(S);
 		return 0;
 	}
@@ -343,7 +330,7 @@ public class MPIN
 		pin%=MAXPIN;
 
 		R=R.pinmul(pin,PBLEN);
-		P.sub(R); //P.affine();
+		P.sub(R); 
 
 		P.toBytes(TOKEN,false);
 
@@ -361,7 +348,6 @@ public class MPIN
 		BIG py=BIG.fromBytes(Y);
 		px.add(py);
 		px.mod(r);
-	//	px.rsub(r);
 
 		P=PAIR.G1mul(P,px);
 		P.neg();
@@ -377,10 +363,6 @@ public class MPIN
 		if (rng!=null)
 		{
 			x=BIG.randomnum(r,rng);
-			//if (ROM.AES_S>0)
-			//{
-			//	x.mod2m(2*ROM.AES_S);
-			//}
 			x.toBytes(X);
 		}
 		else
@@ -389,7 +371,6 @@ public class MPIN
 		}
 		ECP P,T,W;
 		BIG px;
-//		byte[] t=new byte[EFS];
 
 		byte[] h=hashit(sha,0,CLIENT_ID,EFS);
 		P=ECP.mapit(h);
@@ -413,11 +394,10 @@ public class MPIN
 				P.toBytes(xID,false);
 				W=PAIR.G1mul(W,x);
 				P.add(W);
-				//P.affine();
 			}
 			else
 			{
-				P.add(W); //P.affine();
+				P.add(W); 
 				P=PAIR.G1mul(P,x);
 			}
 			if (xCID!=null) P.toBytes(xCID,false);
@@ -431,7 +411,6 @@ public class MPIN
 			}
 		}
 
-		//T.affine();
 		T.toBytes(SEC,false);
 		return 0;
 	}
@@ -459,10 +438,6 @@ public class MPIN
 		if (rng!=null)
 		{
 			x=BIG.randomnum(r,rng);
-			//if (ROM.AES_S>0)
-			//{
-			//	x.mod2m(2*ROM.AES_S);
-			//}
 			x.toBytes(X);
 		}
 		else
@@ -511,13 +486,11 @@ public class MPIN
 		P.toBytes(HID,false);   // new
 		if (date!=0)
 		{
-	//		if (HID!=null) P.toBytes(HID);
 			h=hashit(sha,date,h,EFS);
 			R=ECP.mapit(h);
 			P.add(R); //P.affine();
 			P.toBytes(HTID,false);
 		}
-	//	else P.toBytes(HID,false);
 	}
 
 /* Implement step 2 of MPin protocol on server side */
@@ -573,7 +546,7 @@ public class MPIN
 					if (R.is_infinity()) return INVALID_POINT;
 
 					P=PAIR.G1mul(P,y);
-					P.add(R); //P.affine();
+					P.add(R); 
 				}
 				g=PAIR.ate(Q,P);
 				g=PAIR.fexp(g);
@@ -681,9 +654,7 @@ public class MPIN
 
 		W=PAIR.G1mul(W,x);
 
-//		FP2 f=new FP2(new BIG(ROM.Fra),new BIG(ROM.Frb));
 		BIG r=new BIG(ROM.CURVE_Order);
-//		BIG q=new BIG(ROM.Modulus);
 
 		z.add(h);	//new
 		z.mod(r);
@@ -692,29 +663,7 @@ public class MPIN
 		g1.mul(g2);
 
 		FP4 c=g1.compow(z,r);
-/*
-		BIG m=new BIG(q);
-		m.mod(r);
 
-		BIG a=new BIG(z);
-		a.mod(m);
-
-		BIG b=new BIG(z);
-		b.div(m);
-
-
-		FP4 c=g1.trace();
-		g2.copy(g1);
-		g2.frob(f);
-		FP4 cp=g2.trace();
-		g1.conj();
-		g2.mul(g1);
-		FP4 cpm1=g2.trace();
-		g2.mul(g1);
-		FP4 cpm2=g2.trace();
-
-		c=c.xtr_pow2(cp,cpm1,cpm2,a,b);
-*/
 		t=mpin_hash(sha,c,W);
 
 		for (int i=0;i<ECP.AESKEY;i++) CK[i]=t[i];
@@ -746,7 +695,7 @@ public class MPIN
 		BIG w=BIG.fromBytes(W);
 		BIG h=BIG.fromBytes(H);
 		A=PAIR.G1mul(A,h);	// new
-		R.add(A); //R.affine();
+		R.add(A);
 
 		U=PAIR.G1mul(U,w);
 		FP12 g=PAIR.ate(sQ,R);
@@ -768,10 +717,6 @@ public class MPIN
 		BIG y = BIG.fromBytes(h);
 		BIG q=new BIG(ROM.CURVE_Order);
 		y.mod(q);
-		//if (ROM.AES_S>0)
-		//{
-		//	y.mod2m(2*ROM.AES_S);
-		//}
 		y.toBytes(Y);
 	}
         

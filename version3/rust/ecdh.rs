@@ -36,13 +36,9 @@ pub const ERROR:  isize=-3;
 pub const INVALID: isize=-4;
 pub const EFS: usize=big::MODBYTES as usize;
 pub const EGS: usize=big::MODBYTES as usize;
-//pub const EAS: usize=16;
-//pub const EBS: usize=16;
 pub const SHA256: usize=32;
 pub const SHA384: usize=48;
 pub const SHA512: usize=64;
-
-//pub const HASH_TYPE: usize=SHA512;
 
 #[allow(non_snake_case)]
 
@@ -98,10 +94,6 @@ fn hashit(sha: usize, a: &[u8],n: usize,b: Option<&[u8]>,pad: usize,w: &mut [u8]
 		} else {
 			for i in 0..sha {w[i+pad-sha]=r[i]}
 			for i in 0..(pad-sha) {w[i]=0}
- 
-
-			//for i in 0..sha {w[i]=r[i]}
-			//for i in sha..pad {w[i]=0}
 		}
 	}
 }
@@ -181,9 +173,8 @@ pub fn hmac(sha: usize,m: &[u8],k: &[u8],olen: usize,tag: &mut [u8]) -> bool {
 	* The output is the calculated tag */
 	let mut b:[u8;64]=[0;64];  /* Not good */
 	let mut k0:[u8;128]=[0;128];
-//	let olen=tag.len();    /* length of HMAC */
 
-	if olen<4 /*|| olen>sha */ {return false}
+	if olen<4  {return false}
 
 	let mut lb=64;
 	if sha>32 {lb=128}
@@ -219,7 +210,6 @@ pub fn cbc_iv0_encrypt(k: &[u8],m: &[u8]) -> Vec<u8> { /* AES CBC encryption, wi
 	a.init(aes::CBC,k.len(),k,None);
 
 	let mut ipt=0; 
-//	let mut opt=0;
 	let mut i;
 	loop {
 		i=0;
@@ -232,7 +222,6 @@ pub fn cbc_iv0_encrypt(k: &[u8],m: &[u8]) -> Vec<u8> { /* AES CBC encryption, wi
 		a.encrypt(&mut buff);
 		for j in 0..16 {
 			c.push(buff[j]);
-			//c[opt]=buff[j]; opt+=1;
 		}
 	}    
 
@@ -245,7 +234,6 @@ pub fn cbc_iv0_encrypt(k: &[u8],m: &[u8]) -> Vec<u8> { /* AES CBC encryption, wi
 
 	for j in 0..16 {
 		c.push(buff[j]);
-		//c[opt]=buff[j]; opt+=1;
 	}
 	a.end();   
 	return c;
@@ -262,7 +250,6 @@ pub fn cbc_iv0_decrypt(k: &[u8],c: &[u8]) -> Option<Vec<u8>> { /* padding is rem
 	a.init(aes::CBC,k.len(),k,None);
 
 	let mut ipt=0; 
-	//let mut opt=0;
 	let mut i;
 
 	if c.len()==0 {return None}
@@ -281,7 +268,6 @@ pub fn cbc_iv0_decrypt(k: &[u8],c: &[u8]) -> Option<Vec<u8>> { /* padding is rem
 		if fin {break}
 		for j in 0..16 {
 			m.push(buff[j]);
-			//m[opt]=buff[j]; opt+=1;
 		}
 	}    
 
@@ -298,7 +284,6 @@ pub fn cbc_iv0_decrypt(k: &[u8],c: &[u8]) -> Option<Vec<u8>> { /* padding is rem
 	if !bad { 
 		for i in 0..16-padlen {
 			m.push(buff[i]);
-			//m[opt]=buff[j]; opt+=1;
 		}
 	}
 
@@ -326,9 +311,6 @@ pub fn key_pair_generate(rng: Option<&mut RAND>,s: &mut [u8],w: &mut [u8]) -> is
 		sc.rmod(&r);		
 	}
 
-	//if rom::AES_S>0 {
-	//	sc.mod2m(2*rom::AES_S)
-	//}
 	sc.tobytes(s);
 
 	let WP=G.mul(&mut sc);
@@ -416,9 +398,7 @@ pub fn ecpsp_dsa(sha: usize,rng: &mut RAND,s: &[u8],f: &[u8],c: &mut [u8],d: &mu
 	while db.iszilch() {
 		let mut u=BIG::randomnum(&r,rng);
 		let mut w=BIG::randomnum(&r,rng);   /* side channel masking */
-		//if rom::AES_S>0 {
-		//	u.mod2m(2*rom::AES_S);
-		//}			
+		
 		V.copy(&G);
 		V=V.mul(&mut u);   		
 		let vx=V.getx();
@@ -592,12 +572,6 @@ pub fn ecies_decrypt(sha: usize,p1: &[u8],p2: &[u8],v: &[u8],c: &mut Vec<u8>,t: 
 	for _ in 0..p2l+8 {c.pop();}
 
 	if !ncomp(&t,&tag,t.len()) {return None}
-
-	//let mut same=true;
-	//for i in 0..t.len() {
-	//	if t[i]!=tag[i] {same=false}
-	//}
-	//if !same {return None}
 	
 	return m;
 }

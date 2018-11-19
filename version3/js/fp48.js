@@ -54,7 +54,6 @@ var FP48 = function(ctx) {
 
         /* test x==0 ? */
         iszilch: function() {
-            //this.reduce();
             return (this.a.iszilch() && this.b.iszilch() && this.c.iszilch());
         },
 
@@ -151,9 +150,9 @@ var FP48 = function(ctx) {
 
         /* Granger-Scott Unitary Squaring */
         usqr: function() {
-            var A = new ctx.FP16(this.a), //A.copy(this.a)
-                B = new ctx.FP16(this.c), //B.copy(this.c)
-                C = new ctx.FP16(this.b), //C.copy(this.b)
+            var A = new ctx.FP16(this.a), 
+                B = new ctx.FP16(this.c),
+                C = new ctx.FP16(this.b),
                 D = new ctx.FP16(0);
 
             this.a.sqr();
@@ -189,14 +188,14 @@ var FP48 = function(ctx) {
 
         /* Chung-Hasan SQR2 method from http://cacr.uwaterloo.ca/techreports/2006/cacr2006-24.pdf */
         sqr: function() {
-            var A = new ctx.FP16(this.a), //A.copy(this.a)
-                B = new ctx.FP16(this.b), //B.copy(this.b)
-                C = new ctx.FP16(this.c), //C.copy(this.c)
-                D = new ctx.FP16(this.a); //D.copy(this.a)
+            var A = new ctx.FP16(this.a), 
+                B = new ctx.FP16(this.b), 
+                C = new ctx.FP16(this.c), 
+                D = new ctx.FP16(this.a); 
 
             A.sqr();
             B.mul(this.c);
-            B.add(B); //B.norm();
+            B.add(B); 
             C.sqr();
             D.mul(this.b);
             D.add(D);
@@ -225,12 +224,12 @@ var FP48 = function(ctx) {
 
         /* FP48 full multiplication this=this*y */
         mul: function(y) {
-            var z0 = new ctx.FP16(this.a), //z0.copy(this.a)
+            var z0 = new ctx.FP16(this.a), 
                 z1 = new ctx.FP16(0),
-                z2 = new ctx.FP16(this.b), //z2.copy(this.b)
+                z2 = new ctx.FP16(this.b), 
                 z3 = new ctx.FP16(0),
-                t0 = new ctx.FP16(this.a), //t0.copy(this.a)
-                t1 = new ctx.FP16(y.a); //t1.copy(y.a)
+                t0 = new ctx.FP16(this.a), 
+                t1 = new ctx.FP16(y.a); 
 
             z0.mul(y.a);
             z2.mul(y.b);
@@ -287,7 +286,7 @@ var FP48 = function(ctx) {
             z3.add(t1);
             t0.times_i();
             this.b.add(t0);
-            // z3.norm();
+  
             z3.times_i();
             this.a.copy(z0);
             this.a.add(z3);
@@ -300,11 +299,11 @@ var FP48 = function(ctx) {
             var z0, z1, z2, z3, t0, t1;
 
             if (twist == ctx.ECP.D_TYPE) {
-                z0 = new ctx.FP16(this.a), //z0.copy(this.a);
-                z2 = new ctx.FP16(this.b), //z2.copy(this.b);
-                z3 = new ctx.FP16(this.b), //z3.copy(this.b);
+                z0 = new ctx.FP16(this.a), 
+                z2 = new ctx.FP16(this.b), 
+                z3 = new ctx.FP16(this.b), 
                 t0 = new ctx.FP16(0),
-                t1 = new ctx.FP16(y.a); //t1.copy(y.a);
+                t1 = new ctx.FP16(y.a);
 
                 z0.mul(y.a);
                 z2.pmul(y.b.real());
@@ -398,9 +397,9 @@ var FP48 = function(ctx) {
 
         /* this=1/this */
         inverse: function() {
-            var f0 = new ctx.FP16(this.a), //f0.copy(this.a)
-                f1 = new ctx.FP16(this.b), //f1.copy(this.b)
-                f2 = new ctx.FP16(this.a), //f2.copy(this.a)
+            var f0 = new ctx.FP16(this.a), 
+                f1 = new ctx.FP16(this.b), 
+                f2 = new ctx.FP16(this.a), 
                 f3 = new ctx.FP16(0);
 
             f0.sqr();

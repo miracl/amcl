@@ -65,7 +65,6 @@ var FP = function(ctx) {
         bcopy: function(y) {
             this.f.copy(y);
             this.nres();
-            //alert("4. f= "+this.f.toString());
         },
 
         /* copy from another FP */
@@ -171,13 +170,6 @@ var FP = function(ctx) {
 				this.f.cmove(r,1-sr);
 				sb--;
 			}			
-/*
-    m.rcopy(ctx.ROM_FIELD.Modulus);
-	if (ctx.BIG.comp(this.f,m)>0)
-	{
-		alert("NOT fully reduced q= "+q+" carry= "+carry+" XES= "+this.XES+" FEXCESS= "+FP.FEXCESS+ " quo= "+FP.quo(this.f,m)+" FP.TBITS= "+FP.TBITS);
-	}
-*/
 
             this.XES = 1;
         },
@@ -213,7 +205,6 @@ var FP = function(ctx) {
             var s = false,
                 d, n;
 
-            //this.norm();
             if (c < 0) {
                 c = -c;
                 s = true;
@@ -233,21 +224,6 @@ var FP = function(ctx) {
                 }
             }
 
-            /*
-                    if (c<=ctx.BIG.NEXCESS && this.XES*c<=FP.FEXCESS)
-                    {
-                        this.f.imul(c);
-                        this.XES*=c;
-                        this.norm();
-                    }
-                    else
-                    {
-            //          var p=new ctx.BIG(0);
-            //          p.rcopy(ctx.ROM_FIELD.Modulus);
-                        var d=this.f.pxmul(c);
-                        this.f.copy(FP.mod(d));
-                    }
-            */
             if (s) {
                 this.neg();
                 this.norm();
@@ -262,7 +238,6 @@ var FP = function(ctx) {
             if (this.XES * this.XES > FP.FEXCESS) {
                 this.reduce();
             }
-            //if ((ea+1)>= Math.floor((FP.FEXCESS-1)/(ea+1))) this.reduce();
 
             d = ctx.BIG.sqr(this.f);
             t = FP.mod(d);
@@ -520,36 +495,6 @@ var FP = function(ctx) {
             return r;
         },
 
-        /* return this^e mod Modulus
-        pow: function(e) {
-            var bt,
-                r = new FP(1),
-                m = new FP(0);
-
-            e.norm();
-            this.norm();
-            m.copy(this);
-
-            for (;;) {
-                bt = e.parity();
-                e.fshr(1);
-
-                if (bt == 1) {
-                    r.mul(m);
-                }
-
-                if (e.iszilch()) {
-                    break;
-                }
-
-                m.sqr();
-            }
-
-            r.reduce();
-
-            return r;
-        }, */
-
         /* return jacobi symbol (this/Modulus) */
         jacobi: function() {
             var p = new ctx.BIG(0),
@@ -636,13 +581,6 @@ var FP = function(ctx) {
 		}
 		return Math.floor(num/(den+1))
 	};
-
-    /* calculate Field Excess
-    FP.EXCESS=function(a)
-    {
-        return ((a.w[ctx.BIG.NLEN-1]&FP.OMASK)>>(FP.MODBITS%ctx.BIG.BASEBITS))+1;
-    };
-    */
 
     /* reduce a ctx.DBIG to a ctx.BIG using a "special" modulus */
     FP.mod = function(d) {

@@ -299,7 +299,7 @@ impl ECP4 {
 			iy.times_i(); //iy.norm();
 		}
 
-		let mut t0=FP4::new_copy(&self.y);                  //***** Change 
+		let mut t0=FP4::new_copy(&self.y);             
 		t0.sqr();
 		if ecp::SEXTIC_TWIST==ecp::D_TYPE {		  
 			t0.times_i();
@@ -318,7 +318,6 @@ impl ECP4 {
 		t2.imul(3*rom::CURVE_B_I); 
 		if ecp::SEXTIC_TWIST==ecp::M_TYPE {	
 			t2.times_i();
-			//t2.norm();	
 		}
 		let mut x3=FP4::new_copy(&t2);
 		x3.mul(&self.z); 
@@ -361,7 +360,7 @@ impl ECP4 {
 
 		t3.sub(&t4); t3.norm(); 
 		if ecp::SEXTIC_TWIST==ecp::D_TYPE {
-			t3.times_i();  //t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+			t3.times_i();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 		}
 		t4.copy(&self.y);                    
 		t4.add(&self.z); t4.norm();			//t4=Y1+Z1
@@ -374,7 +373,7 @@ impl ECP4 {
 	
 		t4.sub(&x3); t4.norm(); 
 		if ecp::SEXTIC_TWIST==ecp::D_TYPE {
-			t4.times_i(); //t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+			t4.times_i();         //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 		}
 		x3.copy(&self.x); x3.add(&self.z); x3.norm();	// x3=X1+Z1
 		let mut y3=FP4::new_copy(&Q.x);				
@@ -385,8 +384,8 @@ impl ECP4 {
 		y3.rsub(&x3); y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
 		if ecp::SEXTIC_TWIST==ecp::D_TYPE {
-			t0.times_i(); //t0.norm(); // x.Q.x
-			t1.times_i();// t1.norm(); // y.Q.y
+			t0.times_i(); // x.Q.x
+			t1.times_i(); // y.Q.y
 		}
 		x3.copy(&t0); x3.add(&t0); 
 		t0.add(&x3); t0.norm();
@@ -399,7 +398,6 @@ impl ECP4 {
 		y3.imul(b); 
 		if ecp::SEXTIC_TWIST==ecp::M_TYPE {		
 			y3.times_i();
-			//y3.norm();
 		}
 		x3.copy(&y3); x3.mul(&t4); t2.copy(&t3); t2.mul(&t1); x3.rsub(&t2);
 		y3.mul(&t0); t1.mul(&z3); y3.add(&t1);
@@ -472,8 +470,6 @@ impl ECP4 {
 
 		const CT:usize=1+(big::NLEN*(big::BASEBITS as usize)+3)/4;
 		let mut w:[i8;CT]=[0;CT]; 
-
-	//	self.affine();
 
 /* precompute table */
 		Q.copy(&self);
@@ -665,10 +661,10 @@ impl ECP4 {
 		x = BIG::new_ints(&rom::CURVE_BNX);
 
 
-        let mut xQ=Q.mul(&mut x);
-        let mut x2Q=xQ.mul(&mut x);
-        let mut x3Q=x2Q.mul(&mut x);
-        let mut x4Q=x3Q.mul(&mut x);
+		let mut xQ=Q.mul(&mut x);
+		let mut x2Q=xQ.mul(&mut x);
+		let mut x3Q=x2Q.mul(&mut x);
+		let mut x4Q=x3Q.mul(&mut x);
 
 		if ecp::SIGN_OF_X==ecp::NEGATIVEX {
 			xQ.neg();

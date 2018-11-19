@@ -101,16 +101,11 @@ void FP8_YYY_neg(FP8_YYY *w,FP8_YYY *x)
     /* Just one field neg */
     FP4_YYY m,t;
 	FP8_YYY_norm(x);
-//printf("Into neg 1\n");
     FP4_YYY_add(&m,&(x->a),&(x->b));
 	FP4_YYY_norm(&m);
-//printf("Into neg 2\n");
     FP4_YYY_neg(&m,&m);
-//printf("Into neg 3\n");
     FP4_YYY_add(&t,&m,&(x->b));
-//printf("Into neg 4\n");
     FP4_YYY_add(&(w->b),&m,&(x->a));
-//printf("Into neg 5\n");
     FP4_YYY_copy(&(w->a),&t);
 	FP8_YYY_norm(w);
 }
@@ -282,9 +277,8 @@ void FP8_YYY_inv(FP8_YYY *w,FP8_YYY *x)
 
     FP4_YYY_sub(&t1,&t1,&t2);
 	FP4_YYY_norm(&t1);
-//printf(" in mark 1\n");
     FP4_YYY_inv(&t1,&t1);
-//printf(" in mark 2\n");
+
     FP4_YYY_mul(&(w->a),&t1,&(x->a));
     FP4_YYY_neg(&t1,&t1);
 	FP4_YYY_norm(&t1);
@@ -316,10 +310,8 @@ void FP8_YYY_frob(FP8_YYY *w,FP2_YYY *f)
 	FP2_YYY_sqr(&ff,f);  // (i+1)^(p-3)/2
 	FP2_YYY_mul_ip(&ff); // (i+1)^(p-1)/2
 	FP2_YYY_norm(&ff);
-//printf("in in here 1\n");
 	FP4_YYY_frob(&(w->a),&ff);
 	FP4_YYY_frob(&(w->b),&ff);
-//printf("in in here 2\n");
 	FP4_YYY_pmul(&(w->b),&(w->b),f);  // times (1+i)^(p-3)/4
 	FP4_YYY_times_i(&(w->b));		// (i+1)^(p-1)/4
 }
@@ -682,114 +674,4 @@ void FP8_YYY_div_2i(FP8_YYY *f)
 }
 
 #endif
-
-/*
-int main(){
-		FP2 w0,w1,f;
-		FP4 w,t;
-		FP4 c1,c2,c3,c4,cr;
-		BIG a,b;
-		BIG e,e1,e2;
-		BIG p,md;
-
-
-		BIG_rcopy(md,Modulus);
-		//Test w^(P^4) = w mod p^2
-		BIG_zero(a); BIG_inc(a,27);
-		BIG_zero(b); BIG_inc(b,45);
-		FP2_from_BIGs(&w0,a,b);
-
-		BIG_zero(a); BIG_inc(a,33);
-		BIG_zero(b); BIG_inc(b,54);
-		FP2_from_BIGs(&w1,a,b);
-
-		FP4_from_FP2s(&w,&w0,&w1);
-		FP4_reduce(&w);
-
-		printf("w= ");
-		FP4_output(&w);
-		printf("\n");
-
-
-		FP4_copy(&t,&w);
-
-
-		BIG_copy(p,md);
-		FP4_pow(&w,&w,p);
-
-		printf("w^p= ");
-		FP4_output(&w);
-		printf("\n");
-//exit(0);
-
-		BIG_rcopy(a,CURVE_Fra);
-		BIG_rcopy(b,CURVE_Frb);
-		FP2_from_BIGs(&f,a,b);
-
-		FP4_frob(&t,&f);
-		printf("w^p= ");
-		FP4_output(&t);
-		printf("\n");
-
-		FP4_pow(&w,&w,p);
-		FP4_pow(&w,&w,p);
-		FP4_pow(&w,&w,p);
-		printf("w^p4= ");
-		FP4_output(&w);
-		printf("\n");
-
-// Test 1/(1/x) = x mod p^4
-		FP4_from_FP2s(&w,&w0,&w1);
-		printf("Test Inversion \nw= ");
-		FP4_output(&w);
-		printf("\n");
-
-		FP4_inv(&w,&w);
-		printf("1/w mod p^4 = ");
-		FP4_output(&w);
-		printf("\n");
-
-		FP4_inv(&w,&w);
-		printf("1/(1/w) mod p^4 = ");
-		FP4_output(&w);
-		printf("\n");
-
-		BIG_zero(e); BIG_inc(e,12);
-
-
-
-	//	FP4_xtr_A(&w,&t,&w,&t,&t);
-		FP4_xtr_pow(&w,&w,e);
-
-		printf("w^e= ");
-		FP4_output(&w);
-		printf("\n");
-
-
-		BIG_zero(a); BIG_inc(a,37);
-		BIG_zero(b); BIG_inc(b,17);
-		FP2_from_BIGs(&w0,a,b);
-
-		BIG_zero(a); BIG_inc(a,49);
-		BIG_zero(b); BIG_inc(b,31);
-		FP2_from_BIGs(&w1,a,b);
-
-		FP4_from_FP2s(&c1,&w0,&w1);
-		FP4_from_FP2s(&c2,&w0,&w1);
-		FP4_from_FP2s(&c3,&w0,&w1);
-		FP4_from_FP2s(&c4,&w0,&w1);
-
-		BIG_zero(e1); BIG_inc(e1,3331);
-		BIG_zero(e2); BIG_inc(e2,3372);
-
-		FP4_xtr_pow2(&w,&c1,&w,&c2,&c3,e1,e2);
-
-		printf("c^e= ");
-		FP4_output(&w);
-		printf("\n");
-
-
-		return 0;
-}
-*/
 

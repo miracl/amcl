@@ -33,16 +33,6 @@ public final class ECDH {
 	public static final int INVALID=-4;
 	public static final int EFS=BIG.MODBYTES;
 	public static final int EGS=BIG.MODBYTES;
-//	public static final int EAS=16;
-//	public static final int EBS=16;
-
-//	public static final int SHA256=32;
-//	public static final int SHA384=48;
-//	public static final int SHA512=64;
-
-
-//	public static final int HASH_TYPE=SHA512;
-
 
 /* Convert Integer to n-byte array */
 	public static byte[] inttoBytes(int n,int len)
@@ -99,9 +89,6 @@ public final class ECDH {
 		{
 			for (int i=0;i<sha;i++) W[i+pad-sha]=R[i];
             for (int i=0;i<pad-sha;i++) W[i]=0;
- 
-			//for (int i=0;i<sha;i++) W[i]=R[i];
-			//for (int i=sha;i<pad;i++) W[i]=0;
 		}
 		return W;
 	}
@@ -199,8 +186,7 @@ public final class ECDH {
 		byte[] K0=new byte[b];
 		int olen=tag.length;
 
-		//b=K0.length;
-		if (olen<4 /*|| olen>sha*/) return 0;
+		if (olen<4) return 0;
 
 		for (int i=0;i<b;i++) K0[i]=0;
 
@@ -327,7 +313,6 @@ public final class ECDH {
 		BIG r,s;
 		ECP G,WP;
 		int res=0;
-	//	byte[] T=new byte[EFS];
 
 		G=ECP.generator();
 
@@ -343,10 +328,6 @@ public final class ECDH {
 			s=BIG.randomnum(r,RNG);
 		}
 
-		//if (ROM.AES_S>0)
-		//{
-		//	s.mod2m(2*ROM.AES_S);
-		//}
 		s.toBytes(S);
 
 		WP=G.mul(s);
@@ -438,10 +419,7 @@ public final class ECDH {
 		do {
 			u=BIG.randomnum(r,RNG);
 			w=BIG.randomnum(r,RNG); /* side channel masking */
-			//if (ROM.AES_S>0)
-			//{
-			//	u.mod2m(2*ROM.AES_S);
-			//}			
+
 			V.copy(G);
 			V=V.mul(u);   		
 			vx=V.getX();
@@ -597,10 +575,6 @@ public final class ECDH {
 		HMAC(sha,AC,K2,TAG);
 
 		if (!ncomp(T,TAG,T.length)) return new byte[0];
-		
-//		boolean same=true;
-//		for (i=0;i<T.length;i++) if (T[i]!=TAG[i]) same=false;
-//		if (!same) return new byte[0];
 	
 		return M;
 

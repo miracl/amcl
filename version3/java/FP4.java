@@ -40,7 +40,6 @@ public final class FP4 {
 	}
 /* test this==0 ? */
 	public boolean iszilch() {
-		//reduce();
 		return (a.iszilch() && b.iszilch());
 	}
 
@@ -130,14 +129,12 @@ public final class FP4 {
 		FP2 m=new FP2(a);
 		FP2 t=new FP2(0);
 		m.add(b);
-//	m.norm();
 		m.neg();
-	//	m.norm();
 		t.copy(m); t.add(b);
 		b.copy(m);
 		b.add(a);
 		a.copy(t);
-	norm();
+		norm();
 	}
 /* this=conjugate(this) */
 	public void conj()
@@ -187,8 +184,6 @@ public final class FP4 {
 /* this*=this */	
 	public void sqr()
 	{
-//		norm();
-
 		FP2 t1=new FP2(a);
 		FP2 t2=new FP2(b);
 		FP2 t3=new FP2(a);
@@ -221,8 +216,6 @@ public final class FP4 {
 /* this*=y */
 	public void mul(FP4 y)
 	{
-//		norm();
-
 		FP2 t1=new FP2(a);
 		FP2 t2=new FP2(b);
 		FP2 t3=new FP2(0);
@@ -234,26 +227,20 @@ public final class FP4 {
 		t3.add(y.a);
 		t4.add(a);
 
-	t3.norm();
-	t4.norm();
+		t3.norm();
+		t4.norm();
 
 		t4.mul(t3);
 
-	t3.copy(t1);
-	t3.neg();
-	t4.add(t3);
-	t4.norm();
+		t3.copy(t1);
+		t3.neg();
+		t4.add(t3);
+		t4.norm();
 
-	//	t4.sub(t1);
-	//	t4.norm();
-
-	t3.copy(t2);
-	t3.neg();
-	b.copy(t4);
-	b.add(t3);
-
-	//	b.copy(t4);
-	//	b.sub(t2);
+		t3.copy(t2);
+		t3.neg();
+		b.copy(t4);
+		b.add(t3);
 
 		t2.mul_ip();
 		a.copy(t2);
@@ -275,20 +262,18 @@ public final class FP4 {
 /* this=1/this */
 	public void inverse()
 	{
-//		norm();
-
 		FP2 t1=new FP2(a);
 		FP2 t2=new FP2(b);
 
 		t1.sqr();
 		t2.sqr();
 		t2.mul_ip();
-	t2.norm();
+		t2.norm();
 		t1.sub(t2);
 		t1.inverse();
 		a.mul(t1);
 		t1.neg();
-	t1.norm();
+		t1.norm();
 		b.mul(t1);
 	}
 
@@ -296,12 +281,10 @@ public final class FP4 {
 /* this*=i where i = sqrt(-1+sqrt(-1)) */
 	public void times_i()
 	{
-//		norm();
 		FP2 s=new FP2(b);
 		FP2 t=new FP2(b);
 		s.times_i();
 		t.add(s);
-	//	t.norm();
 		b.copy(a);
 		a.copy(t);
 		norm();
@@ -339,12 +322,11 @@ public final class FP4 {
 	{
 		FP4 r=new FP4(w);
 		FP4 t=new FP4(w);
-	//y.norm();
 		r.sub(y);
-	r.norm();
+		r.norm();
 		r.pmul(a);
 		t.add(y);
-	t.norm();
+		t.norm();
 		t.pmul(b);
 		t.times_i();
 
@@ -360,7 +342,7 @@ public final class FP4 {
 		FP4 w=new FP4(this);
 		sqr(); w.conj();
 		w.add(w);
-	w.norm();
+		w.norm();
 		sub(w);
 		reduce();
 	}
@@ -376,7 +358,6 @@ public final class FP4 {
 		FP4 t=new FP4(0);
 		FP4 r=new FP4(0);
 
-		//n.norm();
 		int par=n.parity();
 		BIG v=new BIG(n); v.norm(); v.fshr(1);
 		if (par==0) {v.dec(1); v.norm();}
@@ -641,84 +622,4 @@ public final class FP4 {
 		b.pmul(s);
 	}
 
-
-
-/*
-	public static void main(String[] args) {
-		BIG m=new BIG(ROM.Modulus);
-		BIG e=new BIG(12);
-		BIG a=new BIG(0);
-		BIG b=new BIG(0);
-		
-		a.inc(27); b.inc(45);
-
-		FP2 w0=new FP2(a,b);
-
-		a.zero(); b.zero();
-		a.inc(33); b.inc(54);
-
-		FP2 w1=new FP2(a,b);
-
-
-		FP4 w=new FP4(w0,w1);
-		FP4 t=new FP4(w);
-
-		a=new BIG(ROM_ZZZ.CURVE_Fra);
-		b=new BIG(ROM_ZZZ.CURVE_Frb);
-
-		FP2 f=new FP2(a,b);
-
-		System.out.println("w= "+w.toString());
-
-		w=w.pow(m);
-
-		System.out.println("w^p= "+w.toString());
-
-		t.frob(f);
-
-
-		System.out.println("w^p= "+t.toString());
-
-		w=w.pow(m);
-		w=w.pow(m);
-		w=w.pow(m);
-		System.out.println("w^p4= "+w.toString());
-
-
-	System.out.println("Test Inversion");
-
-		w=new FP4(w0,w1);
-
-		w.inverse();
-
-		System.out.println("1/w mod p^4 = "+w.toString());
-
-		w.inverse();
-
-		System.out.println("1/(1/w) mod p^4 = "+w.toString());
-
-		FP4 ww=new FP4(w);
-
-		w=w.xtr_pow(e);
-		System.out.println("w^e= "+w.toString());
-
-
-		a.zero(); b.zero();
-		a.inc(37); b.inc(17);
-		w0=new FP2(a,b);
-		a.zero(); b.zero();
-		a.inc(49); b.inc(31);
-		w1=new FP2(a,b);
-
-		FP4 c1=new FP4(w0,w1);
-		FP4 c2=new FP4(w0,w1);
-		FP4 c3=new FP4(w0,w1);
-
-		BIG e1=new BIG(3331);
-		BIG e2=new BIG(3372);
-
-		FP4 cr=w.xtr_pow2(c1,c2,c3,e1,e2);
-
-		System.out.println("c^e= "+cr.toString()); 
-	} */
 }

@@ -28,7 +28,6 @@ pub struct ECP2 {
 	x:FP2,
 	y:FP2,
 	z:FP2,
-//	inf: bool
 }
 
 #[allow(non_snake_case)]
@@ -39,7 +38,6 @@ impl ECP2 {
 				x: FP2::new(),
 				y: FP2::new_int(1),
 				z: FP2::new(),
-//				inf: true
 		}
 	}
 #[allow(non_snake_case)]
@@ -70,14 +68,12 @@ impl ECP2 {
 		let mut rhs=ECP2::rhs(&E.x);
 		if rhs.sqrt() {
 			E.y.copy(&rhs);
-		//	E.inf=false;
 		} else {E.inf();}
 		return E;
 	}
 
 /* Test this=O? */
 	pub fn is_infinity(&self) -> bool {
-	//	if self.inf {return true}
 		let xx=FP2::new_copy(&self.x);
 		let zz=FP2::new_copy(&self.z);
 		return xx.iszilch() && zz.iszilch();
@@ -88,12 +84,10 @@ impl ECP2 {
 		self.x.copy(&P.x);
 		self.y.copy(&P.y);
 		self.z.copy(&P.z);
-	//	self.inf=P.inf;
 	}
 
 /* set self=O */
 	pub fn inf(&mut self) {
-	//	self.inf=true;
 		self.x.zero();
 		self.y.one();
 		self.z.zero();
@@ -101,7 +95,6 @@ impl ECP2 {
 
 /* set self=-self */
 	pub fn neg(&mut self) {
-	//	if self.is_infinity() {return}
 		self.y.norm(); self.y.neg(); self.y.norm();
 	}	
 
@@ -110,12 +103,6 @@ impl ECP2 {
 		self.x.cmove(&Q.x,d);
 		self.y.cmove(&Q.y,d);
 		self.z.cmove(&Q.z,d);
-/*
-		let bd:bool;
-		if d==0 {bd=false}
-		else {bd=true}
-
-		self.inf=(self.inf!=(self.inf!=Q.inf)&&bd); */
 	}
 
 /* return 1 if b==c, no branching */
@@ -149,8 +136,6 @@ impl ECP2 {
 
 /* Test if P == Q */
 	pub fn equals(&mut self,Q :&mut ECP2) -> bool {
-	//	if self.is_infinity() && Q.is_infinity() {return true}
-	//	if self.is_infinity() || Q.is_infinity() {return false}
 
 		let mut a=FP2::new_copy(&self.x);
 		let mut b=FP2::new_copy(&Q.x); 
@@ -246,13 +231,11 @@ impl ECP2 {
 	pub fn tostring(&self) -> String {
 		let mut W=ECP2::new(); W.copy(self); W.affine();
 		if W.is_infinity() {return String::from("infinity")}
-		//self.affine();
 		return format!("({},{})",W.x.tostring(),W.y.tostring());
 }	
 
 /* Calculate RHS of twisted curve equation x^3+B/i */
 	pub fn rhs(x:&FP2) -> FP2 {
-		//x.norm();
 		let mut r=FP2::new_copy(x);
 		r.sqr();
 		let mut b=FP2::new_big(&BIG::new_ints(&rom::CURVE_B));
@@ -274,8 +257,6 @@ impl ECP2 {
 
 /* self+=self */
 	pub fn dbl(&mut self) -> isize {
-	//	if self.inf {return -1}
-
 		let mut iy=FP2::new_copy(&self.y);
 		if ecp::SEXTIC_TWIST==ecp::D_TYPE {		
 			iy.mul_ip(); iy.norm();
@@ -324,12 +305,6 @@ impl ECP2 {
 
 /* self+=Q - return 0 for add, 1 for double, -1 for O */
 	pub fn add(&mut self,Q:&ECP2) -> isize {
-		/*if self.inf {
-			self.copy(Q);
-			return -1;
-		}
-		if Q.inf {return -1}*/
-
 
 		let b=3*rom::CURVE_B_I;
 		let mut t0=FP2::new_copy(&self.x);
@@ -409,7 +384,6 @@ impl ECP2 {
 
 /* set this*=q, where q is Modulus, using Frobenius */
 	pub fn frob(&mut self,x:&FP2) {
-	// 	if self.inf {return}
 		let mut x2=FP2::new_copy(x);
 		x2.sqr();
 		self.x.conj();
@@ -436,8 +410,6 @@ impl ECP2 {
 
 		const CT:usize=1+(big::NLEN*(big::BASEBITS as usize)+3)/4;
 		let mut w:[i8;CT]=[0;CT]; 
-
-	//	self.affine();
 
 /* precompute table */
 		Q.copy(&self);
@@ -504,7 +476,6 @@ impl ECP2 {
 		let mut s:[i8;CT]=[0;CT];
 
 		for i in 0..4 {
-			//Q[i].affine();
 			t[i].norm();
 		}
 
@@ -535,8 +506,7 @@ impl ECP2 {
 		s[nb-1]=1;
 		for i in 0..nb-1 {
 			t[0].fshr(1);
-			s[i]=(2*t[0].parity()-1) as i8;
-			//println!("s={}",s[i]);	
+			s[i]=(2*t[0].parity()-1) as i8;	
 		}
 
 // Recoded exponent
@@ -639,33 +609,4 @@ impl ECP2 {
 	}
 
 }
-/*
-fn main()
-{
-	let mut r=BIG::new_ints(&rom::MODULUS);
 
-	let pxa=BIG::new_ints(&rom::CURVE_PXA);
-	let pxb=BIG::new_ints(&rom::CURVE_PXB);
-	let pya=BIG::new_ints(&rom::CURVE_PYA);
-	let pyb=BIG::new_ints(&rom::CURVE_PYB);
-
-	let fra=BIG::new_ints(&rom::CURVE_FRA);
-	let frb=BIG::new_ints(&rom::CURVE_FRB);
-
-	let mut f=FP2::new_bigs(&fra,&frb);
-
-	let px=FP2::new_bigs(&pxa,&pxb);
-	let py=FP2::new_bigs(&pya,&pyb);
-
-	let mut P=ECP2::new_fp2s(&px,&py);
-
-	println!("P= {}",P.tostring());
-
-	P=P.mul(&mut r);
-	println!("P= {}",P.tostring());
-
-	let mut  Q=ECP2::new_fp2s(&px,&py);
-	Q.frob(&mut f);
-	println!("Q= {}",Q.tostring());
-}
-*/

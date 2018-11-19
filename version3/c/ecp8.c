@@ -25,14 +25,12 @@ under the License.
 
 int ECP8_ZZZ_isinf(ECP8_ZZZ *P)
 {
-//	if (P->inf) return 1;
 	return (FP8_YYY_iszilch(&(P->x)) & FP8_YYY_iszilch(&(P->z)));
 }
 
 /* Set P=Q */
 void ECP8_ZZZ_copy(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 {
-//    P->inf=Q->inf;
     FP8_YYY_copy(&(P->x),&(Q->x));
     FP8_YYY_copy(&(P->y),&(Q->y));
     FP8_YYY_copy(&(P->z),&(Q->z));
@@ -41,7 +39,6 @@ void ECP8_ZZZ_copy(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 /* set P to Infinity */
 void ECP8_ZZZ_inf(ECP8_ZZZ *P)
 {
-//    P->inf=1;
     FP8_YYY_zero(&(P->x));
     FP8_YYY_one(&(P->y));
 	FP8_YYY_zero(&(P->z));
@@ -53,8 +50,6 @@ static void ECP8_ZZZ_cmove(ECP8_ZZZ *P,ECP8_ZZZ *Q,int d)
     FP8_YYY_cmove(&(P->x),&(Q->x),d);
     FP8_YYY_cmove(&(P->y),&(Q->y),d);
     FP8_YYY_cmove(&(P->z),&(Q->z),d);
-//    d=~(d-1);
-//    P->inf^=(P->inf^Q->inf)&d;
 }
 
 /* return 1 if b==c, no branching */
@@ -116,8 +111,6 @@ void ECP8_ZZZ_affine(ECP8_ZZZ *P)
 int ECP8_ZZZ_equals(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 {
     FP8_YYY a,b;
-//    if (ECP8_ZZZ_isinf(P) && ECP8_ZZZ_isinf(Q)) return 1;
-//    if (ECP8_ZZZ_isinf(P) || ECP8_ZZZ_isinf(Q)) return 0;
 
     FP8_YYY_mul(&a,&(P->x),&(Q->z));
     FP8_YYY_mul(&b,&(Q->x),&(P->z));
@@ -136,7 +129,6 @@ int ECP8_ZZZ_get(FP8_YYY *x,FP8_YYY *y,ECP8_ZZZ *P)
 	ECP8_ZZZ_copy(&W,P);
 	ECP8_ZZZ_affine(&W);
     if (ECP8_ZZZ_isinf(&W)) return -1;
-	//ECP8_ZZZ_affine(P);
     FP8_YYY_copy(y,&(W.y));
     FP8_YYY_copy(x,&(W.x));
     return 0;
@@ -340,11 +332,9 @@ int ECP8_ZZZ_set(ECP8_ZZZ *P,FP8_YYY *x,FP8_YYY *y)
     if (!FP8_YYY_equals(&y2,&rhs))
     {
 		ECP8_ZZZ_inf(P);
-      //  P->inf=1;
         return 0;
     }
 
- //   P->inf=0;
     FP8_YYY_copy(&(P->x),x);
     FP8_YYY_copy(&(P->y),y);
 
@@ -365,7 +355,6 @@ int ECP8_ZZZ_setx(ECP8_ZZZ *P,FP8_YYY *x)
         return 0;
     }
 
- //   P->inf=0;
     FP8_YYY_copy(&(P->x),x);
     FP8_YYY_copy(&(P->y),&y);
     FP8_YYY_one(&(P->z));
@@ -376,7 +365,6 @@ int ECP8_ZZZ_setx(ECP8_ZZZ *P,FP8_YYY *x)
 /* SU= 8 */
 void ECP8_ZZZ_neg(ECP8_ZZZ *P)
 {
-//	if (ECP8_ZZZ_isinf(P)) return;
 	FP8_YYY_norm(&(P->y));
     FP8_YYY_neg(&(P->y),&(P->y));
     FP8_YYY_norm(&(P->y));
@@ -389,12 +377,10 @@ void ECP8_ZZZ_neg(ECP8_ZZZ *P)
 int ECP8_ZZZ_dbl(ECP8_ZZZ *P)
 {
     FP8_YYY t0,t1,t2,t3,iy,x3,y3;
- //   if (P->inf) return -1;
 
 	FP8_YYY_copy(&iy,&(P->y));		//FP8_YYY iy=new FP8_YYY(y);
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP8_YYY_times_i(&iy);			//iy.mul_ip(); 
-	//FP8_YYY_norm(&iy);				//iy.norm();
 #endif
 
 	FP8_YYY_sqr(&t0,&(P->y));			//t0.sqr();   
@@ -414,7 +400,6 @@ int ECP8_ZZZ_dbl(ECP8_ZZZ *P)
 	FP8_YYY_imul(&t2,&t2,3*CURVE_B_I_ZZZ);	//t2.imul(3*ROM.CURVE_B_I); 
 #if SEXTIC_TWIST_ZZZ==M_TYPE
 	FP8_YYY_times_i(&t2);
-	//FP8_YYY_norm(&t2);
 #endif
 
 	FP8_YYY_mul(&x3,&t2,&(P->z));	//x3.mul(z); 
@@ -450,13 +435,7 @@ int ECP8_ZZZ_add(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 {
     FP8_YYY t0,t1,t2,t3,t4,x3,y3,z3;
 	int b3=3*CURVE_B_I_ZZZ;
-/*    if (Q->inf) return 0;
-    if (P->inf)
-    {
-        ECP8_ZZZ_copy(P,Q);
-        return 0;
-    }
-*/
+
 	FP8_YYY_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
 	FP8_YYY_mul(&t1,&(P->y),&(Q->y));	//t1.mul(Q.y);		 // y.Q.y
 
@@ -471,8 +450,7 @@ int ECP8_ZZZ_add(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 	FP8_YYY_sub(&t3,&t3,&t4);		//t3.sub(t4); 
 	FP8_YYY_norm(&t3);				//t3.norm(); 
 #if SEXTIC_TWIST_ZZZ==D_TYPE
-	FP8_YYY_times_i(&t3);			//t3.mul_ip();  
-	//FP8_YYY_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
+	FP8_YYY_times_i(&t3);			//t3.mul_ip();  //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1     
 #endif
                    
 	FP8_YYY_add(&t4,&(P->y),&(P->z));	//t4.add(z); 
@@ -488,8 +466,7 @@ int ECP8_ZZZ_add(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 	FP8_YYY_sub(&t4,&t4,&x3);		//t4.sub(x3); 
 	FP8_YYY_norm(&t4);				//t4.norm(); 
 #if SEXTIC_TWIST_ZZZ==D_TYPE
-	FP8_YYY_times_i(&t4);			//t4.mul_ip(); 
-	//FP8_YYY_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
+	FP8_YYY_times_i(&t4);			//t4.mul_ip(); //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1     
 #endif
 
 	FP8_YYY_add(&x3,&(P->x),&(P->z));	//x3.add(z); 
@@ -504,9 +481,7 @@ int ECP8_ZZZ_add(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 	FP8_YYY_norm(&y3);				//y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP8_YYY_times_i(&t0);			//t0.mul_ip(); 
-	//FP8_YYY_norm(&t0);				//t0.norm(); // x.Q.x
 	FP8_YYY_times_i(&t1);			//t1.mul_ip(); 
-	//FP8_YYY_norm(&t1);				//t1.norm(); // y.Q.y
 #endif
 
 	FP8_YYY_add(&x3,&t0,&t0);		//x3.add(t0); 
@@ -524,7 +499,6 @@ int ECP8_ZZZ_add(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 	FP8_YYY_imul(&y3,&y3,b3);		//y3.imul(b); 
 #if SEXTIC_TWIST_ZZZ==M_TYPE
 	FP8_YYY_times_i(&y3);
-	//FP8_YYY_norm(&y3);
 #endif
 
 	FP8_YYY_mul(&x3,&y3,&t4);		//x3.mul(t4); 
@@ -553,9 +527,7 @@ void ECP8_ZZZ_sub(ECP8_ZZZ *P,ECP8_ZZZ *Q)
 	ECP8_ZZZ NQ;
 	ECP8_ZZZ_copy(&NQ,Q);
 	ECP8_ZZZ_neg(&NQ);
-    //ECP8_ZZZ_neg(Q);
     ECP8_ZZZ_add(P,&NQ);
-    //ECP8_ZZZ_neg(Q);
 }
 
 
@@ -577,7 +549,7 @@ void ECP8_ZZZ_mul(ECP8_ZZZ *P,BIG_XXX e)
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
 
     if (ECP8_ZZZ_isinf(P)) return;
-    //ECP8_ZZZ_affine(P);
+    
     /* precompute table */
 
     ECP8_ZZZ_copy(&Q,P);
@@ -671,10 +643,6 @@ void ECP8_ZZZ_frob(ECP8_ZZZ *P,FP2_YYY F[3],int n)
 	int i;
 	FP8_YYY X,Y,Z;
 
-//    if (P->inf) return;
-
-	//ECP8_get(&X,&Y,P);		// F=(1+i)^(p-19)/24
-
 	FP8_YYY_copy(&X,&(P->x));
 	FP8_YYY_copy(&Y,&(P->y));
 	FP8_YYY_copy(&Z,&(P->z));
@@ -729,7 +697,6 @@ void ECP8_ZZZ_mul16(ECP8_ZZZ *P,ECP8_ZZZ Q[16],BIG_XXX u[16])
 
     for (i=0; i<16; i++)
 	{
-        //ECP8_ZZZ_affine(&Q[i]);
         BIG_XXX_copy(t[i],u[i]);
 	}
 // Precomputed table
@@ -901,173 +868,6 @@ void ECP8_ZZZ_mul16(ECP8_ZZZ *P,ECP8_ZZZ Q[16],BIG_XXX u[16])
 	ECP8_ZZZ_affine(P);
 }
 
-/*
-void ECP8_ZZZ_mul16(ECP8_ZZZ *P,ECP8_ZZZ Q[16],BIG_XXX u[16])
-{
-    int i,j,a[4],nb,pb;
-    ECP8_ZZZ W[8],Z[8],WW[8],ZZ[8],T,C;
-    BIG_XXX mt,t[16];
-    sign8 w[NLEN_XXX*BASEBITS_XXX+1];
-    sign8 z[NLEN_XXX*BASEBITS_XXX+1];
-    sign8 ww[NLEN_XXX*BASEBITS_XXX+1];
-    sign8 zz[NLEN_XXX*BASEBITS_XXX+1];
-
-    FP_YYY fx,fy;
-	FP2_YYY X;
-
-    FP_YYY_rcopy(&fx,Fra_YYY);
-    FP_YYY_rcopy(&fy,Frb_YYY);
-    FP2_YYY_from_FPs(&X,&fx,&fy);
-
-
-    for (i=0; i<16; i++)
-        BIG_XXX_copy(t[i],u[i]);
-
-    // precompute tables 
-
-// 12 add/subs 
-
-    ECP8_ZZZ_copy(&W[0],&Q[0]);
-    ECP8_ZZZ_sub(&W[0],&Q[1]);  // P-Q
-    ECP8_ZZZ_copy(&W[1],&W[0]);
-    ECP8_ZZZ_copy(&W[2],&W[0]);
-    ECP8_ZZZ_copy(&W[3],&W[0]);
-    ECP8_ZZZ_copy(&W[4],&Q[0]);
-    ECP8_ZZZ_add(&W[4],&Q[1]);  // P+Q 
-    ECP8_ZZZ_copy(&W[5],&W[4]);
-    ECP8_ZZZ_copy(&W[6],&W[4]);
-    ECP8_ZZZ_copy(&W[7],&W[4]);
-
-    ECP8_ZZZ_copy(&T,&Q[2]);
-    ECP8_ZZZ_sub(&T,&Q[3]);       // R-S 
-    ECP8_ZZZ_sub(&W[1],&T);
-    ECP8_ZZZ_add(&W[2],&T);
-    ECP8_ZZZ_sub(&W[5],&T);
-    ECP8_ZZZ_add(&W[6],&T);
-    ECP8_ZZZ_copy(&T,&Q[2]);
-    ECP8_ZZZ_add(&T,&Q[3]);      // R+S 
-    ECP8_ZZZ_sub(&W[0],&T);
-    ECP8_ZZZ_add(&W[3],&T);
-    ECP8_ZZZ_sub(&W[4],&T);
-    ECP8_ZZZ_add(&W[7],&T);
-
-
-// Use Frobenius 
-
-	for (i=0;i<8;i++)
-	{
-		ECP8_ZZZ_copy(&Z[i],&W[i]);
-		ECP8_ZZZ_frob(&Z[i],&X,4);
-	}
-
-	for (i=0;i<8;i++)
-	{
-		ECP8_ZZZ_copy(&WW[i],&Z[i]);
-		ECP8_ZZZ_frob(&WW[i],&X,4);
-	}
-
-	for (i=0;i<8;i++)
-	{
-		ECP8_ZZZ_copy(&ZZ[i],&WW[i]);
-		ECP8_ZZZ_frob(&ZZ[i],&X,4);
-	}
-
-    // if multiplier is even add 1 to multiplier, and add P to correction 
-    ECP8_ZZZ_inf(&C);
-
-    BIG_XXX_zero(mt);
-    for (i=0; i<16; i++)
-    {
-		pb=BIG_XXX_parity(t[i]);
-		BIG_XXX_inc(t[i],1-pb);
-		BIG_XXX_norm(t[i]);
-		ECP8_ZZZ_copy(&T,&C);
-		ECP8_ZZZ_add(&T,&Q[i]);
-		ECP8_ZZZ_cmove(&C,&T,1-pb);
-
-
-        BIG_XXX_add(mt,mt,t[i]);
-        BIG_XXX_norm(mt);
-    }
-
-    nb=1+BIG_XXX_nbits(mt);
-
-    // convert exponents to signed 1-bit windows 
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_XXX_lastbits(t[i],2)-2;
-            BIG_XXX_dec(t[i],a[i]);
-            BIG_XXX_norm(t[i]);
-            BIG_XXX_fshr(t[i],1);
-        }
-        w[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    w[nb]=8*BIG_XXX_lastbits(t[0],2)+4*BIG_XXX_lastbits(t[1],2)+2*BIG_XXX_lastbits(t[2],2)+BIG_XXX_lastbits(t[3],2);
-
-
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_XXX_lastbits(t[i+4],2)-2;
-            BIG_XXX_dec(t[i+4],a[i]);
-            BIG_XXX_norm(t[i+4]);
-            BIG_XXX_fshr(t[i+4],1);
-        }
-        z[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    z[nb]=8*BIG_XXX_lastbits(t[4],2)+4*BIG_XXX_lastbits(t[5],2)+2*BIG_XXX_lastbits(t[6],2)+BIG_XXX_lastbits(t[7],2);
-
-
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_XXX_lastbits(t[i+8],2)-2;
-            BIG_XXX_dec(t[i+8],a[i]);
-            BIG_XXX_norm(t[i+8]);
-            BIG_XXX_fshr(t[i+8],1);
-        }
-        ww[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    ww[nb]=8*BIG_XXX_lastbits(t[8],2)+4*BIG_XXX_lastbits(t[9],2)+2*BIG_XXX_lastbits(t[10],2)+BIG_XXX_lastbits(t[11],2);
-
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_XXX_lastbits(t[i+12],2)-2;
-            BIG_XXX_dec(t[i+12],a[i]);
-            BIG_XXX_norm(t[i+12]);
-            BIG_XXX_fshr(t[i+12],1);
-        }
-        zz[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    zz[nb]=8*BIG_XXX_lastbits(t[12],2)+4*BIG_XXX_lastbits(t[13],2)+2*BIG_XXX_lastbits(t[14],2)+BIG_XXX_lastbits(t[15],2);
-
-    ECP8_ZZZ_copy(P,&W[(w[nb]-1)/2]);
-	ECP8_ZZZ_add(P,&Z[(z[nb]-1)/2]);
-	ECP8_ZZZ_add(P,&WW[(ww[nb]-1)/2]);
-	ECP8_ZZZ_add(P,&ZZ[(zz[nb]-1)/2]);
-    for (i=nb-1; i>=0; i--)
-    {
-		ECP8_ZZZ_dbl(P);
-        ECP8_ZZZ_select(&T,W,w[i]);
-        ECP8_ZZZ_add(P,&T);
-        ECP8_ZZZ_select(&T,Z,z[i]);
-        ECP8_ZZZ_add(P,&T);
-        ECP8_ZZZ_select(&T,WW,ww[i]);
-        ECP8_ZZZ_add(P,&T);
-        ECP8_ZZZ_select(&T,ZZ,zz[i]);
-        ECP8_ZZZ_add(P,&T);
-
-    }
-    ECP8_ZZZ_sub(P,&C); // apply correction 
-	ECP8_ZZZ_reduce(P);
-}
-*/
 /* Map to hash value to point on G2 from random BIG_XXX */
 
 void ECP8_ZZZ_mapit(ECP8_ZZZ *Q,octet *W)
@@ -1223,89 +1023,3 @@ void ECP8_ZZZ_generator(ECP8_ZZZ *G)
 
 	ECP8_ZZZ_set(G,&X,&Y);
 }
-
-
-// g++ -O2 ecp8_BLS48.cpp fp8_BLS48.cpp fp4_BLS48.cpp fp2_BLS48.cpp fp_BLS48.cpp big_B560_29.cpp rand.cpp hash.cpp rom_field_BLS48.cpp rom_curve_BLS48.cpp oct.cpp -o ecp8_BLS48.exe
-/*
-int main()
-{
-	int i;
-	ECP8 G,P;
-	FP2 Aa,Bb,f;
-	FP8_YYY X,Y;
-	BIG a,b,r,p;
-	char w[100];
-	octet W= {0,sizeof(w),w};
-
-	ECP8_generator(&G);
-
-	BIG_rcopy(a,Fra_YYY);
-    BIG_rcopy(b,Frb_YYY);
-	FP2_from_BIGs(&f,a,b);
-
-	if (G.inf) cout << "Failed to set - point not on curve" << endl;
-	else cout << "set success" << endl;
-
-	ECP8_output(&G);
-	ECP8_copy(&P,&G);
-
-	BIG_rcopy(r,CURVE_Order);
-	BIG_rcopy(p,Modulus);
-
-	BIG_output(r);
-	cout << endl;
-
-	ECP8_mul(&G,r);
-	ECP8_output(&G);
-	cout << endl;
-
-	ECP8_copy(&G,&P);
-
-	cout << "pG = ";
-	ECP8_mul(&G,p);
-	ECP8_output(&G);
-	cout << endl;
-
-	cout << "G^p= ";
-	ECP8_frob(&P,&f,1);
-	ECP8_output(&P);
-	cout << endl;
-
-
-	for (i=0;i<MODBYTES_XXX;i++)
-	{
-		W.val[i]=i+11;
-	}
-	W.len=MODBYTES_XXX;
-
-	printf("W= ");
-	OCT_output(&W);
-	printf("\n");
-
-	ECP8_mapit(&P,&W);
-
-	cout << "Hash to P= ";
-	ECP8_output(&P);
-	cout << endl;
-
-	ECP8_mul(&P,r);
-
-	cout << "rP= ";
-	ECP8_output(&P);
-	cout << endl;
-
-
-
-//	ECP8_dbl(&G);
-//	ECP8_output(&G);
-//	ECP8_reduce(&G);
-//	cout << endl;
-//	ECP8_add(&G,&P);
-//	ECP8_output(&G);
-//	cout << endl;
-
-
-	return 0;
-}
-*/
-

@@ -281,7 +281,6 @@ impl FP12 {
 		t1.copy(&z2); t1.neg();
 
 		z1.add(&t0);
-		//z1.norm();
 		self.b.copy(&z1); self.b.add(&t1);
 
 		z3.add(&t1);
@@ -332,7 +331,6 @@ impl FP12 {
 			t1.copy(&z2); t1.neg();
 	
 			self.b.add(&t0);
-		//self.b.norm();
 
 			self.b.add(&t1);
 			z3.add(&t1);
@@ -711,88 +709,5 @@ impl FP12 {
 		p.reduce();
 		return p;
 	}
-
-/* p=q0^u0.q1^u1.q2^u2.q3^u3 */
-/* Timing attack secure, but not cache attack secure */
-/*
- 	pub fn pow4(q:&[FP12],u:&[BIG]) -> FP12 {
-		let mut a:[i8;4]=[0;4];
-		let mut s:[FP12;2]=[FP12::new(),FP12::new()];
-		let mut g:[FP12;8]=[FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new(),FP12::new()];
-
-		let mut c=FP12::new_int(1);
-		let mut p=FP12::new();
-		const CT:usize=1+big::NLEN*(big::BASEBITS as usize);		
-		let mut w:[i8;CT]=[0;CT];
-
-		let mut mt=BIG::new();
-		let mut t:[BIG;4]=[BIG::new_copy(&u[0]),BIG::new_copy(&u[1]),BIG::new_copy(&u[2]),BIG::new_copy(&u[3])];
-
-		g[0].copy(&q[0]); s[0].copy(&q[1]); s[0].conj(); g[0].mul(&s[0]);
-		p.copy(&g[0]);
-		g[1].copy(&p);
-		g[2].copy(&p);
-		g[3].copy(&p);
-		g[4].copy(&q[0]); g[4].mul(&q[1]);
-		p.copy(&g[4]);
-		g[5].copy(&p);
-		g[6].copy(&p);
-		g[7].copy(&p);
-
-
-		s[1].copy(&q[2]); s[0].copy(&q[3]); s[0].conj(); p.copy(&s[0]); s[1].mul(&p);
-		p.copy(&s[1]); s[0].copy(&p); s[0].conj(); g[1].mul(&s[0]);
-		g[2].mul(&s[1]);
-		g[5].mul(&s[0]);
-		g[6].mul(&s[1]);
-		s[1].copy(&q[2]); s[1].mul(&q[3]);
-		p.copy(&s[1]); s[0].copy(&p); s[0].conj(); g[0].mul(&s[0]);
-		g[3].mul(&s[1]);
-		g[4].mul(&s[0]);
-		g[7].mul(&s[1]);
-
-// if power is even add 1 to power, and add q to correction 
-
-		for i in 0..4 {
-			if t[i].parity()==0 {
-				t[i].inc(1); t[i].norm();
-				c.mul(&q[i]);
-			}
-			mt.add(&t[i]); mt.norm();
-		}
-		c.conj();
-		let nb=1+mt.nbits();
-
-// convert exponent to signed 1-bit window 
-		for j in 0..nb {
-			for i in 0..4 {
-				a[i]=(t[i].lastbits(2)-2) as i8;
-				t[i].dec(a[i] as isize); t[i].norm();
-				t[i].fshr(1);
-			}
-			w[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-		}
-		w[nb]=(8*t[0].lastbits(2)+4*t[1].lastbits(2)+2*t[2].lastbits(2)+t[3].lastbits(2)) as i8;
-		p.copy(&g[((w[nb] as usize)-1)/2]);
-
-		for i in (0..nb).rev() {
-			let m=w[i]>>7;
-			let mut j=((w[i]^m)-m) as usize;  // j=abs(w[i]) 
-			j=(j-1)/2;
-			s[0].copy(&g[j]); s[1].copy(&g[j]); s[1].conj();
-			p.usqr();
-			p.mul(&s[(m&1) as usize]);
-		}
-		p.mul(&c);  // apply correction 
-		p.reduce();
-		return p;
-	}
-*/
-
 }
-/*
-fn main()
-{
-	let mut w=FP12::new();
-}
-*/
+

@@ -29,12 +29,10 @@ public struct ECP4 {
     private var x:FP4
     private var y:FP4
     private var z:FP4
- //   private var INF:Bool
     
     /* Constructor - set self=O */
     init()
     {
-    //    INF=true
         x=FP4(0)
         y=FP4(1)
         z=FP4(0)
@@ -42,7 +40,6 @@ public struct ECP4 {
     /* Test self=O? */
     public func is_infinity() -> Bool
     {
-    //    if INF {return true}
         return x.iszilch() && z.iszilch()
     }
     /* copy self=P */
@@ -51,11 +48,9 @@ public struct ECP4 {
         x.copy(P.x)
         y.copy(P.y)
         z.copy(P.z)
-    //    INF=P.INF
     }
     /* set self=O */
     mutating func inf() {
-    //    INF=true
         x.zero()
         y.one()
         z.zero()
@@ -67,11 +62,6 @@ public struct ECP4 {
         x.cmove(Q.x,d);
         y.cmove(Q.y,d);
         z.cmove(Q.z,d);
-    /*
-        var bd:Bool
-        if d==0 {bd=false}
-        else {bd=true}
-        INF = (INF != ((INF != Q.INF) && bd)) */
     }
     
     /* return 1 if b==c, no branching */
@@ -107,10 +97,8 @@ public struct ECP4 {
     /* Test if P == Q */
     func equals(_ Q:ECP4) -> Bool
     {
-    //    if is_infinity() && Q.is_infinity() {return true}
-    //    if is_infinity() || Q.is_infinity() {return false}
     
-        var a=FP4(x)                            // *****
+        var a=FP4(x) 
         var b=FP4(Q.x)
         a.mul(Q.z); b.mul(z) 
         if !a.equals(b) {return false}
@@ -123,7 +111,6 @@ public struct ECP4 {
     /* set self=-self */
     mutating func neg()
     {
-    //    if is_infinity() {return}
         y.norm(); y.neg(); y.norm()
         return
     }
@@ -312,7 +299,6 @@ public struct ECP4 {
     /* this+=this */
     @discardableResult mutating func dbl() -> Int
     {
-    //    if (INF) {return -1}
         if y.iszilch()
         {
             inf();
@@ -438,7 +424,6 @@ public struct ECP4 {
         var NQ=ECP4(); NQ.copy(Q)
         NQ.neg()
         let D=add(NQ)
-        //Q.neg()
         return D
     }
 
@@ -499,8 +484,6 @@ public struct ECP4 {
         var w=[Int8](repeating: 0,count: 1+(BIG.NLEN*Int(BIG.BASEBITS)+3)/4)
     
         if is_infinity() {return ECP4()}
-    
-        //affine()
     
     /* precompute table */
         Q.copy(self)
@@ -577,7 +560,6 @@ public struct ECP4 {
         {
             t.append(BIG(u[i]))
             t[i].norm()
-            //Q[i].affine()
         }
 
     // precompute table 

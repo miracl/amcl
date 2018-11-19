@@ -145,7 +145,7 @@ int MPIN_ZZZ_ENCODING(csprng *RNG,octet *E)
         if (su<0) su=-su;
         su%=2;
         map(&W,u,su);
-        ECP_ZZZ_sub(&P,&W); //ECP_ZZZ_affine(&P);
+        ECP_ZZZ_sub(&P,&W); 
 
         rn=unmap(v,&sv,&P);
         m=RAND_byte(RNG);
@@ -177,7 +177,7 @@ int MPIN_ZZZ_DECODING(octet *D)
         sv=(D->val[0]>>1)&1;
         map(&W,u,su);
         map(&P,v,sv);
-        ECP_ZZZ_add(&P,&W); //ECP_ZZZ_affine(&P);
+        ECP_ZZZ_add(&P,&W); 
         ECP_ZZZ_toOctet(D,&P,false);
     }
 
@@ -196,7 +196,7 @@ int MPIN_ZZZ_RECOMBINE_G1(octet *R1,octet *R2,octet *R)
     }
     if (res==0)
     {
-        ECP_ZZZ_add(&P,&T); //ECP_ZZZ_affine(&P);
+        ECP_ZZZ_add(&P,&T); 
         ECP_ZZZ_toOctet(R,&P,false);
     }
     return res;
@@ -211,7 +211,7 @@ int MPIN_ZZZ_RECOMBINE_G2(octet *W1,octet *W2,octet *W)
     if (!ECP4_ZZZ_fromOctet(&T,W2)) res=MPIN_INVALID_POINT;
     if (res==0)
     {
-        ECP4_ZZZ_add(&Q,&T); //ECP4_ZZZ_affine(&Q);
+        ECP4_ZZZ_add(&Q,&T); 
         ECP4_ZZZ_toOctet(W,&Q);
     }
     return res;
@@ -254,7 +254,7 @@ int MPIN_ZZZ_EXTRACT_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TOK
         ECP_ZZZ_mapit(&R,&H);
 
         ECP_ZZZ_pinmul(&R,factor,facbits);
-        ECP_ZZZ_sub(&P,&R); //ECP_ZZZ_affine(&P);
+        ECP_ZZZ_sub(&P,&R); 
 
         ECP_ZZZ_toOctet(TOKEN,&P,false);
     }
@@ -276,7 +276,7 @@ int MPIN_ZZZ_RESTORE_FACTOR(int sha,octet *CID,int factor,int facbits,octet *TOK
         ECP_ZZZ_mapit(&R,&H);
 
         ECP_ZZZ_pinmul(&R,factor,facbits);
-        ECP_ZZZ_add(&P,&R); //ECP_ZZZ_affine(&P);
+        ECP_ZZZ_add(&P,&R);
 
         ECP_ZZZ_toOctet(TOKEN,&P,false);
     }
@@ -297,7 +297,6 @@ int MPIN_ZZZ_CLIENT_2(octet *X,octet *Y,octet *SEC)
         BIG_XXX_fromBytes(py,Y->val);
         BIG_XXX_add(px,px,py);
         BIG_XXX_mod(px,r);
-        //	BIG_XXX_sub(px,r,px);
         PAIR_ZZZ_G1mul(&P,px);
         ECP_ZZZ_neg(&P);
         ECP_ZZZ_toOctet(SEC,&P,false);
@@ -445,11 +444,11 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
                 PAIR_ZZZ_G1mul(&P,x);				// P=x.H(ID)
                 ECP_ZZZ_toOctet(xID,&P,false);  // xID
                 PAIR_ZZZ_G1mul(&W,x);               // W=x.H(T|ID)
-                ECP_ZZZ_add(&P,&W); //ECP_ZZZ_affine(&P);
+                ECP_ZZZ_add(&P,&W);
             }
             else
             {
-                ECP_ZZZ_add(&P,&W); //ECP_ZZZ_affine(&P);
+                ECP_ZZZ_add(&P,&W);
                 PAIR_ZZZ_G1mul(&P,x);
             }
             if (xCID!=NULL) ECP_ZZZ_toOctet(xCID,&P,false);  // U
@@ -466,7 +465,6 @@ int MPIN_ZZZ_CLIENT_1(int sha,int date,octet *CLIENT_ID,csprng *RNG,octet *X,int
 
     if (res==0)
 	{
-		//ECP_ZZZ_affine(&T);
         ECP_ZZZ_toOctet(SEC,&T,false);  // V
 	}
     return res;
@@ -506,17 +504,10 @@ int MPIN_ZZZ_GET_CLIENT_PERMIT(int sha,int date,octet *S,octet *CID,octet *CTT)
 
     ECP_ZZZ_mapit(&P,&H);
 
-//printf("P= "); ECP_ZZZ_output(&P); printf("\n");
-//exit(0);
-
     BIG_XXX_fromBytes(s,S->val);
 
-
-
-//printf("s= "); BIG_XXX_output(s); printf("\n");
     PAIR_ZZZ_G1mul(&P,s);
-//printf("OP= "); ECP_ZZZ_output(&P); printf("\n");
-//
+
     ECP_ZZZ_toOctet(CTT,&P,false);
     return 0;
 }
@@ -543,18 +534,15 @@ void MPIN_ZZZ_SERVER_1(int sha,int date,octet *CID,octet *HID,octet *HTID)
 
     if (date)
     {
-        //	if (HID!=NULL) ECP_ZZZ_toOctet(HID,&P,false);
 #ifdef USE_ANONYMOUS
         mhashit(sha,date,CID,&H);
 #else
         mhashit(sha,date,&H,&H);
 #endif
         ECP_ZZZ_mapit(&R,&H);
-        ECP_ZZZ_add(&P,&R); //ECP_ZZZ_affine(&P);
+        ECP_ZZZ_add(&P,&R); 
         ECP_ZZZ_toOctet(HTID,&P,false);
     }
-    //else ECP_ZZZ_toOctet(HID,&P,false);
-
 }
 
 /* Implement M-Pin on server side */
@@ -585,17 +573,12 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     {
        if (date)
         {
-            //BIG_XXX_fromBytes(px,&(xCID->val[1]));
-            //BIG_XXX_fromBytes(py,&(xCID->val[PFS_ZZZ+1]));
 			if (!ECP_ZZZ_fromOctet(&R,xCID))  res=MPIN_INVALID_POINT;
         }
         else
         {
-            //BIG_XXX_fromBytes(px,&(xID->val[1]));
-            //BIG_XXX_fromBytes(py,&(xID->val[PFS_ZZZ+1]));
 			if (!ECP_ZZZ_fromOctet(&R,xID))  res=MPIN_INVALID_POINT;
         }
-        //if (!ECP_ZZZ_set(&R,px,py)) res=MPIN_INVALID_POINT; // x(A+AT)
     }
     if (res==0)
     {
@@ -613,7 +596,6 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
     {
         PAIR_ZZZ_G1mul(&P,y);  // y(A+AT)
         ECP_ZZZ_add(&P,&R); // x(A+AT)+y(A+T)
-		//ECP_ZZZ_affine(&P);
         if (!ECP_ZZZ_fromOctet(&R,mSEC))  res=MPIN_INVALID_POINT; // V
     }
     if (res==0)
@@ -640,7 +622,6 @@ int MPIN_ZZZ_SERVER_2(int date,octet *HID,octet *HTID,octet *Y,octet *SST,octet 
                     {
                         PAIR_ZZZ_G1mul(&P,y);  // yA
                         ECP_ZZZ_add(&P,&R); // yA+xA
-						//ECP_ZZZ_affine(&P);
                     }
                 }
                 if (res==0)
@@ -674,7 +655,6 @@ int MPIN_ZZZ_KANGAROO(octet *E,octet *F)
     int distance[MR_TS];
     FP24_YYY ge,gf,t,table[MR_TS];
     int res=0;
-    // BIG_XXX w;
 
     FP24_YYY_fromOctet(&ge,E);
     FP24_YYY_fromOctet(&gf,F);
@@ -694,11 +674,6 @@ int MPIN_ZZZ_KANGAROO(octet *E,octet *F)
 
     for (dn=0,j=0; j<TRAP; j++)
     {
-
-        //BIG_XXX_copy(w,t.a.a.a);
-        //FP_YYY_redc(w);
-        //i=BIG_XXX_lastbits(w,20)%MR_TS;
-
         i=t.a.a.a.a.g[0]%MR_TS;
 
         FP24_YYY_mul(&t,&table[i]);
@@ -713,10 +688,6 @@ int MPIN_ZZZ_KANGAROO(octet *E,octet *F)
     {
         steps++;
         if (steps>4*TRAP) break;
-
-        //BIG_XXX_copy(w,ge.a.a.a);
-        //FP_YYY_redc(w);
-        //i=BIG_XXX_lastbits(w,20)%MR_TS;
 
         i=ge.a.a.a.a.g[0]%MR_TS;
 
@@ -787,11 +758,11 @@ int MPIN_ZZZ_PRECOMPUTE(octet *TOKEN,octet *CID,octet *CP,octet *G1,octet *G2)
 int MPIN_ZZZ_CLIENT_KEY(int sha,octet *G1,octet *G2,int pin,octet *R,octet *X,octet *H,octet *wCID,octet *CK)
 {
     FP24_YYY g1,g2;
-	FP8_YYY c;//,cp,cpm1,cpm2;
+	FP8_YYY c;
 
     ECP_ZZZ W;
     int res=0;
-    BIG_XXX r,z,x,h;//q,m,a,b;
+    BIG_XXX r,z,x,h;
 
     FP24_YYY_fromOctet(&g1,G1);
     FP24_YYY_fromOctet(&g2,G2);
@@ -857,7 +828,6 @@ int MPIN_ZZZ_SERVER_KEY(int sha,octet *Z,octet *SST,octet *W,octet *H,octet *HID
     {
         PAIR_ZZZ_G1mul(&A,h);
         ECP_ZZZ_add(&R,&A);  // new
-		//ECP_ZZZ_affine(&R);
         PAIR_ZZZ_ate(&g,&sQ,&R);
         PAIR_ZZZ_fexp(&g);
         PAIR_ZZZ_G1mul(&U,w);

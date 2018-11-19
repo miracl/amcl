@@ -178,18 +178,13 @@ func (r *DBIG) mod(c *BIG) *BIG {
 	}
 
 	for k>0 {
-		m.shr(1);
+		m.shr(1)
 
-		dr.copy(r);
-		dr.sub(m);
-		dr.norm();
-		r.cmove(dr,int(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1)));
-/*
-		if dcomp(r,m)>=0 {
-			r.sub(m);
-			r.norm();
-		} */
-		k--;
+		dr.copy(r)
+		dr.sub(m)
+		dr.norm()
+		r.cmove(dr,int(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1)))
+		k--
 	}
 	return NewBIGdcopy(r)
 }
@@ -215,23 +210,16 @@ func (r *DBIG) div(c *BIG) *BIG {
 		m.shr(1)
 		e.shr(1)
 
-		dr.copy(r);
-		dr.sub(m);
-		dr.norm();
-		d=int(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1));
-		r.cmove(dr,d);
-		sr.copy(a);
-		sr.add(e);
-		sr.norm();
-		a.cmove(sr,d);
+		dr.copy(r)
+		dr.sub(m)
+		dr.norm()
+		d=int(1-((dr.w[DNLEN-1]>>uint(CHUNK-1))&1))
+		r.cmove(dr,d)
+		sr.copy(a)
+		sr.add(e)
+		sr.norm()
+		a.cmove(sr,d)
 
-/*
-		if dcomp(r,m)>0 {
-			a.add(e)
-			a.norm()
-			r.sub(m)
-			r.norm()
-		} */
 		k--
 	}
 	return a

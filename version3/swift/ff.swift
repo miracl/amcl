@@ -284,11 +284,11 @@ final public class FF {
         }
         for i in 0 ..< nn-1
         {
-            let carry=v[vp+i].norm();
+            let carry=v[vp+i].norm()
             v[vp+i].xortop(carry<<Chunk(FF.P_TBITS))
-            v[vp+i+1].w[0]+=carry; //inc(carry)
+            v[vp+i+1].w[0]+=carry
         }
-        let carry=v[vp+nn-1].norm();
+        let carry=v[vp+nn-1].norm()
         if (trunc)
             {v[vp+nn-1].xortop(carry<<Chunk(FF.P_TBITS))}
     }
@@ -301,14 +301,14 @@ final public class FF {
     /* increment/decrement by a small integer */
     func inc(_ m: Int)
     {
-        v[0].inc(m);
-        norm();
+        v[0].inc(m)
+        norm()
     }
     
     func dec(_ m: Int)
     {
-        v[0].dec(m);
-        norm();
+        v[0].dec(m)
+        norm()
     }
     
     /* shift left by one bit */
@@ -688,7 +688,6 @@ final public class FF {
         U.v[0].invmod2m();
     
         var i=1
-        //for var i=1;i<n;i<<=1
         while (i<n)
         {
             b.copy(self); b.mod2m(i);
@@ -867,7 +866,6 @@ final public class FF {
         nres(p);
         w.nres(p);
         for i in (0...8*Int(BIG.MODBYTES)*n-1).reversed()
-      //  for var i=8*Int(BIG.MODBYTES)*n-1;i>=0;i--
         {
             modsqr(p,ND)
             let b=e.v[i/Int(BIG.BIGBITS)].bit(UInt(i%Int(BIG.BIGBITS)))
@@ -893,7 +891,6 @@ final public class FF {
         nres(p)
     
         for i in (0...8*Int(BIG.MODBYTES)-1).reversed()
-    //    for var i=8*Int(BIG.MODBYTES)-1;i>=0;i--
         {
             let eb=e.bit(UInt(i))
             let fb=f.bit(UInt(i))

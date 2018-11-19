@@ -83,7 +83,6 @@ impl FP4 {
 
 /* test self=0 ? */
 	pub fn iszilch(&self) -> bool {
-		//self.reduce();
 		return self.a.iszilch() && self.b.iszilch();
 	}	
 
@@ -143,7 +142,6 @@ impl FP4 {
 
 		m.add(&self.b);
 		m.neg();
-	//	m.norm();
 		t.copy(&m); t.add(&self.b);
 		self.b.copy(&m);
 		self.b.add(&self.a);
@@ -210,12 +208,9 @@ impl FP4 {
 
 /* self*=self */	
 	pub fn sqr(&mut self) {
-	//	self.norm();
-
 		let mut t1=FP2::new_copy(&self.a);
 		let mut t2=FP2::new_copy(&self.b);
 		let mut t3=FP2::new_copy(&self.a);
-
 
 		t3.mul(&self.b);
 		t1.add(&self.b);
@@ -244,7 +239,7 @@ impl FP4 {
 
 /* self*=y */
 	pub fn mul(&mut self,y :&FP4) {
-		self.norm();
+		//self.norm();
 
 		let mut t1=FP2::new_copy(&self.a);
 		let mut t2=FP2::new_copy(&self.b);
@@ -285,7 +280,7 @@ impl FP4 {
 
 /* self=1/self */
 	pub fn inverse(&mut self) {
-		self.norm();
+		//self.norm();
 
 		let mut t1=FP2::new_copy(&self.a);
 		let mut t2=FP2::new_copy(&self.b);
@@ -302,12 +297,10 @@ impl FP4 {
 
 /* self*=i where i = sqrt(-1+sqrt(-1)) */
 	pub fn times_i(&mut self) {
-	//	self.norm();
 		let mut s=FP2::new_copy(&self.b);
 		let mut t=FP2::new_copy(&self.b);
 		s.times_i();
 		t.add(&s);
-	//	t.norm();
 		self.b.copy(&self.a);
 		self.a.copy(&t);
 		self.norm();
@@ -322,7 +315,6 @@ impl FP4 {
 
 /* self=self^e */
 	pub fn pow(&self,e: &BIG) -> FP4 {
-		//self.norm();
 		let mut w=FP4::new_copy(self);
 		w.norm();
 		let mut z=BIG::new_copy(&e);
@@ -343,7 +335,6 @@ impl FP4 {
 	pub fn xtr_a(&mut self,w:&FP4,y:&FP4,z:&FP4) {
 		let mut r=FP4::new_copy(w);
 		let mut t=FP4::new_copy(w);
-	//	y.norm();
 		r.sub(y); r.norm();
 		r.pmul(&self.a);
 		t.add(y); t.norm();
@@ -377,7 +368,6 @@ impl FP4 {
 		let mut t=FP4::new();
 		let mut r=FP4::new();
 
-		//n.norm();
 		let par=n.parity();
 		let mut v=BIG::new_copy(n); v.norm(); v.fshr(1);
 		if par==0 {v.dec(1); v.norm(); }
@@ -616,9 +606,4 @@ impl FP4 {
 
 
 }
-/*
-fn main()
-{
-	let mut w=FP4::new();
-}
-*/
+

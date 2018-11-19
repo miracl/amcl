@@ -22,7 +22,6 @@ use xxx::big;
 use xxx::big::BIG;
 use arch::Chunk;
 
-//#[derive(Copy, Clone)]
 pub struct DBIG {
  	pub w: [Chunk; big::DNLEN]
 }
@@ -184,11 +183,7 @@ impl DBIG {
 		dr.sub(&m);
 		dr.norm();
 		self.cmove(&dr,(1-((dr.w[big::DNLEN-1]>>(arch::CHUNK-1))&1)) as isize);
-/*
-            if DBIG::comp(self,&m)>=0 {
-				self.sub(&m);
-				self.norm();
-            } */
+
             k -= 1;
         }
         let r=BIG::new_dcopy(self);
@@ -224,13 +219,7 @@ impl DBIG {
 		r.add(&e);
 		r.norm();
 		a.cmove(&r,d);
-/*
-            if DBIG::comp(self,&m)>0 {
-                a.add(&e);
-                a.norm();
-                self.sub(&m);
-                self.norm();
-            } */
+
             k-=1;
         }
         return a;

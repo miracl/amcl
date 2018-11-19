@@ -99,12 +99,6 @@
             w[i]=x.w[i]-w[i]
         }
     }    
-/*    func muladd(_ x: Int32,_ y: Int32,_ c: Int32,_ i: Int) -> Int32
-    {
-        let prod:Int64 = Int64(x)*Int64(y)+Int64(c)+Int64(w[i])
-        w[i]=Int32(prod&Int64(BIG.BMASK))
-        return Int32(prod>>Int64(BIG.BASEBITS))
-    } */
     /* general shift left */
     mutating func shl(_ k: UInt)
     {
@@ -112,7 +106,6 @@
         let m=Int(k/BIG.BASEBITS)
         w[BIG.DNLEN-1]=((w[BIG.DNLEN-1-m]<<Chunk(n)))|(w[BIG.DNLEN-m-2]>>Chunk(BIG.BASEBITS-n))
         for i in (m+1...BIG.DNLEN-2).reversed()
-     //   for var i=BIG.DNLEN-2;i>m;i--
         {
             w[i]=((w[i-m]<<Chunk(n))&BIG.BMASK)|(w[i-m-1]>>Chunk(BIG.BASEBITS-n))
         }
@@ -135,7 +128,6 @@
     static func comp(_ a: DBIG,_ b: DBIG) -> Int
     {
         for i in (0...BIG.DNLEN-1).reversed()
-       // for var i=BIG.DNLEN-1;i>=0;i--
         {
             if (a.w[i]==b.w[i]) {continue}
             if (a.w[i]>b.w[i]) {return 1}
@@ -180,14 +172,8 @@
 		r.sub(m)
 		r.norm()
 		cmove(r,Int(1-((r.w[BIG.DNLEN-1]>>Chunk(BIG.CHUNK-1))&1)))
-/*
 
-            if (DBIG.comp(self,m)>=0)
-            {
-				sub(m)
-				norm()
-            } */
-            k -= 1;
+            k -= 1
         }
         return BIG(self)
     }
@@ -224,14 +210,7 @@
 		r.add(e)
 		r.norm()
 		a.cmove(r,d)
-/*
-            if (DBIG.comp(self,m)>0)
-            {
-				a.add(e)
-				a.norm()
-				sub(m)
-				norm()
-            } */
+
             k -= 1
         }
         return a
@@ -245,7 +224,6 @@
         var carry=w[BIG.DNLEN-1]<<Chunk(BIG.BASEBITS-m)
     
         for i in (BIG.NLEN-1...BIG.DNLEN-2).reversed()
-      //  for var i=BIG.DNLEN-2;i>=BIG.NLEN-1;i--
         {
             let nw=(w[i]>>Chunk(m))|carry;
             carry=(w[i]<<Chunk(BIG.BASEBITS-m))&BIG.BMASK;
@@ -277,7 +255,6 @@
         else {len/=4; len += 1}
         
         for i in (0...len-1).reversed()
-    //    for var i=len-1;i>=0;i--
         {
             var b = DBIG(self)
             b.shr(UInt(i*4))

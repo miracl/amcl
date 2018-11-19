@@ -60,7 +60,6 @@ fn linedbl(A: &mut ECP4,qx: &FP,qy: &FP) -> FP24 {
 		zz.times_i();
 		zz.dbl();
 		yz.times_i();
-		//yz.norm();
 	}	
 
 	zz.norm(); // 3b.Z^2 
@@ -102,7 +101,6 @@ fn lineadd(A: &mut ECP4,B: &ECP4,qx: &FP,qy: &FP) -> FP24 {
 	x1.qmul(qy);            // X1=(X1-Z1.X2).Ys
 	if ecp::SEXTIC_TWIST==ecp::M_TYPE {
 		x1.times_i();
-		//x1.norm();
 	}
 
 	t1.mul(&B.getpy());       // T1=(X1-Z1.X2).Y2
@@ -162,10 +160,8 @@ pub fn ate(P1: &ECP4,Q1: &ECP) -> FP24 {
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}		
 		if bt == -1 {
-
 			lv=lineadd(&mut A,&NP,&qx,&qy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);	
-
 		}
 	}
 
@@ -227,12 +223,10 @@ pub fn ate2(P1: &ECP4,Q1: &ECP,R1: &ECP4,S1: &ECP) -> FP24 {
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}
 		if bt == -1 {
-
 			lv=lineadd(&mut A,&NP,&qx,&qy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 			lv=lineadd(&mut B,&NR,&sx,&sy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
-
 		}
 	}
 
@@ -385,7 +379,6 @@ pub fn gs(e: &BIG) -> [BIG;8] {
 pub fn g1mul(P: &ECP,e: &mut BIG) -> ECP {
 	let mut R=ECP::new();
 	if rom::USE_GLV {
-	//	P.affine();
 		R.copy(P);
 		let mut Q=ECP::new();
 		Q.copy(P); Q.affine();
@@ -432,7 +425,6 @@ pub fn g2mul(P: &ECP4,e: &BIG) -> ECP4 {
 		let f=ECP4::frob_constants();
 
 		let mut t=BIG::new();
-		//P.affine();
 		Q[0].copy(&P);
 		for i in 1..8 {
 			T.copy(&Q[i-1]);

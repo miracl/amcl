@@ -109,8 +109,6 @@ void YYY::FP_mod(BIG r,DBIG d)
     chunk carry;
     BIG_split(t,b,d,MBITS_YYY);
 
-    //BIG_add(r,t,b);
-
     BIG_dscopy(d,t);
     BIG_dshl(d,BTset);   
 
@@ -269,18 +267,10 @@ void YYY::FP_zero(FP *x)
 
 int YYY::FP_equals(FP *x,FP *y)
 {
-//	int i;
-//	chunk res=0;
 	FP xg,yg;
 	FP_copy(&xg,x);
 	FP_copy(&yg,y);
 	FP_reduce(&xg); FP_reduce(&yg);
-
-//	for (i=0;i<NLEN_XXX;i++)
-//	{
-//		res |= xg.g[i]^yg.g[i];
-//	}
-//	return res;
 
 	if (BIG_comp(xg.g,yg.g)==0) return 1;
 	return 0;
@@ -319,11 +309,6 @@ void YYY::FP_mul(FP *r,FP *a,FP *b)
 {
     DBIG d;
     chunk ea,eb;
-//    BIG_norm(a);
-//    BIG_norm(b);
-//    ea=EXCESS(a->g);
-//    eb=EXCESS(b->g);
-
 
 	if ((sign64)a->XES*b->XES>(sign64)FEXCESS_YYY)
 	{
@@ -381,23 +366,7 @@ void YYY::FP_imul(FP *r,FP *a,int c)
 		FP_mul(r,a,&f);
 	}
 #endif
-/*
-    if (c<=NEXCESS_XXX && a->XES*c <= FEXCESS_YYY)
-	{
-        BIG_imul(r->g,a->g,c);
-		r->XES=a->XES*c;
-		FP_norm(r);
-	}
-    else
-    {
-            BIG_pxmul(d,a->g,c);
 
-            BIG_rcopy(m,Modulus);
-			BIG_dmod(r->g,d,m);
-            //FP_mod(r->g,d);                /// BIG problem here! Too slow for PM, How to do fast for Monty?
-			r->XES=2;
-    }
-*/
     if (s) 
 	{
 		FP_neg(r,r);
@@ -410,10 +379,6 @@ void YYY::FP_imul(FP *r,FP *a,int c)
 void YYY::FP_sqr(FP *r,FP *a)
 {
     DBIG d;
-//    chunk ea;
-//    BIG_norm(a);
-//    ea=EXCESS(a->g);
-
 
 	if ((sign64)a->XES*a->XES>(sign64)FEXCESS_YYY)
 	{
@@ -448,9 +413,7 @@ void YYY::FP_add(FP *r,FP *a,FP *b)
 void YYY::FP_sub(FP *r,FP *a,FP *b)
 {
     FP n;
-//	BIG_norm(b);
     FP_neg(&n,b);
-//	BIG_norm(n);
     FP_add(r,a,&n);
 }
 
@@ -524,14 +487,7 @@ void YYY::FP_reduce(FP *a)
 		BIG_cmove(a->g,r,1-sr);
 		sb--;
 	}
-/*
-    BIG_rcopy(m,Modulus);
-	if (BIG_comp(a->g,m)>0)
-	{
-		printf("NOT fully reduced q=%x %x %x %x\n",q,quo(a->g,m),FEXCESS_YYY,a->XES);
-		exit(0);
-	}
-*/
+
 	a->XES=1;
 }
 
@@ -571,7 +527,6 @@ void YYY::FP_div2(FP *r,FP *a)
     BIG m;
     BIG_rcopy(m,Modulus);
     FP_copy(r,a);
-//    BIG_norm(a);
     if (BIG_parity(a->g)==0)
     {
 
@@ -828,69 +783,3 @@ void YYY::FP_sqrt(FP *r,FP *a)
 #endif
     }
 }
-
-/*
-int main()
-{
-
-	BIG r;
-
-	FP_one(r);
-	FP_sqr(r,r);
-
-	BIG_output(r);
-
-	int i,carry;
-	DBIG c={0,0,0,0,0,0,0,0};
-	BIG a={1,2,3,4};
-	BIG b={3,4,5,6};
-	BIG r={11,12,13,14};
-	BIG s={23,24,25,15};
-	BIG w;
-
-//	printf("NEXCESS_XXX= %d\n",NEXCESS_XXX);
-//	printf("MConst= %d\n",MConst);
-
-	BIG_copy(b,Modulus);
-	BIG_dec(b,1);
-	BIG_norm(b);
-
-	BIG_randomnum(r); BIG_norm(r); BIG_mod(r,Modulus);
-//	BIG_randomnum(s); norm(s); BIG_mod(s,Modulus);
-
-//	BIG_output(r);
-//	BIG_output(s);
-
-	BIG_output(r);
-	FP_nres(r);
-	BIG_output(r);
-	BIG_copy(a,r);
-	FP_redc(r);
-	BIG_output(r);
-	BIG_dscopy(c,a);
-	FP_mod(r,c);
-	BIG_output(r);
-
-
-//	exit(0);
-
-//	copy(r,a);
-	printf("r=   "); BIG_output(r);
-	BIG_modsqr(r,r,Modulus);
-	printf("r^2= "); BIG_output(r);
-
-	FP_nres(r);
-	FP_sqrt(r,r);
-	FP_redc(r);
-	printf("r=   "); BIG_output(r);
-	BIG_modsqr(r,r,Modulus);
-	printf("r^2= "); BIG_output(r);
-
-
-//	for (i=0;i<100000;i++) FP_sqr(r,r);
-//	for (i=0;i<100000;i++)
-		FP_sqrt(r,r);
-
-	BIG_output(r);
-}
-*/

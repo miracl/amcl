@@ -37,20 +37,6 @@ public class DBIG {
 	}
 
 
-/*
-	public String toRawString()
-	{
-		DBIG b=new DBIG(this);
-		String s="(";
-		for (int i=0;i<BIG.DNLEN-1;i++)
-		{
-			s+=Long.toHexString(b.w[i]); s+=",";
-		}
-		s+=Long.toHexString(b.w[BIG.DNLEN-1]); s+=")";
-		return s;
-	}
-*/
-
 /* split DBIG at position n, return higher half, keep lower half */
 	public BIG split(int n)
 	{
@@ -63,7 +49,6 @@ public class DBIG {
 			nw=(w[i]>>m)|carry;
 			carry=(w[i]<<(BIG.BASEBITS-m))&BIG.BMASK;
 			t.w[i-BIG.NLEN+1]=nw;
-			//t.set(i-BIG.NLEN+1,nw);
 		}
 		w[BIG.NLEN-1]&=(((long)1<<m)-1);
 		return t;

@@ -30,7 +30,6 @@ using namespace XXX;
 /* SU= 8 */
 int YYY::FP2_iszilch(FP2 *x)
 {
-    //FP2_reduce(x);
     if (FP_iszilch(&(x->a)) && FP_iszilch(&(x->b))) return 1;
     return 0;
 }
@@ -48,7 +47,6 @@ int YYY::FP2_isunity(FP2 *x)
 {
     FP one;
     FP_one(&one);
-    //FP2_reduce(x);
     if (FP_equals(&(x->a),&one) && FP_iszilch(&(x->b))) return 1;
     return 0;
 }
@@ -134,7 +132,6 @@ void YYY::FP2_neg(FP2 *w,FP2 *x)
 {
     /* Just one neg! */
     FP m,t;
-//    FP2_norm(x);
     FP_add(&m,&(x->a),&(x->b));
     FP_neg(&m,&m);
     FP_add(&t,&m,&(x->b));
@@ -148,7 +145,6 @@ void YYY::FP2_neg(FP2 *w,FP2 *x)
 void YYY::FP2_conj(FP2 *w,FP2 *x)
 {
     FP_copy(&(w->a),&(x->a));
-	//FP_norm(&(x->b));
     FP_neg(&(w->b),&(x->b));
 	FP_norm(&(w->b));
 }
@@ -294,7 +290,6 @@ void YYY::FP2_inv(FP2 *w,FP2 *x)
     FP_neg(&w1,&w1);
 	FP_norm(&w1);
     FP_mul(&(w->b),&(x->b),&w1);
-//	FP2_norm(w);
 }
 
 
@@ -315,7 +310,6 @@ void YYY::FP2_mul_ip(FP2 *w)
     FP z;
 	FP2 t;
 
- //   FP2_norm(w);
     FP2_copy(&t,w);
 
     FP_copy(&z,&(w->a));
@@ -432,9 +426,6 @@ int YYY::FP2_sqrt(FP2 *w,FP2 *u)
 void YYY::FP2_times_i(FP2 *w)
 {
     FP z;
-
- //   FP2_norm(w);
-
     FP_copy(&z,&(w->a));
     FP_neg(&(w->a),&(w->b));
     FP_copy(&(w->b),&z);
@@ -442,45 +433,3 @@ void YYY::FP2_times_i(FP2 *w)
 //    Output NOT normed, so use with care
 }
 
-
-/*
-int main()
-{
-	int i;
-	FP2 w,z;
-	BIG a,b,e;
-	BIG pp1,pm1;
-	BIG_unity(a); BIG_unity(b);
-	FP2_from_BIGs(&w,a,b);
-//	for (i=0;i<100;i++)
-//	{
-//		BIG_randomnum(a); BIG_randomnum(b);
-//		BIG_mod(a,Modulus); BIG_mod(b,Modulus);
-//		FP2_from_FPs(&w,a,b);
-//		FP2_output(&w);
-//		FP2_inv(&z,&w);
-//				FP2_output(&z);
-//		FP2_inv(&z,&z);
-//				FP2_output(&z);
-//				FP2_output(&w);
-//		if (FP2_comp(&w,&z)!=1) printf("error \n");
-//		else printf("OK \n");
-//	}
-//exit(0);
-	printf("w= "); FP2_output(&w); printf("\n");
-	BIG_zero(e); BIG_inc(e,27);
-	FP2_pow(&w,&w,e);
-	FP2_output(&w);
-exit(0);
-	BIG_rcopy(pp1,Modulus);
-	BIG_rcopy(pm1,Modulus);
-	BIG_inc(pp1,1);
-	BIG_dec(pm1,1);
-	BIG_norm(pp1);
-	BIG_norm(pm1);
-	FP2_pow(&w,&w,pp1);
-	FP2_pow(&w,&w,pm1);
-	FP2_output(&w);
-}
-
-*/

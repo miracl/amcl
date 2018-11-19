@@ -32,9 +32,7 @@ public final class PAIR256 {
 /* Line function */
 	public static FP48 line(ECP8 A,ECP8 B,FP Qx,FP Qy)
 	{
-//System.out.println("Into line");
-		FP16 a,b,c;                            // Edits here
-//		c=new FP16(0);
+		FP16 a,b,c;                            
 		if (A==B)
 		{ // Doubling
 			FP8 XX=new FP8(A.getx());  //X
@@ -129,7 +127,6 @@ public final class PAIR256 {
 			}
 			A.add(B);
 		}
-//System.out.println("Out of line");
 		return new FP48(a,b,c);
 	}
 
@@ -171,7 +168,7 @@ public final class PAIR256 {
 			lv=line(A,A,Qx,Qy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 
-			bt=n3.bit(i)-n.bit(i); // bt=n.bit(i);
+			bt=n3.bit(i)-n.bit(i); 
 			if (bt==1)
 			{
 				lv=line(A,P,Qx,Qy);
@@ -179,10 +176,8 @@ public final class PAIR256 {
 			}
 			if (bt==-1)
 			{
-				//P.neg();
 				lv=line(A,MP,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				//P.neg();
 			}
 		}
 
@@ -248,7 +243,7 @@ public final class PAIR256 {
 			lv=line(B,B,Sx,Sy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 
-			bt=n3.bit(i)-n.bit(i); // bt=n.bit(i);
+			bt=n3.bit(i)-n.bit(i);
 			if (bt==1)
 			{
 				lv=line(A,P,Qx,Qy);
@@ -258,14 +253,10 @@ public final class PAIR256 {
 			}
 			if (bt==-1)
 			{
-				//P.neg(); 
 				lv=line(A,MP,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				//P.neg(); 
-				//R.neg();
 				lv=line(B,MR,Sx,Sy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				//R.neg();
 			}
 		}
 
@@ -496,7 +487,6 @@ public final class PAIR256 {
 		ECP R;
 		if (USE_GLV)
 		{
-			//P.affine();
 			R=new ECP();
 			R.copy(P);
 			int i,np,nn;
@@ -551,7 +541,6 @@ public final class PAIR256 {
 
 			BIG t=new BIG(0);
 			int i,np,nn;
-			//P.affine();
 
 			Q[0]=new ECP8(); Q[0].copy(P);
 			for (i=1;i<16;i++)
@@ -570,7 +559,6 @@ public final class PAIR256 {
 					Q[i].neg();
 				}
 				u[i].norm();
-				//Q[i].affine();
 			}
 
 			R=ECP8.mul16(Q,u);
@@ -622,7 +610,5 @@ public final class PAIR256 {
 		}
 		return r;
 	}
-
-
 }
 

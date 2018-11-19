@@ -73,7 +73,6 @@ func (F *FP16) norm() {
 
 /* test this==0 ? */
 func (F *FP16) iszilch() bool {
-	//F.reduce()
 	return F.a.iszilch() && F.b.iszilch()
 }
 
@@ -134,7 +133,6 @@ func (F *FP16) neg() {
 	t:=NewFP8int(0)
 	m.add(F.b)
 	m.neg()
-	//m.norm()
 	t.copy(m); t.add(F.b)
 	F.b.copy(m)
 	F.b.add(F.a)
@@ -190,8 +188,6 @@ func (F *FP16) imul(c int) {
 
 /* this*=this */	
 func (F *FP16) sqr() {
-//	F.norm()
-
 	t1:=NewFP8copy(F.a)
 	t2:=NewFP8copy(F.b)
 	t3:=NewFP8copy(F.a)
@@ -221,8 +217,6 @@ func (F *FP16) sqr() {
 
 /* this*=y */
 func (F *FP16) mul(y *FP16) {
-//	F.norm()
-
 	t1:=NewFP8copy(F.a)
 	t2:=NewFP8copy(F.b)
 	t3:=NewFP8int(0)
@@ -262,8 +256,6 @@ func (F *FP16) toString() string {
 
 /* this=1/this */
 func (F *FP16) inverse() {
-//	F.norm()
-
 	t1:=NewFP8copy(F.a)
 	t2:=NewFP8copy(F.b)
 
@@ -279,7 +271,6 @@ func (F *FP16) inverse() {
 
 /* this*=i where i = sqrt(sqrt(-1+sqrt(-1))) */
 func (F *FP16) times_i() {
-//	F.norm()
 	s:=NewFP8copy(F.b)
 	t:=NewFP8copy(F.a)
 	s.times_i()
@@ -331,7 +322,6 @@ func (F *FP16) pow(e *BIG) *FP16 {
 func (F *FP16) xtr_A(w *FP16,y *FP16,z *FP16) {
 	r:=NewFP16copy(w)
 	t:=NewFP16copy(w)
-	//y.norm()
 	r.sub(y); r.norm()
 	r.pmul(F.a)
 	t.add(y); t.norm()

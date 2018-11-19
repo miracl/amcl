@@ -77,7 +77,6 @@ func (F *FP24) norm() {
 }
 /* test x==0 ? */
 func (F *FP24) iszilch() bool {
-	//F.reduce()
 	return (F.a.iszilch() && F.b.iszilch() && F.c.iszilch())
 }
 
@@ -299,7 +298,6 @@ func (F *FP24) smul(y *FP24,twist int ) {
 		t1.copy(z2); t1.neg()
 
 		F.b.add(t0)
-	//F.b.norm();
 
 		F.b.add(t1)
 		z3.add(t1); z3.norm()
@@ -328,7 +326,7 @@ func (F *FP24) smul(y *FP24,twist int ) {
 		t0.copy(F.b); t0.add(F.c)
 		t0.norm()
 
-		z3.copy(t0) //z3.mul(y.c);
+		z3.copy(t0) 
 		z3.pmul(y.c.getb())
 		z3.times_i()
 
@@ -372,7 +370,7 @@ func (F *FP24) Inverse() {
 	f2:=NewFP8copy(F.a)
 	f3:=NewFP8int(0)
 
-	F.norm()
+	//F.norm()
 	f0.sqr()
 	f1.mul(F.c)
 	f1.times_i()
@@ -607,10 +605,7 @@ func (F *FP24) Pow(e *BIG) *FP24 {
 	e3:=NewBIGcopy(e1)
 	e3.pmul(3)
 	e3.norm()
-
 	w:=NewFP24copy(sf)
-	//z:=NewBIGcopy(e)
-	//r:=NewFP12int(1)
 
 	nb:=e3.nbits()
 	for i:=nb-2;i>=1;i-- {
@@ -627,16 +622,6 @@ func (F *FP24) Pow(e *BIG) *FP24 {
 	}
 	w.reduce()
 	return w
-/*
-	for true {
-		bt:=z.parity()
-		z.fshr(1)
-		if bt==1 {r.Mul(w)}
-		if z.iszilch() {break}
-		w.usqr()
-	}
-	r.reduce();
-	return r; */
 }
 
 /* constant time powering by small integer of max length bts */
@@ -656,7 +641,6 @@ func (F *FP24) pinpow(e int,bts int) {
 /* Fast compressed FP8 power of unitary FP24 */
 func (F *FP24) Compow(e *BIG,r *BIG) *FP8 {
 	q:=NewBIGints(Modulus)
-	//r:=NewBIGints(CURVE_Order)
 	f:=NewFP2bigs(NewBIGints(Fra),NewBIGints(Frb))
 
 	m:=NewBIGcopy(q)
@@ -806,80 +790,4 @@ func pow8(q []*FP24,u []*BIG) *FP24 {
 	p.reduce()
 	return p;
 }
-
-/*
-func pow4(q []*FP12,u []*BIG) *FP12 {
-	var a [4]int8
-	var g []*FP12
-	var s []*FP12
-	c:=NewFP12int(1)
-	p:=NewFP12int(0)
-	var w [NLEN*int(BASEBITS)+1]int8
-	var t []*BIG
-	mt:=NewBIGint(0)
-
-	for i:=0;i<4;i++ {
-		t=append(t,NewBIGcopy(u[i]))
-	}
-
-	s=append(s,NewFP12int(0))
-	s=append(s,NewFP12int(0))
-
-	g=append(g,NewFP12copy(q[0])); s[0].Copy(q[1]); s[0].conj(); g[0].Mul(s[0])
-	g=append(g,NewFP12copy(g[0]))
-	g=append(g,NewFP12copy(g[0]))
-	g=append(g,NewFP12copy(g[0]))
-	g=append(g,NewFP12copy(q[0])); g[4].Mul(q[1])
-	g=append(g,NewFP12copy(g[4]))
-	g=append(g,NewFP12copy(g[4]))
-	g=append(g,NewFP12copy(g[4]))
-
-	s[1].Copy(q[2]); s[0].Copy(q[3]); s[0].conj(); s[1].Mul(s[0])
-	s[0].Copy(s[1]); s[0].conj(); g[1].Mul(s[0])
-	g[2].Mul(s[1])
-	g[5].Mul(s[0])
-	g[6].Mul(s[1])
-	s[1].Copy(q[2]); s[1].Mul(q[3])
-	s[0].Copy(s[1]); s[0].conj(); g[0].Mul(s[0])
-	g[3].Mul(s[1])
-	g[4].Mul(s[0])
-	g[7].Mul(s[1])
-
-// if power is even add 1 to power, and add q to correction 
-
-	for i:=0;i<4;i++ {
-		if t[i].parity()==0 {
-			t[i].inc(1); t[i].norm()
-			c.Mul(q[i])
-		}
-		mt.add(t[i]); mt.norm()
-	}
-	c.conj()
-	nb:=1+mt.nbits()
-
-// convert exponent to signed 1-bit window 
-	for j:=0;j<nb;j++ {
-		for i:=0;i<4;i++ {
-			a[i]=int8(t[i].lastbits(2)-2)
-			t[i].dec(int(a[i])); t[i].norm();
-			t[i].fshr(1)
-		}
-		w[j]=(8*a[0]+4*a[1]+2*a[2]+a[3])
-	}
-	w[nb]=int8(8*t[0].lastbits(2)+4*t[1].lastbits(2)+2*t[2].lastbits(2)+t[3].lastbits(2))
-	p.Copy(g[(w[nb]-1)/2])
-
-	for i:=nb-1;i>=0;i-- {
-		m:=w[i]>>7
-		j:=(w[i]^m)-m  // j=abs(w[i]) 
-		j=(j-1)/2
-		s[0].Copy(g[j]); s[1].Copy(g[j]); s[1].conj()
-		p.usqr()
-		p.Mul(s[m&1]);
-	}
-	p.Mul(c)  // apply correction 
-	p.reduce()
-	return p;
-}
-*/
 

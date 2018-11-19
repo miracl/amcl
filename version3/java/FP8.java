@@ -40,7 +40,6 @@ public final class FP8 {
 	}
 /* test this==0 ? */
 	public boolean iszilch() {
-		//reduce();
 		return (a.iszilch() && b.iszilch());
 	}
 
@@ -130,14 +129,13 @@ public final class FP8 {
 		FP4 m=new FP4(a);
 		FP4 t=new FP4(0);
 		m.add(b);
-//	m.norm();
+
 		m.neg();
-	//	m.norm();
 		t.copy(m); t.add(b);
 		b.copy(m);
 		b.add(a);
 		a.copy(t);
-	norm();
+		norm();
 	}
 
 /* this=conjugate(this) */
@@ -200,8 +198,6 @@ public final class FP8 {
 /* this*=this */	
 	public void sqr()
 	{
-//		norm();
-
 		FP4 t1=new FP4(a);
 		FP4 t2=new FP4(b);
 		FP4 t3=new FP4(a);
@@ -235,8 +231,6 @@ public final class FP8 {
 /* this*=y */
 	public void mul(FP8 y)
 	{
-//		norm();
-
 		FP4 t1=new FP4(a);
 		FP4 t2=new FP4(b);
 		FP4 t3=new FP4(0);
@@ -258,16 +252,10 @@ public final class FP8 {
 		t4.add(t3);
 		t4.norm();
 
-	//	t4.sub(t1);
-	//	t4.norm();
-
 		t3.copy(t2);
 		t3.neg();
 		b.copy(t4);
 		b.add(t3);
-
-	//	b.copy(t4);
-	//	b.sub(t2);
 
 		t2.times_i();
 		a.copy(t2);
@@ -285,8 +273,6 @@ public final class FP8 {
 /* this=1/this */
 	public void inverse()
 	{
-//		norm();
-
 		FP4 t1=new FP4(a);
 		FP4 t2=new FP4(b);
 
@@ -305,7 +291,6 @@ public final class FP8 {
 /* this*=i where i = sqrt(-1+sqrt(-1)) */
 	public void times_i()
 	{
-//		norm();
 		FP4 s=new FP4(b);
 		FP4 t=new FP4(a);
 		s.times_i();

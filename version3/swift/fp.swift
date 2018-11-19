@@ -99,7 +99,6 @@ public struct FP {
             for i in 0 ..< BIG.NLEN {
                 let (top,bot)=BIG.muladd(d.w[i],ROM.MConst-1,d.w[i],d.w[BIG.NLEN+i-1])
                 d.w[BIG.NLEN+i]+=top; d.w[BIG.NLEN+i-1]=bot
- //                   d.w[BIG.NLEN+i]+=d.muladd(d.w[i],ROM.MConst-1,d.w[i],BIG.NLEN+i-1)
             }
     
             var b=BIG(0);
@@ -512,7 +511,6 @@ public struct FP {
             m2.dec(2); m2.norm()
             copy(pow(m2))
         }
-
     }
     
 /* return TRUE if this==a */
@@ -561,26 +559,6 @@ public struct FP {
         r.reduce()
         return r
     }
-
-
-/* return this^e mod Modulus 
-    func pow(_ e: BIG) -> FP
-    {
-        let r=FP(1)
-        e.norm()
-        x.norm()
-	   let m=FP(self)
-        while (true)
-        {
-            let bt=e.parity()
-            e.fshr(1)
-            if bt==1 {r.mul(m)}
-            if e.iszilch() {break}
-            m.sqr();
-        }
-        r.x.mod(FP.p);
-        return r;
-    } */
 
 /* return sqrt(this) mod Modulus */
     mutating func sqrt() -> FP

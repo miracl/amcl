@@ -72,7 +72,6 @@ public struct FP8 {
     /* test this==0 ? */
     func iszilch() -> Bool
     {
-        //reduce()
         return a.iszilch() && b.iszilch()
     }
 
@@ -142,7 +141,6 @@ public struct FP8 {
         var t=FP4(0)
         m.add(b)
         m.neg()
-    //    m.norm()
         t.copy(m); t.add(b)
         b.copy(m)
         b.add(a)
@@ -213,8 +211,6 @@ public struct FP8 {
     /* self*=self */
     mutating func sqr()
     {
-//        norm();
-    
         var t1=FP4(a)
         var t2=FP4(b)
         var t3=FP4(a)
@@ -246,8 +242,6 @@ public struct FP8 {
     /* self*=y */
     mutating func mul(_ y:FP8)
     {
-    //    norm();
-    
         var t1=FP4(a)
         var t2=FP4(b)
         var t3=FP4(0)
@@ -292,7 +286,7 @@ public struct FP8 {
     /* self=1/self */
     mutating func inverse()
     {
-        norm();
+        //norm();
     
         var t1=FP4(a)
         var t2=FP4(b)
@@ -392,15 +386,13 @@ public struct FP8 {
         var r=FP8(0)
         var sf=FP8(self)
     
-        //n.norm();
         let par=n.parity()
         var v=BIG(n); v.norm(); v.fshr(1)
         if par==0 {v.dec(1); v.norm()}
     
         let nb=v.nbits()
-        //for i in (0...nb-1).reverse()
         var i=nb-1
-        //for var i=nb-1;i>=0;i--
+
         while i>=0
         {
             if (v.bit(UInt(i)) != 1)
@@ -654,5 +646,4 @@ public struct FP8 {
 
         return true
     }
-
 }

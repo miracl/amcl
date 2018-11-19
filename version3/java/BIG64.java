@@ -38,8 +38,6 @@ public class BIG {
 	public static final int NEXCESS = ((int)1<<(CHUNK-BASEBITS-1));
 	public static final int BIGBITS=(MODBYTES*8);
 
-
-
 	protected long[] w=new long[NLEN];
 /* Constructors */
 	public BIG()
@@ -567,7 +565,6 @@ public class BIG {
 		for (int i=0;i<MODBYTES;i++)
 		{
 			m.fshl(8); m.w[0]+=(int)b[i+n]&0xff;
-			//m.inc((int)b[i]&0xff);
 		}
 		return m; 
 	}

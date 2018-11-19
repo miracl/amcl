@@ -163,7 +163,6 @@ public final class FP12 {
 /* Granger-Scott Unitary Squaring */
 	public void usqr()
 	{
-//System.out.println("Into usqr");
 		FP4 A=new FP4(a);
 		FP4 B=new FP4(c);
 		FP4 C=new FP4(b);
@@ -197,15 +196,12 @@ public final class FP12 {
 		c.add(c);
 		b.add(B);
 		c.add(C);
-//System.out.println("Out of usqr 1");
 		reduce();
-//System.out.println("Out of usqr 2");
 	}
 
 /* Chung-Hasan SQR2 method from http://cacr.uwaterloo.ca/techreports/2006/cacr2006-24.pdf */
 	public void sqr()
 	{
-//System.out.println("Into sqr");
 		FP4 A=new FP4(a);
 		FP4 B=new FP4(b);
 		FP4 C=new FP4(c);
@@ -214,14 +210,14 @@ public final class FP12 {
 		A.sqr();
 		B.mul(c);
 		B.add(B);
-	B.norm();
+		B.norm();
 		C.sqr();
 		D.mul(b);
 		D.add(D);
 
 		c.add(a);
 		c.add(b);
-	c.norm();
+		c.norm();
 		c.sqr();
 
 		a.copy(A);
@@ -240,14 +236,12 @@ public final class FP12 {
 
 		b.copy(C); b.add(D);
 		c.add(A);
-//System.out.println("Out of sqr");
 		norm();
 	}
 
 /* FP12 full multiplication this=this*y */
 	public void mul(FP12 y)
 	{
-//System.out.println("Into mul");
 		FP4 z0=new FP4(a);
 		FP4 z1=new FP4(0);
 		FP4 z2=new FP4(b);
@@ -261,16 +255,16 @@ public final class FP12 {
 		t0.add(b);
 		t1.add(y.b);
 
-	t0.norm();
-	t1.norm();
+		t0.norm();
+		t1.norm();
 
 		z1.copy(t0); z1.mul(t1);
 		t0.copy(b); t0.add(c);
 
 		t1.copy(y.b); t1.add(y.c);
 
-	t0.norm();
-	t1.norm();
+		t0.norm();
+		t1.norm();
 
 		z3.copy(t0); z3.mul(t1);
 
@@ -278,7 +272,6 @@ public final class FP12 {
 		t1.copy(z2); t1.neg();
 
 		z1.add(t0);
-		//z1.norm();
 		b.copy(z1); b.add(t1);
 
 		z3.add(t1);
@@ -287,8 +280,8 @@ public final class FP12 {
 		t0.copy(a); t0.add(c);
 		t1.copy(y.a); t1.add(y.c);
 
-t0.norm();
-t1.norm();
+		t0.norm();
+		t1.norm();
 	
 		t0.mul(t1);
 		z2.add(t0);
@@ -296,26 +289,19 @@ t1.norm();
 		t0.copy(c); t0.mul(y.c);
 		t1.copy(t0); t1.neg();
 
-//		z2.norm();
-//		z3.norm();
-//		b.norm();
-
 		c.copy(z2); c.add(t1);
 		z3.add(t1);
 		t0.times_i();
 		b.add(t0);
-	z3.norm();
+		z3.norm();
 		z3.times_i();
 		a.copy(z0); a.add(z3);
 		norm();
-//System.out.println("Out of mul");
 	}
 
 /* Special case of multiplication arises from special form of ATE pairing line function */
 	public void smul(FP12 y,int type)
 	{
-//System.out.println("Into smul");
-
 		if (type==ECP.D_TYPE)
 		{
 			FP4 z0=new FP4(a);
@@ -370,7 +356,7 @@ t1.norm();
 			t0.copy(b); t0.add(c);
 			t0.norm();
 
-			z3.copy(t0); //z3.mul(y.c);
+			z3.copy(t0); 
 			z3.pmul(y.c.getb());
 			z3.times_i();
 
@@ -405,7 +391,6 @@ t1.norm();
 			a.copy(z0); a.add(z3);
 		}
 		norm();
-//System.out.println("Out of smul");
 	}
 
 /* this=1/this */
@@ -421,18 +406,18 @@ t1.norm();
 		f1.mul(c);
 		f1.times_i();
 		f0.sub(f1);
-	f0.norm();
+		f0.norm();
 
 		f1.copy(c); f1.sqr();
 		f1.times_i();
 		f2.mul(b);
 		f1.sub(f2);
-	f1.norm();
+		f1.norm();
 
 		f2.copy(b); f2.sqr();
 		f3.copy(a); f3.mul(c);
 		f2.sub(f3);
-	f2.norm();
+		f2.norm();
 
 		f3.copy(b); f3.mul(f2);
 		f3.times_i();
@@ -442,7 +427,7 @@ t1.norm();
 		c.times_i();
 
 		f3.add(c);
-	f3.norm();
+		f3.norm();
 		f3.inverse();
 		a.copy(f0); a.mul(f3);
 		b.copy(f1); b.mul(f3);
@@ -498,7 +483,6 @@ t1.norm();
 
 		e=new FP4(c,d);
 
-
 		for (int i=0;i<BIG.MODBYTES;i++) t[i]=w[i+4*BIG.MODBYTES];
 		a=BIG.fromBytes(t);
 		for (int i=0;i<BIG.MODBYTES;i++) t[i]=w[i+5*BIG.MODBYTES];
@@ -512,7 +496,6 @@ t1.norm();
 		d=new FP2(a,b);
 
 		f=new FP4(c,d);
-
 
 		for (int i=0;i<BIG.MODBYTES;i++) t[i]=w[i+8*BIG.MODBYTES];
 		a=BIG.fromBytes(t);
@@ -573,7 +556,6 @@ t1.norm();
 /* Note this is simple square and multiply, so not side-channel safe */
 	public FP12 pow(BIG e)
 	{
-		//norm();
 		BIG e1=new BIG(e);
 		e1.norm();
 		BIG e3=new BIG(e1);
@@ -598,22 +580,6 @@ t1.norm();
 		}
 		w.reduce();
 		return w;
-
-
-/*
-		BIG z=new BIG(e);
-		FP12 r=new FP12(1);
-
-		while (true)
-		{
-			int bt=z.parity();
-			z.fshr(1);
-			if (bt==1) r.mul(w);
-			if (z.iszilch()) break;
-			w.usqr();
-		}
-		r.reduce();
-		return r; */
 	}
 
 /* constant time powering by small integer of max length bts */
@@ -750,161 +716,5 @@ t1.norm();
 
  		p.reduce();
 		return p;
-	}              
-
-/* p=q0^u0.q1^u1.q2^u2.q3^u3 */
-/* Timing attack secure, but not cache attack secure */
-/*
-	public static FP12 pow4(FP12[] q,BIG[] u)
-	{
-		int i,j,nb,m;
-		int[] a=new int[4];
-		FP12 [] g=new FP12[8];
-		FP12 [] s=new FP12[2];
-		FP12 c=new FP12(1);
-		FP12 p=new FP12(0);
-		BIG [] t=new BIG[4];
-		BIG mt=new BIG(0);
-		byte[] w=new byte[BIG.NLEN*BIG.BASEBITS+1];
-
-		for (i=0;i<4;i++)
-			t[i]=new BIG(u[i]);
-
-		s[0]=new FP12(0);
-		s[1]=new FP12(0);
-
-		g[0]=new FP12(q[0]); s[0].copy(q[1]); s[0].conj(); g[0].mul(s[0]);
-		g[1]=new FP12(g[0]);
-		g[2]=new FP12(g[0]);
-		g[3]=new FP12(g[0]);
-		g[4]=new FP12(q[0]); g[4].mul(q[1]);
-		g[5]=new FP12(g[4]);
-		g[6]=new FP12(g[4]);
-		g[7]=new FP12(g[4]);
-
-		s[1].copy(q[2]); s[0].copy(q[3]); s[0].conj(); s[1].mul(s[0]);
-		s[0].copy(s[1]); s[0].conj(); g[1].mul(s[0]);
-		g[2].mul(s[1]);
-		g[5].mul(s[0]);
-		g[6].mul(s[1]);
-		s[1].copy(q[2]); s[1].mul(q[3]);
-		s[0].copy(s[1]); s[0].conj(); g[0].mul(s[0]);
-		g[3].mul(s[1]);
-		g[4].mul(s[0]);
-		g[7].mul(s[1]);
-
-// if power is even add 1 to power, and add q to correction 
-
-		for (i=0;i<4;i++)
-		{
-			if (t[i].parity()==0)
-			{
-				t[i].inc(1); t[i].norm();
-				c.mul(q[i]);
-			}
-			mt.add(t[i]); mt.norm();
-		}
-		c.conj();
-		nb=1+mt.nbits();
-
-// convert exponent to signed 1-bit window 
-		for (j=0;j<nb;j++)
-		{
-			for (i=0;i<4;i++)
-			{
-				a[i]=(t[i].lastbits(2)-2);
-				t[i].dec(a[i]); t[i].norm(); 
-				t[i].fshr(1);
-			}
-			w[j]=(byte)(8*a[0]+4*a[1]+2*a[2]+a[3]);
-		}
-		w[nb]=(byte)(8*t[0].lastbits(2)+4*t[1].lastbits(2)+2*t[2].lastbits(2)+t[3].lastbits(2));
-		p.copy(g[(w[nb]-1)/2]);  
-
-		for (i=nb-1;i>=0;i--)
-		{
-			m=w[i]>>7;
-			j=(w[i]^m)-m;  // j=abs(w[i]) 
-			j=(j-1)/2;
-			s[0].copy(g[j]); s[1].copy(g[j]); s[1].conj();
-			p.usqr();
-			p.mul(s[m&1]);
-		}
-		p.mul(c);  // apply correction 
-		p.reduce();
-		return p;
 	}
-*/
-/*
-	public static void main(String[] args) {
-		BIG p=new BIG(ROM.Modulus);
-		FP2 w0,w1;
-		BIG a=new BIG(0);
-		BIG b=new BIG(0);
-		
-		a.zero(); b.zero(); a.inc(1); b.inc(2);
-		w0=new FP2(a,b);
-		a.zero(); b.zero(); a.inc(3); b.inc(4);
-		w1=new FP2(a,b);
-		FP4 t0=new FP4(w0,w1);
-
-		a.zero(); b.zero(); a.inc(5); b.inc(6);
-		w0=new FP2(a,b);
-		a.zero(); b.zero(); a.inc(7); b.inc(8);
-		w1=new FP2(a,b);
-		FP4 t1=new FP4(w0,w1);
-
-		a.zero(); b.zero(); a.inc(9); b.inc(10);
-		w0=new FP2(a,b);
-		a.zero(); b.zero(); a.inc(11); b.inc(12);
-		w1=new FP2(a,b);
-		FP4 t2=new FP4(w0,w1);
-
-		FP12 w=new FP12(t0,t1,t2);
-		FP12 t=new FP12(w);
-
-		System.out.println("w= "+w.toString());
-
-		a=new BIG(ROM_ZZZ.CURVE_Fra);
-		b=new BIG(ROM_ZZZ.CURVE_Frb);
-
-		FP2 f=new FP2(a,b);
-
-		w.frob(f);
-		System.out.println("w= "+w.toString());
-
-		w=t.pow(p);
-
-		System.out.println("w= "+w.toString());
-
-		w.inverse();
-
-		System.out.println("1/w= "+w.toString());
-
-		w.inverse();
-
-		System.out.println("w= "+w.toString());
-
-		t.copy(w);
-		w.conj();
-		t.inverse();
-		w.mul(t);
-
-		System.out.println("w^(p^6-1)= "+w.toString());
-
-		t.copy(w);
-		w.frob(f);
-		w.frob(f);
-		w.mul(t);
-
-		System.out.println("w^(p^6-1)(p^2+1)= "+w.toString());
-
-		t.copy(w);
-
-		t.inverse();
-		w.conj();
-
-		System.out.println("w= "+w.toString());
-		System.out.println("t= "+t.toString());
-	} */
 }

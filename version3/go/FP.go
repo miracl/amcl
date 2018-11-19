@@ -111,10 +111,7 @@ func mod(d *DBIG) *BIG {
 		t.w[0]+=(MConst*((tw>>TBITS)+(v<<(BASEBITS-TBITS))))
 
 		t.norm()
-		return t
-	//	b.add(t)
-	//	b.norm()
-	//	return b		
+		return t	
 	}
 	if MODTYPE==MONTGOMERY_FRIENDLY {
 		for i:=0;i<NLEN;i++ {
@@ -332,7 +329,6 @@ func (F *FP) rsub(b *FP) {
 
 /* this/=2 mod Modulus */
 func (F *FP) div2() {
-//	F.x.norm()
 	if (F.x.parity()==0) {
 		F.x.fshr(1)
 	} else {
@@ -471,25 +467,6 @@ func (F *FP) Equals(a *FP) bool {
 	return false
 }
 
-/* return this^e mod Modulus */
-/*
-func (F *FP) pow(e *BIG) *FP {
-	r:=NewFPint(1)
-	e.norm()
-	F.norm()
-	m:=NewFPcopy(F)
-	for true {
-		bt:=e.parity()
-		e.fshr(1)
-		if bt==1 {r.mul(m)}
-		if e.iszilch() {break}
-		m.sqr()
-	}
-	r.reduce()
-	return r
-}
-*/
-
 
 func (F *FP) pow(e *BIG) *FP {
 	var tb []*FP
@@ -523,7 +500,6 @@ func (F *FP) pow(e *BIG) *FP {
 	r.reduce()
 	return r
 }
-
 
 /* return sqrt(this) mod Modulus */
 func (F *FP) sqrt() *FP {

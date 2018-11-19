@@ -173,10 +173,8 @@ func Ate(P1 *ECP2,Q1 *ECP) *FP12 {
 			r.smul(lv,SEXTIC_TWIST)
 		}	
 		if bt==-1 {
-			//P.neg()
 			lv=line(A,NP,Qx,Qy)
 			r.smul(lv,SEXTIC_TWIST)
-			//P.neg()
 		}		
 	}
 
@@ -189,7 +187,6 @@ func Ate(P1 *ECP2,Q1 *ECP) *FP12 {
 
 	if CURVE_PAIRING_TYPE == BN {
 		if SIGN_OF_X==NEGATIVEX {
-			//r.conj()
 			A.neg()
 		}
 
@@ -274,14 +271,10 @@ func Ate2(P1 *ECP2,Q1 *ECP,R1 *ECP2,S1 *ECP) *FP12 {
 			r.smul(lv,SEXTIC_TWIST)
 		}
 		if bt==-1 {
-			//P.neg(); 
 			lv=line(A,NP,Qx,Qy)
 			r.smul(lv,SEXTIC_TWIST)
-			//P.neg(); 
-			//R.neg()
 			lv=line(B,NR,Sx,Sy)
 			r.smul(lv,SEXTIC_TWIST)
-			//R.neg()
 		}
 	}
 
@@ -292,7 +285,6 @@ func Ate2(P1 *ECP2,Q1 *ECP,R1 *ECP2,S1 *ECP) *FP12 {
 /* R-ate fixup */
 	if CURVE_PAIRING_TYPE == BN {
 		if SIGN_OF_X==NEGATIVEX {
-		//	r.conj()
 			A.neg()
 			B.neg()
 		}
@@ -445,50 +437,6 @@ func Fexp(m *FP12) *FP12 {
 		y1.Mul(y2)
 		r.Copy(y1)
 		r.reduce()
-
-
-/*
-		x0:=NewFP12copy(r)
-		x1:=NewFP12copy(r)
-		lv.Copy(r); lv.frob(f)
-		x3:=NewFP12copy(lv); x3.conj(); x1.Mul(x3)
-		lv.frob(f); lv.frob(f)
-		x1.Mul(lv)
-
-		r.Copy(r.Pow(x))  //r=r.Pow(x);
-		x3.Copy(r); x3.conj(); x1.Mul(x3)
-		lv.Copy(r); lv.frob(f)
-		x0.Mul(lv)
-		lv.frob(f)
-		x1.Mul(lv)
-		lv.frob(f)
-		x3.Copy(lv); x3.conj(); x0.Mul(x3)
-
-		r.Copy(r.Pow(x))
-		x0.Mul(r)
-		lv.Copy(r); lv.frob(f); lv.frob(f)
-		x3.Copy(lv); x3.conj(); x0.Mul(x3)
-		lv.frob(f)
-		x1.Mul(lv)
-
-		r.Copy(r.Pow(x))
-		lv.Copy(r); lv.frob(f)
-		x3.Copy(lv); x3.conj(); x0.Mul(x3)
-		lv.frob(f)
-		x1.Mul(lv)
-
-		r.Copy(r.Pow(x))
-		x3.Copy(r); x3.conj(); x0.Mul(x3)
-		lv.Copy(r); lv.frob(f)
-		x1.Mul(lv)
-
-		r.Copy(r.Pow(x))
-		x1.Mul(r)
-
-		x0.usqr()
-		x0.Mul(x1)
-		r.Copy(x0)
-		r.reduce() */
 	}
 	return r
 }
@@ -576,7 +524,6 @@ func gs(e *BIG) []*BIG {
 func G1mul(P *ECP,e *BIG) *ECP {
 	var R *ECP
 	if (USE_GLV) {
-		//P.Affine()
 		R=NewECP()
 		R.Copy(P)
 		Q:=NewECP()
@@ -628,7 +575,6 @@ func G2mul(P *ECP2,e *BIG) *ECP2 {
 		u:=gs(e)
 
 		t:=NewBIGint(0)
-		//P.Affine()
 		Q=append(Q,NewECP2());  Q[0].Copy(P);
 		for i:=1;i<4;i++ {
 			Q=append(Q,NewECP2()); Q[i].Copy(Q[i-1])
@@ -687,91 +633,3 @@ func GTpow(d *FP12,e *BIG) *FP12 {
 	}
 	return r
 }
-
-/* test group membership - no longer needed*/
-/* with GT-Strong curve, now only check that m!=1, conj(m)*m==1, and m.m^{p^4}=m^{p^2} */
-/*
-func GTmember(m *FP12) bool {
-	if m.Isunity() {return false}
-	r:=NewFP12copy(m)
-	r.conj()
-	r.Mul(m)
-	if !r.Isunity() {return false}
-
-	f:=NewFP2bigs(NewBIGints(Fra),NewBIGints(Frb))
-
-	r.Copy(m); r.frob(f); r.frob(f)
-	w:=NewFP12copy(r); w.frob(f); w.frob(f)
-	w.Mul(m)
-	if !GT_STRONG {
-		if !w.Equals(r) {return false}
-		x:=NewBIGints(CURVE_Bnx);
-		r.Copy(m); w=r.Pow(x); w=w.Pow(x)
-		r.Copy(w); r.sqr(); r.Mul(w); r.sqr()
-		w.Copy(m); w.frob(f)
-	}
-	return w.Equals(r)
-}
-*/
-/*
-func main() {
-
-	Q:=NewECPbigs(NewBIGints(CURVE_Gx),NewBIGints(CURVE_Gy))
-	P:=NewECP2fp2s(NewFP2bigs(NewBIGints(CURVE_Pxa),NewBIGints(CURVE_Pxb)),NewFP2bigs(NewBIGints(CURVE_Pya),NewBIGints(CURVE_Pyb)))
-
-	//r:=NewBIGints(CURVE_Order)
-	//xa:=NewBIGints(CURVE_Pxa)
-
-	fmt.Printf("P= "+P.ToString())
-	fmt.Printf("\n");
-	fmt.Printf("Q= "+Q.ToString());
-	fmt.Printf("\n");
-
-	//m:=NewBIGint(17)
-
-	e:=Ate(P,Q)
-	e=Fexp(e)
-	for i:=1;i<1000;i++ {
-		e=Ate(P,Q)
-//	fmt.Printf("\ne= "+e.ToString())
-//	fmt.Printf("\n")
-
-		e=Fexp(e)
-	}
-	//	e=GTpow(e,m);
-
-	fmt.Printf("\ne= "+e.ToString())
-	fmt.Printf("\n");
-	GLV:=glv(r)
-
-	fmt.Printf("GLV[0]= "+GLV[0].ToString())
-	fmt.Printf("\n")
-
-	fmt.Printf("GLV[0]= "+GLV[1].ToString())
-	fmt.Printf("\n")
-
-	G:=NewECP(); G.Copy(Q)
-	R:=NewECP2(); R.Copy(P)
-
-
-	e=Ate(R,Q)
-	e=Fexp(e)
-
-	e=GTpow(e,xa)
-	fmt.Printf("\ne= "+e.ToString());
-	fmt.Printf("\n")
-
-	R=G2mul(R,xa)
-	e=Ate(R,G)
-	e=Fexp(e)
-
-	fmt.Printf("\ne= "+e.ToString())
-	fmt.Printf("\n")
-
-	G=G1mul(G,xa)
-	e=Ate(P,G)
-	e=Fexp(e)
-	fmt.Printf("\ne= "+e.ToString())
-	fmt.Printf("\n") 
-}
-*/

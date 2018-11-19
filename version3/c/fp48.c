@@ -180,7 +180,7 @@ void FP48_YYY_sqr(FP48_YYY *w,FP48_YYY *x)
     FP16_YYY_sqr(&A,&(x->a));
     FP16_YYY_mul(&B,&(x->b),&(x->c));
     FP16_YYY_add(&B,&B,&B);
-FP16_YYY_norm(&B);
+	FP16_YYY_norm(&B);
     FP16_YYY_sqr(&C,&(x->c));
 
     FP16_YYY_mul(&D,&(x->a),&(x->b));
@@ -188,7 +188,7 @@ FP16_YYY_norm(&B);
 
     FP16_YYY_add(&(w->c),&(x->a),&(x->c));
     FP16_YYY_add(&(w->c),&(x->b),&(w->c));
-FP16_YYY_norm(&(w->c));	
+	FP16_YYY_norm(&(w->c));	
 
     FP16_YYY_sqr(&(w->c),&(w->c));
 
@@ -228,15 +228,15 @@ void FP48_YYY_mul(FP48_YYY *w,FP48_YYY *y)
     FP16_YYY_add(&t0,&(w->a),&(w->b));
     FP16_YYY_add(&t1,&(y->a),&(y->b));  //
 
-FP16_YYY_norm(&t0);
-FP16_YYY_norm(&t1);
+	FP16_YYY_norm(&t0);
+	FP16_YYY_norm(&t1);
 
     FP16_YYY_mul(&z1,&t0,&t1);
     FP16_YYY_add(&t0,&(w->b),&(w->c));
     FP16_YYY_add(&t1,&(y->b),&(y->c));  //
 
-FP16_YYY_norm(&t0);
-FP16_YYY_norm(&t1);
+	FP16_YYY_norm(&t0);
+	FP16_YYY_norm(&t1);
 
     FP16_YYY_mul(&z3,&t0,&t1);
 
@@ -244,17 +244,15 @@ FP16_YYY_norm(&t1);
     FP16_YYY_neg(&t1,&z2);
 
     FP16_YYY_add(&z1,&z1,&t0);   // z1=z1-z0
-//    FP16_YYY_norm(&z1);
-    FP16_YYY_add(&(w->b),&z1,&t1);
-// z1=z1-z2
+    FP16_YYY_add(&(w->b),&z1,&t1); // z1=z1-z2
     FP16_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
     FP16_YYY_add(&z2,&z2,&t0);        // z2=z2-z0
 
     FP16_YYY_add(&t0,&(w->a),&(w->c));
     FP16_YYY_add(&t1,&(y->a),&(y->c));
 
-FP16_YYY_norm(&t0);
-FP16_YYY_norm(&t1);
+	FP16_YYY_norm(&t0);
+	FP16_YYY_norm(&t1);
 
     FP16_YYY_mul(&t0,&t1,&t0);
     FP16_YYY_add(&z2,&z2,&t0);
@@ -266,7 +264,7 @@ FP16_YYY_norm(&t1);
     FP16_YYY_add(&z3,&z3,&t1);
     FP16_YYY_times_i(&t0);
     FP16_YYY_add(&(w->b),&(w->b),&t0);
-FP16_YYY_norm(&z3);
+	FP16_YYY_norm(&z3);
     FP16_YYY_times_i(&z3);
     FP16_YYY_add(&(w->a),&z0,&z3);
 
@@ -302,7 +300,6 @@ void FP48_YYY_smul(FP48_YYY *w,FP48_YYY *y,int type)
 		FP16_YYY_neg(&t1,&z2);
 
 		FP16_YYY_add(&(w->b),&(w->b),&t0);   // z1=z1-z0
-//    FP16_YYY_norm(&(w->b));
 		FP16_YYY_add(&(w->b),&(w->b),&t1);   // z1=z1-z2
 
 		FP16_YYY_add(&z3,&z3,&t1);        // z3=z3-z2
@@ -370,7 +367,6 @@ void FP48_YYY_smul(FP48_YYY *w,FP48_YYY *y,int type)
 void FP48_YYY_inv(FP48_YYY *w,FP48_YYY *x)
 {
     FP16_YYY f0,f1,f2,f3;
-//    FP48_YYY_norm(x);
 
     FP16_YYY_sqr(&f0,&(x->a));
     FP16_YYY_mul(&f1,&(x->b),&(x->c));
@@ -395,8 +391,6 @@ void FP48_YYY_inv(FP48_YYY *w,FP48_YYY *x)
     FP16_YYY_add(&f3,&(w->a),&f3);
     FP16_YYY_mul(&(w->c),&f1,&(x->c));
     FP16_YYY_times_i(&(w->c));
-
-
 
     FP16_YYY_add(&f3,&(w->c),&f3);
 	FP16_YYY_norm(&f3);
@@ -509,41 +503,6 @@ void FP48_YYY_pow(FP48_YYY *r,FP48_YYY *a,BIG_XXX b)
 	FP48_YYY_copy(r,&w);
 	FP48_YYY_reduce(r);
 }
-
-
-/* SU= 528 */
-/* set r=a^b */
-/* Note this is simple square and multiply, so not side-channel safe 
-
-void FP48_YYY_ppow(FP48_YYY *r,FP48_YYY *a,BIG_XXX b)
-{
-    FP48_YYY w;
-    BIG_XXX z,zilch;
-    int bt;
-    BIG_XXX_zero(zilch);
-    BIG_XXX_norm(b);
-    BIG_XXX_copy(z,b);
-    FP48_YYY_copy(&w,a);
-    FP48_YYY_one(r);
-
-    while(1)
-    {
-        bt=BIG_XXX_parity(z);
-        BIG_XXX_shr(z,1);
-        if (bt)
-		{
-			//printf("In mul\n");
-            FP48_YYY_mul(r,&w);
-			//printf("Out of mul\n");
-		}
-        if (BIG_XXX_comp(z,zilch)==0) break;
-		//printf("In sqr\n");
-        FP48_YYY_sqr(&w,&w);
-		//printf("Out of sqr\n");
-    }
-
-    FP48_YYY_reduce(r);
-}  */
 
 /* p=q0^u0.q1^u1.q2^u2.q3^u3... */
 /* Side channel attack secure */
@@ -740,192 +699,6 @@ void FP48_YYY_pow16(FP48_YYY *p,FP48_YYY *q,BIG_XXX u[16])
 
 	FP48_YYY_reduce(p);
 }
-
-/*
-void FP48_YYY_pow16(FP48_YYY *p,FP48_YYY *q,BIG_XXX u[16])
-{
-    int i,j,a[4],nb,m;
-    FP48_YYY g[8],f[8],gg[8],ff[8],c,s[2];
-    BIG_XXX t[16],mt;
-    sign8 w[NLEN_XXX*BASEBITS_XXX+1];
-    sign8 z[NLEN_XXX*BASEBITS_XXX+1];
-    sign8 ww[NLEN_XXX*BASEBITS_XXX+1];
-    sign8 zz[NLEN_XXX*BASEBITS_XXX+1];
-
-    FP_YYY fx,fy;
-	FP2_YYY  X;
-
-    FP_YYY_rcopy(&fx,Fra_YYY);
-    FP_YYY_rcopy(&fy,Frb_YYY);
-    FP2_YYY _from_FPs(&X,&fx,&fy);
-
-    for (i=0; i<16; i++)
-        BIG_XXX_copy(t[i],u[i]);
-
-    FP48_YYY_copy(&g[0],&q[0]);
-    FP48_YYY_conj(&s[0],&q[1]);
-    FP48_YYY_mul(&g[0],&s[0]);  // P/Q 
-    FP48_YYY_copy(&g[1],&g[0]);
-    FP48_YYY_copy(&g[2],&g[0]);
-    FP48_YYY_copy(&g[3],&g[0]);
-    FP48_YYY_copy(&g[4],&q[0]);
-    FP48_YYY_mul(&g[4],&q[1]);  // P*Q 
-    FP48_YYY_copy(&g[5],&g[4]);
-    FP48_YYY_copy(&g[6],&g[4]);
-    FP48_YYY_copy(&g[7],&g[4]);
-
-    FP48_YYY_copy(&s[1],&q[2]);
-    FP48_YYY_conj(&s[0],&q[3]);
-    FP48_YYY_mul(&s[1],&s[0]);       // R/S 
-    FP48_YYY_conj(&s[0],&s[1]);
-    FP48_YYY_mul(&g[1],&s[0]);
-    FP48_YYY_mul(&g[2],&s[1]);
-    FP48_YYY_mul(&g[5],&s[0]);
-    FP48_YYY_mul(&g[6],&s[1]);
-    FP48_YYY_copy(&s[1],&q[2]);
-    FP48_YYY_mul(&s[1],&q[3]);      // R*S 
-    FP48_YYY_conj(&s[0],&s[1]);
-    FP48_YYY_mul(&g[0],&s[0]);
-    FP48_YYY_mul(&g[3],&s[1]);
-    FP48_YYY_mul(&g[4],&s[0]);
-    FP48_YYY_mul(&g[7],&s[1]);
-
-// Use Frobenius
-
-	for (i=0;i<8;i++)
-	{
-		FP48_YYY_copy(&f[i],&g[i]);
-		FP48_YYY_frob(&f[i],&X,4);
-	}
-
-	for (i=0;i<8;i++)
-	{
-		FP48_YYY_copy(&gg[i],&f[i]);
-		FP48_YYY_frob(&gg[i],&X,4);
-	}
-
-	for (i=0;i<8;i++)
-	{
-		FP48_YYY_copy(&ff[i],&gg[i]);
-		FP48_YYY_frob(&ff[i],&X,4);
-	}
-
-
-    // if power is even add 1 to power, and add q to correction 
-    FP48_YYY_one(&c);
-
-    BIG_XXX_zero(mt);
-    for (i=0; i<16; i++)
-    {
-        if (BIG_XXX_parity(t[i])==0)
-        {
-            BIG_XXX_inc(t[i],1);
-            BIG_XXX_norm(t[i]);
-            FP48_YYY_mul(&c,&q[i]);
-        }
-        BIG_XXX_add(mt,mt,t[i]);
-        BIG_XXX_norm(mt);
-    }
-
-    FP48_YYY_conj(&c,&c);
-    nb=1+BIG_XXX_nbits(mt);
-
-    // convert exponents to signed 1-bit windows 
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_XXX_lastbits(t[i],2)-2;
-            BIG_XXX_dec(t[i],a[i]);
-            BIG_XXX_norm(t[i]);
-            BIG_XXX_fshr(t[i],1);
-        }
-        w[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    w[nb]=8*BIG_XXX_lastbits(t[0],2)+4*BIG_XXX_lastbits(t[1],2)+2*BIG_XXX_lastbits(t[2],2)+BIG_XXX_lastbits(t[3],2);
-
-
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_XXX_lastbits(t[i+4],2)-2;
-            BIG_XXX_dec(t[i+4],a[i]);
-            BIG_XXX_norm(t[i+4]);
-            BIG_XXX_fshr(t[i+4],1);
-        }
-        z[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    z[nb]=8*BIG_XXX_lastbits(t[4],2)+4*BIG_XXX_lastbits(t[5],2)+2*BIG_XXX_lastbits(t[6],2)+BIG_XXX_lastbits(t[7],2);
-
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_XXX_lastbits(t[i+8],2)-2;
-            BIG_XXX_dec(t[i+8],a[i]);
-            BIG_XXX_norm(t[i+8]);
-            BIG_XXX_fshr(t[i+8],1);
-        }
-        ww[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    ww[nb]=8*BIG_XXX_lastbits(t[8],2)+4*BIG_XXX_lastbits(t[9],2)+2*BIG_XXX_lastbits(t[10],2)+BIG_XXX_lastbits(t[11],2);
-
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_XXX_lastbits(t[i+12],2)-2;
-            BIG_XXX_dec(t[i+12],a[i]);
-            BIG_XXX_norm(t[i+12]);
-            BIG_XXX_fshr(t[i+12],1);
-        }
-        zz[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    zz[nb]=8*BIG_XXX_lastbits(t[12],2)+4*BIG_XXX_lastbits(t[13],2)+2*BIG_XXX_lastbits(t[14],2)+BIG_XXX_lastbits(t[15],2);
-
-    FP48_YYY_copy(p,&g[(w[nb]-1)/2]);
-    FP48_YYY_mul(p,&f[(z[nb]-1)/2]);
-    FP48_YYY_mul(p,&gg[(ww[nb]-1)/2]);
-    FP48_YYY_mul(p,&ff[(zz[nb]-1)/2]);
-
-    for (i=nb-1; i>=0; i--)
-    {
-		FP48_YYY_usqr(p,p);
-
-        m=w[i]>>7;
-        j=(w[i]^m)-m;  // j=abs(w[i]) 
-        j=(j-1)/2;
-        FP48_YYY_copy(&s[0],&g[j]);
-        FP48_YYY_conj(&s[1],&g[j]);
-        FP48_YYY_mul(p,&s[m&1]);
-
-        m=z[i]>>7;
-        j=(z[i]^m)-m;  // j=abs(w[i]) 
-        j=(j-1)/2;
-        FP48_YYY_copy(&s[0],&f[j]);
-        FP48_YYY_conj(&s[1],&f[j]);
-        FP48_YYY_mul(p,&s[m&1]);
-
-        m=ww[i]>>7;
-        j=(ww[i]^m)-m;  // j=abs(w[i]) 
-        j=(j-1)/2;
-        FP48_YYY_copy(&s[0],&gg[j]);
-        FP48_YYY_conj(&s[1],&gg[j]);
-        FP48_YYY_mul(p,&s[m&1]);
-
-        m=zz[i]>>7;
-        j=(zz[i]^m)-m;  // j=abs(w[i]) 
-        j=(j-1)/2;
-        FP48_YYY_copy(&s[0],&ff[j]);
-        FP48_YYY_conj(&s[1],&ff[j]);
-        FP48_YYY_mul(p,&s[m&1]);
-
-    }
-    FP48_YYY_mul(p,&c); // apply correction 
-    FP48_YYY_reduce(p);
-}
-*/
 
 /* Set w=w^p using Frobenius */
 /* SU= 160 */
@@ -1256,130 +1029,3 @@ void FP48_YYY_cmove(FP48_YYY *f,FP48_YYY *g,int d)
     FP16_YYY_cmove(&(f->b),&(g->b),d);
     FP16_YYY_cmove(&(f->c),&(g->c),d);
 }
-
-/*
-using namespace YYY;
-
-int main() {
-	int i;
-	FP2 f,w0,w1,X;
-	FP4 f0,f1;
-	FP16_YYY t0,t1,t2;
-	FP48 w,t,lv;
-	BIG a,b;
-	BIG p;
-
-
-	char raw[100];
-	csprng RNG;                // Crypto Strong RNG 
-
-	for (i=0; i<100; i++) raw[i]=i;
-
-	BIG_rcopy(a,Fra_YYY);
-    BIG_rcopy(b,Frb_YYY);
-	FP2_from_BIGs(&X,a,b);
-
-
-
-    RAND_seed(&RNG,100,raw);   // initialise strong RNG 
-
-	BIG_rcopy(p,Modulus);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w0,a,b);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w1,a,b);
-
-	FP4_from_FP2s(&f0,&w0,&w1);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w0,a,b);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w1,a,b);
-
-	FP4_from_FP2s(&f1,&w0,&w1);
-	FP16_YYY_from_FP4s(&t0,&f0,&f1);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w0,a,b);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w1,a,b);
-
-	FP4_from_FP2s(&f0,&w0,&w1);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w0,a,b);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w1,a,b);
-
-	FP4_from_FP2s(&f1,&w0,&w1);
-	FP16_YYY_from_FP4s(&t1,&f0,&f1);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w0,a,b);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w1,a,b);
-
-	FP4_from_FP2s(&f0,&w0,&w1);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w0,a,b);
-
-	BIG_randomnum(a,p,&RNG);
-	BIG_randomnum(b,p,&RNG);
-	FP2_from_BIGs(&w1,a,b);
-
-	FP4_from_FP2s(&f1,&w0,&w1);
-	FP16_YYY_from_FP4s(&t2,&f0,&f1);
-
-	FP48_from_FP16s(&w,&t0,&t1,&t2);
-
-
-	FP48_copy(&t,&w);
-
-	printf("w= ");
-	FP48_output(&w);
-	printf("\n");
-
-	FP48_norm(&w);
-
-	printf("w^p= ");
-	FP48_frob(&w,&X);
-	FP48_output(&w);
-	printf("\n");	
-
-//	printf("p.w= ");
-//	FP48_ppow(&t,&t,p);
-//	FP48_output(&t);
-//	printf("\n");	
-
-	printf("1/w= ");
-	FP48_inv(&t,&w);
-	FP48_output(&t);
-	printf("\n");	
-
-	printf("w= ");
-	FP48_inv(&w,&t);
-	FP48_output(&w);
-	printf("\n");	
-
-	return 0;
-}
-
-*/

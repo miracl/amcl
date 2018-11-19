@@ -42,7 +42,6 @@ use hash512::HASH512;
 
 pub const EFS: usize=big::MODBYTES as usize;
 pub const EGS: usize=big::MODBYTES as usize;
-//pub const PAS: usize=16;
 pub const BAD_PARAMS: isize=-11;
 pub const INVALID_POINT: isize=-14;
 pub const WRONG_ORDER: isize=-18;
@@ -57,8 +56,6 @@ pub const MAXPIN: i32=10000;  /* PIN less than this */
 pub const PBLEN: i32=14;      /* Number of bits in PIN */
 pub const TS: usize=10;         /* 10 for 4 digit PIN, 14 for 6-digit PIN - 2^TS/TS approx = sqrt(MAXPIN) */
 pub const TRAP:usize=200;      /* 200 for 4 digit PIN, 2000 for 6-digit PIN  - approx 2*sqrt(MAXPIN) */
-
-//pub const HASH_TYPE: usize=SHA256;
 
 #[allow(non_snake_case)]
 fn hash(sha: usize,c: &mut FP4,U: &mut ECP,r: &mut [u8]) -> bool {
@@ -136,10 +133,6 @@ fn hashit(sha: usize,n: usize,id: &[u8],w: &mut [u8]) -> bool {
 	} else {
 		for i in 0..sha {w[i+rm-sha]=r[i]}
 		for i in 0..(rm-sha) {w[i]=0}
-
-
-		//for i in 0..sha {w[i]=r[i]}	
-		//for i in sha..rm {w[i]=0}
 	}
 
 	return true;
@@ -205,13 +198,13 @@ pub fn encoding(rng: &mut RAND,e: &mut [u8]) ->isize {
 	let p=BIG::new_ints(&rom::MODULUS);
 	u=BIG::randomnum(&p,rng);
 
-	let mut su=rng.getbyte() as isize; /*if (su<0) su=-su;*/ su%=2;
+	let mut su=rng.getbyte() as isize;  su%=2;
 		
 	let mut W=emap(&mut u,su);
 	P.sub(&mut W);
 	let sv=P.gets();
 	let rn=unmap(&mut v,&mut P);
-	let mut m=rng.getbyte() as isize; /*if (m<0) m=-m;*/ m%=rn;
+	let mut m=rng.getbyte() as isize;  m%=rn;
 	v.inc(m+1);
 	e[0]=(su+2*sv) as u8;
 	u.tobytes(&mut t);
@@ -280,10 +273,7 @@ pub fn recombine_g2(w1: &[u8],w2: &[u8],w: &mut [u8]) -> isize {
 /* create random secret S */
 pub fn random_generate(rng: &mut RAND,s: &mut [u8]) -> isize {
 	let r=BIG::new_ints(&rom::CURVE_ORDER);
-	let mut sc=BIG::randomnum(&r,rng);
-	//if rom::AES_S>0 {
-	//	sc.mod2m(2*rom::AES_S);
-	//}		
+	let mut sc=BIG::randomnum(&r,rng);	
 	sc.tobytes(s);
 	return 0;
 }
@@ -314,9 +304,6 @@ pub fn get_g1_multiple(rng: Option<&mut RAND>,typ: usize,x: &mut [u8],g: &[u8],w
 	if let Some(rd)=rng
 	{
 		sx=BIG::randomnum(&r,rd);
-		//if rom::AES_S>0 {
-		//	sx.mod2m(2*rom::AES_S);
-		//}
 		sx.tobytes(x);
 	} else {
 		sx=BIG::frombytes(x);
@@ -329,8 +316,6 @@ pub fn get_g1_multiple(rng: Option<&mut RAND>,typ: usize,x: &mut [u8],g: &[u8],w
 	} else {
 		P=ECP::mapit(g)
 	}
-
-
 
 	pair::g1mul(&mut P,&mut sx).tobytes(w,false);
 	return 0;
@@ -385,26 +370,6 @@ pub fn restore_factor(sha: usize,cid: &[u8],factor: i32,facbits: i32,token: &mut
 	return 0;
 }
 
-/* Extract PIN from TOKEN for identity CID 
-#[allow(non_snake_case)]
-pub fn extract_pin(sha: usize,cid: &[u8],pin: i32,token: &mut [u8]) -> isize {
-	let mut P=ECP::frombytes(&token);
-	const RM:usize=big::MODBYTES as usize;
-	let mut h:[u8;RM]=[0;RM];
-	if P.is_infinity() {return INVALID_POINT}
-	hashit(sha,0,cid,&mut h);
-	let mut R=ECP::mapit(&h);
-
-	R=R.pinmul(pin%MAXPIN,PBLEN);
-	P.sub(&mut R);
-
-	P.tobytes(token,false);
-
-	return 0;
-}
-*/
-
-
 /* Functions to support M-Pin Full */
 #[allow(non_snake_case)]
 pub fn precompute(token: &[u8],cid: &[u8],g1: &mut [u8],g2: &mut [u8]) -> isize {
@@ -449,9 +414,6 @@ pub fn client_1(sha: usize,date: usize,client_id: &[u8],rng: Option<&mut RAND>,x
 	if let Some(rd)=rng
 	{
 		sx=BIG::randomnum(&r,rd);
-		//if rom::AES_S>0 {
-		//	sx.mod2m(2*rom::AES_S);
-		//}
 		sx.tobytes(x);
 	} else {
 		sx=BIG::frombytes(x);
@@ -527,7 +489,6 @@ pub fn client_2(x: &[u8],y: &[u8],sec: &mut [u8]) -> isize {
 	let py=BIG::frombytes(y);
 	px.add(&py);
 	px.rmod(&mut r);
-	//px.rsub(r)
 
 	P=pair::g1mul(&mut P,&mut px);
 	P.neg();
@@ -551,16 +512,12 @@ pub fn get_y(sha: usize,timevalue: usize,xcid: &[u8],y: &mut [u8]) {
 	let mut sy= BIG::frombytes(&h);
 	let mut q=BIG::new_ints(&rom::CURVE_ORDER);
 	sy.rmod(&mut q);
-	//if rom::AES_S>0 {
-	//	sy.mod2m(2*rom::AES_S);
-	//}
 	sy.tobytes(y);
 }
 
 /* Implement step 2 of MPin protocol on server side */
 #[allow(non_snake_case)]
 pub fn server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],xid: Option<&[u8]>,xcid: Option<&[u8]>,msec: &[u8],e: Option<&mut [u8]>,f: Option<&mut [u8]>) -> isize {
-//	q:=NewBIGints(Modulus)
 	let Q=ECP2::generator();
 
 	let sQ=ECP2::frombytes(&sst);
@@ -588,12 +545,11 @@ pub fn server_2(date: usize,hid: &[u8],htid: Option<&[u8]>,y: &[u8],sst: &[u8],x
 	if P.is_infinity() {return INVALID_POINT}
 
 	P=pair::g1mul(&mut P,&mut sy);
-	P.add(&mut R); //P.affine();
+	P.add(&mut R); 
 	R=ECP::frombytes(&msec);
 	if R.is_infinity() {return INVALID_POINT}
 
 	let mut g:FP12;
-//		FP12 g1=new FP12(0);
 
 	g=pair::ate2(&Q,&R,&sQ,&P);
 	g=pair::fexp(&g);
@@ -720,9 +676,7 @@ pub fn client_key(sha: usize,g1: &[u8],g2: &[u8],pin: usize,r: &[u8],x: &[u8],h:
 
 	W=pair::g1mul(&mut W,&mut x);
 
-//	let mut f=FP2::new_bigs(&BIG::new_ints(&rom::FRA),&BIG::new_ints(&rom::FRB));
 	let mut r=BIG::new_ints(&rom::CURVE_ORDER);
-//	let q=BIG::new_ints(&rom::MODULUS);
 
 	z.add(&h);	//new
 	z.rmod(&mut r);
@@ -732,30 +686,6 @@ pub fn client_key(sha: usize,g1: &[u8],g2: &[u8],pin: usize,r: &[u8],x: &[u8],h:
 
 	let mut c=g1.compow(&z,&mut r);
 
-/*	
-
-	let mut m=BIG::new_copy(&q);
-	m.rmod(&mut r);
-
-	let mut a=BIG::new_copy(&z);
-	a.rmod(&mut m);
-
-	let mut b=BIG::new_copy(&z);
-	b.div(&mut m);
-
-
-	let mut c=g1.trace();
-	g2.copy(&g1);
-	g2.frob(&mut f);
-	let cp=g2.trace();
-	g1.conj();
-	g2.mul(&mut g1);
-	let cpm1=g2.trace();
-	g2.mul(&mut g1);
-	let cpm2=g2.trace();
-
-	c=c.xtr_pow2(&cp,&cpm1,&cpm2,&mut a,&mut b);
-*/
 	hash(sha,&mut c,&mut W,ck);
 
 	return 0
@@ -784,7 +714,7 @@ pub fn server_key(sha: usize,z: &[u8],sst: &[u8],w: &[u8],h: &[u8],hid: &[u8],xi
 	let mut w=BIG::frombytes(&w);
 	let mut h=BIG::frombytes(&h);
 	A=pair::g1mul(&mut A,&mut h);	// new
-	R.add(&mut A); //R.affine();
+	R.add(&mut A); 
 
 	U=pair::g1mul(&mut U,&mut w);
 	let mut g=pair::ate(&sQ,&R);

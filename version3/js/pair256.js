@@ -133,7 +133,7 @@ var PAIR256 = function(ctx) {
 
             x = new ctx.BIG(0);
             x.rcopy(ctx.ROM_CURVE.CURVE_Bnx);
-            n = new ctx.BIG(x); //n.copy(x);
+            n = new ctx.BIG(x); 
 
             n3 = new ctx.BIG(n);
             n3.pmul(3);
@@ -142,10 +142,8 @@ var PAIR256 = function(ctx) {
 			var P=new ctx.ECP8(); P.copy(P1); P.affine();
 			var Q=new ctx.ECP(); Q.copy(Q1); Q.affine();
 
-            //  P.affine();
-            //  Q.affine();
-            Qx = new ctx.FP(Q.getx()); //Qx.copy(Q.getx());
-            Qy = new ctx.FP(Q.gety()); //Qy.copy(Q.gety());
+            Qx = new ctx.FP(Q.getx()); 
+            Qy = new ctx.FP(Q.gety()); 
 
             A = new ctx.ECP8();
             r = new ctx.FP48(1);
@@ -171,10 +169,8 @@ var PAIR256 = function(ctx) {
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 }
                 if (bt == -1) {
-                    //P.neg();
                     lv = PAIR256.line(A, NP, Qx, Qy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-                    //P.neg();
                 }
             }
 
@@ -195,7 +191,7 @@ var PAIR256 = function(ctx) {
             x = new ctx.BIG(0);
             x.rcopy(ctx.ROM_CURVE.CURVE_Bnx);
 
-            n = new ctx.BIG(x); //n.copy(x);
+            n = new ctx.BIG(x);
             n3 = new ctx.BIG(n);
             n3.pmul(3);
             n3.norm();
@@ -206,11 +202,11 @@ var PAIR256 = function(ctx) {
 			var S=new ctx.ECP(); S.copy(S1); S.affine();
 
 
-            Qx = new ctx.FP(Q.getx()); //Qx.copy(Q.getx());
-            Qy = new ctx.FP(Q.gety()); //Qy.copy(Q.gety());
+            Qx = new ctx.FP(Q.getx()); 
+            Qy = new ctx.FP(Q.gety()); 
 
-            Sx = new ctx.FP(S.getx()); //Sx.copy(S.getx());
-            Sy = new ctx.FP(S.gety()); //Sy.copy(S.gety());
+            Sx = new ctx.FP(S.getx()); 
+            Sy = new ctx.FP(S.gety()); 
 
             A = new ctx.ECP8();
             B = new ctx.ECP8();
@@ -244,14 +240,10 @@ var PAIR256 = function(ctx) {
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
                 }
                 if (bt == -1) {
-                    //P.neg();
                     lv = PAIR256.line(A, NP, Qx, Qy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-                    //P.neg();
-                    //R.neg();
                     lv = PAIR256.line(B, NR, Sx, Sy);
                     r.smul(lv,ctx.ECP.SEXTIC_TWIST);
-                    //R.neg();
                 }
             }
 
@@ -492,7 +484,6 @@ var PAIR256 = function(ctx) {
         var R, Q, q, bcru, cru, t, u, np, nn;
 
         if (ctx.ROM_CURVE.USE_GLV) {
-            //P.affine();
             R = new ctx.ECP();
             R.copy(P);
             Q = new ctx.ECP();
@@ -545,7 +536,7 @@ var PAIR256 = function(ctx) {
 
             u = PAIR256.gs(e);
             t = new ctx.BIG(0);
-            //P.affine();
+          
             Q[0] = new ctx.ECP8();
             Q[0].copy(P);
 

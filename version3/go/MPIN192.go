@@ -28,7 +28,6 @@ import "github.com/milagro-crypto/amcl/version3/go/amcl"
 
 const MFS int=int(MODBYTES)
 const MGS int=int(MODBYTES)
-//const PAS int=16
 const BAD_PARAMS int=-11
 const INVALID_POINT int=-14
 const WRONG_ORDER int=-18
@@ -41,8 +40,6 @@ const MAXPIN int32=10000  /* PIN less than this */
 const PBLEN int32=14      /* Number of bits in PIN */
 const TS int=10         /* 10 for 4 digit PIN, 14 for 6-digit PIN - 2^TS/TS approx = sqrt(MAXPIN) */
 const TRAP int=200      /* 200 for 4 digit PIN, 2000 for 6-digit PIN  - approx 2*sqrt(MAXPIN) */
-
-//const MPIN_HASH_TYPE int=amcl.SHA256
 
 func mpin_hash(sha int,c *FP8,U *ECP) []byte {
 	var w [MFS]byte
@@ -114,10 +111,6 @@ func mhashit(sha int,n int32,ID []byte) []byte {
 	} else {
 		for i:=0;i<sha;i++ {W[i+RM-sha]=R[i]}
 		for i:=0;i<RM-sha;i++ {W[i]=0}
-
-
-	//	for i:=0;i<sha;i++ {W[i]=R[i]}	
-	//	for i:=sha;i<RM;i++ {W[i]=0}
 	}
 
 	return W[:]
@@ -181,13 +174,13 @@ func MPIN_ENCODING(rng *amcl.RAND,E []byte) int {
 	p:=NewBIGints(Modulus)
 	u=Randomnum(p,rng)
 
-	su:=int(rng.GetByte()); /*if (su<0) su=-su;*/ su%=2
+	su:=int(rng.GetByte());  su%=2
 		
 	W:=emap(u,su)
 	P.Sub(W)
 	sv:=P.GetS()
 	rn:=unmap(v,P)
-	m:=int(rng.GetByte()); /*if (m<0) m=-m;*/ m%=rn
+	m:=int(rng.GetByte());  m%=rn
 	v.inc(m+1)
 	E[0]=byte(su+2*sv)
 	u.ToBytes(T[:])
@@ -253,10 +246,7 @@ func MPIN_RECOMBINE_G2(W1 []byte,W2 []byte,W []byte) int {
 /* create random secret S */
 func MPIN_RANDOM_GENERATE(rng *amcl.RAND,S []byte) int {
 	r:=NewBIGints(CURVE_Order);
-	s:=Randomnum(r,rng)
-	//if AES_S>0 {
-	//	s.mod2m(2*AES_S)
-	//}		
+	s:=Randomnum(r,rng)	
 	s.ToBytes(S)
 	return 0
 }
@@ -296,22 +286,6 @@ func MPIN_RESTORE_FACTOR(sha int,CID []byte,factor int32,facbits int32,TOKEN []b
 	return 0
 }
 
-
-/* Extract PIN from TOKEN for identity CID 
-func MPIN_EXTRACT_PIN(sha int,CID []byte,pin int,TOKEN []byte) int {
-	P:=ECP_fromBytes(TOKEN)
-	if P.Is_infinity() {return INVALID_POINT}
-	h:=mhashit(sha,0,CID)
-	R:=ECP_mapit(h)
-
-	R=R.pinmul(int32(pin)%MAXPIN,PBLEN)
-	P.Sub(R)
-
-	P.ToBytes(TOKEN,false)
-
-	return 0
-}*/
-
 /* Implement step 2 on client side of MPin protocol */
 func MPIN_CLIENT_2(X []byte,Y []byte,SEC []byte) int {
 	r:=NewBIGints(CURVE_Order)
@@ -322,12 +296,11 @@ func MPIN_CLIENT_2(X []byte,Y []byte,SEC []byte) int {
 	py:=FromBytes(Y)
 	px.add(py)
 	px.Mod(r)
-	//px.rsub(r)
 
 	P=G1mul(P,px)
 	P.neg()
 	P.ToBytes(SEC,false)
-	//G1mul(P,px).ToBytes(SEC,false)
+
 	return 0
 }
 
@@ -338,9 +311,6 @@ func MPIN_CLIENT_1(sha int,date int,CLIENT_ID []byte,rng *amcl.RAND,X []byte,pin
 	var x *BIG
 	if (rng!=nil) {
 		x=Randomnum(r,rng)
-		//if AES_S>0 {
-		//	x.mod2m(2*AES_S)
-		//}
 		x.ToBytes(X)
 	} else {
 		x=FromBytes(X)
@@ -403,9 +373,6 @@ func MPIN_GET_G1_MULTIPLE(rng *amcl.RAND,typ int,X []byte,G []byte,W []byte) int
 	r:=NewBIGints(CURVE_Order)
 	if rng!=nil {
 		x=Randomnum(r,rng)
-		//if AES_S>0 {
-		//	x.mod2m(2*AES_S)
-		//}
 		x.ToBytes(X)
 	} else {
 		x=FromBytes(X)
@@ -443,12 +410,11 @@ func MPIN_SERVER_1(sha int,date int,CID []byte,HID []byte,HTID []byte) {
 	
 	P.ToBytes(HID,false);
 	if date!=0 {
-	//	if HID!=nil {P.ToBytes(HID,false)}
 		h=mhashit(sha,int32(date),h)
 		R:=ECP_mapit(h)
 		P.Add(R)
 		P.ToBytes(HTID,false)
-	} //else {P.ToBytes(HID,false)}
+	} 
 }
 
 /* Implement step 2 of MPin protocol on server side */
@@ -481,7 +447,6 @@ func MPIN_SERVER_2(date int,HID []byte,HTID []byte,Y []byte,SST []byte,xID []byt
 
 	P=G1mul(P,y)
 	P.Add(R)
-	//P.Affine()
 	R=ECP_fromBytes(mSEC)
 	if R.Is_infinity() {return INVALID_POINT}
 
@@ -625,9 +590,7 @@ func MPIN_CLIENT_KEY(sha int,G1 []byte,G2 []byte,pin int,R []byte,X []byte,H []b
 
 	W=G1mul(W,x)
 
-//	f:=NewFP2bigs(NewBIGints(Fra),NewBIGints(Frb))
 	r:=NewBIGints(CURVE_Order)
-//	q:=NewBIGints(Modulus)
 
 	z.add(h);	//new
 	z.Mod(r);
@@ -636,29 +599,7 @@ func MPIN_CLIENT_KEY(sha int,G1 []byte,G2 []byte,pin int,R []byte,X []byte,H []b
 	g1.Mul(g2)
 
 	c:=g1.Compow(z,r);
-/*
-	m:=NewBIGcopy(q)
-	m.Mod(r)
 
-	a:=NewBIGcopy(z)
-	a.Mod(m)
-
-	b:=NewBIGcopy(z)
-	b.div(m)
-
-
-	c:=g1.trace()
-	g2.Copy(g1)
-	g2.frob(f)
-	cp:=g2.trace()
-	g1.conj()
-	g2.Mul(g1)
-	cpm1:=g2.trace()
-	g2.Mul(g1)
-	cpm2:=g2.trace()
-
-	c=c.xtr_pow2(cp,cpm1,cpm2,a,b)
-*/
 	t:=mpin_hash(sha,c,W);
 
 	for i:=0;i<AESKEY;i++ {CK[i]=t[i]}
@@ -687,7 +628,6 @@ func MPIN_SERVER_KEY(sha int,Z []byte,SST []byte,W []byte,H []byte,HID []byte,xI
 	h:=FromBytes(H)
 	A=G1mul(A,h)	// new
 	R.Add(A)
-	//R.Affine()
 
 	U=G1mul(U,w)
 	g:=Ate(sQ,R)
@@ -714,9 +654,6 @@ func MPIN_GET_Y(sha int,TimeValue int,xCID []byte,Y []byte) {
 	y:= FromBytes(h)
 	q:=NewBIGints(CURVE_Order)
 	y.Mod(q)
-	//if AES_S>0 {
-	//	y.mod2m(2*AES_S)
-	//}
 	y.ToBytes(Y)
 }
         

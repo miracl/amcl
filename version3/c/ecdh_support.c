@@ -179,29 +179,6 @@ int HMAC(int sha,octet *m,octet *k,int olen,octet *tag)
     return 1;
 }
 
-/* Key Derivation Functions */
-/* Input octet z */
-/* Output key of length olen */
-/*
-void KDF1(octet *z,int olen,octet *key)
-{
-    char h[32];
-	octet H={0,sizeof(h),h};
-    int counter,cthreshold;
-    int hlen=32;
-
-    OCT_empty(key);
-
-    cthreshold=ROUNDUP(olen,hlen);
-
-    for (counter=0;counter<cthreshold;counter++)
-    {
-        ehashit(z,counter,NULL,NULL,&H);
-        if (key->len+hlen>olen) OCT_jbytes(key,H.val,olen%hlen);
-        else                    OCT_joctet(key,&H);
-    }
-}
-*/
 void KDF2(int sha,octet *z,octet *p,int olen,octet *key)
 {
     /* NOTE: the parameter olen is the length of the output k in bytes */

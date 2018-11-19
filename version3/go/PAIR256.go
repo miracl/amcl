@@ -122,8 +122,6 @@ func Ate(P1 *ECP8,Q1 *ECP) *FP48 {
 	x:=NewBIGints(CURVE_Bnx)
 	n:=NewBIGcopy(x)
 	var lv *FP48
-	
-	//n.copy(x); n.norm()
 
 	n3:=NewBIGcopy(n);
 	n3.pmul(3);
@@ -155,10 +153,8 @@ func Ate(P1 *ECP8,Q1 *ECP) *FP48 {
 			r.smul(lv,SEXTIC_TWIST)
 		}	
 		if bt==-1 {
-			//P.neg()
 			lv=line(A,NP,Qx,Qy)
 			r.smul(lv,SEXTIC_TWIST)
-			//P.neg()
 		}		
 	}
 
@@ -174,8 +170,6 @@ func Ate2(P1 *ECP8,Q1 *ECP,R1 *ECP8,S1 *ECP) *FP48 {
 	x:=NewBIGints(CURVE_Bnx)
 	n:=NewBIGcopy(x)
 	var lv *FP48
-
-	//n.copy(x); n.norm()
 
 	n3:=NewBIGcopy(n);
 	n3.pmul(3);
@@ -222,14 +216,10 @@ func Ate2(P1 *ECP8,Q1 *ECP,R1 *ECP8,S1 *ECP) *FP48 {
 			r.smul(lv,SEXTIC_TWIST)
 		}
 		if bt==-1 {
-			//P.neg(); 
 			lv=line(A,NP,Qx,Qy)
 			r.smul(lv,SEXTIC_TWIST)
-			//P.neg(); 
-			//R.neg()
 			lv=line(B,NR,Sx,Sy)
 			r.smul(lv,SEXTIC_TWIST)
-			//R.neg()
 		}
 	}
 
@@ -452,7 +442,6 @@ func gs(e *BIG) []*BIG {
 func G1mul(P *ECP,e *BIG) *ECP {
 	var R *ECP
 	if (USE_GLV) {
-		//P.Affine()
 		R=NewECP()
 		R.Copy(P)
 		Q:=NewECP()
@@ -500,7 +489,6 @@ func G2mul(P *ECP8,e *BIG) *ECP8 {
 		u:=gs(e)
 
 		t:=NewBIGint(0)
-		//P.Affine()
 
 		Q=append(Q,NewECP8());  Q[0].Copy(P);
 		for i:=1;i<16;i++ {

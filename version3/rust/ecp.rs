@@ -26,7 +26,6 @@ pub struct ECP {
 	x:FP,
 	y:FP,
 	z:FP,
-//	inf: bool
 }
 
 pub const WEIERSTRASS:usize=0;
@@ -56,7 +55,6 @@ impl ECP {
 				x: FP::new(),
 				y: FP::new_int(1),
 				z: FP::new(),
-//				inf: true
 		}
 
 	}
@@ -78,15 +76,15 @@ impl ECP {
 		E.x.norm();
 		let mut rhs=ECP::rhs(&E.x);
 		if CURVETYPE==MONTGOMERY {
-			if rhs.jacobi()==1 {
-			//	E.inf=false;
-			} else {E.inf()}
+			if rhs.jacobi()!=1 {
+				E.inf();
+			} 
 		} else {
 			let mut y2=FP::new_copy(&E.y);
 			y2.sqr();	
-			if y2.equals(&mut rhs) {
-			//	E.inf=false
-			} else {E.inf()}
+			if !y2.equals(&mut rhs) {
+				E.inf();
+			} 
 		}
 		return E;
 	}
@@ -104,7 +102,6 @@ impl ECP {
 			let mut ny=rhs.sqrt();
 			if ny.redc().parity()!=s {ny.neg()}
 			E.y.copy(&ny);
-		//	E.inf=false;
 		} else {E.inf()}
 		return E;
 	}
@@ -119,14 +116,12 @@ impl ECP {
 		let mut rhs=ECP::rhs(&E.x);
 		if rhs.jacobi()==1 {
 			if CURVETYPE!=MONTGOMERY {E.y.copy(&rhs.sqrt())}
-		//	E.inf=false;
 		} else {E.inf();}
 		return E;
 	}
 
 /* set this=O */
 	pub fn inf(&mut self) {
-	//	self.inf=true;
 		self.x.zero();
 		if CURVETYPE!=MONTGOMERY {
 			self.y.one();
@@ -138,7 +133,6 @@ impl ECP {
 
 /* Calculate RHS of curve equation */
 	fn rhs(x: &FP) -> FP {
-		//x.norm();
 		let mut r=FP::new_copy(x);
 		r.sqr();
 
@@ -178,7 +172,6 @@ impl ECP {
 
 /* test for O point-at-infinity */
 	pub fn is_infinity(&self) -> bool {
-	//	if self.inf {return true}
 		let xx=FP::new_copy(&self.x);
 		let zz=FP::new_copy(&self.z);
 
@@ -200,12 +193,6 @@ impl ECP {
 		self.x.cswap(&mut Q.x,d);
 		if CURVETYPE!=MONTGOMERY {self.y.cswap(&mut Q.y,d)}
 		self.z.cswap(&mut Q.z,d);
-/*		
-		let mut bd=true;
-		if d==0 {bd=false}
-		bd=bd&&(self.inf!=Q.inf);
-		self.inf=bd!=self.inf;
-		Q.inf=bd!=Q.inf; */
 	}
 
 /* Conditional move of Q to P dependant on d */
@@ -213,10 +200,6 @@ impl ECP {
 		self.x.cmove(&Q.x,d);
 		if CURVETYPE!=MONTGOMERY {self.y.cmove(&Q.y,d)}
 		self.z.cmove(&Q.z,d);
-	/*	
-		let mut bd=true;
-		if d==0 {bd=false}
-		self.inf=(self.inf!=((self.inf!=Q.inf)&&bd)); */
 	}
 
 /* return 1 if b==c, no branching */
@@ -231,12 +214,10 @@ impl ECP {
 		self.x.copy(&P.x);
 		if CURVETYPE!=MONTGOMERY {self.y.copy(&P.y)}
 		self.z.copy(&P.z);
-	//	self.inf=P.inf;
-}
+	}
 
 /* this=-this */
 	pub fn neg(&mut self) {
-	//	if self.is_infinity() {return}
 		if CURVETYPE==WEIERSTRASS {
 			self.y.neg(); self.y.norm();
 		}
@@ -274,9 +255,6 @@ impl ECP {
 
 /* Test P == Q */
 	pub fn equals(&mut self,Q: &mut ECP) -> bool {
-	//	if self.is_infinity() && Q.is_infinity() {return true}
-	//	if self.is_infinity() || Q.is_infinity() {return false}
-
 		let mut a=FP::new();
 		let mut b=FP::new();
 		a.copy(&self.x); a.mul(&Q.z); 
@@ -400,7 +378,6 @@ impl ECP {
 	pub fn tostring(&self) -> String {
 		let mut W=ECP::new(); W.copy(self);
 	 	if W.is_infinity() {return String::from("infinity")}
-		//self.affine();
 		if CURVETYPE==MONTGOMERY {
 			return format!("({})",W.x.redc().tostring());
 		} else {return format!("({},{})",W.x.redc().tostring(),W.y.redc().tostring())} ; 
@@ -408,8 +385,6 @@ impl ECP {
 
 /* this*=2 */
 	pub fn dbl(&mut self) {
-	//	if self.inf {return}
-
 		if CURVETYPE==WEIERSTRASS {
 
 			if rom::CURVE_A==0 {
@@ -469,16 +444,16 @@ impl ECP {
 					y3.imul(rom::CURVE_B_I);
 				}
 				
-				y3.sub(&z3); //y3.norm(); //9  ***
+				y3.sub(&z3); //9  ***
 				x3.copy(&y3); x3.add(&y3); x3.norm();//10
 
-				y3.add(&x3); //y3.norm();//11
+				y3.add(&x3); //11
 				x3.copy(&t1); x3.sub(&y3); x3.norm();//12
 				y3.add(&t1); y3.norm();//13
 				y3.mul(&x3); //14
 				x3.mul(&t3); //15
-				t3.copy(&t2); t3.add(&t2); //t3.norm(); //16
-				t2.add(&t3); //t2.norm(); //17
+				t3.copy(&t2); t3.add(&t2); //16
+				t2.add(&t3);  //17
 
 				if rom::CURVE_B_I==0 {
 					z3.mul(&b); //18
@@ -486,21 +461,21 @@ impl ECP {
 					z3.imul(rom::CURVE_B_I);
 				}
 
-				z3.sub(&t2); //z3.norm();//19
+				z3.sub(&t2); //19
 				z3.sub(&t0); z3.norm();//20  ***
-				t3.copy(&z3); t3.add(&z3); //t3.norm();//21
+				t3.copy(&z3); t3.add(&z3); //21
 
 				z3.add(&t3); z3.norm(); //22
-				t3.copy(&t0); t3.add(&t0); //t3.norm(); //23
-				t0.add(&t3); //t0.norm();//24
+				t3.copy(&t0); t3.add(&t0);  //23
+				t0.add(&t3); //24
 				t0.sub(&t2); t0.norm();//25
 
 				t0.mul(&z3);//26
-				y3.add(&t0); //y3.norm();//27
+				y3.add(&t0); //27
 				t0.copy(&self.y); t0.mul(&self.z);//28
 				t0.dbl(); t0.norm(); //29
 				z3.mul(&t0);//30
-				x3.sub(&z3); //x3.norm();//31
+				x3.sub(&z3); //31
 				t0.dbl(); t0.norm();//32
 				t1.dbl(); t1.norm();//33
 				z3.copy(&t0); z3.mul(&t1);//34
@@ -532,9 +507,6 @@ impl ECP {
             self.y.mul(&c);
             self.z.mul(&j);
     
-        //    self.x.norm();
-        //    self.y.norm();
-        //    self.z.norm();
         }
         if CURVETYPE==MONTGOMERY {
             let mut a=FP::new_copy(&self.x);
@@ -564,11 +536,6 @@ impl ECP {
     /* self+=Q */
     pub fn add(&mut self,Q:&ECP)
     {
-    /*    if self.inf {
-			self.copy(&Q);
-			return;
-        }
-        if Q.inf {return}  */
 
         if CURVETYPE==WEIERSTRASS {
  
@@ -643,19 +610,19 @@ impl ECP {
 				t3.add(&self.y); t3.norm(); //4
 				t4.add(&Q.y); t4.norm();//5
 				t3.mul(&t4);//6
-				t4.copy(&t0); t4.add(&t1); //t4.norm(); //7
+				t4.copy(&t0); t4.add(&t1); //7
 				t3.sub(&t4); t3.norm(); //8
 				t4.copy(&self.y); t4.add(&self.z); t4.norm();//9
 				x3.add(&Q.z); x3.norm();//10
 				t4.mul(&x3); //11
-				x3.copy(&t1); x3.add(&t2); //x3.norm();//12
+				x3.copy(&t1); x3.add(&t2); //12
 
 				t4.sub(&x3); t4.norm();//13
 				x3.copy(&self.x); x3.add(&self.z); x3.norm(); //14
 				y3.add(&Q.z); y3.norm();//15
 
 				x3.mul(&y3); //16
-				y3.copy(&t0); y3.add(&t2); //y3.norm();//17
+				y3.copy(&t0); y3.add(&t2); //17
 
 				y3.rsub(&x3); y3.norm(); //18
 				z3.copy(&t2); 
@@ -668,9 +635,9 @@ impl ECP {
 				}
 				
 				x3.copy(&y3); x3.sub(&z3); x3.norm(); //20
-				z3.copy(&x3); z3.add(&x3); //z3.norm(); //21
+				z3.copy(&x3); z3.add(&x3);  //21
 
-				x3.add(&z3); //x3.norm(); //22
+				x3.add(&z3);  //22
 				z3.copy(&t1); z3.sub(&x3); z3.norm(); //23
 				x3.add(&t1); x3.norm(); //24
 
@@ -681,16 +648,16 @@ impl ECP {
 				}
 
 				t1.copy(&t2); t1.add(&t2); //t1.norm();//26
-				t2.add(&t1); //t2.norm();//27
+				t2.add(&t1); //27
 
-				y3.sub(&t2); //y3.norm(); //28
+				y3.sub(&t2); //28
 
 				y3.sub(&t0); y3.norm(); //29
-				t1.copy(&y3); t1.add(&y3); //t1.norm();//30
+				t1.copy(&y3); t1.add(&y3); //30
 				y3.add(&t1); y3.norm(); //31
 
-				t1.copy(&t0); t1.add(&t0); //t1.norm(); //32
-				t0.add(&t1); //t0.norm();//33
+				t1.copy(&t0); t1.add(&t0);  //32
+				t0.add(&t1); //33
 				t0.sub(&t2); t0.norm();//34
 				t1.copy(&t4); t1.mul(&y3);//35
 				t2.copy(&t0); t2.mul(&y3);//36
@@ -849,8 +816,6 @@ impl ECP {
 		 	const CT:usize=1+(big::NLEN*(big::BASEBITS as usize)+3)/4;
 			let mut w:[i8;CT]=[0;CT];
 
-		//	self.affine();
-
 			Q.copy(&self);
 			Q.dbl();
 
@@ -909,9 +874,6 @@ impl ECP {
 
 		const CT:usize=1+(big::NLEN*(big::BASEBITS as usize)+1)/2;
 		let mut w: [i8;CT]=[0;CT];		
-
-	//	self.affine();
-	//	Q.affine();
 
 		te.copy(e);
 		tf.copy(f);
@@ -975,12 +937,10 @@ impl ECP {
 		if cf==1 {return}
 		if cf==4 {
 			self.dbl(); self.dbl();
-			//self.affine();
 			return;
 		} 
 		if cf==8 {
 			self.dbl(); self.dbl(); self.dbl();
-			//self.affine();
 			return;
 		}
 		let c=BIG::new_ints(&rom::CURVE_COF);
@@ -1028,38 +988,4 @@ impl ECP {
 	}
 
 }
-/*
-fn main()
-{
-	let mut E=ECP::new();
 
-	let mut W:[&ECP;8]=[&ECP::new(),&ECP::new(),&ECP::new(),&ECP::new(),&ECP::new(),&ECP::new(),&ECP::new(),&ECP::new()];
-
-	let mut gx=BIG::new_ints(&rom::CURVE_GX);
-	let mut gy=BIG::new();
-	let mut P=ECP::new();
-
-	if CURVETYPE!=MONTGOMERY {gy.copy(&BIG::new_ints(&rom::CURVE_GY))}
-	let mut r=BIG::new_ints(&rom::CURVE_ORDER);
-
-	//r.dec(7);
-	
-	println!("gx= {}",gx.tostring());
-
-	if CURVETYPE!=MONTGOMERY {
-		println!("gy= {}",gy.tostring());
-	}	
-
-	if CURVETYPE!=MONTGOMERY {
-		P.copy(&ECP::new_bigs(&gx,&gy))}
-	else  {P.copy(&ECP::new_big(&gx))}
-
-	println!("P= {}",P.tostring());		
-
-	let mut R=P.mul(&mut r);
-		//for i in 0..10000	(R=P.mul(r));
-	
-	println!("R= {}",R.tostring());
-
-}
-*/

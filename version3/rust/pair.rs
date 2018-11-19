@@ -29,9 +29,6 @@ use xxx::dbig::DBIG;
 use xxx::ecp;
 use xxx::rom;
 
-//use std::thread;
-
-
 #[allow(non_snake_case)]
 fn linedbl(A: &mut ECP2,qx: &FP,qy: &FP) -> FP12 {
 	let mut a=FP4::new();
@@ -174,11 +171,6 @@ pub fn ate(P1: &ECP2,Q1: &ECP) -> FP12 {
 
 	for i in (1..nb-1).rev() {
 		r.sqr();	
-		//let mut lv=FP12::new();
-		//let handler = thread::spawn(move || {
-		//	lv=linedbl(&mut A,&qx,&qy);
-		//});
-		//handler.join().unwrap();
 	
 		let mut lv=linedbl(&mut A,&qx,&qy);
 		r.smul(&lv,ecp::SEXTIC_TWIST);
@@ -188,10 +180,8 @@ pub fn ate(P1: &ECP2,Q1: &ECP) -> FP12 {
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}		
 		if bt == -1 {
-
 			lv=lineadd(&mut A,&NP,&qx,&qy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);	
-
 		}
 	}
 
@@ -204,7 +194,6 @@ pub fn ate(P1: &ECP2,Q1: &ECP) -> FP12 {
 
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
 		if ecp::SIGN_OF_X == ecp::NEGATIVEX {
-			//r.conj();
 			A.neg();			
 		}
 
@@ -290,12 +279,10 @@ pub fn ate2(P1: &ECP2,Q1: &ECP,R1: &ECP2,S1: &ECP) -> FP12 {
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 		}
 		if bt == -1 {
-
 			lv=lineadd(&mut A,&NP,&qx,&qy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
 			lv=lineadd(&mut B,&NR,&sx,&sy);
 			r.smul(&lv,ecp::SEXTIC_TWIST);
-
 		}
 	}
 
@@ -306,7 +293,6 @@ pub fn ate2(P1: &ECP2,Q1: &ECP,R1: &ECP2,S1: &ECP) -> FP12 {
 /* R-ate fixup */
 	if ecp::CURVE_PAIRING_TYPE == ecp::BN {
 		if ecp::SIGN_OF_X == ecp::NEGATIVEX {		
-			//r.conj();
 			A.neg();
 			B.neg();
 		}
@@ -453,49 +439,6 @@ pub fn fexp(m: &FP12) -> FP12 {
 		r.copy(&y1);
 		r.reduce();
 
-
-/*
-		let mut x0=FP12::new_copy(&r);
-		let mut x1=FP12::new_copy(&r);
-		lv.copy(&r); lv.frob(&mut f);
-		let mut x3=FP12::new_copy(&lv); x3.conj(); x1.mul(&mut x3);
-		lv.frob(&mut f); lv.frob(&mut f);
-		x1.mul(&mut lv);
-
-		r=r.pow(&mut x);  //r=r.pow(x);
-		x3.copy(&r); x3.conj(); x1.mul(&mut x3);
-		lv.copy(&r); lv.frob(&mut f);
-		x0.mul(&mut lv);
-		lv.frob(&mut f);
-		x1.mul(&mut lv);
-		lv.frob(&mut f);
-		x3.copy(&lv); x3.conj(); x0.mul(&mut x3);
-
-		r=r.pow(&mut x);
-		x0.mul(&mut r);
-		lv.copy(&r); lv.frob(&mut f); lv.frob(&mut f);
-		x3.copy(&lv); x3.conj(); x0.mul(&mut x3);
-		lv.frob(&mut f);
-		x1.mul(&mut lv);
-
-		r=r.pow(&mut x);
-		lv.copy(&r); lv.frob(&mut f);
-		x3.copy(&lv); x3.conj(); x0.mul(&mut x3);
-		lv.frob(&mut f);
-		x1.mul(&mut lv);
-
-		r=r.pow(&mut x);
-		x3.copy(&r); x3.conj(); x0.mul(&mut x3);
-		lv.copy(&r); lv.frob(&mut f);
-		x1.mul(&mut lv);
-
-		r=r.pow(&mut x);
-		x1.mul(&mut r);
-
-		x0.usqr();
-		x0.mul(&mut x1);
-		r.copy(&x0);
-		r.reduce();  */
 	}
 	return r;
 }
@@ -587,7 +530,6 @@ pub fn gs(e: &BIG) -> [BIG;4] {
 pub fn g1mul(P: &ECP,e: &mut BIG) -> ECP {
 	let mut R=ECP::new();
 	if rom::USE_GLV {
-	//	P.affine();
 		R.copy(P);
 		let mut Q=ECP::new();
 		Q.copy(P); Q.affine();
@@ -638,7 +580,6 @@ pub fn g2mul(P: &ECP2,e: &BIG) -> ECP2 {
 		}	
 
 		let mut t=BIG::new();
-	//	P.affine();
 		Q[0].copy(&P);
 		for i in 1..4 {
 			T.copy(&Q[i-1]);
@@ -699,66 +640,3 @@ pub fn gtpow(d: &FP12,e: &BIG) -> FP12 {
 	return r;
 }
 
-/*
-#[allow(non_snake_case)]
-fn main()
-{
-	let mut Q=ECP::new_bigs(&BIG::new_ints(&rom::CURVE_GX),&BIG::new_ints(&rom::CURVE_GY));
-	let mut P=ECP2::new_fp2s(&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PXA),&BIG::new_ints(&rom::CURVE_PXB)),&FP2::new_bigs(&BIG::new_ints(&rom::CURVE_PYA),&BIG::new_ints(&rom::CURVE_PYB)));
-
-	let mut r=BIG::new_ints(&rom::CURVE_ORDER);
-	
-	println!("P= {}",P.tostring());
-	println!("Q= {}",Q.tostring());
-
-	//m:=NewBIGint(17)
-
-	let mut e=ate(&mut P,&mut Q);
-	println!("\ne= {}",e.tostring());
-
-	e=fexp(&e);
-
-	for i in 1..10 {
-		e=ate(&mut P,&mut Q);
-		e=fexp(&e);
-	}
-
-
-	//	e=GTpow(e,m);
-
-	println!("\ne= {}",e.tostring());
-
-	
-	fmt.Printf("\n");
-	GLV:=glv(r)
-
-	fmt.Printf("GLV[0]= "+GLV[0].toString())
-	fmt.Printf("\n")
-
-	fmt.Printf("GLV[0]= "+GLV[1].toString())
-	fmt.Printf("\n")
-
-	G:=NewECP(); G.copy(Q)
-	R:=NewECP2(); R.copy(P)
-
-
-	e=ate(R,Q)
-	e=fexp(e)
-
-	e=GTpow(e,xa)
-	fmt.Printf("\ne= "+e.toString());
-	fmt.Printf("\n")
-
-	R=G2mul(R,xa)
-	e=ate(R,G)
-	e=fexp(e)
-
-	fmt.Printf("\ne= "+e.toString())
-	fmt.Printf("\n")
-
-	G=G1mul(G,xa)
-	e=ate(P,G)
-	e=fexp(e)
-	fmt.Printf("\ne= "+e.toString())
-	fmt.Printf("\n") 
-}*/

@@ -43,7 +43,6 @@ public final class FP2 {
 
 /* test this=0 ? */
 	public boolean iszilch() {
-		//reduce();
 		return (a.iszilch() && b.iszilch());
 	}
 
@@ -100,12 +99,7 @@ public final class FP2 {
 		a=new FP(c);
 		b=new FP(0);
 	}
-/*
-	public BIG geta()
-	{
-		return a.tobig();
-	}
-*/
+
 /* extract a */
 	public BIG getA()
 	{ 
@@ -352,74 +346,5 @@ public final class FP2 {
 		norm();
 		div2();
 	}
-/*
-	public FP2 pow(BIG e)
-	{
-		int bt;
-		FP2 r=new FP2(1);
-		e.norm();
-		norm();
-		while (true)
-		{
-			bt=e.parity();
-			e.fshr(1);
-			if (bt==1) r.mul(this);
-			if (e.iszilch()) break;
-			sqr();
-		}
 
-		r.reduce();
-		return r;
-	}
-
-	public static void main(String[] args) {
-		BIG m=new BIG(ROM.Modulus);
-		BIG x=new BIG(3);
-		BIG e=new BIG(27);
-		BIG pp1=new BIG(m);
-		BIG pm1=new BIG(m);
-		BIG a=new BIG(1);
-		BIG b=new BIG(1);
-		FP2 w=new FP2(a,b);
-		FP2 z=new FP2(w);
-
-		byte[] RAW=new byte[100];
-
-		RAND rng=new RAND();
-		for (int i=0;i<100;i++) RAW[i]=(byte)(i);
-
-		rng.seed(100,RAW);
-
-	//	for (int i=0;i<100;i++)
-	//	{
-			a.randomnum(rng);
-			b.randomnum(rng);
-
-			w=new FP2(a,b);
-			System.out.println("w="+w.toString());
-
-			z=new FP2(w);
-			z.inverse();
-			System.out.println("z="+z.toString());
-
-			z.inverse();
-			if (!z.equals(w)) System.out.println("Error");
-	//	}
-
-//		System.out.println("m="+m.toString());
-//		w.sqr();
-//		w.mul(z);
-
-		System.out.println("w="+w.toString());
-
-
-		pp1.inc(1); pp1.norm();
-		pm1.dec(1); pm1.norm();
-		System.out.println("p+1="+pp1.toString());
-		System.out.println("p-1="+pm1.toString());
-		w=w.pow(pp1);
-		w=w.pow(pm1);
-		System.out.println("w="+w.toString());
-	}
-*/
 }

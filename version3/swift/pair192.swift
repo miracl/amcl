@@ -152,7 +152,6 @@ public struct PAIR192 {
         let nb=n3.nbits()
     
         for i in (1...nb-2).reversed()
-        //for var i=nb-2;i>=1;i--
         {
             r.sqr()            
             lv=linedbl(&A,Qx,Qy)
@@ -163,10 +162,8 @@ public struct PAIR192 {
               r.smul(lv,ECP.SEXTIC_TWIST)
             }
             if bt == -1 {
-                //P.neg()
                 lv=lineadd(&A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-                //P.neg()
             }
         }
     
@@ -231,14 +228,10 @@ public struct PAIR192 {
             }
 
             if bt == -1 {
-                //P.neg(); 
                 lv=lineadd(&A,NP,Qx,Qy)
                 r.smul(lv,ECP.SEXTIC_TWIST)
-                //P.neg(); 
-                //R.neg()
                 lv=lineadd(&B,NR,Sx,Sy)
-                r.smul(lv,ECP.SEXTIC_TWIST)
-                //R.neg()                
+                r.smul(lv,ECP.SEXTIC_TWIST)              
             }            
 
         }
@@ -388,7 +381,6 @@ public struct PAIR192 {
         var R:ECP
         if (ROM.USE_GLV)
         {
-            //P.affine()
             R=ECP()
             R.copy(P)
             var Q=ECP()
@@ -439,7 +431,6 @@ public struct PAIR192 {
             var u=PAIR192.gs(e);
     
             var t=BIG(0)
-            //P.affine()
             Q.append(ECP4())
             Q[0].copy(P);
             for i in 1 ..< 8

@@ -28,7 +28,6 @@ under the License.
 /* SU= 8 */
 int FP2_YYY_iszilch(FP2_YYY *x)
 {
-   // FP2_YYY_reduce(x);
     if (FP_YYY_iszilch(&(x->a)) && FP_YYY_iszilch(&(x->b))) return 1;
     return 0;
 }
@@ -46,7 +45,6 @@ int FP2_YYY_isunity(FP2_YYY *x)
 {
     FP_YYY one;
     FP_YYY_one(&one);
-    //FP2_YYY_reduce(x);
     if (FP_YYY_equals(&(x->a),&one) && FP_YYY_iszilch(&(x->b))) return 1;
     return 0;
 }
@@ -132,7 +130,6 @@ void FP2_YYY_neg(FP2_YYY *w,FP2_YYY *x)
 {
     /* Just one neg! */
     FP_YYY m,t;
-//    FP2_YYY_norm(x);
     FP_YYY_add(&m,&(x->a),&(x->b));
     FP_YYY_neg(&m,&m);
     FP_YYY_add(&t,&m,&(x->b));
@@ -146,7 +143,6 @@ void FP2_YYY_neg(FP2_YYY *w,FP2_YYY *x)
 void FP2_YYY_conj(FP2_YYY *w,FP2_YYY *x)
 {
     FP_YYY_copy(&(w->a),&(x->a));
-//	BIG_XXX_norm(x->b);
     FP_YYY_neg(&(w->b),&(x->b));
     FP_YYY_norm(&(w->b));
 }
@@ -204,7 +200,6 @@ void FP2_YYY_sqr(FP2_YYY *w,FP2_YYY *x)
 
     FP_YYY_mul(&(w->a),&w1,&(w->a));     /* w->a#2 w->a=1 w1&w2=6 w1*w2=2 */
 }
-
 
 /* Set w=x*y */
 /* Inputs MUST be normed  */
@@ -298,7 +293,6 @@ void FP2_YYY_inv(FP2_YYY *w,FP2_YYY *x)
     FP_YYY_neg(&w1,&w1);
     FP_YYY_norm(&w1);
     FP_YYY_mul(&(w->b),&(x->b),&w1);
-//	FP2_YYY_norm(w);
 }
 
 
@@ -318,8 +312,6 @@ void FP2_YYY_mul_ip(FP2_YYY *w)
 {
     FP_YYY z;
     FP2_YYY t;
-
-//   FP2_YYY_norm(w);
     FP2_YYY_copy(&t,w);
 
     FP_YYY_copy(&z,&(w->a));
@@ -436,9 +428,6 @@ int FP2_YYY_sqrt(FP2_YYY *w,FP2_YYY *u)
 void FP2_YYY_times_i(FP2_YYY *w)
 {
     FP_YYY z;
-
- //   FP2_norm(w);
-
     FP_YYY_copy(&z,&(w->a));
     FP_YYY_neg(&(w->a),&(w->b));
     FP_YYY_copy(&(w->b),&z);
@@ -446,44 +435,3 @@ void FP2_YYY_times_i(FP2_YYY *w)
 //    Output NOT normed, so use with care
 }
 
-/*
-int main()
-{
-	int i;
-	FP2_YYY w,z;
-	BIG_XXX a,b,e;
-	BIG_XXX pp1,pm1;
-	BIG_XXX_unity(a); BIG_XXX_unity(b);
-	FP2_YYY_from_BIGs(&w,a,b);
-//	for (i=0;i<100;i++)
-//	{
-//		BIG_XXX_randomnum(a); BIG_XXX_randomnum(b);
-//		BIG_XXX_mod(a,Modulus_YYY); BIG_XXX_mod(b,Modulus_YYY);
-//		FP2_YYY_from_FPs(&w,a,b);
-//		FP2_YYY_output(&w);
-//		FP2_YYY_inv(&z,&w);
-//				FP2_YYY_output(&z);
-//		FP2_YYY_inv(&z,&z);
-//				FP2_YYY_output(&z);
-//				FP2_YYY_output(&w);
-//		if (FP2_YYY_comp(&w,&z)!=1) printf("error \n");
-//		else printf("OK \n");
-//	}
-//exit(0);
-	printf("w= "); FP2_YYY_output(&w); printf("\n");
-	BIG_XXX_zero(e); BIG_XXX_inc(e,27);
-	FP2_YYY_pow(&w,&w,e);
-	FP2_YYY_output(&w);
-exit(0);
-	BIG_XXX_rcopy(pp1,Modulus_YYY);
-	BIG_XXX_rcopy(pm1,Modulus_YYY);
-	BIG_XXX_inc(pp1,1);
-	BIG_XXX_dec(pm1,1);
-	BIG_XXX_norm(pp1);
-	BIG_XXX_norm(pm1);
-	FP2_YYY_pow(&w,&w,pp1);
-	FP2_YYY_pow(&w,&w,pm1);
-	FP2_YYY_output(&w);
-}
-
-*/

@@ -35,7 +35,6 @@ namespace ZZZ {
 /* Line function */
 static void ZZZ::PAIR_line(FP48 *v,ECP8 *A,ECP8 *B,FP *Qx,FP *Qy)
 {
-	//FP2 t;
 
 	FP8 X1,Y1,T1,T2;
 	FP8 XX,YY,ZZ,YZ;
@@ -60,11 +59,9 @@ static void ZZZ::PAIR_line(FP48 *v,ECP8 *A,ECP8 *B,FP *Qx,FP *Qy)
 		FP8_norm(&YZ);			//YZ.norm();       //-4YZ
 
 		FP8_imul(&XX,&XX,6);					//6X^2
-		//FP2_from_FP(&t,Qx);
 		FP8_tmul(&XX,&XX,Qx);	               //6X^2.Xs
 
 		FP8_imul(&ZZ,&ZZ,3*CURVE_B_I);	//3Bz^2 
-		//FP2_from_FP(&t,Qy);
 		FP8_tmul(&YZ,&YZ,Qy);	//-4YZ.Ys
 
 #if SEXTIC_TWIST_ZZZ==D_TYPE
@@ -113,7 +110,6 @@ static void ZZZ::PAIR_line(FP48 *v,ECP8 *A,ECP8 *B,FP *Qx,FP *Qy)
 		FP8_norm(&Y1);				//Y1.norm();  // Y1=Y1-Z1.Y2
 
 		FP8_copy(&T1,&X1);			//T1.copy(X1);            // T1=X1-Z1.X2
-		//FP2_from_FP(&t,Qy);
 		FP8_tmul(&X1,&X1,Qy);		//X1.pmul(Qy);            // X1=(X1-Z1.X2).Ys
 #if SEXTIC_TWIST_ZZZ==M_TYPE
 		FP8_times_i(&X1);
@@ -126,7 +122,6 @@ static void ZZZ::PAIR_line(FP48 *v,ECP8 *A,ECP8 *B,FP *Qx,FP *Qy)
 		FP8_mul(&T2,&T2,&(B->x));	//T2.mul(B.getx());       // T2=(Y1-Z1.Y2).X2
 		FP8_sub(&T2,&T2,&T1);		//T2.sub(T1); 
 		FP8_norm(&T2);				//T2.norm();          // T2=(Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2
-		//FP2_from_FP(&t,Qx);
 		FP8_tmul(&Y1,&Y1,Qx);		//Y1.pmul(Qx);  
 		FP8_neg(&Y1,&Y1);			//Y1.neg(); 
 		FP8_norm(&Y1);				//Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
@@ -142,7 +137,6 @@ static void ZZZ::PAIR_line(FP48 *v,ECP8 *A,ECP8 *B,FP *Qx,FP *Qy)
 #endif
 		ECP8_add(A,B);			// A.add(B);
     }
-
 
     FP48_from_FP16s(v,&a,&b,&c);
 }
@@ -161,7 +155,6 @@ void ZZZ::PAIR_ate(FP48 *r,ECP8 *P1,ECP *Q1)
 
     BIG_copy(n,x);
 
-    //BIG_norm(n);
 	BIG_pmul(n3,n,3);
 	BIG_norm(n3);
 
@@ -190,22 +183,17 @@ void ZZZ::PAIR_ate(FP48 *r,ECP8 *P1,ECP *Q1)
 		FP48_sqr(r,r);
         PAIR_line(&lv,&A,&A,&Qx,&Qy);
         FP48_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-//printf("r= "); FP48_output(r); printf("\n");
-//if (j>3) exit(0);
+
 		bt= BIG_bit(n3,i)-BIG_bit(n,i);  // BIG_bit(n,i); 
         if (bt==1)
         {
-//printf("bt=1\n");
             PAIR_line(&lv,&A,&P,&Qx,&Qy);
             FP48_smul(r,&lv,SEXTIC_TWIST_ZZZ);
         }
 		if (bt==-1)
 		{
-//printf("bt=-1\n");
-			//ECP8_neg(P);
             PAIR_line(&lv,&A,&NP,&Qx,&Qy);
             FP48_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			//ECP8_neg(P);
 		}
 
     }
@@ -229,7 +217,6 @@ void ZZZ::PAIR_double_ate(FP48 *r,ECP8 *P1,ECP *Q1,ECP8 *R1,ECP *S1)
     BIG_rcopy(x,CURVE_Bnx);
     BIG_copy(n,x);
 
-    //BIG_norm(n);
 	BIG_pmul(n3,n,3);
 	BIG_norm(n3);
 
@@ -245,7 +232,6 @@ void ZZZ::PAIR_double_ate(FP48 *r,ECP8 *P1,ECP *Q1,ECP8 *R1,ECP *S1)
 	ECP8_affine(&R);
 	ECP_affine(&S);
 
-
     FP_copy(&Qx,&(Q.x));
     FP_copy(&Qy,&(Q.y));
 
@@ -257,7 +243,6 @@ void ZZZ::PAIR_double_ate(FP48 *r,ECP8 *P1,ECP *Q1,ECP8 *R1,ECP *S1)
 
 	ECP8_copy(&NP,&P); ECP8_neg(&NP);
 	ECP8_copy(&NR,&R); ECP8_neg(&NR);
-
 
     FP48_one(r);
     nb=BIG_nbits(n3);
@@ -283,18 +268,12 @@ void ZZZ::PAIR_double_ate(FP48 *r,ECP8 *P1,ECP *Q1,ECP8 *R1,ECP *S1)
         }
 		if (bt==-1)
 		{
-			//ECP8_neg(P); 
             PAIR_line(&lv,&A,&NP,&Qx,&Qy);
             FP48_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			//ECP8_neg(P); 
-			//ECP8_neg(R);
             PAIR_line(&lv,&B,&NR,&Sx,&Sy);
             FP48_smul(r,&lv,SEXTIC_TWIST_ZZZ);
-			//ECP8_neg(R);
 		}
 	}
-
-
 
 #if SIGN_OF_X_ZZZ==NEGATIVEX
     FP48_conj(r,r);
@@ -328,42 +307,6 @@ void ZZZ::PAIR_fexp(FP48 *r)
 
     FP48_mul(r,&t7);
 
-
-// Ghamman & Fouotsa Method for hard part of fexp - r^e1 . r^p^e2 . r^p^2^e3 ..
-
-// e0 = u^17 - 2*u^16 + u^15 - u^9 + 2*u^8 - u^7 + 3	// .p^0
-// e1 = u^16 - 2*u^15 + u^14 - u^8 + 2*u^7 - u^6		// .p^1
-// e2 = u^15 - 2*u^14 + u^13 - u^7 + 2*u^6 - u^5
-// e3 = u^14 - 2*u^13 + u^12 - u^6 + 2*u^5 - u^4
-// e4 = u^13 - 2*u^12 + u^11 - u^5 + 2*u^4 - u^3
-// e5 = u^12 - 2*u^11 + u^10 - u^4 + 2*u^3 - u^2
-// e6 = u^11 - 2*u^10 + u^9 - u^3 + 2*u^2 - u
-// e7 =  u^10 - 2*u^9 + u^8 - u^2 + 2*u - 1
-// e8 =  u^9 - 2*u^8 + u^7
-// e9 =  u^8 - 2*u^7 + u^6
-// e10 = u^7 - 2*u^6 + u^5
-// e11 = u^6 - 2*u^5 + u^4
-// e12 = u^5 - 2*u^4 + u^3
-// e13 = u^4 - 2*u^3 + u^2
-// e14 = u^3 - 2*u^2 + u
-// e15 = u^2 - 2*u + 1
-
-// e15 = u^2-2*u+1
-// e14 = u.e15
-// e13 = u.e14
-// e12 = u.e13
-// e11 = u.e12
-// e10 = u.e11
-// e9 =  u.e10
-// e8 =  u.e9
-// e7 =  u.e8 - e15
-// e6 =  u.e7
-// e5 =  u.e6
-// e4 =  u.e5
-// e3 =  u.e4
-// e2 =  u.e3
-// e1 =  u.e2
-// e0 =  u.e1 + 3
 
 // f^e0.f^e1^p.f^e2^p^2.. .. f^e14^p^14.f^e15^p^15
 
@@ -507,7 +450,6 @@ void ZZZ::PAIR_fexp(FP48 *r)
 	FP48_frob(&t2,&X,15);	// f^(e15.p^15)
 	FP48_mul(r,&t2);
 
-
 	FP48_reduce(r);
 
 }
@@ -586,7 +528,6 @@ void ZZZ::PAIR_G1mul(ECP *P,BIG e)
     BIG_rcopy(q,CURVE_Order);
     glv(u,e);
 
-    //ECP_affine(P);
     ECP_copy(&Q,P); ECP_affine(&Q);
     FP_rcopy(&cru,CURVE_Cru);
     FP_mul(&(Q.x),&(Q.x),&cru);
@@ -633,8 +574,6 @@ void ZZZ::PAIR_G2mul(ECP8 *P,BIG e)
     BIG_rcopy(y,CURVE_Order);
     gs(u,e);
 
-    //ECP8_affine(P);
-
     ECP8_copy(&Q[0],P);
     for (i=1; i<16; i++)
     {
@@ -653,7 +592,6 @@ void ZZZ::PAIR_G2mul(ECP8 *P,BIG e)
             ECP8_neg(&Q[i]);
         }
         BIG_norm(u[i]);   
-		//ECP8_affine(&Q[i]);
     }
 
     ECP8_mul16(P,Q,u);
@@ -707,46 +645,6 @@ void ZZZ::PAIR_GTpow(FP48 *f,BIG e)
 #endif
 }
 
-/* test group membership test - no longer needed */
-/* with GT-Strong curve, now only check that m!=1, conj(m)*m==1, and m.m^{p^4}=m^{p^2} */
-
-/*
-int PAIR_GTmember(FP48 *m)
-{
-	BIG a,b;
-	FP2 X;
-	FP48 r,w;
-	if (FP48_isunity(m)) return 0;
-	FP48_conj(&r,m);
-	FP48_mul(&r,m);
-	if (!FP48_isunity(&r)) return 0;
-
-	BIG_rcopy(a,CURVE_Fra);
-	BIG_rcopy(b,CURVE_Frb);
-	FP2_from_BIGs(&X,a,b);
-
-
-	FP48_copy(&r,m); FP48_frob(&r,&X); FP48_frob(&r,&X);
-	FP48_copy(&w,&r); FP48_frob(&w,&X); FP48_frob(&w,&X);
-	FP48_mul(&w,m);
-
-
-#ifndef GT_STRONG
-	if (!FP48_equals(&w,&r)) return 0;
-
-	BIG_rcopy(a,CURVE_Bnx);
-
-	FP48_copy(&r,m); FP48_pow(&w,&r,a); FP48_pow(&w,&w,a);
-	FP48_sqr(&r,&w); FP48_mul(&r,&w); FP48_sqr(&r,&r);
-
-	FP48_copy(&w,m); FP48_frob(&w,&X);
- #endif
-
-	return FP48_equals(&w,&r);
-}
-
-*/
-
 
 #ifdef HAS_MAIN
 
@@ -798,9 +696,6 @@ int main()
     BIG_rcopy(b,Frb);
     FP2_from_BIGs(&f,a,b);
 
-
-//exit(0);
-
     PAIR_ate(&g,&P,&Q);
 
 	printf("gb= ");
@@ -811,12 +706,6 @@ int main()
     printf("g= ");
     FP48_output(&g);
     printf("\n");
-
-	//FP48_pow(&g,&g,r);
-
-   // printf("g^r= ");
-    //FP48_output(&g);
-    //printf("\n");
 
 	ECP_copy(&R,&Q);
 	ECP8_copy(&G,&P);
@@ -839,17 +728,14 @@ int main()
     FP48_output(&g);
     printf("\n");
 
-
 	PAIR_G1mul(&Q,r);
 	printf("rQ= ");ECP_output(&Q); printf("\n");
 
 	PAIR_G2mul(&P,r);
 	printf("rP= ");ECP8_output(&P); printf("\n");
 
-	//FP48_pow(&g,&g,r);
 	PAIR_GTpow(&g,r);
 	printf("g^r= ");FP48_output(&g); printf("\n");
-
 
 	BIG_randomnum(w,r,&rng);
 
@@ -865,14 +751,6 @@ int main()
 
 	printf("t(g)= "); FP16_output(&t); printf("\n");
 
-//    PAIR_ate(&g,&P,&R);
-//    PAIR_fexp(&g);
-
-//    printf("g= ");
-//    FP48_output(&g);
-//    printf("\n");
-
-//	PAIR_GTpow(&g,xa);
 }
 
 #endif

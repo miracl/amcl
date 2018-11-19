@@ -50,7 +50,6 @@ var FP16 = function(ctx) {
 
         /* test this==0 ? */
         iszilch: function() {
-            //this.reduce();
             return (this.a.iszilch() && this.b.iszilch());
         },
 
@@ -122,14 +121,13 @@ var FP16 = function(ctx) {
 
         /* this=-this */
         neg: function() {
-            var m = new ctx.FP8(this.a), //m.copy(this.a);
+            var m = new ctx.FP8(this.a), 
                 t = new ctx.FP8(0);
 
             this.norm();
-
             m.add(this.b);
             m.neg();
-            //  m.norm();
+ 
             t.copy(m);
             t.add(this.b);
             this.b.copy(m);
@@ -158,7 +156,7 @@ var FP16 = function(ctx) {
 
         /* this-=x */
         sub: function(x) {
-            var m = new FP16(x); // m.copy(x);
+            var m = new FP16(x); 
             m.neg();
             this.add(m);
         },
@@ -183,11 +181,9 @@ var FP16 = function(ctx) {
 
         /* this*=this */
         sqr: function() {
-            //      this.norm();
-
-            var t1 = new ctx.FP8(this.a), //t1.copy(this.a)
-                t2 = new ctx.FP8(this.b), //t2.copy(this.b)
-                t3 = new ctx.FP8(this.a); //t3.copy(this.a)
+            var t1 = new ctx.FP8(this.a), 
+                t2 = new ctx.FP8(this.b), 
+                t3 = new ctx.FP8(this.a); 
 
             t3.mul(this.b);
             t1.add(this.b);
@@ -217,10 +213,10 @@ var FP16 = function(ctx) {
         /* this*=y */
         mul: function(y) {
 
-            var t1 = new ctx.FP8(this.a), //t1.copy(this.a)
-                t2 = new ctx.FP8(this.b), //t2.copy(this.b)
+            var t1 = new ctx.FP8(this.a), 
+                t2 = new ctx.FP8(this.b), 
                 t3 = new ctx.FP8(0),
-                t4 = new ctx.FP8(this.b); //t4.copy(this.b)
+                t4 = new ctx.FP8(this.b); 
 
             t1.mul(y.a);
             t2.mul(y.b);
@@ -256,10 +252,10 @@ var FP16 = function(ctx) {
 
         /* this=1/this */
         inverse: function() {
-            this.norm();
+            //this.norm();
 
-            var t1 = new ctx.FP8(this.a), //t1.copy(this.a);
-                t2 = new ctx.FP8(this.b); // t2.copy(this.b);
+            var t1 = new ctx.FP8(this.a), 
+                t2 = new ctx.FP8(this.b); 
 
             t1.sqr();
             t2.sqr();
@@ -308,8 +304,8 @@ var FP16 = function(ctx) {
         /* this=this^e */
         pow: function(e) {
             
-            var w = new FP16(this), //w.copy(this);
-                z = new ctx.BIG(e), //z.copy(e);
+            var w = new FP16(this), 
+                z = new ctx.BIG(e), 
                 r = new FP16(1),
                 bt;
 			w.norm();
@@ -335,10 +331,9 @@ var FP16 = function(ctx) {
 
         /* XTR xtr_a function */
         xtr_A: function(w, y, z) {
-            var r = new FP16(w), //r.copy(w);
-                t = new FP16(w); //t.copy(w);
+            var r = new FP16(w), 
+                t = new FP16(w); 
 
-            //y.norm(); // ??
             r.sub(y);
             r.norm();
             r.pmul(this.a);
@@ -356,10 +351,10 @@ var FP16 = function(ctx) {
 
         /* XTR xtr_d function */
         xtr_D: function() {
-            var w = new FP16(this); //w.copy(this);
+            var w = new FP16(this); 
             this.sqr();
             w.conj();
-            w.add(w); //w.norm(); // ??
+            w.add(w); 
             this.sub(w);
             this.reduce();
         },
@@ -422,13 +417,13 @@ var FP16 = function(ctx) {
         /* r=ck^a.cl^n using XTR double exponentiation method on traces of FP12s. See Stam thesis. */
         xtr_pow2: function(ck, ckml, ckm2l, a, b) {
 
-            var e = new ctx.BIG(a), //e.copy(a)
-                d = new ctx.BIG(b), //d.copy(b)
+            var e = new ctx.BIG(a), 
+                d = new ctx.BIG(b), 
                 w = new ctx.BIG(0),
-                cu = new FP16(ck), //cu.copy(ck), // can probably be passed in w/o copying
-                cv = new FP16(this), //cv.copy(this),
-                cumv = new FP16(ckml), //cumv.copy(ckml),
-                cum2v = new FP16(ckm2l), //cum2v.copy(ckm2l),
+                cu = new FP16(ck), 
+                cv = new FP16(this), 
+                cumv = new FP16(ckml), 
+                cum2v = new FP16(ckm2l), 
                 r = new FP16(0),
                 t = new FP16(0),
                 f2 = 0,

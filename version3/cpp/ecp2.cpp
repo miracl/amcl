@@ -27,7 +27,6 @@ using namespace YYY;
 
 int ZZZ::ECP2_isinf(ECP2 *P)
 {
-//	if (P->inf) return 1;
 	return (FP2_iszilch(&(P->x)) & FP2_iszilch(&(P->z)));
 }
 
@@ -35,7 +34,6 @@ int ZZZ::ECP2_isinf(ECP2 *P)
 /* SU= 16 */
 void ZZZ::ECP2_copy(ECP2 *P,ECP2 *Q)
 {
-//    P->inf=Q->inf;
     FP2_copy(&(P->x),&(Q->x));
     FP2_copy(&(P->y),&(Q->y));
     FP2_copy(&(P->z),&(Q->z));
@@ -45,7 +43,6 @@ void ZZZ::ECP2_copy(ECP2 *P,ECP2 *Q)
 /* SU= 8 */
 void ZZZ::ECP2_inf(ECP2 *P)
 {
-//    P->inf=1;
     FP2_zero(&(P->x));
     FP2_one(&(P->y));
     FP2_zero(&(P->z));
@@ -57,8 +54,6 @@ static void ECP2_cmove(ZZZ::ECP2 *P,ZZZ::ECP2 *Q,int d)
     FP2_cmove(&(P->x),&(Q->x),d);
     FP2_cmove(&(P->y),&(Q->y),d);
     FP2_cmove(&(P->z),&(Q->z),d);
-//    d=~(d-1);
-//    P->inf^=(P->inf^Q->inf)&d;
 }
 
 /* return 1 if b==c, no branching */
@@ -97,8 +92,6 @@ static void ECP2_select(ZZZ::ECP2 *P,ZZZ::ECP2 W[],sign32 b)
 int ZZZ::ECP2_equals(ECP2 *P,ECP2 *Q)
 {
     FP2 a,b;
-//    if (ECP2_isinf(P) && ECP2_isinf(Q)) return 1;
-//    if (ECP2_isinf(P) || ECP2_isinf(Q)) return 0;
 
     FP2_mul(&a,&(P->x),&(Q->z));
     FP2_mul(&b,&(Q->x),&(P->z));
@@ -142,8 +135,7 @@ int ZZZ::ECP2_get(FP2 *x,FP2 *y,ECP2 *P)
 	ECP2_copy(&W,P);
 	ECP2_affine(&W);
 	if (ECP2_isinf(&W)) return -1;
-//    if (P->inf) return -1;
-    //ECP2_affine(P);
+
     FP2_copy(y,&(W.y));
     FP2_copy(x,&(W.x));
     return 0;
@@ -275,7 +267,6 @@ int ZZZ::ECP2_set(ECP2 *P,FP2 *x,FP2 *y)
         return 0;
     }
 
-   // P->inf=0;
     FP2_copy(&(P->x),x);
     FP2_copy(&(P->y),y);
 
@@ -296,7 +287,6 @@ int ZZZ::ECP2_setx(ECP2 *P,FP2 *x)
         return 0;
     }
 
-//    P->inf=0;
     FP2_copy(&(P->x),x);
     FP2_copy(&(P->y),&y);
     FP2_one(&(P->z));
@@ -307,7 +297,6 @@ int ZZZ::ECP2_setx(ECP2 *P,FP2 *x)
 /* SU= 8 */
 void ZZZ::ECP2_neg(ECP2 *P)
 {
-//	if (ECP2_isinf(P)) return;
 	FP2_norm(&(P->y));
     FP2_neg(&(P->y),&(P->y));
     FP2_norm(&(P->y));
@@ -319,24 +308,19 @@ void ZZZ::ECP2_neg(ECP2 *P)
 int ZZZ::ECP2_dbl(ECP2 *P)
 {
     FP2 t0,t1,t2,t3,iy,x3,y3;
-//    if (P->inf) return -1;
 
 	FP2_copy(&iy,&(P->y));		//FP2 iy=new FP2(y);
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP2_mul_ip(&iy);			//iy.mul_ip(); 
 	FP2_norm(&iy);				//iy.norm();
 #endif
-	//FP2_copy(&t0,&(P->y));		//FP2 t0=new FP2(y);                  //***** Change 
 	FP2_sqr(&t0,&(P->y));			//t0.sqr();   
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP2_mul_ip(&t0);			//t0.mul_ip(); 
 #endif
-	//FP2_copy(&t1,&iy);				//FP2 t1=new FP2(iy);  
 	FP2_mul(&t1,&iy,&(P->z));	//t1.mul(z);
-	//FP2_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
 	FP2_sqr(&t2,&(P->z));				//t2.sqr();
 
-	//FP2_copy(&(P->z),&t0);		//z.copy(t0);
 	FP2_add(&(P->z),&t0,&t0);	//z.add(t0); 
 	FP2_norm(&(P->z));				//z.norm(); 
 	FP2_add(&(P->z),&(P->z),&(P->z));	//z.add(z); 
@@ -349,32 +333,26 @@ int ZZZ::ECP2_dbl(ECP2 *P)
 	FP2_norm(&t2);
 #endif
 
-	//FP2_copy(&x3,&t2);			//FP2 x3=new FP2(t2);
 	FP2_mul(&x3,&t2,&(P->z));	//x3.mul(z); 
-
-	//FP2_copy(&y3,&t0);			//FP2 y3=new FP2(t0);   
 
 	FP2_add(&y3,&t0,&t2);		//y3.add(t2); 
 	FP2_norm(&y3);				//y3.norm();
 	FP2_mul(&(P->z),&(P->z),&t1);	//z.mul(t1);
 
-	//FP2_copy(&t1,&t2);			//t1.copy(t2); 
 	FP2_add(&t1,&t2,&t2);		//t1.add(t2); 
 	FP2_add(&t2,&t2,&t1);		//t2.add(t1); 
 	FP2_norm(&t2);				//t2.norm();  
 	FP2_sub(&t0,&t0,&t2);		//t0.sub(t2); 
 	FP2_norm(&t0);				//t0.norm();                           //y^2-9bz^2
 	FP2_mul(&y3,&y3,&t0);		//y3.mul(t0); 
-	FP2_add(&(P->y),&y3,&x3);		//y3.add(x3);                          //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
-	//FP2_copy(&t1,&(P->x));		//t1.copy(x); 
-	FP2_mul(&t1,&(P->x),&iy);		//t1.mul(iy);						//
-	//FP2_copy(&(P->x),&t0);		//x.copy(t0); 
+	FP2_add(&(P->y),&y3,&x3);		//y3.add(x3);                      //(y^2+3z*2)(y^2-9z^2)+3b.z^2.8y^2
+	FP2_mul(&t1,&(P->x),&iy);		//t1.mul(iy);
+	
 	FP2_norm(&t0);			//x.norm(); 
 	FP2_mul(&(P->x),&t0,&t1);	//x.mul(t1); 
 	FP2_add(&(P->x),&(P->x),&(P->x));	//x.add(x);       //(y^2-9bz^2)xy2
 
 	FP2_norm(&(P->x));			//x.norm(); 
-	//FP2_copy(&(P->y),&y3);		//y.copy(y3); 
 	FP2_norm(&(P->y));			//y.norm();
 
     return 1;
@@ -386,32 +364,18 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 {
     FP2 t0,t1,t2,t3,t4,x3,y3,z3;
 	int b3=3*CURVE_B_I;
-/*    if (Q->inf) return 0;
-    if (P->inf)
-    {
-        ECP2_copy(P,Q);
-        return 0;
-    }
-*/
 
-
-	//FP2_copy(&t0,&(P->x));		//FP2 t0=new FP2(x);
 	FP2_mul(&t0,&(P->x),&(Q->x));	//t0.mul(Q.x);         // x.Q.x
-	//FP2_copy(&t1,&(P->y));		//FP2 t1=new FP2(y);
 	FP2_mul(&t1,&(P->y),&(Q->y));	//t1.mul(Q.y);		 // y.Q.y
 
-	//FP2_copy(&t2,&(P->z));		//FP2 t2=new FP2(z);
 	FP2_mul(&t2,&(P->z),&(Q->z));	//t2.mul(Q.z);
-	//FP2_copy(&t3,&(P->x));		//FP2 t3=new FP2(x);
 
 	FP2_add(&t3,&(P->x),&(P->y));	//t3.add(y); 
-	FP2_norm(&t3);				//t3.norm();          //t3=X1+Y1
-	//FP2_copy(&t4,&(Q->x));		//FP2 t4=new FP2(Q.x);            
+	FP2_norm(&t3);				//t3.norm();          //t3=X1+Y1           
 	FP2_add(&t4,&(Q->x),&(Q->y));	//t4.add(Q.y); 
 	FP2_norm(&t4);				//t4.norm();			//t4=X2+Y2
 	FP2_mul(&t3,&t3,&t4);		//t3.mul(t4);						//t3=(X1+Y1)(X2+Y2)
 
-	//FP2_copy(&t4,&t0);			//t4.copy(t0); 
 	FP2_add(&t4,&t0,&t1);		//t4.add(t1);		//t4=X1.X2+Y1.Y2
 
 	FP2_sub(&t3,&t3,&t4);		//t3.sub(t4); 
@@ -419,16 +383,13 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 #if SEXTIC_TWIST_ZZZ==D_TYPE
 	FP2_mul_ip(&t3);			//t3.mul_ip();  
 	FP2_norm(&t3);				//t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
-#endif
-	//FP2_copy(&t4,&(P->y));		//t4.copy(y);                    
+#endif                   
 	FP2_add(&t4,&(P->y),&(P->z));	//t4.add(z); 
 	FP2_norm(&t4);				//t4.norm();			//t4=Y1+Z1
-	//FP2_copy(&x3,&(Q->y));		//FP2 x3=new FP2(Q.y);
 	FP2_add(&x3,&(Q->y),&(Q->z));	//x3.add(Q.z); 
 	FP2_norm(&x3);				//x3.norm();			//x3=Y2+Z2
 
 	FP2_mul(&t4,&t4,&x3);		//t4.mul(x3);						//t4=(Y1+Z1)(Y2+Z2)
-	//FP2_copy(&x3,&t1);			//x3.copy(t1);					//
 	FP2_add(&x3,&t1,&t2);		//x3.add(t2);						//X3=Y1.Y2+Z1.Z2
 	
 	FP2_sub(&t4,&t4,&x3);		//t4.sub(x3); 
@@ -437,14 +398,11 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 	FP2_mul_ip(&t4);			//t4.mul_ip(); 
 	FP2_norm(&t4);				//t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 #endif
-	//FP2_copy(&x3,&(P->x));		//x3.copy(x); 
 	FP2_add(&x3,&(P->x),&(P->z));	//x3.add(z); 
 	FP2_norm(&x3);				//x3.norm();	// x3=X1+Z1
-	//FP2_copy(&y3,&(Q->x));		//FP2 y3=new FP2(Q.x);				
 	FP2_add(&y3,&(Q->x),&(Q->z));	//y3.add(Q.z); 
 	FP2_norm(&y3);				//y3.norm();				// y3=X2+Z2
 	FP2_mul(&x3,&x3,&y3);		//x3.mul(y3);							// x3=(X1+Z1)(X2+Z2)
-	//FP2_copy(&y3,&t0);			//y3.copy(t0);
 	FP2_add(&y3,&t0,&t2);		//y3.add(t2);							// y3=X1.X2+Z1+Z2
 	FP2_sub(&y3,&x3,&y3);		//y3.rsub(x3); 
 	FP2_norm(&y3);				//y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
@@ -455,7 +413,6 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 	FP2_norm(&t1);				//t1.norm(); // y.Q.y
 #endif
 
-	//FP2_copy(&x3,&t0);			//x3.copy(t0); 
 	FP2_add(&x3,&t0,&t0);		//x3.add(t0); 
 	FP2_add(&t0,&t0,&x3);		//t0.add(x3); 
 	FP2_norm(&t0);				//t0.norm();
@@ -465,7 +422,6 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 	FP2_norm(&t2);
 #endif
 
-	//FP2_copy(&z3,&t1);			//FP2 z3=new FP2(t1); 
 	FP2_add(&z3,&t1,&t2);		//z3.add(t2); 
 	FP2_norm(&z3);				//z3.norm();
 	FP2_sub(&t1,&t1,&t2);		//t1.sub(t2); 
@@ -477,9 +433,7 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 	FP2_norm(&y3);
 #endif
 
-	//FP2_copy(&x3,&y3);			//x3.copy(y3); 
 	FP2_mul(&x3,&y3,&t4);		//x3.mul(t4); 
-	//FP2_copy(&t2,&t3);			//t2.copy(t3); 
 	FP2_mul(&t2,&t3,&t1);		//t2.mul(t1); 
 	FP2_sub(&(P->x),&t2,&x3);		//x3.rsub(t2);
 	FP2_mul(&y3,&y3,&t0);		//y3.mul(t0); 
@@ -490,11 +444,8 @@ int ZZZ::ECP2_add(ECP2 *P,ECP2 *Q)
 	FP2_mul(&z3,&z3,&t4);		//z3.mul(t4); 
 	FP2_add(&(P->z),&z3,&t0);		//z3.add(t0);
 
-	//FP2_copy(&(P->x),&x3);		//x.copy(x3); 
 	FP2_norm(&(P->x));			//x.norm(); 
-	//FP2_copy(&(P->y),&y3);		//y.copy(y3); 
 	FP2_norm(&(P->y));			//y.norm();
-	//FP2_copy(&(P->z),&z3);		//z.copy(z3); 
 	FP2_norm(&(P->z));			//z.norm();
 
     return 0;
@@ -507,9 +458,7 @@ void ZZZ::ECP2_sub(ECP2 *P,ECP2 *Q)
 	ECP2 NQ;
 	ECP2_copy(&NQ,Q);
 	ECP2_neg(&NQ);
-    //ECP2_neg(Q);
     ECP2_add(P,&NQ);
-    //ECP2_neg(Q);
 }
 
 /* P*=e */
@@ -523,8 +472,6 @@ void ZZZ::ECP2_mul(ECP2 *P,BIG e)
     sign8 w[1+(NLEN_XXX*BASEBITS_XXX+3)/4];
 
     if (ECP2_isinf(P)) return;
-    //ECP2_affine(P);
-
 
     /* precompute table */
 
@@ -583,13 +530,9 @@ void ZZZ::ECP2_frob(ECP2 *P,FP2 *X)
 {
     FP2 X2;
     FP2_sqr(&X2,X);
-//printf("Into frob  %d\n",(P->z).b.XES);
     FP2_conj(&(P->x),&(P->x));
-//printf("x\n");
     FP2_conj(&(P->y),&(P->y));
-//printf("za = %d zb= %d\n",(P->z).a.g[MPV_XXX],(P->z).b.g[MPV_XXX]);
     FP2_conj(&(P->z),&(P->z));
-//printf("Into frob  %d\n",(P->z).b.XES);
     FP2_reduce(&(P->z));
     FP2_mul(&(P->x),&X2,&(P->x));
     FP2_mul(&(P->y),&X2,&(P->y));
@@ -611,7 +554,6 @@ void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
     for (i=0; i<4; i++)
     {
         BIG_copy(t[i],u[i]);
-        //ECP2_affine(&Q[i]);
     }
 
 // Precomputed table
@@ -686,94 +628,6 @@ void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
     ECP2_affine(P);
 }
 
-/*
-void ZZZ::ECP2_mul4(ECP2 *P,ECP2 Q[4],BIG u[4])
-{
-    int i,j,a[4],nb,pb;
-    ECP2 W[8],T,C;
-    BIG mt,t[4];
-  
-    sign8 w[NLEN_XXX*BASEBITS_XXX+1];
-
-    for (i=0; i<4; i++)
-    {
-        BIG_copy(t[i],u[i]);
-        ECP2_affine(&Q[i]);
-    }
-
-    // precompute table 
-
-    ECP2_copy(&W[0],&Q[0]);
-    ECP2_sub(&W[0],&Q[1]);  // P-Q 
-    ECP2_copy(&W[1],&W[0]);
-    ECP2_copy(&W[2],&W[0]);
-    ECP2_copy(&W[3],&W[0]);
-    ECP2_copy(&W[4],&Q[0]);
-    ECP2_add(&W[4],&Q[1]);  // P+Q 
-    ECP2_copy(&W[5],&W[4]);
-    ECP2_copy(&W[6],&W[4]);
-    ECP2_copy(&W[7],&W[4]);
-
-    ECP2_copy(&T,&Q[2]);
-    ECP2_sub(&T,&Q[3]);       // R-S 
-    ECP2_sub(&W[1],&T);
-    ECP2_add(&W[2],&T);
-    ECP2_sub(&W[5],&T);
-    ECP2_add(&W[6],&T);
-    ECP2_copy(&T,&Q[2]);
-    ECP2_add(&T,&Q[3]);      // R+S 
-    ECP2_sub(&W[0],&T);
-    ECP2_add(&W[3],&T);
-    ECP2_sub(&W[4],&T);
-    ECP2_add(&W[7],&T);
-
-    // if a multiplier u[i] is even add 1 to multiplier, and add Q[i] to correction 
-    ECP2_inf(&C);
-
-    BIG_zero(mt);
-    for (i=0; i<4; i++)
-    {
-
-		pb=BIG_parity(t[i]);
-		BIG_inc(t[i],1-pb);
-		BIG_norm(t[i]);
-		ECP2_copy(&T,&C);
-		ECP2_add(&T,&Q[i]);
-		ECP2_cmove(&C,&T,1-pb);
-
-        BIG_add(mt,mt,t[i]);
-        BIG_norm(mt);
-    }
-
-    nb=1+BIG_nbits(mt);
-
-    // convert exponent to signed 1-bit window 
-    for (j=0; j<nb; j++)
-    {
-        for (i=0; i<4; i++)
-        {
-            a[i]=BIG_lastbits(t[i],2)-2;
-            BIG_dec(t[i],a[i]);
-            BIG_norm(t[i]);
-            BIG_fshr(t[i],1);
-        }
-        w[j]=8*a[0]+4*a[1]+2*a[2]+a[3];
-    }
-    w[nb]=8*BIG_lastbits(t[0],2)+4*BIG_lastbits(t[1],2)+2*BIG_lastbits(t[2],2)+BIG_lastbits(t[3],2);
-
-    ECP2_copy(P,&W[(w[nb]-1)/2]);
-    for (i=nb-1; i>=0; i--)
-    {
-        ECP2_select(&T,W,w[i]);
-        ECP2_dbl(P);
-        ECP2_add(P,&T);
-    }
-    ECP2_sub(P,&C); // apply correction 
-
-    ECP2_affine(P);
-}
-
-*/
 
 /* Map to hash value to point on G2 from random BIG */
 
@@ -822,7 +676,6 @@ void ZZZ::ECP2_mapit(ECP2 *Q,octet *W)
     ECP2_copy(&K,&T);
     ECP2_dbl(&K);
     ECP2_add(&K,&T);
-    //ECP2_affine(&K);
 
     ECP2_frob(&K,&X);
     ECP2_frob(Q,&X);
@@ -878,45 +731,4 @@ void ZZZ::ECP2_generator(ECP2 *G)
 	ECP2_set(G,&wx,&wy);
 }
 
-/*
 
-int main()
-{
-	int i;
-	ECP2 G,P;
-	ECP2 *W;
-	FP2 x,y,w,z,f;
-	BIG r,xa,xb,ya,yb;
-
-	BIG_rcopy(xa,CURVE_Pxa);
-	BIG_rcopy(xb,CURVE_Pxb);
-	BIG_rcopy(ya,CURVE_Pya);
-	BIG_rcopy(yb,CURVE_Pyb);
-
-	FP2_from_BIGs(&x,xa,xb);
-	FP2_from_BIGs(&y,ya,yb);
-	ECP2_set(&G,&x,&y);
-	if (G.inf) printf("Failed to set - point not on curve\n");
-	else printf("set success\n");
-
-	ECP2_output(&G);
-
-//	BIG_copy(r,CURVE_Order);
-	BIG_rcopy(r,Modulus);
-
-	ECP2_copy(&P,&G);
-
-	ECP2_mul(&P,r);
-
-	ECP2_output(&P);
-
-	FP2_gfc(&f,12);
-
-	ECP2_frob(&G,&f);
-
-	ECP2_output(&G);
-
-	return 0;
-}
-
-*/

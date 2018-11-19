@@ -891,7 +891,6 @@ var FF = function(ctx) {
         var i;
 
         for (i = 0; i < a.length; i++) {
-            //  ctx.BIG.cswap(a.v[i],b.v[i],d);
             a.v[i].cswap(b.v[i], d);
         }
     };

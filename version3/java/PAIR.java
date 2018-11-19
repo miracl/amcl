@@ -32,9 +32,7 @@ public final class PAIR {
 /* Line function */
 	public static FP12 line(ECP2 A,ECP2 B,FP Qx,FP Qy)
 	{
-//System.out.println("Into line");
 		FP4 a,b,c;                            // Edits here
-//		c=new FP4(0);
 		if (A==B)
 		{ // Doubling
 			FP2 XX=new FP2(A.getx());  //X
@@ -129,7 +127,7 @@ public final class PAIR {
 			}
 			A.add(B);
 		}
-//System.out.println("Out of line");
+
 		return new FP12(a,b,c);
 	}
 
@@ -192,7 +190,7 @@ public final class PAIR {
 			lv=line(A,A,Qx,Qy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 
-			bt=n3.bit(i)-n.bit(i); // bt=n.bit(i);
+			bt=n3.bit(i)-n.bit(i); 
 			if (bt==1)
 			{
 				lv=line(A,P,Qx,Qy);
@@ -200,10 +198,8 @@ public final class PAIR {
 			}
 			if (bt==-1)
 			{
-				//P.neg();
 				lv=line(A,MP,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				//P.neg();
 			}
 		}
 
@@ -217,7 +213,6 @@ public final class PAIR {
 		{
 			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
 			{
-				//r.conj();
 				A.neg();
 			}
 			K.copy(P);
@@ -307,7 +302,7 @@ public final class PAIR {
 			lv=line(B,B,Sx,Sy);
 			r.smul(lv,ECP.SEXTIC_TWIST);
 
-			bt=n3.bit(i)-n.bit(i); // bt=n.bit(i);
+			bt=n3.bit(i)-n.bit(i);
 			if (bt==1)
 			{
 				lv=line(A,P,Qx,Qy);
@@ -317,14 +312,10 @@ public final class PAIR {
 			}
 			if (bt==-1)
 			{
-				//P.neg(); 
 				lv=line(A,MP,Qx,Qy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				//P.neg(); 
-				//R.neg();
 				lv=line(B,MR,Sx,Sy);
 				r.smul(lv,ECP.SEXTIC_TWIST);
-				//R.neg();
 			}
 		}
 
@@ -660,7 +651,6 @@ public final class PAIR {
 
 			BIG t=new BIG(0);
 			int i,np,nn;
-			//P.affine();
 
 			Q[0]=new ECP2(); Q[0].copy(P);
 			for (i=1;i<4;i++)
@@ -679,7 +669,6 @@ public final class PAIR {
 					Q[i].neg();
 				}
 				u[i].norm();	
-				//Q[i].affine();
 			}
 
 			R=ECP2.mul4(Q,u);
@@ -732,86 +721,5 @@ public final class PAIR {
 		return r;
 	}
 
-/* test group membership - no longer needed */
-/* with GT-Strong curve, now only check that m!=1, conj(m)*m==1, and m.m^{p^4}=m^{p^2} */
-/*
-	public static boolean GTmember(FP12 m)
-	{
-		if (m.isunity()) return false;
-		FP12 r=new FP12(m);
-		r.conj();
-		r.mul(m);
-		if (!r.isunity()) return false;
-
-		FP2 f=new FP2(new BIG(ROM.Fra),new BIG(ROM.Frb));
-
-		r.copy(m); r.frob(f); r.frob(f);
-		FP12 w=new FP12(r); w.frob(f); w.frob(f);
-		w.mul(m);
-		if (!ROM.GT_STRONG)
-		{
-			if (!w.equals(r)) return false;
-			BIG x=new BIG(ROM.CURVE_Bnx);
-			r.copy(m); w=r.pow(x); w=w.pow(x);
-			r.copy(w); r.sqr(); r.mul(w); r.sqr();
-			w.copy(m); w.frob(f);
-		}
-		return w.equals(r);
-	}
-*/
-/*
-	public static void main(String[] args) {
-		ECP Q=new ECP(new BIG(ROM.CURVE_Gx),new BIG(ROM.CURVE_Gy));
-		ECP2 P=new ECP2(new FP2(new BIG(ROM.CURVE_Pxa),new BIG(ROM.CURVE_Pxb)),new FP2(new BIG(ROM.CURVE_Pya),new BIG(ROM.CURVE_Pyb)));
-
-		BIG r=new BIG(ROM.CURVE_Order);
-		BIG xa=new BIG(ROM.CURVE_Pxa);
-
-		System.out.println("P= "+P.toString());
-		System.out.println("Q= "+Q.toString());
-
-		BIG m=new BIG(17);
-
-		FP12 e=ate(P,Q);
-		System.out.println("\ne= "+e.toString());
-
-		e=fexp(e);
-
-		for (int i=1;i<1000;i++)
-		{
-			e=ate(P,Q);
-			e=fexp(e);
-		}
-	//	e=GTpow(e,m);
-
-		System.out.println("\ne= "+e.toString());
-
-		BIG [] GLV=glv(r);
-
-		System.out.println("GLV[0]= "+GLV[0].toString());
-		System.out.println("GLV[0]= "+GLV[1].toString());
-
-		ECP G=new ECP(); G.copy(Q);
-		ECP2 R=new ECP2(); R.copy(P);
-
-
-		e=ate(R,Q);
-		e=fexp(e);
-
-		e=GTpow(e,xa);
-		System.out.println("\ne= "+e.toString()); 
-
-
-		R=G2mul(R,xa);
-		e=ate(R,G);
-		e=fexp(e);
-
-		System.out.println("\ne= "+e.toString());
-
-		G=G1mul(G,xa);
-		e=ate(P,G);
-		e=fexp(e);
-		System.out.println("\ne= "+e.toString()); 
-	} */
 }
 

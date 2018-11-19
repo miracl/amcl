@@ -342,18 +342,6 @@ public final class FF {
 		return s;
 	}
 
-/*
-	public String toRawString(int len) 
-	{
-	//	norm(len);
-		String s="";
-		for (int i=len-1;i>=0;i--)
-		{
-			s+=v[i].toRawString(); s+=" ";
-		}
-		return s;
-	}
-*/
 /* Convert FFs to/from byte arrays */
 	public void toBytes(byte[] b)
 	{
@@ -376,7 +364,6 @@ public final class FF {
 	{
 		for (int i=0;i<a.length;i++)
 		{
-		//	BIG.cswap(a.v[i],b.v[i],d);
 			a.v[i].cswap(b.v[i],d);
 		}
 	}
@@ -478,7 +465,7 @@ public final class FF {
 		int n=x.length;
 		FF z=new FF(2*n);
 		FF t=new FF(2*n);
-//		x.norm(); y.norm();
+
 		z.karmul(0,x,0,y,0,t,0,n);
 		return z;
 	}
@@ -489,7 +476,7 @@ public final class FF {
 		int n=x.length;
 		FF z=new FF(2*n);
 		FF t=new FF(2*n);
-//		x.norm(); 
+
 		z.karsqr(0,x,0,t,0,n);
 		return z;
 	}
@@ -500,7 +487,7 @@ public final class FF {
 		int n=length;
 		FF t=new FF(2*n);
 		FF x=new FF(n); x.copy(this);
-//		x.norm(); y.norm();
+
 		karmul_lower(0,x,0,y,0,t,0,n);
 	}
 
