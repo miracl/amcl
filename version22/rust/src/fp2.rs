@@ -295,8 +295,8 @@ impl FP2 {
 
 	pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP2 {
 		let mut ret:FP2 = FP2::new();
-		ret.a = FP::from_hex_iter(iter);
-		ret.b = FP::from_hex_iter(iter);
+		ret.a = FP::from_hex(iter.next().unwrap_or("").to_string());
+		ret.b = FP::from_hex(iter.next().unwrap_or("").to_string());
 		return ret;
 	}
 

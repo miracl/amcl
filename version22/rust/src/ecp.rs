@@ -395,9 +395,9 @@ impl ECP {
 		let mut ret:ECP = ECP::new();
 		if let Some(x) = iter.next() {
 			ret.inf = x == "true";
-			ret.x = FP::from_hex_iter(iter);
-			ret.y = FP::from_hex_iter(iter);
-			ret.z = FP::from_hex_iter(iter);
+			ret.x = FP::from_hex(iter.next().unwrap_or("").to_string());
+			ret.y = FP::from_hex(iter.next().unwrap_or("").to_string());
+			ret.z = FP::from_hex(iter.next().unwrap_or("").to_string());
 		}
 		return ret;
 	}
