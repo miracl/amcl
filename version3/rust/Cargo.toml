@@ -1,0 +1,41 @@
+[package]
+name = "amcl"
+version = "0.1.0"
+authors = ["Nikita Khateev <nikita.khateev@dsr-corporation.com>"]
+
+[dependencies]
+
+[lib]
+name = "amcl"
+path = "src/lib.rs"
+
+[features]
+default = ["bn254", "rsa2048"]
+bn254 = []
+bn254cx = []
+ansii = []
+bls24 = []
+bls48 = []
+bls381 = []
+bls461 = []
+brainpool = []
+c25519 = []
+c41417 = []
+ed25519 = []
+fp256Bn = []
+fp512BN = []
+goldilocks = []
+hifive = []
+nist256 = []
+nist384 = []
+nist521 = []
+nums256e = []
+nums256w = []
+nums384e = []
+nums384w = []
+nums512e = []
+nums512w = []
+secp256k1 = []
+rsa2048 = []
+rsa3072 = []
+rsa4096 = []
