@@ -58,3 +58,6 @@ pub const CURVE_GY: [Chunk; NLEN] = [
     0x14A28415, 0x3DE8A78, 0x3D2C983, 0x17797719, 0x197DBDEA, 0x15D88025, 0x1BBB718F, 0xAD679C1,
     0x14CA29AD, 0x4A1D2,
 ];
+
+pub const MODBYTES: usize = 64;
+pub const BASEBITS: usize = 29;

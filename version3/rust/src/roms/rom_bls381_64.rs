@@ -192,3 +192,6 @@ pub const USE_GLV: bool = true;
 pub const USE_GS_G2: bool = true;
 pub const USE_GS_GT: bool = true;
 pub const GT_STRONG: bool = false;
+
+pub const MODBYTES: usize = 48;
+pub const BASEBITS: usize = 58;

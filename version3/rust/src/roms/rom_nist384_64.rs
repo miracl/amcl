@@ -42,6 +42,7 @@ pub const R2MODP: [Chunk; NLEN] = [
 ];
 pub const MCONST: Chunk = 0x100000001;
 
+
 // nist384 Curve
 pub const CURVE_COF_I: isize = 1;
 pub const CURVE_A: isize = -3;
@@ -83,3 +84,6 @@ pub const CURVE_GY: [Chunk; NLEN] = [
     0x2C6F5D9E98BF92,
     0x3617DE4A9626,
 ];
+
+pub const MODBYTES: usize = 48;
+pub const BASEBITS: usize = 56;

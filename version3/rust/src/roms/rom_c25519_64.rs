@@ -42,3 +42,6 @@ pub const CURVE_ORDER: [Chunk; NLEN] =
     [0x12631A5CF5D3ED, 0xF9DEA2F79CD658, 0x14DE, 0x0, 0x10000000];
 pub const CURVE_GX: [Chunk; NLEN] = [0x9, 0x0, 0x0, 0x0, 0x0];
 pub const CURVE_GY: [Chunk; NLEN] = [0x0, 0x0, 0x0, 0x0, 0x0];
+
+pub const MODBYTES: usize = 32;
+pub const BASEBITS: usize = 56;
