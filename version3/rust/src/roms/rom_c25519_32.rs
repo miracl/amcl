@@ -20,7 +20,7 @@ under the License.
 use c25519::big::NLEN;
 use arch::Chunk;
 use std;
-use modtype::ModType;
+use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 29
 // Curve25519 Modulus
@@ -50,3 +50,10 @@ pub const MODBITS: usize = 255;
 pub const MOD8: usize = 5;
 pub const MODTYPE: ModType = ModType::PSEUDO_MERSENNE;
 pub const SH: usize = std::cmp::min(14, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+
+pub const CURVETYPE: CurveType = CurveType::MONTGOMERY;
+pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::NOT;
+pub const SEXTIC_TWIST: SexticTwist = SexticTwist::NOT;
+pub const SIGN_OF_X: SignOfX = SignOfX::NOT;
+pub const HASH_TYPE: usize = 32;
+pub const AESKEY: usize = 16;

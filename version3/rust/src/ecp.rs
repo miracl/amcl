@@ -22,30 +22,14 @@ use super::big::BIG;
 use super::big;
 use super::rom;
 
+pub use super::rom::{CURVETYPE, CURVE_PAIRING_TYPE, SEXTIC_TWIST, SIGN_OF_X, HASH_TYPE, AESKEY};
+pub use types::CurveType;
+
 pub struct ECP {
     x: FP,
     y: FP,
     z: FP,
 }
-
-pub const WEIERSTRASS: usize = 0;
-pub const EDWARDS: usize = 1;
-pub const MONTGOMERY: usize = 2;
-pub const NOT: usize = 0;
-pub const BN: usize = 1;
-pub const BLS: usize = 2;
-pub const D_TYPE: usize = 0;
-pub const M_TYPE: usize = 1;
-pub const POSITIVEX: usize = 0;
-pub const NEGATIVEX: usize = 1;
-
-pub const CURVETYPE:usize=@CT@;
-pub const CURVE_PAIRING_TYPE:usize=@PF@;
-pub const SEXTIC_TWIST:usize=@ST@;
-pub const SIGN_OF_X:usize=@SX@;
-
-pub const HASH_TYPE:usize=@HT@;
-pub const AESKEY:usize=@AK@;
 
 #[allow(non_snake_case)]
 impl ECP {
@@ -59,7 +43,7 @@ impl ECP {
 
     pub fn new() -> ECP {
         let mut E = ECP::pnew();
-        if CURVETYPE == EDWARDS {
+        if CURVETYPE == CurveType::EDWARDS {
             E.z.one();
         }
         return E;
@@ -73,7 +57,7 @@ impl ECP {
         E.z.one();
         E.x.norm();
         let mut rhs = ECP::rhs(&E.x);
-        if CURVETYPE == MONTGOMERY {
+        if CURVETYPE == CurveType::MONTGOMERY {
             if rhs.jacobi() != 1 {
                 E.inf();
             }
@@ -117,7 +101,7 @@ impl ECP {
         E.z.one();
         let mut rhs = ECP::rhs(&E.x);
         if rhs.jacobi() == 1 {
-            if CURVETYPE != MONTGOMERY {
+            if CURVETYPE != CurveType::MONTGOMERY {
                 E.y.copy(&rhs.sqrt())
             }
         } else {
@@ -129,10 +113,10 @@ impl ECP {
     /* set this=O */
     pub fn inf(&mut self) {
         self.x.zero();
-        if CURVETYPE != MONTGOMERY {
+        if CURVETYPE != CurveType::MONTGOMERY {
             self.y.one();
         }
-        if CURVETYPE != EDWARDS {
+        if CURVETYPE != CurveType::EDWARDS {
             self.z.zero();
         } else {
             self.z.one()
@@ -144,7 +128,7 @@ impl ECP {
         let mut r = FP::new_copy(x);
         r.sqr();
 
-        if CURVETYPE == WEIERSTRASS {
+        if CURVETYPE == CurveType::WEIERSTRASS {
             // x^3+Ax+B
             let b = FP::new_big(&BIG::new_ints(&rom::CURVE_B));
             r.mul(x);
@@ -157,7 +141,7 @@ impl ECP {
             }
             r.add(&b);
         }
-        if CURVETYPE == EDWARDS {
+        if CURVETYPE == CurveType::EDWARDS {
             // (Ax^2-1)/(Bx^2-1)
             let mut b = FP::new_big(&BIG::new_ints(&rom::CURVE_B));
             let one = FP::new_int(1);
@@ -172,7 +156,7 @@ impl ECP {
             b.inverse();
             r.mul(&b);
         }
-        if CURVETYPE == MONTGOMERY {
+        if CURVETYPE == CurveType::MONTGOMERY {
             // x^3+Ax^2+x
             let mut x3 = FP::new();
             x3.copy(&r);
@@ -190,14 +174,14 @@ impl ECP {
         let xx = FP::new_copy(&self.x);
         let zz = FP::new_copy(&self.z);
 
-        if CURVETYPE == EDWARDS {
+        if CURVETYPE == CurveType::EDWARDS {
             let yy = FP::new_copy(&self.y);
             return xx.iszilch() && yy.equals(&zz);
         }
-        if CURVETYPE == WEIERSTRASS {
+        if CURVETYPE == CurveType::WEIERSTRASS {
             return xx.iszilch() && zz.iszilch();
         }
-        if CURVETYPE == MONTGOMERY {
+        if CURVETYPE == CurveType::MONTGOMERY {
             return zz.iszilch();
         }
         return true;
@@ -206,7 +190,7 @@ impl ECP {
     /* Conditional swap of P and Q dependant on d */
     pub fn cswap(&mut self, Q: &mut ECP, d: isize) {
         self.x.cswap(&mut Q.x, d);
-        if CURVETYPE != MONTGOMERY {
+        if CURVETYPE != CurveType::MONTGOMERY {
             self.y.cswap(&mut Q.y, d)
         }
         self.z.cswap(&mut Q.z, d);
@@ -215,7 +199,7 @@ impl ECP {
     /* Conditional move of Q to P dependant on d */
     pub fn cmove(&mut self, Q: &ECP, d: isize) {
         self.x.cmove(&Q.x, d);
-        if CURVETYPE != MONTGOMERY {
+        if CURVETYPE != CurveType::MONTGOMERY {
             self.y.cmove(&Q.y, d)
         }
         self.z.cmove(&Q.z, d);
@@ -231,7 +215,7 @@ impl ECP {
     /* this=P */
     pub fn copy(&mut self, P: &ECP) {
         self.x.copy(&P.x);
-        if CURVETYPE != MONTGOMERY {
+        if CURVETYPE != CurveType::MONTGOMERY {
             self.y.copy(&P.y)
         }
         self.z.copy(&P.z);
@@ -239,11 +223,11 @@ impl ECP {
 
     /* this=-this */
     pub fn neg(&mut self) {
-        if CURVETYPE == WEIERSTRASS {
+        if CURVETYPE == CurveType::WEIERSTRASS {
             self.y.neg();
             self.y.norm();
         }
-        if CURVETYPE == EDWARDS {
+        if CURVETYPE == CurveType::EDWARDS {
             self.x.neg();
             self.x.norm();
         }
@@ -288,7 +272,7 @@ impl ECP {
         if !a.equals(&mut b) {
             return false;
         }
-        if CURVETYPE != MONTGOMERY {
+        if CURVETYPE != CurveType::MONTGOMERY {
             a.copy(&self.y);
             a.mul(&Q.z);
             b.copy(&Q.y);
@@ -313,7 +297,7 @@ impl ECP {
 
         self.x.mul(&self.z);
         self.x.reduce();
-        if CURVETYPE != MONTGOMERY {
+        if CURVETYPE != CurveType::MONTGOMERY {
             self.y.mul(&self.z);
             self.y.reduce();
         }
@@ -372,7 +356,7 @@ impl ECP {
             b[i + 1] = t[i]
         }
 
-        if CURVETYPE == MONTGOMERY {
+        if CURVETYPE == CurveType::MONTGOMERY {
             b[0] = 0x06;
             return;
         }
@@ -407,7 +391,7 @@ impl ECP {
             return ECP::new();
         }
 
-        if CURVETYPE == MONTGOMERY {
+        if CURVETYPE == CurveType::MONTGOMERY {
             return ECP::new_big(&px);
         }
 
@@ -436,7 +420,7 @@ impl ECP {
         if W.is_infinity() {
             return String::from("infinity");
         }
-        if CURVETYPE == MONTGOMERY {
+        if CURVETYPE == CurveType::MONTGOMERY {
             return format!("({})", W.x.redc().tostring());
         } else {
             return format!("({},{})", W.x.redc().tostring(), W.y.redc().tostring());
@@ -445,7 +429,7 @@ impl ECP {
 
     /* this*=2 */
     pub fn dbl(&mut self) {
-        if CURVETYPE == WEIERSTRASS {
+        if CURVETYPE == CurveType::WEIERSTRASS {
             if rom::CURVE_A == 0 {
                 let mut t0 = FP::new_copy(&self.y);
                 t0.sqr();
@@ -577,7 +561,7 @@ impl ECP {
                 self.z.norm();
             }
         }
-        if CURVETYPE == EDWARDS {
+        if CURVETYPE == CurveType::EDWARDS {
             let mut c = FP::new_copy(&self.x);
             let mut d = FP::new_copy(&self.y);
             let mut h = FP::new_copy(&self.z);
@@ -606,7 +590,7 @@ impl ECP {
             self.y.mul(&c);
             self.z.mul(&j);
         }
-        if CURVETYPE == MONTGOMERY {
+        if CURVETYPE == CurveType::MONTGOMERY {
             let mut a = FP::new_copy(&self.x);
             let mut b = FP::new_copy(&self.x);
             let mut aa = FP::new();
@@ -641,7 +625,7 @@ impl ECP {
 
     /* self+=Q */
     pub fn add(&mut self, Q: &ECP) {
-        if CURVETYPE == WEIERSTRASS {
+        if CURVETYPE == CurveType::WEIERSTRASS {
             if rom::CURVE_A == 0 {
                 let b = 3 * rom::CURVE_B_I;
                 let mut t0 = FP::new_copy(&self.x);
@@ -834,7 +818,7 @@ impl ECP {
                 self.z.norm();
             }
         }
-        if CURVETYPE == EDWARDS {
+        if CURVETYPE == CurveType::EDWARDS {
             let bb = FP::new_big(&BIG::new_ints(&rom::CURVE_B));
             let mut a = FP::new_copy(&self.z);
             let mut b = FP::new();
@@ -946,7 +930,7 @@ impl ECP {
 
     /* constant time multiply by small integer of length bts - use ladder */
     pub fn pinmul(&self, e: i32, bts: i32) -> ECP {
-        if CURVETYPE == MONTGOMERY {
+        if CURVETYPE == CurveType::MONTGOMERY {
             return self.mul(&mut BIG::new_int(e as isize));
         } else {
             let mut P = ECP::new();
@@ -976,7 +960,7 @@ impl ECP {
             return ECP::new();
         }
         let mut P = ECP::new();
-        if CURVETYPE == MONTGOMERY {
+        if CURVETYPE == CurveType::MONTGOMERY {
             /* use Ladder */
             let mut D = ECP::new();
             let mut R0 = ECP::new();
@@ -1210,7 +1194,7 @@ impl ECP {
 
         loop {
             loop {
-                if CURVETYPE != MONTGOMERY {
+                if CURVETYPE != CurveType::MONTGOMERY {
                     P = ECP::new_bigint(&x, 0);
                 } else {
                     P = ECP::new_big(&x);
@@ -1235,7 +1219,7 @@ impl ECP {
 
         let gx = BIG::new_ints(&rom::CURVE_GX);
 
-        if CURVETYPE != MONTGOMERY {
+        if CURVETYPE != CurveType::MONTGOMERY {
             let gy = BIG::new_ints(&rom::CURVE_GY);
             G = ECP::new_bigs(&gx, &gy);
         } else {

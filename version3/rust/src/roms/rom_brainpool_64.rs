@@ -22,7 +22,7 @@ under the License.
 use brainpool::big::NLEN;
 use arch::Chunk;
 use std;
-use modtype::ModType;
+use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 56
 // brainpool Modulus
@@ -83,3 +83,10 @@ pub const MODBITS: usize = 256;
 pub const MOD8: usize = 7;
 pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
 pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+
+pub const CURVETYPE: CurveType = CurveType::WEIERSTRASS;
+pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::NOT;
+pub const SEXTIC_TWIST: SexticTwist = SexticTwist::NOT;
+pub const SIGN_OF_X: SignOfX = SignOfX::NOT;
+pub const HASH_TYPE: usize = 32;
+pub const AESKEY: usize = 16;

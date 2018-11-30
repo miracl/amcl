@@ -23,7 +23,7 @@ use super::dbig::DBIG;
 use super::rom;
 use super::arch::Chunk;
 use super::arch;
-use modtype::ModType;
+use types::ModType;
 
 #[derive(Copy, Clone)]
 pub struct FP {

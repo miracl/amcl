@@ -6,7 +6,7 @@ pub mod hash512;
 pub mod rand;
 pub mod sha3;
 pub mod nhs;
-mod modtype;
+mod types;
 
 #[cfg(feature = "bn254")]
 #[path = "./"]

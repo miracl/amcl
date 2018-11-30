@@ -20,7 +20,7 @@ under the License.
 use bls24::big::NLEN;
 use arch::Chunk;
 use std;
-use modtype::ModType;
+use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 29
 // bls24 Modulus
@@ -231,3 +231,10 @@ pub const MODBITS: usize = 479;
 pub const MOD8: usize = 3;
 pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
 pub const SH: usize = std::cmp::min(14, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+
+pub const CURVETYPE: CurveType = CurveType::WEIERSTRASS;
+pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::BLS;
+pub const SEXTIC_TWIST: SexticTwist = SexticTwist::M_TYPE;
+pub const SIGN_OF_X: SignOfX = SignOfX::POSITIVEX;
+pub const HASH_TYPE: usize = 48;
+pub const AESKEY: usize = 24;

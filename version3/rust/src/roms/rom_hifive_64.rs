@@ -20,7 +20,9 @@ under the License.
 use hifive::big::NLEN;
 use arch::Chunk;
 use std;
-use modtype::ModType;// Base Bits= 60
+use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
+
+// Base Bits= 60
 
 // Base Bits= 60
 // hifive Modulus
@@ -66,3 +68,10 @@ pub const MODBITS: usize = 336;
 pub const MOD8: usize = 5;
 pub const MODTYPE: ModType = ModType::PSEUDO_MERSENNE;
 pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+
+pub const CURVETYPE: CurveType = CurveType::EDWARDS;
+pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::NOT;
+pub const SEXTIC_TWIST: SexticTwist = SexticTwist::NOT;
+pub const SIGN_OF_X: SignOfX = SignOfX::NOT;
+pub const HASH_TYPE: usize = 48;
+pub const AESKEY: usize = 24;

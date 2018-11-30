@@ -20,7 +20,7 @@ under the License.
 use fp256bn::big::NLEN;
 use arch::Chunk;
 use std;
-use modtype::ModType;
+use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // fp256bn Modulus
 // Base Bits= 56
@@ -224,3 +224,10 @@ pub const MODBITS: usize = 256;
 pub const MOD8: usize = 3;
 pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
 pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+
+pub const CURVETYPE: CurveType = CurveType::WEIERSTRASS;
+pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::BN;
+pub const SEXTIC_TWIST: SexticTwist = SexticTwist::M_TYPE;
+pub const SIGN_OF_X: SignOfX = SignOfX::NEGATIVEX;
+pub const HASH_TYPE: usize = 32;
+pub const AESKEY: usize = 16;

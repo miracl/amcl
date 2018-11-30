@@ -20,7 +20,9 @@ under the License.
 use nist384::big::NLEN;
 use arch::Chunk;
 use std;
-use modtype::ModType;// Base Bits= 56
+use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
+
+// Base Bits= 56
 
 // nist384 Modulus
 pub const MODULUS: [Chunk; NLEN] = [
@@ -93,3 +95,10 @@ pub const MODBITS: usize = 384;
 pub const MOD8: usize = 7;
 pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
 pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+
+pub const CURVETYPE: CurveType = CurveType::WEIERSTRASS;
+pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::NOT;
+pub const SEXTIC_TWIST: SexticTwist = SexticTwist::NOT;
+pub const SIGN_OF_X: SignOfX = SignOfX::NOT;
+pub const HASH_TYPE: usize = 48;
+pub const AESKEY: usize = 24;
