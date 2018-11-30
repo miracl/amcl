@@ -17,8 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use crate::arch::Chunk;
-use crate::hifive::big::NLEN;
+use hifive::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;// Base Bits= 60
 
 // Base Bits= 60
 // hifive Modulus
@@ -59,3 +61,8 @@ pub const CURVE_GY: [Chunk; NLEN] = [
 
 pub const MODBYTES: usize = 42;
 pub const BASEBITS: usize = 60;
+
+pub const MODBITS: usize = 336;
+pub const MOD8: usize = 5;
+pub const MODTYPE: ModType = ModType::PSEUDO_MERSENNE;
+pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);

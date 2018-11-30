@@ -20,6 +20,11 @@ under the License.
 use crate::arch::Chunk;
 use crate::bls24::big::NLEN;
 
+use bls24::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;
+
 // Base Bits= 56
 // bls24 Modulus
 
@@ -272,3 +277,8 @@ pub const GT_STRONG: bool = true;
 
 pub const MODBYTES: usize = 60;
 pub const BASEBITS: usize = 56;
+
+pub const MODBITS: usize = 479;
+pub const MOD8: usize = 3;
+pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
+pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);

@@ -17,8 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use crate::arch::Chunk;
-use crate::bls48::big::NLEN;
+use bls48::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;
 
 // Base Bits= 58
 // bls48 Modulus
@@ -385,3 +387,8 @@ pub const GT_STRONG: bool = true;
 
 pub const MODBYTES: usize = 70;
 pub const BASEBITS: usize = 58;
+
+pub const MODBITS: usize = 556;
+pub const MOD8: usize = 3;
+pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
+pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);

@@ -19,8 +19,10 @@ under the License.
 
 /* Note that the original curve has been transformed to an isomorphic curve with A=-3 */
 
-use crate::arch::Chunk;
-use crate::brainpool::big::NLEN;
+use brainpool::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;
 
 // Base Bits= 56
 // brainpool Modulus
@@ -76,3 +78,8 @@ pub const CURVE_GY: [Chunk; NLEN] = [
 
 pub const MODBYTES: usize = 32;
 pub const BASEBITS: usize = 56;
+
+pub const MODBITS: usize = 256;
+pub const MOD8: usize = 7;
+pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
+pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);

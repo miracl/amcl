@@ -17,8 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use crate::anssi::big::NLEN;
-use crate::arch::Chunk;
+use anssi::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;
 
 // Base Bits= 28
 // anssi Modulus
@@ -57,3 +59,8 @@ pub const CURVE_GY: [Chunk; NLEN] = [
 
 pub const MODBYTES: usize = 32;
 pub const BASEBITS: usize = 28;
+
+pub const MODBITS: usize = 256;
+pub const MOD8: usize = 7;
+pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
+pub const SH: usize = std::cmp::min(14, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);

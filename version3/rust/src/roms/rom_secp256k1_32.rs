@@ -19,8 +19,10 @@ under the License.
 
 /* Fixed Data in ROM - Field and Curve parameters */
 
-use crate::arch::Chunk;
-use crate::secp256k1::big::NLEN;
+use secp256k1::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;
 
 // Base Bits= 28
 // secp256k1 modulus
@@ -54,3 +56,8 @@ pub const CURVE_GY: [Chunk; NLEN] = [
 
 pub const MODBYTES: usize = 32;
 pub const BASEBITS: usize = 28;
+
+pub const MODBITS: usize = 256;
+pub const MOD8: usize = 7;
+pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
+pub const SH: usize = std::cmp::min(14, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);

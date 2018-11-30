@@ -17,10 +17,11 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use crate::arch::Chunk;
-use crate::nist384::big::NLEN;
+use nist384::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;// Base Bits= 56
 
-// Base Bits= 56
 // nist384 Modulus
 pub const MODULUS: [Chunk; NLEN] = [
     0xFFFFFFFF,
@@ -87,3 +88,8 @@ pub const CURVE_GY: [Chunk; NLEN] = [
 
 pub const MODBYTES: usize = 48;
 pub const BASEBITS: usize = 56;
+
+pub const MODBITS: usize = 384;
+pub const MOD8: usize = 7;
+pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
+pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);

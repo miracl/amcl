@@ -17,8 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use crate::arch::Chunk;
-use crate::fp512bn::big::NLEN;
+use fp512bn::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;
 
 // Base Bits= 60
 pub const MODULUS: [Chunk; NLEN] = [
@@ -466,3 +468,8 @@ pub const GT_STRONG: bool = false;
 
 pub const MODBYTES: usize = 64;
 pub const BASEBITS: usize = 60;
+
+pub const MODBITS: usize = 512;
+pub const MOD8: usize = 3;
+pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
+pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);

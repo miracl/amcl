@@ -17,8 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use crate::arch::Chunk;
-use crate::nums512e::big::NLEN;
+use nums512e::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;
 
 // Base Bits= 60
 // nums512 Modulus
@@ -87,4 +89,14 @@ pub const CURVE_GY: [Chunk; NLEN] = [
 ];
 
 pub const MODBYTES: usize = 64;
+<<<<<<< HEAD
 pub const BASEBITS: usize = 29;
+=======
+pub const BASEBITS: usize = 60;
+
+pub const MODBITS: usize = 512;
+pub const MOD8: usize = 3;
+pub const MODTYPE: ModType = ModType::PSEUDO_MERSENNE;
+pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+
+>>>>>>> 4e42b9d... Add constants for FP

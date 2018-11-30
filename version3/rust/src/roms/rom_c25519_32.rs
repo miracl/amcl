@@ -17,8 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use crate::arch::Chunk;
-use crate::c25519::big::NLEN;
+use c25519::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;
 
 // Base Bits= 29
 // Curve25519 Modulus
@@ -43,3 +45,8 @@ pub const CURVE_GY: [Chunk; NLEN] = [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 
 pub const MODBYTES: usize = 32;
 pub const BASEBITS: usize = 29;
+
+pub const MODBITS: usize = 255;
+pub const MOD8: usize = 5;
+pub const MODTYPE: ModType = ModType::PSEUDO_MERSENNE;
+pub const SH: usize = std::cmp::min(14, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);

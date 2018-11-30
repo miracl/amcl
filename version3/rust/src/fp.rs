@@ -21,8 +21,9 @@ use super::big;
 use super::big::BIG;
 use super::dbig::DBIG;
 use super::rom;
-use arch::Chunk;
-use arch;
+use super::arch::Chunk;
+use super::arch;
+use modtype::ModType;
 
 #[derive(Copy, Clone)]
 pub struct FP {
@@ -30,19 +31,12 @@ pub struct FP {
     pub xes: i32,
 }
 
-pub const NOT_SPECIAL: usize = 0;
-pub const PSEUDO_MERSENNE: usize = 1;
-pub const MONTGOMERY_FRIENDLY: usize = 2;
-pub const GENERALISED_MERSENNE: usize = 3;
+pub use super::rom::{MODBITS, MOD8, MODTYPE, SH};
 
-pub const MODBITS:usize = @NBT@; /* Number of bits in Modulus */
-pub const MOD8: usize = @M8@;  /* Modulus mod 8 */
-pub const MODTYPE:usize=@MT@;
-
-pub const FEXCESS:i32 = (((1 as i32)<<@SH@)-1);
-pub const OMASK: Chunk = (-1) << (MODBITS % big::BASEBITS);
-pub const TBITS: usize = MODBITS % big::BASEBITS; // Number of active bits in top word
-pub const TMASK: Chunk = (1 << TBITS) - 1;
+pub const FEXCESS:i32 = (((1 as i32)<<SH)-1);
+pub const OMASK:Chunk = (-1)<<(MODBITS%big::BASEBITS);
+pub const TBITS:usize=MODBITS%big::BASEBITS; // Number of active bits in top word
+pub const TMASK:Chunk=(1<<TBITS)-1;
 
 impl FP {
     /* Constructors */
@@ -75,9 +69,9 @@ impl FP {
     }
 
     pub fn nres(&mut self) {
-        if MODTYPE != PSEUDO_MERSENNE && MODTYPE != GENERALISED_MERSENNE {
-            let r = BIG::new_ints(&rom::R2MODP);
-            let mut d = BIG::mul(&(self.x), &r);
+        if MODTYPE != ModType::PSEUDO_MERSENNE && MODTYPE != ModType::GENERALISED_MERSENNE {
+            let r=BIG::new_ints(&rom::R2MODP);
+            let mut d=BIG::mul(&(self.x),&r);
             self.x.copy(&FP::modulo(&mut d));
             self.xes = 2;
         } else {
@@ -87,8 +81,8 @@ impl FP {
 
     /* convert back to regular form */
     pub fn redc(&mut self) -> BIG {
-        if MODTYPE != PSEUDO_MERSENNE && MODTYPE != GENERALISED_MERSENNE {
-            let mut d = DBIG::new_scopy(&(self.x));
+        if MODTYPE != ModType::PSEUDO_MERSENNE && MODTYPE != ModType::GENERALISED_MERSENNE {
+            let mut d=DBIG::new_scopy(&(self.x));
             return FP::modulo(&mut d);
         } else {
             let r = BIG::new_copy(&(self.x));
@@ -99,9 +93,9 @@ impl FP {
     /* reduce a DBIG to a BIG using the appropriate form of the modulus */
     /* dd */
     pub fn modulo(d: &mut DBIG) -> BIG {
-        if MODTYPE == PSEUDO_MERSENNE {
-            let mut b = BIG::new();
-            let mut t = d.split(MODBITS);
+        if MODTYPE==ModType::PSEUDO_MERSENNE {
+            let mut b=BIG::new();
+            let mut t=d.split(MODBITS);
             b.dcopy(&d);
             let v = t.pmul(rom::MCONST as isize);
 
@@ -114,8 +108,8 @@ impl FP {
             t.norm();
             return t;
         }
-
-        if MODTYPE == MONTGOMERY_FRIENDLY {
+    
+        if MODTYPE==ModType::MONTGOMERY_FRIENDLY {
             let mut b = BIG::new();
             for i in 0..big::NLEN {
                 let x = d.w[i];
@@ -134,7 +128,7 @@ impl FP {
             return b;
         }
 
-        if MODTYPE == GENERALISED_MERSENNE {
+        if MODTYPE == ModType::GENERALISED_MERSENNE {
             // GoldiLocks Only
             let mut b = BIG::new();
             let t = d.split(MODBITS);
@@ -160,8 +154,7 @@ impl FP {
             b.norm();
             return b;
         }
-
-        if MODTYPE == NOT_SPECIAL {
+        if MODTYPE == ModType::NOT_SPECIAL {
             let m = BIG::new_ints(&rom::MODULUS);
             return BIG::monty(&m, rom::MCONST, d);
         }
@@ -318,7 +311,7 @@ impl FP {
             s = true;
         }
 
-        if MODTYPE == PSEUDO_MERSENNE || MODTYPE == GENERALISED_MERSENNE {
+        if MODTYPE == ModType::PSEUDO_MERSENNE || MODTYPE == ModType::GENERALISED_MERSENNE {
             let mut d = self.x.pxmul(cc);
             self.x.copy(&FP::modulo(&mut d));
             self.xes = 2
@@ -445,7 +438,7 @@ impl FP {
         let mut n = MODBITS as isize;
         let c: isize;
 
-        if MODTYPE == GENERALISED_MERSENNE {
+        if MODTYPE == ModType::GENERALISED_MERSENNE {
             // Goldilocks ONLY
             n /= 2;
         }
@@ -530,7 +523,7 @@ impl FP {
             }
             r.mul(&key);
         }
-        if MODTYPE == GENERALISED_MERSENNE {
+        if MODTYPE == ModType::GENERALISED_MERSENNE {
             // Goldilocks ONLY
             key.copy(&r);
             r.sqr();
@@ -544,7 +537,7 @@ impl FP {
     }
     /* self=1/self mod Modulus */
     pub fn inverse(&mut self) {
-        if MODTYPE == PSEUDO_MERSENNE || MODTYPE == GENERALISED_MERSENNE {
+        if MODTYPE == ModType::PSEUDO_MERSENNE || MODTYPE == ModType::GENERALISED_MERSENNE {
             let mut y = self.fpow();
             if MOD8 == 5 {
                 let mut t = FP::new_copy(self);
@@ -640,7 +633,7 @@ impl FP {
             let v: FP;
             let mut i = FP::new_copy(self);
             i.x.shl(1);
-            if MODTYPE == PSEUDO_MERSENNE || MODTYPE == GENERALISED_MERSENNE {
+            if MODTYPE == ModType::PSEUDO_MERSENNE || MODTYPE == ModType::GENERALISED_MERSENNE {
                 v = i.fpow();
             } else {
                 let mut p = BIG::new_ints(&rom::MODULUS);
@@ -659,7 +652,7 @@ impl FP {
             return r;
         } else {
             let mut r: FP;
-            if MODTYPE == PSEUDO_MERSENNE || MODTYPE == GENERALISED_MERSENNE {
+            if MODTYPE == ModType::PSEUDO_MERSENNE || MODTYPE == ModType::GENERALISED_MERSENNE {
                 r = self.fpow();
                 r.mul(self);
             } else {

@@ -17,8 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use crate::arch::Chunk;
-use crate::goldilocks::big::NLEN;
+use goldilocks::big::NLEN;
+use arch::Chunk;
+use std;
+use modtype::ModType;
 
 // Base Bits= 29
 // Goldilocks modulus
@@ -57,3 +59,8 @@ pub const CURVE_GY: [Chunk; NLEN] = [
 
 pub const MODBYTES: usize = 56;
 pub const BASEBITS: usize = 29;
+
+pub const MODBITS: usize = 448;
+pub const MOD8: usize = 7;
+pub const MODTYPE: ModType = ModType::GENERALISED_MERSENNE;
+pub const SH: usize = std::cmp::min(14, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
