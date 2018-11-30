@@ -97,7 +97,7 @@ pub const BASEBITS: usize = 60;
 pub const MODBITS: usize = 512;
 pub const MOD8: usize = 3;
 pub const MODTYPE: ModType = ModType::PSEUDO_MERSENNE;
-pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+pub const SH: usize = 28;
 
 <<<<<<< HEAD
 >>>>>>> 4e42b9d... Add constants for FP

@@ -67,7 +67,7 @@ pub const BASEBITS: usize = 60;
 pub const MODBITS: usize = 414;
 pub const MOD8: usize = 7;
 pub const MODTYPE: ModType = ModType::PSEUDO_MERSENNE;
-pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+pub const SH: usize = 6;
 
 pub const CURVETYPE: CurveType = CurveType::EDWARDS;
 pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::NOT;

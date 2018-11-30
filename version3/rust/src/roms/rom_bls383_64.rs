@@ -208,7 +208,7 @@ pub const BASEBITS: usize = 58;
 pub const MODBITS: usize = 383;
 pub const MOD8: usize = 3;
 pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
-pub const SH: usize = std::cmp::min(30, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+pub const SH: usize = 23;
 
 pub const CURVETYPE: CurveType = CurveType::WEIERSTRASS;
 pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::BLS;
