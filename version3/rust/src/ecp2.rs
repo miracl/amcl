@@ -22,6 +22,7 @@ use super::big;
 use super::ecp;
 use super::fp2::FP2;
 use super::big::BIG;
+use types::{SexticTwist, CurvePairingType, SignOfX};
 
 //#[derive(Copy, Clone)]
 pub struct ECP2 {
@@ -276,10 +277,10 @@ impl ECP2 {
         let mut r = FP2::new_copy(x);
         r.sqr();
         let mut b = FP2::new_big(&BIG::new_ints(&rom::CURVE_B));
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::D_TYPE {
             b.div_ip();
         }
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::M_TYPE {
             b.norm();
             b.mul_ip();
             b.norm();
@@ -295,14 +296,14 @@ impl ECP2 {
     /* self+=self */
     pub fn dbl(&mut self) -> isize {
         let mut iy = FP2::new_copy(&self.y);
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::D_TYPE {
             iy.mul_ip();
             iy.norm();
         }
 
         let mut t0 = FP2::new_copy(&self.y); //***** Change
         t0.sqr();
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::D_TYPE {
             t0.mul_ip();
         }
         let mut t1 = FP2::new_copy(&iy);
@@ -318,7 +319,7 @@ impl ECP2 {
         self.z.norm();
 
         t2.imul(3 * rom::CURVE_B_I);
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::M_TYPE {
             t2.mul_ip();
             t2.norm();
         }
@@ -374,7 +375,7 @@ impl ECP2 {
 
         t3.sub(&t4);
         t3.norm();
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::D_TYPE {
             t3.mul_ip();
             t3.norm(); //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
         }
@@ -391,7 +392,7 @@ impl ECP2 {
 
         t4.sub(&x3);
         t4.norm();
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::D_TYPE {
             t4.mul_ip();
             t4.norm(); //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
         }
@@ -407,7 +408,7 @@ impl ECP2 {
         y3.rsub(&x3);
         y3.norm(); // y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::D_TYPE {
             t0.mul_ip();
             t0.norm(); // x.Q.x
             t1.mul_ip();
@@ -418,7 +419,7 @@ impl ECP2 {
         t0.add(&x3);
         t0.norm();
         t2.imul(b);
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::M_TYPE {
             t2.mul_ip();
             t2.norm();
         }
@@ -428,7 +429,7 @@ impl ECP2 {
         t1.sub(&t2);
         t1.norm();
         y3.imul(b);
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::M_TYPE {
             y3.mul_ip();
             y3.norm();
         }
@@ -682,15 +683,15 @@ impl ECP2 {
             x.norm();
         }
         let mut X = FP2::new_bigs(&BIG::new_ints(&rom::FRA), &BIG::new_ints(&rom::FRB));
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SignOfX::M_TYPE {
             X.inverse();
             X.norm();
         }
         x = BIG::new_ints(&rom::CURVE_BNX);
 
-        if ecp::CURVE_PAIRING_TYPE == ecp::BN {
+        if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
             let mut T = Q.mul(&mut x);
-            if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+            if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
                 T.neg();
             }
             let mut K = ECP2::new();
@@ -708,11 +709,11 @@ impl ECP2 {
             T.frob(&X);
             Q.add(&T);
         }
-        if ecp::CURVE_PAIRING_TYPE == ecp::BLS {
+        if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BLS {
             let mut xQ = Q.mul(&mut x);
             let mut x2Q = xQ.mul(&mut x);
 
-            if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+            if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
                 xQ.neg();
             }
             x2Q.sub(&xQ);

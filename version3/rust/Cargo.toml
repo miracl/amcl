@@ -10,7 +10,7 @@ name = "amcl"
 path = "src/lib.rs"
 
 [features]
-default = ["bn254", "rsa2048"]
+default = ["bn254"]
 bn254 = []
 bn254cx = []
 ansii = []

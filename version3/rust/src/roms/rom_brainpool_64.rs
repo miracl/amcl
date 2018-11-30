@@ -20,7 +20,7 @@ under the License.
 /* Note that the original curve has been transformed to an isomorphic curve with A=-3 */
 
 use brainpool::big::NLEN;
-use arch::Chunk;
+use super::arch::Chunk;
 use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 

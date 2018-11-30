@@ -18,7 +18,7 @@ under the License.
 */
 
 use bn254::big::NLEN;
-use arch::Chunk;
+use super::arch::Chunk;
 use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
@@ -161,7 +161,7 @@ pub const BASEBITS: usize = 28;
 pub const MODBITS: usize = 254;
 pub const MOD8: usize = 3;
 pub const MODTYPE: ModType = ModType::NOT_SPECIAL;
-pub const SH: usize = std::cmp::min(14, BASEBITS*(1+((8*MODBYTES-1)/BASEBITS))-MODBITS);
+pub const SH: usize = 14;
 
 pub const CURVETYPE: CurveType = CurveType::WEIERSTRASS;
 pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::BN;

@@ -28,6 +28,7 @@ use super::big::BIG;
 use super::dbig::DBIG;
 use super::ecp;
 use super::rom;
+use types::{SexticTwist, CurvePairingType, SignOfX};
 
 #[allow(non_snake_case)]
 fn linedbl(A: &mut ECP2, qx: &FP, qy: &FP) -> FP12 {
@@ -54,10 +55,10 @@ fn linedbl(A: &mut ECP2, qx: &FP, qy: &FP) -> FP12 {
 
     let sb = 3 * rom::CURVE_B_I;
     zz.imul(sb);
-    if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
         zz.div_ip2();
     }
-    if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
         zz.mul_ip();
         zz.dbl();
         yz.mul_ip();
@@ -71,10 +72,10 @@ fn linedbl(A: &mut ECP2, qx: &FP, qy: &FP) -> FP12 {
     zz.norm(); // 3b.Z^2-Y^2
 
     a.copy(&FP4::new_fp2s(&yz, &zz)); // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs
-    if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
         b.copy(&FP4::new_fp2(&xx)); // L(0,1) | L(0,0) | L(1,0)
     }
-    if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
         c.copy(&FP4::new_fp2(&xx));
         c.times_i();
     }
@@ -103,7 +104,7 @@ fn lineadd(A: &mut ECP2, B: &ECP2, qx: &FP, qy: &FP) -> FP12 {
 
     t1.copy(&x1); // T1=X1-Z1.X2
     x1.pmul(qy); // X1=(X1-Z1.X2).Ys
-    if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
         x1.mul_ip();
         x1.norm();
     }
@@ -119,10 +120,10 @@ fn lineadd(A: &mut ECP2, B: &ECP2, qx: &FP, qy: &FP) -> FP12 {
     y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
 
     a.copy(&FP4::new_fp2s(&x1, &t2)); // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
-    if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
         b.copy(&FP4::new_fp2(&y1));
     }
-    if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
         c.copy(&FP4::new_fp2(&y1));
         c.times_i();
     }
@@ -139,13 +140,13 @@ pub fn ate(P1: &ECP2, Q1: &ECP) -> FP12 {
     let mut n = BIG::new_copy(&x);
     let mut K = ECP2::new();
 
-    if ecp::CURVE_PAIRING_TYPE == ecp::BN {
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
+        if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
             f.inverse();
             f.norm();
         }
         n.pmul(6);
-        if ecp::SIGN_OF_X == ecp::POSITIVEX {
+        if ecp::SIGN_OF_X == SignOfX::POSITIVEX {
             n.inc(2);
         } else {
             n.dec(2);
@@ -195,14 +196,14 @@ pub fn ate(P1: &ECP2, Q1: &ECP) -> FP12 {
         }
     }
 
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         r.conj();
     }
 
     /* R-ate fixup required for BN curves */
 
-    if ecp::CURVE_PAIRING_TYPE == ecp::BN {
-        if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
+        if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
             A.neg();
         }
 
@@ -228,13 +229,13 @@ pub fn ate2(P1: &ECP2, Q1: &ECP, R1: &ECP2, S1: &ECP) -> FP12 {
     let mut n = BIG::new_copy(&x);
     let mut K = ECP2::new();
 
-    if ecp::CURVE_PAIRING_TYPE == ecp::BN {
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
+        if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
             f.inverse();
             f.norm();
         }
         n.pmul(6);
-        if ecp::SIGN_OF_X == ecp::POSITIVEX {
+        if ecp::SIGN_OF_X == SignOfX::POSITIVEX {
             n.inc(2);
         } else {
             n.dec(2);
@@ -304,13 +305,13 @@ pub fn ate2(P1: &ECP2, Q1: &ECP, R1: &ECP2, S1: &ECP) -> FP12 {
         }
     }
 
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         r.conj();
     }
 
     /* R-ate fixup */
-    if ecp::CURVE_PAIRING_TYPE == ecp::BN {
-        if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
+        if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
             A.neg();
             B.neg();
         }
@@ -355,7 +356,7 @@ pub fn fexp(m: &FP12) -> FP12 {
     r.frob(&f);
     r.mul(&lv);
     /* Hard part of final exp */
-    if ecp::CURVE_PAIRING_TYPE == ecp::BN {
+    if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
         lv.copy(&r);
         lv.frob(&f);
         let mut x0 = FP12::new_copy(&lv);
@@ -366,7 +367,7 @@ pub fn fexp(m: &FP12) -> FP12 {
         let mut x1 = FP12::new_copy(&r);
         x1.conj();
         let mut x4 = r.pow(&mut x);
-        if ecp::SIGN_OF_X == ecp::POSITIVEX {
+        if ecp::SIGN_OF_X == SignOfX::POSITIVEX {
             x4.conj();
         }
 
@@ -374,13 +375,13 @@ pub fn fexp(m: &FP12) -> FP12 {
         x3.frob(&f);
 
         let mut x2 = x4.pow(&mut x);
-        if ecp::SIGN_OF_X == ecp::POSITIVEX {
+        if ecp::SIGN_OF_X == SignOfX::POSITIVEX {
             x2.conj();
         }
         let mut x5 = FP12::new_copy(&x2);
         x5.conj();
         lv = x2.pow(&mut x);
-        if ecp::SIGN_OF_X == ecp::POSITIVEX {
+        if ecp::SIGN_OF_X == SignOfX::POSITIVEX {
             lv.conj();
         }
         x2.frob(&f);
@@ -416,12 +417,12 @@ pub fn fexp(m: &FP12) -> FP12 {
         let mut y0 = FP12::new_copy(&r);
         y0.usqr();
         let mut y1 = y0.pow(&mut x);
-        if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+        if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
             y1.conj();
         }
         x.fshr(1);
         let mut y2 = y1.pow(&mut x);
-        if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+        if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
             y2.conj();
         }
         x.fshl(1);
@@ -433,11 +434,11 @@ pub fn fexp(m: &FP12) -> FP12 {
         y1.mul(&y2);
 
         y2 = y1.pow(&mut x);
-        if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+        if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
             y2.conj();
         }
         y3 = y2.pow(&mut x);
-        if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+        if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
             y3.conj();
         }
         y1.conj();
@@ -452,7 +453,7 @@ pub fn fexp(m: &FP12) -> FP12 {
         y1.mul(&y2);
 
         y2 = y3.pow(&mut x);
-        if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+        if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
             y2.conj();
         }
         y2.mul(&y0);
@@ -472,7 +473,7 @@ pub fn fexp(m: &FP12) -> FP12 {
 /* GLV method */
 fn glv(e: &BIG) -> [BIG; 2] {
     let mut u: [BIG; 2] = [BIG::new(), BIG::new()];
-    if ecp::CURVE_PAIRING_TYPE == ecp::BN {
+    if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
         let mut t = BIG::new();
         let q = BIG::new_ints(&rom::CURVE_ORDER);
         let mut v: [BIG; 2] = [BIG::new(), BIG::new()];
@@ -509,7 +510,7 @@ fn glv(e: &BIG) -> [BIG; 2] {
 /* Galbraith & Scott Method */
 pub fn gs(e: &BIG) -> [BIG; 4] {
     let mut u: [BIG; 4] = [BIG::new(), BIG::new(), BIG::new(), BIG::new()];
-    if ecp::CURVE_PAIRING_TYPE == ecp::BN {
+    if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
         let mut t = BIG::new();
         let q = BIG::new_ints(&rom::CURVE_ORDER);
 
@@ -539,7 +540,7 @@ pub fn gs(e: &BIG) -> [BIG; 4] {
             w.div(&x);
         }
         u[3].copy(&w);
-        if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+        if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
             let mut t = BIG::new();
             t.copy(&BIG::modneg(&mut u[1], &q));
             u[1].copy(&t);
@@ -599,7 +600,7 @@ pub fn g2mul(P: &ECP2, e: &BIG) -> ECP2 {
         let mut u = gs(e);
         let mut T = ECP2::new();
 
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
             f.inverse();
             f.norm();
         }

@@ -18,7 +18,7 @@ under the License.
 */
 
 use c25519::big::NLEN;
-use arch::Chunk;
+use super::arch::Chunk;
 use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 

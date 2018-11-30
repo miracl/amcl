@@ -36,14 +36,14 @@ pub const HMASK: Chunk= ((1<<HBITS)-1);
 pub const NEXCESS:isize = (1<<((arch::CHUNK)-BASEBITS-1));
 pub const BIGBITS:usize = (MODBYTES*8);
 
-//#[derive(Copy)]
+#[derive(Copy)]
 pub struct BIG {
     pub w: [Chunk; NLEN],
 }
 
-//impl Clone for BIG {
-//    fn clone(&self) -> BIG { *self }
-//}
+impl Clone for BIG {
+    fn clone(&self) -> BIG { *self }
+}
 
 impl BIG {
     pub fn new() -> BIG {

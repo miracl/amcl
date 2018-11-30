@@ -20,7 +20,7 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 use nist256::big::NLEN;
-use arch::Chunk;
+use super::arch::Chunk;
 use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 

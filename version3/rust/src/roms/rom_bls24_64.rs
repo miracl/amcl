@@ -21,7 +21,7 @@ use crate::arch::Chunk;
 use crate::bls24::big::NLEN;
 
 use bls24::big::NLEN;
-use arch::Chunk;
+use super::arch::Chunk;
 use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 

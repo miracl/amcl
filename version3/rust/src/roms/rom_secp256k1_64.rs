@@ -20,7 +20,7 @@ under the License.
 /* Fixed Data in ROM - Field and Curve parameters */
 
 use secp256k1::big::NLEN;
-use arch::Chunk;
+use super::arch::Chunk;
 use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
