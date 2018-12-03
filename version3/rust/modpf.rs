@@ -8,4 +8,5 @@ pub mod fp4;
 pub mod fp12;
 pub mod pair;
 pub mod mpin;
+pub mod bls;
 pub mod rom;

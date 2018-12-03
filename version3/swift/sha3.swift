@@ -40,12 +40,12 @@ public struct SHA3{
 		0x8000000000008002,0x8000000000000080,0x000000000000800A,0x800000008000000A,
 		0x8000000080008081,0x8000000000008080,0x0000000080000001,0x8000000080008008]
 
-	static let HASH224:Int=28
-	static let HASH256:Int=32
-	static let HASH384:Int=48
-	static let HASH512:Int=64
-	static let SHAKE128:Int=16
-	static let SHAKE256:Int=32
+	static public let HASH224:Int=28
+	static public let HASH256:Int=32
+	static public let HASH384:Int=48
+	static public let HASH512:Int=64
+	static public let SHAKE128:Int=16
+	static public let SHAKE256:Int=32
     	
 	static let ROUNDS:Int=24
     

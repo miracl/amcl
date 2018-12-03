@@ -24,4 +24,7 @@ mvn clean install
 
 Testing will be carried out during the installation process.
 
+Elliptic curve key exchange, signature and encryption (ECDH, ECDSA and ECCSI) will be tested.
+Also MPIN and BLS (Boneh-Lynn-Shacham) signature (using pairings)
+
 *New* This library is now available directly on maven central

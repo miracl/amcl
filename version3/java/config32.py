@@ -148,14 +148,18 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"FP12.java "+fpath+"FP12.java")
 			os.system(copytext+"PAIR.java "+fpath+"PAIR.java")
 			os.system(copytext+"MPIN.java "+fpath+"MPIN.java")
+			os.system(copytext+"BLS.java "+fpath+"BLS.java")
 			os.system(copytext+"TestMPIN.java "+fpathTest+"TestMPIN.java")	#ms
+			os.system(copytext+"TestBLS.java "+fpathTest+"TestBLS.java")	#ms
 			os.system(copytext+"TesttimeMPIN.java "+fpathTest+"TesttimeMPIN.java")	#ms
 
 			replace(fpath+"FP12.java","XXX",tc)
 			replace(fpath+"ECP2.java","XXX",tc)
 			replace(fpath+"PAIR.java","XXX",tc)
 			replace(fpath+"MPIN.java","XXX",tc)
+			replace(fpath+"BLS.java","XXX",tc)
 			replace(fpathTest+"TestMPIN.java","XXX",tc)  #ms
+			replace(fpathTest+"TestBLS.java","XXX",tc)  #ms
 			replace(fpathTest+"TesttimeMPIN.java","XXX",tc)  #ms
 
 		if cs == "192" :
@@ -164,7 +168,9 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"FP24.java "+fpath+"FP24.java")
 			os.system(copytext+"PAIR192.java "+fpath+"PAIR192.java")
 			os.system(copytext+"MPIN192.java "+fpath+"MPIN192.java")
+			os.system(copytext+"BLS192.java "+fpath+"BLS192.java")
 			os.system(copytext+"TestMPIN192.java "+fpathTest+"TestMPIN192.java")	#ms
+			os.system(copytext+"TestBLS192.java "+fpathTest+"TestBLS192.java")	#ms
 			os.system(copytext+"TesttimeMPIN192.java "+fpathTest+"TesttimeMPIN192.java")	#ms
 
 			replace(fpath+"FP8.java","XXX",tc)
@@ -172,7 +178,9 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fpath+"ECP4.java","XXX",tc)
 			replace(fpath+"PAIR192.java","XXX",tc)
 			replace(fpath+"MPIN192.java","XXX",tc)
+			replace(fpath+"BLS192.java","XXX",tc)
 			replace(fpathTest+"TestMPIN192.java","XXX",tc)  #ms
+			replace(fpathTest+"TestBLS192.java","XXX",tc)  #ms
 			replace(fpathTest+"TesttimeMPIN192.java","XXX",tc)  #ms
 
 		if cs == "256" :
@@ -182,7 +190,9 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"FP48.java "+fpath+"FP48.java")
 			os.system(copytext+"PAIR256.java "+fpath+"PAIR256.java")
 			os.system(copytext+"MPIN256.java "+fpath+"MPIN256.java")
+			os.system(copytext+"BLS256.java "+fpath+"BLS256.java")
 			os.system(copytext+"TestMPIN256.java "+fpathTest+"TestMPIN256.java")	#ms
+			os.system(copytext+"TestBLS256.java "+fpathTest+"TestBLS256.java")	#ms
 			os.system(copytext+"TesttimeMPIN256.java "+fpathTest+"TesttimeMPIN256.java")	#ms
 
 			replace(fpath+"FP8.java","XXX",tc)
@@ -191,7 +201,9 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fpath+"ECP8.java","XXX",tc)
 			replace(fpath+"PAIR256.java","XXX",tc)
 			replace(fpath+"MPIN256.java","XXX",tc)
+			replace(fpath+"BLS256.java","XXX",tc)
 			replace(fpathTest+"TestMPIN256.java","XXX",tc)  #ms
+			replace(fpathTest+"TestBLS256.java","XXX",tc)  #ms
 			replace(fpathTest+"TesttimeMPIN256.java","XXX",tc)  #ms
 
 

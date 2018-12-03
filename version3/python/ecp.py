@@ -589,7 +589,7 @@ class ECp:
             return PK
         if compress:
             PK = bytearray(FS + 1)
-            x, b = self.getx()
+            x, b = self.getxs()
             if b == 0:
                 PK[0] = 2
             else:

@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-/* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
+/* test driver and function exerciser for MPIN API Functions */
 package org.apache.milagro.amcl.XXX;  //
 
 import java.util.Scanner;

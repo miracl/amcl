@@ -132,11 +132,13 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"fp12.rs "+fpath+"fp12.rs")
 			os.system(copytext+"pair.rs "+fpath+"pair.rs")
 			os.system(copytext+"mpin.rs "+fpath+"mpin.rs")
+			os.system(copytext+"bls.rs "+fpath+"bls.rs")
 
 			replace(fpath+"fp12.rs","xxx",tc)
 			replace(fpath+"ecp2.rs","xxx",tc)
 			replace(fpath+"pair.rs","xxx",tc)
 			replace(fpath+"mpin.rs","xxx",tc)
+			replace(fpath+"bls.rs","xxx",tc)
 
 			os.system(copytext+"modpf.rs "+fpath+"mod.rs")
 
@@ -147,12 +149,14 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"fp24.rs "+fpath+"fp24.rs")
 			os.system(copytext+"pair192.rs "+fpath+"pair192.rs")
 			os.system(copytext+"mpin192.rs "+fpath+"mpin192.rs")
+			os.system(copytext+"bls192.rs "+fpath+"bls192.rs")
 
 			replace(fpath+"fp8.rs","xxx",tc)
 			replace(fpath+"fp24.rs","xxx",tc)
 			replace(fpath+"ecp4.rs","xxx",tc)
 			replace(fpath+"pair192.rs","xxx",tc)
 			replace(fpath+"mpin192.rs","xxx",tc)
+			replace(fpath+"bls192.rs","xxx",tc)
 
 			os.system(copytext+"modpf192.rs "+fpath+"mod.rs")
 
@@ -163,6 +167,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"fp48.rs "+fpath+"fp48.rs")
 			os.system(copytext+"pair256.rs "+fpath+"pair256.rs")
 			os.system(copytext+"mpin256.rs "+fpath+"mpin256.rs")
+			os.system(copytext+"bls256.rs "+fpath+"bls256.rs")
 
 			replace(fpath+"fp8.rs","xxx",tc)
 			replace(fpath+"fp16.rs","xxx",tc)
@@ -170,6 +175,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fpath+"ecp8.rs","xxx",tc)
 			replace(fpath+"pair256.rs","xxx",tc)
 			replace(fpath+"mpin256.rs","xxx",tc)
+			replace(fpath+"bls256.rs","xxx",tc)
 
 			os.system(copytext+"modpf256.rs "+fpath+"mod.rs")
 
@@ -392,6 +398,7 @@ os.system(deltext+" rsa.rs")
 os.system(deltext+" ecp*.rs")
 os.system(deltext+" pair*.rs")
 os.system(deltext+" mpin*.rs")
+os.system(deltext+" bls*.rs")
 os.system(deltext+" rom*.rs")
 
 # create library

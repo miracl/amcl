@@ -10,4 +10,5 @@ pub mod fp16;
 pub mod fp48;
 pub mod pair256;
 pub mod mpin256;
+pub mod bls256;
 pub mod rom;

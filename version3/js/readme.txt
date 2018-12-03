@@ -41,7 +41,7 @@ var ctx = new CTX();
 --------------------------------------
 
 
-To see some running examples, load TestALL.html or BenchtestALL.html into your favourite browser.
+To see some running examples, load TestALL.html or TestBLS.html or BenchtestALL.html into your favourite browser.
 You might have to wait a few seconds for the benchmarking scripts to complete.
 
 For TestALL.html the correct PIN number is 1234.

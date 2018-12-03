@@ -237,6 +237,19 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 		replace(fnameh,"XXX",bd)
 		os.system("gcc -O3 -std=c99 -c "+fnamec)
 
+		fnamec="bls_"+tc+".c"
+		fnameh="bls_"+tc+".h"
+
+		os.system(copytext+" bls.c "+fnamec)
+		os.system(copytext+" bls.h "+fnameh)
+		replace(fnamec,"ZZZ",tc)
+		replace(fnamec,"YYY",tf)
+		replace(fnamec,"XXX",bd)
+		replace(fnameh,"ZZZ",tc)
+		replace(fnameh,"YYY",tf)
+		replace(fnameh,"XXX",bd)
+		os.system("gcc -O3 -std=c99 -c "+fnamec)
+
 replace("arch.h","@WL@","16")
 print("Elliptic Curves")
 print("1. ED25519")

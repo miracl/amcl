@@ -43,6 +43,10 @@ go run TestALL.go
 
 The correct PIN is 1234
 
+Run another test program by executing
+
+go run TestBLS.go
+
 Next run the Benchmark program by executing
 
 go run BenchtestALL.go

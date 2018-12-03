@@ -244,6 +244,19 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fnameh,"XXX",bd)
 			os.system("gcc -O3 -std=c99 -c "+fnamec)
 
+			fnamec="bls_"+tc+".c"
+			fnameh="bls_"+tc+".h"
+
+			os.system(copytext+" bls.c "+fnamec)
+			os.system(copytext+" bls.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
+
 		if cs == "192" :
 			fnamec="fp8_"+tf+".c"
 			fnameh="fp8_"+tf+".h"
@@ -308,6 +321,19 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			os.system("gcc -O3 -std=c99 -c "+fnamec)		
+
+			fnamec="bls192_"+tc+".c"
+			fnameh="bls192_"+tc+".h"
+
+			os.system(copytext+" bls192.c "+fnamec)
+			os.system(copytext+" bls192.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)	
 
 		if cs == "256" :
 
@@ -390,6 +416,19 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			os.system("gcc -O3 -std=c99 -c "+fnamec)				
+
+			fnamec="bls256_"+tc+".c"
+			fnameh="bls256_"+tc+".h"
+
+			os.system(copytext+" bls256.c "+fnamec)
+			os.system(copytext+" bls256.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("gcc -O3 -std=c99 -c "+fnamec)
 
 replace("arch.h","@WL@","32")
 print("Elliptic Curves")

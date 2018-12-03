@@ -582,6 +582,8 @@ var CTX = function(input_parameter) {
             prepareModule("ECP2");
             prepareModule("PAIR");
             prepareModule("MPIN");
+			prepareModule("BLS");
+
         }
 
         if (ctx.config["@PF"] == 3) {
@@ -592,6 +594,7 @@ var CTX = function(input_parameter) {
             prepareModule("ECP4");
             prepareModule("PAIR192");
             prepareModule("MPIN192");
+            prepareModule("BLS192");
         }
 
         if (ctx.config["@PF"] == 4) {
@@ -603,6 +606,7 @@ var CTX = function(input_parameter) {
             prepareModule("ECP8");
             prepareModule("PAIR256");
             prepareModule("MPIN256");
+            prepareModule("BLS256");
         }
 
         return;

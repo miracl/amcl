@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-/* test driver and function exerciser for ECDH/ECIES/ECDSA API Functions */
+/* test driver and function exerciser for ECDH/ECIES/ECDSA and MPIN API Functions */
 
 
 package main

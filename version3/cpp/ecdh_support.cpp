@@ -31,7 +31,7 @@ using namespace amcl;
 #define ROUNDUP(a,b) ((a)-1)/(b)+1
 
 /* general purpose hash function w=hash(p|n|x|y) */
-/* pad or truncate ouput to length pad if pad!=0 */
+/* pad or truncate output to length pad if pad!=0 */
 void amcl::ehashit(int sha,octet *p,int n,octet *x,octet *w,int pad)
 {
     int i,c[4],hlen;

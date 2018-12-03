@@ -18,11 +18,13 @@
 */
 
 //
-//  TestECDH.swift
+//  TestALL.swift
 //
 //  Created by Michael Scott on 02/07/2015.
 //  Copyright (c) 2015 Michael Scott. All rights reserved.
 //
+
+/* Test Elliptic curve and MPIN APIs */
 
 import Foundation
 import amcl // comment out for Xcode
@@ -525,8 +527,8 @@ public func TestMPIN_bn254(_ rng: inout RAND)
     let SINGLE_PASS=true
    
    
-    let EGS=bn254.MPIN.EFS
-    let EFS=bn254.MPIN.EGS
+    let EGS=bn254.MPIN.EGS
+    let EFS=bn254.MPIN.EFS
     let G1S=2*EFS+1    // Group 1 Size
     let G2S=4*EFS;     // Group 2 Size
     let EAS=bn254.ECP.AESKEY
@@ -747,8 +749,8 @@ public func TestMPIN_bls383(_ rng: inout RAND)
     let SINGLE_PASS=true
    
    
-    let EGS=bls383.MPIN.EFS
-    let EFS=bls383.MPIN.EGS
+    let EGS=bls383.MPIN.EGS
+    let EFS=bls383.MPIN.EFS
     let G1S=2*EFS+1    // Group 1 Size
     let G2S=4*EFS;     // Group 2 Size
     let EAS=bls383.ECP.AESKEY
@@ -970,8 +972,8 @@ public func TestMPIN_bls24(_ rng: inout RAND)
     let SINGLE_PASS=true
    
    
-    let EGS=bls24.MPIN192.EFS
-    let EFS=bls24.MPIN192.EGS
+    let EGS=bls24.MPIN192.EGS
+    let EFS=bls24.MPIN192.EFS
     let G1S=2*EFS+1    // Group 1 Size
     let G2S=8*EFS;     // Group 2 Size
     let EAS=bls24.ECP.AESKEY
@@ -1192,8 +1194,8 @@ public func TestMPIN_bls48(_ rng: inout RAND)
     let SINGLE_PASS=true
    
    
-    let EGS=bls48.MPIN256.EFS
-    let EFS=bls48.MPIN256.EGS
+    let EGS=bls48.MPIN256.EGS
+    let EFS=bls48.MPIN256.EFS
     let G1S=2*EFS+1    // Group 1 Size
     let G2S=16*EFS;     // Group 2 Size
     let EAS=bls48.ECP.AESKEY

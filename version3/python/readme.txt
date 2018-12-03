@@ -37,3 +37,7 @@ py test.py
 or
 
 python3 test.py
+
+Elliptic curve key exchange, signature and encryption (ECDH, ECDSA and ECCSI) will be tested.
+Also MPIN and BLS (Boneh-Lynn-Shacham) signature (using pairings)
+

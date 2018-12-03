@@ -112,12 +112,14 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"fp12.swift "+fpath+"fp12.swift")
 			os.system(copytext+"pair.swift "+fpath+"pair.swift")
 			os.system(copytext+"mpin.swift "+fpath+"mpin.swift")
+			os.system(copytext+"bls.swift "+fpath+"bls.swift")
 		if cs == "192" :
 			os.system(copytext+"fp8.swift "+fpath+"fp8.swift")
 			os.system(copytext+"ecp4.swift "+fpath+"ecp4.swift")
 			os.system(copytext+"fp24.swift "+fpath+"fp24.swift")
 			os.system(copytext+"pair192.swift "+fpath+"pair192.swift")
 			os.system(copytext+"mpin192.swift "+fpath+"mpin192.swift")
+			os.system(copytext+"bls192.swift "+fpath+"bls192.swift")
 		if cs == "256" :
 			os.system(copytext+"fp8.swift "+fpath+"fp8.swift")
 			os.system(copytext+"fp16.swift "+fpath+"fp16.swift")
@@ -125,6 +127,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"fp48.swift "+fpath+"fp48.swift")
 			os.system(copytext+"pair256.swift "+fpath+"pair256.swift")
 			os.system(copytext+"mpin256.swift "+fpath+"mpin256.swift")
+			os.system(copytext+"bls256.swift "+fpath+"bls256.swift")
 	else :
 		os.system(copytext+"ecdh.swift "+fpath+"ecdh.swift")
 
@@ -344,6 +347,7 @@ os.system(deltext+" ff.swift")
 os.system(deltext+" rsa.swift")
 os.system(deltext+" pair*.swift")
 os.system(deltext+" mpin*.swift")
+os.system(deltext+" bls*.swift")
 os.system(deltext+" rom*.swift")
 
 os.system(deltext+"amcl"+slashtext+"*.*")

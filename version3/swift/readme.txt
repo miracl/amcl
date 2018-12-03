@@ -39,5 +39,9 @@ swift -I. -L. -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 
 
 and
 
+swift -I. -L. -lbn254 -lbls383 -lbls24 -lbls48 TestBLS.swift 
+
+and 
+
 swift -I. -L. -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 BenchtestALL.swift 
 

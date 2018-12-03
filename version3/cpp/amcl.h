@@ -94,7 +94,7 @@ typedef struct {
 #define SHA3_HASH512 64 /**< SHA3 512 bit hash */
 
 #define SHAKE128 16 /**< SHAKE128   hash */
-#define SHAKE256 32 /**< SHAKE256 hash */
+#define SHAKE256 32 /**< SHAKE256   hash */
 
 
 /* NewHope parameters */

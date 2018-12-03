@@ -31,6 +31,11 @@ rustc TestALL.rs --extern amcl=libamcl.rlib
 
 Run this test program by executing the program TestALL
 
+rustc TestBLS.rs --extern amcl=libamcl.rlib
+
+Run this test program by executing the program TestBLS
+
+
 rustc BenchtestALL.rs --extern amcl=libamcl.rlib
 
 Run this test program by executing the program BenchtestALL

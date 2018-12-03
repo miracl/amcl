@@ -130,11 +130,13 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"FP12.go "+fpath+"FP12.go")
 			os.system(copytext+"PAIR.go "+fpath+"PAIR.go")
 			os.system(copytext+"MPIN.go "+fpath+"MPIN.go")
+			os.system(copytext+"BLS.go "+fpath+"BLS.go")
 
 			replace(fpath+"FP12.go","XXX",tc)
 			replace(fpath+"ECP2.go","XXX",tc)
 			replace(fpath+"PAIR.go","XXX",tc)
 			replace(fpath+"MPIN.go","XXX",tc)
+			replace(fpath+"BLS.go","XXX",tc)
 
 		if cs == "192" :
 			os.system(copytext+"FP24.go "+fpath+"FP24.go")
@@ -142,12 +144,14 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"ECP4.go "+fpath+"ECP4.go")
 			os.system(copytext+"PAIR192.go "+fpath+"PAIR192.go")
 			os.system(copytext+"MPIN192.go "+fpath+"MPIN192.go")
+			os.system(copytext+"BLS192.go "+fpath+"BLS192.go")
 
 			replace(fpath+"FP24.go","XXX",tc)
 			replace(fpath+"FP8.go","XXX",tc)
 			replace(fpath+"ECP4.go","XXX",tc)
 			replace(fpath+"PAIR192.go","XXX",tc)
 			replace(fpath+"MPIN192.go","XXX",tc)
+			replace(fpath+"BLS192.go","XXX",tc)
 
 		if cs == "256" :
 			os.system(copytext+"FP48.go "+fpath+"FP48.go")
@@ -156,6 +160,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			os.system(copytext+"ECP8.go "+fpath+"ECP8.go")
 			os.system(copytext+"PAIR256.go "+fpath+"PAIR256.go")
 			os.system(copytext+"MPIN256.go "+fpath+"MPIN256.go")
+			os.system(copytext+"BLS256.go "+fpath+"BLS256.go")
 
 			replace(fpath+"FP48.go","XXX",tc)
 			replace(fpath+"FP16.go","XXX",tc)
@@ -163,6 +168,7 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fpath+"ECP8.go","XXX",tc)
 			replace(fpath+"PAIR256.go","XXX",tc)
 			replace(fpath+"MPIN256.go","XXX",tc)
+			replace(fpath+"BLS256.go","XXX",tc)
 
 
 os.system("mkdir amcl")

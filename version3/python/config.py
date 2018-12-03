@@ -66,11 +66,13 @@ def curveset(tc, pf):
         os.system(copytext + "fp12.py " + fpath + "fp12.py")
         os.system(copytext + "pair.py " + fpath + "pair.py")
         os.system(copytext + "mpin.py " + fpath + "mpin.py")
+        os.system(copytext + "bls.py " + fpath + "bls.py")
 
         replace(fpath + "fp12.py", "XXX", tc)
         replace(fpath + "ecp2.py", "XXX", tc)
         replace(fpath + "pair.py", "XXX", tc)
         replace(fpath + "mpin.py", "XXX", tc)
+        replace(fpath + "bls.py", "XXX", tc)
 
 
 print("Elliptic Curves")
@@ -160,6 +162,7 @@ os.system(deltext + " fp2.py")
 os.system(deltext + " fp4.py")
 os.system(deltext + " fp12.py")
 os.system(deltext + " mpin.py")
+os.system(deltext + " bls.py")
 os.system(deltext + " pair.py")
 os.system(deltext + " ecp2.py")
 os.system(deltext + " c25519.py")

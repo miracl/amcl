@@ -9,6 +9,7 @@ from constants import *
 import ed25519.ecdh
 import ed25519.curve
 import bn254.mpin
+import bn254.bls
 
 # first test ECDH/ECDSA on curve ed25519
 
@@ -65,6 +66,24 @@ if ed25519.curve.CurveType != MONTGOMERY:
         print("Signature is Valid")
     else:
         print("Signature is NOT Valid")
+
+
+# Now test BLS signature
+
+print("\nNow test BLS signature on curve bn254\n")
+mess= "This is a test message"
+mess2="This is a test massage"
+SK,PK=bn254.bls.KeyPairGenerate()
+print("Secret Key: ", bytes(SK).hex())
+print("Public Key: ", bytes(PK).hex())
+SIG=bn254.bls.sign(mess,SK)
+print("Signature: ", bytes(SIG).hex())
+rtn=bn254.bls.verify(SIG,mess,PK)       # try with mess2
+if rtn:
+    print("SUCCESS: Signature is valid")
+else:
+    print("ERROR: Signature is NOT valid")
+
 
 
 # Now test a simple Pairing-based protocol MPIN on curve bn254

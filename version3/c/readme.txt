@@ -57,8 +57,18 @@ pairing friendly curve and RSA, all in the one binary.
 The correct PIN is 1234
 
 
-Next compile 
+Next compile
 
+gcc -O2 -std=c99 testbls.c amcl.a -o testbls.exe
+
+if using MINGW in Windows. Or for Linux
+
+gcc -O2 -std=c99 testbls.c amcl.a -o testbls
+
+This program implements the pairing-based BLS signature
+
+
+Next compile 
 
 gcc -O2 -std=c99 benchtest_all.c amcl.a -o benchtest_all.exe
 
