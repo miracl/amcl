@@ -19,7 +19,6 @@ under the License.
 
 use fp256bn::big::NLEN;
 use super::arch::Chunk;
-use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // fp256bn Modulus

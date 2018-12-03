@@ -326,7 +326,7 @@ impl FP12 {
 
     /* Special case of multiplication arises from special form of ATE pairing line function */
     pub fn smul(&mut self, y: &FP12, twist: usize) {
-        if twist == SexticTwist::D_TYPE {
+        if twist == SexticTwist::D_TYPE.into() {
             let mut z0 = FP4::new_copy(&self.a);
             let mut z2 = FP4::new_copy(&self.b);
             let mut z3 = FP4::new_copy(&self.b);
@@ -370,7 +370,7 @@ impl FP12 {
             self.a.copy(&z0);
             self.a.add(&z3);
         }
-        if twist == SexticTwist::M_TYPE {
+        if twist == SexticTwist::M_TYPE.into() {
             let mut z0 = FP4::new_copy(&self.a);
             let mut z1 = FP4::new();
             let mut z2 = FP4::new();

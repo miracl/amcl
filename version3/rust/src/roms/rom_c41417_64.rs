@@ -19,7 +19,6 @@ under the License.
 
 use c41417::big::NLEN;
 use super::arch::Chunk;
-use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 60
@@ -60,6 +59,7 @@ pub const CURVE_GX: [Chunk; NLEN] = [
     0x300218C0631C326,
     0x1A334905141443,
 ];
+pub const CURVE_GY: [Chunk; NLEN] = [0x22, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0];
 
 pub const MODBYTES: usize = 52;
 pub const BASEBITS: usize = 60;

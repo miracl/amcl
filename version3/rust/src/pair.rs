@@ -184,15 +184,15 @@ pub fn ate(P1: &ECP2, Q1: &ECP) -> FP12 {
         r.sqr();
 
         let mut lv = linedbl(&mut A, &qx, &qy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
         let bt = n3.bit(i) - n.bit(i);
         if bt == 1 {
             lv = lineadd(&mut A, &P, &qx, &qy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
         }
         if bt == -1 {
             lv = lineadd(&mut A, &NP, &qx, &qy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
         }
     }
 
@@ -211,11 +211,11 @@ pub fn ate(P1: &ECP2, Q1: &ECP) -> FP12 {
         K.frob(&f);
 
         let mut lv = lineadd(&mut A, &K, &qx, &qy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
         K.frob(&f);
         K.neg();
         lv = lineadd(&mut A, &K, &qx, &qy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
     }
 
     return r;
@@ -287,21 +287,21 @@ pub fn ate2(P1: &ECP2, Q1: &ECP, R1: &ECP2, S1: &ECP) -> FP12 {
     for i in (1..nb - 1).rev() {
         r.sqr();
         let mut lv = linedbl(&mut A, &qx, &qy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
         lv = linedbl(&mut B, &sx, &sy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
         let bt = n3.bit(i) - n.bit(i);
         if bt == 1 {
             lv = lineadd(&mut A, &P, &qx, &qy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
             lv = lineadd(&mut B, &R, &sx, &sy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
         }
         if bt == -1 {
             lv = lineadd(&mut A, &NP, &qx, &qy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
             lv = lineadd(&mut B, &NR, &sx, &sy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
         }
     }
 
@@ -319,21 +319,21 @@ pub fn ate2(P1: &ECP2, Q1: &ECP, R1: &ECP2, S1: &ECP) -> FP12 {
         K.frob(&f);
 
         let mut lv = lineadd(&mut A, &K, &qx, &qy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
         K.frob(&f);
         K.neg();
         lv = lineadd(&mut A, &K, &qx, &qy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
 
         K.copy(&R);
         K.frob(&f);
 
         lv = lineadd(&mut B, &K, &sx, &sy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
         K.frob(&f);
         K.neg();
         lv = lineadd(&mut B, &K, &sx, &sy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
     }
 
     return r;

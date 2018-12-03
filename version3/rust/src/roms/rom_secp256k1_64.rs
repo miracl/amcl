@@ -21,7 +21,6 @@ under the License.
 
 use secp256k1::big::NLEN;
 use super::arch::Chunk;
-use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 56

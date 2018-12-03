@@ -17,12 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use crate::arch::Chunk;
-use crate::bls24::big::NLEN;
-
 use bls24::big::NLEN;
 use super::arch::Chunk;
-use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 56

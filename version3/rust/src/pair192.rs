@@ -28,6 +28,7 @@ use super::fp24::FP24;
 use super::big::BIG;
 use super::ecp;
 use super::rom;
+use types::{SexticTwist, SignOfX};
 
 #[allow(non_snake_case)]
 fn linedbl(A: &mut ECP4, qx: &FP, qy: &FP) -> FP24 {
@@ -54,10 +55,10 @@ fn linedbl(A: &mut ECP4, qx: &FP, qy: &FP) -> FP24 {
 
     let sb = 3 * rom::CURVE_B_I;
     zz.imul(sb);
-    if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
         zz.div_2i();
     }
-    if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
         zz.times_i();
         zz.dbl();
         yz.times_i();
@@ -70,10 +71,10 @@ fn linedbl(A: &mut ECP4, qx: &FP, qy: &FP) -> FP24 {
     zz.norm(); // 3b.Z^2-Y^2
 
     a.copy(&FP8::new_fp4s(&yz, &zz)); // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs
-    if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
         b.copy(&FP8::new_fp4(&xx)); // L(0,1) | L(0,0) | L(1,0)
     }
-    if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
         c.copy(&FP8::new_fp4(&xx));
         c.times_i();
     }
@@ -102,7 +103,7 @@ fn lineadd(A: &mut ECP4, B: &ECP4, qx: &FP, qy: &FP) -> FP24 {
 
     t1.copy(&x1); // T1=X1-Z1.X2
     x1.qmul(qy); // X1=(X1-Z1.X2).Ys
-    if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
         x1.times_i();
     }
 
@@ -117,10 +118,10 @@ fn lineadd(A: &mut ECP4, B: &ECP4, qx: &FP, qy: &FP) -> FP24 {
     y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
 
     a.copy(&FP8::new_fp4s(&x1, &t2)); // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
-    if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
         b.copy(&FP8::new_fp4(&y1));
     }
-    if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+    if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
         c.copy(&FP8::new_fp4(&y1));
         c.times_i();
     }
@@ -162,19 +163,19 @@ pub fn ate(P1: &ECP4, Q1: &ECP) -> FP24 {
     for i in (1..nb - 1).rev() {
         r.sqr();
         let mut lv = linedbl(&mut A, &qx, &qy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
         let bt = n3.bit(i) - n.bit(i);
         if bt == 1 {
             lv = lineadd(&mut A, &P, &qx, &qy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
         }
         if bt == -1 {
             lv = lineadd(&mut A, &NP, &qx, &qy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
         }
     }
 
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         r.conj();
     }
 
@@ -229,25 +230,25 @@ pub fn ate2(P1: &ECP4, Q1: &ECP, R1: &ECP4, S1: &ECP) -> FP24 {
     for i in (1..nb - 1).rev() {
         r.sqr();
         let mut lv = linedbl(&mut A, &qx, &qy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
         lv = linedbl(&mut B, &sx, &sy);
-        r.smul(&lv, ecp::SEXTIC_TWIST);
+        r.smul(&lv, ecp::SEXTIC_TWIST.into());
         let bt = n3.bit(i) - n.bit(i);
         if bt == 1 {
             lv = lineadd(&mut A, &P, &qx, &qy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
             lv = lineadd(&mut B, &R, &sx, &sy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
         }
         if bt == -1 {
             lv = lineadd(&mut A, &NP, &qx, &qy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
             lv = lineadd(&mut B, &NR, &sx, &sy);
-            r.smul(&lv, ecp::SEXTIC_TWIST);
+            r.smul(&lv, ecp::SEXTIC_TWIST.into());
         }
     }
 
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         r.conj();
     }
 
@@ -281,7 +282,7 @@ pub fn fexp(m: &FP24) -> FP24 {
     let mut t2 = t1.pow(&mut x);
     x.fshl(1);
 
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         t1.conj();
     }
     let mut t3 = FP24::new_copy(&t1);
@@ -293,7 +294,7 @@ pub fn fexp(m: &FP24) -> FP24 {
     let mut t4 = t3.pow(&mut x);
     let mut t5 = t4.pow(&mut x);
 
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         t3.conj();
         t5.conj();
     }
@@ -303,7 +304,7 @@ pub fn fexp(m: &FP24) -> FP24 {
     t3.mul(&t4);
 
     let mut t6 = t5.pow(&mut x);
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         t6.conj();
     }
 
@@ -321,7 +322,7 @@ pub fn fexp(m: &FP24) -> FP24 {
     t5.copy(&t6.pow(&mut x));
     t6.copy(&t5.pow(&mut x));
 
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         t5.conj();
     }
 
@@ -334,7 +335,7 @@ pub fn fexp(m: &FP24) -> FP24 {
     t3.mul(&t0);
     t5.copy(&t6.pow(&mut x));
 
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         t5.conj();
     }
     t2.frob(&f, 7);
@@ -388,7 +389,7 @@ pub fn gs(e: &BIG) -> [BIG; 8] {
         w.div(&x);
     }
     u[7].copy(&w);
-    if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+    if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
         let mut t = BIG::new();
         t.copy(&BIG::modneg(&mut u[1], &q));
         u[1].copy(&t);

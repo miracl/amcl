@@ -23,6 +23,7 @@ use std::io;
 use std::str;
 
 use amcl::rand::RAND;
+use amcl::types::CurveType;
 
 pub fn printbinary(array: &[u8]) {
     for i in 0..array.len() {
@@ -121,7 +122,7 @@ fn ecdh_ed25519(mut rng: &mut RAND) {
     print!("Servers DH Key=  0x");
     printbinary(&key);
 
-    if ecp::CURVETYPE != ecp::MONTGOMERY {
+    if ecp::CURVETYPE != CurveType::MONTGOMERY {
         for i in 0..17 {
             m[i] = i as u8
         }
@@ -272,7 +273,7 @@ fn ecdh_nist256(mut rng: &mut RAND) {
     print!("Servers DH Key=  0x");
     printbinary(&key);
 
-    if ecp::CURVETYPE != ecp::MONTGOMERY {
+    if ecp::CURVETYPE != CurveType::MONTGOMERY {
         for i in 0..17 {
             m[i] = i as u8
         }
@@ -423,7 +424,7 @@ fn ecdh_goldilocks(mut rng: &mut RAND) {
     print!("Servers DH Key=  0x");
     printbinary(&key);
 
-    if ecp::CURVETYPE != ecp::MONTGOMERY {
+    if ecp::CURVETYPE != CurveType::MONTGOMERY {
         for i in 0..17 {
             m[i] = i as u8
         }
@@ -1435,6 +1436,7 @@ fn rsa_2048(mut rng: &mut RAND) {
     rsa::private_key_kill(&mut prv);
 }
 
+#[test]
 fn main() {
     let mut raw: [u8; 100] = [0; 100];
 

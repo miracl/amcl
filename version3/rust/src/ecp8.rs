@@ -24,6 +24,7 @@ use super::fp2::FP2;
 use super::fp4::FP4;
 use super::fp8::FP8;
 use super::big::BIG;
+use types::{SexticTwist, SignOfX};
 
 pub struct ECP8 {
     x: FP8,
@@ -413,10 +414,10 @@ impl ECP8 {
         let mut r = FP8::new_copy(x);
         r.sqr();
         let mut b = FP8::new_fp4(&FP4::new_fp2(&FP2::new_big(&BIG::new_ints(&rom::CURVE_B))));
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
             b.div_i();
         }
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
             b.times_i();
         }
 
@@ -430,13 +431,13 @@ impl ECP8 {
     /* self+=self */
     pub fn dbl(&mut self) -> isize {
         let mut iy = FP8::new_copy(&self.y);
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
             iy.times_i(); //iy.norm();
         }
 
         let mut t0 = FP8::new_copy(&self.y);
         t0.sqr();
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
             t0.times_i();
         }
         let mut t1 = FP8::new_copy(&iy);
@@ -452,7 +453,7 @@ impl ECP8 {
         self.z.norm();
 
         t2.imul(3 * rom::CURVE_B_I);
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
             t2.times_i();
         }
         let mut x3 = FP8::new_copy(&t2);
@@ -507,7 +508,7 @@ impl ECP8 {
 
         t3.sub(&t4);
         t3.norm();
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
             t3.times_i(); //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
         }
         t4.copy(&self.y);
@@ -523,7 +524,7 @@ impl ECP8 {
 
         t4.sub(&x3);
         t4.norm();
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
             t4.times_i(); //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
         }
         x3.copy(&self.x);
@@ -538,7 +539,7 @@ impl ECP8 {
         y3.rsub(&x3);
         y3.norm(); // y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-        if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
             t0.times_i(); // x.Q.x
             t1.times_i(); // y.Q.y
         }
@@ -547,7 +548,7 @@ impl ECP8 {
         t0.add(&x3);
         t0.norm();
         t2.imul(b);
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
             t2.times_i();
         }
         let mut z3 = FP8::new_copy(&t1);
@@ -556,7 +557,7 @@ impl ECP8 {
         t1.sub(&t2);
         t1.norm();
         y3.imul(b);
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
             y3.times_i();
         }
         x3.copy(&y3);
@@ -606,7 +607,7 @@ impl ECP8 {
         f2.norm();
 
         f1.copy(&f);
-        if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+        if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
             f1.mul_ip();
             f1.inverse();
             f0.copy(&f1);
@@ -625,18 +626,18 @@ impl ECP8 {
         for _i in 0..n {
             self.x.frob(&f[2]);
             self.x.qmul(&f[0]);
-            if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+            if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
                 self.x.div_i2();
             }
-            if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+            if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
                 self.x.times_i2();
             }
             self.y.frob(&f[2]);
             self.y.qmul(&f[1]);
-            if ecp::SEXTIC_TWIST == ecp::M_TYPE {
+            if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
                 self.y.div_i();
             }
-            if ecp::SEXTIC_TWIST == ecp::D_TYPE {
+            if ecp::SEXTIC_TWIST == SexticTwist::D_TYPE {
                 self.y.times_i2();
                 self.y.times_i2();
                 self.y.times_i();
@@ -1052,7 +1053,7 @@ impl ECP8 {
         let mut x7Q = x6Q.mul(&mut x);
         let mut x8Q = x7Q.mul(&mut x);
 
-        if ecp::SIGN_OF_X == ecp::NEGATIVEX {
+        if ecp::SIGN_OF_X == SignOfX::NEGATIVEX {
             xQ.neg();
             x3Q.neg();
             x5Q.neg();

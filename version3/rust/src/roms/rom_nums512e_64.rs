@@ -19,7 +19,6 @@ under the License.
 
 use nums512e::big::NLEN;
 use super::arch::Chunk;
-use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 60
@@ -89,9 +88,6 @@ pub const CURVE_GY: [Chunk; NLEN] = [
 ];
 
 pub const MODBYTES: usize = 64;
-<<<<<<< HEAD
-pub const BASEBITS: usize = 29;
-=======
 pub const BASEBITS: usize = 60;
 
 pub const MODBITS: usize = 512;
@@ -99,13 +95,9 @@ pub const MOD8: usize = 3;
 pub const MODTYPE: ModType = ModType::PSEUDO_MERSENNE;
 pub const SH: usize = 28;
 
-<<<<<<< HEAD
->>>>>>> 4e42b9d... Add constants for FP
-=======
 pub const CURVETYPE: CurveType = CurveType::EDWARDS;
 pub const CURVE_PAIRING_TYPE: CurvePairingType = CurvePairingType::NOT;
 pub const SEXTIC_TWIST: SexticTwist = SexticTwist::NOT;
 pub const SIGN_OF_X: SignOfX = SignOfX::NOT;
 pub const HASH_TYPE: usize = 64;
 pub const AESKEY: usize = 32;
->>>>>>> 7e02af4... Add constants for ECP

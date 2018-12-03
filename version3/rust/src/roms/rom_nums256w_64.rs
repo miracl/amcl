@@ -19,7 +19,6 @@ under the License.
 
 use nums256w::big::NLEN;
 use super::arch::Chunk;
-use std;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 56

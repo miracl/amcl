@@ -25,6 +25,7 @@ use super::fp8::FP8;
 use super::fp16::FP16;
 use super::big::BIG;
 use super::rom;
+use types::SexticTwist;
 
 #[derive(Copy, Clone)]
 pub struct FP48 {
@@ -327,7 +328,7 @@ impl FP48 {
 
     /* Special case of multiplication arises from special form of ATE pairing line function */
     pub fn smul(&mut self, y: &FP48, twist: usize) {
-        if twist == ecp::D_TYPE {
+        if twist == SexticTwist::D_TYPE.into() {
             let mut z0 = FP16::new_copy(&self.a);
             let mut z2 = FP16::new_copy(&self.b);
             let mut z3 = FP16::new_copy(&self.b);
@@ -370,7 +371,7 @@ impl FP48 {
             self.a.copy(&z0);
             self.a.add(&z3);
         }
-        if twist == ecp::M_TYPE {
+        if twist == SexticTwist::M_TYPE.into() {
             let mut z0 = FP16::new_copy(&self.a);
             let mut z1 = FP16::new();
             let mut z2 = FP16::new();
