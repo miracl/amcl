@@ -17,10 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use super::arch;
+use super::super::arch;
 use super::big;
 use super::big::BIG;
-use super::arch::Chunk;
+use super::super::arch::Chunk;
 
 pub struct DBIG {
     pub w: [Chunk; big::DNLEN],

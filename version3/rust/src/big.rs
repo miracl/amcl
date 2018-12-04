@@ -17,10 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use super::arch;
-use super::arch::Chunk;
+use super::super::arch;
+use super::super::arch::Chunk;
 
-use super::arch::DChunk;
+use super::super::arch::DChunk;
 
 use super::dbig::DBIG;
 use rand::RAND;

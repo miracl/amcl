@@ -18,7 +18,7 @@ under the License.
 */
 
 use fp512bn::big::NLEN;
-use super::arch::Chunk;
+use super::super::arch::Chunk;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 60

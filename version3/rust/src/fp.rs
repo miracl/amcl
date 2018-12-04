@@ -21,8 +21,8 @@ use super::big;
 use super::big::BIG;
 use super::dbig::DBIG;
 use super::rom;
-use super::arch::Chunk;
-use super::arch;
+use super::super::arch::Chunk;
+use super::super::arch;
 use types::ModType;
 use std::str::FromStr;
 

@@ -18,7 +18,7 @@ under the License.
 */
 
 use bn254::big::NLEN;
-use super::arch::Chunk;
+use super::super::arch::Chunk;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // BN254 Modulus

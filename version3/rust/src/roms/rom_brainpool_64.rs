@@ -20,7 +20,7 @@ under the License.
 /* Note that the original curve has been transformed to an isomorphic curve with A=-3 */
 
 use brainpool::big::NLEN;
-use super::arch::Chunk;
+use super::super::arch::Chunk;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 56

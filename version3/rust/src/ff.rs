@@ -20,10 +20,10 @@ under the License.
 use super::big;
 use super::dbig::DBIG;
 use super::big::BIG;
-use super::arch::Chunk;
+use super::super::arch::Chunk;
 use rand::RAND;
 
-use super::arch::DChunk;
+use super::super::arch::DChunk;
 
 /* Finite field support - for RSA, DH etc. */
 /* RSA/DH modulus length as multiple of BIGBITS */

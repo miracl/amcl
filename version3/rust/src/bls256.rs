@@ -16,18 +16,18 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-use crate::xxx::ecp::ECP;
-use crate::xxx::ecp4::ECP4;
 use std::str;
-//use xxx::fp24::FP24;
-use crate::xxx::big;
-use crate::xxx::big::BIG;
-use crate::xxx::pair192;
-use crate::xxx::rom;
+use super::ecp::ECP;
+use super::ecp8::ECP8;
+//use super::fp48::FP48;
+use super::big::BIG;
+use super::pair256;
+use super::big;
+use super::rom;
 
-use crate::rand::RAND;
-use crate::sha3::SHA3;
-use crate::sha3::SHAKE256;
+use rand::RAND;
+use sha3::SHA3;
+use sha3::SHAKE256;
 
 /* BLS API Functions */
 
@@ -54,10 +54,10 @@ fn bls_hashit(m: &str) -> ECP {
 /* generate key pair, private key s, public key w */
 pub fn key_pair_generate(mut rng: &mut RAND, s: &mut [u8], w: &mut [u8]) -> isize {
     let q = BIG::new_ints(&rom::CURVE_ORDER);
-    let g = ECP4::generator();
+    let g = ECP8::generator();
     let mut sc = BIG::randomnum(&q, &mut rng);
     sc.tobytes(s);
-    pair192::g2mul(&g, &mut sc).tobytes(w);
+    pair256::g2mul(&g, &mut sc).tobytes(w);
     return BLS_OK;
 }
 
@@ -66,7 +66,7 @@ pub fn key_pair_generate(mut rng: &mut RAND, s: &mut [u8], w: &mut [u8]) -> isiz
 pub fn sign(sig: &mut [u8], m: &str, s: &[u8]) -> isize {
     let d = bls_hashit(m);
     let mut sc = BIG::frombytes(&s);
-    pair192::g1mul(&d, &mut sc).tobytes(sig, true);
+    pair256::g1mul(&d, &mut sc).tobytes(sig, true);
     return BLS_OK;
 }
 
@@ -75,11 +75,11 @@ pub fn sign(sig: &mut [u8], m: &str, s: &[u8]) -> isize {
 pub fn verify(sig: &[u8], m: &str, w: &[u8]) -> isize {
     let hm = bls_hashit(m);
     let mut d = ECP::frombytes(&sig);
-    let g = ECP4::generator();
-    let pk = ECP4::frombytes(&w);
+    let g = ECP8::generator();
+    let pk = ECP8::frombytes(&w);
     d.neg();
-    let mut v = pair192::ate2(&g, &d, &pk, &hm);
-    v = pair192::fexp(&v);
+    let mut v = pair256::ate2(&g, &d, &pk, &hm);
+    v = pair256::fexp(&v);
     if v.isunity() {
         return BLS_OK;
     }
