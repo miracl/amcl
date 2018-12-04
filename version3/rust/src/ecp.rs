@@ -35,10 +35,7 @@ pub struct ECP {
 
 impl PartialEq for ECP {
     fn eq(&self, other: &ECP) -> bool {
-        return self.is_infinity() && other.is_infinity() ||
-            (self.x == other.x) &&
-            (self.y == other.y) &&
-            (self.z == other.z);
+        self.equals(other)
     }
 }
 
@@ -273,7 +270,7 @@ impl ECP {
     }
 
     /* Test P == Q */
-    pub fn equals(&mut self, Q: &mut ECP) -> bool {
+    pub fn equals(&self, Q: &ECP) -> bool {
         let mut a = FP::new();
         let mut b = FP::new();
         a.copy(&self.x);

@@ -25,11 +25,17 @@ use super::rom;
 use types::SexticTwist;
 use std::str::SplitWhitespace;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct FP12 {
     a: FP4,
     b: FP4,
     c: FP4,
+}
+
+impl PartialEq for FP12 {
+	fn eq(&self, other: &FP12) -> bool {
+		self.equals(other)
+	}
 }
 
 impl FP12 {

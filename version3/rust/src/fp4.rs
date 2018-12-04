@@ -22,10 +22,16 @@ use super::fp2::FP2;
 use super::big::BIG;
 use std::str::SplitWhitespace;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct FP4 {
     a: FP2,
     b: FP2,
+}
+
+impl PartialEq for FP4 {
+	fn eq(&self, other: &FP4) -> bool {
+		self.equals(other)
+	}
 }
 
 impl FP4 {

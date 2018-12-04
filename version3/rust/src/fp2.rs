@@ -25,10 +25,16 @@ use super::rom;
 use std::str::SplitWhitespace;
 use std::fmt;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct FP2 {
     a: FP,
     b: FP,
+}
+
+impl PartialEq for FP2 {
+	fn eq(&self, other: &FP2) -> bool {
+		self.equals(other)
+	}
 }
 
 impl fmt::Display for FP2 {

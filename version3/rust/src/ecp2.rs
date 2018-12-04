@@ -26,11 +26,17 @@ use types::{SexticTwist, CurvePairingType, SignOfX};
 use std::str::SplitWhitespace;
 use std::fmt;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct ECP2 {
     x: FP2,
     y: FP2,
     z: FP2,
+}
+
+impl PartialEq for ECP2 {
+	fn eq(&self, other: &ECP2) -> bool {
+		self.equals(other)
+	}
 }
 
 impl fmt::Display for ECP2 {
@@ -153,7 +159,7 @@ impl ECP2 {
     }
 
     /* Test if P == Q */
-    pub fn equals(&mut self, Q: &mut ECP2) -> bool {
+    pub fn equals(&self, Q: &ECP2) -> bool {
         let mut a = FP2::new_copy(&self.x);
         let mut b = FP2::new_copy(&Q.x);
 

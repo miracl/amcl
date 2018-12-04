@@ -26,10 +26,16 @@ use super::super::arch;
 use types::ModType;
 use std::str::FromStr;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct FP {
     pub x: BIG,
     pub xes: i32,
+}
+
+impl PartialEq for FP {
+    fn eq(&self, other: &FP) -> bool {
+        self.equals(other)
+    }
 }
 
 impl fmt::Display for FP {
