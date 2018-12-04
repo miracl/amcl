@@ -1,1 +1,0 @@
-{"rustc":17859320367814235581,"features":"[\"bn254\", \"default\"]","target":1913880094254024406,"profile":3089293049514449554,"path":10872709659218687626,"deps":[],"local":[{"MtimeBased":[[1543832331,523577161],".fingerprint/amcl-00d679492de22cdb/dep-lib-amcl-00d679492de22cdb"]}],"rustflags":[],"edition":"Edition2015"}
