@@ -25,6 +25,7 @@ use super::rom;
 pub use super::rom::{CURVETYPE, CURVE_PAIRING_TYPE, SEXTIC_TWIST, SIGN_OF_X, HASH_TYPE, AESKEY};
 pub use types::CurveType;
 use std::str::SplitWhitespace;
+use std::fmt;
 
 #[derive(Copy, Clone)]
 pub struct ECP {
@@ -37,6 +38,18 @@ impl PartialEq for ECP {
     fn eq(&self, other: &ECP) -> bool {
         self.equals(other)
     }
+}
+
+impl fmt::Display for ECP {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP: [ {}, {}, {} ]", self.x, self.y, self.z)
+	}
+}
+
+impl fmt::Debug for ECP {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP: [ {}, {}, {} ]", self.x, self.y, self.z)
+	}
 }
 
 #[allow(non_snake_case)]
