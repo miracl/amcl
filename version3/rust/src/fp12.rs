@@ -23,8 +23,9 @@ use super::fp4::FP4;
 use super::big::BIG;
 use super::rom;
 use types::SexticTwist;
+use std::str::SplitWhitespace;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct FP12 {
     a: FP4,
     b: FP4,

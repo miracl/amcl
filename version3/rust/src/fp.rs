@@ -24,14 +24,29 @@ use super::rom;
 use super::arch::Chunk;
 use super::arch;
 use types::ModType;
+use std::str::FromStr;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct FP {
     pub x: BIG,
     pub xes: i32,
 }
 
+impl fmt::Display for FP {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "FP: [ {} ]", self.x)
+    }
+}
+
+impl fmt::Debug for FP {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "FP: [ {} ]", self.x)
+    }
+}
+
 pub use super::rom::{MODBITS, MOD8, MODTYPE, SH};
+use std::str::SplitWhitespace;
+use std::fmt;
 
 pub const FEXCESS:i32 = (((1 as i32)<<SH)-1);
 pub const OMASK:Chunk = (-1)<<(MODBITS%big::BASEBITS);
@@ -79,7 +94,27 @@ impl FP {
         }
     }
 
-    /* convert back to regular form */
+    pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP {
+        let xes = i32::from_str(iter.next().unwrap()).unwrap();
+        let x = iter.next().unwrap();
+        FP {
+            x: BIG::from_hex(x.to_string()),
+            xes
+        }
+    }
+
+    pub fn from_hex(val: String) -> FP {
+        let mut s = val.split_whitespace();
+        FP::from_hex_iter(&mut s)
+    }
+
+    pub fn to_hex(&self) -> String {
+        let mut x = self.x;
+        let big = x.to_hex();
+        format!("{} {}", self.xes, big)
+    }
+
+/* convert back to regular form */
     pub fn redc(&mut self) -> BIG {
         if MODTYPE != ModType::PSEUDO_MERSENNE && MODTYPE != ModType::GENERALISED_MERSENNE {
             let mut d=DBIG::new_scopy(&(self.x));

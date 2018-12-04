@@ -23,12 +23,26 @@ use super::ecp;
 use super::fp2::FP2;
 use super::big::BIG;
 use types::{SexticTwist, CurvePairingType, SignOfX};
+use std::str::SplitWhitespace;
+use std::fmt;
 
-//#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct ECP2 {
     x: FP2,
     y: FP2,
     z: FP2,
+}
+
+impl fmt::Display for ECP2 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP2: [ {}, {}, {} ]", self.x, self.y, self.z)
+	}
+}
+
+impl fmt::Debug for ECP2 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "ECP2: [ {}, {}, {} ]", self.x, self.y, self.z)
+	}
 }
 
 #[allow(non_snake_case)]

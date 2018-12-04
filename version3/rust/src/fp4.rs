@@ -20,8 +20,9 @@ under the License.
 use super::fp::FP;
 use super::fp2::FP2;
 use super::big::BIG;
+use std::str::SplitWhitespace;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct FP4 {
     a: FP2,
     b: FP2,

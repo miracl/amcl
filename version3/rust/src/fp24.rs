@@ -25,6 +25,7 @@ use super::fp8::FP8;
 use super::big::BIG;
 use super::rom;
 use types::{SexticTwist};
+use std::str::SplitWhitespace;
 
 #[derive(Copy, Clone)]
 pub struct FP24 {

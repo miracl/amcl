@@ -27,6 +27,8 @@ use rand::RAND;
 
 pub use super::rom::MODBYTES;
 pub use super::rom::BASEBITS;
+use std::cmp::Ordering;
+use std::fmt;
 
 pub const NLEN: usize = (1+((8*MODBYTES-1)/BASEBITS));
 pub const DNLEN: usize = 2*NLEN;
@@ -43,6 +45,47 @@ pub struct BIG {
 
 impl Clone for BIG {
     fn clone(&self) -> BIG { *self }
+}
+
+impl fmt::Display for BIG {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut big = self.clone();
+        write!(f, "BIG: [ {} ]", big.tostring())
+    }
+}
+
+impl fmt::Debug for BIG {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut big = self.clone();
+        write!(f, "BIG: [ {} ]", big.tostring())
+    }
+}
+
+impl PartialEq for BIG {
+    fn eq(&self, other: &BIG) -> bool {
+        return self.w == other.w;
+    }
+}
+
+impl Ord for BIG {
+    fn cmp(&self, other: &BIG) -> Ordering {
+        let r = BIG::comp(self, other);
+        if r > 0 {
+            return Ordering::Greater;
+        }
+        if r < 0 {
+            return Ordering::Less;
+        }
+        return Ordering::Equal;
+    }
+}
+
+impl Eq for BIG { }
+
+impl PartialOrd for BIG {
+    fn partial_cmp(&self, other: &BIG) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl BIG {
@@ -288,6 +331,29 @@ impl BIG {
             s = s + &format!("{:X}", b.w[0] & 15);
         }
         return s;
+    }
+
+    pub fn fromstring(val: String) -> BIG {
+        let mut res = BIG::new();
+        let len = val.len();
+        let op = &val[0..1];
+        let n = u8::from_str_radix(op, 16).unwrap();
+        res.w[0] += n as Chunk;
+        for i in 1..len {
+            res.shl(4);
+            let op = &val[i..i+1];
+            let n = u8::from_str_radix(op, 16).unwrap();
+            res.w[0] += n as Chunk;
+        }
+        return res;
+    }
+
+    pub fn from_hex(val: String) -> BIG {
+        BIG::fromstring(val)
+    }
+    
+    pub fn to_hex(&mut self) -> String {
+        self.tostring()
     }
 
     pub fn add(&mut self, r: &BIG) {

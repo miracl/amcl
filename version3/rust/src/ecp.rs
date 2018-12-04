@@ -24,11 +24,22 @@ use super::rom;
 
 pub use super::rom::{CURVETYPE, CURVE_PAIRING_TYPE, SEXTIC_TWIST, SIGN_OF_X, HASH_TYPE, AESKEY};
 pub use types::CurveType;
+use std::str::SplitWhitespace;
 
+#[derive(Copy, Clone)]
 pub struct ECP {
     x: FP,
     y: FP,
     z: FP,
+}
+
+impl PartialEq for ECP {
+    fn eq(&self, other: &ECP) -> bool {
+        return self.is_infinity() && other.is_infinity() ||
+            (self.x == other.x) &&
+            (self.y == other.y) &&
+            (self.z == other.z);
+    }
 }
 
 #[allow(non_snake_case)]

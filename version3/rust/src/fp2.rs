@@ -22,11 +22,25 @@ use super::fp::FP;
 use super::big::BIG;
 use super::dbig::DBIG;
 use super::rom;
+use std::str::SplitWhitespace;
+use std::fmt;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct FP2 {
     a: FP,
     b: FP,
+}
+
+impl fmt::Display for FP2 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "FP2: [ {}, {} ]", self.a, self.b)
+	}
+}
+
+impl fmt::Debug for FP2 {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "FP2: [ {}, {} ]", self.a, self.b)
+	}
 }
 
 impl FP2 {

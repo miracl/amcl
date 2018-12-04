@@ -26,6 +26,7 @@ use super::fp16::FP16;
 use super::big::BIG;
 use super::rom;
 use types::SexticTwist;
+use std::str::SplitWhitespace;
 
 #[derive(Copy, Clone)]
 pub struct FP48 {

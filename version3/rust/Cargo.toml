@@ -1,7 +1,11 @@
 [package]
 name = "amcl"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Nikita Khateev <nikita.khateev@dsr-corporation.com>"]
+
+description = "The Apache Milagro Cryptographic Library (version 3)"
+license = "Apache-2.0"
+repository = "https://github.com/milagro-crypto/amcl"
 
 [dependencies]
 
