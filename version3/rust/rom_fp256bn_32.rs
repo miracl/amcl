@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use fp256bn::big::NLEN;
-use arch::Chunk;
+use crate::fp256bn::big::NLEN;
+use crate::arch::Chunk;
 
 
 // Base Bits= 28

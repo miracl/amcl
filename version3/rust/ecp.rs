@@ -17,10 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use xxx::fp::FP;
-use xxx::big::BIG;
-use xxx::big;
-use xxx::rom;
+use crate::xxx::fp::FP;
+use crate::xxx::big::BIG;
+use crate::xxx::big;
+use crate::xxx::rom;
 
 pub struct ECP {
 	x:FP,

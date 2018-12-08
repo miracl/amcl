@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use bn254::big::NLEN;
-use arch::Chunk;
+use crate::bn254::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 28
 pub const MODULUS:[Chunk;NLEN]=[0x13,0x0,0x13A7,0x0,0x86121,0x8000000,0x1BA344D,0x4000000,0x5236482,0x2];

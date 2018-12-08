@@ -17,18 +17,18 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use xxx::ecp;
-use xxx::ecp::ECP;
-use xxx::big::BIG;
-use xxx::rom;
-use xxx::big;
+use crate::xxx::ecp;
+use crate::xxx::ecp::ECP;
+use crate::xxx::big::BIG;
+use crate::xxx::rom;
+use crate::xxx::big;
 
-use rand::RAND;
-use hash256::HASH256;
-use hash384::HASH384;
-use hash512::HASH512;
-use aes;
-use aes::AES;
+use crate::rand::RAND;
+use crate::hash256::HASH256;
+use crate::hash384::HASH384;
+use crate::hash512::HASH512;
+use crate::aes;
+use crate::aes::AES;
 
 
 pub const INVALID_PUBLIC_KEY:isize=-2;

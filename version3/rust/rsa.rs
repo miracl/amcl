@@ -17,14 +17,14 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use xxx::big;
-use xxx::ff;
-use xxx::ff::FF;
+use crate::xxx::big;
+use crate::xxx::ff;
+use crate::xxx::ff::FF;
 
-use rand::RAND;
-use hash256::HASH256;
-use hash384::HASH384;
-use hash512::HASH512;
+use crate::rand::RAND;
+use crate::hash256::HASH256;
+use crate::hash384::HASH384;
+use crate::hash512::HASH512;
 
 pub const RFS:usize =(big::MODBYTES as usize)*ff::FFLEN;
 pub const SHA256:usize=32;

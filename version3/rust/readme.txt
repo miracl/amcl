@@ -1,9 +1,9 @@
-NOTE: This version of the library requires Version 1.17+ of Rust for 64-bit 
-support. Unfortunately support for the 128-bit integer type is still
-flagged as unstable, and so for now a nightly build of rust must be used.
+NOTE: Updated to Rust 2018
 
-NEW: 128-bit integers are now stable with version 1.26. So please use latest 
-version.
+NOTE: This version of the library requires Version 1.31+ of Rust for 64-bit 
+support and for Rust 2018. It may not work correctly with older versions.
+Basically for Rust 2018 support "use " was changed everywhere to 
+"use crate:: "
 
 Namespaces are used to separate different curves.
 

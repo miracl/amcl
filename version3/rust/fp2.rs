@@ -17,11 +17,11 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use xxx::fp;
-use xxx::fp::FP;
-use xxx::big::BIG;
-use xxx::dbig::DBIG;
-use xxx::rom;
+use crate::xxx::fp;
+use crate::xxx::fp::FP;
+use crate::xxx::big::BIG;
+use crate::xxx::dbig::DBIG;
+use crate::xxx::rom;
 
 #[derive(Copy, Clone)]
 pub struct FP2 {

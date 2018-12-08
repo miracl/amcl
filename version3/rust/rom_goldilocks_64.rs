@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use goldilocks::big::NLEN;
-use arch::Chunk;
+use crate::goldilocks::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 58
 // Goldilocks modulus

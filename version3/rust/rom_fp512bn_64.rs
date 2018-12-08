@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use fp512bn::big::NLEN;
-use arch::Chunk;
+use crate::fp512bn::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 60
 pub const MODULUS:[Chunk;NLEN]=[0x4EB280922ADEF33,0x6A55CE5F4C6467B,0xC65DEAB236FE191,0xCF1EACBE98B8E48,0x3C111B0EF455146,0xA1D8CB5307C0BBE,0xFFFF9EC7F01C60B,0xFFFFFFFFFFFFFFF,0xFFFFFFFF];

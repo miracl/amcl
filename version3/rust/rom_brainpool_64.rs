@@ -19,8 +19,8 @@ under the License.
 
 /* Note that the original curve has been transformed to an isomorphic curve with A=-3 */
 
-use brainpool::big::NLEN;
-use arch::Chunk;
+use crate::brainpool::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 56
 // brainpool Modulus 

@@ -17,13 +17,13 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use arch;
-use arch::Chunk;
+use crate::arch;
+use crate::arch::Chunk;
 
-use arch::DChunk;
+use crate::arch::DChunk;
 
-use xxx::dbig::DBIG;
-use rand::RAND;
+use crate::xxx::dbig::DBIG;
+use crate::rand::RAND;
 
 pub const MODBYTES:usize = @NB@;
 pub const BASEBITS:usize = @BASE@;

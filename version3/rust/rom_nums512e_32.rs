@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use nums512e::big::NLEN;
-use arch::Chunk;
+use crate::nums512e::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 29
 // nums512 Modulus 

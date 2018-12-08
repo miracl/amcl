@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use hifive::big::NLEN;
-use arch::Chunk;
+use crate::hifive::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 29
 // hifive Modulus

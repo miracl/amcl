@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use c25519::big::NLEN;
-use arch::Chunk;
+use crate::c25519::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 29
 // Curve25519 Modulus 

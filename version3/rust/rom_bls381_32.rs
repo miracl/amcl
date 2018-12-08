@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use bls381::big::NLEN;
-use arch::Chunk;
+use crate::bls381::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 29
 // bls381 Modulus

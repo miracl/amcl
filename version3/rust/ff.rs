@@ -17,13 +17,13 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use xxx::big;
-use xxx::dbig::DBIG;
-use xxx::big::BIG;
-use arch::Chunk;
-use rand::RAND;
+use crate::xxx::big;
+use crate::xxx::dbig::DBIG;
+use crate::xxx::big::BIG;
+use crate::arch::Chunk;
+use crate::rand::RAND;
 
-use arch::DChunk;
+use crate::arch::DChunk;
 
 /* Finite field support - for RSA, DH etc. */
 /* RSA/DH modulus length as multiple of BIGBITS */

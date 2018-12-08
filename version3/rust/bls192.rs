@@ -17,17 +17,17 @@ specific language governing permissions and limitations
 under the License.
 */
 use std::str;
-use xxx::ecp::ECP;
-use xxx::ecp4::ECP4;
+use crate::xxx::ecp::ECP;
+use crate::xxx::ecp4::ECP4;
 //use xxx::fp24::FP24;
-use xxx::big::BIG;
-use xxx::pair192;
-use xxx::big;
-use xxx::rom;
+use crate::xxx::big::BIG;
+use crate::xxx::pair192;
+use crate::xxx::big;
+use crate::xxx::rom;
 
-use rand::RAND;
-use sha3::SHA3;
-use sha3::SHAKE256;
+use crate::rand::RAND;
+use crate::sha3::SHA3;
+use crate::sha3::SHAKE256;
 
 /* BLS API Functions */
 

@@ -19,9 +19,9 @@ under the License.
 
 /* NewHope Simple API high-level functions  */
 
-use sha3;
-use sha3::SHA3;
-use rand::RAND;
+use crate::sha3;
+use crate::sha3::SHA3;
+use crate::rand::RAND;
 
 const PRIME: i32=0x3001;	// q in Hex
 const LGN: usize=10;		// Degree n=2^LGN

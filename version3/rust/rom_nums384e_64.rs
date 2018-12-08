@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use nums384e::big::NLEN;
-use arch::Chunk;
+use crate::nums384e::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 56
 // nums384 Modulus 

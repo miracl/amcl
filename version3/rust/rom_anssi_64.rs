@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use anssi::big::NLEN;
-use arch::Chunk;
+use crate::anssi::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 56
 // anssi Modulus 

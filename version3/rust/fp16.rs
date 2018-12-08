@@ -17,9 +17,9 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use xxx::fp2::FP2;
-use xxx::fp8::FP8;
-use xxx::big::BIG;
+use crate::xxx::fp2::FP2;
+use crate::xxx::fp8::FP8;
+use crate::xxx::big::BIG;
 
 #[derive(Copy, Clone)]
 pub struct FP16 {

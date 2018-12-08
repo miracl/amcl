@@ -25,11 +25,11 @@ under the License.
 
 extern crate amcl;
 
-use std::str;
-use std::io;
+//use std::str;
+//use std::io;
 
 use amcl::rand::RAND;
-use amcl::aes;
+//use amcl::aes;
 use amcl::nhs;
 
 fn main()

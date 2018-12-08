@@ -19,7 +19,7 @@ under the License.
 
 //mod hash256;
 
-use hash256::HASH256;
+use crate::hash256::HASH256;
 
 const RAND_NK: usize=21;
 const RAND_NJ: usize=6;

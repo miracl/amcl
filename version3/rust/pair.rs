@@ -18,16 +18,16 @@ under the License.
 */
 
 
-use xxx::fp::FP;
-use xxx::ecp::ECP;
-use xxx::fp2::FP2;
-use xxx::ecp2::ECP2;
-use xxx::fp4::FP4;
-use xxx::fp12::FP12;
-use xxx::big::BIG;
-use xxx::dbig::DBIG;
-use xxx::ecp;
-use xxx::rom;
+use crate::xxx::fp::FP;
+use crate::xxx::ecp::ECP;
+use crate::xxx::fp2::FP2;
+use crate::xxx::ecp2::ECP2;
+use crate::xxx::fp4::FP4;
+use crate::xxx::fp12::FP12;
+use crate::xxx::big::BIG;
+use crate::xxx::dbig::DBIG;
+use crate::xxx::ecp;
+use crate::xxx::rom;
 
 #[allow(non_snake_case)]
 fn linedbl(A: &mut ECP2,qx: &FP,qy: &FP) -> FP12 {

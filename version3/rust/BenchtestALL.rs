@@ -16,11 +16,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-
+#![allow(non_snake_case)]
 extern crate amcl;
 
-use std::str;
-use std::io;
+//use std::str;
+//use std::io;
 
 use amcl::arch;
 use amcl::rand::RAND;
@@ -30,10 +30,9 @@ use std::time::Instant;
 const MIN_ITERS:isize=10;
 const MIN_TIME: isize=10;
 
-
 fn ed25519(mut rng: &mut RAND)
 {
-	use amcl::ed25519;
+	//use amcl::ed25519;
 	use amcl::ed25519::ecp;
 	use amcl::ed25519::fp;
 	use amcl::ed25519::big;	
@@ -72,7 +71,7 @@ fn ed25519(mut rng: &mut RAND)
 	let mut r=big::BIG::new_ints(&rom::CURVE_ORDER);
 	let mut s=big::BIG::randomnum(&r,&mut rng);
 
-	let mut P=G.mul(&mut r);
+	let P=G.mul(&mut r);
 	if !P.is_infinity() {
 		println!("FAILURE - rG!=O");
 		fail=true;
@@ -82,7 +81,7 @@ fn ed25519(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		P=G.mul(&mut s);
+		let _=G.mul(&mut s);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -98,7 +97,7 @@ fn ed25519(mut rng: &mut RAND)
 
 fn nist256(mut rng: &mut RAND)
 {
-	use amcl::nist256;
+	//use amcl::nist256;
 	use amcl::nist256::ecp;
 	use amcl::nist256::fp;
 	use amcl::nist256::big;	
@@ -137,7 +136,7 @@ fn nist256(mut rng: &mut RAND)
 	let mut r=big::BIG::new_ints(&rom::CURVE_ORDER);
 	let mut s=big::BIG::randomnum(&r,&mut rng);
 
-	let mut P=G.mul(&mut r);
+	let P=G.mul(&mut r);
 	if !P.is_infinity() {
 		println!("FAILURE - rG!=O");
 		fail=true;
@@ -147,7 +146,7 @@ fn nist256(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		P=G.mul(&mut s);
+		let _=G.mul(&mut s);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -162,7 +161,7 @@ fn nist256(mut rng: &mut RAND)
 
 fn goldilocks(mut rng: &mut RAND)
 {
-	use amcl::goldilocks;
+	//use amcl::goldilocks;
 	use amcl::goldilocks::ecp;
 	use amcl::goldilocks::fp;
 	use amcl::goldilocks::big;	
@@ -201,7 +200,7 @@ fn goldilocks(mut rng: &mut RAND)
 	let mut r=big::BIG::new_ints(&rom::CURVE_ORDER);
 	let mut s=big::BIG::randomnum(&r,&mut rng);
 
-	let mut P=G.mul(&mut r);
+	let P=G.mul(&mut r);
 	if !P.is_infinity() {
 		println!("FAILURE - rG!=O");
 		fail=true;
@@ -211,7 +210,7 @@ fn goldilocks(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		P=G.mul(&mut s);
+		let _=G.mul(&mut s);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -226,7 +225,7 @@ fn goldilocks(mut rng: &mut RAND)
 
 fn bn254(mut rng: &mut RAND)
 {
-	use amcl::bn254;
+	//use amcl::bn254;
 	use amcl::bn254::ecp;
 	use amcl::bn254::ecp2;	
 	use amcl::bn254::fp;	
@@ -306,7 +305,7 @@ fn bn254(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		g=pair::gtpow(&mut w,&mut s);
+		let _=pair::gtpow(&mut w,&mut s);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -319,7 +318,7 @@ fn bn254(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		let c=w.compow(&s,&mut r);
+		let _=w.compow(&s,&mut r);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -346,7 +345,7 @@ fn bn254(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		g=pair::fexp(&w);
+		let _=pair::fexp(&w);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -389,7 +388,7 @@ fn bn254(mut rng: &mut RAND)
 
 fn bls383(mut rng: &mut RAND)
 {
-	use amcl::bls383;
+	//use amcl::bls383;
 	use amcl::bls383::ecp;
 	use amcl::bls383::ecp2;	
 	use amcl::bls383::fp;	
@@ -469,7 +468,7 @@ fn bls383(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		g=pair::gtpow(&mut w,&mut s);
+		let _=pair::gtpow(&mut w,&mut s);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -482,7 +481,7 @@ fn bls383(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		let c=w.compow(&s,&mut r);
+		let _=w.compow(&s,&mut r);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -509,7 +508,7 @@ fn bls383(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		g=pair::fexp(&w);
+		let _=pair::fexp(&w);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -551,7 +550,7 @@ fn bls383(mut rng: &mut RAND)
 
 fn bls24(mut rng: &mut RAND)
 {
-	use amcl::bls24;
+	//use amcl::bls24;
 	use amcl::bls24::ecp;
 	use amcl::bls24::ecp4;	
 	use amcl::bls24::fp;	
@@ -631,7 +630,7 @@ fn bls24(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		g=pair192::gtpow(&mut w,&mut s);
+		let _=pair192::gtpow(&mut w,&mut s);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -644,7 +643,7 @@ fn bls24(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		let c=w.compow(&s,&mut r);
+		let _=w.compow(&s,&mut r);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -671,7 +670,7 @@ fn bls24(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		g=pair192::fexp(&w);
+		let _=pair192::fexp(&w);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -714,7 +713,7 @@ fn bls24(mut rng: &mut RAND)
 
 fn bls48(mut rng: &mut RAND)
 {
-	use amcl::bls48;
+	//use amcl::bls48;
 	use amcl::bls48::ecp;
 	use amcl::bls48::ecp8;	
 	use amcl::bls48::fp;	
@@ -794,7 +793,7 @@ fn bls48(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		g=pair256::gtpow(&mut w,&mut s);
+		let _=pair256::gtpow(&mut w,&mut s);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -807,7 +806,7 @@ fn bls48(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		let c=w.compow(&s,&mut r);
+		let _=w.compow(&s,&mut r);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;
@@ -834,7 +833,7 @@ fn bls48(mut rng: &mut RAND)
 	let mut iterations=0;
 	let mut dur=0 as u64;
 	while dur<(MIN_TIME as u64)*1000 || iterations<MIN_ITERS {
-		g=pair256::fexp(&w);
+		let _=pair256::fexp(&w);
 		iterations+=1;
 		let elapsed=start.elapsed();
 		dur=(elapsed.as_secs() * 1_000) + (elapsed.subsec_nanos() / 1_000_000) as u64;

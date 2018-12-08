@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use nist521::big::NLEN;
-use arch::Chunk;
+use crate::nist521::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 60
 // nist521 Modulus 

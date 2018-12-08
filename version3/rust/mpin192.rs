@@ -20,20 +20,20 @@ under the License.
 use std::time::{SystemTime};
 use std::time::UNIX_EPOCH;
 
-use xxx::ecp;
-use xxx::ecp::ECP;
-use xxx::ecp4::ECP4;
-use xxx::fp8::FP8;
-use xxx::fp24::FP24;
-use xxx::big::BIG;
-use xxx::pair192;
-use xxx::big;
-use xxx::rom;
+use crate::xxx::ecp;
+use crate::xxx::ecp::ECP;
+use crate::xxx::ecp4::ECP4;
+use crate::xxx::fp8::FP8;
+use crate::xxx::fp24::FP24;
+use crate::xxx::big::BIG;
+use crate::xxx::pair192;
+use crate::xxx::big;
+use crate::xxx::rom;
 
-use rand::RAND;
-use hash256::HASH256;
-use hash384::HASH384;
-use hash512::HASH512;
+use crate::rand::RAND;
+use crate::hash256::HASH256;
+use crate::hash384::HASH384;
+use crate::hash512::HASH512;
 
 
 /* MPIN API Functions */

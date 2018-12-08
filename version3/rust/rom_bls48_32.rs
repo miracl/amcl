@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use bls48::big::NLEN;
-use arch::Chunk;
+use crate::bls48::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 29
 // bls48 Modulus

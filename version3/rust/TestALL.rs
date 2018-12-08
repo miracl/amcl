@@ -34,7 +34,7 @@ pub fn printbinary(array: &[u8]) {
 
 fn ecdh_ed25519(mut rng: &mut RAND)
 {
-	use amcl::ed25519;
+	//use amcl::ed25519;
 	use amcl::ed25519::ecdh;
 	use amcl::ed25519::ecp;
 
@@ -173,7 +173,7 @@ fn ecdh_ed25519(mut rng: &mut RAND)
 
 fn ecdh_nist256(mut rng: &mut RAND)
 {
-	use amcl::nist256;
+	//use amcl::nist256;
 	use amcl::nist256::ecdh;
 	use amcl::nist256::ecp;
 
@@ -311,7 +311,7 @@ fn ecdh_nist256(mut rng: &mut RAND)
 
 fn ecdh_goldilocks(mut rng: &mut RAND)
 {
-	use amcl::goldilocks;
+	//use amcl::goldilocks;
 	use amcl::goldilocks::ecdh;
 	use amcl::goldilocks::ecp;
 
@@ -450,13 +450,13 @@ fn ecdh_goldilocks(mut rng: &mut RAND)
 
 fn mpin_bn254(mut rng: &mut RAND)
 {
-	use amcl::bn254;
+	//use amcl::bn254;
 	use amcl::bn254::ecp;	
 	use amcl::bn254::mpin;
 	pub const PERMITS:bool=true;
 	pub const PINERROR:bool=true;
 	pub const FULL: bool=true;
-	pub const SINGLE_PASS:bool=false;
+	//pub const SINGLE_PASS:bool=false;
 
 	const EFS:usize=mpin::EFS;	
 	const EGS:usize=mpin::EGS;
@@ -625,13 +625,13 @@ fn mpin_bn254(mut rng: &mut RAND)
 
 fn mpin_bls383(mut rng: &mut RAND)
 {
-	use amcl::bls383;
+	//use amcl::bls383;
 	use amcl::bls383::ecp;	
 	use amcl::bls383::mpin;
 	pub const PERMITS:bool=true;
 	pub const PINERROR:bool=true;
 	pub const FULL: bool=true;
-	pub const SINGLE_PASS:bool=false;
+	//pub const SINGLE_PASS:bool=false;
 
 	const EFS:usize=mpin::EFS;	
 	const EGS:usize=mpin::EGS;
@@ -799,14 +799,14 @@ fn mpin_bls383(mut rng: &mut RAND)
 
 fn mpin_bls24(mut rng: &mut RAND)
 {
-	use amcl::bls24;
+	//use amcl::bls24;
 	use amcl::bls24::ecp;	
 	use amcl::bls24::mpin192;
 
 	pub const PERMITS:bool=true;
 	pub const PINERROR:bool=true;
 	pub const FULL: bool=true;
-	pub const SINGLE_PASS:bool=false;
+	//pub const SINGLE_PASS:bool=false;
 
 	const EFS:usize=mpin192::EFS;	
 	const EGS:usize=mpin192::EGS;
@@ -975,14 +975,14 @@ fn mpin_bls24(mut rng: &mut RAND)
 
 fn mpin_bls48(mut rng: &mut RAND)
 {
-	use amcl::bls48;
+	//use amcl::bls48;
 	use amcl::bls48::ecp;	
 	use amcl::bls48::mpin256;
 
 	pub const PERMITS:bool=true;
 	pub const PINERROR:bool=true;
 	pub const FULL: bool=true;
-	pub const SINGLE_PASS:bool=false;
+	//pub const SINGLE_PASS:bool=false;
 
 	const EFS:usize=mpin256::EFS;	
 	const EGS:usize=mpin256::EGS;
@@ -1152,7 +1152,7 @@ fn mpin_bls48(mut rng: &mut RAND)
 
 fn rsa_2048(mut rng: &mut RAND)
 {
-	use amcl::rsa2048;
+	//use amcl::rsa2048;
 	use amcl::rsa2048::ff;
 	use amcl::rsa2048::rsa;
 

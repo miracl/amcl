@@ -19,8 +19,8 @@ under the License.
 
 /* Fixed Data in ROM - Field and Curve parameters */
 
-use nist256::big::NLEN;
-use arch::Chunk;
+use crate::nist256::big::NLEN;
+use crate::arch::Chunk;
 
 
 // Base Bits= 28

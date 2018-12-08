@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use bn254::big::NLEN;
-use arch::Chunk;
+use crate::bn254::big::NLEN;
+use crate::arch::Chunk;
 
 // BN254 Modulus
 // Base Bits= 56

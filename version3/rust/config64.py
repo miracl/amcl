@@ -374,9 +374,10 @@ while ptr<max:
 		rsaset("rsa4096","64","60","8")
 		rsa_selected=True
 
-os.system("cargo rustc --manifest-path amcl"+slashtext+"Cargo.toml --release --lib -- --cfg D64")
+os.system("cargo rustc --manifest-path amcl"+slashtext+"Cargo.toml --release --lib")
 
-#os.system("cargo rustc --target wasm64-unknown-emscripten --manifest-path amcl"+slashtext+"Cargo.toml --release --lib -- --cfg D64")
+#-- --cfg D64
+#os.system("cargo rustc --target wasm64-unknown-emscripten --manifest-path amcl"+slashtext+"Cargo.toml --release --lib")
 
 os.system(deltext+" hash*.rs")
 os.system(deltext+" sha3.rs")

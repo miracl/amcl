@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-use c41417::big::NLEN;
-use arch::Chunk;
+use crate::c41417::big::NLEN;
+use crate::arch::Chunk;
 
 // Base Bits= 29
 // c41417 Modulus 
