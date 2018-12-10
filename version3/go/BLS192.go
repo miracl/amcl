@@ -25,57 +25,57 @@ import "github.com/milagro-crypto/amcl/version3/go/amcl"
 
 //import "fmt"
 
-const BFS int=int(MODBYTES)
-const BGS int=int(MODBYTES)
-const BLS_OK int=0
-const BLS_FAIL int=-1
+const BFS int = int(MODBYTES)
+const BGS int = int(MODBYTES)
+const BLS_OK int = 0
+const BLS_FAIL int = -1
 
 /* hash a message to an ECP point, using SHA3 */
 
 func bls192_hash(m string) *ECP {
-	sh:=amcl.NewSHA3(amcl.SHA3_SHAKE256)
+	sh := amcl.NewSHA3(amcl.SHA3_SHAKE256)
 	var hm [BFS]byte
-	t:=[]byte(m)
-	for i:=0;i<len(t);i++ {
+	t := []byte(m)
+	for i := 0; i < len(t); i++ {
 		sh.Process(t[i])
 	}
-	sh.Shake(hm[:],BFS)
-	P:=ECP_mapit(hm[:])
+	sh.Shake(hm[:], BFS)
+	P := ECP_mapit(hm[:])
 	return P
 }
 
 /* generate key pair, private key S, public key W */
 
-func KeyPairGenerate(rng *amcl.RAND,S []byte,W []byte) int {
-	G:=ECP4_generator()
-	q:=NewBIGints(CURVE_Order)
-	s:=Randomnum(q,rng)
+func KeyPairGenerate(rng *amcl.RAND, S []byte, W []byte) int {
+	G := ECP4_generator()
+	q := NewBIGints(CURVE_Order)
+	s := Randomnum(q, rng)
 	s.ToBytes(S)
-	G=G2mul(G,s)
+	G = G2mul(G, s)
 	G.ToBytes(W)
 	return BLS_OK
 }
 
 /* Sign message m using private key S to produce signature SIG */
 
-func Sign(SIG []byte,m string,S []byte) int {
-	D:=bls192_hash(m)
-	s:=FromBytes(S)
-	D=G1mul(D,s)
-	D.ToBytes(SIG,true)
+func Sign(SIG []byte, m string, S []byte) int {
+	D := bls192_hash(m)
+	s := FromBytes(S)
+	D = G1mul(D, s)
+	D.ToBytes(SIG, true)
 	return BLS_OK
 }
 
 /* Verify signature given message m, the signature SIG, and the public key W */
 
-func Verify(SIG []byte,m string,W []byte) int {
-	HM:=bls192_hash(m)
-	D:=ECP_fromBytes(SIG)
-	G:=ECP4_generator()
-	PK:=ECP4_fromBytes(W)
+func Verify(SIG []byte, m string, W []byte) int {
+	HM := bls192_hash(m)
+	D := ECP_fromBytes(SIG)
+	G := ECP4_generator()
+	PK := ECP4_fromBytes(W)
 	D.neg()
-	v:=Ate2(G,D,PK,HM)
-	v=Fexp(v)
+	v := Ate2(G, D, PK, HM)
+	v = Fexp(v)
 	if v.Isunity() {
 		return BLS_OK
 	} else {

@@ -17,12 +17,11 @@ specific language governing permissions and limitations
 under the License.
 */
 
-/* AMCL BIG number class */ 
+/* AMCL BIG number class */
 
 package XXX
 
 type Chunk int32
 type DChunk int64
 
-const CHUNK int=32	/* Set word size */
-
+const CHUNK int = 32 /* Set word size */
