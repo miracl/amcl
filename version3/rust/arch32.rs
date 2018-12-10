@@ -17,6 +17,6 @@ specific language governing permissions and limitations
 under the License.
 */
 
-pub type Chunk=i32;
-pub type DChunk=i64;
-pub const CHUNK:usize=32;
+pub type Chunk = i32;
+pub type DChunk = i64;
+pub const CHUNK: usize = 32;

@@ -16,13 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-use std::str;
 use crate::xxx::ecp::ECP;
 use crate::xxx::ecp4::ECP4;
+use std::str;
 //use xxx::fp24::FP24;
+use crate::xxx::big;
 use crate::xxx::big::BIG;
 use crate::xxx::pair192;
-use crate::xxx::big;
 use crate::xxx::rom;
 
 use crate::rand::RAND;
@@ -31,57 +31,57 @@ use crate::sha3::SHAKE256;
 
 /* BLS API Functions */
 
-pub const BFS: usize=big::MODBYTES as usize;
-pub const BGS: usize=big::MODBYTES as usize;
-pub const BLS_OK: isize=0;
-pub const BLS_FAIL: isize=-1;
+pub const BFS: usize = big::MODBYTES as usize;
+pub const BGS: usize = big::MODBYTES as usize;
+pub const BLS_OK: isize = 0;
+pub const BLS_FAIL: isize = -1;
 
 /* hash a message to an ECP point, using SHA3 */
 
 #[allow(non_snake_case)]
 fn bls_hashit(m: &str) -> ECP {
-	let mut sh=SHA3::new(SHAKE256);
-	let mut hm: [u8;BFS]=[0;BFS];
-	let t=m.as_bytes();
-	for i in 0..m.len(){
-		sh.process(t[i]);
-	}
-	sh.shake(&mut hm,BFS);  
-	let P=ECP::mapit(&hm);
-	return P;
+    let mut sh = SHA3::new(SHAKE256);
+    let mut hm: [u8; BFS] = [0; BFS];
+    let t = m.as_bytes();
+    for i in 0..m.len() {
+        sh.process(t[i]);
+    }
+    sh.shake(&mut hm, BFS);
+    let P = ECP::mapit(&hm);
+    return P;
 }
 
 /* generate key pair, private key s, public key w */
-pub fn key_pair_generate(mut rng: &mut RAND,s: &mut[u8],w: &mut[u8]) -> isize {
-	let q=BIG::new_ints(&rom::CURVE_ORDER);
-	let g=ECP4::generator();
-	let mut sc=BIG::randomnum(&q,&mut rng);
-	sc.tobytes(s);
-	pair192::g2mul(&g,&mut sc).tobytes(w);
-	return BLS_OK;
+pub fn key_pair_generate(mut rng: &mut RAND, s: &mut [u8], w: &mut [u8]) -> isize {
+    let q = BIG::new_ints(&rom::CURVE_ORDER);
+    let g = ECP4::generator();
+    let mut sc = BIG::randomnum(&q, &mut rng);
+    sc.tobytes(s);
+    pair192::g2mul(&g, &mut sc).tobytes(w);
+    return BLS_OK;
 }
 
 /* Sign message m using private key s to produce signature sig */
 
-pub fn sign(sig: &mut[u8],m: &str,s: &[u8]) -> isize {
-	let d=bls_hashit(m);
-	let mut sc=BIG::frombytes(&s);
-	pair192::g1mul(&d,&mut sc).tobytes(sig,true);
-	return BLS_OK;
+pub fn sign(sig: &mut [u8], m: &str, s: &[u8]) -> isize {
+    let d = bls_hashit(m);
+    let mut sc = BIG::frombytes(&s);
+    pair192::g1mul(&d, &mut sc).tobytes(sig, true);
+    return BLS_OK;
 }
 
 /* Verify signature given message m, the signature sig, and the public key w */
 
-pub fn verify(sig: &[u8],m: &str,w: &[u8]) -> isize {
-	let hm=bls_hashit(m);
-	let mut d=ECP::frombytes(&sig);
-	let g=ECP4::generator();
-	let pk=ECP4::frombytes(&w);
-	d.neg();
-	let mut v=pair192::ate2(&g,&d,&pk,&hm);
-	v=pair192::fexp(&v);
-	if v.isunity() {
-		return BLS_OK;
-	}
-	return BLS_FAIL;
+pub fn verify(sig: &[u8], m: &str, w: &[u8]) -> isize {
+    let hm = bls_hashit(m);
+    let mut d = ECP::frombytes(&sig);
+    let g = ECP4::generator();
+    let pk = ECP4::frombytes(&w);
+    d.neg();
+    let mut v = pair192::ate2(&g, &d, &pk, &hm);
+    v = pair192::fexp(&v);
+    if v.isunity() {
+        return BLS_OK;
+    }
+    return BLS_FAIL;
 }
