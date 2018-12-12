@@ -22,7 +22,6 @@ use super::super::arch::Chunk;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 28
-
 // nums256 modulus
 pub const MODULUS: [Chunk; NLEN] = [
     0xFFFFF43, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF,

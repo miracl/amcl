@@ -22,8 +22,6 @@ use super::super::arch::Chunk;
 use types::{ModType, CurveType, CurvePairingType, SexticTwist, SignOfX};
 
 // Base Bits= 28
-
-// Base Bits= 28
 // nist521 Modulus
 pub const MODULUS: [Chunk; NLEN] = [
     0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF, 0xFFFFFFF,
