@@ -35,13 +35,16 @@ example program provided). Select 0 to exit.
 
 Then execute
 
-swift -I. -L. -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 TestALL.swift 
+swift -I. -L. -lamcl -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 TestALL.swift 
 
 and
 
-swift -I. -L. -lbn254 -lbls383 -lbls24 -lbls48 TestBLS.swift 
+swift -I. -L. -lamcl -lbn254 -lbls383 -lbls24 -lbls48 TestBLS.swift 
 
 and 
 
-swift -I. -L. -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 BenchtestALL.swift 
+swift -I. -L. -lamcl -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 BenchtestALL.swift 
 
+Also
+
+swift -I. -L. -lamcl TestNHS.swift

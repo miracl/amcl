@@ -29,8 +29,8 @@ import amcl
 
 public struct MPIN192
 {
-    static public let EFS=Int(BIG.MODBYTES)
-    static public let EGS=Int(BIG.MODBYTES)
+    static public let EFS=Int(CONFIG_BIG.MODBYTES)
+    static public let EGS=Int(CONFIG_BIG.MODBYTES)
     static let INVALID_POINT:Int = -14
     static let BAD_PARAMS:Int = -11
     static let WRONG_ORDER:Int = -18
@@ -86,8 +86,8 @@ public struct MPIN192
             h=H.hash()
         }
         if h.isEmpty {return h}
-        var R=[UInt8](repeating: 0,count: ECP.AESKEY)
-        for i in 0 ..< ECP.AESKEY {R[i]=h[i]}
+        var R=[UInt8](repeating: 0,count: CONFIG_CURVE.AESKEY)
+        for i in 0 ..< CONFIG_CURVE.AESKEY {R[i]=h[i]}
         return R
     }
     
@@ -118,7 +118,7 @@ public struct MPIN192
             R=H.hash()
         }
         if R.isEmpty {return R}
-        let RM=Int(BIG.MODBYTES)
+        let RM=Int(CONFIG_BIG.MODBYTES)
         var W=[UInt8](repeating: 0,count: RM)
         if sha >= RM
         {
@@ -654,7 +654,7 @@ public struct MPIN192
 
         let t=mpin_hash(sha,c,W)
 
-        for i in 0 ..< ECP.AESKEY {CK[i]=t[i]}
+        for i in 0 ..< CONFIG_CURVE.AESKEY {CK[i]=t[i]}
     
         return 0
     }
@@ -693,7 +693,7 @@ public struct MPIN192
         
         let t=mpin_hash(sha,c,U)
  
-        for i in 0 ..< ECP.AESKEY {SK[i]=t[i]}
+        for i in 0 ..< CONFIG_CURVE.AESKEY {SK[i]=t[i]}
     
         return 0
     }

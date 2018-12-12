@@ -27,7 +27,7 @@
 // Note that the original curve has been transformed to an isomorphic curve with A=-3 
 
 
-final public class ROM{
+public struct ROM{
  
 #if D32
 

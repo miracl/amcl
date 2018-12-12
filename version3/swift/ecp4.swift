@@ -162,7 +162,7 @@ public struct ECP4 {
     /* convert to byte array */
     func toBytes(_ b:inout [UInt8])
     {
-        let RM=Int(BIG.MODBYTES)
+        let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
         var W=ECP4(); W.copy(self)
         W.affine();
@@ -201,7 +201,7 @@ public struct ECP4 {
     /* convert from byte array to point */
     static func fromBytes(_ b:[UInt8]) -> ECP4
     {
-        let RM=Int(BIG.MODBYTES)
+        let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
 
         for i in 0 ..< RM {t[i]=b[i]}
@@ -256,10 +256,10 @@ public struct ECP4 {
         var r=FP4(x)
         r.sqr()
         var b=FP4(FP2(BIG(ROM.CURVE_B)))
-        if ECP.SEXTIC_TWIST == ECP.D_TYPE {
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE {
             b.div_i()
         }
-        if ECP.SEXTIC_TWIST == ECP.M_TYPE {
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {
             b.times_i()
         }
         r.mul(x)
@@ -306,13 +306,13 @@ public struct ECP4 {
         }
     
         var iy=FP4(y)
-        if ECP.SEXTIC_TWIST == ECP.D_TYPE {       
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE {       
             iy.times_i(); 
         }
 
         var t0=FP4(y) 
         t0.sqr();
-        if ECP.SEXTIC_TWIST == ECP.D_TYPE {           
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE {           
             t0.times_i() 
         }  
         var t1=FP4(iy)  
@@ -327,7 +327,7 @@ public struct ECP4 {
         z.norm()  
 
         t2.imul(3*ROM.CURVE_B_I) 
-        if ECP.SEXTIC_TWIST == ECP.M_TYPE {
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {
             t2.times_i()  
         }
         var x3=FP4(t2)
@@ -368,7 +368,7 @@ public struct ECP4 {
         t4.copy(t0); t4.add(t1)        //t4=X1.X2+Y1.Y2
 
         t3.sub(t4); t3.norm(); 
-        if ECP.SEXTIC_TWIST == ECP.D_TYPE {
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE {
             t3.times_i()         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
         }
         t4.copy(y)                    
@@ -381,7 +381,7 @@ public struct ECP4 {
         x3.add(t2)                     //X3=Y1.Y2+Z1.Z2
     
         t4.sub(x3); t4.norm(); 
-        if ECP.SEXTIC_TWIST == ECP.D_TYPE {  
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE {  
             t4.times_i()          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
         }
         x3.copy(x); x3.add(z); x3.norm()   // x3=X1+Z1
@@ -391,20 +391,20 @@ public struct ECP4 {
         y3.copy(t0)
         y3.add(t2)                         // y3=X1.X2+Z1+Z2
         y3.rsub(x3); y3.norm()             // y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
-        if ECP.SEXTIC_TWIST == ECP.D_TYPE {  
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE {  
             t0.times_i() // x.Q.x
             t1.times_i() // y.Q.y
         }
         x3.copy(t0); x3.add(t0) 
         t0.add(x3); t0.norm()
         t2.imul(b)
-        if ECP.SEXTIC_TWIST == ECP.M_TYPE {
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {
             t2.times_i()
         }  
         var z3=FP4(t1); z3.add(t2); z3.norm()
         t1.sub(t2); t1.norm()
         y3.imul(b)
-        if ECP.SEXTIC_TWIST == ECP.M_TYPE {          
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {          
             y3.times_i()
         }
         x3.copy(y3); x3.mul(t4); t2.copy(t3); t2.mul(t1); x3.rsub(t2)
@@ -439,7 +439,7 @@ public struct ECP4 {
         f2.mul_ip(); f2.norm()
         var f1=FP2(f2); f1.sqr()
         f2.mul(f1); f1.copy(X)
-        if ECP.SEXTIC_TWIST == ECP.M_TYPE {
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {
             f1.mul_ip()
             f1.inverse()
             f0.copy(f1); f0.sqr()
@@ -481,7 +481,7 @@ public struct ECP4 {
         var W=[ECP4]();
         for _ in 0 ..< 8 {W.append(ECP4())}
         
-        var w=[Int8](repeating: 0,count: 1+(BIG.NLEN*Int(BIG.BASEBITS)+3)/4)
+        var w=[Int8](repeating: 0,count: 1+(CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+3)/4)
     
         if is_infinity() {return ECP4()}
     
@@ -550,11 +550,11 @@ public struct ECP4 {
         var mt=BIG()
         var t=[BIG]()
     
-        var w1=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)
-        var s1=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)
+        var w1=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)
+        var s1=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)
     
-        var w2=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)
-        var s2=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)
+        var w2=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)
+        var s2=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)
 
         for i in 0 ..< 8
         {
@@ -681,7 +681,7 @@ public struct ECP4 {
         var x3Q=x2Q.mul(x)
         var x4Q=x3Q.mul(x)
 
-        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
             xQ.neg()
             x3Q.neg()
         }

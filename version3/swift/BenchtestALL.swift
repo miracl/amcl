@@ -42,8 +42,8 @@ public func TimeRSA_2048(_ rng: inout RAND)
     let MIN_ITERS=10 
     var fail=false;
 
-    var pub=rsa_public_key(Int(FF.FFLEN))
-    var priv=rsa_private_key(Int(FF.HFLEN))
+    var pub=rsa_public_key(Int(CONFIG_FF.FFLEN))
+    var priv=rsa_private_key(Int(CONFIG_FF.HFLEN))
 
     var M=[UInt8](repeating: 0,count: RFS)
     var C=[UInt8](repeating: 0,count: RFS)
@@ -114,29 +114,29 @@ public func TimeECDH_ed25519(_ rng: inout RAND)
     var fail=false;
 
     print("\nTiming/Testing ED25519 ECC")
-    if ed25519.ECP.CURVETYPE==ed25519.ECP.WEIERSTRASS {
+    if ed25519.CONFIG_CURVE.CURVETYPE==ed25519.CONFIG_CURVE.WEIERSTRASS {
         print("Weierstrass parameterisation")
     }
-    if ed25519.ECP.CURVETYPE==ed25519.ECP.EDWARDS {
+    if ed25519.CONFIG_CURVE.CURVETYPE==ed25519.CONFIG_CURVE.EDWARDS {
         print("Edwards parameterisation")
     }
-    if ed25519.ECP.CURVETYPE==ed25519.ECP.MONTGOMERY {
+    if ed25519.CONFIG_CURVE.CURVETYPE==ed25519.CONFIG_CURVE.MONTGOMERY {
         print("Montgomery representation")
     }
-    if ed25519.FP.MODTYPE==ed25519.FP.PSEUDO_MERSENNE {
+    if ed25519.CONFIG_FIELD.MODTYPE==ed25519.CONFIG_FIELD.PSEUDO_MERSENNE {
         print("Pseudo-Mersenne Modulus")
     }
-    if ed25519.FP.MODTYPE==ed25519.FP.MONTGOMERY_FRIENDLY {
+    if ed25519.CONFIG_FIELD.MODTYPE==ed25519.CONFIG_FIELD.MONTGOMERY_FRIENDLY {
         print("Montgomery Friendly Modulus")
     }
-    if ed25519.FP.MODTYPE==ed25519.FP.GENERALISED_MERSENNE {
+    if ed25519.CONFIG_FIELD.MODTYPE==ed25519.CONFIG_FIELD.GENERALISED_MERSENNE {
         print("Generalised-Mersenne Modulus")
     }
-    if ed25519.FP.MODTYPE==ed25519.FP.NOT_SPECIAL {
+    if ed25519.CONFIG_FIELD.MODTYPE==ed25519.CONFIG_FIELD.NOT_SPECIAL {
         print("Not special Modulus")
     }
-    print("Modulus size \(ed25519.FP.MODBITS) bits")
-    print("\(ed25519.BIG.CHUNK) bit build")
+    print("Modulus size \(ed25519.CONFIG_FIELD.MODBITS) bits")
+    print("\(ed25519.CONFIG_BIG.CHUNK) bit build")
     
 
     var s:ed25519.BIG
@@ -176,29 +176,29 @@ public func TimeECDH_nist256(_ rng: inout RAND)
     var fail=false;
 
     print("\nTiming/Testing NIST256 ECC")
-    if nist256.ECP.CURVETYPE==nist256.ECP.WEIERSTRASS {
+    if nist256.CONFIG_CURVE.CURVETYPE==nist256.CONFIG_CURVE.WEIERSTRASS {
         print("Weierstrass parameterisation")
     }
-    if nist256.ECP.CURVETYPE==nist256.ECP.EDWARDS {
+    if nist256.CONFIG_CURVE.CURVETYPE==nist256.CONFIG_CURVE.EDWARDS {
         print("Edwards parameterisation")
     }
-    if nist256.ECP.CURVETYPE==nist256.ECP.MONTGOMERY {
+    if nist256.CONFIG_CURVE.CURVETYPE==nist256.CONFIG_CURVE.MONTGOMERY {
         print("Montgomery representation")
     }
-    if nist256.FP.MODTYPE==nist256.FP.PSEUDO_MERSENNE {
+    if nist256.CONFIG_FIELD.MODTYPE==nist256.CONFIG_FIELD.PSEUDO_MERSENNE {
         print("Pseudo-Mersenne Modulus")
     }
-    if nist256.FP.MODTYPE==nist256.FP.MONTGOMERY_FRIENDLY {
+    if nist256.CONFIG_FIELD.MODTYPE==nist256.CONFIG_FIELD.MONTGOMERY_FRIENDLY {
         print("Montgomery Friendly Modulus")
     }
-    if nist256.FP.MODTYPE==nist256.FP.GENERALISED_MERSENNE {
+    if nist256.CONFIG_FIELD.MODTYPE==nist256.CONFIG_FIELD.GENERALISED_MERSENNE {
         print("Generalised-Mersenne Modulus")
     }
-    if nist256.FP.MODTYPE==nist256.FP.NOT_SPECIAL {
+    if nist256.CONFIG_FIELD.MODTYPE==nist256.CONFIG_FIELD.NOT_SPECIAL {
         print("Not special Modulus")
     }
-    print("Modulus size \(nist256.FP.MODBITS) bits")
-    print("\(nist256.BIG.CHUNK) bit build")
+    print("Modulus size \(nist256.CONFIG_FIELD.MODBITS) bits")
+    print("\(nist256.CONFIG_BIG.CHUNK) bit build")
     
 
     var s:nist256.BIG
@@ -230,7 +230,6 @@ public func TimeECDH_nist256(_ rng: inout RAND)
     }    
 }
 
-
 public func TimeECDH_goldilocks(_ rng: inout RAND)
 {
     let MIN_TIME=10.0
@@ -239,29 +238,29 @@ public func TimeECDH_goldilocks(_ rng: inout RAND)
     var fail=false;
 
     print("\nTiming/Testing GOLDILOCKS ECC")
-    if goldilocks.ECP.CURVETYPE==goldilocks.ECP.WEIERSTRASS {
+    if goldilocks.CONFIG_CURVE.CURVETYPE==goldilocks.CONFIG_CURVE.WEIERSTRASS {
         print("Weierstrass parameterisation")
     }
-    if goldilocks.ECP.CURVETYPE==goldilocks.ECP.EDWARDS {
+    if goldilocks.CONFIG_CURVE.CURVETYPE==goldilocks.CONFIG_CURVE.EDWARDS {
         print("Edwards parameterisation")
     }
-    if goldilocks.ECP.CURVETYPE==goldilocks.ECP.MONTGOMERY {
+    if goldilocks.CONFIG_CURVE.CURVETYPE==goldilocks.CONFIG_CURVE.MONTGOMERY {
         print("Montgomery representation")
     }
-    if goldilocks.FP.MODTYPE==goldilocks.FP.PSEUDO_MERSENNE {
+    if goldilocks.CONFIG_FIELD.MODTYPE==goldilocks.CONFIG_FIELD.PSEUDO_MERSENNE {
         print("Pseudo-Mersenne Modulus")
     }
-    if goldilocks.FP.MODTYPE==goldilocks.FP.MONTGOMERY_FRIENDLY {
+    if goldilocks.CONFIG_FIELD.MODTYPE==goldilocks.CONFIG_FIELD.MONTGOMERY_FRIENDLY {
         print("Montgomery Friendly Modulus")
     }
-    if goldilocks.FP.MODTYPE==goldilocks.FP.GENERALISED_MERSENNE {
+    if goldilocks.CONFIG_FIELD.MODTYPE==goldilocks.CONFIG_FIELD.GENERALISED_MERSENNE {
         print("Generalised-Mersenne Modulus")
     }
-    if goldilocks.FP.MODTYPE==goldilocks.FP.NOT_SPECIAL {
+    if goldilocks.CONFIG_FIELD.MODTYPE==goldilocks.CONFIG_FIELD.NOT_SPECIAL {
         print("Not special Modulus")
     }
-    print("Modulus size \(goldilocks.FP.MODBITS) bits")
-    print("\(goldilocks.BIG.CHUNK) bit build")
+    print("Modulus size \(goldilocks.CONFIG_FIELD.MODBITS) bits")
+    print("\(goldilocks.CONFIG_BIG.CHUNK) bit build")
     
 
     var s:goldilocks.BIG
@@ -300,14 +299,14 @@ public func TimeMPIN_bn254(_ rng: inout RAND)
     var fail=false;
 
     print("\nTiming/Testing BN254 Pairings")
-    if bn254.ECP.CURVE_PAIRING_TYPE==bn254.ECP.BN {
+    if bn254.CONFIG_CURVE.CURVE_PAIRING_TYPE==bn254.CONFIG_CURVE.BN {
         print("BN Pairing-Friendly Curve")
     }
-    if bn254.ECP.CURVE_PAIRING_TYPE==bn254.ECP.BLS {
+    if bn254.CONFIG_CURVE.CURVE_PAIRING_TYPE==bn254.CONFIG_CURVE.BLS {
         print("BLS Pairing-Friendly Curve")
     }
-    print("Modulus size \(bn254.FP.MODBITS) bits")
-    print("\(bn254.BIG.CHUNK) bit build")
+    print("Modulus size \(bn254.CONFIG_FIELD.MODBITS) bits")
+    print("\(bn254.CONFIG_BIG.CHUNK) bit build")
     
     let G=bn254.ECP.generator();
     
@@ -443,14 +442,14 @@ public func TimeMPIN_bls383(_ rng: inout RAND)
     var fail=false;
 
     print("\nTiming/Testing BLS383 Pairings")
-    if bls383.ECP.CURVE_PAIRING_TYPE==bls383.ECP.BN {
+    if bls383.CONFIG_CURVE.CURVE_PAIRING_TYPE==bls383.CONFIG_CURVE.BN {
         print("BN Pairing-Friendly Curve")
     }
-    if bls383.ECP.CURVE_PAIRING_TYPE==bls383.ECP.BLS {
+    if bls383.CONFIG_CURVE.CURVE_PAIRING_TYPE==bls383.CONFIG_CURVE.BLS {
         print("BLS Pairing-Friendly Curve")
     }
-    print("Modulus size \(bls383.FP.MODBITS) bits")
-    print("\(bls383.BIG.CHUNK) bit build")
+    print("Modulus size \(bls383.CONFIG_FIELD.MODBITS) bits")
+    print("\(bls383.CONFIG_BIG.CHUNK) bit build")
     
     let G=bls383.ECP.generator();
     
@@ -587,14 +586,14 @@ public func TimeMPIN_bls24(_ rng: inout RAND)
     var fail=false;
 
     print("\nTiming/Testing BLS24 Pairings")
-    if bls24.ECP.CURVE_PAIRING_TYPE==bls24.ECP.BN {
+    if bls24.CONFIG_CURVE.CURVE_PAIRING_TYPE==bls24.CONFIG_CURVE.BN {
         print("BN Pairing-Friendly Curve")
     }
-    if bls24.ECP.CURVE_PAIRING_TYPE==bls24.ECP.BLS {
+    if bls24.CONFIG_CURVE.CURVE_PAIRING_TYPE==bls24.CONFIG_CURVE.BLS {
         print("BLS24 Pairing-Friendly Curve")
     }
-    print("Modulus size \(bls24.FP.MODBITS) bits")
-    print("\(bls24.BIG.CHUNK) bit build")
+    print("Modulus size \(bls24.CONFIG_FIELD.MODBITS) bits")
+    print("\(bls24.CONFIG_BIG.CHUNK) bit build")
     
     let G=bls24.ECP.generator();
     
@@ -731,14 +730,14 @@ public func TimeMPIN_bls48(_ rng: inout RAND)
     var fail=false;
 
     print("\nTiming/Testing BLS48 Pairings")
-    if bls48.ECP.CURVE_PAIRING_TYPE==bls48.ECP.BN {
+    if bls48.CONFIG_CURVE.CURVE_PAIRING_TYPE==bls48.CONFIG_CURVE.BN {
         print("BN Pairing-Friendly Curve")
     }
-    if bls48.ECP.CURVE_PAIRING_TYPE==bls48.ECP.BLS {
+    if bls48.CONFIG_CURVE.CURVE_PAIRING_TYPE==bls48.CONFIG_CURVE.BLS {
         print("BLS48 Pairing-Friendly Curve")
     }
-    print("Modulus size \(bls48.FP.MODBITS) bits")
-    print("\(bls48.BIG.CHUNK) bit build")
+    print("Modulus size \(bls48.CONFIG_FIELD.MODBITS) bits")
+    print("\(bls48.CONFIG_BIG.CHUNK) bit build")
     
     let G=bls48.ECP.generator();
     

@@ -59,7 +59,7 @@ public struct rsa_public_key
 
 public struct RSA {
     
-    static public let RFS=Int(BIG.MODBYTES*FF.FFLEN)
+    static public let RFS=Int(CONFIG_BIG.MODBYTES*CONFIG_FF.FFLEN)
     static public let SHA256=32
     static public let SHA384=48
     static public let SHA512=64
@@ -183,7 +183,7 @@ public struct RSA {
     static public func PKCS15(_ sha:Int,_ m:[UInt8],_ w:inout [UInt8])->Bool
     {
         let hlen=sha
-        let olen=Int(FF.FF_BITS/8)
+        let olen=Int(CONFIG_FF.FF_BITS/8)
         let idlen=19;
         
         if olen<idlen+hlen+10 {return false}

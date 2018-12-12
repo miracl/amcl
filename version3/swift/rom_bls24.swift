@@ -20,7 +20,7 @@
 //
 //  rom.swift
 //
-final public class ROM{
+public struct ROM{
  
 #if D32
 // Base Bits= 29
@@ -95,10 +95,7 @@ static let CURVE_BB:[[[Chunk]]] = [[[0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0],[0x0,0
 
 #endif
 
-    static let USE_GLV = true
-    static let USE_GS_G2 = true
-    static let USE_GS_GT = true
-    static let GT_STRONG = true
+
 
 }
 

@@ -225,7 +225,7 @@ public struct FP2
     /* self*=y */
     mutating func mul(_ y:FP2)
     { 
-        if Int64(a.xes+b.xes)*Int64(y.a.xes+y.b.xes) > Int64(FP.FEXCESS)
+        if Int64(a.xes+b.xes)*Int64(y.a.xes+y.b.xes) > Int64(CONFIG_FIELD.FEXCESS)
         {
             if a.xes>1 {a.reduce()}
             if b.xes>1 {b.reduce()}       

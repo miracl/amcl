@@ -39,15 +39,17 @@ def rsaset(tb,nb,base,ml) :
 	os.system("mkdir amcl"+slashtext+tb)
 
 	os.system(copytext+"big.swift "+fpath+"big.swift")
+	os.system(copytext+"config_big.swift "+fpath+"config_big.swift")
+	os.system(copytext+"config_ff.swift "+fpath+"config_ff.swift")
 	os.system(copytext+"dbig.swift "+fpath+"dbig.swift")
 	os.system(copytext+"ff.swift "+fpath+"ff.swift")
 	os.system(copytext+"rsa.swift "+fpath+"rsa.swift")
 
-	replace(fpath+"big.swift","@NB@",nb)
-	replace(fpath+"big.swift","@BASE32@",base)
-	replace(fpath+"big.swift","@BASE64@",base)
+	replace(fpath+"config_big.swift","@NB@",nb)
+	replace(fpath+"config_big.swift","@BASE32@",base)
+	replace(fpath+"config_big.swift","@BASE64@",base)
 
-	replace(fpath+"ff.swift","@ML@",ml);
+	replace(fpath+"config_ff.swift","@ML@",ml);
 
 	os.system("swiftc -DD32 "+fpath+"*.swift -L. -lamcl -I. -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name "+tb)
 	os.system(deltext+fpath+"*.*")
@@ -65,18 +67,21 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	os.system("mkdir amcl"+slashtext+tc)
 
 	os.system(copytext+"big.swift "+fpath+"big.swift")
+	os.system(copytext+"config_big.swift "+fpath+"config_big.swift")
+	os.system(copytext+"config_field.swift "+fpath+"config_field.swift")
+	os.system(copytext+"config_curve.swift "+fpath+"config_curve.swift")
 	os.system(copytext+"dbig.swift "+fpath+"dbig.swift")
 	os.system(copytext+"fp.swift "+fpath+"fp.swift")
 	os.system(copytext+"ecp.swift "+fpath+"ecp.swift")
 	os.system(copytext+"rom_"+tc+".swift "+fpath+"rom.swift")
 
-	replace(fpath+"big.swift","@NB@",nb)
-	replace(fpath+"big.swift","@BASE32@",base)
-	replace(fpath+"big.swift","@BASE64@",base)
+	replace(fpath+"config_big.swift","@NB@",nb)
+	replace(fpath+"config_big.swift","@BASE32@",base)
+	replace(fpath+"config_big.swift","@BASE64@",base)
 
-	replace(fpath+"fp.swift","@NBT@",nbt)
-	replace(fpath+"fp.swift","@M8@",m8)
-	replace(fpath+"fp.swift","@MT@",mt)
+	replace(fpath+"config_field.swift","@NBT@",nbt)
+	replace(fpath+"config_field.swift","@M8@",m8)
+	replace(fpath+"config_field.swift","@MT@",mt)
 
 	ib=int(base)
 	inb=int(nb)
@@ -84,24 +89,24 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	sh=ib*(1+((8*inb-1)//ib))-inbt
 	if sh > 14 :
 		sh=14
-	replace(fpath+"fp.swift","@SH@",str(sh))
+	replace(fpath+"config_field.swift","@SH@",str(sh))
 
 
-	replace(fpath+"ecp.swift","@CT@",ct)
-	replace(fpath+"ecp.swift","@PF@",pf)
+	replace(fpath+"config_curve.swift","@CT@",ct)
+	replace(fpath+"config_curve.swift","@PF@",pf)
 
-	replace(fpath+"ecp.swift","@ST@",stw)
-	replace(fpath+"ecp.swift","@SX@",sx)
+	replace(fpath+"config_curve.swift","@ST@",stw)
+	replace(fpath+"config_curve.swift","@SX@",sx)
 
 	if cs == "128" :
-		replace(fpath+"ecp.swift","@HT@","32")
-		replace(fpath+"ecp.swift","@AK@","16")
+		replace(fpath+"config_curve.swift","@HT@","32")
+		replace(fpath+"config_curve.swift","@AK@","16")
 	if cs == "192" :
-		replace(fpath+"ecp.swift","@HT@","48")
-		replace(fpath+"ecp.swift","@AK@","24")
+		replace(fpath+"config_curve.swift","@HT@","48")
+		replace(fpath+"config_curve.swift","@AK@","24")
 	if cs == "256" :
-		replace(fpath+"ecp.swift","@HT@","64")
-		replace(fpath+"ecp.swift","@AK@","32")
+		replace(fpath+"config_curve.swift","@HT@","64")
+		replace(fpath+"config_curve.swift","@AK@","32")
 
 	if pf != "NOT" :
 
@@ -340,6 +345,7 @@ os.system(deltext+" nhs.swift")
 os.system(deltext+" big.swift")
 os.system(deltext+" dbig.swift")
 os.system(deltext+" fp*.swift")
+os.system(deltext+" config*.swift")
 
 os.system(deltext+" ecp*.swift")
 os.system(deltext+" ecdh.swift")

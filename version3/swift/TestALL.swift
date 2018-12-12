@@ -53,8 +53,8 @@ public func TestRSA_2048(_ rng: inout RAND)
 
     var message="Hello World\n"
 
-    var pub=rsa_public_key(Int(FF.FFLEN))
-    var priv=rsa_private_key(Int(FF.HFLEN))
+    var pub=rsa_public_key(Int(CONFIG_FF.FFLEN))
+    var priv=rsa_private_key(Int(CONFIG_FF.HFLEN))
 
     var ML=[UInt8](repeating: 0,count: RFS)
     var C=[UInt8](repeating: 0,count: RFS)
@@ -114,8 +114,8 @@ public func TestECDH_ed25519(_ rng: inout RAND)
     
     let EGS=ed25519.ECDH.EGS
     let EFS=ed25519.ECDH.EFS
-    let EAS=ed25519.ECP.AESKEY
-    let sha=ed25519.ECP.HASH_TYPE
+    let EAS=ed25519.CONFIG_CURVE.AESKEY
+    let sha=ed25519.CONFIG_CURVE.HASH_TYPE
     
     var S1=[UInt8](repeating: 0,count: EGS)
     var W0=[UInt8](repeating: 0,count: 2*EFS+1)
@@ -199,7 +199,7 @@ public func TestECDH_ed25519(_ rng: inout RAND)
     print("Alice's DH Key=  0x",terminator: ""); printBinary(KEY)
     print("Servers DH Key=  0x",terminator: ""); printBinary(KEY)
 
-    if ed25519.ECP.CURVETYPE != ed25519.ECP.MONTGOMERY
+    if ed25519.CONFIG_CURVE.CURVETYPE != ed25519.CONFIG_CURVE.MONTGOMERY
     {
         print("Testing ECIES")
     
@@ -253,8 +253,8 @@ public func TestECDH_nist256(_ rng: inout RAND)
     
     let EGS=nist256.ECDH.EGS
     let EFS=nist256.ECDH.EFS
-    let EAS=nist256.ECP.AESKEY
-    let sha=nist256.ECP.HASH_TYPE
+    let EAS=nist256.CONFIG_CURVE.AESKEY
+    let sha=nist256.CONFIG_CURVE.HASH_TYPE
     
     var S1=[UInt8](repeating: 0,count: EGS)
     var W0=[UInt8](repeating: 0,count: 2*EFS+1)
@@ -336,7 +336,7 @@ public func TestECDH_nist256(_ rng: inout RAND)
     print("Alice's DH Key=  0x",terminator: ""); printBinary(KEY)
     print("Servers DH Key=  0x",terminator: ""); printBinary(KEY)
 
-    if nist256.ECP.CURVETYPE != nist256.ECP.MONTGOMERY
+    if nist256.CONFIG_CURVE.CURVETYPE != nist256.CONFIG_CURVE.MONTGOMERY
     {
         print("Testing ECIES")
     
@@ -389,8 +389,8 @@ public func TestECDH_goldilocks(_ rng: inout RAND)
     
     let EGS=goldilocks.ECDH.EGS
     let EFS=goldilocks.ECDH.EFS
-    let EAS=goldilocks.ECP.AESKEY
-    let sha=goldilocks.ECP.HASH_TYPE
+    let EAS=goldilocks.CONFIG_CURVE.AESKEY
+    let sha=goldilocks.CONFIG_CURVE.HASH_TYPE
     
     var S1=[UInt8](repeating: 0,count: EGS)
     var W0=[UInt8](repeating: 0,count: 2*EFS+1)
@@ -472,7 +472,7 @@ public func TestECDH_goldilocks(_ rng: inout RAND)
     print("Alice's DH Key=  0x",terminator: ""); printBinary(KEY)
     print("Servers DH Key=  0x",terminator: ""); printBinary(KEY)
 
-    if goldilocks.ECP.CURVETYPE != goldilocks.ECP.MONTGOMERY
+    if goldilocks.CONFIG_CURVE.CURVETYPE != goldilocks.CONFIG_CURVE.MONTGOMERY
     {
         print("Testing ECIES")
     
@@ -531,9 +531,9 @@ public func TestMPIN_bn254(_ rng: inout RAND)
     let EFS=bn254.MPIN.EFS
     let G1S=2*EFS+1    // Group 1 Size
     let G2S=4*EFS;     // Group 2 Size
-    let EAS=bn254.ECP.AESKEY
+    let EAS=bn254.CONFIG_CURVE.AESKEY
     
-    let sha=bn254.ECP.HASH_TYPE
+    let sha=bn254.CONFIG_CURVE.HASH_TYPE
     
     var S=[UInt8](repeating: 0,count: EGS)
     var SST=[UInt8](repeating: 0,count: G2S)
@@ -753,9 +753,9 @@ public func TestMPIN_bls383(_ rng: inout RAND)
     let EFS=bls383.MPIN.EFS
     let G1S=2*EFS+1    // Group 1 Size
     let G2S=4*EFS;     // Group 2 Size
-    let EAS=bls383.ECP.AESKEY
+    let EAS=bls383.CONFIG_CURVE.AESKEY
     
-    let sha=bls383.ECP.HASH_TYPE
+    let sha=bls383.CONFIG_CURVE.HASH_TYPE
     
     var S=[UInt8](repeating: 0,count: EGS)
     var SST=[UInt8](repeating: 0,count: G2S)
@@ -976,9 +976,9 @@ public func TestMPIN_bls24(_ rng: inout RAND)
     let EFS=bls24.MPIN192.EFS
     let G1S=2*EFS+1    // Group 1 Size
     let G2S=8*EFS;     // Group 2 Size
-    let EAS=bls24.ECP.AESKEY
+    let EAS=bls24.CONFIG_CURVE.AESKEY
     
-    let sha=bls24.ECP.HASH_TYPE
+    let sha=bls24.CONFIG_CURVE.HASH_TYPE
     
     var S=[UInt8](repeating: 0,count: EGS)
     var SST=[UInt8](repeating: 0,count: G2S)
@@ -1198,9 +1198,9 @@ public func TestMPIN_bls48(_ rng: inout RAND)
     let EFS=bls48.MPIN256.EFS
     let G1S=2*EFS+1    // Group 1 Size
     let G2S=16*EFS;     // Group 2 Size
-    let EAS=bls48.ECP.AESKEY
+    let EAS=bls48.CONFIG_CURVE.AESKEY
     
-    let sha=bls48.ECP.HASH_TYPE
+    let sha=bls48.CONFIG_CURVE.HASH_TYPE
     
     var S=[UInt8](repeating: 0,count: EGS)
     var SST=[UInt8](repeating: 0,count: G2S)

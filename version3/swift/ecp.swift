@@ -26,25 +26,6 @@
 
 public struct ECP {
 
-    static public let WEIERSTRASS=0
-    static public let EDWARDS=1
-    static public let MONTGOMERY=2
-    static public let NOT=0
-    static public let BN=1
-    static public let BLS=2
-    static public let D_TYPE=0
-    static public let M_TYPE=1
-    static public let POSITIVEX=0
-    static public let NEGATIVEX=1
-
-    static public let CURVETYPE = @CT@
-    static public let CURVE_PAIRING_TYPE = @PF@
-    static public let SEXTIC_TWIST = @ST@
-    static public let SIGN_OF_X = @SX@
-
-    static public let HASH_TYPE = @HT@
-    static public let AESKEY = @AK@
-
     private var x:FP
     private var y:FP
     private var z:FP
@@ -54,7 +35,7 @@ public struct ECP {
     {
         x=FP(0)
         y=FP(1)
-        if ECP.CURVETYPE==ECP.EDWARDS {
+        if CONFIG_CURVE.CURVETYPE==CONFIG_CURVE.EDWARDS {
 	       z=FP(1)
 	   } else {
 	       z=FP(0)
@@ -64,15 +45,15 @@ public struct ECP {
     /* test for O point-at-infinity */
     public func is_infinity() -> Bool
     {  
-        if (ECP.CURVETYPE==ECP.EDWARDS)
+        if (CONFIG_CURVE.CURVETYPE==CONFIG_CURVE.EDWARDS)
         {
             return x.iszilch() && y.equals(z)
         }
-        if (ECP.CURVETYPE==ECP.WEIERSTRASS)
+        if (CONFIG_CURVE.CURVETYPE==CONFIG_CURVE.WEIERSTRASS)
         {
             return x.iszilch() && z.iszilch()
         }        
-        if (ECP.CURVETYPE==ECP.MONTGOMERY)     
+        if (CONFIG_CURVE.CURVETYPE==CONFIG_CURVE.MONTGOMERY)     
         {
             return z.iszilch()
         }   
@@ -83,7 +64,7 @@ public struct ECP {
     private mutating func cswap(_ Q: inout ECP,_ d:Int)
     {
         x.cswap(&(Q.x),d)
-        if ECP.CURVETYPE != ECP.MONTGOMERY {y.cswap(&(Q.y),d)}
+        if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.MONTGOMERY {y.cswap(&(Q.y),d)}
         z.cswap(&(Q.z),d)
     }
     
@@ -91,7 +72,7 @@ public struct ECP {
     private mutating func cmove(_ Q: ECP,_ d:Int)
     {
         x.cmove(Q.x,d)
-        if ECP.CURVETYPE != ECP.MONTGOMERY {y.cmove(Q.y,d)}
+        if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.MONTGOMERY {y.cmove(Q.y,d)}
         z.cmove(Q.z,d)
     }
     
@@ -107,16 +88,16 @@ public struct ECP {
     public mutating func copy(_ P: ECP)
     {
         x.copy(P.x)
-        if ECP.CURVETYPE != ECP.MONTGOMERY {y.copy(P.y)}
+        if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.MONTGOMERY {y.copy(P.y)}
         z.copy(P.z)
     }
     /* self=-self */
     mutating func neg() {
-        if (ECP.CURVETYPE == ECP.WEIERSTRASS)
+        if (CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.WEIERSTRASS)
         {
             y.neg(); y.norm();
         }
-        if (ECP.CURVETYPE == ECP.EDWARDS)
+        if (CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.EDWARDS)
         {
             x.neg(); x.norm();
         }
@@ -154,7 +135,7 @@ public struct ECP {
         a.copy(x); a.mul(Q.z)
         b.copy(Q.x); b.mul(z)
         if !a.equals(b) {return false}
-        if ECP.CURVETYPE != ECP.MONTGOMERY
+        if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.MONTGOMERY
         {
 			a.copy(y); a.mul(Q.z); 
 			b.copy(Q.y); b.mul(z); 
@@ -173,8 +154,8 @@ public struct ECP {
     {
     //    INF=true;
         x.zero()
-        if ECP.CURVETYPE != ECP.MONTGOMERY {y.one()}
-        if ECP.CURVETYPE != ECP.EDWARDS {z.zero()}
+        if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.MONTGOMERY {y.one()}
+        if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.EDWARDS {z.zero()}
         else {z.one()}
     }
     
@@ -184,7 +165,7 @@ public struct ECP {
         var r=FP(x)
         r.sqr()
     
-        if ECP.CURVETYPE == ECP.WEIERSTRASS
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.WEIERSTRASS
         { // x^3+Ax+B
             let b=FP(BIG(ROM.CURVE_B))
             r.mul(x)
@@ -197,7 +178,7 @@ public struct ECP {
             }
             r.add(b);
         }
-        if (ECP.CURVETYPE == ECP.EDWARDS)
+        if (CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.EDWARDS)
         { // (Ax^2-1)/(Bx^2-1)
             var b=FP(BIG(ROM.CURVE_B))
     
@@ -209,7 +190,7 @@ public struct ECP {
             b.inverse()
             r.mul(b);
         }
-        if ECP.CURVETYPE == ECP.MONTGOMERY
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.MONTGOMERY
         { // x^3+Ax^2+x
             var x3=FP(0)
             x3.copy(r);
@@ -232,7 +213,7 @@ public struct ECP {
         x.norm()
         let rhs=ECP.RHS(x);
     
-        if ECP.CURVETYPE == ECP.MONTGOMERY
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.MONTGOMERY
         {
             if rhs.jacobi() != 1 {inf()}
         }
@@ -272,7 +253,7 @@ public struct ECP {
         z=FP(1)
         if rhs.jacobi()==1
         {
-            if ECP.CURVETYPE != ECP.MONTGOMERY {y.copy(rhs.sqrt())}
+            if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.MONTGOMERY {y.copy(rhs.sqrt())}
         }
         else {inf()}
     }
@@ -289,7 +270,7 @@ public struct ECP {
         z.inverse()
 
         x.mul(z); x.reduce()
-        if ECP.CURVETYPE != ECP.MONTGOMERY
+        if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.MONTGOMERY
         {
             y.mul(z); y.reduce()
  
@@ -335,14 +316,14 @@ public struct ECP {
     /* convert to byte array */
     func toBytes(_ b:inout [UInt8],_ compress: Bool)
     {
-        let RM=Int(BIG.MODBYTES)
+        let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
         var W=ECP(); W.copy(self)
         W.affine()
         W.x.redc().toBytes(&t)
         for i in 0 ..< RM {b[i+1]=t[i]}
 
-        if ECP.CURVETYPE == ECP.MONTGOMERY {
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.MONTGOMERY {
 		b[0]=0x06
 		return
 	}
@@ -361,7 +342,7 @@ public struct ECP {
     /* convert from byte array to point */
     static func fromBytes(_ b: [UInt8]) -> ECP
     {
-        let RM=Int(BIG.MODBYTES)
+        let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
         let p=BIG(ROM.Modulus);
     
@@ -369,7 +350,7 @@ public struct ECP {
         let px=BIG.fromBytes(t)
         if BIG.comp(px,p)>=0 {return ECP()}
     
-        if ECP.CURVETYPE == ECP.MONTGOMERY {
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.MONTGOMERY {
 		return ECP(px)
 	}
 
@@ -392,14 +373,14 @@ public struct ECP {
         var W=ECP(); W.copy(self)
         if W.is_infinity() {return "infinity"}
         W.affine();
-        if ECP.CURVETYPE==ECP.MONTGOMERY {return "("+W.x.redc().toString()+")"}
+        if CONFIG_CURVE.CURVETYPE==CONFIG_CURVE.MONTGOMERY {return "("+W.x.redc().toString()+")"}
         else {return "("+W.x.redc().toString()+","+W.y.redc().toString()+")"}
     }
     
     /* self*=2 */
     mutating func dbl()
     {
-        if (ECP.CURVETYPE == ECP.WEIERSTRASS)
+        if (CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.WEIERSTRASS)
         {
 
             if ROM.CURVE_A == 0
@@ -503,7 +484,7 @@ public struct ECP {
                 z.copy(z3); z.norm()                
             }
         }
-        if ECP.CURVETYPE == ECP.EDWARDS
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.EDWARDS
         {
             var C=FP(x)
             var D=FP(y)
@@ -524,7 +505,7 @@ public struct ECP {
             z.mul(J)
     
         }
-        if ECP.CURVETYPE == ECP.MONTGOMERY
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.MONTGOMERY
         {
             var A=FP(x)
             var B=FP(x);
@@ -552,7 +533,7 @@ public struct ECP {
     mutating func add(_ Q:ECP)
     {
 
-        if ECP.CURVETYPE == ECP.WEIERSTRASS
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.WEIERSTRASS
         {
 
                 if ROM.CURVE_A == 0
@@ -696,7 +677,7 @@ public struct ECP {
                     z.copy(z3); z.norm()
                 }
         }
-        if ECP.CURVETYPE == ECP.EDWARDS
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.EDWARDS
         {
             let b=FP(BIG(ROM.CURVE_B))
             var A=FP(z)
@@ -787,7 +768,7 @@ public struct ECP {
     /* constant time multiply by small integer of length bts - use ladder */
     func pinmul(_ e:Int32,_ bts:Int32) -> ECP
     {
-        if ECP.CURVETYPE == ECP.MONTGOMERY
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.MONTGOMERY
             {return self.mul(BIG(Int(e)))}
         else
         {
@@ -818,7 +799,7 @@ public struct ECP {
         if (e.iszilch() || is_infinity()) {return ECP()}
     
         var P=ECP()
-        if ECP.CURVETYPE == ECP.MONTGOMERY
+        if CONFIG_CURVE.CURVETYPE == CONFIG_CURVE.MONTGOMERY
         {
             /* use Ladder */
             var D=ECP()
@@ -848,7 +829,7 @@ public struct ECP {
             var Q=ECP()
             var C=ECP()
             var W=[ECP]()
-            let n=1+(BIG.NLEN*Int(BIG.BASEBITS)+3)/4
+            let n=1+(CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+3)/4
             var w=[Int8](repeating: 0,count: n)
     
     // precompute table
@@ -913,7 +894,7 @@ public struct ECP {
         var T=ECP()
         var C=ECP()
         var W=[ECP]()
-        let n=1+(BIG.NLEN*Int(BIG.BASEBITS)+1)/2
+        let n=1+(CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)/2
         var w=[Int8](repeating: 0,count: n);
     
         te.copy(e);
@@ -1001,7 +982,7 @@ public struct ECP {
         var P=ECP()
         while (true) {
 		while (true) {
-			if ECP.CURVETYPE != ECP.MONTGOMERY {
+			if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.MONTGOMERY {
 				P.copy(ECP(x,0))
 			} else {
 				P.copy(ECP(x))
@@ -1020,7 +1001,7 @@ public struct ECP {
     {
         let gx=BIG(ROM.CURVE_Gx);
         var G:ECP
-        if ECP.CURVETYPE != ECP.MONTGOMERY
+        if CONFIG_CURVE.CURVETYPE != CONFIG_CURVE.MONTGOMERY
         {
             let gy=BIG(ROM.CURVE_Gy)
             G=ECP(gx,gy)

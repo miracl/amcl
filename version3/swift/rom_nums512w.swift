@@ -24,7 +24,7 @@
 //  Copyright (c) 2015 Michael Scott. All rights reserved.
 //
 
-final public class ROM{
+public struct ROM{
  
 #if D32
 

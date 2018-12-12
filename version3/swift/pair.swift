@@ -53,10 +53,10 @@ public struct PAIR {
 
         let sb=3*ROM.CURVE_B_I
         ZZ.imul(sb)  
-        if ECP.SEXTIC_TWIST == ECP.D_TYPE {             
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE {             
              ZZ.div_ip2();  
         }
-        if ECP.SEXTIC_TWIST == ECP.M_TYPE {
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {
             ZZ.mul_ip()
             ZZ.add(ZZ)
             ZZ.norm()
@@ -69,7 +69,7 @@ public struct PAIR {
         ZZ.sub(YY); ZZ.norm()     // 3b.Z^2-Y^2
 
         a=FP4(YZ,ZZ)          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
-        if ECP.SEXTIC_TWIST == ECP.D_TYPE {             
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE {             
             b=FP4(XX)            // L(0,1) | L(0,0) | L(1,0)
             c=FP4(0)
         } else { 
@@ -102,7 +102,7 @@ public struct PAIR {
 
         T1.copy(X1)            // T1=X1-Z1.X2
         X1.pmul(Qy)            // X1=(X1-Z1.X2).Ys
-        if ECP.SEXTIC_TWIST == ECP.M_TYPE {
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {
             X1.mul_ip()
             X1.norm()
         }              
@@ -114,7 +114,7 @@ public struct PAIR {
         Y1.pmul(Qx);  Y1.neg(); Y1.norm() // Y1=-(Y1-Z1.Y2).Xs
 
         a=FP4(X1,T2)       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
-        if ECP.SEXTIC_TWIST == ECP.D_TYPE {              
+        if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE {              
             b=FP4(Y1)
             c=FP4(0)
         } else {
@@ -136,13 +136,13 @@ public struct PAIR {
         
         var lv:FP12
 
-        if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-            if ECP.SEXTIC_TWIST == ECP.M_TYPE {  
+        if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
+            if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {  
                 f.inverse()
                 f.norm()
             }
             n.pmul(6);
-            if ECP.SIGN_OF_X == ECP.NEGATIVEX { 
+            if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX { 
                 n.dec(2)
             } else {
                 n.inc(2)
@@ -177,37 +177,37 @@ public struct PAIR {
         {
             r.sqr()            
             lv=linedbl(&A,Qx,Qy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+            r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
             let bt=n3.bit(UInt(i))-n.bit(UInt(i))
             if bt == 1 {
 		      lv=lineadd(&A,P,Qx,Qy)
-		      r.smul(lv,ECP.SEXTIC_TWIST)
+		      r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
             }
             if bt == -1 {
                 lv=lineadd(&A,NP,Qx,Qy)
-                r.smul(lv,ECP.SEXTIC_TWIST)
+                r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
             }
         }
     
-        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
             r.conj()
          }     
 
     // R-ate fixup required for BN curves
 
-	   if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-            if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+	   if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
+            if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
                 A.neg()
             }           
             K.copy(P)
             K.frob(f)
 
             lv=lineadd(&A,K,Qx,Qy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+            r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
             K.frob(f)
             K.neg()
             lv=lineadd(&A,K,Qx,Qy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+            r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
         }
         return r
     }
@@ -220,13 +220,13 @@ public struct PAIR {
         var K=ECP2()
         var lv:FP12
 
-        if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-            if ECP.SEXTIC_TWIST == ECP.M_TYPE {  
+        if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
+            if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {  
                 f.inverse()
                 f.norm()
             }
             n.pmul(6); 
-            if ECP.SIGN_OF_X == ECP.NEGATIVEX { 
+            if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX { 
                 n.dec(2)
             } else {
                 n.inc(2)
@@ -269,35 +269,35 @@ public struct PAIR {
         {
             r.sqr()            
             lv=linedbl(&A,Qx,Qy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+            r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
             lv=linedbl(&B,Sx,Sy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+            r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
             let bt=n3.bit(UInt(i))-n.bit(UInt(i))
 
             if bt == 1 {
                 lv=lineadd(&A,P,Qx,Qy)
-                r.smul(lv,ECP.SEXTIC_TWIST)
+                r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
                 lv=lineadd(&B,R,Sx,Sy)
-                r.smul(lv,ECP.SEXTIC_TWIST)
+                r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
             }
 
             if bt == -1 {
                 lv=lineadd(&A,NP,Qx,Qy)
-                r.smul(lv,ECP.SEXTIC_TWIST)
+                r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
                 lv=lineadd(&B,NR,Sx,Sy)
-                r.smul(lv,ECP.SEXTIC_TWIST)              
+                r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)              
             }            
 
         }
     
-        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
             r.conj()
          }     
 
     // R-ate fixup required for BN curves
 
-	   if ECP.CURVE_PAIRING_TYPE == ECP.BN {
-            if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+	   if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
+            if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
                 A.neg()                
                 B.neg()
             }
@@ -305,21 +305,21 @@ public struct PAIR {
             K.frob(f)
 
             lv=lineadd(&A,K,Qx,Qy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+            r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
             K.frob(f)
             K.neg()
             lv=lineadd(&A,K,Qx,Qy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+            r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
     
             K.copy(R)
             K.frob(f)
 
             lv=lineadd(&B,K,Sx,Sy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+            r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
             K.frob(f)
             K.neg()
             lv=lineadd(&B,K,Sx,Sy)
-            r.smul(lv,ECP.SEXTIC_TWIST)
+            r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST)
         }
         return r
     }
@@ -343,7 +343,7 @@ public struct PAIR {
         r.mul(lv)
         
     // Hard part of final exp
-	if ECP.CURVE_PAIRING_TYPE == ECP.BN {
+	if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
 		lv.copy(r)
 		lv.frob(f)
 		var x0=FP12(lv)
@@ -354,19 +354,19 @@ public struct PAIR {
 		var x1=FP12(r)
 		x1.conj()
 		var x4=r.pow(x)
-        if ECP.SIGN_OF_X == ECP.POSITIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.POSITIVEX {
             x4.conj()
         }
 		var x3=FP12(x4)
 		x3.frob(f)
     
 		var x2=x4.pow(x)
-        if ECP.SIGN_OF_X == ECP.POSITIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.POSITIVEX {
             x2.conj()
         }    
 		var x5=FP12(x2); x5.conj()
 		lv=x2.pow(x)
-        if ECP.SIGN_OF_X == ECP.POSITIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.POSITIVEX {
             lv.conj()
         }   
 		x2.frob(f)
@@ -404,7 +404,7 @@ public struct PAIR {
 		x1.mul(lv)
 
 		r.copy(r.pow(x)) 
-        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
             r.conj()
         }          
 		x3.copy(r); x3.conj(); x1.mul(x3)
@@ -416,7 +416,7 @@ public struct PAIR {
 		x3.copy(lv); x3.conj(); x0.mul(x3)
 
 		r.copy(r.pow(x))
-        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
             r.conj()
         }  
 		x0.mul(r)
@@ -426,7 +426,7 @@ public struct PAIR {
 		x1.mul(lv)
 
 		r.copy(r.pow(x))
-        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
             r.conj()
         }          
 		lv.copy(r); lv.frob(f)
@@ -435,7 +435,7 @@ public struct PAIR {
 		x1.mul(lv)
 
 		r.copy(r.pow(x))
-        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
             r.conj()
         }          
 		x3.copy(r); x3.conj(); x0.mul(x3)
@@ -443,7 +443,7 @@ public struct PAIR {
 		x1.mul(lv)
 
 		r.copy(r.pow(x))
-        if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+        if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
             r.conj()
         }          
 		x1.mul(r)
@@ -460,7 +460,7 @@ public struct PAIR {
     static func glv(_ e:BIG) -> [BIG]
     {
 	var u=[BIG]();
-	if ECP.CURVE_PAIRING_TYPE == ECP.BN {
+	if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
 		var t=BIG(0)
 		let q=BIG(ROM.CURVE_Order)
 		var v=[BIG]();
@@ -505,7 +505,7 @@ public struct PAIR {
     static func gs(_ e:BIG) -> [BIG]
     {
         var u=[BIG]();
-        if ECP.CURVE_PAIRING_TYPE == ECP.BN {
+        if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
 		  var t=BIG(0)
 		  let q=BIG(ROM.CURVE_Order)
 		  var v=[BIG]();
@@ -545,7 +545,7 @@ public struct PAIR {
 			     w.div(x)
             }
             u.append(BIG(w))
-            if ECP.SIGN_OF_X == ECP.NEGATIVEX {
+            if CONFIG_CURVE.SIGN_OF_X == CONFIG_CURVE.NEGATIVEX {
                 u[1].copy(BIG.modneg(u[1],q))
                 u[3].copy(BIG.modneg(u[3],q))                
             }        
@@ -557,7 +557,7 @@ public struct PAIR {
     static public func G1mul(_ P:ECP,_ e:BIG) -> ECP
     {
         var R:ECP
-        if (ROM.USE_GLV)
+        if (CONFIG_CURVE.USE_GLV)
         {
             R=ECP()
             R.copy(P)
@@ -601,14 +601,14 @@ public struct PAIR {
     static public func G2mul(_ P:ECP2,_ e:BIG) -> ECP2
     {
         var R:ECP2
-        if (ROM.USE_GS_G2)
+        if (CONFIG_CURVE.USE_GS_G2)
         {
             var Q=[ECP2]()
             var f=FP2(BIG(ROM.Fra),BIG(ROM.Frb));
             let q=BIG(ROM.CURVE_Order);
             var u=PAIR.gs(e);
     
-            if ECP.SEXTIC_TWIST == ECP.M_TYPE {  
+            if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {  
                 f.inverse()
                 f.norm()
             }
@@ -647,7 +647,7 @@ public struct PAIR {
     static public func GTpow(_ d:FP12,_ e:BIG) -> FP12
     {
         var r:FP12
-        if (ROM.USE_GS_GT)
+        if (CONFIG_CURVE.USE_GS_GT)
         {
             var g=[FP12]()
             let f=FP2(BIG(ROM.Fra),BIG(ROM.Frb))

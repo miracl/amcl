@@ -305,7 +305,7 @@ public struct FP12
     /* Special case of multiplication arises from special form of ATE pairing line function */
     mutating func smul(_ y:FP12,_ twist:Int)
     {
-        if twist == ECP.D_TYPE {
+        if twist == CONFIG_CURVE.D_TYPE {
             var z0=FP4(a)
             var z2=FP4(b)
             var z3=FP4(b)
@@ -340,7 +340,7 @@ public struct FP12
             z3.times_i()
             a.copy(z0); a.add(z3)
         }
-        if twist == ECP.M_TYPE {
+        if twist == CONFIG_CURVE.M_TYPE {
             var z0=FP4(a)
             var z1=FP4(0)
             var z2=FP4(0)
@@ -458,7 +458,7 @@ public struct FP12
     /* convert from byte array to FP12 */
     static func fromBytes(_ w:[UInt8]) -> FP12
     {
-        let RM=Int(BIG.MODBYTES)
+        let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
     
         for i in 0 ..< RM {t[i]=w[i]}
@@ -510,7 +510,7 @@ public struct FP12
     /* convert this to byte array */
     func toBytes(_ w:inout [UInt8])
     {
-        let RM=Int(BIG.MODBYTES)
+        let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
 
         a.geta().getA().toBytes(&t)
@@ -653,8 +653,8 @@ public struct FP12
         }
 
         var mt=BIG(0);
-        var w=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)           
-        var s=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)   
+        var w=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)           
+        var s=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)   
 
 // precompute table 
         g[0].copy(q[0])   // q[0]

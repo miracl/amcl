@@ -35,8 +35,8 @@ public struct ECDH
     static let INVALID_PUBLIC_KEY:Int = -2
     static let ERROR:Int = -3
     static let INVALID:Int = -4
-    static public let EFS=Int(BIG.MODBYTES);
-    static public let EGS=Int(BIG.MODBYTES);
+    static public let EFS=Int(CONFIG_BIG.MODBYTES);
+    static public let EGS=Int(CONFIG_BIG.MODBYTES);
     static public let SHA256=32
     static public let SHA384=48
     static public let SHA512=64
@@ -397,7 +397,7 @@ public struct ECDH
     static public func ECPSP_DSA(_ sha:Int,_ RNG: inout RAND,_ S:[UInt8],_ F:[UInt8],_ C:inout [UInt8],_ D:inout [UInt8]) -> Int
     {
         var T=[UInt8](repeating: 0,count: ECDH.EFS)
-        let B=hashit(sha,F,0,nil,Int(BIG.MODBYTES))
+        let B=hashit(sha,F,0,nil,Int(CONFIG_BIG.MODBYTES))
     
         let G=ECP.generator();  
         let r=BIG(ROM.CURVE_Order)
@@ -438,7 +438,7 @@ public struct ECDH
     static public func ECPVP_DSA(_ sha:Int,_ W:[UInt8],_ F:[UInt8],_ C:[UInt8],_ D:[UInt8]) -> Int
     {
         var res=0
-        let B=hashit(sha,F,0,nil,Int(BIG.MODBYTES))
+        let B=hashit(sha,F,0,nil,Int(CONFIG_BIG.MODBYTES))
     
         let G=ECP.generator();
         let r=BIG(ROM.CURVE_Order)
@@ -481,8 +481,8 @@ public struct ECDH
     {
         var Z=[UInt8](repeating: 0,count: ECDH.EFS)
         var VZ=[UInt8](repeating: 0,count: 3*ECDH.EFS+1)
-        var K1=[UInt8](repeating: 0,count: ECP.AESKEY)
-        var K2=[UInt8](repeating: 0,count: ECP.AESKEY)
+        var K1=[UInt8](repeating: 0,count: CONFIG_CURVE.AESKEY)
+        var K2=[UInt8](repeating: 0,count: CONFIG_CURVE.AESKEY)
         var U=[UInt8](repeating: 0,count: ECDH.EGS)
 
 
@@ -493,9 +493,9 @@ public struct ECDH
         for i in 0 ..< ECDH.EFS {VZ[2*ECDH.EFS+1+i]=Z[i]}
     
     
-        var K=KDF2(sha,VZ,P1,2*ECP.AESKEY)
+        var K=KDF2(sha,VZ,P1,2*CONFIG_CURVE.AESKEY)
     
-        for i in 0 ..< ECP.AESKEY {K1[i]=K[i]; K2[i]=K[ECP.AESKEY+i];}
+        for i in 0 ..< CONFIG_CURVE.AESKEY {K1[i]=K[i]; K2[i]=K[CONFIG_CURVE.AESKEY+i];}
     
         var C=AES_CBC_IV0_ENCRYPT(K1,M)
     
@@ -527,8 +527,8 @@ public struct ECDH
     {
         var Z=[UInt8](repeating: 0,count: ECDH.EFS)
         var VZ=[UInt8](repeating: 0,count: 3*ECDH.EFS+1)
-        var K1=[UInt8](repeating: 0,count: ECP.AESKEY)
-        var K2=[UInt8](repeating: 0,count: ECP.AESKEY)
+        var K1=[UInt8](repeating: 0,count: CONFIG_CURVE.AESKEY)
+        var K2=[UInt8](repeating: 0,count: CONFIG_CURVE.AESKEY)
 
         var TAG=[UInt8](repeating: 0,count: T.count)
     
@@ -537,9 +537,9 @@ public struct ECDH
         for i in 0 ..< 2*ECDH.EFS+1 {VZ[i]=V[i]}
         for i in 0 ..< ECDH.EFS {VZ[2*EFS+1+i]=Z[i]}
     
-        var K=KDF2(sha,VZ,P1,2*ECP.AESKEY)
+        var K=KDF2(sha,VZ,P1,2*CONFIG_CURVE.AESKEY)
     
-        for i in 0 ..< ECP.AESKEY {K1[i]=K[i]; K2[i]=K[ECP.AESKEY+i]}
+        for i in 0 ..< CONFIG_CURVE.AESKEY {K1[i]=K[i]; K2[i]=K[CONFIG_CURVE.AESKEY+i]}
     
         let M=ECDH.AES_CBC_IV0_DECRYPT(K1,C)
     

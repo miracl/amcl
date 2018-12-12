@@ -31,8 +31,8 @@ import amcl
 
 public struct BLS
 {
-    static public let BFS=Int(BIG.MODBYTES)
-    static public let BGS=Int(BIG.MODBYTES)
+    static public let BFS=Int(CONFIG_BIG.MODBYTES)
+    static public let BGS=Int(CONFIG_BIG.MODBYTES)
     static let BLS_OK:Int = 0
     static let BLS_FAIL:Int = -1
     

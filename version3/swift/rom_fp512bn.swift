@@ -26,7 +26,7 @@
 
 import amcl
 
-final public class ROM{
+public struct ROM{
  
 #if D32
 
@@ -96,10 +96,6 @@ static let CURVE_BB:[[[Chunk]]] = [[[0xB306BB5E1BD810,0x82F5C030B0F7F01,0x68,0x0
 
 #endif
 
-static let USE_GLV = true
-static let USE_GS_G2 = true
-static let USE_GS_GT = true
-static let GT_STRONG = false
 
 }
 

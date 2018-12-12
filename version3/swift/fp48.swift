@@ -308,7 +308,7 @@ public struct FP48
     /* Special case of multiplication arises from special form of ATE pairing line function */
     mutating func smul(_ y:FP48,_ twist:Int)
     {
-        if twist == ECP.D_TYPE {
+        if twist == CONFIG_CURVE.D_TYPE {
             var z0=FP16(a)
             var z2=FP16(b)
             var z3=FP16(b)
@@ -343,7 +343,7 @@ public struct FP48
             z3.times_i()
             a.copy(z0); a.add(z3)
         }
-        if twist == ECP.M_TYPE {
+        if twist == CONFIG_CURVE.M_TYPE {
             var z0=FP16(a)
             var z1=FP16(0)
             var z2=FP16(0)
@@ -469,7 +469,7 @@ public struct FP48
     /* convert from byte array to FP48 */
     static func fromBytes(_ w:[UInt8]) -> FP48
     {
-        let RM=Int(BIG.MODBYTES)
+        let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
     
         for i in 0 ..< RM {t[i]=w[i]}
@@ -672,7 +672,7 @@ public struct FP48
     /* convert this to byte array */
     func toBytes(_ w:inout [UInt8])
     {
-        let RM=Int(BIG.MODBYTES)
+        let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
 
         a.geta().geta().geta().getA().toBytes(&t)
@@ -909,14 +909,14 @@ public struct FP48
         }
 
         var mt=BIG(0);
-        var w1=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)           
-        var s1=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)   
-        var w2=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)           
-        var s2=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)   
-        var w3=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)           
-        var s3=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)   
-        var w4=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)           
-        var s4=[Int8](repeating: 0,count: BIG.NLEN*Int(BIG.BASEBITS)+1)   
+        var w1=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)           
+        var s1=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)   
+        var w2=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)           
+        var s2=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)   
+        var w3=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)           
+        var s3=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)   
+        var w4=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)           
+        var s4=[Int8](repeating: 0,count: CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+1)   
 
 
 // precompute table 

@@ -31,25 +31,13 @@ import amcl
 
 final public class FF {
 
-    static public let FFLEN:UInt=@ML@
-
-    static public let FF_BITS:UInt=(BIG.BIGBITS*FF.FFLEN) /* Finite Field Size in bits - must be BIGBITS.2^n */
-    static public let HFLEN=(FF.FFLEN/2);  /* Useful for half-size RSA private key operations */
-
-    static let P_MBITS:UInt=BIG.MODBYTES*8
-    static let P_OMASK:Chunk=Chunk(-1)<<Chunk(FF.P_MBITS%BIG.BASEBITS)
-    static let P_FEXCESS:Chunk=(1<<Chunk(BIG.BASEBITS*UInt(BIG.NLEN)-FF.P_MBITS-1))
-    static let P_TBITS=(FF.P_MBITS%BIG.BASEBITS)
- 
-
-
     var v = [BIG]()
     var length:Int=1
 
 /* calculate Field Excess */
     static func EXCESS(_ a: BIG) -> Chunk
     {
-        return ((a.w[BIG.NLEN-1] & FF.P_OMASK)>>Chunk(FF.P_MBITS%BIG.BASEBITS))+1
+        return ((a.w[CONFIG_BIG.NLEN-1] & CONFIG_FF.P_OMASK)>>Chunk(CONFIG_FF.P_MBITS%CONFIG_BIG.BASEBITS))+1
     }
 
 #if D32
@@ -57,13 +45,13 @@ final public class FF {
     {
         let ea=FF.EXCESS(a)
         let eb=FF.EXCESS(b)
-        if (DChunk(ea)+1)*(DChunk(eb)+1) > DChunk(FF.P_FEXCESS) {return true}
+        if (DChunk(ea)+1)*(DChunk(eb)+1) > DChunk(CONFIG_FF.P_FEXCESS) {return true}
         return false;
     }
     static func sexceed(_ a: BIG) -> Bool
     {
         let ea=FF.EXCESS(a)
-        if (DChunk(ea)+1)*(DChunk(ea)+1) > DChunk(FF.P_FEXCESS) {return true}
+        if (DChunk(ea)+1)*(DChunk(ea)+1) > DChunk(CONFIG_FF.P_FEXCESS) {return true}
         return false;
     }
 #endif
@@ -72,13 +60,13 @@ final public class FF {
     {
         let ea=FF.EXCESS(a)
         let eb=FF.EXCESS(b)
-        if (ea+1) > FF.P_FEXCESS/(eb+1) {return true}
+        if (ea+1) > CONFIG_FF.P_FEXCESS/(eb+1) {return true}
         return false;
     }
     static func sexceed(_ a: BIG) -> Bool
     {
         let ea=FF.EXCESS(a)
-        if (ea+1) > FF.P_FEXCESS/(ea+1) {return true}
+        if (ea+1) > CONFIG_FF.P_FEXCESS/(ea+1) {return true}
         return false;
     }
 #endif
@@ -285,12 +273,12 @@ final public class FF {
         for i in 0 ..< nn-1
         {
             let carry=v[vp+i].norm()
-            v[vp+i].xortop(carry<<Chunk(FF.P_TBITS))
+            v[vp+i].xortop(carry<<Chunk(CONFIG_FF.P_TBITS))
             v[vp+i+1].w[0]+=carry
         }
         let carry=v[vp+nn-1].norm()
         if (trunc)
-            {v[vp+nn-1].xortop(carry<<Chunk(FF.P_TBITS))}
+            {v[vp+nn-1].xortop(carry<<Chunk(CONFIG_FF.P_TBITS))}
     }
     
     func norm()
@@ -319,7 +307,7 @@ final public class FF {
         {
             let carry=v[i].fshl(1)
             v[i].inc(delay_carry);
-            v[i].xortop(Chunk(carry)<<Chunk(FF.P_TBITS));
+            v[i].xortop(Chunk(carry)<<Chunk(CONFIG_FF.P_TBITS));
             delay_carry=carry;
         }
         v[length-1].fshl(1)
@@ -332,7 +320,7 @@ final public class FF {
         for i in (1..<length).reversed()
         {
             let carry=v[i].fshr(1);
-            v[i-1].ortop(Chunk(carry)<<Chunk(FF.P_TBITS));
+            v[i-1].ortop(Chunk(carry)<<Chunk(CONFIG_FF.P_TBITS));
         }
         v[0].fshr(1);
     }
@@ -354,14 +342,14 @@ final public class FF {
     {
         for i in 0 ..< length
         {
-            v[i].tobytearray(&b,(length-i-1)*Int(BIG.MODBYTES))
+            v[i].tobytearray(&b,(length-i-1)*Int(CONFIG_BIG.MODBYTES))
         }
     }
     static func fromBytes(_ x: FF,_ b:[UInt8])
     {
         for i in 0 ..< x.length
         {
-            x.v[i]=BIG.frombytearray(b,(x.length-i-1)*Int(BIG.MODBYTES))
+            x.v[i]=BIG.frombytearray(b,(x.length-i-1)*Int(CONFIG_BIG.MODBYTES))
         }
     }
     
@@ -380,7 +368,7 @@ final public class FF {
         {
             x.v[xp].norm(); y.v[yp].norm()
             var d=BIG.mul(x.v[xp],y.v[yp])
-            v[vp+1]=d.split(8*BIG.MODBYTES)
+            v[vp+1]=d.split(8*CONFIG_BIG.MODBYTES)
             v[vp].copy(d)
             return
         }
@@ -405,7 +393,7 @@ final public class FF {
         {
             x.v[xp].norm()
             var d=BIG.sqr(x.v[xp])
-            v[vp+1].copy(d.split(8*BIG.MODBYTES))
+            v[vp+1].copy(d.split(8*CONFIG_BIG.MODBYTES))
             v[vp].copy(d);
             return;
         }
@@ -541,7 +529,7 @@ final public class FF {
         x.copy(self)
         x.norm()
         m.dsucopy(b)
-        var k=Int(BIG.BIGBITS)*n
+        var k=Int(CONFIG_BIG.BIGBITS)*n
     
         while (FF.comp(x,m)>=0)
         {
@@ -646,7 +634,7 @@ final public class FF {
         let n=m.length
         if (n==1) {
                 var d=DBIG(v[0])
-                d.shl(UInt(BIG.NLEN)*BIG.BASEBITS)
+                d.shl(UInt(CONFIG_BIG.NLEN)*CONFIG_BIG.BASEBITS)
                 v[0].copy(d.mod(m.v[0]))
             } else {
                 let d=FF(2*n)
@@ -660,7 +648,7 @@ final public class FF {
         let n=m.length
         if (n==1) {
                 var d=DBIG(v[0])
-                v[0].copy(BIG.monty(m.v[0],(Chunk(1)<<Chunk(BIG.BASEBITS))-ND.v[0].w[0],&d))
+                v[0].copy(BIG.monty(m.v[0],(Chunk(1)<<Chunk(CONFIG_BIG.BASEBITS))-ND.v[0].w[0],&d))
             } else {
                 let d=FF(2*n)
                 mod(m)
@@ -715,7 +703,7 @@ final public class FF {
             v[i].copy(BIG.random(&rng));
         }
     /* make sure top bit is 1 */
-        while (v[n-1].nbits()<Int(BIG.MODBYTES)*8) {v[n-1].copy(BIG.random(&rng))}
+        while (v[n-1].nbits()<Int(CONFIG_BIG.MODBYTES)*8) {v[n-1].copy(BIG.random(&rng))}
     }
     /* generate random x */
     func randomnum(_ p: FF,_ rng: inout RAND)
@@ -736,7 +724,7 @@ final public class FF {
         let n=p.length
         if (n==1) {
                 var d=BIG.mul(v[0],y.v[0])
-                v[0].copy(BIG.monty(p.v[0],(Chunk(1)<<Chunk(BIG.BASEBITS))-nd.v[0].w[0],&d))
+                v[0].copy(BIG.monty(p.v[0],(Chunk(1)<<Chunk(CONFIG_BIG.BASEBITS))-nd.v[0].w[0],&d))
             } else {
                 let d=FF.mul(self,y);
                 copy(d.reduce(p,nd));
@@ -750,7 +738,7 @@ final public class FF {
         let n=p.length
         if (n==1) {
                 var d=BIG.sqr(v[0])
-                v[0].copy(BIG.monty(p.v[0],(Chunk(1)<<Chunk(BIG.BASEBITS))-nd.v[0].w[0],&d))
+                v[0].copy(BIG.monty(p.v[0],(Chunk(1)<<Chunk(CONFIG_BIG.BASEBITS))-nd.v[0].w[0],&d))
             } else {
                 let d=FF.sqr(self);
                 copy(d.reduce(p,nd));
@@ -771,9 +759,9 @@ final public class FF {
         R0.nres(p)
         R1.nres(p)
     
-        for i in (0...8*Int(BIG.MODBYTES)*n-1).reversed()
+        for i in (0...8*Int(CONFIG_BIG.MODBYTES)*n-1).reversed()
         {
-            let b=Int(e.v[i/Int(BIG.BIGBITS)].bit(UInt(i%Int(BIG.BIGBITS))))
+            let b=Int(e.v[i/Int(CONFIG_BIG.BIGBITS)].bit(UInt(i%Int(CONFIG_BIG.BIGBITS))))
             copy(R0)
             modmul(R1,p,ND)
     
@@ -803,7 +791,7 @@ final public class FF {
         R0.nres(p)
         R1.nres(p)
     
-        for i in (0...8*Int(BIG.MODBYTES)-1).reversed()
+        for i in (0...8*Int(CONFIG_BIG.MODBYTES)-1).reversed()
         {
             let b=(e.bit(UInt(i)))
             copy(R0)
@@ -865,10 +853,10 @@ final public class FF {
         one();
         nres(p);
         w.nres(p);
-        for i in (0...8*Int(BIG.MODBYTES)*n-1).reversed()
+        for i in (0...8*Int(CONFIG_BIG.MODBYTES)*n-1).reversed()
         {
             modsqr(p,ND)
-            let b=e.v[i/Int(BIG.BIGBITS)].bit(UInt(i%Int(BIG.BIGBITS)))
+            let b=e.v[i/Int(CONFIG_BIG.BIGBITS)].bit(UInt(i%Int(CONFIG_BIG.BIGBITS)))
             if (b==1) {modmul(w,p,ND)}
         }
         redc(p,ND);
@@ -890,7 +878,7 @@ final public class FF {
         one()
         nres(p)
     
-        for i in (0...8*Int(BIG.MODBYTES)-1).reversed()
+        for i in (0...8*Int(CONFIG_BIG.MODBYTES)-1).reversed()
         {
             let eb=e.bit(UInt(i))
             let fb=f.bit(UInt(i))

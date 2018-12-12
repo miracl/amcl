@@ -24,7 +24,7 @@
 //  Copyright (c) 2015 Michael Scott. All rights reserved.
 //
 
-final public class ROM{
+public struct ROM{
  
 #if D32
 
@@ -98,9 +98,5 @@ static let CURVE_BB:[[[Chunk]]] = [[[0x11C0A6332B0CBD,0xD6EE0CC906CE7E,0x647A636
 
 #endif
 
-    static let USE_GLV = true
-    static let USE_GS_G2 = true
-    static let USE_GS_GT = true
-    static let GT_STRONG = true
 }
 

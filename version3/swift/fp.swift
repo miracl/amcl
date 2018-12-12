@@ -28,19 +28,6 @@
 public struct FP {
 
 
-    static public let NOT_SPECIAL=0
-    static public let PSEUDO_MERSENNE=1
-    static public let MONTGOMERY_FRIENDLY=2
-    static public let GENERALISED_MERSENNE=3
-
-    static public let MODBITS:UInt = @NBT@
-    static let MOD8:UInt = @M8@
-    static public let MODTYPE =  @MT@   
-
-    static let FEXCESS:Int32 = ((Int32(1)<<@SH@)-1)
-    static let OMASK:Chunk=Chunk(-1)<<Chunk(FP.MODBITS%BIG.BASEBITS)
-    static let TBITS:UInt=FP.MODBITS%BIG.BASEBITS; // Number of active bits in top word
-    static let TMASK:Chunk=(1<<Chunk(FP.TBITS))-1
 
     var x:BIG
     var xes:Int32
@@ -50,7 +37,7 @@ public struct FP {
 /* convert to Montgomery n-residue form */
     mutating func nres()
     {
-        if FP.MODTYPE != FP.PSEUDO_MERSENNE && FP.MODTYPE != FP.GENERALISED_MERSENNE
+        if CONFIG_FIELD.MODTYPE != CONFIG_FIELD.PSEUDO_MERSENNE && CONFIG_FIELD.MODTYPE != CONFIG_FIELD.GENERALISED_MERSENNE
         {
             var d=BIG.mul(x,FP.r2modp);
             x.copy(FP.mod(&d))
@@ -60,7 +47,7 @@ public struct FP {
 /* convert back to regular form */
     func redc() -> BIG
     {
-        if FP.MODTYPE != FP.PSEUDO_MERSENNE && FP.MODTYPE != FP.GENERALISED_MERSENNE
+        if CONFIG_FIELD.MODTYPE != CONFIG_FIELD.PSEUDO_MERSENNE && CONFIG_FIELD.MODTYPE != CONFIG_FIELD.GENERALISED_MERSENNE
         {
             var d=DBIG(x)
             return FP.mod(&d)
@@ -76,9 +63,9 @@ public struct FP {
     static func mod(_ d: inout DBIG) -> BIG
     {
  
-        if FP.MODTYPE==FP.PSEUDO_MERSENNE
+        if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE
         {
-            var t=d.split(FP.MODBITS)
+            var t=d.split(CONFIG_FIELD.MODBITS)
             let b=BIG(d)
             let v=t.pmul(Int(ROM.MConst))
 
@@ -86,40 +73,40 @@ public struct FP {
             t.norm()
 
 
-            let tw=t.w[BIG.NLEN-1]
-            t.w[BIG.NLEN-1] &= TMASK
-            t.inc(Int(ROM.MConst*((tw>>Chunk(FP.TBITS))+(v<<Chunk(BIG.BASEBITS-FP.TBITS)))))
+            let tw=t.w[CONFIG_BIG.NLEN-1]
+            t.w[CONFIG_BIG.NLEN-1] &= CONFIG_FIELD.TMASK
+            t.inc(Int(ROM.MConst*((tw>>Chunk(CONFIG_FIELD.TBITS))+(v<<Chunk(CONFIG_BIG.BASEBITS-CONFIG_FIELD.TBITS)))))
     
             t.norm()
             return t
 
         }
-        if FP.MODTYPE==FP.MONTGOMERY_FRIENDLY
+        if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.MONTGOMERY_FRIENDLY
         {
-            for i in 0 ..< BIG.NLEN {
-                let (top,bot)=BIG.muladd(d.w[i],ROM.MConst-1,d.w[i],d.w[BIG.NLEN+i-1])
-                d.w[BIG.NLEN+i]+=top; d.w[BIG.NLEN+i-1]=bot
+            for i in 0 ..< CONFIG_BIG.NLEN {
+                let (top,bot)=BIG.muladd(d.w[i],ROM.MConst-1,d.w[i],d.w[CONFIG_BIG.NLEN+i-1])
+                d.w[CONFIG_BIG.NLEN+i]+=top; d.w[CONFIG_BIG.NLEN+i-1]=bot
             }
     
             var b=BIG(0);
     
-            for i in 0 ..< BIG.NLEN
+            for i in 0 ..< CONFIG_BIG.NLEN
             {
-                b.w[i]=d.w[BIG.NLEN+i]
+                b.w[i]=d.w[CONFIG_BIG.NLEN+i]
             }
             b.norm()
             return b;
         }
-        if FP.MODTYPE==FP.GENERALISED_MERSENNE
+        if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE
         { // GoldiLocks Only
-            let t=d.split(FP.MODBITS)
-            let RM2=FP.MODBITS/2
+            let t=d.split(CONFIG_FIELD.MODBITS)
+            let RM2=CONFIG_FIELD.MODBITS/2
             var b=BIG(d)
             b.add(t)
             var dd=DBIG(t)
             dd.shl(RM2)
             
-            var tt=dd.split(FP.MODBITS)
+            var tt=dd.split(CONFIG_FIELD.MODBITS)
             let lo=BIG(dd)
             b.add(tt)
             b.add(lo)
@@ -127,15 +114,15 @@ public struct FP {
             tt.shl(RM2)
             b.add(tt)
             
-            let carry=b.w[BIG.NLEN-1]>>Chunk(FP.TBITS)
-            b.w[BIG.NLEN-1]&=TMASK
+            let carry=b.w[CONFIG_BIG.NLEN-1]>>Chunk(CONFIG_FIELD.TBITS)
+            b.w[CONFIG_BIG.NLEN-1]&=CONFIG_FIELD.TMASK
             b.w[0]+=carry
             
-            b.w[Int(224/BIG.BASEBITS)]+=carry<<Chunk(224%BIG.BASEBITS)
+            b.w[Int(224/CONFIG_BIG.BASEBITS)]+=carry<<Chunk(224%CONFIG_BIG.BASEBITS)
             b.norm()
             return b;
         }
-        if FP.MODTYPE==FP.NOT_SPECIAL
+        if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.NOT_SPECIAL
         {
             let md=BIG(ROM.Modulus);
 
@@ -195,7 +182,7 @@ public struct FP {
 	   if xes>16 {
 		  let q=FP.quo(x,m)
 		  let carry=r.pmul(q)
-		  r.w[BIG.NLEN-1]+=carry<<Chunk(BIG.BASEBITS); // correction - put any carry out back in again
+		  r.w[CONFIG_BIG.NLEN-1]+=carry<<Chunk(CONFIG_BIG.BASEBITS); // correction - put any carry out back in again
 		  x.sub(r)
 		  x.norm()		
 		  sb=2
@@ -268,7 +255,7 @@ public struct FP {
     mutating func mul(_ b: FP)
     {
 
-        if Int64(xes)*Int64(b.xes) > Int64(FP.FEXCESS) {reduce()}
+        if Int64(xes)*Int64(b.xes) > Int64(CONFIG_FIELD.FEXCESS) {reduce()}
         
         var d=BIG.mul(x,b.x)
         x.copy(FP.mod(&d))
@@ -294,15 +281,15 @@ public struct FP {
 // Note that MAXXES is bounded to be 2-bits less than half a word
     static func quo(_ n: BIG,_ m: BIG) -> Int
     {
-        let hb=UInt(BIG.CHUNK)/2
-        if FP.TBITS < hb {
-		  let sh=Chunk(hb-FP.TBITS);
-		  let num=((n.w[BIG.NLEN-1]<<sh))|(n.w[BIG.NLEN-2]>>(Chunk(BIG.BASEBITS)-sh));
-		  let den=((m.w[BIG.NLEN-1]<<sh))|(m.w[BIG.NLEN-2]>>(Chunk(BIG.BASEBITS)-sh));
+        let hb=UInt(CONFIG_BIG.CHUNK)/2
+        if CONFIG_FIELD.TBITS < hb {
+		  let sh=Chunk(hb-CONFIG_FIELD.TBITS);
+		  let num=((n.w[CONFIG_BIG.NLEN-1]<<sh))|(n.w[CONFIG_BIG.NLEN-2]>>(Chunk(CONFIG_BIG.BASEBITS)-sh));
+		  let den=((m.w[CONFIG_BIG.NLEN-1]<<sh))|(m.w[CONFIG_BIG.NLEN-2]>>(Chunk(CONFIG_BIG.BASEBITS)-sh));
 		  return Int(num/(den+1));
 	   } else {
-		  let num=n.w[BIG.NLEN-1];
-		  let den=m.w[BIG.NLEN-1];
+		  let num=n.w[CONFIG_BIG.NLEN-1];
+		  let den=m.w[CONFIG_BIG.NLEN-1];
 		  return Int(num/(den+1));
 	   }
     }
@@ -315,7 +302,7 @@ public struct FP {
         m.fshl(sb)
         x.rsub(m)
         xes=(1<<Int32(sb))+1
-        if xes>FP.FEXCESS {reduce()}
+        if xes>CONFIG_FIELD.FEXCESS {reduce()}
     }
     /* this*=c mod Modulus, where c is a small int */
     mutating func imul(_ c: Int)
@@ -329,14 +316,14 @@ public struct FP {
             s=true
         }
 
-        if FP.MODTYPE==FP.PSEUDO_MERSENNE || FP.MODTYPE==FP.GENERALISED_MERSENNE
+        if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE || CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE
         {
             var d=x.pxmul(cc)
             x.copy(FP.mod(&d))
             xes=2
         }
         else {
-            if xes*Int32(cc)<FP.FEXCESS
+            if xes*Int32(cc)<CONFIG_FIELD.FEXCESS
             {
                 x.pmul(cc)
                 xes*=Int32(cc);
@@ -354,7 +341,7 @@ public struct FP {
 /* this*=this mod Modulus */
     mutating func sqr()
     {
-        if Int64(xes)*Int64(xes) > Int64(FP.FEXCESS) {reduce()}   
+        if Int64(xes)*Int64(xes) > Int64(CONFIG_FIELD.FEXCESS) {reduce()}   
         var d=BIG.sqr(x);
         x.copy(FP.mod(&d));
         xes=2
@@ -365,7 +352,7 @@ public struct FP {
     {
         x.add(b.x);
         xes+=b.xes
-        if xes>FP.FEXCESS {reduce()}
+        if xes>CONFIG_FIELD.FEXCESS {reduce()}
     }
 /* this-=b */
     mutating func sub(_ b: FP)
@@ -413,13 +400,13 @@ public struct FP {
         xp.append(FP(xp[8])); xp[9].sqr()
         xp.append(FP(xp[9])); xp[10].mul(xp[5])
 
-        var n=Int(FP.MODBITS)
+        var n=Int(CONFIG_FIELD.MODBITS)
         var c: Int
-        if FP.MODTYPE==FP.GENERALISED_MERSENNE {   // Goldilocks ONLY
+        if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE {   // Goldilocks ONLY
             n=n/2
         }
 
-        if (FP.MOD8==5)
+        if (CONFIG_FIELD.MOD8==5)
         {
             n=n-3
             c=(Int(ROM.MConst)+5)/8
@@ -480,7 +467,7 @@ public struct FP {
             for _ in 0..<bw {r.sqr()}
             r.mul(key)
         }
-        if FP.MODTYPE==FP.GENERALISED_MERSENNE {   // Goldilocks ONLY
+        if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE {   // Goldilocks ONLY
             key.copy(r)
             r.sqr()
             r.mul(self)
@@ -493,9 +480,9 @@ public struct FP {
 /* this=1/this mod Modulus */
     mutating func inverse()
     {
-        if FP.MODTYPE==FP.PSEUDO_MERSENNE || FP.MODTYPE==FP.GENERALISED_MERSENNE {
+        if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE || CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE {
             var y=fpow()
-            if (FP.MOD8==5)
+            if (CONFIG_FIELD.MOD8==5)
             {
                 var t=FP(self)
                 t.sqr()
@@ -529,7 +516,7 @@ public struct FP {
     mutating func pow(_ e: BIG) -> FP
     {
         var tb=[FP]() 
-        let n=1+(BIG.NLEN*Int(BIG.BASEBITS)+3)/4
+        let n=1+(CONFIG_BIG.NLEN*Int(CONFIG_BIG.BASEBITS)+3)/4
         var w=[Int8](repeating: 0,count: n)     
         norm()
         var t=BIG(e); t.norm()
@@ -564,11 +551,11 @@ public struct FP {
     mutating func sqrt() -> FP
     {
         reduce();
-        if (FP.MOD8==5)
+        if (CONFIG_FIELD.MOD8==5)
         {
             var v: FP
             var i=FP(self); i.x.shl(1)
-            if FP.MODTYPE==FP.PSEUDO_MERSENNE  || FP.MODTYPE==FP.GENERALISED_MERSENNE {
+            if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE  || CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE {
                 v=i.fpow()
             } else {       
                 var b=BIG(FP.p)
@@ -584,7 +571,7 @@ public struct FP {
         }
         else
         {
-           if FP.MODTYPE==FP.PSEUDO_MERSENNE  || FP.MODTYPE==FP.GENERALISED_MERSENNE {
+           if CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE  || CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE {
                 var r=fpow()
                 r.mul(self)
                 return r
