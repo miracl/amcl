@@ -24,19 +24,19 @@ package XXX
 
 //import "fmt"
 
-const NOT_SPECIAL int = 0
-const PSEUDO_MERSENNE int = 1
-const MONTGOMERY_FRIENDLY int = 2
-const GENERALISED_MERSENNE int = 3
+//const NOT_SPECIAL int = 0
+//const PSEUDO_MERSENNE int = 1
+//const MONTGOMERY_FRIENDLY int = 2
+//const GENERALISED_MERSENNE int = 3
 
-const MODBITS uint = @NBT@ /* Number of bits in Modulus */
-const MOD8 uint = @M8@  /* Modulus mod 8 */
-const MODTYPE int = @MT@ //NOT_SPECIAL
+//const MODBITS uint = @NBT@ /* Number of bits in Modulus */
+//const MOD8 uint = @M8@  /* Modulus mod 8 */
+//const MODTYPE int = @MT@ //NOT_SPECIAL
+//const FEXCESS int32=((int32(1)<<@SH@)-1)
 
-const FEXCESS int32=((int32(1)<<@SH@)-1)
-const OMASK Chunk = ((Chunk(-1)) << (MODBITS % BASEBITS))
-const TBITS uint = MODBITS % BASEBITS // Number of active bits in top word
-const TMASK Chunk = (Chunk(1) << TBITS) - 1
+//const OMASK Chunk = ((Chunk(-1)) << (MODBITS % BASEBITS))
+//const TBITS uint = MODBITS % BASEBITS // Number of active bits in top word
+//const TMASK Chunk = (Chunk(1) << TBITS) - 1
 
 type FP struct {
 	x   *BIG

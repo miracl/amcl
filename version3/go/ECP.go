@@ -21,25 +21,25 @@ package XXX
 
 //import "fmt"
 
-const WEIERSTRASS int = 0
-const EDWARDS int = 1
-const MONTGOMERY int = 2
-const NOT int = 0
-const BN int = 1
-const BLS int = 2
-const D_TYPE int = 0
-const M_TYPE int = 1
-const POSITIVEX int = 0
-const NEGATIVEX int = 1
+//const WEIERSTRASS int = 0
+//const EDWARDS int = 1
+//const MONTGOMERY int = 2
+//const NOT int = 0
+//const BN int = 1
+//const BLS int = 2
+//const D_TYPE int = 0
+//const M_TYPE int = 1
+//const POSITIVEX int = 0
+//const NEGATIVEX int = 1
 
 
-const CURVETYPE int = @CT@
-const CURVE_PAIRING_TYPE int = @PF@
-const SEXTIC_TWIST int = @ST@
-const SIGN_OF_X int = @SX@
+//const CURVETYPE int = @CT@
+//const CURVE_PAIRING_TYPE int = @PF@
+//const SEXTIC_TWIST int = @ST@
+//const SIGN_OF_X int = @SX@
 
-const HASH_TYPE int = @HT@
-const AESKEY int = @AK@
+//const HASH_TYPE int = @HT@
+//const AESKEY int = @AK@
 
 /* Elliptic Curve Point Structure */
 

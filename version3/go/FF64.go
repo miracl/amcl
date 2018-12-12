@@ -23,15 +23,15 @@ package XXX
 //import "os"
 import "github.com/milagro-crypto/amcl/version3/go/amcl"
 
-const FFLEN int = @ML@
+//const FFLEN int = @ML@
 
-const FF_BITS int = (BIGBITS * FFLEN) /* Finite Field Size in bits - must be 256.2^n */
-const HFLEN int = (FFLEN / 2)         /* Useful for half-size RSA private key operations */
+//const FF_BITS int = (BIGBITS * FFLEN) /* Finite Field Size in bits - must be 256.2^n */
+//const HFLEN int = (FFLEN / 2)         /* Useful for half-size RSA private key operations */
 
-const P_MBITS uint = MODBYTES * 8
-const P_OMASK Chunk = (Chunk(-1) << (P_MBITS % BASEBITS))
-const P_FEXCESS Chunk = (Chunk(1) << (BASEBITS*uint(NLEN) - P_MBITS - 1))
-const P_TBITS uint = (P_MBITS % BASEBITS)
+//const P_MBITS uint = MODBYTES * 8
+//const P_OMASK Chunk = (Chunk(-1) << (P_MBITS % BASEBITS))
+//const P_FEXCESS Chunk = (Chunk(1) << (BASEBITS*uint(NLEN) - P_MBITS - 1))
+//const P_TBITS uint = (P_MBITS % BASEBITS)
 
 func FF_EXCESS(a *BIG) Chunk {
 	return ((a.w[NLEN-1] & P_OMASK) >> (P_TBITS)) + 1
