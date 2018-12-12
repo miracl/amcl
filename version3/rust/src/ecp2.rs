@@ -292,6 +292,23 @@ impl ECP2 {
         return format!("({},{})", W.x.tostring(), W.y.tostring());
     }
 
+    pub fn to_hex(&self) -> String {
+        format!("{} {} {}", self.x.to_hex(), self.y.to_hex(), self.z.to_hex())
+    }
+
+    pub fn from_hex_iter(iter: &mut SplitWhitespace) -> ECP2 {
+        ECP2 {
+            x: FP2::from_hex_iter(iter),
+            y: FP2::from_hex_iter(iter),
+            z: FP2::from_hex_iter(iter)
+        }
+    }
+
+    pub fn from_hex(val: String) -> ECP2 {
+        let mut iter = val.split_whitespace();
+        return ECP2::from_hex_iter(&mut iter);
+    }
+
     /* Calculate RHS of twisted curve equation x^3+B/i */
     pub fn rhs(x: &FP2) -> FP2 {
         let mut r = FP2::new_copy(x);

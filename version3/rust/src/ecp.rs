@@ -448,6 +448,23 @@ impl ECP {
         };
     }
 
+    pub fn to_hex(&self) -> String {
+        format!("{} {} {}", self.x.to_hex(), self.y.to_hex(), self.z.to_hex())
+    }
+
+    pub fn from_hex_iter(iter: &mut SplitWhitespace) -> ECP {
+        ECP {
+            x: FP::from_hex_iter(iter),
+            y: FP::from_hex_iter(iter),
+            z: FP::from_hex_iter(iter),
+        }
+    }
+
+    pub fn from_hex(val: String) -> ECP {
+        let mut iter = val.split_whitespace();
+        return ECP::from_hex_iter(&mut iter);
+    }
+
     /* this*=2 */
     pub fn dbl(&mut self) {
         if CURVETYPE == CurveType::WEIERSTRASS {

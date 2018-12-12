@@ -289,6 +289,22 @@ impl FP4 {
         return format!("[{},{}]", self.a.tostring(), self.b.tostring());
     }
 
+    pub fn to_hex(&self) -> String {
+        format!("{} {}", self.a.to_hex(), self.b.to_hex())
+    }
+
+    pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP4 {
+        FP4 {
+            a: FP2::from_hex_iter(iter),
+            b: FP2::from_hex_iter(iter)
+        }
+    }
+
+    pub fn from_hex(val: String) -> FP4 {
+        let mut iter = val.split_whitespace();
+        return FP4::from_hex_iter(&mut iter);
+    }
+
     /* self=1/self */
     pub fn inverse(&mut self) {
         //self.norm();

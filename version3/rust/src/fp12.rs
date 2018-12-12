@@ -652,6 +652,23 @@ impl FP12 {
         );
     }
 
+    pub fn to_hex(&self) -> String {
+        format!("{} {} {}", self.a.to_hex(), self.b.to_hex(), self.c.to_hex())
+    }
+
+    pub fn from_hex_iter(iter: &mut SplitWhitespace) -> FP12 {
+        FP12 {
+            a: FP4::from_hex_iter(iter),
+            b: FP4::from_hex_iter(iter),
+            c: FP4::from_hex_iter(iter)
+        }
+    }
+
+    pub fn from_hex(val: String) -> FP12 {
+        let mut iter = val.split_whitespace();
+        return FP12::from_hex_iter(&mut iter);
+    }
+
     /* self=self^e */
     pub fn pow(&self, e: &BIG) -> FP12 {
         let mut r = FP12::new_copy(self);
