@@ -27,3 +27,39 @@ And to use primitives of needed curve:
 ```rust
 use amcl::bls48::{ECP, ECP8}; //any primitive you need
 ```
+
+Full list of features:
+
+* Elliptic Curves
+  * ed25519
+  * c25519
+  * nist256
+  * brainpool
+  * anssi
+  * hifive
+  * goldilocks
+  * nist384
+  * c41417
+  * nist521
+  * nums256w
+  * nums256e
+  * nums384w
+  * nums384e
+  * nums512w
+  * nums512e
+  * secp256k1
+* Pairing-Friendly Elliptic Curves
+  * bn254
+  * bn254CX
+  * bls383
+  * bls381
+  * fp256BN
+  * fp512BN
+  * bls461
+  * bls24
+  * bls48
+  
+* RSA
+  * rsa2048
+  * rsa3072
+  * rsa4096
