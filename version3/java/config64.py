@@ -49,6 +49,8 @@ def rsaset(tb,nb,base,ml) :
 	os.system(makedir+amclpath+slashtext+tb)
 	os.system(makedir+amclTestPath+slashtext+tb) #ms
 	
+	os.system(copytext+"CONFIG_BIG.java "+fpath+"CONFIG_BIG.java")
+	os.system(copytext+"CONFIG_FF.java "+fpath+"CONFIG_FF.java")
 	os.system(copytext+"BIG64.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG64.java "+fpath+"DBIG.java")
 	os.system(copytext+"FF64.java "+fpath+"FF.java")
@@ -58,6 +60,8 @@ def rsaset(tb,nb,base,ml) :
 	os.system(copytext+"TestRSA.java "+fpathTest+"TestRSA.java") #ms
 	os.system(copytext+"TesttimeRSA.java "+fpathTest+"TesttimeRSA.java")	#ms
 
+	replace(fpath+"CONFIG_BIG.java","XXX",tb)
+	replace(fpath+"CONFIG_FF.java","XXX",tb)
 	replace(fpath+"BIG.java","XXX",tb)
 	replace(fpath+"DBIG.java","XXX",tb)
 	replace(fpath+"FF.java","XXX",tb)
@@ -68,10 +72,10 @@ def rsaset(tb,nb,base,ml) :
 	replace(fpathTest+"TesttimeRSA.java","XXX",tb)  #ms
 
 
-	replace(fpath+"BIG.java","@NB@",nb)
-	replace(fpath+"BIG.java","@BASE@",base)
+	replace(fpath+"CONFIG_BIG.java","@NB@",nb)
+	replace(fpath+"CONFIG_BIG.java","@BASE@",base)
 
-	replace(fpath+"FF.java","@ML@",ml);
+	replace(fpath+"CONFIG_FF.java","@ML@",ml);
 
 
 def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
@@ -86,6 +90,9 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	os.system(makedir+amclpath+slashtext+tc)
 	os.system(makedir+amclTestPath+slashtext+tc)  #ms
 
+	os.system(copytext+"CONFIG_BIG.java "+fpath+"CONFIG_BIG.java")
+	os.system(copytext+"CONFIG_FIELD.java "+fpath+"CONFIG_FIELD.java")
+	os.system(copytext+"CONFIG_CURVE.java "+fpath+"CONFIG_CURVE.java")
 	os.system(copytext+"BIG64.java "+fpath+"BIG.java")
 	os.system(copytext+"DBIG64.java "+fpath+"DBIG.java")
 	os.system(copytext+"FP64.java "+fpath+"FP.java")
@@ -95,6 +102,9 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	os.system(copytext+"TestECDH.java "+fpathTest+"TestECDH.java")	#ms
 	os.system(copytext+"TesttimeECDH.java "+fpathTest+"TesttimeECDH.java")	#ms
 	
+	replace(fpath+"CONFIG_BIG.java","XXX",tc)	
+	replace(fpath+"CONFIG_FIELD.java","XXX",tc)	
+	replace(fpath+"CONFIG_CURVE.java","XXX",tc)	
 	replace(fpath+"BIG.java","XXX",tc)
 	replace(fpath+"DBIG.java","XXX",tc)
 	replace(fpath+"FP.java","XXX",tc)
@@ -103,12 +113,12 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	replace(fpathTest+"TestECDH.java","XXX",tc)  #ms
 	replace(fpathTest+"TesttimeECDH.java","XXX",tc)  #ms
 
-	replace(fpath+"BIG.java","@NB@",nb)
-	replace(fpath+"BIG.java","@BASE@",base)
+	replace(fpath+"CONFIG_BIG.java","@NB@",nb)
+	replace(fpath+"CONFIG_BIG.java","@BASE@",base)
 
-	replace(fpath+"FP.java","@NBT@",nbt)
-	replace(fpath+"FP.java","@M8@",m8)
-	replace(fpath+"FP.java","@MT@",mt)
+	replace(fpath+"CONFIG_FIELD.java","@NBT@",nbt)
+	replace(fpath+"CONFIG_FIELD.java","@M8@",m8)
+	replace(fpath+"CONFIG_FIELD.java","@MT@",mt)
 
 	ib=int(base)
 	inb=int(nb)
@@ -116,23 +126,23 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 	sh=ib*(1+((8*inb-1)//ib))-inbt
 	if sh > 30 :
 		sh=30
-	replace(fpath+"FP.java","@SH@",str(sh))
+	replace(fpath+"CONFIG_FIELD.java","@SH@",str(sh))
 
 
-	replace(fpath+"ECP.java","@CT@",ct)
-	replace(fpath+"ECP.java","@PF@",pf)
-	replace(fpath+"ECP.java","@ST@",stw)
-	replace(fpath+"ECP.java","@SX@",sx)
+	replace(fpath+"CONFIG_CURVE.java","@CT@",ct)
+	replace(fpath+"CONFIG_CURVE.java","@PF@",pf)
+	replace(fpath+"CONFIG_CURVE.java","@ST@",stw)
+	replace(fpath+"CONFIG_CURVE.java","@SX@",sx)
 
 	if cs == "128" :
-		replace(fpath+"ECP.java","@HT@","32")
-		replace(fpath+"ECP.java","@AK@","16")
+		replace(fpath+"CONFIG_CURVE.java","@HT@","32")
+		replace(fpath+"CONFIG_CURVE.java","@AK@","16")
 	if cs == "192" :
-		replace(fpath+"ECP.java","@HT@","48")
-		replace(fpath+"ECP.java","@AK@","24")
+		replace(fpath+"CONFIG_CURVE.java","@HT@","48")
+		replace(fpath+"CONFIG_CURVE.java","@AK@","24")
 	if cs == "256" :
-		replace(fpath+"ECP.java","@HT@","64")
-		replace(fpath+"ECP.java","@AK@","32")
+		replace(fpath+"CONFIG_CURVE.java","@HT@","64")
+		replace(fpath+"CONFIG_CURVE.java","@AK@","32")
 
 	if pf != "NOT" :
 		os.system(copytext+"FP2.java "+fpath+"FP2.java")

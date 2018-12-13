@@ -25,25 +25,21 @@ import org.apache.milagro.amcl.RAND;
 
 public final class FF {
 
-/* RSA/DH modulus length as multiple of BIGBITS */
-	public static final int FFLEN=@ML@;
-
 /* Don't Modify from here... */
 
-
 /* Finite field support - for RSA, DH etc. */
-	public static final int FF_BITS=(BIG.BIGBITS*FFLEN); /* Finite Field Size in bits - must be 256.2^n */
-	public static final int HFLEN=(FFLEN/2);  /* Useful for half-size RSA private key operations */
-	public static final int P_MBITS=BIG.MODBYTES*8;
-	public static final int P_TBITS=(P_MBITS%BIG.BASEBITS);
+	public static final int FF_BITS=(BIG.BIGBITS*CONFIG_FF.FFLEN); /* Finite Field Size in bits - must be 256.2^n */
+	public static final int HFLEN=(CONFIG_FF.FFLEN/2);  /* Useful for half-size RSA private key operations */
+	public static final int P_MBITS=CONFIG_BIG.MODBYTES*8;
+	public static final int P_TBITS=(P_MBITS%CONFIG_BIG.BASEBITS);
 
 	private final BIG[] v;
 	private final int length;
 
 /**************** 32-bit specific ************************/
 
-	public static final int P_OMASK=((int)(-1)<<(P_MBITS%BIG.BASEBITS));
-	public static final int P_FEXCESS=((int)1<<(BIG.BASEBITS*BIG.NLEN-P_MBITS-1));
+	public static final int P_OMASK=((int)(-1)<<(P_MBITS%CONFIG_BIG.BASEBITS));
+	public static final int P_FEXCESS=((int)1<<(CONFIG_BIG.BASEBITS*BIG.NLEN-P_MBITS-1));
 
 	public static int EXCESS(BIG a)
 	{
@@ -91,7 +87,7 @@ public final class FF {
 	{
 		zero();
 		v[0].set(0,(m&BIG.BMASK));
-		v[0].set(1,(m>>BIG.BASEBITS));
+		v[0].set(1,(m>>CONFIG_BIG.BASEBITS));
 	}
 
 /* copy from FF b */
@@ -347,7 +343,7 @@ public final class FF {
 	{
 		for (int i=0;i<length;i++)
 		{
-			v[i].tobytearray(b,(length-i-1)*BIG.MODBYTES);
+			v[i].tobytearray(b,(length-i-1)*CONFIG_BIG.MODBYTES);
 		}
 	}
 
@@ -355,7 +351,7 @@ public final class FF {
 	{
 		for (int i=0;i<x.length;i++)
 		{
-			x.v[i]=BIG.frombytearray(b,(x.length-i-1)*BIG.MODBYTES);
+			x.v[i]=BIG.frombytearray(b,(x.length-i-1)*CONFIG_BIG.MODBYTES);
 		}
 	}
 
@@ -377,7 +373,7 @@ public final class FF {
 			x.v[xp].norm();
 			y.v[yp].norm();
 			DBIG d=BIG.mul(x.v[xp],y.v[yp]);
-			v[vp+1]=d.split(8*BIG.MODBYTES);
+			v[vp+1]=d.split(8*CONFIG_BIG.MODBYTES);
 			v[vp].copy(d);
 			return;
 		}
@@ -403,7 +399,7 @@ public final class FF {
 		{
 			x.v[xp].norm();
 			DBIG d=BIG.sqr(x.v[xp]);
-			v[vp+1].copy(d.split(8*BIG.MODBYTES));
+			v[vp+1].copy(d.split(8*CONFIG_BIG.MODBYTES));
 			v[vp].copy(d);
 			return;
 		}	
@@ -658,7 +654,7 @@ idue mod m */
 		if (n==1)
 		{ 
 			DBIG d=new DBIG(this.v[0]);
-			d.shl(BIG.NLEN*BIG.BASEBITS);
+			d.shl(BIG.NLEN*CONFIG_BIG.BASEBITS);
 			this.v[0].copy(d.mod(m.v[0]));
 		}
 		else
@@ -675,7 +671,7 @@ idue mod m */
 		if (n==1)
 		{
 			DBIG d=new DBIG(this.v[0]);
-			this.v[0].copy(BIG.monty(m.v[0],(BIG.cast_to_chunk(1)<<BIG.BASEBITS)-ND.v[0].w[0],d));
+			this.v[0].copy(BIG.monty(m.v[0],(BIG.cast_to_chunk(1)<<CONFIG_BIG.BASEBITS)-ND.v[0].w[0],d));
 		}
 		else
 		{
@@ -735,7 +731,7 @@ idue mod m */
 			v[i].copy(BIG.random(rng));
 		}
 	/* make sure top bit is 1 */
-		while (v[n-1].nbits()<BIG.MODBYTES*8) v[n-1].copy(BIG.random(rng));
+		while (v[n-1].nbits()<CONFIG_BIG.MODBYTES*8) v[n-1].copy(BIG.random(rng));
 	}
 
 	/* generate random x */
@@ -759,7 +755,7 @@ idue mod m */
 		if (n==1)
 		{
 			DBIG d=BIG.mul(this.v[0],y.v[0]);
-			this.v[0].copy(BIG.monty(p.v[0],(BIG.cast_to_chunk(1)<<BIG.BASEBITS)-nd.v[0].w[0],d));
+			this.v[0].copy(BIG.monty(p.v[0],(BIG.cast_to_chunk(1)<<CONFIG_BIG.BASEBITS)-nd.v[0].w[0],d));
 		}
 		else
 		{
@@ -776,7 +772,7 @@ idue mod m */
 		if (n==1)
 		{
 			DBIG d=BIG.sqr(this.v[0]);
-			this.v[0].copy(BIG.monty(p.v[0],(BIG.cast_to_chunk(1)<<BIG.BASEBITS)-nd.v[0].w[0],d));
+			this.v[0].copy(BIG.monty(p.v[0],(BIG.cast_to_chunk(1)<<CONFIG_BIG.BASEBITS)-nd.v[0].w[0],d));
 
 		}
 		else
@@ -800,7 +796,7 @@ idue mod m */
 		R0.nres(p);
 		R1.nres(p);
 
-		for (i=8*BIG.MODBYTES*n-1;i>=0;i--)
+		for (i=8*CONFIG_BIG.MODBYTES*n-1;i>=0;i--)
 		{
 			b=e.v[i/BIG.BIGBITS].bit(i%BIG.BIGBITS);
 			copy(R0);
@@ -830,7 +826,7 @@ idue mod m */
 		R0.nres(p);
 		R1.nres(p);
 
-		for (i=8*BIG.MODBYTES-1;i>=0;i--)
+		for (i=8*CONFIG_BIG.MODBYTES-1;i>=0;i--)
 		{
 			b=e.bit(i);
 			copy(R0);
@@ -888,7 +884,7 @@ idue mod m */
 		one();
 		nres(p);
 		w.nres(p);
-		for (i=8*BIG.MODBYTES*n-1;i>=0;i--)
+		for (i=8*CONFIG_BIG.MODBYTES*n-1;i>=0;i--)
 		{
 			modsqr(p,ND);
 			b=e.v[i/BIG.BIGBITS].bit(i%BIG.BIGBITS);
@@ -914,7 +910,7 @@ idue mod m */
 		one();
 		nres(p);
 
-		for (i=8*BIG.MODBYTES-1;i>=0;i--)
+		for (i=8*CONFIG_BIG.MODBYTES-1;i>=0;i--)
 		{
 			eb=e.bit(i);
 			fb=f.bit(i);

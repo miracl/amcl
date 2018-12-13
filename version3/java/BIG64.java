@@ -26,17 +26,14 @@ public class BIG {
 
 	public static final int CHUNK=64; /* Set word size */
 
-	public static final int MODBYTES=@NB@; //(1+(MODBITS-1)/8);
-	public static final int BASEBITS=@BASE@; 
-
-	public static final int NLEN=(1+((8*MODBYTES-1)/BASEBITS));
+	public static final int NLEN=(1+((8*CONFIG_BIG.MODBYTES-1)/CONFIG_BIG.BASEBITS));
 	public static final int DNLEN=2*NLEN;
-	public static final long BMASK=(((long)1<<BASEBITS)-1);
+	public static final long BMASK=(((long)1<<CONFIG_BIG.BASEBITS)-1);
 
-	public static final int HBITS=BASEBITS/2;
+	public static final int HBITS=CONFIG_BIG.BASEBITS/2;
 	public static final long HMASK=(((long)1<<HBITS)-1);
-	public static final int NEXCESS = ((int)1<<(CHUNK-BASEBITS-1));
-	public static final int BIGBITS=(MODBYTES*8);
+	public static final int NEXCESS = ((int)1<<(CHUNK-CONFIG_BIG.BASEBITS-1));
+	public static final int BIGBITS=(CONFIG_BIG.MODBYTES*8);
 
 	protected long[] w=new long[NLEN];
 /* Constructors */
@@ -113,17 +110,17 @@ public class BIG {
 		return (long)x;
 	}
 
-/* normalise BIG - force all digits < 2^BASEBITS */
+/* normalise BIG - force all digits < 2^CONFIG_BIG.BASEBITS */
 	public long norm() {
 		long d,carry=0;
 		for (int i=0;i<NLEN-1;i++)
 		{
 			d=w[i]+carry;
 			w[i]=d&BMASK;
-			carry=(d>>BASEBITS);
+			carry=(d>>CONFIG_BIG.BASEBITS);
 		}
 		w[NLEN-1]=(w[NLEN-1]+carry);
-		return (long)(w[NLEN-1]>>((8*MODBYTES)%BASEBITS));  
+		return (long)(w[NLEN-1]>>((8*CONFIG_BIG.MODBYTES)%CONFIG_BIG.BASEBITS));  
 	}
 
 /* return number of bits */
@@ -134,7 +131,7 @@ public class BIG {
 		t.norm();
 		while (k>=0 && t.w[k]==0) k--;
 		if (k<0) return 0;
-		bts=BASEBITS*k;
+		bts=CONFIG_BIG.BASEBITS*k;
 		c=t.w[k];
 		while (c!=0) {c/=2; bts++;}
 		return bts;
@@ -160,7 +157,7 @@ public class BIG {
 
 		if (len%4==0) len/=4;
 		else {len/=4; len++;}
-		if (len<MODBYTES*2) len=MODBYTES*2;
+		if (len<CONFIG_BIG.MODBYTES*2) len=CONFIG_BIG.MODBYTES*2;
 
 		for (int i=len-1;i>=0;i--)
 		{
@@ -188,7 +185,7 @@ public class BIG {
 		x1=(mid>>HBITS);
 		bot+=x0<<HBITS; bot+=c; bot+=r;
 		top+=x1;
-		long carry=bot>>BASEBITS;
+		long carry=bot>>CONFIG_BIG.BASEBITS;
 		bot&=BMASK;
 		top+=carry;
 		tb[0]=top;
@@ -236,7 +233,7 @@ public class BIG {
 	{	
 		long ak,base,carry=0;
 		norm();
-		base=((long)1<<BASEBITS);
+		base=((long)1<<CONFIG_BIG.BASEBITS);
 		for (int i=NLEN-1;i>=0;i--)
 		{
 			ak=(carry*base+w[i]);
@@ -353,14 +350,14 @@ public class BIG {
 	public static int ssn(BIG r,BIG a,BIG m)
 	{
 		int n=NLEN-1;
-		m.w[0]=(m.w[0]>>1)|((m.w[1]<<(BASEBITS-1))&BMASK);
+		m.w[0]=(m.w[0]>>1)|((m.w[1]<<(CONFIG_BIG.BASEBITS-1))&BMASK);
 		r.w[0]=a.w[0]-m.w[0];
-		long carry=r.w[0]>>BASEBITS;
+		long carry=r.w[0]>>CONFIG_BIG.BASEBITS;
 		r.w[0]&=BMASK;
 		for (int i=1;i<n;i++) {
-			m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(BASEBITS-1))&BMASK);
+			m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(CONFIG_BIG.BASEBITS-1))&BMASK);
 			r.w[i]=a.w[i]-m.w[i]+carry;
-			carry=r.w[i]>>BASEBITS;
+			carry=r.w[i]>>CONFIG_BIG.BASEBITS;
 			r.w[i]&=BMASK;
 		}
 		m.w[n]>>=1;
@@ -379,8 +376,8 @@ public class BIG {
 	public void mod2m(int m)
 	{
 		int i,wd,bt;
-		wd=m/BASEBITS;
-		bt=m%BASEBITS;
+		wd=m/CONFIG_BIG.BASEBITS;
+		bt=m%CONFIG_BIG.BASEBITS;
 		w[wd]&=((cast_to_chunk(1)<<bt)-1);
 		for (i=wd+1;i<NLEN;i++) w[i]=0;
 	}
@@ -388,7 +385,7 @@ public class BIG {
 /* return n-th bit */
 	public int bit(int n)
 	{
-		if ((w[n/BASEBITS]&(cast_to_chunk(1)<<(n%BASEBITS)))>0) return 1;
+		if ((w[n/CONFIG_BIG.BASEBITS]&(cast_to_chunk(1)<<(n%CONFIG_BIG.BASEBITS)))>0) return 1;
 		else return 0;
 	}
 
@@ -396,18 +393,18 @@ public class BIG {
 	public int fshr(int k) {
 		int r=(int)(w[0]&((cast_to_chunk(1)<<k)-1)); /* shifted out part */
 		for (int i=0;i<NLEN-1;i++)
-			w[i]=(w[i]>>k)|((w[i+1]<<(BASEBITS-k))&BMASK);
+			w[i]=(w[i]>>k)|((w[i+1]<<(CONFIG_BIG.BASEBITS-k))&BMASK);
 		w[NLEN-1]=w[NLEN-1]>>k;
 		return r;
 	}
 
 /* Shift right by less than a word */
 	public int fshl(int k) {
-		w[NLEN-1]=((w[NLEN-1]<<k))|(w[NLEN-2]>>(BASEBITS-k));
+		w[NLEN-1]=((w[NLEN-1]<<k))|(w[NLEN-2]>>(CONFIG_BIG.BASEBITS-k));
 		for (int i=NLEN-2;i>0;i--)
-			w[i]=((w[i]<<k)&BMASK)|(w[i-1]>>(BASEBITS-k));
+			w[i]=((w[i]<<k)&BMASK)|(w[i-1]>>(CONFIG_BIG.BASEBITS-k));
 		w[0]=(w[0]<<k)&BMASK; 
-		return (int)(w[NLEN-1]>>((8*MODBYTES)%BASEBITS)); /* return excess - only used in FF.java */
+		return (int)(w[NLEN-1]>>((8*CONFIG_BIG.MODBYTES)%CONFIG_BIG.BASEBITS)); /* return excess - only used in FF.java */
 	}
 
 /* test for zero */
@@ -456,24 +453,24 @@ public class BIG {
 
 /* general shift right */
 	public void shr(int k) {
-		int n=k%BASEBITS;
-		int m=k/BASEBITS;	
+		int n=k%CONFIG_BIG.BASEBITS;
+		int m=k/CONFIG_BIG.BASEBITS;	
 		for (int i=0;i<NLEN-m-1;i++)
-			w[i]=(w[m+i]>>n)|((w[m+i+1]<<(BASEBITS-n))&BMASK);
+			w[i]=(w[m+i]>>n)|((w[m+i+1]<<(CONFIG_BIG.BASEBITS-n))&BMASK);
 		if (NLEN>m) w[NLEN-m-1]=w[NLEN-1]>>n;
 		for (int i=NLEN-m;i<NLEN;i++) w[i]=0;
 	}
 
 /* general shift left */
 	public void shl(int k) {
-		int n=k%BASEBITS;
-		int m=k/BASEBITS;
+		int n=k%CONFIG_BIG.BASEBITS;
+		int m=k/CONFIG_BIG.BASEBITS;
 
 		w[NLEN-1]=((w[NLEN-1-m]<<n));
-		if (NLEN>=m+2) w[NLEN-1]|=(w[NLEN-m-2]>>(BASEBITS-n));
+		if (NLEN>=m+2) w[NLEN-1]|=(w[NLEN-m-2]>>(CONFIG_BIG.BASEBITS-n));
 
 		for (int i=NLEN-2;i>m;i--)
-			w[i]=((w[i-m]<<n)&BMASK)|(w[i-m-1]>>(BASEBITS-n));
+			w[i]=((w[i-m]<<n)&BMASK)|(w[i-m-1]>>(CONFIG_BIG.BASEBITS-n));
 		w[m]=(w[0]<<n)&BMASK;
 		for (int i=0;i<m;i++) w[i]=0;
 	}
@@ -550,7 +547,7 @@ public class BIG {
 		BIG c=new BIG(this);
 		c.norm();
 
-		for (int i=MODBYTES-1;i>=0;i--)
+		for (int i=CONFIG_BIG.MODBYTES-1;i>=0;i--)
 		{
 			b[i+n]=(byte)c.w[0];
 			c.fshr(8);
@@ -562,7 +559,7 @@ public class BIG {
 	{
 		BIG m=new BIG(0);
 
-		for (int i=0;i<MODBYTES;i++)
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++)
 		{
 			m.fshl(8); m.w[0]+=(int)b[i+n]&0xff;
 		}
@@ -740,14 +737,14 @@ public class BIG {
 		return ((int)w[0])&msk;
 	}
 
-/* get 8*MODBYTES size random number */
+/* get 8*CONFIG_BIG.MODBYTES size random number */
 	public static BIG random(RAND rng)
 	{
 		BIG m=new BIG(0);
 		int i,b,j=0,r=0;
 
 /* generate random BIG */ 
-		for (i=0;i<8*MODBYTES;i++)   
+		for (i=0;i<8*CONFIG_BIG.MODBYTES;i++)   
 		{
 			if (j==0) r=rng.getByte();
 			else r>>=1;

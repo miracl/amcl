@@ -52,7 +52,7 @@ public class TestRSA extends TestCase
 
 		String message="Hello World\n";
 
-		public_key pub=new public_key(FF.FFLEN);
+		public_key pub=new public_key(CONFIG_FF.FFLEN);
 		private_key priv=new private_key(FF.HFLEN);
 
 		byte[] ML=new byte[RFS];

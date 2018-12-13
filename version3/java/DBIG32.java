@@ -30,7 +30,7 @@ public class DBIG {
 		for (int i=0;i<BIG.DNLEN-1;i++)
 		{
 			d=w[i]+carry;
-			carry=d>>BIG.BASEBITS;
+			carry=d>>CONFIG_BIG.BASEBITS;
 			w[i]=d&BIG.BMASK;
 		}
 		w[BIG.DNLEN-1]=(w[BIG.DNLEN-1]+carry);
@@ -40,13 +40,13 @@ public class DBIG {
 	public BIG split(int n)
 	{
 		BIG t=new BIG(0);
-		int nw,m=n%BIG.BASEBITS;
-		int carry=w[BIG.DNLEN-1]<<(BIG.BASEBITS-m);
+		int nw,m=n%CONFIG_BIG.BASEBITS;
+		int carry=w[BIG.DNLEN-1]<<(CONFIG_BIG.BASEBITS-m);
 
 		for (int i=BIG.DNLEN-2;i>=BIG.NLEN-1;i--)
 		{
 			nw=(w[i]>>m)|carry;
-			carry=(w[i]<<(BIG.BASEBITS-m))&BIG.BMASK;
+			carry=(w[i]<<(CONFIG_BIG.BASEBITS-m))&BIG.BMASK;
 			t.w[i-BIG.NLEN+1]=nw;
 		}
 		w[BIG.NLEN-1]&=(((int)1<<m)-1);
@@ -65,7 +65,7 @@ public class DBIG {
 		t.norm();
 		while (t.w[k]==0 && k>=0) k--;
 		if (k<0) return 0;
-		bts=BIG.BASEBITS*k;
+		bts=CONFIG_BIG.BASEBITS*k;
 		c=t.w[k];
 		while (c!=0) {c/=2; bts++;}
 		return bts;
@@ -117,7 +117,7 @@ public class DBIG {
 			w[i]=x.w[i];//get(i);
 
 		w[BIG.NLEN-1]=x.w[(BIG.NLEN-1)]&BIG.BMASK; /* top word normalized */
-		w[BIG.NLEN]=(x.w[(BIG.NLEN-1)]>>BIG.BASEBITS);
+		w[BIG.NLEN]=(x.w[(BIG.NLEN-1)]>>CONFIG_BIG.BASEBITS);
 
 		for (int i=BIG.NLEN+1;i<BIG.DNLEN;i++) w[i]=0;
 	}
@@ -148,22 +148,22 @@ public class DBIG {
 
 /* shift this right by k bits */
 	public void shr(int k) {
-		int n=k%BIG.BASEBITS;
-		int m=k/BIG.BASEBITS;	
+		int n=k%CONFIG_BIG.BASEBITS;
+		int m=k/CONFIG_BIG.BASEBITS;	
 		for (int i=0;i<BIG.DNLEN-m-1;i++)
-			w[i]=(w[m+i]>>n)|((w[m+i+1]<<(BIG.BASEBITS-n))&BIG.BMASK);
+			w[i]=(w[m+i]>>n)|((w[m+i+1]<<(CONFIG_BIG.BASEBITS-n))&BIG.BMASK);
 		w[BIG.DNLEN-m-1]=w[BIG.DNLEN-1]>>n;
 		for (int i=BIG.DNLEN-m;i<BIG.DNLEN;i++) w[i]=0;
 	}
 
 /* shift this left by k bits */
 	public void shl(int k) {
-		int n=k%BIG.BASEBITS;
-		int m=k/BIG.BASEBITS;
+		int n=k%CONFIG_BIG.BASEBITS;
+		int m=k/CONFIG_BIG.BASEBITS;
 
-		w[BIG.DNLEN-1]=((w[BIG.DNLEN-1-m]<<n))|(w[BIG.DNLEN-m-2]>>(BIG.BASEBITS-n));
+		w[BIG.DNLEN-1]=((w[BIG.DNLEN-1-m]<<n))|(w[BIG.DNLEN-m-2]>>(CONFIG_BIG.BASEBITS-n));
 		for (int i=BIG.DNLEN-2;i>m;i--)
-			w[i]=((w[i-m]<<n)&BIG.BMASK)|(w[i-m-1]>>(BIG.BASEBITS-n));
+			w[i]=((w[i-m]<<n)&BIG.BMASK)|(w[i-m-1]>>(CONFIG_BIG.BASEBITS-n));
 		w[m]=(w[0]<<n)&BIG.BMASK; 
 		for (int i=0;i<m;i++) w[i]=0;
 	}

@@ -26,8 +26,8 @@ import org.apache.milagro.amcl.SHA3;
 
 public class BLS
 {
-	public static final int BFS=BIG.MODBYTES;
-	public static final int BGS=BIG.MODBYTES;
+	public static final int BFS=CONFIG_BIG.MODBYTES;
+	public static final int BGS=CONFIG_BIG.MODBYTES;
 	public static final int BLS_OK=0;
 	public static final int BLS_FAIL=-1;
 

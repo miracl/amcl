@@ -24,18 +24,8 @@ package org.apache.milagro.amcl.XXX;
 
 public final class FP {
 
-	public static final int NOT_SPECIAL=0;
-	public static final int PSEUDO_MERSENNE=1;
-	public static final int MONTGOMERY_FRIENDLY=2;
-	public static final int GENERALISED_MERSENNE=3;
-
-	public static final int MODBITS=@NBT@; /* Number of bits in Modulus */
-	public static final int MOD8=@M8@;  /* Modulus mod 8 */
-	public static final int MODTYPE=@MT@;
-
-	public static final int FEXCESS = (((int)1<<@SH@)-1);  // BASEBITS*NLEN-MODBITS or 2^30 max!
-	public static final long OMASK=(long)(-1)<<(MODBITS%BIG.BASEBITS);
-	public static final int TBITS=MODBITS%BIG.BASEBITS; // Number of active bits in top word 
+	public static final long OMASK=(long)(-1)<<(CONFIG_FIELD.MODBITS%CONFIG_BIG.BASEBITS);
+	public static final int TBITS=CONFIG_FIELD.MODBITS%CONFIG_BIG.BASEBITS; // Number of active bits in top word 
 	public static final long TMASK=((long)1<<TBITS)-1;
 
 	public final BIG x;
@@ -46,11 +36,11 @@ public final class FP {
 /* reduce a DBIG to a BIG using the appropriate form of the modulus */
 	public static BIG mod(DBIG d)
 	{
-		if (MODTYPE==PSEUDO_MERSENNE)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE)
 		{
 			BIG b;		
 			long v,tw;
-			BIG t=d.split(MODBITS);
+			BIG t=d.split(CONFIG_FIELD.MODBITS);
 			b=new BIG(d);
 
 			v=t.pmul((int)ROM.MConst);
@@ -60,12 +50,12 @@ public final class FP {
 
 			tw=t.w[BIG.NLEN-1];
 			t.w[BIG.NLEN-1]&=FP.TMASK;
-			t.w[0]+=(ROM.MConst*((tw>>TBITS)+(v<<(BIG.BASEBITS-TBITS))));
+			t.w[0]+=(ROM.MConst*((tw>>TBITS)+(v<<(CONFIG_BIG.BASEBITS-TBITS))));
 
 			t.norm();
 			return t;			
 		}
-		if (FP.MODTYPE==MONTGOMERY_FRIENDLY)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.MONTGOMERY_FRIENDLY)
 		{
 			BIG b;		
 			long[] cr=new long[2];
@@ -82,32 +72,32 @@ public final class FP {
 			b.norm();
 			return b;		
 		}
-		if (MODTYPE==GENERALISED_MERSENNE)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE)
 		{ // GoldiLocks Only
 			BIG b;		
-			BIG t=d.split(MODBITS);
+			BIG t=d.split(CONFIG_FIELD.MODBITS);
 			b=new BIG(d);
 			b.add(t);
 			DBIG dd=new DBIG(t);
-			dd.shl(MODBITS/2);
+			dd.shl(CONFIG_FIELD.MODBITS/2);
 
-			BIG tt=dd.split(MODBITS);
+			BIG tt=dd.split(CONFIG_FIELD.MODBITS);
 			BIG lo=new BIG(dd);
 			b.add(tt);
 			b.add(lo);
 			b.norm();
-			tt.shl(MODBITS/2);
+			tt.shl(CONFIG_FIELD.MODBITS/2);
 			b.add(tt);
 
 			long carry=b.w[BIG.NLEN-1]>>TBITS;
 			b.w[BIG.NLEN-1]&=FP.TMASK;
 			b.w[0]+=carry;
 			
-			b.w[224/BIG.BASEBITS]+=carry<<(224%BIG.BASEBITS);
+			b.w[224/CONFIG_BIG.BASEBITS]+=carry<<(224%CONFIG_BIG.BASEBITS);
 			b.norm();
 			return b;		
 		}
-		if (MODTYPE==NOT_SPECIAL)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.NOT_SPECIAL)
 		{
 			return BIG.monty(new BIG(ROM.Modulus),ROM.MConst,d);
 		}
@@ -123,8 +113,8 @@ public final class FP {
 		if (TBITS<hb)
 		{
 			sh=hb-TBITS;
-			num=(n.w[BIG.NLEN-1]<<sh)|(n.w[BIG.NLEN-2]>>(BIG.BASEBITS-sh));
-			den=(m.w[BIG.NLEN-1]<<sh)|(m.w[BIG.NLEN-2]>>(BIG.BASEBITS-sh));
+			num=(n.w[BIG.NLEN-1]<<sh)|(n.w[BIG.NLEN-2]>>(CONFIG_BIG.BASEBITS-sh));
+			den=(m.w[BIG.NLEN-1]<<sh)|(m.w[BIG.NLEN-2]>>(CONFIG_BIG.BASEBITS-sh));
 		}
 		else
 		{
@@ -147,7 +137,7 @@ public final class FP {
 		{
 			q=quo(x,m);
 			carry=r.pmul(q);
-			r.w[BIG.NLEN-1]+=(carry<<BIG.BASEBITS); // correction - put any carry out back in again
+			r.w[BIG.NLEN-1]+=(carry<<CONFIG_BIG.BASEBITS); // correction - put any carry out back in again
 			x.sub(r);
 			x.norm();
 			sb=2;
@@ -210,7 +200,7 @@ public final class FP {
 /* convert to Montgomery n-residue form */
 	public void nres()
 	{
-		if (MODTYPE!=PSEUDO_MERSENNE && MODTYPE!=GENERALISED_MERSENNE)
+		if (CONFIG_FIELD.MODTYPE!=CONFIG_FIELD.PSEUDO_MERSENNE && CONFIG_FIELD.MODTYPE!=CONFIG_FIELD.GENERALISED_MERSENNE)
 		{
 			DBIG d=BIG.mul(x,new BIG(ROM.R2modp));  /*** Change ***/
 			x.copy(mod(d));
@@ -222,7 +212,7 @@ public final class FP {
 /* convert back to regular form */
 	public BIG redc()
 	{
-		if (MODTYPE!=PSEUDO_MERSENNE && MODTYPE!=GENERALISED_MERSENNE)
+		if (CONFIG_FIELD.MODTYPE!=CONFIG_FIELD.PSEUDO_MERSENNE && CONFIG_FIELD.MODTYPE!=CONFIG_FIELD.GENERALISED_MERSENNE)
 		{
 			DBIG d=new DBIG(x);
 			return mod(d);
@@ -290,7 +280,7 @@ public final class FP {
 /* this*=b mod Modulus */
 	public void mul(FP b)
 	{
-		if ((long)XES*b.XES>(long)FEXCESS) reduce();
+		if ((long)XES*b.XES>(long)CONFIG_FIELD.FEXCESS) reduce();
 
 		DBIG d=BIG.mul(x,b.x);
 		x.copy(mod(d));
@@ -308,7 +298,7 @@ public final class FP {
 			s=true;
 		}
 
-		if (MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE || CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE)
 		{
 			DBIG d=x.pxmul(c);
 			x.copy(mod(d));
@@ -316,7 +306,7 @@ public final class FP {
 		}
 		else
 		{
-			if (XES*c<=FEXCESS)
+			if (XES*c<=CONFIG_FIELD.FEXCESS)
 			{
 				x.pmul(c);
 				XES*=c;
@@ -335,7 +325,7 @@ public final class FP {
 	public void sqr()
 	{
 		DBIG d;
-		if ((long)XES*XES>(long)FEXCESS) reduce();
+		if ((long)XES*XES>(long)CONFIG_FIELD.FEXCESS) reduce();
 
 		d=BIG.sqr(x);	
 		x.copy(mod(d));
@@ -346,7 +336,7 @@ public final class FP {
 	public void add(FP b) {
 		x.add(b.x);
 		XES+=b.XES;
-		if (XES>FEXCESS) reduce();
+		if (XES>CONFIG_FIELD.FEXCESS) reduce();
 	}
 
 // https://graphics.stanford.edu/~seander/bithacks.html
@@ -378,7 +368,7 @@ public final class FP {
 		x.rsub(m);		
 
 		XES=(1<<sb)+1;
-		if (XES>FEXCESS) reduce();
+		if (XES>CONFIG_FIELD.FEXCESS) reduce();
 	}
 
 /* this-=b */
@@ -431,11 +421,11 @@ public final class FP {
 		xp[9]=new FP(xp[8]); xp[9].sqr();  // 240
 		xp[10]=new FP(xp[9]); xp[10].mul(xp[5]);  // 255		
 			
-		n=MODBITS;
-		if (MODTYPE==GENERALISED_MERSENNE)  // Goldilocks ONLY
+		n=CONFIG_FIELD.MODBITS;
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE)  // Goldilocks ONLY
 			n/=2;
 
-		if (MOD8==5)
+		if (CONFIG_FIELD.MOD8==5)
 		{
 			n-=3;
 			c=(int)(ROM.MConst+5)/8;
@@ -504,7 +494,7 @@ public final class FP {
 			r.mul(key); 
 		}
 
-		if (MODTYPE==GENERALISED_MERSENNE)  // Goldilocks ONLY
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE)  // Goldilocks ONLY
 		{
 			key.copy(r);
 			r.sqr();
@@ -520,10 +510,10 @@ public final class FP {
 	public void inverse()
 	{
 
-		if (MODTYPE==PSEUDO_MERSENNE  || MODTYPE==GENERALISED_MERSENNE)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE  || CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE)
 		{
 			FP y=fpow();
-			if (MOD8==5)
+			if (CONFIG_FIELD.MOD8==5)
 			{
 				FP t=new FP(this);
 				t.sqr();
@@ -554,7 +544,7 @@ public final class FP {
 
 	private FP pow(BIG e)
 	{
-		byte[] w=new byte[1+(BIG.NLEN*BIG.BASEBITS+3)/4];
+		byte[] w=new byte[1+(BIG.NLEN*CONFIG_BIG.BASEBITS+3)/4];
 		FP [] tb=new FP[16];
 		BIG t=new BIG(e);
 		t.norm();
@@ -592,11 +582,11 @@ public final class FP {
 	public FP sqrt()
 	{
 		reduce();
-		if (MOD8==5)
+		if (CONFIG_FIELD.MOD8==5)
 		{
 			FP i=new FP(this); i.x.shl(1);
 			FP v;
-			if (MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE)
+			if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE || CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE)
 			{
 				v=i.fpow();
 			} else {
@@ -613,7 +603,7 @@ public final class FP {
 		}
 		else
 		{
-			if (MODTYPE==PSEUDO_MERSENNE || MODTYPE==GENERALISED_MERSENNE)
+			if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE || CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE)
 			{
 				FP r=fpow();
 				r.mul(this);

@@ -23,10 +23,7 @@ package org.apache.milagro.amcl.XXX;
 
 public final class PAIR192 {
 
-	public static final boolean USE_GLV =true;
-	public static final boolean USE_GS_G2 =true;
-	public static final boolean USE_GS_GT =true;	
-	public static final boolean GT_STRONG=false;
+//	public static final boolean GT_STRONG=false;
 
 
 /* Line function */
@@ -54,11 +51,11 @@ public final class PAIR192 {
 			int sb=3*ROM.CURVE_B_I;
 			ZZ.imul(sb); 	
 			
-			if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 			{
 				ZZ.div_2i();
 			}
-			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 			{
 				ZZ.times_i();
 				ZZ.add(ZZ);
@@ -72,12 +69,12 @@ public final class PAIR192 {
 			ZZ.sub(YY); ZZ.norm();     // 3b.Z^2-Y^2
 
 			a=new FP8(YZ,ZZ);          // -2YZ.Ys | 3b.Z^2-Y^2 | 3X^2.Xs 
-			if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 			{			
 				b=new FP8(XX);             // L(0,1) | L(0,0) | L(1,0)
 				c=new FP8(0);
 			}
-			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 			{
 				b=new FP8(0);
 				c=new FP8(XX); c.times_i();
@@ -101,7 +98,7 @@ public final class PAIR192 {
 			T1.copy(X1);            // T1=X1-Z1.X2
 			X1.qmul(Qy);            // X1=(X1-Z1.X2).Ys
 
-			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 			{
 				X1.times_i();
 				X1.norm();
@@ -115,12 +112,12 @@ public final class PAIR192 {
 			Y1.qmul(Qx);  Y1.neg(); Y1.norm(); // Y1=-(Y1-Z1.Y2).Xs
 
 			a=new FP8(X1,T2);       // (X1-Z1.X2).Ys  |  (Y1-Z1.Y2).X2 - (X1-Z1.X2).Y2  | - (Y1-Z1.Y2).Xs
-			if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 			{
 				b=new FP8(Y1);
 				c=new FP8(0);
 			}
-			if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 			{
 				b=new FP8(0);
 				c=new FP8(Y1); c.times_i();
@@ -165,22 +162,22 @@ public final class PAIR192 {
 		{
 			r.sqr();
 			lv=line(A,A,Qx,Qy);
-			r.smul(lv,ECP.SEXTIC_TWIST);
+			r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST);
 
 			bt=n3.bit(i)-n.bit(i); 
 			if (bt==1)
 			{
 				lv=line(A,P,Qx,Qy);
-				r.smul(lv,ECP.SEXTIC_TWIST);
+				r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST);
 			}
 			if (bt==-1)
 			{
 				lv=line(A,MP,Qx,Qy);
-				r.smul(lv,ECP.SEXTIC_TWIST);
+				r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST);
 			}
 		}
 
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX)
 		{
 			r.conj();
 		}
@@ -238,29 +235,29 @@ public final class PAIR192 {
 		{
 			r.sqr();
 			lv=line(A,A,Qx,Qy);
-			r.smul(lv,ECP.SEXTIC_TWIST);
+			r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST);
 
 			lv=line(B,B,Sx,Sy);
-			r.smul(lv,ECP.SEXTIC_TWIST);
+			r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST);
 
 			bt=n3.bit(i)-n.bit(i); // bt=n.bit(i);
 			if (bt==1)
 			{
 				lv=line(A,P,Qx,Qy);
-				r.smul(lv,ECP.SEXTIC_TWIST);
+				r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST);
 				lv=line(B,R,Sx,Sy);
-				r.smul(lv,ECP.SEXTIC_TWIST);
+				r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST);
 			}
 			if (bt==-1)
 			{
 				lv=line(A,MP,Qx,Qy);
-				r.smul(lv,ECP.SEXTIC_TWIST);
+				r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST);
 				lv=line(B,MR,Sx,Sy);
-				r.smul(lv,ECP.SEXTIC_TWIST);
+				r.smul(lv,CONFIG_CURVE.SEXTIC_TWIST);
 			}
 		}
 
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX)
 		{
 			r.conj();
 		}
@@ -296,7 +293,7 @@ public final class PAIR192 {
 		t2=t1.pow(x);
 		x.fshl(1);
 
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX) {
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX) {
 			t1.conj();
 		}
 		t3=new FP24(t1); t3.conj();
@@ -307,7 +304,7 @@ public final class PAIR192 {
 		t4=t3.pow(x);
 		t5=t4.pow(x);
 
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX) {
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX) {
 			t3.conj(); t5.conj();
 		}
 
@@ -315,7 +312,7 @@ public final class PAIR192 {
 		t3.mul(t4);
 
 		t6=t5.pow(x);
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX) {
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX) {
 			t6.conj();
 		}
 
@@ -332,7 +329,7 @@ public final class PAIR192 {
 		t5=t6.pow(x);
 		t6=t5.pow(x);
 
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX) {
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX) {
 			t5.conj();
 		}
 
@@ -345,7 +342,7 @@ public final class PAIR192 {
 		t3.mul(t0);
 		t5=t6.pow(x);
 
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX) {
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX) {
 			t5.conj();
 		}
 		t2.frob(f,7);
@@ -393,7 +390,7 @@ public final class PAIR192 {
 			w.div(x);
 		}
 		u[7]=new BIG(w);
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX)
 		{
 			u[1].copy(BIG.modneg(u[1],q));
 			u[3].copy(BIG.modneg(u[3],q));
@@ -408,7 +405,7 @@ public final class PAIR192 {
 	public static ECP G1mul(ECP P,BIG e)
 	{
 		ECP R;
-		if (USE_GLV)
+		if (CONFIG_CURVE.USE_GLV)
 		{
 			R=new ECP();
 			R.copy(P);
@@ -454,7 +451,7 @@ public final class PAIR192 {
 	public static ECP4 G2mul(ECP4 P,BIG e)
 	{
 		ECP4 R;
-		if (USE_GS_G2)
+		if (CONFIG_CURVE.USE_GS_G2)
 		{
 			ECP4[] Q=new ECP4[8];
 			FP2[] F=ECP4.frob_constants();
@@ -498,7 +495,7 @@ public final class PAIR192 {
 	public static FP24 GTpow(FP24 d,BIG e)
 	{
 		FP24 r;
-		if (USE_GS_GT)
+		if (CONFIG_CURVE.USE_GS_GT)
 		{
 			FP24[] g=new FP24[8];
 			FP2 f=new FP2(new BIG(ROM.Fra),new BIG(ROM.Frb));

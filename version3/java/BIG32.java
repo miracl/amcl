@@ -26,17 +26,14 @@ public class BIG {
 
 	public static final int CHUNK=32; /* Set word size */
 
-	public static final int MODBYTES=@NB@; //(1+(MODBITS-1)/8);
-	public static final int BASEBITS=@BASE@; 
-
-	public static final int NLEN=(1+((8*MODBYTES-1)/BASEBITS));
+	public static final int NLEN=(1+((8*CONFIG_BIG.MODBYTES-1)/CONFIG_BIG.BASEBITS));
 	public static final int DNLEN=2*NLEN;
-	public static final int BMASK=(((int)1<<BASEBITS)-1);
+	public static final int BMASK=(((int)1<<CONFIG_BIG.BASEBITS)-1);
 
-	public static final int HBITS=BASEBITS/2;
+	public static final int HBITS=CONFIG_BIG.BASEBITS/2;
 	public static final int HMASK=(((int)1<<HBITS)-1);
-	public static final int NEXCESS = ((int)1<<(CHUNK-BASEBITS-1));
-	public static final int BIGBITS=(MODBYTES*8);
+	public static final int NEXCESS = ((int)1<<(CHUNK-CONFIG_BIG.BASEBITS-1));
+	public static final int BIGBITS=(CONFIG_BIG.MODBYTES*8);
 
 	protected int[] w=new int[NLEN];
 
@@ -121,10 +118,10 @@ public class BIG {
 		{
 			d=w[i]+carry;
 			w[i]=d&BMASK;
-			carry=d>>BASEBITS;
+			carry=d>>CONFIG_BIG.BASEBITS;
 		}
 		w[NLEN-1]=(w[NLEN-1]+carry);
-		return (long)(w[NLEN-1]>>((8*MODBYTES)%BASEBITS));  
+		return (long)(w[NLEN-1]>>((8*CONFIG_BIG.MODBYTES)%CONFIG_BIG.BASEBITS));  
 	}
 
 /* return number of bits */
@@ -135,7 +132,7 @@ public class BIG {
 		t.norm();
 		while (k>=0 && t.w[k]==0) k--;
 		if (k<0) return 0;
-		bts=BASEBITS*k;
+		bts=CONFIG_BIG.BASEBITS*k;
 		c=t.w[k];
 		while (c!=0) {c/=2; bts++;}
 		return bts;
@@ -161,7 +158,7 @@ public class BIG {
 
 		if (len%4==0) len/=4;
 		else {len/=4; len++;}
-		if (len<MODBYTES*2) len=MODBYTES*2;
+		if (len<CONFIG_BIG.MODBYTES*2) len=CONFIG_BIG.MODBYTES*2;
 
 		for (int i=len-1;i>=0;i--)
 		{
@@ -177,7 +174,7 @@ public class BIG {
 		int[] tb=new int[2];
 		long prod=(long)x*y+c+r;	
 		tb[1]=(int)prod&BMASK;
-		tb[0]=(int)(prod>>BASEBITS);
+		tb[0]=(int)(prod>>CONFIG_BIG.BASEBITS);
 		return tb;
 	}
 
@@ -219,7 +216,7 @@ public class BIG {
 	{	
 		int ak,base,carry=0;
 		norm();
-		base=((int)1<<BASEBITS);
+		base=((int)1<<CONFIG_BIG.BASEBITS);
 		for (int i=NLEN-1;i>=0;i--)
 		{
 			ak=(carry*base+w[i]);
@@ -266,15 +263,15 @@ public class BIG {
 			d[i]=(long)a.w[i]*b.w[i];
 
 		s=d[0];
-		t=s; c.w[0]=(int)t&BMASK; co=t>>BASEBITS;
+		t=s; c.w[0]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 
 		for (k=1;k<NLEN;k++)
 		{
-			s+=d[k]; t=co+s; for (i=k;i>=1+k/2;i--) t+=(long)(a.w[i]-a.w[k-i])*(b.w[k-i]-b.w[i]); c.w[k]=(int)t&BMASK; co=t>>BASEBITS;
+			s+=d[k]; t=co+s; for (i=k;i>=1+k/2;i--) t+=(long)(a.w[i]-a.w[k-i])*(b.w[k-i]-b.w[i]); c.w[k]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 		}
 		for (k=NLEN;k<2*NLEN-1;k++)
 		{
-			s-=d[k-NLEN]; t=co+s; for (i=NLEN-1;i>=1+k/2;i--) t+=(long)(a.w[i]-a.w[k-i])*(b.w[k-i]-b.w[i]); c.w[k]=(int)t&BMASK; co=t>>BASEBITS;
+			s-=d[k-NLEN]; t=co+s; for (i=NLEN-1;i>=1+k/2;i--) t+=(long)(a.w[i]-a.w[k-i])*(b.w[k-i]-b.w[i]); c.w[k]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 		}
 		c.w[2*NLEN-1]=(int)co;
 
@@ -290,34 +287,34 @@ public class BIG {
 		DBIG c=new DBIG(0);
 
 		t=(long)a.w[0]*a.w[0]; 
-		c.w[0]=(int)t&BMASK; co=t>>BASEBITS;
+		c.w[0]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 
 		for (j=1;j<NLEN-1; )
 		{
 			t=(long)a.w[j]*a.w[0]; for (i=1; i<(j+1)/2; i++) {t+=(long)a.w[j-i]*a.w[i];} t+=t;  t+=co; 
-			c.w[j]=(int)t&BMASK; co=t>>BASEBITS;
+			c.w[j]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 			j++;
 			t=(long)a.w[j]*a.w[0]; for (i=1; i<(j+1)/2; i++) {t+=(long)a.w[j-i]*a.w[i];} t+=t; t+=co; t+=(long)a.w[j/2]*a.w[j/2]; 
-			c.w[j]=(int)t&BMASK; co=t>>BASEBITS;
+			c.w[j]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 			j++;
 		}
 
 		for (j=NLEN-1+NLEN%2;j<DNLEN-3; )
 		{
 			t=(long)a.w[NLEN-1]*a.w[j-NLEN+1]; for (i=j-NLEN+2; i<(j+1)/2; i++) {t+=(long)a.w[j-i]*a.w[i];} t+=t; t+=co; 
-			c.w[j]=(int)t&BMASK; co=t>>BASEBITS;
+			c.w[j]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 			j++;
 			t=(long)a.w[NLEN-1]*a.w[j-NLEN+1]; for (i=j-NLEN+2; i<(j+1)/2; i++) {t+=(long)a.w[j-i]*a.w[i];} t+=t; t+=co; t+=(long)a.w[j/2]*a.w[j/2]; 
-			c.w[j]=(int)t&BMASK; co=t>>BASEBITS;
+			c.w[j]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 			j++;
 		}
 
 		t=(long)a.w[NLEN-2]*a.w[NLEN-1];
 		t+=t; t+=co;
-		c.w[DNLEN-3]=(int)t&BMASK; co=t>>BASEBITS;
+		c.w[DNLEN-3]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 	
 		t=(long)a.w[NLEN-1]*a.w[NLEN-1]+co; 
-		c.w[DNLEN-2]=(int)t&BMASK; co=t>>BASEBITS;
+		c.w[DNLEN-2]=(int)t&BMASK; co=t>>CONFIG_BIG.BASEBITS;
 		c.w[DNLEN-1]=(int)co;
 
 		return c;
@@ -332,20 +329,20 @@ public class BIG {
 		int[] v=new int[NLEN];
 		b=new BIG(0);
 
-		t=d.w[0]; v[0]=((int)t*MC)&BMASK; t+=(long)v[0]*m.w[0]; c=(t>>BASEBITS)+d.w[1]; s=0;
+		t=d.w[0]; v[0]=((int)t*MC)&BMASK; t+=(long)v[0]*m.w[0]; c=(t>>CONFIG_BIG.BASEBITS)+d.w[1]; s=0;
 
 		for (k=1;k<NLEN;k++)
 		{
 			t=c+s+(long)v[0]*m.w[k];
 			for (i=k-1;i>k/2;i--) t+=(long)(v[k-i]-v[i])*(m.w[i]-m.w[k-i]);
-			v[k]=((int)t*MC)&BMASK; t+=(long)v[k]*m.w[0]; c=(t>>BASEBITS)+d.w[k+1];
+			v[k]=((int)t*MC)&BMASK; t+=(long)v[k]*m.w[0]; c=(t>>CONFIG_BIG.BASEBITS)+d.w[k+1];
 			dd[k]=(long)v[k]*m.w[k]; s+=dd[k];
 		}
 		for (k=NLEN;k<2*NLEN-1;k++)
 		{
 			t=c+s;
 			for (i=NLEN-1;i>=1+k/2;i--) t+=(long)(v[k-i]-v[i])*(m.w[i]-m.w[k-i]);
-			b.w[k-NLEN]=(int)t&BMASK; c=(t>>BASEBITS)+d.w[k+1]; s-=dd[k-NLEN+1];
+			b.w[k-NLEN]=(int)t&BMASK; c=(t>>CONFIG_BIG.BASEBITS)+d.w[k+1]; s-=dd[k-NLEN+1];
 		}
 		b.w[NLEN-1]=(int)c&BMASK;	
 		return b;		
@@ -354,14 +351,14 @@ public class BIG {
 	public static int ssn(BIG r,BIG a,BIG m)
 	{
 		int n=NLEN-1;
-		m.w[0]=(m.w[0]>>1)|((m.w[1]<<(BASEBITS-1))&BMASK);
+		m.w[0]=(m.w[0]>>1)|((m.w[1]<<(CONFIG_BIG.BASEBITS-1))&BMASK);
 		r.w[0]=a.w[0]-m.w[0];
-		int carry=r.w[0]>>BASEBITS;
+		int carry=r.w[0]>>CONFIG_BIG.BASEBITS;
 		r.w[0]&=BMASK;
 		for (int i=1;i<n;i++) {
-			m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(BASEBITS-1))&BMASK);
+			m.w[i]=(m.w[i]>>1)|((m.w[i+1]<<(CONFIG_BIG.BASEBITS-1))&BMASK);
 			r.w[i]=a.w[i]-m.w[i]+carry;
-			carry=r.w[i]>>BASEBITS;
+			carry=r.w[i]>>CONFIG_BIG.BASEBITS;
 			r.w[i]&=BMASK;
 		}
 		m.w[n]>>=1;
@@ -380,8 +377,8 @@ public class BIG {
 	public void mod2m(int m)
 	{
 		int i,wd,bt;
-		wd=m/BASEBITS;
-		bt=m%BASEBITS;
+		wd=m/CONFIG_BIG.BASEBITS;
+		bt=m%CONFIG_BIG.BASEBITS;
 		w[wd]&=((cast_to_chunk(1)<<bt)-1);
 		for (i=wd+1;i<NLEN;i++) w[i]=0;
 	}
@@ -389,7 +386,7 @@ public class BIG {
 /* return n-th bit */
 	public int bit(int n)
 	{
-		if ((w[n/BASEBITS]&(cast_to_chunk(1)<<(n%BASEBITS)))>0) return 1;
+		if ((w[n/CONFIG_BIG.BASEBITS]&(cast_to_chunk(1)<<(n%CONFIG_BIG.BASEBITS)))>0) return 1;
 		else return 0;
 	}
 
@@ -397,18 +394,18 @@ public class BIG {
 	public int fshr(int k) {
 		int r=(int)(w[0]&((cast_to_chunk(1)<<k)-1)); /* shifted out part */
 		for (int i=0;i<NLEN-1;i++)
-			w[i]=(w[i]>>k)|((w[i+1]<<(BASEBITS-k))&BMASK);
+			w[i]=(w[i]>>k)|((w[i+1]<<(CONFIG_BIG.BASEBITS-k))&BMASK);
 		w[NLEN-1]=w[NLEN-1]>>k;
 		return r;
 	}
 
 /* Shift right by less than a word */
 	public int fshl(int k) {
-		w[NLEN-1]=((w[NLEN-1]<<k))|(w[NLEN-2]>>(BASEBITS-k));
+		w[NLEN-1]=((w[NLEN-1]<<k))|(w[NLEN-2]>>(CONFIG_BIG.BASEBITS-k));
 		for (int i=NLEN-2;i>0;i--)
-			w[i]=((w[i]<<k)&BMASK)|(w[i-1]>>(BASEBITS-k));
+			w[i]=((w[i]<<k)&BMASK)|(w[i-1]>>(CONFIG_BIG.BASEBITS-k));
 		w[0]=(w[0]<<k)&BMASK; 
-		return (int)(w[NLEN-1]>>((8*MODBYTES)%BASEBITS)); /* return excess - only used in FF.java */
+		return (int)(w[NLEN-1]>>((8*CONFIG_BIG.MODBYTES)%CONFIG_BIG.BASEBITS)); /* return excess - only used in FF.java */
 	}
 
 /* test for zero */
@@ -457,24 +454,24 @@ public class BIG {
 
 /* general shift right */
 	public void shr(int k) {
-		int n=k%BASEBITS;
-		int m=k/BASEBITS;	
+		int n=k%CONFIG_BIG.BASEBITS;
+		int m=k/CONFIG_BIG.BASEBITS;	
 		for (int i=0;i<NLEN-m-1;i++)
-			w[i]=(w[m+i]>>n)|((w[m+i+1]<<(BASEBITS-n))&BMASK);
+			w[i]=(w[m+i]>>n)|((w[m+i+1]<<(CONFIG_BIG.BASEBITS-n))&BMASK);
 		if (NLEN>m) w[NLEN-m-1]=w[NLEN-1]>>n;
 		for (int i=NLEN-m;i<NLEN;i++) w[i]=0;
 	}
 
 /* general shift left */
 	public void shl(int k) {
-		int n=k%BASEBITS;
-		int m=k/BASEBITS;
+		int n=k%CONFIG_BIG.BASEBITS;
+		int m=k/CONFIG_BIG.BASEBITS;
 
 		w[NLEN-1]=((w[NLEN-1-m]<<n));
-		if (NLEN>=m+2) w[NLEN-1]|=(w[NLEN-m-2]>>(BASEBITS-n));
+		if (NLEN>=m+2) w[NLEN-1]|=(w[NLEN-m-2]>>(CONFIG_BIG.BASEBITS-n));
 
 		for (int i=NLEN-2;i>m;i--)
-			w[i]=((w[i-m]<<n)&BMASK)|(w[i-m-1]>>(BASEBITS-n));
+			w[i]=((w[i-m]<<n)&BMASK)|(w[i-m-1]>>(CONFIG_BIG.BASEBITS-n));
 		w[m]=(w[0]<<n)&BMASK;
 		for (int i=0;i<m;i++) w[i]=0;
 	}
@@ -549,7 +546,7 @@ public class BIG {
 		BIG c=new BIG(this);
 		c.norm();
 
-		for (int i=MODBYTES-1;i>=0;i--)
+		for (int i=CONFIG_BIG.MODBYTES-1;i>=0;i--)
 		{
 			b[i+n]=(byte)c.w[0];
 			c.fshr(8);
@@ -561,7 +558,7 @@ public class BIG {
 	{
 		BIG m=new BIG(0);
 
-		for (int i=0;i<MODBYTES;i++)
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++)
 		{
 			m.fshl(8); m.w[0]+=(int)b[i+n]&0xff;
 			//m.inc((int)b[i]&0xff);
@@ -741,14 +738,14 @@ public class BIG {
 		return ((int)w[0])&msk;
 	}
 
-/* get 8*MODBYTES size random number */
+/* get 8*CONFIG_BIG.MODBYTES size random number */
 	public static BIG random(RAND rng)
 	{
 		BIG m=new BIG(0);
 		int i,b,j=0,r=0;
 
 /* generate random BIG */ 
-		for (i=0;i<8*MODBYTES;i++)   
+		for (i=0;i<8*CONFIG_BIG.MODBYTES;i++)   
 		{
 			if (j==0) r=rng.getByte();
 			else r>>=1;

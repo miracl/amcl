@@ -168,10 +168,10 @@ public final class ECP8 {
 /* convert to byte array */
 	public void toBytes(byte[] b)
 	{
-		byte[] t=new byte[BIG.MODBYTES];
+		byte[] t=new byte[CONFIG_BIG.MODBYTES];
 		ECP8 W=new ECP8(this);
 		W.affine();
-		int MB=BIG.MODBYTES;
+		int MB=CONFIG_BIG.MODBYTES;
 
 		W.x.geta().geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) { b[i]=t[i];}
@@ -215,10 +215,10 @@ public final class ECP8 {
 /* convert from byte array to point */
 	public static ECP8 fromBytes(byte[] b)
 	{
-		byte[] t=new byte[BIG.MODBYTES];
+		byte[] t=new byte[CONFIG_BIG.MODBYTES];
 		BIG ra;
 		BIG rb;
-		int MB=BIG.MODBYTES;
+		int MB=CONFIG_BIG.MODBYTES;
 
 		for (int i=0;i<MB;i++) {t[i]=b[i];}
 		ra=BIG.fromBytes(t);
@@ -307,11 +307,11 @@ public final class ECP8 {
 		r.sqr();
 		FP8 b=new FP8(new FP4(new FP2(new BIG(ROM.CURVE_B))));
 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{
 			b.div_i();
 		}
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			b.times_i();
 		}
@@ -355,13 +355,13 @@ public final class ECP8 {
 //		if (INF) return -1;      
 
 		FP8 iy=new FP8(y);
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{
 			iy.times_i(); 
 		}
 		FP8 t0=new FP8(y);                  //***** Change 
 		t0.sqr();            
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{		
 			t0.times_i();
 		}
@@ -377,7 +377,7 @@ public final class ECP8 {
 		z.norm();  
 
 		t2.imul(3*ROM.CURVE_B_I); 
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			t2.times_i();
 		}
@@ -420,7 +420,7 @@ public final class ECP8 {
 		t4.copy(t0); t4.add(t1);		//t4=X1.X2+Y1.Y2
 
 		t3.sub(t4); t3.norm(); 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{		
 			t3.times_i();        //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 		}
@@ -434,7 +434,7 @@ public final class ECP8 {
 		x3.add(t2);						//X3=Y1.Y2+Z1.Z2
 	
 		t4.sub(x3); t4.norm(); 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{	
 			t4.times_i();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 		}
@@ -446,7 +446,7 @@ public final class ECP8 {
 		y3.add(t2);							// y3=X1.X2+Z1+Z2
 		y3.rsub(x3); y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{
 			t0.times_i();  // x.Q.x
 			t1.times_i();  // y.Q.y
@@ -454,14 +454,14 @@ public final class ECP8 {
 		x3.copy(t0); x3.add(t0); 
 		t0.add(x3); t0.norm();
 		t2.imul(b); 	
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			t2.times_i();
 		}
 		FP8 z3=new FP8(t1); z3.add(t2); z3.norm();
 		t1.sub(t2); t1.norm(); 
 		y3.imul(b); 
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			y3.times_i(); 
 		}
@@ -498,7 +498,7 @@ public final class ECP8 {
 			F2.mul_ip(); F2.norm();
 
 			F1.copy(X);
-			if (ECP.SEXTIC_TWIST == ECP.M_TYPE)
+			if (CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE)
 			{
 				F1.mul_ip();
 				F1.inverse();
@@ -516,20 +516,20 @@ public final class ECP8 {
 		for (int i=0;i<n;i++) {
 			x.frob(F[2]);
 			x.qmul(F[0]);
-			if (ECP.SEXTIC_TWIST == ECP.M_TYPE) {
+			if (CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE) {
 				x.div_i2();
 			}
-			if (ECP.SEXTIC_TWIST == ECP.D_TYPE) {
+			if (CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE) {
 				x.times_i2();
 			}		
 
 			y.frob(F[2]);
 			y.qmul(F[1]);
 
-			if (ECP.SEXTIC_TWIST == ECP.M_TYPE) {
+			if (CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE) {
 				y.div_i();
 			}
-			if (ECP.SEXTIC_TWIST == ECP.D_TYPE) {
+			if (CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.D_TYPE) {
 				y.times_i2(); y.times_i2(); y.times_i();
 			}
 				z.frob(F[2]);
@@ -547,7 +547,7 @@ public final class ECP8 {
 		ECP8 Q=new ECP8();
 		ECP8 C=new ECP8();
 		ECP8[] W=new ECP8[8];
-		byte[] w=new byte[1+(BIG.NLEN*BIG.BASEBITS+3)/4];
+		byte[] w=new byte[1+(BIG.NLEN*CONFIG_BIG.BASEBITS+3)/4];
 
 		if (is_infinity()) return new ECP8();
 
@@ -615,14 +615,14 @@ public final class ECP8 {
 		BIG mt=new BIG();
 		BIG[] t=new BIG[16];
 
-		byte[] w1=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] s1=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] w2=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] s2=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] w3=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] s3=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] w4=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] s4=new byte[BIG.NLEN*BIG.BASEBITS+1];
+		byte[] w1=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] s1=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] w2=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] s2=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] w3=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] s3=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] w4=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] s4=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
 
 		for (i=0;i<16;i++)
 		{
@@ -819,7 +819,7 @@ public final class ECP8 {
 		ECP8 x7Q=x6Q.mul(x);
 		ECP8 x8Q=x7Q.mul(x);
 
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX)
 		{
 			xQ.neg();
 			x3Q.neg();

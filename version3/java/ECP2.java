@@ -166,39 +166,39 @@ public final class ECP2 {
 /* convert to byte array */
 	public void toBytes(byte[] b)
 	{
-		byte[] t=new byte[BIG.MODBYTES];
+		byte[] t=new byte[CONFIG_BIG.MODBYTES];
 		ECP2 W=new ECP2(this);
 		W.affine();
 		W.x.getA().toBytes(t);
-		for (int i=0;i<BIG.MODBYTES;i++)
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++)
 			b[i]=t[i];
 		W.x.getB().toBytes(t);
-		for (int i=0;i<BIG.MODBYTES;i++)
-			b[i+BIG.MODBYTES]=t[i];
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++)
+			b[i+CONFIG_BIG.MODBYTES]=t[i];
 
 		W.y.getA().toBytes(t);
-		for (int i=0;i<BIG.MODBYTES;i++)
-			b[i+2*BIG.MODBYTES]=t[i];
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++)
+			b[i+2*CONFIG_BIG.MODBYTES]=t[i];
 		W.y.getB().toBytes(t);
-		for (int i=0;i<BIG.MODBYTES;i++)
-			b[i+3*BIG.MODBYTES]=t[i];
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++)
+			b[i+3*CONFIG_BIG.MODBYTES]=t[i];
 	}
 /* convert from byte array to point */
 	public static ECP2 fromBytes(byte[] b)
 	{
-		byte[] t=new byte[BIG.MODBYTES];
+		byte[] t=new byte[CONFIG_BIG.MODBYTES];
 		BIG ra;
 		BIG rb;
 
-		for (int i=0;i<BIG.MODBYTES;i++) t[i]=b[i];
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++) t[i]=b[i];
 		ra=BIG.fromBytes(t);
-		for (int i=0;i<BIG.MODBYTES;i++) t[i]=b[i+BIG.MODBYTES];
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++) t[i]=b[i+CONFIG_BIG.MODBYTES];
 		rb=BIG.fromBytes(t);
 		FP2 rx=new FP2(ra,rb);
 
-		for (int i=0;i<BIG.MODBYTES;i++) t[i]=b[i+2*BIG.MODBYTES];
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++) t[i]=b[i+2*CONFIG_BIG.MODBYTES];
 		ra=BIG.fromBytes(t);
-		for (int i=0;i<BIG.MODBYTES;i++) t[i]=b[i+3*BIG.MODBYTES];
+		for (int i=0;i<CONFIG_BIG.MODBYTES;i++) t[i]=b[i+3*CONFIG_BIG.MODBYTES];
 		rb=BIG.fromBytes(t);
 		FP2 ry=new FP2(ra,rb);
 
@@ -219,11 +219,11 @@ public final class ECP2 {
 		r.sqr();
 		FP2 b=new FP2(new BIG(ROM.CURVE_B));
 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{
 			b.div_ip();
 		}
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			b.norm();
 			b.mul_ip();
@@ -267,13 +267,13 @@ public final class ECP2 {
 /* this+=this */
 	public int dbl() {  
 		FP2 iy=new FP2(y);
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{
 			iy.mul_ip(); iy.norm();
 		}
 		FP2 t0=new FP2(y);                  //***** Change 
 		t0.sqr();            
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{		
 			t0.mul_ip();
 		}
@@ -289,7 +289,7 @@ public final class ECP2 {
 		z.norm();  
 
 		t2.imul(3*ROM.CURVE_B_I); 
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			t2.mul_ip();
 			t2.norm();
@@ -333,7 +333,7 @@ public final class ECP2 {
 		t4.copy(t0); t4.add(t1);		//t4=X1.X2+Y1.Y2
 
 		t3.sub(t4); t3.norm(); 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{		
 			t3.mul_ip();  t3.norm();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 		}
@@ -347,7 +347,7 @@ public final class ECP2 {
 		x3.add(t2);						//X3=Y1.Y2+Z1.Z2
 	
 		t4.sub(x3); t4.norm(); 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{	
 			t4.mul_ip(); t4.norm();          //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 		}
@@ -359,7 +359,7 @@ public final class ECP2 {
 		y3.add(t2);							// y3=X1.X2+Z1+Z2
 		y3.rsub(x3); y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{
 			t0.mul_ip(); t0.norm(); // x.Q.x
 			t1.mul_ip(); t1.norm(); // y.Q.y
@@ -367,14 +367,14 @@ public final class ECP2 {
 		x3.copy(t0); x3.add(t0); 
 		t0.add(x3); t0.norm();
 		t2.imul(b); 	
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			t2.mul_ip(); t2.norm();
 		}
 		FP2 z3=new FP2(t1); z3.add(t2); z3.norm();
 		t1.sub(t2); t1.norm(); 
 		y3.imul(b); 
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			y3.mul_ip(); 
 			y3.norm();
@@ -424,7 +424,7 @@ public final class ECP2 {
 		ECP2 Q=new ECP2();
 		ECP2 C=new ECP2();
 		ECP2[] W=new ECP2[8];
-		byte[] w=new byte[1+(BIG.NLEN*BIG.BASEBITS+3)/4];
+		byte[] w=new byte[1+(BIG.NLEN*CONFIG_BIG.BASEBITS+3)/4];
 
 		if (is_infinity()) return new ECP2();
 
@@ -489,8 +489,8 @@ public final class ECP2 {
 		BIG mt=new BIG();
 		BIG[] t=new BIG[4];
 
-		byte[] w=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] s=new byte[BIG.NLEN*BIG.BASEBITS+1];
+		byte[] w=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] s=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
 
 		for (i=0;i<4;i++)
 		{
@@ -579,7 +579,7 @@ public final class ECP2 {
 		BIG Frb=new BIG(ROM.Frb);
 		X=new FP2(Fra,Frb);
 
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			X.inverse();
 			X.norm();
@@ -589,14 +589,14 @@ public final class ECP2 {
 
 /* Fast Hashing to G2 - Fuentes-Castaneda, Knapp and Rodriguez-Henriquez */
 
-		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
+		if (CONFIG_CURVE.CURVE_PAIRING_TYPE==CONFIG_CURVE.BN)
 		{
 			ECP2 T,K;
 
 			T=new ECP2(); T.copy(Q);
 			T=T.mul(x); 
 			
-			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX)
 			{
 				T.neg();
 			}	
@@ -614,12 +614,12 @@ public final class ECP2 {
 /* Efficient hash maps to G2 on BLS curves - Budroni, Pintore */
 /* Q -> x2Q -xQ -Q +F(xQ -Q) +F(F(2Q)) */
 
-		if (ECP.CURVE_PAIRING_TYPE==ECP.BLS)
+		if (CONFIG_CURVE.CURVE_PAIRING_TYPE==CONFIG_CURVE.BLS)
 		{
 			ECP2 xQ=Q.mul(x);
 			ECP2 x2Q=xQ.mul(x);
 
-			if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+			if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX)
 			{
 				xQ.neg();
 			}	

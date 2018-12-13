@@ -37,7 +37,7 @@ public class TesttimeRSA extends TestCase
 		int i,iterations;
 		long start,elapsed;
 		double dur;
-		public_key pub=new public_key(FF.FFLEN);
+		public_key pub=new public_key(CONFIG_FF.FFLEN);
 		private_key priv=new private_key(FF.HFLEN);
 
 		rng.clean();

@@ -168,9 +168,9 @@ public final class ECP4 {
 /* convert to byte array */
 	public void toBytes(byte[] b)
 	{
-		byte[] t=new byte[BIG.MODBYTES];
+		byte[] t=new byte[CONFIG_BIG.MODBYTES];
 		ECP4 W=new ECP4(this);
-		int MB=BIG.MODBYTES;
+		int MB=CONFIG_BIG.MODBYTES;
 
 		W.x.geta().getA().toBytes(t);
 		for (int i=0;i<MB;i++) 
@@ -203,10 +203,10 @@ public final class ECP4 {
 /* convert from byte array to point */
 	public static ECP4 fromBytes(byte[] b)
 	{
-		byte[] t=new byte[BIG.MODBYTES];
+		byte[] t=new byte[CONFIG_BIG.MODBYTES];
 		BIG ra;
 		BIG rb;
-		int MB=BIG.MODBYTES;
+		int MB=CONFIG_BIG.MODBYTES;
 
 		for (int i=0;i<MB;i++) {t[i]=b[i];}
 		ra=BIG.fromBytes(t);
@@ -257,11 +257,11 @@ public final class ECP4 {
 		r.sqr();
 		FP4 b=new FP4(new FP2(new BIG(ROM.CURVE_B)));
 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{
 			b.div_i();
 		}
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			b.times_i();
 		}
@@ -303,13 +303,13 @@ public final class ECP4 {
 	public int dbl() {    
 
 		FP4 iy=new FP4(y);
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{
 			iy.times_i(); 
 		}
 		FP4 t0=new FP4(y);                  //***** Change 
 		t0.sqr();            
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{		
 			t0.times_i();
 		}
@@ -325,7 +325,7 @@ public final class ECP4 {
 		z.norm();  
 
 		t2.imul(3*ROM.CURVE_B_I); 
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			t2.times_i();
 			//t2.norm();
@@ -369,7 +369,7 @@ public final class ECP4 {
 		t4.copy(t0); t4.add(t1);		//t4=X1.X2+Y1.Y2
 
 		t3.sub(t4); t3.norm(); 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{		
 			t3.times_i();         //t3=(X1+Y1)(X2+Y2)-(X1.X2+Y1.Y2) = X1.Y2+X2.Y1
 		}
@@ -383,7 +383,7 @@ public final class ECP4 {
 		x3.add(t2);						//X3=Y1.Y2+Z1.Z2
 	
 		t4.sub(x3); t4.norm(); 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{	
 			t4.times_i();           //t4=(Y1+Z1)(Y2+Z2) - (Y1.Y2+Z1.Z2) = Y1.Z2+Y2.Z1
 		}
@@ -395,7 +395,7 @@ public final class ECP4 {
 		y3.add(t2);							// y3=X1.X2+Z1+Z2
 		y3.rsub(x3); y3.norm();				// y3=(X1+Z1)(X2+Z2) - (X1.X2+Z1.Z2) = X1.Z2+X2.Z1
 
-		if (ECP.SEXTIC_TWIST==ECP.D_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 		{
 			t0.times_i(); // x.Q.x
 			t1.times_i(); // y.Q.y
@@ -403,14 +403,14 @@ public final class ECP4 {
 		x3.copy(t0); x3.add(t0); 
 		t0.add(x3); t0.norm();
 		t2.imul(b); 	
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			t2.times_i();
 		}
 		FP4 z3=new FP4(t1); z3.add(t2); z3.norm();
 		t1.sub(t2); t1.norm(); 
 		y3.imul(b); 
-		if (ECP.SEXTIC_TWIST==ECP.M_TYPE)
+		if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 		{
 			y3.times_i(); 
 		}
@@ -445,7 +445,7 @@ public final class ECP4 {
 			FP2 F1=new FP2(F2); F1.sqr();
 			F2.mul(F1);
 			F1.copy(X);
-			if (ECP.SEXTIC_TWIST == ECP.M_TYPE)
+			if (CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE)
 			{
 				F1.mul_ip();
 				F1.inverse();
@@ -484,7 +484,7 @@ public final class ECP4 {
 		ECP4 Q=new ECP4();
 		ECP4 C=new ECP4();
 		ECP4[] W=new ECP4[8];
-		byte[] w=new byte[1+(BIG.NLEN*BIG.BASEBITS+3)/4];
+		byte[] w=new byte[1+(BIG.NLEN*CONFIG_BIG.BASEBITS+3)/4];
 
 		if (is_infinity()) return new ECP4();
 
@@ -551,10 +551,10 @@ public final class ECP4 {
 		BIG mt=new BIG();
 		BIG[] t=new BIG[8];
 
-		byte[] w1=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] s1=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] w2=new byte[BIG.NLEN*BIG.BASEBITS+1];
-		byte[] s2=new byte[BIG.NLEN*BIG.BASEBITS+1];
+		byte[] w1=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] s1=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] w2=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
+		byte[] s2=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];
 
 		for (i=0;i<8;i++)
 		{
@@ -687,7 +687,7 @@ public final class ECP4 {
 		ECP4 x3Q=x2Q.mul(x);
 		ECP4 x4Q=x3Q.mul(x);
 
-		if (ECP.SIGN_OF_X==ECP.NEGATIVEX)
+		if (CONFIG_CURVE.SIGN_OF_X==CONFIG_CURVE.NEGATIVEX)
 		{
 			xQ.neg();
 			x3Q.neg();

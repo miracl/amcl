@@ -42,37 +42,37 @@ public class TesttimeECDH extends TestCase
 		rng.seed(100,RAW);
 
 		System.out.println("\nTesting/Timing ECC");
-		if (ECP.CURVETYPE==ECP.WEIERSTRASS)
+		if (CONFIG_CURVE.CURVETYPE==CONFIG_CURVE.WEIERSTRASS)
 		{
 			System.out.print("Weierstrass parameterization\n");
 		}		
-		if (ECP.CURVETYPE==ECP.EDWARDS)
+		if (CONFIG_CURVE.CURVETYPE==CONFIG_CURVE.EDWARDS)
 		{
 			System.out.print("Edwards parameterization\n");
 		}
-		if (ECP.CURVETYPE==ECP.MONTGOMERY)
+		if (CONFIG_CURVE.CURVETYPE==CONFIG_CURVE.MONTGOMERY)
 		{
 			System.out.print("Montgomery parameterization\n");
 		}
 
-		if (FP.MODTYPE==FP.PSEUDO_MERSENNE)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.PSEUDO_MERSENNE)
 		{
 			System.out.print("Pseudo-Mersenne Modulus\n");
 		}
-		if (FP.MODTYPE==FP.MONTGOMERY_FRIENDLY)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.MONTGOMERY_FRIENDLY)
 		{
 			System.out.print("Montgomery friendly Modulus\n");
 		}
-		if (FP.MODTYPE==FP.GENERALISED_MERSENNE)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.GENERALISED_MERSENNE)
 		{
 			System.out.print("Generalised-Mersenne Modulus\n");
 		}
-		if (FP.MODTYPE==FP.NOT_SPECIAL)
+		if (CONFIG_FIELD.MODTYPE==CONFIG_FIELD.NOT_SPECIAL)
 		{
 			System.out.print("Not special Modulus\n");
 		}
 
-		System.out.format("Modulus size %d bits\n",FP.MODBITS); 
+		System.out.format("Modulus size %d bits\n",CONFIG_FIELD.MODBITS); 
 		System.out.format("%d bit build\n",BIG.CHUNK); 
 		BIG r,s,wx,wy;
 		ECP G,WP;

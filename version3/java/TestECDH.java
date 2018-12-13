@@ -53,7 +53,7 @@ public class TestECDH extends TestCase   //
 		int EGS=ECDH.EGS;
 		int EFS=ECDH.EFS;
 		int EAS=AES.KS;
-		int sha=ECP.HASH_TYPE;
+		int sha=CONFIG_CURVE.HASH_TYPE;
 
 		byte[] S1=new byte[EGS];
 		byte[] W0=new byte[2*EFS+1];
@@ -129,7 +129,7 @@ public class TestECDH extends TestCase   //
 		System.out.print("Alice's DH Key=  0x"); printBinary(KEY);
 		System.out.print("Servers DH Key=  0x"); printBinary(KEY);
 
-		if (ECP.CURVETYPE!=ECP.MONTGOMERY)
+		if (CONFIG_CURVE.CURVETYPE!=CONFIG_CURVE.MONTGOMERY)
 		{
 			System.out.println("Testing ECIES");
 

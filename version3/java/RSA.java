@@ -28,7 +28,7 @@ import org.apache.milagro.amcl.HASH512;
 
 public final class RSA {
 
-	public static final int RFS=BIG.MODBYTES*FF.FFLEN;
+	public static final int RFS=CONFIG_BIG.MODBYTES*CONFIG_FF.FFLEN;
 	public static final int SHA256=32;
 	public static final int SHA384=48;
 	public static final int SHA512=64;

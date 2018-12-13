@@ -31,8 +31,8 @@ import org.apache.milagro.amcl.AES;
 
 public class MPIN
 {
-	public static final int EFS=BIG.MODBYTES;
-	public static final int EGS=BIG.MODBYTES;
+	public static final int EFS=CONFIG_BIG.MODBYTES;
+	public static final int EGS=CONFIG_BIG.MODBYTES;
 	public static final int INVALID_POINT=-14;
 	public static final int BAD_PARAMS=-11;
 	public static final int WRONG_ORDER=-18;
@@ -54,7 +54,7 @@ public class MPIN
 	{
 		byte[] R=null;
 
-		if (sha==ECP.SHA256)
+		if (sha==CONFIG_CURVE.SHA256)
 		{
 			HASH256 H=new HASH256();
 			if (n>0) H.process_num(n);
@@ -62,14 +62,14 @@ public class MPIN
 			H.process_array(B);
 			R=H.hash();
 		}
-		if (sha==ECP.SHA384)
+		if (sha==CONFIG_CURVE.SHA384)
 		{
 			HASH384 H=new HASH384();
 			if (n>0) H.process_num(n);
 			H.process_array(B);
 			R=H.hash();
 		}
-		if (sha==ECP.SHA512)
+		if (sha==CONFIG_CURVE.SHA512)
 		{
 			HASH512 H=new HASH512();
 			if (n>0) H.process_num(n);
@@ -155,27 +155,27 @@ public class MPIN
 		U.getX().toBytes(w); for (int i=4*EFS;i<5*EFS;i++) t[i]=w[i-4*EFS];
 		U.getY().toBytes(w); for (int i=5*EFS;i<6*EFS;i++) t[i]=w[i-5*EFS];
 		
-		if (sha==ECP.SHA256)
+		if (sha==CONFIG_CURVE.SHA256)
 		{
 			HASH256 H=new HASH256();
 			H.process_array(t);
 			h=H.hash();
 		}
-		if (sha==ECP.SHA384)
+		if (sha==CONFIG_CURVE.SHA384)
 		{
 			HASH384 H=new HASH384();
 			H.process_array(t);
 			h=H.hash();
 		}
-		if (sha==ECP.SHA512)
+		if (sha==CONFIG_CURVE.SHA512)
 		{
 			HASH512 H=new HASH512();
 			H.process_array(t);
 			h=H.hash();
 		}
 		if (h==null) return null;
-		byte[] R=new byte[ECP.AESKEY];
-		for (int i=0;i<ECP.AESKEY;i++) R[i]=h[i];
+		byte[] R=new byte[CONFIG_CURVE.AESKEY];
+		for (int i=0;i<CONFIG_CURVE.AESKEY;i++) R[i]=h[i];
 		return R;
 	}
 
@@ -666,7 +666,7 @@ public class MPIN
 
 		t=mpin_hash(sha,c,W);
 
-		for (int i=0;i<ECP.AESKEY;i++) CK[i]=t[i];
+		for (int i=0;i<CONFIG_CURVE.AESKEY;i++) CK[i]=t[i];
 
 		return 0;
 	}
@@ -705,7 +705,7 @@ public class MPIN
 
 		t=mpin_hash(sha,c,U);
 
-		for (int i=0;i<ECP.AESKEY;i++) SK[i]=t[i];
+		for (int i=0;i<CONFIG_CURVE.AESKEY;i++) SK[i]=t[i];
 
 		return 0;
 	}

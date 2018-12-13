@@ -50,7 +50,7 @@ public class TestMPIN extends TestCase //
 		int G1S=2*EFS+1; /* Group 1 Size */
 		int G2S=4*EFS; /* Group 2 Size */
 
-		int sha=ECP.HASH_TYPE;
+		int sha=CONFIG_CURVE.HASH_TYPE;
 
 		byte[] S = new byte[EGS];
 		byte[] SST = new byte[G2S];
@@ -72,8 +72,8 @@ public class TestMPIN extends TestCase //
 		byte[] Z=new byte[G1S];
 		byte[] W=new byte[EGS];
 		byte[] T=new byte[G1S];
-		byte[] CK=new byte[ECP.AESKEY];
-		byte[] SK=new byte[ECP.AESKEY];
+		byte[] CK=new byte[CONFIG_CURVE.AESKEY];
+		byte[] SK=new byte[CONFIG_CURVE.AESKEY];
 
 		byte[] HSID=null;
 		byte[] RAW=new byte[100];

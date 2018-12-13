@@ -215,7 +215,7 @@ public final class FP2 {
 /* Now uses Lazy reduction */
 	public void mul(FP2 y)
 	{
-		if ((long)(a.XES+b.XES)*(y.a.XES+y.b.XES)>(long)FP.FEXCESS)
+		if ((long)(a.XES+b.XES)*(y.a.XES+y.b.XES)>(long)CONFIG_FIELD.FEXCESS)
 		{
 			if (a.XES>1) a.reduce();
 			if (b.XES>1) b.reduce();		

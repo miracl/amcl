@@ -49,16 +49,16 @@ public class TesttimeMPIN extends TestCase
 
 
 		System.out.println("\nTesting/Timing Pairings");
-		if (ECP.CURVE_PAIRING_TYPE==ECP.BN)
+		if (CONFIG_CURVE.CURVE_PAIRING_TYPE==CONFIG_CURVE.BN)
 		{
 			System.out.print("BN Pairing-Friendly Curve\n");
 		}
-		if (ECP.CURVE_PAIRING_TYPE==ECP.BLS)
+		if (CONFIG_CURVE.CURVE_PAIRING_TYPE==CONFIG_CURVE.BLS)
 		{
 			System.out.print("BLS Pairing-Friendly Curve\n");
 		}
 
-		System.out.format("Modulus size %d bits\n",FP.MODBITS); 
+		System.out.format("Modulus size %d bits\n",CONFIG_FIELD.MODBITS); 
 		System.out.format("%d bit build\n",BIG.CHUNK); 
 
 		ECP G=ECP.generator();
