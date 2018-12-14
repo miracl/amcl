@@ -63,7 +63,11 @@ impl fmt::Debug for BIG {
 
 impl PartialEq for BIG {
     fn eq(&self, other: &BIG) -> bool {
-        return self.w == other.w;
+        if BIG::comp(self,other)==0 {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
