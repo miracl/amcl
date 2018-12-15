@@ -32,7 +32,7 @@ use amcl::rand::RAND;
 //use amcl::aes;
 use amcl::nhs;
 
-#[test]
+//#[test]
 fn main()
 {
 	let mut raw:[u8;100]=[0;100];	

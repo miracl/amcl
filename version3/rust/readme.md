@@ -1,32 +1,46 @@
-# README
+NOTE: Updated to Rust 2018
 
-NOTE: This version of the library requires Version 1.17+ of Rust for 64-bit
-support. Unfortunately support for the 128-bit integer type is still
-flagged as unstable, and so for now a nightly build of rust must be used.
-
-NEW: 128-bit integers are now stable with version 1.26. So please use latest
-version.
+NOTE: This version of the library requires Version 1.31+ of Rust for 64-bit 
+integer support and for Rust 2018. 
 
 Now AMCL version 3 is distributed as a cargo crate.
-To use the curve (or algorithm) that you need you have to put it as a dependency and to state a corresponding feature in your `Cargo.toml`.
 
-Example:
+Namespaces are used to separate different curves.
 
-To use BLS48:
+To build the library and see it in action, copy all of the files in this 
+directory and its subdirectories to a fresh root directory. 
 
-```rust
+Then for example execute
+
+cargo rustc  --release --features 'bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048' -- --cfg D32
+
+This will create a 32-bit build of the library. For a 64-bit build
+
+cargo rustc  --release --features 'bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048' -- --cfg D64
+
+Next copy the library from target/release/libamcl.rlib into the root 
+directory and execute
+
+rustc TestALL.rs --extern amcl=libamcl.rlib
+rustc TestBLS.rs --extern amcl=libamcl.rlib
+rustc BenchtestALL.rs --extern amcl=libamcl.rlib
+rustc TestNHS.rs --extern amcl=libamcl.rlib
+
+Finally execute these programs.
+
+To add amcl functionality to your own programs, add a dependency to your 
+Cargo.toml file. For example to use the curve bls48, add this dependency
+
+[dependencies]
 amcl = { version = "0.2.0",  optional = true, default-features = false, features = ["bls48"]}
-```
 
-Then, in your `main.rs` or `lib.rs` (you don't need it if you use Rust 2018) :
-```rust
-extern crate amcl;
-```
+if published to crates.io, or 
 
-And to use primitives of needed curve:
-```rust
+amcl = { version = "0.2.0",  optional = true, default-features = false, features = ["bls48"], path="your_amcl_location" }
+
+And to use primitives of the needed curve in your source code:
+
 use amcl::bls48::{ECP, ECP8}; //any primitive you need
-```
 
 Full list of features:
 

@@ -934,7 +934,7 @@ fn rsa2048(mut rng: &mut RAND) {
 }
 
 #[allow(non_snake_case)]
-#[test]
+//#[test]
 fn main() {
 	let mut raw: [u8; 100] = [0; 100];
 

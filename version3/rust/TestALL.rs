@@ -1436,7 +1436,7 @@ fn rsa_2048(mut rng: &mut RAND) {
     rsa::private_key_kill(&mut prv);
 }
 
-#[test]
+//#[test]
 fn main() {
     let mut raw: [u8; 100] = [0; 100];
 
