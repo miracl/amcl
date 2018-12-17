@@ -12,11 +12,9 @@ directory and its subdirectories to a fresh root directory.
 
 Then for example execute
 
-cargo rustc  --release --features 'bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048' -- --cfg D32
+cargo rustc  --release --features 'bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048'
 
-This will create a 32-bit build of the library. For a 64-bit build
-
-cargo rustc  --release --features 'bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048' -- --cfg D64
+This will create a build of the library for the current default target (be it 32 or 64 bits). 
 
 Next copy the library from target/release/libamcl.rlib into the root 
 directory and execute
