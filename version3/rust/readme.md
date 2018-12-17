@@ -20,8 +20,11 @@ Next copy the library from target/release/libamcl.rlib into the root
 directory and execute
 
 rustc TestALL.rs --extern amcl=libamcl.rlib
+
 rustc TestBLS.rs --extern amcl=libamcl.rlib
+
 rustc BenchtestALL.rs --extern amcl=libamcl.rlib
+
 rustc TestNHS.rs --extern amcl=libamcl.rlib
 
 Finally execute these programs.
