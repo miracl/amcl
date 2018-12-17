@@ -49,7 +49,7 @@ The Emscripten toolchain is also required, as above
 
 Build the Rust library by executing
 
-cargo rustc  --release --features 'bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048' --target wasm32-unknown-emscripten
+cargo rustc  --release --features "bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048" --target wasm32-unknown-emscripten
 
 Copy the AMCL library to the current directory
 

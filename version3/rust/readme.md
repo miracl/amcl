@@ -12,7 +12,7 @@ directory and its subdirectories to a fresh root directory.
 
 Then for example execute
 
-cargo rustc  --release --features 'bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048'
+cargo rustc  --release --features "bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048"
 
 This will create a build of the library for the current default target (be it 32 or 64 bits). 
 
@@ -35,6 +35,7 @@ To add amcl functionality to your own programs, add a dependency to your
 Cargo.toml file. For example to use the curve bls48, add this dependency
 
 [dependencies]
+
 amcl = { version = "0.2.0",  optional = true, default-features = false, features = ["bls48"]}
 
 if published to crates.io, or 
