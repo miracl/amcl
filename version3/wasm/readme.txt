@@ -47,26 +47,19 @@ rustup target add wasm32-unknown-emscripten
 
 The Emscripten toolchain is also required, as above
 
-Edit the Rust file config32.py, where it generates "cargo rustc" instruction 
-(around line 372), and include the flag --target wasm32-unknown-emscripten
+Build the Rust library by executing
 
-Build the Rust library as described in the Rust readme.txt file by executing
-
-python3 config32.py
+cargo rustc  --release --features 'bn254 bls383 bls24 bls48 ed25519 nist256 goldilocks rsa2048' --target wasm32-unknown-emscripten
 
 Copy the AMCL library to the current directory
 
-cp amcl/target/wasm32-unknown-emscripten/release/libamcl.rlib .
+cp target/wasm32-unknown-emscripten/release/libamcl.rlib .
 
 Finally build one of the test programs by, for example
 
-rustc --target wasm32-unknown-emscripten BenchtestALL.rs --extern amcl=libamcl.rlib -o BenchtestALL.html
+rustc --target=wasm32-unknown-emscripten TestBLS.rs --extern amcl=libamcl.rlib -o TestBLS.html
 
-Note that this will create a HTML file, which can be loaded into a browser as 
+Note that this will create a HTML file, which can be loaded into a browser (tested on Edge) as 
 described above.
-
-Right now (6/2018) this doesn't work with the 64-bit build, I suspect because 
-Webassembly is not happy with 128-bit integers. But in time it might (and 
-would then be even faster).
 
 

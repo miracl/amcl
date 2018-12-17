@@ -16,6 +16,8 @@ cargo rustc  --release --features 'bn254 bls383 bls24 bls48 ed25519 nist256 gold
 
 This will create a build of the library for the current default target (be it 32 or 64 bits). 
 
+(To test a 32-bit environment you can follow the Web Assembly (wasm) readme instructions for rust)
+
 Next copy the library from target/release/libamcl.rlib into the root 
 directory and execute
 
