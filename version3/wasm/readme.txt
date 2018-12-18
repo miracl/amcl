@@ -65,9 +65,9 @@ cp target/wasm32-unknown-emscripten/release/libamcl.rlib .
 
 Finally build one of the test programs by, for example
 
-rustc --target=wasm32-unknown-emscripten TestBLS.rs --extern amcl=libamcl.rlib -o TestBLS.html
+rustc -O --target=wasm32-unknown-emscripten TestBLS.rs --extern amcl=libamcl.rlib -o TestBLS.html
 
-Note that this will create a HTML file, which can be loaded into a browser (tested on Edge) as 
+Note that this will create a HTML file, which can be loaded into a browser as 
 described above.
 
 
