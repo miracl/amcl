@@ -351,6 +351,7 @@ os.system(deltext+" fp12.*")
 os.system(deltext+" ecp2.*")
 os.system(deltext+" pair.*")
 os.system(deltext+" mpin.*")
+os.system(deltext+" bls.*")
 
 # create library
 os.system("g++ -O3 -c randapi.cpp")

@@ -59,6 +59,7 @@ int bls_BN254(csprng *RNG)
 	res=BLS_BN254_VERIFY(&SIG,message,&W);
 	if (res==BLS_OK) printf("Signature is OK\n");
 	else printf("Signature is *NOT* OK\n");
+	return res;
 }
 
 #if CHUNK==32 || CHUNK==64
@@ -87,6 +88,7 @@ int bls_BLS383(csprng *RNG)
 	res=BLS_BLS383_VERIFY(&SIG,message,&W);
 	if (res==BLS_OK) printf("Signature is OK\n");
 	else printf("Signature is *NOT* OK\n");
+	return res;
 }
 
 int bls_BLS24(csprng *RNG)
@@ -113,6 +115,7 @@ int bls_BLS24(csprng *RNG)
 	res=BLS_BLS24_VERIFY(&SIG,message,&W);
 	if (res==BLS_OK) printf("Signature is OK\n");
 	else printf("Signature is *NOT* OK\n");
+	return res;
 }
 
 int bls_BLS48(csprng *RNG)
@@ -139,6 +142,7 @@ int bls_BLS48(csprng *RNG)
 	res=BLS_BLS48_VERIFY(&SIG,message,&W);
 	if (res==BLS_OK) printf("Signature is OK\n");
 	else printf("Signature is *NOT* OK\n");
+	return res;
 }
 
 #endif

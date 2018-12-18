@@ -719,5 +719,6 @@ void ECP2_ZZZ_generator(ECP2_ZZZ *G)
     FP_YYY_rcopy(&(wx.b),CURVE_Pxb_ZZZ); 
     FP_YYY_rcopy(&(wy.a),CURVE_Pya_ZZZ); 
     FP_YYY_rcopy(&(wy.b),CURVE_Pyb_ZZZ);     
+
 	ECP2_ZZZ_set(G,&wx,&wy);
 }

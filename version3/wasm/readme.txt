@@ -14,7 +14,13 @@ entirely. Which is good for our type of application, as the way
 in which Javascript handles integer arithmetic is very slow.
 
 To install the Emscripten C/C++ compiler follow the instructions
-above. Then copy the AMCL C code into a new directory, along with
+above. 
+
+--------------------------------------------------
+
+C installation
+
+Copy the AMCL C code into a new directory, along with
 the config.py file from this directory. In the new directory execute
 
 python3 config.py
@@ -26,19 +32,21 @@ Build the test programs with
 
 emcc -O2 benchtest_all.c amcl.a -s WASM=1 -o benchtest_all.html
 
-and
-
 emcc -O2 testall.c amcl.a -s WASM=1 -o testall.html
+
+emcc -O2 testbls.c amcl.a -s WASM=1 -o testbls.html
 
 Then run a local HTML server (as described in the link above) and load the 
 HTML file.
 
-Wait for the benchtest_all program to complete (which will take a while).
+Wait for programs to complete (which will take a while).
 
 *Firefox, Safari, Edge, Chrome
 
 
 -------------------------------
+
+Rust Installation
 
 Webassembly can also be generated from the Rust code. First the Rust compiler 
 must be updated to target wasm, by

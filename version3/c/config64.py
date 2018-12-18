@@ -638,12 +638,15 @@ os.system(deltext+" ecp8.*")
 
 os.system(deltext+" pair.*")
 os.system(deltext+" mpin.*")
+os.system(deltext+" bls.*")
 
 os.system(deltext+" pair192.*")
 os.system(deltext+" mpin192.*")
+os.system(deltext+" bls192.*")
 
 os.system(deltext+" pair256.*")
 os.system(deltext+" mpin256.*")
+os.system(deltext+" bls256.*")
 
 # create library
 os.system("gcc -O3 -std=c99 -c randapi.c")

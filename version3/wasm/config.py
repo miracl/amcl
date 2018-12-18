@@ -257,6 +257,21 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fnameh,"XXX",bd)
 			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
 
+			fnamec="bls_"+tc+".c"
+			fnamebc="bls_"+tc+".bc"
+			fnameh="bls_"+tc+".h"
+
+			os.system(copytext+" bls.c "+fnamec)
+			os.system(copytext+" bls.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+
+
 		if cs == "192" :
 			fnamec="fp8_"+tf+".c"
 			fnamebc="fp8_"+tf+".bc"
@@ -326,6 +341,21 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)		
+
+			fnamec="bls192_"+tc+".c"
+			fnamebc="bls192_"+tc+".bc"
+			fnameh="bls192_"+tc+".h"
+
+			os.system(copytext+" bls192.c "+fnamec)
+			os.system(copytext+" bls192.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)	
+
 
 		if cs == "256" :
 
@@ -414,6 +444,20 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,cs) :
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)				
+
+			fnamec="bls256_"+tc+".c"
+			fnamebc="bls256_"+tc+".bc"
+			fnameh="bls256_"+tc+".h"
+
+			os.system(copytext+" bls256.c "+fnamec)
+			os.system(copytext+" bls256.h "+fnameh)
+			replace(fnamec,"ZZZ",tc)
+			replace(fnamec,"YYY",tf)
+			replace(fnamec,"XXX",bd)
+			replace(fnameh,"ZZZ",tc)
+			replace(fnameh,"YYY",tf)
+			replace(fnameh,"XXX",bd)
+			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)		
 
 replace("arch.h","@WL@","32")
 print("Elliptic Curves")
@@ -551,7 +595,7 @@ while ptr<max:
 		curveset("256","BN254CX","BN254CX","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","128")
 		pfcurve_selected=True
 	if x==20:
-		curveset("384","BLS383","BLS383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","D_TYPE","POSITIVEX","128")
+		curveset("384","BLS383","BLS383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","128")
 		pfcurve_selected=True
 
 	if x==21:
@@ -630,12 +674,16 @@ os.system(deltext+" ecp8.*")
 
 os.system(deltext+" pair.*")
 os.system(deltext+" mpin.*")
+os.system(deltext+" bls.*")
 
 os.system(deltext+" pair192.*")
 os.system(deltext+" mpin192.*")
+os.system(deltext+" bls192.*")
 
 os.system(deltext+" pair256.*")
 os.system(deltext+" mpin256.*")
+os.system(deltext+" bls256.*")
+
 
 # create library
 os.system("emcc -O2  randapi.c -o randapi.bc")
