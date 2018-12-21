@@ -1,7 +1,9 @@
 The Apache Milagro Cryptographic Library
 
 Note that the AMCL currently comes in two versions, version 2.2 
-and version 3.1
+and version 3.2
+
+---------------------------------------
 
 AMCL v2.2 is presented in what might be called a pre-library state.
 
@@ -11,6 +13,24 @@ It is expected that the consumer will themselves take this final step,
 depending on the exact requirements of their project.
 
 Note that version 2.2 is no longer supported.
+
+-----------------------------------
+
+AMCL v3.2 incorporates many minor improvements
+
+Python version
+Web Assembly support
+Improved side channel resistance
+Faster Swift code
+Better Rust build system
+Improved modular inversion algorithm
+General speed optimizations
+Improved Javascript testbed
+More curves supported
+New BLS signature API
+Post quantum New Hope Implementation
+
+-----------------------------------
 
 AMCL v3.1 uses a standard Python 3 script to build libraries in all
 supported languages. New users should use this version.
@@ -38,4 +58,4 @@ mitigates against side-channel attacks. Exception-free formulae are
 now used for Weierstrass elliptic curves. A new standardised script 
 builds for the same set of curves across all languages.
 
-
+---------------------------------------------

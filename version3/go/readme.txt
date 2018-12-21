@@ -51,3 +51,6 @@ Next run the Benchmark program by executing
 
 go run BenchtestALL.go
 
+Finally
+
+go run TestNHS.go

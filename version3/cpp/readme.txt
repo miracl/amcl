@@ -64,6 +64,10 @@ g++ -O2  benchtest_all.cpp amcl.a -o benchtest_all
 
 This program provides some timings.
 
+Finally
+
+g++ -O2  testnhs.cpp amcl.a -o testnhs
+
 
 *Using clang on Windows
 Download latest clang from http://releases.llvm.org/download.html

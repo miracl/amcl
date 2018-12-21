@@ -78,6 +78,12 @@ gcc -O2 -std=c99 benchtest_all.c amcl.a -o benchtest_all
 
 This program provides some timings.
 
+Finally
+
+gcc -O2 -std=c99 testnhs.c amcl.a -o testnhs
+
+
+
 *Using clang on Windows
 Download latest clang from http://releases.llvm.org/download.html
 Choose Clang for Windows (64-bit) (.sig) 
