@@ -250,7 +250,7 @@ impl HASH384 {
         self.process((n & 0xff) as u8);
     }
 
-    /* Generate 32-byte Hash */
+    /* Generate 48-byte Hash */
     pub fn hash(&mut self) -> [u8; 48] {
         /* pad message and finish - supply digest */
         let mut digest: [u8; 48] = [0; 48];

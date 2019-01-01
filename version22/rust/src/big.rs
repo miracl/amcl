@@ -148,7 +148,7 @@ impl BIG {
 
 /* Test for equal to one */
 	pub fn isunity(&self) -> bool {
-		for i in 0 ..rom::NLEN {
+		for i in 1 ..rom::NLEN {
 			if self.w[i]!=0 {return false}
 		}
 		if self.w[0]!=1 {return false}

@@ -170,7 +170,7 @@ impl BIG {
 
     /* Test for equal to one */
     pub fn isunity(&self) -> bool {
-        for i in 0..NLEN {
+        for i in 1..NLEN {
             if self.w[i] != 0 {
                 return false;
             }
