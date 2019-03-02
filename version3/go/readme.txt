@@ -22,6 +22,9 @@ https://git-scm.com/download/
 
 Next navigate to $GOPATH/src/github.com/miracl/amcl/version3/go
 
+NOTE: If the repository address changes, then change the above, and also
+change import statements at the start of some files.
+
 To build the library and see it in action, execute the python3 
 script config32.py or config64.py (depending om whether you want a 
 32 or 64-bit build), and select the curves that you wish to support. 
