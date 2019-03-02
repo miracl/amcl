@@ -71,11 +71,11 @@ public final class PAIR256 {
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 			{			
 				b=new FP16(XX);             // L(0,1) | L(0,0) | L(1,0)
-				c=new FP16(0);
+				c=new FP16();
 			}
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 			{
-				b=new FP16(0);
+				b=new FP16();
 				c=new FP16(XX); c.times_i();
 			}
 			A.dbl();
@@ -114,11 +114,11 @@ public final class PAIR256 {
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 			{
 				b=new FP16(Y1);
-				c=new FP16(0);
+				c=new FP16();
 			}
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 			{
-				b=new FP16(0);
+				b=new FP16();
 				c=new FP16(Y1); c.times_i();
 			}
 			A.add(B);
@@ -658,7 +658,7 @@ public final class PAIR256 {
 			g[0]=new FP48(d);
 			for (i=1;i<16;i++)
 			{
-				g[i]=new FP48(0); g[i].copy(g[i-1]);
+				g[i]=new FP48(); g[i].copy(g[i-1]);
 				g[i].frob(f,1);
 			}
 			for (i=0;i<16;i++)

@@ -156,16 +156,24 @@ public final class FP48 {
 	public FP48(FP16 d)
 	{
 		a=new FP16(d);
-		b=new FP16(0);
-		c=new FP16(0);
+		b=new FP16();
+		c=new FP16();
 		type=SPARSER;
+	}
+
+	public FP48()
+	{
+		a=new FP16();
+		b=new FP16();
+		c=new FP16();
+		type=ZERO;
 	}
 
 	public FP48(int d)
 	{
 		a=new FP16(d);
-		b=new FP16(0);
-		c=new FP16(0);
+		b=new FP16();
+		c=new FP16();
 		if (d==1)
 			type=ONE;
 		else
@@ -194,7 +202,7 @@ public final class FP48 {
 		FP16 A=new FP16(a);
 		FP16 B=new FP16(c);
 		FP16 C=new FP16(b);
-		FP16 D=new FP16(0);
+		FP16 D=new FP16();
 
 		a.sqr();
 		D.copy(a); D.add(a);
@@ -279,9 +287,9 @@ public final class FP48 {
 	public void mul(FP48 y)
 	{
 		FP16 z0=new FP16(a);
-		FP16 z1=new FP16(0);
+		FP16 z1=new FP16();
 		FP16 z2=new FP16(b);
-		FP16 z3=new FP16(0);
+		FP16 z3=new FP16();
 		FP16 t0=new FP16(a);
 		FP16 t1=new FP16(y.a);
 
@@ -464,9 +472,9 @@ public final class FP48 {
 		if (y.type>=SPARSE)
 		{
 			FP16 z0=new FP16(a);
-			FP16 z1=new FP16(0);
-			FP16 z2=new FP16(0);
-			FP16 z3=new FP16(0);
+			FP16 z1=new FP16();
+			FP16 z2=new FP16();
+			FP16 z3=new FP16();
 			z0.mul(y.a);
 
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
@@ -566,7 +574,7 @@ public final class FP48 {
 				FP16 z0=new FP16(a);
 				FP16 z2=new FP16(b);
 				FP16 z3=new FP16(b);
-				FP16 t0=new FP16(0);
+				FP16 t0=new FP16();
 				FP16 t1=new FP16(y.a);
 				z0.mul(y.a);
 				z2.pmul(y.b.real());
@@ -600,11 +608,11 @@ public final class FP48 {
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 			{
 				FP16 z0=new FP16(a);
-				FP16 z1=new FP16(0);
-				FP16 z2=new FP16(0);
-				FP16 z3=new FP16(0);
+				FP16 z1=new FP16();
+				FP16 z2=new FP16();
+				FP16 z3=new FP16();
 				FP16 t0=new FP16(a);
-				FP16 t1=new FP16(0);
+				FP16 t1=new FP16();
 		
 				z0.mul(y.a);
 				t0.add(b); t0.norm();
@@ -651,7 +659,7 @@ public final class FP48 {
 		FP16 f0=new FP16(a);
 		FP16 f1=new FP16(b);
 		FP16 f2=new FP16(a);
-		FP16 f3=new FP16(0);
+		FP16 f3=new FP16();
 
 		//norm();
 		f0.sqr();
@@ -714,7 +722,7 @@ public final class FP48 {
 /* trace function */
 	public FP16 trace()
 	{
-		FP16 t=new FP16(0);
+		FP16 t=new FP16();
 		t.copy(a);
 		t.imul(3);
 		t.reduce();
@@ -1085,8 +1093,8 @@ public final class FP48 {
 
 	public FP16 compow(BIG e,BIG r)
 	{
-		FP48 g1=new FP48(0);
-		FP48 g2=new FP48(0);
+		FP48 g1=new FP48();
+		FP48 g2=new FP48();
 		FP2 f=new FP2(new BIG(ROM.Fra),new BIG(ROM.Frb));
 		BIG q=new BIG(ROM.Modulus);
 
@@ -1136,7 +1144,7 @@ public final class FP48 {
 		FP48 [] g3=new FP48[8];
 		FP48 [] g4=new FP48[8];
 		FP48 r=new FP48(1);
-		FP48 p=new FP48(0);
+		FP48 p=new FP48();
 		BIG [] t=new BIG[16];
 		BIG mt=new BIG(0);
 		byte[] w1=new byte[BIG.NLEN*CONFIG_BIG.BASEBITS+1];

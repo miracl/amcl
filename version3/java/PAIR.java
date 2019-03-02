@@ -71,11 +71,11 @@ public final class PAIR {
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 			{			
 				b=new FP4(XX);             // L(0,1) | L(0,0) | L(1,0)
-				c=new FP4(0);
+				c=new FP4();
 			}
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 			{
-				b=new FP4(0);
+				b=new FP4();
 				c=new FP4(XX); c.times_i();
 			}
 			A.dbl();
@@ -114,11 +114,11 @@ public final class PAIR {
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.D_TYPE)
 			{
 				b=new FP4(Y1);
-				c=new FP4(0);
+				c=new FP4();
 			}
 			if (CONFIG_CURVE.SEXTIC_TWIST==CONFIG_CURVE.M_TYPE)
 			{
-				b=new FP4(0);
+				b=new FP4();
 				c=new FP4(Y1); c.times_i();
 			}
 			A.add(B);

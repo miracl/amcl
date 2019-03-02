@@ -30,7 +30,8 @@ var FP = function(ctx) {
             this.XES = x.XES;
         } else {
             this.f = new ctx.BIG(x);
-            this.nres();
+			if (x!=0)
+				this.nres();
         }
     };
 

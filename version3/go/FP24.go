@@ -32,11 +32,20 @@ type FP24 struct {
 }
 
 /* Constructors */
+func NewFP24() *FP24 {
+	F := new(FP24)
+	F.a = NewFP8()
+	F.b = NewFP8()
+	F.c = NewFP8()
+	F.stype=FP_ZERO
+	return F
+}
+
 func NewFP24fp8(d *FP8) *FP24 {
 	F := new(FP24)
 	F.a = NewFP8copy(d)
-	F.b = NewFP8int(0)
-	F.c = NewFP8int(0)
+	F.b = NewFP8()
+	F.c = NewFP8()
 	F.stype=FP_SPARSER
 	return F
 }
@@ -44,8 +53,8 @@ func NewFP24fp8(d *FP8) *FP24 {
 func NewFP24int(d int) *FP24 {
 	F := new(FP24)
 	F.a = NewFP8int(d)
-	F.b = NewFP8int(0)
-	F.c = NewFP8int(0)
+	F.b = NewFP8()
+	F.c = NewFP8()
 	if d==1 {
 		F.stype=FP_ONE
 	} else {
@@ -176,7 +185,7 @@ func (F *FP24) usqr() {
 	A := NewFP8copy(F.a)
 	B := NewFP8copy(F.c)
 	C := NewFP8copy(F.b)
-	D := NewFP8int(0)
+	D := NewFP8()
 
 	F.a.sqr()
 	D.copy(F.a)
@@ -264,9 +273,9 @@ func (F *FP24) sqr() {
 /* FP24 full multiplication this=this*y */
 func (F *FP24) Mul(y *FP24) {
 	z0 := NewFP8copy(F.a)
-	z1 := NewFP8int(0)
+	z1 := NewFP8()
 	z2 := NewFP8copy(F.b)
-	z3 := NewFP8int(0)
+	z3 := NewFP8()
 	t0 := NewFP8copy(F.a)
 	t1 := NewFP8copy(y.a)
 
@@ -343,9 +352,9 @@ func (F *FP24) ssmul(y *FP24) {
 	}
 	if y.stype>=FP_SPARSE {
 		z0:=NewFP8copy(F.a)
-		z1:=NewFP8int(0)
-		z2:=NewFP8int(0)
-		z3:=NewFP8int(0)
+		z1:=NewFP8()
+		z2:=NewFP8()
+		z3:=NewFP8()
 		z0.mul(y.a)
 
 		if SEXTIC_TWIST==M_TYPE {
@@ -435,7 +444,7 @@ func (F *FP24) ssmul(y *FP24) {
 			z0:=NewFP8copy(F.a)
 			z2:=NewFP8copy(F.b)
 			z3:=NewFP8copy(F.b)
-			t0:=NewFP8int(0)
+			t0:=NewFP8()
 			t1:=NewFP8copy(y.a)
 			z0.mul(y.a)
 			z2.pmul(y.b.real())
@@ -468,11 +477,11 @@ func (F *FP24) ssmul(y *FP24) {
 		}
 		if SEXTIC_TWIST==M_TYPE {
 			z0:=NewFP8copy(F.a)
-			z1:=NewFP8int(0)
-			z2:=NewFP8int(0)
-			z3:=NewFP8int(0)
+			z1:=NewFP8()
+			z2:=NewFP8()
+			z3:=NewFP8()
 			t0:=NewFP8copy(F.a)
-			t1:=NewFP8int(0)
+			t1:=NewFP8()
 		
 			z0.mul(y.a)
 			t0.add(F.b); t0.norm()
@@ -627,7 +636,7 @@ func (F *FP24) Inverse() {
 	f0 := NewFP8copy(F.a)
 	f1 := NewFP8copy(F.b)
 	f2 := NewFP8copy(F.a)
-	f3 := NewFP8int(0)
+	f3 := NewFP8()
 
 	//F.norm()
 	f0.sqr()
@@ -697,7 +706,7 @@ func (F *FP24) frob(f *FP2, n int) {
 
 /* trace function */
 func (F *FP24) trace() *FP8 {
-	t := NewFP8int(0)
+	t := NewFP8()
 	t.copy(F.a)
 	t.imul(3)
 	t.reduce()
@@ -1057,8 +1066,8 @@ func pow8(q []*FP24, u []*BIG) *FP24 {
 	var w2 [NLEN*int(BASEBITS) + 1]int8
 	var s2 [NLEN*int(BASEBITS) + 1]int8
 	var t []*BIG
-	r := NewFP24int(0)
-	p := NewFP24int(0)
+	r := NewFP24()
+	p := NewFP24()
 	mt := NewBIGint(0)
 	var bt int8
 	var k int

@@ -44,6 +44,12 @@ type FP struct {
 }
 
 /* Constructors */
+func NewFP() *FP {
+	F := new(FP)
+	F.x = NewBIG()
+	return F
+}
+
 func NewFPint(a int) *FP {
 	F := new(FP)
 	F.x = NewBIGint(a)
@@ -400,7 +406,7 @@ func (F *FP) fpow() *FP {
 	k := w - c
 
 	i := 10
-	key := NewFPint(0)
+	key := NewFP()
 
 	if k != 0 {
 		for ac[i] > k {
@@ -426,7 +432,7 @@ func (F *FP) fpow() *FP {
 	j := 3
 	m := 8
 	nw := n - bw
-	t := NewFPint(0)
+	t := NewFP()
 	for 2*m < nw {
 		t.copy(xp[j])
 		j++
