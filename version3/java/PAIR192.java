@@ -125,7 +125,7 @@ public final class PAIR192 {
 			A.add(B);
 		}
 		FP24 r=new FP24(a,b,c);
-		r.settype(FP24.SPARSE);
+		r.settype(FP24.SPARSER);
 		return r;
 	}
 

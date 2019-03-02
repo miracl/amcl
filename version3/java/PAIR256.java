@@ -124,7 +124,7 @@ public final class PAIR256 {
 			A.add(B);
 		}
 		FP48 r=new FP48(a,b,c);
-		r.settype(FP48.SPARSE);
+		r.settype(FP48.SPARSER);
 		return r;
 	}
 

@@ -46,11 +46,11 @@ func NewFP12int(d int) *FP12 {
 	F.a = NewFP4int(d)
 	F.b = NewFP4int(0)
 	F.c = NewFP4int(0)
-//	if d==1 {
-//		F.stype=FP_ONE
-//	} else {
-//		F.stype=FP_SPARSER
-//	}
+	if d==1 {
+		F.stype=FP_ONE
+	} else {
+		F.stype=FP_SPARSER
+	}
 	return F
 }
 
