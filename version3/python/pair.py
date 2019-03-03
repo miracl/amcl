@@ -126,7 +126,7 @@ def another(r,P1,Q1) :
         r[0] *= lv
 
 def e(P, Q):
-    r = miller(P, Q)
+    r = ate(P, Q)
     return fexp(r)
 
 
