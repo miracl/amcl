@@ -47,6 +47,7 @@ type FP struct {
 func NewFP() *FP {
 	F := new(FP)
 	F.x = NewBIG()
+	F.XES = 1
 	return F
 }
 
