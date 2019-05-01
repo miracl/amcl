@@ -335,12 +335,30 @@ public struct AES {
         while j<N
         {
             fkey[j]=fkey[j-nk]^AES.SubByte(AES.ROTL24(fkey[j-1]))^UInt32(AES.rco[k])
-            var i=1
-            while i<nk && (i+j)<N
-            {
-                fkey[i+j]=fkey[i+j-nk]^fkey[i+j-1]
-                i+=1
-            }
+	    if nk <= 6 {
+                var i=1
+                while i<nk && (i+j)<N
+                {
+                    fkey[i+j]=fkey[i+j-nk]^fkey[i+j-1]
+                    i+=1
+		}
+            } else {
+                var i=1
+                while i<4 && (i+j)<N
+                {
+                    fkey[i+j]=fkey[i+j-nk]^fkey[i+j-1]
+                    i+=1
+		}
+                if (j+4) < N {
+		    fkey[j + 4] = fkey[j + 4 - nk] ^ AES.SubByte(fkey[j + 3])
+		}
+		i=5
+                while i<nk && (i+j)<N 
+		{
+		    fkey[i + j] = fkey[i + j - nk] ^ fkey[i + j - 1]
+		    i+=1
+		}
+	    }
             j+=nk
             k+=1
         }
