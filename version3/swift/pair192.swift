@@ -324,7 +324,10 @@ public struct PAIR192 {
         lv.copy(r)
         r.frob(f,4)
         r.mul(lv)
-        
+        if r.isunity() {
+		r.zero()
+		return r
+	}        
     // Hard part of final exp
 
         var t7=FP24(r); t7.usqr()

@@ -355,7 +355,11 @@ public final class PAIR256 {
 		lv.copy(r);
 		r.frob(f,8);
 		r.mul(lv);
-
+		if (r.isunity())
+		{
+			r.zero();
+			return r;
+		}
 		FP48 t0,t1,t2,t3,t4,t5,t6,t7;
 /* Hard part of final exp */	
 // Ghamman & Fouotsa Method

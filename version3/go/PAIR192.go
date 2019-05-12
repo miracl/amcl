@@ -336,7 +336,10 @@ func Fexp(m *FP24) *FP24 {
 	lv.Copy(r)
 	r.frob(f, 4)
 	r.Mul(lv)
-
+	if r.Isunity() {
+		r.zero()
+		return r
+	}
 	/* Hard part of final exp */
 	// Ghamman & Fouotsa Method
 

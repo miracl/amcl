@@ -423,7 +423,10 @@ public struct PAIR {
         r.frob(f)
         r.frob(f)
         r.mul(lv)
-        
+        if r.isunity() {
+		r.zero()
+		return r
+	}        
     // Hard part of final exp
 	if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
 		lv.copy(r)
