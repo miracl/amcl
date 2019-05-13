@@ -474,7 +474,7 @@ var FP = function(ctx) {
                 tb=[],
                 t=new ctx.BIG(e),
                 nb, lsbs, r;
-
+			this.norm();
             t.norm();
             nb= 1 + Math.floor((t.nbits() + 3) / 4);
 
