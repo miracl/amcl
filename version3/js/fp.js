@@ -31,7 +31,7 @@ var FP = function(ctx) {
         } else {
             this.f = new ctx.BIG(x);
 			this.XES = 1;
-			if (x!=0)
+			if (!this.f.iszilch())
 				this.nres();
         }
     };
