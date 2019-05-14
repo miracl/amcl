@@ -193,6 +193,16 @@ public struct FP12
         c.zero()
         stype=FP12.ONE
     }
+
+    /* set self=0 */
+    mutating func zero()
+    {
+        a.zero()
+        b.zero()
+        c.zero()
+        stype=FP12.ZERO
+    }
+
     /* self=conj(self) */
     mutating func conj()
     {

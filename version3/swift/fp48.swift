@@ -194,6 +194,16 @@ public struct FP48
         c.zero()
         stype=FP48.ONE        
     }
+
+    /* set self=0 */
+    mutating func zero()
+    {
+        a.zero()
+        b.zero()
+        c.zero()
+        stype=FP48.ZERO
+    }
+
     /* self=conj(self) */
     mutating func conj()
     {

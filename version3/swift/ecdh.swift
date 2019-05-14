@@ -325,7 +325,7 @@ public struct ECDH
         }
         else
         {
-            s=BIG.randtrunc(r,16*CONFIG_CURVE.AESKEY,&RNG!)
+            s=BIG.randomnum(r,&RNG!)
         }
     
         s.toBytes(&S)

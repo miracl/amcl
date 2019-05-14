@@ -173,6 +173,14 @@ func (F *FP24) one() {
 	F.stype=FP_ONE
 }
 
+/* set this=0 */
+func (F *FP24) zero() {
+	F.a.zero()
+	F.b.zero()
+	F.c.zero()
+	F.stype=FP_ZERO
+}
+
 /* this=conj(this) */
 func (F *FP24) conj() {
 	F.a.conj()
