@@ -145,6 +145,16 @@ public final class FP48 {
 		c.zero();
 		type=ONE;
 	}
+
+/* set this=0 */
+	public void zero()
+	{
+		a.zero();
+		b.zero();
+		c.zero();
+		type=ZERO;
+	}
+
 /* this=conj(this) */
 	public void conj()
 	{
