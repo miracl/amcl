@@ -185,7 +185,7 @@ var FP = function(ctx) {
         /* set this=1 */
         one: function() {
             this.f.one();
-            return this.nres();
+            this.nres();
         },
 
         /* normalise this */
