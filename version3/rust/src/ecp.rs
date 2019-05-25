@@ -1202,6 +1202,7 @@ impl ECP {
         return S;
     }
 
+    // Multiply itself by cofactor of the curve
     pub fn cfp(&mut self) {
         let cf = rom::CURVE_COF_I;
         if cf == 1 {
@@ -1223,6 +1224,7 @@ impl ECP {
         self.copy(&P);
     }
 
+    // Map a given byte slice to a point on the curve. The byte slice should be atleast the size of the modulus
     #[allow(non_snake_case)]
     pub fn mapit(h: &[u8]) -> ECP {
         let mut q = BIG::new_ints(&rom::MODULUS);
