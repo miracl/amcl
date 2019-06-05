@@ -192,20 +192,11 @@ impl ECP {
 
     /* test for O point-at-infinity */
     pub fn is_infinity(&self) -> bool {
-        let xx = FP::new_copy(&self.x);
-        let zz = FP::new_copy(&self.z);
-
-        if CURVETYPE == CurveType::EDWARDS {
-            let yy = FP::new_copy(&self.y);
-            return xx.iszilch() && yy.equals(&zz);
+        match CURVETYPE {
+            CurveType::EDWARDS=> self.x.iszilch() && self.y.iszilch(),
+            CurveType::WEIERSTRASS => self.x.iszilch() && self.z.iszilch(),
+            CurveType::MONTGOMERY => self.z.iszilch(),
         }
-        if CURVETYPE == CurveType::WEIERSTRASS {
-            return xx.iszilch() && zz.iszilch();
-        }
-        if CURVETYPE == CurveType::MONTGOMERY {
-            return zz.iszilch();
-        }
-        return true;
     }
 
     /* Conditional swap of P and Q dependant on d */
