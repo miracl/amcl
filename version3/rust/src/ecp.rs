@@ -193,7 +193,7 @@ impl ECP {
     /* test for O point-at-infinity */
     pub fn is_infinity(&self) -> bool {
         match CURVETYPE {
-            CurveType::EDWARDS=> self.x.iszilch() && self.y.iszilch(),
+            CurveType::EDWARDS=> self.x.iszilch() && self.y.equals(&self.z),
             CurveType::WEIERSTRASS => self.x.iszilch() && self.z.iszilch(),
             CurveType::MONTGOMERY => self.z.iszilch(),
         }
