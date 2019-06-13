@@ -1,0 +1,10 @@
+language: rust
+rust:
+  - stable
+before_script: cd version3/rust
+script:
+  - cargo build --all-features
+deploy:
+  provider: cargo
+  on:
+     branch: master
