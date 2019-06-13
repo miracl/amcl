@@ -32,7 +32,7 @@ int main()
 		printf("\ts+=d[%d]; t=s ",k);
 		for (i=k;i>=1+k/2;i--)
 			printf("+(dchunk)(a[%d]-a[%d])*(b[%d]-b[%d])",i,k-i,k-i,i);
-		printf("; t+=c+(dchunk)v[0]*md[%d]",k,k);
+		printf("; t+=c+(dchunk)v[0]*md[%d]",k);
 		for (i=k-1;i>k/2;i--) printf("+(dchunk)(v[%d]-v[%d])*(md[%d]-md[%d])",k-i,i,i,k-i);
 		printf("; v[%d]=((chunk)t*MC)&BMASK_XXX; t+=(dchunk)v[%d]*md[0]; ",k,k);
 		printf(" dd[%d]=(dchunk)v[%d]*md[%d]; s+=dd[%d]; c=(t>>BASEBITS_XXX); \n",k,k,k,k);
@@ -43,7 +43,7 @@ int main()
 		printf("\ts-=d[%d]; t=s ",k-N);
 		for (i=N-1;i>=1+k/2;i--)
 			printf("+(dchunk)(a[%d]-a[%d])*(b[%d]-b[%d])",i,k-i,k-i,i);
-		printf("; t+=c",k);
+		printf("; t+=c");
 		for (i=N-1;i>=1+k/2;i--) printf("+(dchunk)(v[%d]-v[%d])*(md[%d]-md[%d])",k-i,i,i,k-i);
 		printf("; r[%d]=(chunk)t&BMASK_XXX;  s-=dd[%d]; c=(t>>BASEBITS_XXX); \n",k-N,k-N+1);
 	}
