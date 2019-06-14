@@ -22,11 +22,19 @@
 var ECP2 = function(ctx) {
     "use strict";
 
-    /* Constructor, set this=O */
-    var ECP2 = function() {
-        this.x = new ctx.FP2(0);
-        this.y = new ctx.FP2(1);
-        this.z = new ctx.FP2(0);
+    /* Constructor */
+    var ECP2 = function(input) {
+        if (input instanceof ECP2) {
+            // copy constructor
+            this.x = new ctx.FP2(input.x);
+            this.y = new ctx.FP2(input.y);
+            this.z = new ctx.FP2(input.z);
+        } else {
+            // default constructor (point at infinity)
+            this.x = new ctx.FP2(0);
+            this.y = new ctx.FP2(1);
+            this.z = new ctx.FP2(0);
+        }
     };
 
     ECP2.prototype = {
