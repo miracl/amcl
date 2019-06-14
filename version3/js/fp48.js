@@ -1520,3 +1520,8 @@ var FP48 = function(ctx) {
 
     return FP48;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.FP48 = FP48;
+}

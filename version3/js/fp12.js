@@ -1046,3 +1046,8 @@ var FP12 = function(ctx) {
 
     return FP12;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.FP12 = FP12;
+}

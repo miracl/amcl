@@ -1049,3 +1049,8 @@ var MPIN256 = function(ctx) {
 
     return MPIN256;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.MPIN256 = MPIN256;
+}

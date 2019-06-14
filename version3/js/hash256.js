@@ -196,3 +196,8 @@ var HASH256 = function() {
 
     return HASH256;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.HASH256 = HASH256;
+}

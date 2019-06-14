@@ -999,3 +999,8 @@ var FF = function(ctx) {
 
     return FF;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.FF = FF;
+}

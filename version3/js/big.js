@@ -1446,3 +1446,9 @@ DBIG = function(ctx) {
 
     return DBIG;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.BIG = BIG;
+  module.exports.DBIG = DBIG;
+}
