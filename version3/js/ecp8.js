@@ -1043,3 +1043,8 @@ var ECP8 = function(ctx) {
 
     return ECP8;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.ECP8 = ECP8;
+}

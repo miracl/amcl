@@ -683,3 +683,8 @@ var PAIR256 = function(ctx) {
 
     return PAIR256;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.PAIR256 = PAIR256;
+}

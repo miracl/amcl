@@ -423,3 +423,29 @@ ROM_FIELD_SECP256K1 = function() {
     };
     return ROM_FIELD_SECP256K1;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.ROM_FIELD_25519 = ROM_FIELD_25519;
+  module.exports.ROM_FIELD_256PM = ROM_FIELD_256PM;
+  module.exports.ROM_FIELD_384PM = ROM_FIELD_384PM;
+  module.exports.ROM_FIELD_512PM = ROM_FIELD_512PM;
+  module.exports.ROM_FIELD_ANSSI = ROM_FIELD_ANSSI;
+  module.exports.ROM_FIELD_BLS383 = ROM_FIELD_BLS383;
+  module.exports.ROM_FIELD_BLS24 = ROM_FIELD_BLS24;
+  module.exports.ROM_FIELD_BLS48 = ROM_FIELD_BLS48;
+  module.exports.ROM_FIELD_BLS381 = ROM_FIELD_BLS381;
+  module.exports.ROM_FIELD_BLS461 = ROM_FIELD_BLS461;
+  module.exports.ROM_FIELD_FP256BN = ROM_FIELD_FP256BN;
+  module.exports.ROM_FIELD_FP512BN = ROM_FIELD_FP512BN;
+  module.exports.ROM_FIELD_BN254 = ROM_FIELD_BN254;
+  module.exports.ROM_FIELD_BN254CX = ROM_FIELD_BN254CX;
+  module.exports.ROM_FIELD_BRAINPOOL = ROM_FIELD_BRAINPOOL;
+  module.exports.ROM_FIELD_C41417 = ROM_FIELD_C41417;
+  module.exports.ROM_FIELD_GOLDILOCKS = ROM_FIELD_GOLDILOCKS;
+  module.exports.ROM_FIELD_HIFIVE = ROM_FIELD_HIFIVE;
+  module.exports.ROM_FIELD_NIST256 = ROM_FIELD_NIST256;
+  module.exports.ROM_FIELD_NIST384 = ROM_FIELD_NIST384;
+  module.exports.ROM_FIELD_NIST521 = ROM_FIELD_NIST521;
+  module.exports.ROM_FIELD_SECP256K1 = ROM_FIELD_SECP256K1;
+}

@@ -635,3 +635,8 @@ var FP4 = function(ctx) {
 
     return FP4;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.FP4 = FP4;
+}

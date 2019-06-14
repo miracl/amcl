@@ -513,3 +513,10 @@ rsa_public_key = function(ctx) {
 
     return rsa_public_key;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.RSA = RSA;
+  module.exports.rsa_private_key = rsa_private_key;
+  module.exports.rsa_public_key = rsa_public_key;
+}

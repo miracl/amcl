@@ -718,3 +718,8 @@ var AES = function() {
 
     return AES;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.AES = AES;
+}

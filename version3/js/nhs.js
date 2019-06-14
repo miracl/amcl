@@ -563,3 +563,8 @@ var NHS = function(ctx) {
 
     return NHS;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.NHS = NHS;
+}

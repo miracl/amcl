@@ -426,3 +426,8 @@ var GCM = function(ctx) {
 
     return GCM;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.GCM = GCM;
+}
