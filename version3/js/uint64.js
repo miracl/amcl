@@ -59,3 +59,8 @@ var UInt64 = function() {
 
     return UInt64;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.UInt64 = UInt64;
+}

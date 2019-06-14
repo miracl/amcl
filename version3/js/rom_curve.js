@@ -1125,3 +1125,33 @@ ROM_CURVE_SECP256K1 = function() {
     };
     return ROM_CURVE_SECP256K1;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.ROM_CURVE_ANSSI = ROM_CURVE_ANSSI;
+  module.exports.ROM_CURVE_BLS383 = ROM_CURVE_BLS383;
+  module.exports.ROM_CURVE_BLS24 = ROM_CURVE_BLS24;
+  module.exports.ROM_CURVE_BLS48 = ROM_CURVE_BLS48;
+  module.exports.ROM_CURVE_BLS381 = ROM_CURVE_BLS381;
+  module.exports.ROM_CURVE_BLS461 = ROM_CURVE_BLS461;
+  module.exports.ROM_CURVE_FP256BN = ROM_CURVE_FP256BN;
+  module.exports.ROM_CURVE_FP512BN = ROM_CURVE_FP512BN;
+  module.exports.ROM_CURVE_BN254 = ROM_CURVE_BN254;
+  module.exports.ROM_CURVE_BN254CX = ROM_CURVE_BN254CX;
+  module.exports.ROM_CURVE_BRAINPOOL = ROM_CURVE_BRAINPOOL;
+  module.exports.ROM_CURVE_C25519 = ROM_CURVE_C25519;
+  module.exports.ROM_CURVE_C41417 = ROM_CURVE_C41417;
+  module.exports.ROM_CURVE_ED25519 = ROM_CURVE_ED25519;
+  module.exports.ROM_CURVE_GOLDILOCKS = ROM_CURVE_GOLDILOCKS;
+  module.exports.ROM_CURVE_HIFIVE = ROM_CURVE_HIFIVE;
+  module.exports.ROM_CURVE_NIST256 = ROM_CURVE_NIST256;
+  module.exports.ROM_CURVE_NIST384 = ROM_CURVE_NIST384;
+  module.exports.ROM_CURVE_NIST521 = ROM_CURVE_NIST521;
+  module.exports.ROM_CURVE_NUMS256E = ROM_CURVE_NUMS256E;
+  module.exports.ROM_CURVE_NUMS256W = ROM_CURVE_NUMS256W;
+  module.exports.ROM_CURVE_NUMS384E = ROM_CURVE_NUMS384E;
+  module.exports.ROM_CURVE_NUMS384W = ROM_CURVE_NUMS384W;
+  module.exports.ROM_CURVE_NUMS512E = ROM_CURVE_NUMS512E;
+  module.exports.ROM_CURVE_NUMS512W = ROM_CURVE_NUMS512W;
+  module.exports.ROM_CURVE_SECP256K1 = ROM_CURVE_SECP256K1;
+}

@@ -120,3 +120,7 @@ var BLS = function(ctx) {
     return BLS;
 };	
 		
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.BLS = BLS;
+}

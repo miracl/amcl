@@ -1016,3 +1016,8 @@ var MPIN192 = function(ctx) {
 
     return MPIN192;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.MPIN192 = MPIN192;
+}

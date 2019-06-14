@@ -182,3 +182,8 @@ var RAND = function(ctx) {
 
     return RAND;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.RAND = RAND;
+}

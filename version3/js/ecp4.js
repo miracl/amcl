@@ -837,3 +837,8 @@ var ECP4 = function(ctx) {
 
     return ECP4;
 };
+
+// CommonJS module exports
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports.ECP4 = ECP4;
+}
