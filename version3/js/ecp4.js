@@ -22,11 +22,19 @@
 var ECP4 = function(ctx) {
     "use strict";
 
-    /* Constructor, set this=O */
-    var ECP4 = function() {
-        this.x = new ctx.FP4(0);
-        this.y = new ctx.FP4(1);
-        this.z = new ctx.FP4(0);
+    /* Constructor */
+    var ECP4 = function(input) {
+        if (input instanceof ECP4) {
+            // copy constructor
+            this.x = new ctx.FP4(input.x);
+            this.y = new ctx.FP4(input.y);
+            this.z = new ctx.FP4(input.z);
+        } else {
+            // default constructor (point at infinity)
+            this.x = new ctx.FP4(0);
+            this.y = new ctx.FP4(1);
+            this.z = new ctx.FP4(0);
+        }
     };
 
     ECP4.prototype = {

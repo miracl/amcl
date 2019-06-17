@@ -23,13 +23,21 @@ var ECP = function(ctx) {
     "use strict";
 
     /* Constructor */
-    var ECP = function() {
-        this.x = new ctx.FP(0);
-        this.y = new ctx.FP(1);
-        if (ECP.CURVETYPE != ECP.EDWARDS) {
-            this.z = new ctx.FP(0);
+    var ECP = function(input) {
+        if (input instanceof ECP) {
+            // copy constructor
+            this.x = new ctx.FP(input.x);
+            this.y = new ctx.FP(input.y);
+            this.z = new ctx.FP(input.z);
         } else {
-            this.z = new ctx.FP(1);
+            // default constructor (point at infinity)
+            this.x = new ctx.FP(0);
+            this.y = new ctx.FP(1);
+            if (ECP.CURVETYPE != ECP.EDWARDS) {
+                this.z = new ctx.FP(0);
+            } else {
+                this.z = new ctx.FP(1);
+            }
         }
     };
 
