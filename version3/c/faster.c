@@ -43,7 +43,7 @@ int main()
 
 	for (k=1;k<N;k++)
 	{
-		printf("\tt= ");
+		printf("\tt= ",k);
 		for (i=k;i>=1+k/2;i--)
 			printf("+(dchunk)a[%d]*a[%d]",i,k-i);
 		printf("; t+=t; t+=co;");
@@ -54,7 +54,7 @@ int main()
 
 	for (k=N;k<2*N-2;k++)
 	{
-		printf("\tt= ");
+		printf("\tt= ",k-N);
 		for (i=N-1;i>=1+k/2;i--)
 			printf("+(dchunk)a[%d]*a[%d]",i,k-i);
 		printf("; t+=t; t+=co;");
