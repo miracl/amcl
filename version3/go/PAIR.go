@@ -429,10 +429,10 @@ func Fexp(m *FP12) *FP12 {
 	r.frob(f)
 	r.frob(f)
 	r.Mul(lv)
-	if r.Isunity() {
-		r.zero()
-		return r
-	}
+//	if r.Isunity() {
+//		r.zero()
+//		return r
+//	}
 	/* Hard part of final exp */
 	if CURVE_PAIRING_TYPE == BN {
 		lv.Copy(r)

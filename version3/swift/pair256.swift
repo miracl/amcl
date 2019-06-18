@@ -321,10 +321,10 @@ public struct PAIR256 {
         lv.copy(r)
         r.frob(f,8)
         r.mul(lv)
-        if r.isunity() {
-		r.zero()
-		return r
-	}        
+//      if r.isunity() {
+//		r.zero()
+//		return r
+//	}        
     // Hard part of final exp
 
         var t7=FP48(r); t7.usqr()

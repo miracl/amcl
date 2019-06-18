@@ -250,9 +250,9 @@ def fexp(r):
     r.powq()
     r.powq()
     r *= t0
-    if r.isone() :
-        r.zero()
-        return
+#   if r.isone() :
+#       r.zero()
+#       return
 # final exp - hard part
     x = curve.x
 
