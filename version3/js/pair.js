@@ -127,7 +127,7 @@ var PAIR = function(ctx) {
             return r;
         },
 
-/* prepare for multi-pairing */
+		/* prepare for multi-pairing */
 		initmp: function() {
 			var r=[];
 			for (var i=0;i<ctx.ECP.ATE_BITS;i++)
@@ -135,7 +135,7 @@ var PAIR = function(ctx) {
 			return r;
 		},
 
-/* basic Miller loop */
+		/* basic Miller loop */
 		miller: function(r) {
 			var res=new ctx.FP12(1);
 			for (var i=ctx.ECP.ATE_BITS-1; i>=1; i--)
@@ -151,7 +151,7 @@ var PAIR = function(ctx) {
 			return res;
 		},
 
-/* Accumulate another set of line functions for n-pairing */
+		/* Accumulate another set of line functions for n-pairing */
 		another: function(r,P1,Q1) {
 
 			var f;
@@ -309,8 +309,7 @@ var PAIR = function(ctx) {
             return r;
         },
 
-        /* Optimal R-ate double pairing e(P,Q).e(R,S) */
-	
+        /* Optimal R-ate double pairing e(P,Q).e(R,S) */	
         ate2: function(P1, Q1, R1, S1) {
             var fa, fb, f, x, n, n3, K, lv, lv2,
                 Qx, Qy, Sx, Sy, A, B, NP,NR,r, nb, bt,
@@ -565,9 +564,8 @@ var PAIR = function(ctx) {
         }
     };
 
-/* prepare ate parameter, n=6u+2 (BN) or n=u (BLS), n3=3*n */
-	PAIR.lbits = function(n3,n)
-	{
+	/* prepare ate parameter, n=6u+2 (BN) or n=u (BLS), n3=3*n */
+	PAIR.lbits = function(n3,n) {
 		n.rcopy(ctx.ROM_CURVE.CURVE_Bnx);
 		if (ctx.ECP.CURVE_PAIRING_TYPE==ctx.ECP.BN)
 		{
