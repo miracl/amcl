@@ -492,7 +492,7 @@ var PAIR256 = function(ctx) {
 		n3.pmul(3);
 		n3.norm();
 		return n3.nbits();
-	},
+	};
 
     /* GLV method */
     PAIR256.glv = function(e) {

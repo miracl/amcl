@@ -583,7 +583,7 @@ var PAIR = function(ctx) {
 		n3.pmul(3);
 		n3.norm();
 		return n3.nbits();
-	},
+	};
 
     /* GLV method */
     PAIR.glv = function(e) {
