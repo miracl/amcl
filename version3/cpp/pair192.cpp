@@ -204,6 +204,7 @@ void ZZZ::PAIR_another(FP24 r[],ECP4* PV,ECP* QV)
 	ECP Q;
 	FP Qx,Qy;
 
+	if (ECP_isinf(QV)) return;
 	nb=PAIR_nbits(n3,n);
 
 	ECP4_copy(&P,PV);
@@ -247,6 +248,9 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P1,ECP *Q1)
 	ECP Q;
     FP24 lv,lv2;
 
+    FP24_one(r);
+	if (ECP_isinf(Q1)) return;
+
 	nb=PAIR_nbits(n3,n);
 
 	ECP4_copy(&P,P1);
@@ -260,8 +264,6 @@ void ZZZ::PAIR_ate(FP24 *r,ECP4 *P1,ECP *Q1)
 
     ECP4_copy(&A,&P);
 	ECP4_copy(&NP,&P); ECP4_neg(&NP);
-
-    FP24_one(r);
 
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)
@@ -299,6 +301,17 @@ void ZZZ::PAIR_double_ate(FP24 *r,ECP4 *P1,ECP *Q1,ECP4 *R1,ECP *S1)
     ECP4 A,B,NP,NR,P,R;
 	ECP Q,S;
     FP24 lv,lv2;
+
+	if (ECP_isinf(Q1))
+	{
+		PAIR_ate(r,R1,S1);
+		return;
+	}
+	if (ECP_isinf(S1))
+	{
+		PAIR_ate(r,P1,Q1);
+		return;
+	}
 	nb=PAIR_nbits(n3,n);
 
 	ECP4_copy(&P,P1);

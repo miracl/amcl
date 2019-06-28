@@ -195,6 +195,8 @@ void PAIR_ZZZ_another(FP24_YYY r[],ECP4_ZZZ* PV,ECP_ZZZ* QV)
     ECP_ZZZ Q;
     FP_YYY Qx,Qy;
 
+	if (ECP_ZZZ_isinf(QV)) return;
+
     nb=PAIR_ZZZ_nbits(n3,n);
 
     ECP4_ZZZ_copy(&P,PV);
@@ -239,6 +241,10 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P1,ECP_ZZZ *Q1)
     ECP_ZZZ Q;
     FP24_YYY lv,lv2;
 
+    FP24_YYY_one(r);
+
+	if (ECP_ZZZ_isinf(Q1)) return;
+
     nb=PAIR_ZZZ_nbits(n3,n);
 
     ECP4_ZZZ_copy(&P,P1);
@@ -254,8 +260,6 @@ void PAIR_ZZZ_ate(FP24_YYY *r,ECP4_ZZZ *P1,ECP_ZZZ *Q1)
     ECP4_ZZZ_copy(&A,&P);
     ECP4_ZZZ_copy(&NP,&P);
     ECP4_ZZZ_neg(&NP);
-
-    FP24_YYY_one(r);
 
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)
@@ -292,6 +296,17 @@ void PAIR_ZZZ_double_ate(FP24_YYY *r,ECP4_ZZZ *P1,ECP_ZZZ *Q1,ECP4_ZZZ *R1,ECP_Z
     ECP4_ZZZ A,B,NP,NR,P,R;
     ECP_ZZZ Q,S;
     FP24_YYY lv,lv2;
+
+	if (ECP_ZZZ_isinf(Q1))
+	{
+		PAIR_ZZZ_ate(r,R1,S1);
+		return;
+	}
+	if (ECP_ZZZ_isinf(S1))
+	{
+		PAIR_ZZZ_ate(r,P1,Q1);
+		return;
+	}
     nb=PAIR_ZZZ_nbits(n3,n);
 
     ECP4_ZZZ_copy(&P,P1);

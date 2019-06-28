@@ -217,6 +217,8 @@ void PAIR_ZZZ_another(FP12_YYY r[],ECP2_ZZZ* PV,ECP_ZZZ* QV)
 #endif
 #endif
 
+	if (ECP_ZZZ_isinf(QV)) return;
+
     nb=PAIR_ZZZ_nbits(n3,n);
 
     ECP2_ZZZ_copy(&P,PV);
@@ -291,6 +293,9 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P1,ECP_ZZZ *Q1)
 #endif
 #endif
 
+    FP12_YYY_one(r);
+	if (ECP_ZZZ_isinf(Q1)) return;
+
     nb=PAIR_ZZZ_nbits(n3,n);
 
     ECP2_ZZZ_copy(&P,P1);
@@ -306,7 +311,7 @@ void PAIR_ZZZ_ate(FP12_YYY *r,ECP2_ZZZ *P1,ECP_ZZZ *Q1)
     ECP2_ZZZ_copy(&NP,&P);
     ECP2_ZZZ_neg(&NP);
 
-    FP12_YYY_one(r);
+
 
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)   //0
@@ -374,6 +379,17 @@ void PAIR_ZZZ_double_ate(FP12_YYY *r,ECP2_ZZZ *P1,ECP_ZZZ *Q1,ECP2_ZZZ *R1,ECP_Z
     FP2_YYY_norm(&X);
 #endif
 #endif
+
+	if (ECP_ZZZ_isinf(Q1))
+	{
+		PAIR_ZZZ_ate(r,R1,S1);
+		return;
+	}
+	if (ECP_ZZZ_isinf(S1))
+	{
+		PAIR_ZZZ_ate(r,P1,Q1);
+		return;
+	}
     nb=PAIR_ZZZ_nbits(n3,n);
 
     ECP2_ZZZ_copy(&P,P1);

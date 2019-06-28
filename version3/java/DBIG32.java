@@ -234,7 +234,7 @@ public class DBIG {
 		int i,wd,bt;
 		wd=m/CONFIG_BIG.BASEBITS;
 		bt=m%CONFIG_BIG.BASEBITS;
-		w[wd]&=((cast_to_chunk(1)<<bt)-1);
+		w[wd]&=((BIG.cast_to_chunk(1)<<bt)-1);
 		for (i=wd+1;i<BIG.DNLEN;i++) w[i]=0;
 	}
 

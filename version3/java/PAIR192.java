@@ -174,6 +174,7 @@ public final class PAIR192 {
 		FP24 lv,lv2;
 		int bt;
 
+		if (Q1.is_infinity()) return;
 // P is needed in affine form for line function, Q for (Qx,Qy) extraction
 		ECP4 P=new ECP4(P1);
 		ECP Q=new ECP(Q1);
@@ -221,6 +222,8 @@ public final class PAIR192 {
 		FP24 lv,lv2;
 		int bt;
 		
+		if (Q1.is_infinity()) return new FP24(1);
+
 		ECP4 P=new ECP4(P1);
 		ECP Q=new ECP(Q1);
 
@@ -274,6 +277,9 @@ public final class PAIR192 {
 		BIG n3=new BIG(0);
 		FP24 lv,lv2;
 		int bt;
+
+		if (Q1.is_infinity()) return ate(R1,S1);
+		if (S1.is_infinity()) return ate(P1,Q1);
 
 		ECP4 P=new ECP4(P1);
 		ECP Q=new ECP(Q1);

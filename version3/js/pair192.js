@@ -157,6 +157,7 @@ var PAIR192 = function(ctx) {
 			var lv,lv2;
 			var bt;
 
+			if (Q1.is_infinity()) return;
 			// P is needed in affine form for line function, Q for (Qx,Qy) extraction
 			var P=new ctx.ECP4(); P.copy(P1); P.affine();
 			var Q=new ctx.ECP(); Q.copy(Q1); Q.affine();
@@ -201,6 +202,7 @@ var PAIR192 = function(ctx) {
                 Qx, Qy, A, NP, r, nb, bt,
                 i;
 
+			if (Q1.is_infinity()) return new ctx.FP24(1);
             n = new ctx.BIG(0);
 			n3 = new ctx.BIG(0);
 
@@ -250,6 +252,8 @@ var PAIR192 = function(ctx) {
                 Qx, Qy, Sx, Sy, A, B, NP, NR, r, nb, bt,
                 i;
 
+			if (Q1.is_infinity()) return PAIR192.ate(R1,S1);
+			if (S1.is_infinity()) return PAIR192.ate(P1,Q1);
 
             n = new ctx.BIG(0);
 			n3 = new ctx.BIG(0);

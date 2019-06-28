@@ -94,6 +94,8 @@ def miller(r) :
     return res
 	
 def another(r,P1,Q1) :
+    if Q1.isinf() :
+        return
     nb,n3,n=lbits()
     P = P1.copy()
     Q = Q1.copy()
@@ -131,6 +133,8 @@ def e(P, Q):
 
 
 def ate(P1, Q1):
+    if Q1.isinf() :
+        return Fp12.one();
     nb,n3,n=lbits()
     
     P = P1.copy()
@@ -174,7 +178,10 @@ def ate(P1, Q1):
 
 
 def double_ate(P1, Q1, U1, V1):
-
+    if Q1.isinf() :
+        return ate(U1,V1)
+    if V1.isinf() :
+        return ate(P1,Q1)
     nb,n3,n=lbits()
 
     P = P1.copy()

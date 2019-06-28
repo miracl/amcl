@@ -178,6 +178,9 @@ public struct PAIR {
         var n3 = BIG();
         var K = ECP2()
 
+	if Q1.is_infinity() {
+		return
+	}
 // P is needed in affine form for line function, Q for (Qx,Qy) extraction
         var P=ECP2(); P.copy(P1); P.affine()
         var Q=ECP(); Q.copy(Q1); Q.affine()
@@ -240,6 +243,10 @@ public struct PAIR {
         var n3 = BIG();
         var K=ECP2()
         
+	if Q1.is_infinity() {
+		return FP12(1)
+	}
+
         var lv:FP12
 
         if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
@@ -314,6 +321,13 @@ public struct PAIR {
         var n3 = BIG();
         var K=ECP2()
         var lv:FP12
+
+	if Q1.is_infinity() {
+		return PAIR.ate(R1,S1);
+	}
+	if S1.is_infinity() {
+		return PAIR.ate(P1,Q1);
+	}
 
         if CONFIG_CURVE.CURVE_PAIRING_TYPE == CONFIG_CURVE.BN {
             if CONFIG_CURVE.SEXTIC_TWIST == CONFIG_CURVE.M_TYPE {  

@@ -187,6 +187,7 @@ public final class PAIR {
 		FP12 lv,lv2;
 		int bt;
 
+		if (Q1.is_infinity()) return;
 // P is needed in affine form for line function, Q for (Qx,Qy) extraction
 		ECP2 P=new ECP2(P1);
 		ECP Q=new ECP(Q1);
@@ -261,6 +262,7 @@ public final class PAIR {
 		FP12 lv,lv2;
 		int bt;
 
+		if (Q1.is_infinity()) return new FP12(1);
 // P is needed in affine form for line function, Q for (Qx,Qy) extraction
 		ECP2 P=new ECP2(P1);
 		ECP Q=new ECP(Q1);
@@ -342,6 +344,9 @@ public final class PAIR {
 		ECP2 K=new ECP2();
 		FP12 lv,lv2;
 		int bt;
+
+		if (Q1.is_infinity()) return ate(R1,S1);
+		if (S1.is_infinity()) return ate(P1,Q1);
 
 		ECP2 P=new ECP2(P1);
 		ECP Q=new ECP(Q1);

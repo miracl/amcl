@@ -171,7 +171,10 @@ pub fn miller(r:&[FP24]) -> FP24 {
 pub fn another(r:&mut [FP24],P1: &ECP4,Q1: &ECP) {
     let mut n = BIG::new();
     let mut n3 = BIG::new();
-    
+
+    if Q1.is_infinity() {
+        return;
+    }      
 // P is needed in affine form for line function, Q for (Qx,Qy) extraction
     let mut P = ECP4::new();
     P.copy(P1);
@@ -212,6 +215,10 @@ pub fn another(r:&mut [FP24],P1: &ECP4,Q1: &ECP) {
 pub fn ate(P1: &ECP4, Q1: &ECP) -> FP24 {
     let mut n = BIG::new();
     let mut n3 = BIG::new();
+
+    if Q1.is_infinity() {
+        return FP24::new_int(1);
+    }
 
     let mut P = ECP4::new();
     P.copy(P1);
@@ -262,6 +269,13 @@ pub fn ate(P1: &ECP4, Q1: &ECP) -> FP24 {
 pub fn ate2(P1: &ECP4, Q1: &ECP, R1: &ECP4, S1: &ECP) -> FP24 {
     let mut n = BIG::new();
     let mut n3 = BIG::new();
+
+    if Q1.is_infinity() {
+        return ate(R1,S1);
+    }
+    if S1.is_infinity() {
+        return ate(P1,Q1);
+    }
 
     let mut P = ECP4::new();
     P.copy(P1);

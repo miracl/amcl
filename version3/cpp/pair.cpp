@@ -225,6 +225,7 @@ void ZZZ::PAIR_another(FP12 r[],ECP2* PV,ECP* QV)
 #endif
 #endif
 
+	if (ECP_isinf(QV)) return;
 	nb=PAIR_nbits(n3,n);
 
 	ECP2_copy(&P,PV);
@@ -299,6 +300,9 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P1,ECP *Q1)
 
 #endif
 
+    FP12_one(r);
+	if (ECP_isinf(Q1)) return;
+
 	nb=PAIR_nbits(n3,n);
 
 	ECP2_copy(&P,P1);
@@ -312,8 +316,6 @@ void ZZZ::PAIR_ate(FP12 *r,ECP2 *P1,ECP *Q1)
 
     ECP2_copy(&A,&P);
 	ECP2_copy(&NP,&P); ECP2_neg(&NP);
-
-    FP12_one(r);
 
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)
@@ -381,6 +383,17 @@ void ZZZ::PAIR_double_ate(FP12 *r,ECP2 *P1,ECP *Q1,ECP2 *R1,ECP *S1)
 #endif
 
 #endif
+
+	if (ECP_isinf(Q1))
+	{
+		PAIR_ate(r,R1,S1);
+		return;
+	}
+	if (ECP_isinf(S1))
+	{
+		PAIR_ate(r,P1,Q1);
+		return;
+	}
 	nb=PAIR_nbits(n3,n);
 
 	ECP2_copy(&P,P1);

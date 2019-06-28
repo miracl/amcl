@@ -163,6 +163,9 @@ public struct PAIR256 {
         var n = BIG();
         var n3 = BIG();
 
+	if Q1.is_infinity() {
+		return
+	}
 // P is needed in affine form for line function, Q for (Qx,Qy) extraction
         var P=ECP8(); P.copy(P1); P.affine()
         var Q=ECP(); Q.copy(Q1); Q.affine()
@@ -200,6 +203,9 @@ public struct PAIR256 {
         var n = BIG();
         var n3 = BIG();
         
+	if Q1.is_infinity() {
+		return FP48(1)
+	}
         var lv:FP48
 
         var P=ECP8(); P.copy(P1); P.affine()
@@ -249,6 +255,13 @@ public struct PAIR256 {
         var n3 = BIG();
         var lv:FP48
     
+	if Q1.is_infinity() {
+		return PAIR256.ate(R1,S1);
+	}
+	if S1.is_infinity() {
+		return PAIR256.ate(P1,Q1);
+	}
+
         var P=ECP8(); P.copy(P1); P.affine()
         var Q=ECP(); Q.copy(Q1); Q.affine()
         var R=ECP8(); R.copy(R1); R.affine()

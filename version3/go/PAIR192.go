@@ -167,6 +167,9 @@ func another(r []*FP24,P1 *ECP4,Q1 *ECP) {
 	n3:=NewBIG()
 	var lv,lv2 *FP24
 
+	if Q1.Is_infinity() {
+		return
+	}
 // P is needed in affine form for line function, Q for (Qx,Qy) extraction
 	P:=NewECP4()
 	P.Copy(P1)
@@ -209,6 +212,10 @@ func Ate(P1 *ECP4, Q1 *ECP) *FP24 {
 	n:=NewBIG()
 	n3:=NewBIG()
 	var lv,lv2 *FP24
+
+	if Q1.Is_infinity() {
+		return NewFP24int(1)
+	}
 
 	P := NewECP4()
 	P.Copy(P1)
@@ -258,6 +265,13 @@ func Ate2(P1 *ECP4, Q1 *ECP, R1 *ECP4, S1 *ECP) *FP24 {
 	n:=NewBIG()
 	n3:=NewBIG()
 	var lv,lv2 *FP24
+
+	if Q1.Is_infinity() {
+		return Ate(R1,S1)
+	}
+	if S1.Is_infinity() {
+		return Ate(P1,Q1)
+	}
 
 	P := NewECP4()
 	P.Copy(P1)

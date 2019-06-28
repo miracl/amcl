@@ -202,6 +202,7 @@ void ZZZ::PAIR_another(FP48 r[],ECP8* PV,ECP* QV)
 	ECP Q;
 	FP Qx,Qy;
 
+	if (ECP_isinf(QV)) return;
 	nb=PAIR_nbits(n3,n);
 
 	ECP8_copy(&P,PV);
@@ -245,6 +246,9 @@ void ZZZ::PAIR_ate(FP48 *r,ECP8 *P1,ECP *Q1)
 	ECP Q;
     FP48 lv,lv2;
 
+    FP48_one(r);
+	if (ECP_isinf(Q1)) return;
+
 	nb=PAIR_nbits(n3,n);
 
 	ECP8_copy(&P,P1);
@@ -253,14 +257,11 @@ void ZZZ::PAIR_ate(FP48 *r,ECP8 *P1,ECP *Q1)
 	ECP8_affine(&P);
 	ECP_affine(&Q);
 
-
     FP_copy(&Qx,&(Q.x));
     FP_copy(&Qy,&(Q.y));
 
     ECP8_copy(&A,&P);
 	ECP8_copy(&NP,&P); ECP8_neg(&NP);
-
-    FP48_one(r);
 
     /* Main Miller Loop */
     for (i=nb-2; i>=1; i--)
@@ -298,6 +299,17 @@ void ZZZ::PAIR_double_ate(FP48 *r,ECP8 *P1,ECP *Q1,ECP8 *R1,ECP *S1)
     ECP8 A,B,NP,NR,P,R;
 	ECP Q,S;
     FP48 lv,lv2;
+
+	if (ECP_isinf(Q1))
+	{
+		PAIR_ate(r,R1,S1);
+		return;
+	}
+	if (ECP_isinf(S1))
+	{
+		PAIR_ate(r,P1,Q1);
+		return;
+	}
 	nb=PAIR_nbits(n3,n);
 
 	ECP8_copy(&P,P1);

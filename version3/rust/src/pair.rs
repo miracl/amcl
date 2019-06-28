@@ -185,7 +185,9 @@ pub fn another(r:&mut [FP12],P1: &ECP2,Q1: &ECP) {
     let mut n3 = BIG::new();
     let mut K = ECP2::new();
 
-
+    if Q1.is_infinity() {
+        return;
+    }
 // P is needed in affine form for line function, Q for (Qx,Qy) extraction
     let mut P = ECP2::new();
     P.copy(P1);
@@ -251,6 +253,9 @@ pub fn ate(P1: &ECP2, Q1: &ECP) -> FP12 {
     let mut n3 = BIG::new();
     let mut K = ECP2::new();
 
+    if Q1.is_infinity() {
+        return FP12::new_int(1);
+    }
     if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
         if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {
             f.inverse();
@@ -324,6 +329,13 @@ pub fn ate2(P1: &ECP2, Q1: &ECP, R1: &ECP2, S1: &ECP) -> FP12 {
     let mut n = BIG::new();
     let mut n3 = BIG::new();
     let mut K = ECP2::new();
+
+    if Q1.is_infinity() {
+        return ate(R1,S1);
+    }
+    if S1.is_infinity() {
+        return ate(P1,Q1);
+    }
 
     if ecp::CURVE_PAIRING_TYPE == CurvePairingType::BN {
         if ecp::SEXTIC_TWIST == SexticTwist::M_TYPE {

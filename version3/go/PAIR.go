@@ -179,6 +179,9 @@ func another(r []*FP12,P1 *ECP2,Q1 *ECP) {
 	K:=NewECP2();
 	var lv,lv2 *FP12
 
+	if Q1.Is_infinity() {
+		return
+	}
 // P is needed in affine form for line function, Q for (Qx,Qy) extraction
 	P:=NewECP2()
 	P.Copy(P1)
@@ -244,6 +247,10 @@ func Ate(P1 *ECP2, Q1 *ECP) *FP12 {
 	n3:=NewBIG()
 	K := NewECP2()
 	var lv,lv2 *FP12
+
+	if Q1.Is_infinity() {
+		return NewFP12int(1)
+	}
 
 	if CURVE_PAIRING_TYPE == BN {
 		if SEXTIC_TWIST == M_TYPE {
@@ -319,6 +326,13 @@ func Ate2(P1 *ECP2, Q1 *ECP, R1 *ECP2, S1 *ECP) *FP12 {
 	n3:=NewBIG()
 	K := NewECP2()
 	var lv,lv2 *FP12
+
+	if Q1.Is_infinity() {
+		return Ate(R1,S1)
+	}
+	if S1.Is_infinity() {
+		return Ate(P1,Q1)
+	}
 
 	if CURVE_PAIRING_TYPE == BN {
 		if SEXTIC_TWIST == M_TYPE {
