@@ -170,7 +170,7 @@ func (r *DBIG) shr(k uint) {
 }
 
 /* set x = x mod 2^m */
-func (r *BIG) mod2m(m uint) {
+func (r *DBIG) mod2m(m uint) {
 	wd := int(m / BASEBITS)
 	bt := m % BASEBITS
 	msk := (Chunk(1) << bt) - 1
