@@ -12,6 +12,6 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 4
 
-[*.sh]
+[*.{js,json,sh}]
 indent_style = space
 indent_size = 2
