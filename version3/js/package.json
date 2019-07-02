@@ -1,0 +1,16 @@
+{
+  "name": "amcl-js",
+  "version": "3.0.0",
+  "description": "AMCL for JavaScript",
+  "main": "index.js",
+  "repository": "https://github.com/miracl/amcl/tree/master/version3/js/",
+  "author": "The Apache Software Foundation",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write --loglevel warn \"./*.js\""
+  },
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  }
+}

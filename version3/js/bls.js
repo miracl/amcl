@@ -20,106 +20,104 @@
 /* BLS API Functions */
 
 var BLS = function(ctx) {
-    "use strict";
+  "use strict";
 
-    var BLS = {
-        BLS_OK: 0,
-        BLS_FAIL: -1,
+  var BLS = {
+    BLS_OK: 0,
+    BLS_FAIL: -1,
 
-        BFS: ctx.BIG.MODBYTES,
-        BGS: ctx.BIG.MODBYTES,
+    BFS: ctx.BIG.MODBYTES,
+    BGS: ctx.BIG.MODBYTES,
 
-        bytestostring: function(b) {
-            var s = "",
-                len = b.length,
-                ch, i;
+    bytestostring: function(b) {
+      var s = "",
+        len = b.length,
+        ch,
+        i;
 
-            for (i = 0; i < len; i++) {
-                ch = b[i];
-                s += ((ch >>> 4) & 15).toString(16);
-                s += (ch & 15).toString(16);
+      for (i = 0; i < len; i++) {
+        ch = b[i];
+        s += ((ch >>> 4) & 15).toString(16);
+        s += (ch & 15).toString(16);
+      }
 
-            }
+      return s;
+    },
 
-            return s;
-        },
+    stringtobytes: function(s) {
+      var b = [],
+        i;
 
-        stringtobytes: function(s) {
-            var b = [],
-                i;
+      for (i = 0; i < s.length; i++) {
+        b.push(s.charCodeAt(i));
+      }
 
-            for (i = 0; i < s.length; i++) {
-                b.push(s.charCodeAt(i));
-            }
+      return b;
+    },
 
-            return b;
-        },
+    /* hash a message to an ECP point, using SHA3 */
 
-/* hash a message to an ECP point, using SHA3 */
+    bls_hashit: function(m) {
+      var sh = new ctx.SHA3(ctx.SHA3.SHAKE256);
+      var hm = [];
+      var t = this.stringtobytes(m);
+      for (var i = 0; i < t.length; i++) sh.process(t[i]);
+      sh.shake(hm, this.BFS);
+      var P = ctx.ECP.mapit(hm);
+      return P;
+    },
 
-        bls_hashit: function(m) {
-			var sh = new ctx.SHA3(ctx.SHA3.SHAKE256);
-            var hm = [];
-            var t=this.stringtobytes(m);
-			for (var i=0;i<t.length;i++)
-				sh.process(t[i]);
-			sh.shake(hm,this.BFS);
-			var P=ctx.ECP.mapit(hm);
-			return P;
-		},
+    /* generate key pair, private key S, public key W */
 
-/* generate key pair, private key S, public key W */
+    KeyPairGenerate(rng, S, W) {
+      var G = ctx.ECP2.generator();
+      var q = new ctx.BIG(0);
+      q.rcopy(ctx.ROM_CURVE.CURVE_Order);
+      var s = ctx.BIG.randomnum(q, rng);
+      s.toBytes(S);
+      G = ctx.PAIR.G2mul(G, s);
 
-		KeyPairGenerate(rng,S,W) {
-			var G=ctx.ECP2.generator();
-			var q=new ctx.BIG(0);
-			q.rcopy(ctx.ROM_CURVE.CURVE_Order);
-			var s=ctx.BIG.randomnum(q,rng);
-            s.toBytes(S);
-            G = ctx.PAIR.G2mul(G,s);
+      G.toBytes(W); // To use point compression on public keys, change to true
+      return this.BLS_OK;
+    },
 
-            G.toBytes(W);  // To use point compression on public keys, change to true 
-			return this.BLS_OK;
-		},
+    /* Sign message m using private key S to produce signature SIG */
 
-/* Sign message m using private key S to produce signature SIG */
+    sign(SIG, m, S) {
+      var D = this.bls_hashit(m);
+      var s = ctx.BIG.fromBytes(S);
+      D = ctx.PAIR.G1mul(D, s);
+      D.toBytes(SIG, true);
+      return this.BLS_OK;
+    },
 
-		sign(SIG,m,S) {
-			var D=this.bls_hashit(m);
-			var s=ctx.BIG.fromBytes(S);
-			D=ctx.PAIR.G1mul(D,s);
-			D.toBytes(SIG,true);
-			return this.BLS_OK;
-		},
+    /* Verify signature given message m, the signature SIG, and the public key W */
 
-/* Verify signature given message m, the signature SIG, and the public key W */
+    verify(SIG, m, W) {
+      var HM = this.bls_hashit(m);
+      var D = ctx.ECP.fromBytes(SIG);
+      var G = ctx.ECP2.generator();
+      var PK = ctx.ECP2.fromBytes(W);
+      D.neg();
 
-		verify(SIG,m,W) {
-			var HM=this.bls_hashit(m);
-			var D=ctx.ECP.fromBytes(SIG);
-			var G=ctx.ECP2.generator();
-			var PK=ctx.ECP2.fromBytes(W);
-			D.neg();
+      // Use new multi-pairing mechanism
+      var r = ctx.PAIR.initmp();
+      ctx.PAIR.another(r, G, D);
+      ctx.PAIR.another(r, PK, HM);
+      var v = ctx.PAIR.miller(r);
 
-// Use new multi-pairing mechanism 
-			var r=ctx.PAIR.initmp();
-			ctx.PAIR.another(r,G,D);
-			ctx.PAIR.another(r,PK,HM);
-			var v=ctx.PAIR.miller(r);
+      //.. or alternatively
+      //			var v=ctx.PAIR.ate2(G,D,PK,HM);
 
-//.. or alternatively
-//			var v=ctx.PAIR.ate2(G,D,PK,HM);
+      v = ctx.PAIR.fexp(v);
+      if (v.isunity()) return this.BLS_OK;
+      return this.BLS_FAIL;
+    },
+  };
 
-			v=ctx.PAIR.fexp(v);
-			if (v.isunity())
-				return this.BLS_OK;
-			return this.BLS_FAIL;
-		}
-    };
+  return BLS;
+};
 
-    return BLS;
-};	
-		
 // CommonJS module exports
 if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
   module.exports.BLS = BLS;
