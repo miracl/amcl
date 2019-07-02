@@ -602,7 +602,7 @@ while ptr<max:
 		pfcurve_selected=True
 
 
-# rsaset(big,ring,big_length_bytes,bit_bits_in_base,multiplier)
+# rsaset(big,ring,big_length_bytes,bits_in_base,multiplier)
 # for each choice give distinct names for "big" and "ring".
 # Typically "big" is the length in bits of the underlying big number type
 # "ring" is the RSA modulus size = "big" times 2^m
