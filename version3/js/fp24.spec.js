@@ -21,7 +21,6 @@ describe("FP24Static", () => {
     });
 
     it("can construct from a single number 0", () => {
-      pending("Sparse type not yet working when constructed with single number 0");
       const x = new ctx.FP24(0);
       expect(x.iszilch()).toEqual(true);
       expect(x.stype).toEqual(ctx.FP.ZERO);
@@ -63,7 +62,6 @@ describe("FP24Static", () => {
     });
 
     it("can construct from a single FP8", () => {
-      pending("Not yet working");
       const x = new ctx.FP24(new ctx.FP8(14));
       expect(x.a.a.a.a.equals(new ctx.FP(14))).toEqual(true);
       expect(x.a.a.a.b.iszilch()).toEqual(true);
