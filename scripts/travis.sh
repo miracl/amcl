@@ -4,7 +4,7 @@ command -v shellcheck > /dev/null && shellcheck "$0"
 
 case "$AMCL_LANG" in
   js)
-    echo "Coming soon :)"
+    ./scripts/travis_js.sh
     ;;
   rust)
     ./scripts/travis_rust.sh

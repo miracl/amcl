@@ -7,10 +7,15 @@
   "author": "The Apache Software Foundation",
   "license": "Apache-2.0",
   "private": true,
+  "jest": {
+    "testPathIgnorePatterns": ["util.spec.js"]
+  },
   "scripts": {
-    "format": "prettier --write --loglevel warn \"./*.js\""
+    "format": "prettier --write --loglevel warn \"./*.js\"",
+    "test": "jest"
   },
   "devDependencies": {
+    "jest": "^24.8.0",
     "prettier": "^1.18.2"
   }
 }
