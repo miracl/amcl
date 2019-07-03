@@ -1,5 +1,13 @@
 The Apache Milagro Cryptographic Library
 
+AMCL is a multi-lingual Cryptographic library that supports elliptic 
+curve cryptography, pairing-friendly curve cryptography, RSA, AES symmetric 
+encryption and hash functions. All code is entirely in the supported high-
+level languages. No assembly language and no third party code is required - 
+these libraries are completely self-contained. AMCL was designed from 
+the ground up with side-channel attack resistance in mind. Read the PDF manual
+for more details.
+
 Note that the AMCL currently comes in two versions, version 2.2 
 and version 3.2
 
