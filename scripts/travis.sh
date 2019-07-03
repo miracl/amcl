@@ -3,6 +3,9 @@ set -o errexit -o nounset -o pipefail
 command -v shellcheck > /dev/null && shellcheck "$0"
 
 case "$AMCL_LANG" in
+  cpp)
+    ./scripts/travis_cpp.sh
+    ;;
   js)
     ./scripts/travis_js.sh
     ;;
