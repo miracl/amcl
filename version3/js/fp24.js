@@ -26,22 +26,25 @@ var FP24 = function(ctx) {
 
   /* general purpose constructor */
   var FP24 = function(d, e, f) {
-    if (!isNaN(d)) {
+    if (d instanceof FP24) {
+      // ignore e, d, which are assumed be undefined in this case
+      this.a = new ctx.FP8(d.a);
+      this.b = new ctx.FP8(d.b);
+      this.c = new ctx.FP8(d.c);
+      this.stype = ctx.FP.DENSE;
+    } else if (typeof e === "undefined" && typeof f === "undefined") {
+      // 0-1 components set
       this.a = new ctx.FP8(d);
       this.b = new ctx.FP8(0);
       this.c = new ctx.FP8(0);
-      if (d == 1) this.stype = ctx.FP.ONE;
+      if (this.a.iszilch()) this.stype = ctx.FP.ZERO;
+      else if (this.a.isunity()) this.stype = ctx.FP.ONE;
       else this.stype = ctx.FP.SPARSER;
     } else {
-      if (d instanceof FP24) {
-        this.a = new ctx.FP8(d.a);
-        this.b = new ctx.FP8(d.b);
-        this.c = new ctx.FP8(d.c);
-      } else {
-        this.a = new ctx.FP8(d);
-        this.b = new ctx.FP8(e);
-        this.c = new ctx.FP8(f);
-      }
+      // all 3 components set
+      this.a = new ctx.FP8(d);
+      this.b = new ctx.FP8(e);
+      this.c = new ctx.FP8(f);
       this.stype = ctx.FP.DENSE;
     }
   };
