@@ -45,7 +45,7 @@ END_OF_INPUT
   # Run examples
   #
   export LD_LIBRARY_PATH=.
-  echo 1234 | ./TestALL
+  ./TestALL
   ./TestBLS
   ./TestNHS
   ./BenchtestALL
