@@ -39,8 +39,7 @@ END_OF_INPUT
   swiftc -I. -L. -lamcl -lbn254 -lbls383 -lbls24 -lbls48 TestBLS.swift
   swiftc -I. -L. -lamcl TestNHS.swift
   swiftc -I. -L. -lamcl -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 BenchtestALL.swift
-
-  ls -lA
+  ls -lA # debug compilation, just to get some visibility
 
   #
   # Run examples
