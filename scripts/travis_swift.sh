@@ -35,10 +35,10 @@ END_OF_INPUT
   #
   # Compile examples
   #
-  swift -I. -L. -lamcl -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 TestALL.swift
-  swift -I. -L. -lamcl -lbn254 -lbls383 -lbls24 -lbls48 TestBLS.swift
-  swift -I. -L. -lamcl TestNHS.swift
-  swift -I. -L. -lamcl -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 BenchtestALL.swift
+  swiftc -I. -L. -lamcl -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 TestALL.swift
+  swiftc -I. -L. -lamcl -lbn254 -lbls383 -lbls24 -lbls48 TestBLS.swift
+  swiftc -I. -L. -lamcl TestNHS.swift
+  swiftc -I. -L. -lamcl -led25519 -lnist256 -lgoldilocks -lbn254 -lbls383 -lbls24 -lbls48 -lrsa2048 BenchtestALL.swift
 
   ls -lA
 
