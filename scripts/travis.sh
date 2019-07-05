@@ -12,6 +12,9 @@ case "$AMCL_LANG" in
   rust)
     ./scripts/travis_rust.sh
     ;;
+  swift)
+    ./scripts/travis_swift.sh
+    ;;
   *)
     echo "Unknown value for AMCL_LANG"
     exit 1

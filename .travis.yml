@@ -6,6 +6,7 @@ env:
     - AMCL_LANG=cpp
     - AMCL_LANG=js
     - AMCL_LANG=rust
+    - AMCL_LANG=swift
 
 script:
   - ./scripts/travis.sh
