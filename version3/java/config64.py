@@ -75,7 +75,7 @@ def rsaset(tb,nb,base,ml) :
 	replace(fpath+"CONFIG_BIG.java","@NB@",nb)
 	replace(fpath+"CONFIG_BIG.java","@BASE@",base)
 
-	replace(fpath+"CONFIG_FF.java","@ML@",ml);
+	replace(fpath+"CONFIG_FF.java","@ML@",ml)
 
 
 def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
@@ -281,12 +281,12 @@ while ptr<max:
 			break
 	if already:
 		continue
-	
+
 	selection.append(x)
 	ptr=ptr+1
 
 # curveset(curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly,sextic twist,sign of x,curve security)
-# where "curve" is the common name for the elliptic curve   
+# where "curve" is the common name for the elliptic curve
 # big_length_bytes is the modulus size rounded up to a number of bytes
 # bits_in_base gives the number base used for 64 bit architectures, as n where the base is 2^n
 # modulus_bits is the actual bit length of the modulus.
@@ -367,7 +367,7 @@ while ptr<max:
 		pfcurve_selected=True
 
 	if x==22:
-		curveset("FP256BN","32","56","256","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","NEGATIVEX","66","128")  
+		curveset("FP256BN","32","56","256","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","NEGATIVEX","66","128")
 		pfcurve_selected=True
 	if x==23:
 		curveset("FP512BN","64","60","512","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","POSITIVEX","130","128")

@@ -74,7 +74,7 @@ def rsaset(tb,nb,base,ml) :
 	replace(fpath+"CONFIG_BIG.java","@NB@",nb)
 	replace(fpath+"CONFIG_BIG.java","@BASE@",base)
 
-	replace(fpath+"CONFIG_FF.java","@ML@",ml);
+	replace(fpath+"CONFIG_FF.java","@ML@",ml)
 
 
 def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
@@ -101,9 +101,9 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	os.system(copytext+"TestECDH.java "+fpathTest+"TestECDH.java")	#ms
 	os.system(copytext+"TesttimeECDH.java "+fpathTest+"TesttimeECDH.java")	#ms
 
-	replace(fpath+"CONFIG_BIG.java","XXX",tc)	
-	replace(fpath+"CONFIG_FIELD.java","XXX",tc)	
-	replace(fpath+"CONFIG_CURVE.java","XXX",tc)	
+	replace(fpath+"CONFIG_BIG.java","XXX",tc)
+	replace(fpath+"CONFIG_FIELD.java","XXX",tc)
+	replace(fpath+"CONFIG_CURVE.java","XXX",tc)
 	replace(fpath+"BIG.java","XXX",tc)
 	replace(fpath+"DBIG.java","XXX",tc)
 	replace(fpath+"FP.java","XXX",tc)
@@ -280,12 +280,12 @@ while ptr<max:
 			break
 	if already:
 		continue
-	
+
 	selection.append(x)
 	ptr=ptr+1
 
 # curveset(curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly,sextic twist,sign of x,curve security)
-# where "curve" is the common name for the elliptic curve   
+# where "curve" is the common name for the elliptic curve
 # big_length_bytes is the modulus size rounded up to a number of bytes
 # bits_in_base gives the number base used for 32 bit architectures, as n where the base is 2^n
 # modulus_bits is the actual bit length of the modulus.
@@ -352,22 +352,22 @@ while ptr<max:
 		curve_selected=True
 
 	if x==18:
-		curveset("BN254","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","66","128")  
+		curveset("BN254","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","66","128")
 		pfcurve_selected=True
 	if x==19:
-		curveset("BN254CX","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","66","128")  
+		curveset("BN254CX","32","28","254","3","NOT_SPECIAL","WEIERSTRASS","BN","D_TYPE","NEGATIVEX","66","128")
 		pfcurve_selected=True
 	if x==20:
-		curveset("BLS383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","65","128") 
+		curveset("BLS383","48","29","383","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","POSITIVEX","65","128")
 		pfcurve_selected=True
 
 	if x==21:
-		curveset("BLS381","48","29","381","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX","65","128") 
+		curveset("BLS381","48","29","381","3","NOT_SPECIAL","WEIERSTRASS","BLS","M_TYPE","NEGATIVEX","65","128")
 		pfcurve_selected=True
 
 
 	if x==22:
-		curveset("FP256BN","32","28","256","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","NEGATIVEX","66","128") 
+		curveset("FP256BN","32","28","256","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","NEGATIVEX","66","128")
 		pfcurve_selected=True
 	if x==23:
 		curveset("FP512BN","64","29","512","3","NOT_SPECIAL","WEIERSTRASS","BN","M_TYPE","POSITIVEX","130","128")

@@ -61,7 +61,7 @@ def rsaset(tb,nb,base,ml) :
 	replace(fpath+"CONFIG_BIG.go","@NB@",nb)
 	replace(fpath+"CONFIG_BIG.go","@BASE@",base)
 
-	replace(fpath+"CONFIG_FF.go","@ML@",ml);
+	replace(fpath+"CONFIG_FF.go","@ML@",ml)
 
 def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	global deltext,slashtext,copytext

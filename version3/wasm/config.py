@@ -36,7 +36,7 @@ def rsaset(tb,tff,nb,base,ml) :
 	os.system(copytext+" config_ff.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"WWW",tff)
-	replace(fnameh,"@ML@",ml);
+	replace(fnameh,"@ML@",ml)
 
 	fnamec="big_"+bd+".c"
 	fnamebc="big_"+bd+".bc"
@@ -141,7 +141,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	replace(fnameh,"XXX",bd)
 	os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
 
-	os.system("emcc -O2 rom_field_"+tf+".c -o rom_field_"+tf+".bc");
+	os.system("emcc -O2 rom_field_"+tf+".c -o rom_field_"+tf+".bc")
 
 	fnamec="ecp_"+tc+".c"
 	fnamebc="ecp_"+tc+".bc"
@@ -173,7 +173,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	replace(fnameh,"XXX",bd)
 	os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
 
-	os.system("emcc -O2 rom_curve_"+tc+".c -o rom_curve_"+tc+".bc");
+	os.system("emcc -O2 rom_curve_"+tc+".c -o rom_curve_"+tc+".bc")
 
 	if pf != "NOT" :
 		fnamec="fp2_"+tf+".c"
@@ -522,13 +522,13 @@ while ptr<max:
 			break
 	if already:
 		continue
-	
+
 	selection.append(x)
 	ptr=ptr+1
 
 # curveset(big,field,curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly,sextic twist,sign of x,ate bits,curve security)
-# for each curve give names for big, field and curve. In many cases the latter two will be the same. 
-# Typically "big" is the size in bits, always a multiple of 8, "field" describes the modulus, and "curve" is the common name for the elliptic curve   
+# for each curve give names for big, field and curve. In many cases the latter two will be the same.
+# Typically "big" is the size in bits, always a multiple of 8, "field" describes the modulus, and "curve" is the common name for the elliptic curve
 # big_length_bytes is "big" divided by 8
 # Next give the number base used for 32 bit architectures, as n where the base is 2^n (note that these must be fixed for the same "big" name, if is ever re-used for another curve)
 # modulus_bits is the bit length of the modulus, typically the same or slightly smaller than "big"
@@ -719,7 +719,6 @@ else :
 	
 os.system(deltext+" *.bc")
 
-#print("Your section was ");	
+#print("Your section was ")
 #for i in range(0,ptr):
 #	print (selection[i])
-

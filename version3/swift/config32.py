@@ -49,7 +49,7 @@ def rsaset(tb,nb,base,ml) :
 	replace(fpath+"config_big.swift","@BASE32@",base)
 	replace(fpath+"config_big.swift","@BASE64@",base)
 
-	replace(fpath+"config_ff.swift","@ML@",ml);
+	replace(fpath+"config_ff.swift","@ML@",ml)
 
 	os.system("swiftc -DD32 "+fpath+"*.swift -L. -lamcl -I. -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name "+tb)
 	os.system(deltext+fpath+"*.*")
@@ -209,12 +209,12 @@ while ptr<max:
 			break
 	if already:
 		continue
-	
+
 	selection.append(x)
 	ptr=ptr+1
 
 # curveset(curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly,curve security)
-# where "curve" is the common name for the elliptic curve   
+# where "curve" is the common name for the elliptic curve
 # big_length_bytes is the modulus size rounded up to a number of bytes
 # bits_in_base gives the number base used for 32 bit architectures, as n where the base is 2^n
 # modulus_bits is the actual bit length of the modulus.
