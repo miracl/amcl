@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 deltext=""
@@ -16,6 +17,9 @@ if sys.platform.startswith("win") :
 	copytext="copy "
 	deltext="del "
 	slashtext="\\"
+
+def run_in_shell(cmd):
+    subprocess.check_call(cmd, shell=True)
 
 chosen=[]
 cptr=0
@@ -40,15 +44,15 @@ def rsaset(tb,nb,base,ml) :
 	cptr=cptr+1
 
 	fpath="amcl"+slashtext+tb+slashtext
-	os.system("mkdir amcl"+slashtext+tb)
+	run_in_shell("mkdir amcl"+slashtext+tb)
 
-	os.system(copytext+"ARCH64.go "+fpath+"ARCH.go")
-	os.system(copytext+"BIG64.go "+fpath+"BIG.go")
-	os.system(copytext+"DBIG.go "+fpath+"DBIG.go")
-	os.system(copytext+"FF64.go "+fpath+"FF.go")
-	os.system(copytext+"RSA.go "+fpath+"RSA.go")
-	os.system(copytext+"CONFIG_BIG.go "+fpath+"CONFIG_BIG.go")
-	os.system(copytext+"CONFIG_FF.go "+fpath+"CONFIG_FF.go")
+	run_in_shell(copytext+"ARCH64.go "+fpath+"ARCH.go")
+	run_in_shell(copytext+"BIG64.go "+fpath+"BIG.go")
+	run_in_shell(copytext+"DBIG.go "+fpath+"DBIG.go")
+	run_in_shell(copytext+"FF64.go "+fpath+"FF.go")
+	run_in_shell(copytext+"RSA.go "+fpath+"RSA.go")
+	run_in_shell(copytext+"CONFIG_BIG.go "+fpath+"CONFIG_BIG.go")
+	run_in_shell(copytext+"CONFIG_FF.go "+fpath+"CONFIG_FF.go")
 
 	replace(fpath+"ARCH.go","XXX",tb)
 	replace(fpath+"CONFIG_BIG.go","XXX",tb)
@@ -71,18 +75,18 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	cptr=cptr+1
 
 	fpath="amcl"+slashtext+tc+slashtext
-	os.system("mkdir amcl"+slashtext+tc)
+	run_in_shell("mkdir amcl"+slashtext+tc)
 
-	os.system(copytext+"ARCH64.go "+fpath+"ARCH.go")
-	os.system(copytext+"BIG64.go "+fpath+"BIG.go")
-	os.system(copytext+"DBIG.go "+fpath+"DBIG.go")
-	os.system(copytext+"FP.go "+fpath+"FP.go")
-	os.system(copytext+"ECP.go "+fpath+"ECP.go")
-	os.system(copytext+"ECDH.go "+fpath+"ECDH.go")
-	os.system(copytext+"CONFIG_BIG.go "+fpath+"CONFIG_BIG.go")
-	os.system(copytext+"CONFIG_FIELD.go "+fpath+"CONFIG_FIELD.go")
-	os.system(copytext+"CONFIG_CURVE.go "+fpath+"CONFIG_CURVE.go")
-	os.system(copytext+"ROM_"+tc+"_64.go "+fpath+"ROM.go")
+	run_in_shell(copytext+"ARCH64.go "+fpath+"ARCH.go")
+	run_in_shell(copytext+"BIG64.go "+fpath+"BIG.go")
+	run_in_shell(copytext+"DBIG.go "+fpath+"DBIG.go")
+	run_in_shell(copytext+"FP.go "+fpath+"FP.go")
+	run_in_shell(copytext+"ECP.go "+fpath+"ECP.go")
+	run_in_shell(copytext+"ECDH.go "+fpath+"ECDH.go")
+	run_in_shell(copytext+"CONFIG_BIG.go "+fpath+"CONFIG_BIG.go")
+	run_in_shell(copytext+"CONFIG_FIELD.go "+fpath+"CONFIG_FIELD.go")
+	run_in_shell(copytext+"CONFIG_CURVE.go "+fpath+"CONFIG_CURVE.go")
+	run_in_shell(copytext+"ROM_"+tc+"_64.go "+fpath+"ROM.go")
 
 	replace(fpath+"ARCH.go","XXX",tc)
 	replace(fpath+"BIG.go","XXX",tc)
@@ -130,19 +134,19 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 
 	if pf != "NOT" :
 
-		os.system(copytext+"FP2.go "+fpath+"FP2.go")
-		os.system(copytext+"FP4.go "+fpath+"FP4.go")
+		run_in_shell(copytext+"FP2.go "+fpath+"FP2.go")
+		run_in_shell(copytext+"FP4.go "+fpath+"FP4.go")
 
 		replace(fpath+"FP2.go","XXX",tc)
 		replace(fpath+"FP4.go","XXX",tc)
 
 		if cs == "128" :
 
-			os.system(copytext+"ECP2.go "+fpath+"ECP2.go")
-			os.system(copytext+"FP12.go "+fpath+"FP12.go")
-			os.system(copytext+"PAIR.go "+fpath+"PAIR.go")
-			os.system(copytext+"MPIN.go "+fpath+"MPIN.go")
-			os.system(copytext+"BLS.go "+fpath+"BLS.go")
+			run_in_shell(copytext+"ECP2.go "+fpath+"ECP2.go")
+			run_in_shell(copytext+"FP12.go "+fpath+"FP12.go")
+			run_in_shell(copytext+"PAIR.go "+fpath+"PAIR.go")
+			run_in_shell(copytext+"MPIN.go "+fpath+"MPIN.go")
+			run_in_shell(copytext+"BLS.go "+fpath+"BLS.go")
 
 			replace(fpath+"FP12.go","XXX",tc)
 			replace(fpath+"ECP2.go","XXX",tc)
@@ -151,12 +155,12 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 			replace(fpath+"BLS.go","XXX",tc)
 
 		if cs == "192" :
-			os.system(copytext+"FP24.go "+fpath+"FP24.go")
-			os.system(copytext+"FP8.go "+fpath+"FP8.go")
-			os.system(copytext+"ECP4.go "+fpath+"ECP4.go")
-			os.system(copytext+"PAIR192.go "+fpath+"PAIR192.go")
-			os.system(copytext+"MPIN192.go "+fpath+"MPIN192.go")
-			os.system(copytext+"BLS192.go "+fpath+"BLS192.go")
+			run_in_shell(copytext+"FP24.go "+fpath+"FP24.go")
+			run_in_shell(copytext+"FP8.go "+fpath+"FP8.go")
+			run_in_shell(copytext+"ECP4.go "+fpath+"ECP4.go")
+			run_in_shell(copytext+"PAIR192.go "+fpath+"PAIR192.go")
+			run_in_shell(copytext+"MPIN192.go "+fpath+"MPIN192.go")
+			run_in_shell(copytext+"BLS192.go "+fpath+"BLS192.go")
 
 			replace(fpath+"FP24.go","XXX",tc)
 			replace(fpath+"FP8.go","XXX",tc)
@@ -166,13 +170,13 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 			replace(fpath+"BLS192.go","XXX",tc)
 
 		if cs == "256" :
-			os.system(copytext+"FP48.go "+fpath+"FP48.go")
-			os.system(copytext+"FP16.go "+fpath+"FP16.go")
-			os.system(copytext+"FP8.go "+fpath+"FP8.go")
-			os.system(copytext+"ECP8.go "+fpath+"ECP8.go")
-			os.system(copytext+"PAIR256.go "+fpath+"PAIR256.go")
-			os.system(copytext+"MPIN256.go "+fpath+"MPIN256.go")
-			os.system(copytext+"BLS256.go "+fpath+"BLS256.go")
+			run_in_shell(copytext+"FP48.go "+fpath+"FP48.go")
+			run_in_shell(copytext+"FP16.go "+fpath+"FP16.go")
+			run_in_shell(copytext+"FP8.go "+fpath+"FP8.go")
+			run_in_shell(copytext+"ECP8.go "+fpath+"ECP8.go")
+			run_in_shell(copytext+"PAIR256.go "+fpath+"PAIR256.go")
+			run_in_shell(copytext+"MPIN256.go "+fpath+"MPIN256.go")
+			run_in_shell(copytext+"BLS256.go "+fpath+"BLS256.go")
 
 			replace(fpath+"FP48.go","XXX",tc)
 			replace(fpath+"FP16.go","XXX",tc)
@@ -183,13 +187,13 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 			replace(fpath+"BLS256.go","XXX",tc)
 
 
-os.system("mkdir amcl")
-os.system(copytext+ "HASH*.go amcl"+slashtext+".")
-os.system(copytext+ "SHA3.go amcl"+slashtext+".")
-os.system(copytext+ "RAND.go amcl"+slashtext+".")
-os.system(copytext+ "AES.go amcl"+slashtext+".")
-os.system(copytext+ "GCM.go amcl"+slashtext+".")
-os.system(copytext+ "NHS.go amcl"+slashtext+".")
+run_in_shell("mkdir amcl")
+run_in_shell(copytext+ "HASH*.go amcl"+slashtext+".")
+run_in_shell(copytext+ "SHA3.go amcl"+slashtext+".")
+run_in_shell(copytext+ "RAND.go amcl"+slashtext+".")
+run_in_shell(copytext+ "AES.go amcl"+slashtext+".")
+run_in_shell(copytext+ "GCM.go amcl"+slashtext+".")
+run_in_shell(copytext+ "NHS.go amcl"+slashtext+".")
 
 print("Elliptic Curves")
 print("1. ED25519")

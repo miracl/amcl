@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 deltext = ""
@@ -17,6 +18,8 @@ if sys.platform.startswith("win"):
     deltext = "del "
     slashtext = "\\"
 
+def run_in_shell(cmd):
+    subprocess.check_call(cmd, shell=True)
 
 chosen = []
 cptr = 0
@@ -42,13 +45,13 @@ def curveset(tc, pf):
     cptr = cptr + 1
 
     fpath = tc + slashtext
-    os.system("mkdir " + tc)
+    run_in_shell("mkdir " + tc)
 
-    os.system(copytext + "big.py " + fpath + "big.py")
-    os.system(copytext + "fp.py " + fpath + "fp.py")
-    os.system(copytext + "ecp.py " + fpath + "ecp.py")
-    os.system(copytext + "ecdh.py " + fpath + "ecdh.py")
-    os.system(copytext + tc + ".py " + fpath + "curve.py")
+    run_in_shell(copytext + "big.py " + fpath + "big.py")
+    run_in_shell(copytext + "fp.py " + fpath + "fp.py")
+    run_in_shell(copytext + "ecp.py " + fpath + "ecp.py")
+    run_in_shell(copytext + "ecdh.py " + fpath + "ecdh.py")
+    run_in_shell(copytext + tc + ".py " + fpath + "curve.py")
 
     replace(fpath + "big.py", "XXX", tc)
     replace(fpath + "fp.py", "XXX", tc)
@@ -56,17 +59,17 @@ def curveset(tc, pf):
     replace(fpath + "ecdh.py", "XXX", tc)
 
     if pf != "NOT":
-        os.system(copytext + "fp2.py " + fpath + "fp2.py")
-        os.system(copytext + "fp4.py " + fpath + "fp4.py")
+        run_in_shell(copytext + "fp2.py " + fpath + "fp2.py")
+        run_in_shell(copytext + "fp4.py " + fpath + "fp4.py")
 
         replace(fpath + "fp2.py", "XXX", tc)
         replace(fpath + "fp4.py", "XXX", tc)
 
-        os.system(copytext + "ecp2.py " + fpath + "ecp2.py")
-        os.system(copytext + "fp12.py " + fpath + "fp12.py")
-        os.system(copytext + "pair.py " + fpath + "pair.py")
-        os.system(copytext + "mpin.py " + fpath + "mpin.py")
-        os.system(copytext + "bls.py " + fpath + "bls.py")
+        run_in_shell(copytext + "ecp2.py " + fpath + "ecp2.py")
+        run_in_shell(copytext + "fp12.py " + fpath + "fp12.py")
+        run_in_shell(copytext + "pair.py " + fpath + "pair.py")
+        run_in_shell(copytext + "mpin.py " + fpath + "mpin.py")
+        run_in_shell(copytext + "bls.py " + fpath + "bls.py")
 
         replace(fpath + "fp12.py", "XXX", tc)
         replace(fpath + "ecp2.py", "XXX", tc)
@@ -154,25 +157,25 @@ while ptr < max:
         pfcurve_selected = True
 
 
-os.system(deltext + " big.py")
-os.system(deltext + " fp.py")
-os.system(deltext + " ecp.py")
-os.system(deltext + " ecdh.py")
-os.system(deltext + " fp2.py")
-os.system(deltext + " fp4.py")
-os.system(deltext + " fp12.py")
-os.system(deltext + " mpin.py")
-os.system(deltext + " bls.py")
-os.system(deltext + " pair.py")
-os.system(deltext + " ecp2.py")
-os.system(deltext + " c25519.py")
-os.system(deltext + " ed25519.py")
-os.system(deltext + " nist256.py")
-os.system(deltext + " bn254.py")
-os.system(deltext + " bn254cx.py")
-os.system(deltext + " bls383.py")
-os.system(deltext + " goldilocks.py")
-os.system(deltext + " bls381.py")
-os.system(deltext + " nist384.py")
-os.system(deltext + " nist521.py")
-os.system(deltext + " sec256k1.py")
+run_in_shell(deltext + " big.py")
+run_in_shell(deltext + " fp.py")
+run_in_shell(deltext + " ecp.py")
+run_in_shell(deltext + " ecdh.py")
+run_in_shell(deltext + " fp2.py")
+run_in_shell(deltext + " fp4.py")
+run_in_shell(deltext + " fp12.py")
+run_in_shell(deltext + " mpin.py")
+run_in_shell(deltext + " bls.py")
+run_in_shell(deltext + " pair.py")
+run_in_shell(deltext + " ecp2.py")
+run_in_shell(deltext + " c25519.py")
+run_in_shell(deltext + " ed25519.py")
+run_in_shell(deltext + " nist256.py")
+run_in_shell(deltext + " bn254.py")
+run_in_shell(deltext + " bn254cx.py")
+run_in_shell(deltext + " bls383.py")
+run_in_shell(deltext + " goldilocks.py")
+run_in_shell(deltext + " bls381.py")
+run_in_shell(deltext + " nist384.py")
+run_in_shell(deltext + " nist521.py")
+run_in_shell(deltext + " sec256k1.py")

@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 deltext=""
@@ -11,6 +12,9 @@ if sys.platform.startswith("darwin")  :
 if sys.platform.startswith("win") :
 	deltext="del"
 	copytext="copy"
+
+def run_in_shell(cmd):
+    subprocess.check_call(cmd, shell=True)
 
 def replace(namefile,oldtext,newtext):
 	f = open(namefile,'r')
@@ -27,13 +31,13 @@ def replace(namefile,oldtext,newtext):
 def rsaset(tb,tff,nb,base,ml) :
 	bd=tb+"_"+base
 	fnameh="config_big_"+bd+".h"
-	os.system(copytext+" config_big.h "+fnameh)
+	run_in_shell(copytext+" config_big.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"@NB@",nb)
 	replace(fnameh,"@BASE@",base)
 
 	fnameh="config_ff_"+tff+".h"
-	os.system(copytext+" config_ff.h "+fnameh)
+	run_in_shell(copytext+" config_ff.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"@ML@",ml)
@@ -41,42 +45,42 @@ def rsaset(tb,tff,nb,base,ml) :
 	fnamec="big_"+bd+".c"
 	fnameh="big_"+bd+".h"
 
-	os.system(copytext+" big.c "+fnamec)
-	os.system(copytext+" big.h "+fnameh)
+	run_in_shell(copytext+" big.c "+fnamec)
+	run_in_shell(copytext+" big.h "+fnameh)
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -std=c99 -c "+fnamec)
+	run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 	fnamec="ff_"+tff+".c"
 	fnameh="ff_"+tff+".h"
 
-	os.system(copytext+" ff.c "+fnamec)
-	os.system(copytext+" ff.h "+fnameh)
+	run_in_shell(copytext+" ff.c "+fnamec)
+	run_in_shell(copytext+" ff.h "+fnameh)
 
 	replace(fnamec,"WWW",tff)
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -std=c99 -c "+fnamec)
+	run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 	fnamec="rsa_"+tff+".c"
 	fnameh="rsa_"+tff+".h"
 
-	os.system(copytext+" rsa.c "+fnamec)
-	os.system(copytext+" rsa.h "+fnameh)
+	run_in_shell(copytext+" rsa.c "+fnamec)
+	run_in_shell(copytext+" rsa.h "+fnameh)
 
 	replace(fnamec,"WWW",tff)
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -std=c99 -c "+fnamec)
+	run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	bd=tb+"_"+base
 
 	fnameh="config_big_"+bd+".h"
-	os.system(copytext+" config_big.h "+fnameh)
+	run_in_shell(copytext+" config_big.h "+fnameh)
 
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"@NB@",nb)
@@ -84,7 +88,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 
 
 	fnameh="config_field_"+tf+".h"
-	os.system(copytext+" config_field.h "+fnameh)
+	run_in_shell(copytext+" config_field.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"@NBT@",nbt)
@@ -101,8 +105,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 		sh=14
 	replace(fnameh,"@SH@",str(sh))
 
-	fnameh="config_curve_"+tc+".h"	
-	os.system(copytext+" config_curve.h "+fnameh)
+	fnameh="config_curve_"+tc+".h"
+	run_in_shell(copytext+" config_curve.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"ZZZ",tc)
@@ -117,32 +121,32 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	fnamec="big_"+bd+".c"
 	fnameh="big_"+bd+".h"
 
-	os.system(copytext+" big.c "+fnamec)
-	os.system(copytext+" big.h "+fnameh)
+	run_in_shell(copytext+" big.c "+fnamec)
+	run_in_shell(copytext+" big.h "+fnameh)
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -std=c99 -c "+fnamec)
+	run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 	fnamec="fp_"+tf+".c"
 	fnameh="fp_"+tf+".h"
 
-	os.system(copytext+" fp.c "+fnamec)
-	os.system(copytext+" fp.h "+fnameh)
+	run_in_shell(copytext+" fp.c "+fnamec)
+	run_in_shell(copytext+" fp.h "+fnameh)
 
 	replace(fnamec,"YYY",tf)
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -std=c99 -c "+fnamec)
+	run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
-	os.system("gcc -O3 -std=c99 -c rom_field_"+tf+".c")
+	run_in_shell("gcc -O3 -std=c99 -c rom_field_"+tf+".c")
 
 	fnamec="ecp_"+tc+".c"
 	fnameh="ecp_"+tc+".h"
 
-	os.system(copytext+" ecp.c "+fnamec)
-	os.system(copytext+" ecp.h "+fnameh)
+	run_in_shell(copytext+" ecp.c "+fnamec)
+	run_in_shell(copytext+" ecp.h "+fnameh)
 
 	replace(fnamec,"ZZZ",tc)
 	replace(fnamec,"YYY",tf)
@@ -150,13 +154,13 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -std=c99 -c "+fnamec)
+	run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 	fnamec="ecdh_"+tc+".c"
 	fnameh="ecdh_"+tc+".h"
 
-	os.system(copytext+" ecdh.c "+fnamec)
-	os.system(copytext+" ecdh.h "+fnameh)
+	run_in_shell(copytext+" ecdh.c "+fnamec)
+	run_in_shell(copytext+" ecdh.h "+fnameh)
 
 	replace(fnamec,"ZZZ",tc)
 	replace(fnamec,"YYY",tf)
@@ -164,278 +168,278 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("gcc -O3 -std=c99 -c "+fnamec)
+	run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
-	os.system("gcc -O3 -std=c99 -c rom_curve_"+tc+".c")
+	run_in_shell("gcc -O3 -std=c99 -c rom_curve_"+tc+".c")
 
 	if pf != "NOT" :
 		fnamec="fp2_"+tf+".c"
 		fnameh="fp2_"+tf+".h"
 
-		os.system(copytext+" fp2.c "+fnamec)
-		os.system(copytext+" fp2.h "+fnameh)
+		run_in_shell(copytext+" fp2.c "+fnamec)
+		run_in_shell(copytext+" fp2.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
-		os.system("gcc -O3 -std=c99 -c "+fnamec)
+		run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 		fnamec="fp4_"+tf+".c"
 		fnameh="fp4_"+tf+".h"
 
-		os.system(copytext+" fp4.c "+fnamec)
-		os.system(copytext+" fp4.h "+fnameh)
+		run_in_shell(copytext+" fp4.c "+fnamec)
+		run_in_shell(copytext+" fp4.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
 		replace(fnamec,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
 		replace(fnameh,"ZZZ",tc)
-		os.system("gcc -O3 -std=c99 -c "+fnamec)
+		run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 
 		if cs == "128" :
 			fnamec="fp12_"+tf+".c"
 			fnameh="fp12_"+tf+".h"
 
-			os.system(copytext+" fp12.c "+fnamec)
-			os.system(copytext+" fp12.h "+fnameh)
+			run_in_shell(copytext+" fp12.c "+fnamec)
+			run_in_shell(copytext+" fp12.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="ecp2_"+tc+".c"
 			fnameh="ecp2_"+tc+".h"
 
-			os.system(copytext+" ecp2.c "+fnamec)
-			os.system(copytext+" ecp2.h "+fnameh)
+			run_in_shell(copytext+" ecp2.c "+fnamec)
+			run_in_shell(copytext+" ecp2.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="pair_"+tc+".c"
 			fnameh="pair_"+tc+".h"
 
-			os.system(copytext+" pair.c "+fnamec)
-			os.system(copytext+" pair.h "+fnameh)
+			run_in_shell(copytext+" pair.c "+fnamec)
+			run_in_shell(copytext+" pair.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="mpin_"+tc+".c"
 			fnameh="mpin_"+tc+".h"
 
-			os.system(copytext+" mpin.c "+fnamec)
-			os.system(copytext+" mpin.h "+fnameh)
+			run_in_shell(copytext+" mpin.c "+fnamec)
+			run_in_shell(copytext+" mpin.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="bls_"+tc+".c"
 			fnameh="bls_"+tc+".h"
 
-			os.system(copytext+" bls.c "+fnamec)
-			os.system(copytext+" bls.h "+fnameh)
+			run_in_shell(copytext+" bls.c "+fnamec)
+			run_in_shell(copytext+" bls.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 		if cs == "192" :
 			fnamec="fp8_"+tf+".c"
 			fnameh="fp8_"+tf+".h"
 
-			os.system(copytext+" fp8.c "+fnamec)
-			os.system(copytext+" fp8.h "+fnameh)
+			run_in_shell(copytext+" fp8.c "+fnamec)
+			run_in_shell(copytext+" fp8.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 
 			fnamec="fp24_"+tf+".c"
 			fnameh="fp24_"+tf+".h"
 
-			os.system(copytext+" fp24.c "+fnamec)
-			os.system(copytext+" fp24.h "+fnameh)
+			run_in_shell(copytext+" fp24.c "+fnamec)
+			run_in_shell(copytext+" fp24.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="ecp4_"+tc+".c"
 			fnameh="ecp4_"+tc+".h"
 
-			os.system(copytext+" ecp4.c "+fnamec)
-			os.system(copytext+" ecp4.h "+fnameh)
+			run_in_shell(copytext+" ecp4.c "+fnamec)
+			run_in_shell(copytext+" ecp4.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="pair192_"+tc+".c"
 			fnameh="pair192_"+tc+".h"
 
-			os.system(copytext+" pair192.c "+fnamec)
-			os.system(copytext+" pair192.h "+fnameh)
+			run_in_shell(copytext+" pair192.c "+fnamec)
+			run_in_shell(copytext+" pair192.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="mpin192_"+tc+".c"
 			fnameh="mpin192_"+tc+".h"
 
-			os.system(copytext+" mpin192.c "+fnamec)
-			os.system(copytext+" mpin192.h "+fnameh)
+			run_in_shell(copytext+" mpin192.c "+fnamec)
+			run_in_shell(copytext+" mpin192.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)		
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="bls192_"+tc+".c"
 			fnameh="bls192_"+tc+".h"
 
-			os.system(copytext+" bls192.c "+fnamec)
-			os.system(copytext+" bls192.h "+fnameh)
+			run_in_shell(copytext+" bls192.c "+fnamec)
+			run_in_shell(copytext+" bls192.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)	
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 		if cs == "256" :
 
 			fnamec="fp8_"+tf+".c"
 			fnameh="fp8_"+tf+".h"
 
-			os.system(copytext+" fp8.c "+fnamec)
-			os.system(copytext+" fp8.h "+fnameh)
+			run_in_shell(copytext+" fp8.c "+fnamec)
+			run_in_shell(copytext+" fp8.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 
 			fnamec="ecp8_"+tc+".c"
 			fnameh="ecp8_"+tc+".h"
 
-			os.system(copytext+" ecp8.c "+fnamec)
-			os.system(copytext+" ecp8.h "+fnameh)
+			run_in_shell(copytext+" ecp8.c "+fnamec)
+			run_in_shell(copytext+" ecp8.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 
 			fnamec="fp16_"+tf+".c"
 			fnameh="fp16_"+tf+".h"
 
-			os.system(copytext+" fp16.c "+fnamec)
-			os.system(copytext+" fp16.h "+fnameh)
+			run_in_shell(copytext+" fp16.c "+fnamec)
+			run_in_shell(copytext+" fp16.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 
 			fnamec="fp48_"+tf+".c"
 			fnameh="fp48_"+tf+".h"
 
-			os.system(copytext+" fp48.c "+fnamec)
-			os.system(copytext+" fp48.h "+fnameh)
+			run_in_shell(copytext+" fp48.c "+fnamec)
+			run_in_shell(copytext+" fp48.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 
 			fnamec="pair256_"+tc+".c"
 			fnameh="pair256_"+tc+".h"
 
-			os.system(copytext+" pair256.c "+fnamec)
-			os.system(copytext+" pair256.h "+fnameh)
+			run_in_shell(copytext+" pair256.c "+fnamec)
+			run_in_shell(copytext+" pair256.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="mpin256_"+tc+".c"
 			fnameh="mpin256_"+tc+".h"
 
-			os.system(copytext+" mpin256.c "+fnamec)
-			os.system(copytext+" mpin256.h "+fnameh)
+			run_in_shell(copytext+" mpin256.c "+fnamec)
+			run_in_shell(copytext+" mpin256.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)				
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 			fnamec="bls256_"+tc+".c"
 			fnameh="bls256_"+tc+".h"
 
-			os.system(copytext+" bls256.c "+fnamec)
-			os.system(copytext+" bls256.h "+fnameh)
+			run_in_shell(copytext+" bls256.c "+fnamec)
+			run_in_shell(copytext+" bls256.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("gcc -O3 -std=c99 -c "+fnamec)
+			run_in_shell("gcc -O3 -std=c99 -c "+fnamec)
 
 replace("arch.h","@WL@","32")
 print("Elliptic Curves")
@@ -627,67 +631,67 @@ while ptr<max:
 		rsa_selected=True
 
 
-os.system(deltext+" big.*")
-os.system(deltext+" fp.*")
-os.system(deltext+" ecp.*")
-os.system(deltext+" ecdh.*")
-os.system(deltext+" ff.*")
-os.system(deltext+" rsa.*")
-os.system(deltext+" config_big.h")
-os.system(deltext+" config_field.h")
-os.system(deltext+" config_curve.h")
-os.system(deltext+" config_ff.h")
-os.system(deltext+" fp2.*")
-os.system(deltext+" fp4.*")
-os.system(deltext+" fp8.*")
-os.system(deltext+" fp16.*")
+run_in_shell(deltext+" big.*")
+run_in_shell(deltext+" fp.*")
+run_in_shell(deltext+" ecp.*")
+run_in_shell(deltext+" ecdh.*")
+run_in_shell(deltext+" ff.*")
+run_in_shell(deltext+" rsa.*")
+run_in_shell(deltext+" config_big.h")
+run_in_shell(deltext+" config_field.h")
+run_in_shell(deltext+" config_curve.h")
+run_in_shell(deltext+" config_ff.h")
+run_in_shell(deltext+" fp2.*")
+run_in_shell(deltext+" fp4.*")
+run_in_shell(deltext+" fp8.*")
+run_in_shell(deltext+" fp16.*")
 
 
-os.system(deltext+" fp12.*")
-os.system(deltext+" fp24.*")
-os.system(deltext+" fp48.*")
+run_in_shell(deltext+" fp12.*")
+run_in_shell(deltext+" fp24.*")
+run_in_shell(deltext+" fp48.*")
 
-os.system(deltext+" ecp2.*")
-os.system(deltext+" ecp4.*")
-os.system(deltext+" ecp8.*")
+run_in_shell(deltext+" ecp2.*")
+run_in_shell(deltext+" ecp4.*")
+run_in_shell(deltext+" ecp8.*")
 
-os.system(deltext+" pair.*")
-os.system(deltext+" mpin.*")
-os.system(deltext+" bls.*")
+run_in_shell(deltext+" pair.*")
+run_in_shell(deltext+" mpin.*")
+run_in_shell(deltext+" bls.*")
 
-os.system(deltext+" pair192.*")
-os.system(deltext+" mpin192.*")
-os.system(deltext+" bls192.*")
+run_in_shell(deltext+" pair192.*")
+run_in_shell(deltext+" mpin192.*")
+run_in_shell(deltext+" bls192.*")
 
-os.system(deltext+" pair256.*")
-os.system(deltext+" mpin256.*")
-os.system(deltext+" bls256.*")
+run_in_shell(deltext+" pair256.*")
+run_in_shell(deltext+" mpin256.*")
+run_in_shell(deltext+" bls256.*")
 
 # create library
-os.system("gcc -O3 -std=c99 -c randapi.c")
+run_in_shell("gcc -O3 -std=c99 -c randapi.c")
 if curve_selected :
-	os.system("gcc -O3 -std=c99 -c ecdh_support.c")
+	run_in_shell("gcc -O3 -std=c99 -c ecdh_support.c")
 if rsa_selected :
-	os.system("gcc -O3 -std=c99 -c rsa_support.c")
+	run_in_shell("gcc -O3 -std=c99 -c rsa_support.c")
 if pfcurve_selected :
-	os.system("gcc -O3 -std=c99 -c pbc_support.c")
+	run_in_shell("gcc -O3 -std=c99 -c pbc_support.c")
 
-os.system("gcc -O3 -std=c99 -c hash.c")
-os.system("gcc -O3 -std=c99 -c rand.c")
-os.system("gcc -O3 -std=c99 -c oct.c")
-os.system("gcc -O3 -std=c99 -c aes.c")
-os.system("gcc -O3 -std=c99 -c gcm.c")
-os.system("gcc -O3 -std=c99 -c newhope.c")
+run_in_shell("gcc -O3 -std=c99 -c hash.c")
+run_in_shell("gcc -O3 -std=c99 -c rand.c")
+run_in_shell("gcc -O3 -std=c99 -c oct.c")
+run_in_shell("gcc -O3 -std=c99 -c aes.c")
+run_in_shell("gcc -O3 -std=c99 -c gcm.c")
+run_in_shell("gcc -O3 -std=c99 -c newhope.c")
 
 if sys.platform.startswith("win") :
-	os.system("for %i in (*.o) do @echo %~nxi >> f.list")
-	os.system("ar rc amcl.a @f.list")
-	os.system(deltext+" f.list")
+	run_in_shell("for %i in (*.o) do @echo %~nxi >> f.list")
+	run_in_shell("ar rc amcl.a @f.list")
+	run_in_shell(deltext+" f.list")
 
 else :
-	os.system("ar rc amcl.a *.o")
-	
-os.system(deltext+" *.o")
+	run_in_shell("ar rc amcl.a *.o")
+
+run_in_shell(deltext+" *.o")
 
 #print("Your section was ")
 #for i in range(0,ptr):

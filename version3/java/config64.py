@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 deltext=""
@@ -19,6 +20,9 @@ if sys.platform.startswith("win") :
 	deltext="del "
 	slashtext="\\"
 	makedir="md "
+
+def run_in_shell(cmd):
+    subprocess.check_call(cmd, shell=True)
 
 amclpath = "amcl" + slashtext + "src" + slashtext + "main" + slashtext + "java" + slashtext + org1text + slashtext + org2text + slashtext + org3text +slashtext + "amcl"
 amclTestPath = "amcl" + slashtext + "src" + slashtext + "test" + slashtext + "java" + slashtext + org1text + slashtext + org2text + slashtext + org3text +slashtext + "amcl"
@@ -46,19 +50,19 @@ def rsaset(tb,nb,base,ml) :
 
 	fpath=amclpath+slashtext+tb+slashtext
 	fpathTest=amclTestPath+slashtext+tb+slashtext #ms
-	os.system(makedir+amclpath+slashtext+tb)
-	os.system(makedir+amclTestPath+slashtext+tb) #ms
-	
-	os.system(copytext+"CONFIG_BIG.java "+fpath+"CONFIG_BIG.java")
-	os.system(copytext+"CONFIG_FF.java "+fpath+"CONFIG_FF.java")
-	os.system(copytext+"BIG64.java "+fpath+"BIG.java")
-	os.system(copytext+"DBIG64.java "+fpath+"DBIG.java")
-	os.system(copytext+"FF64.java "+fpath+"FF.java")
-	os.system(copytext+"RSA.java "+fpath+"RSA.java")
-	os.system(copytext+"private_key.java "+fpath+"private_key.java")
-	os.system(copytext+"public_key.java "+fpath+"public_key.java")	
-	os.system(copytext+"TestRSA.java "+fpathTest+"TestRSA.java") #ms
-	os.system(copytext+"TesttimeRSA.java "+fpathTest+"TesttimeRSA.java")	#ms
+	run_in_shell(makedir+amclpath+slashtext+tb)
+	run_in_shell(makedir+amclTestPath+slashtext+tb) #ms
+
+	run_in_shell(copytext+"CONFIG_BIG.java "+fpath+"CONFIG_BIG.java")
+	run_in_shell(copytext+"CONFIG_FF.java "+fpath+"CONFIG_FF.java")
+	run_in_shell(copytext+"BIG64.java "+fpath+"BIG.java")
+	run_in_shell(copytext+"DBIG64.java "+fpath+"DBIG.java")
+	run_in_shell(copytext+"FF64.java "+fpath+"FF.java")
+	run_in_shell(copytext+"RSA.java "+fpath+"RSA.java")
+	run_in_shell(copytext+"private_key.java "+fpath+"private_key.java")
+	run_in_shell(copytext+"public_key.java "+fpath+"public_key.java")
+	run_in_shell(copytext+"TestRSA.java "+fpathTest+"TestRSA.java") #ms
+	run_in_shell(copytext+"TesttimeRSA.java "+fpathTest+"TesttimeRSA.java")	#ms
 
 	replace(fpath+"CONFIG_BIG.java","XXX",tb)
 	replace(fpath+"CONFIG_FF.java","XXX",tb)
@@ -87,24 +91,24 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 
 	fpath=amclpath+slashtext+tc+slashtext
 	fpathTest=amclTestPath+slashtext+tc+slashtext  #ms
-	os.system(makedir+amclpath+slashtext+tc)
-	os.system(makedir+amclTestPath+slashtext+tc)  #ms
+	run_in_shell(makedir+amclpath+slashtext+tc)
+	run_in_shell(makedir+amclTestPath+slashtext+tc)  #ms
 
-	os.system(copytext+"CONFIG_BIG.java "+fpath+"CONFIG_BIG.java")
-	os.system(copytext+"CONFIG_FIELD.java "+fpath+"CONFIG_FIELD.java")
-	os.system(copytext+"CONFIG_CURVE.java "+fpath+"CONFIG_CURVE.java")
-	os.system(copytext+"BIG64.java "+fpath+"BIG.java")
-	os.system(copytext+"DBIG64.java "+fpath+"DBIG.java")
-	os.system(copytext+"FP64.java "+fpath+"FP.java")
-	os.system(copytext+"ECP.java "+fpath+"ECP.java")
-	os.system(copytext+"ECDH.java "+fpath+"ECDH.java")
-	os.system(copytext+"ROM_"+tc+"_64.java "+fpath+"ROM.java")
-	os.system(copytext+"TestECDH.java "+fpathTest+"TestECDH.java")	#ms
-	os.system(copytext+"TesttimeECDH.java "+fpathTest+"TesttimeECDH.java")	#ms
-	
-	replace(fpath+"CONFIG_BIG.java","XXX",tc)	
-	replace(fpath+"CONFIG_FIELD.java","XXX",tc)	
-	replace(fpath+"CONFIG_CURVE.java","XXX",tc)	
+	run_in_shell(copytext+"CONFIG_BIG.java "+fpath+"CONFIG_BIG.java")
+	run_in_shell(copytext+"CONFIG_FIELD.java "+fpath+"CONFIG_FIELD.java")
+	run_in_shell(copytext+"CONFIG_CURVE.java "+fpath+"CONFIG_CURVE.java")
+	run_in_shell(copytext+"BIG64.java "+fpath+"BIG.java")
+	run_in_shell(copytext+"DBIG64.java "+fpath+"DBIG.java")
+	run_in_shell(copytext+"FP64.java "+fpath+"FP.java")
+	run_in_shell(copytext+"ECP.java "+fpath+"ECP.java")
+	run_in_shell(copytext+"ECDH.java "+fpath+"ECDH.java")
+	run_in_shell(copytext+"ROM_"+tc+"_64.java "+fpath+"ROM.java")
+	run_in_shell(copytext+"TestECDH.java "+fpathTest+"TestECDH.java")	#ms
+	run_in_shell(copytext+"TesttimeECDH.java "+fpathTest+"TesttimeECDH.java")	#ms
+
+	replace(fpath+"CONFIG_BIG.java","XXX",tc)
+	replace(fpath+"CONFIG_FIELD.java","XXX",tc)
+	replace(fpath+"CONFIG_CURVE.java","XXX",tc)
 	replace(fpath+"BIG.java","XXX",tc)
 	replace(fpath+"DBIG.java","XXX",tc)
 	replace(fpath+"FP.java","XXX",tc)
@@ -146,22 +150,22 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 		replace(fpath+"CONFIG_CURVE.java","@AK@","32")
 
 	if pf != "NOT" :
-		os.system(copytext+"FP2.java "+fpath+"FP2.java")
-		os.system(copytext+"FP4.java "+fpath+"FP4.java")
+		run_in_shell(copytext+"FP2.java "+fpath+"FP2.java")
+		run_in_shell(copytext+"FP4.java "+fpath+"FP4.java")
 
 		replace(fpath+"FP2.java","XXX",tc)
 		replace(fpath+"FP4.java","XXX",tc)
 
 		if cs == "128" :
 
-			os.system(copytext+"ECP2.java "+fpath+"ECP2.java")
-			os.system(copytext+"FP12.java "+fpath+"FP12.java")
-			os.system(copytext+"PAIR.java "+fpath+"PAIR.java")
-			os.system(copytext+"MPIN.java "+fpath+"MPIN.java")
-			os.system(copytext+"BLS.java "+fpath+"BLS.java")
-			os.system(copytext+"TestMPIN.java "+fpathTest+"TestMPIN.java")	#ms
-			os.system(copytext+"TestBLS.java "+fpathTest+"TestBLS.java")	#ms
-			os.system(copytext+"TesttimeMPIN.java "+fpathTest+"TesttimeMPIN.java")	#ms
+			run_in_shell(copytext+"ECP2.java "+fpath+"ECP2.java")
+			run_in_shell(copytext+"FP12.java "+fpath+"FP12.java")
+			run_in_shell(copytext+"PAIR.java "+fpath+"PAIR.java")
+			run_in_shell(copytext+"MPIN.java "+fpath+"MPIN.java")
+			run_in_shell(copytext+"BLS.java "+fpath+"BLS.java")
+			run_in_shell(copytext+"TestMPIN.java "+fpathTest+"TestMPIN.java")	#ms
+			run_in_shell(copytext+"TestBLS.java "+fpathTest+"TestBLS.java")	#ms
+			run_in_shell(copytext+"TesttimeMPIN.java "+fpathTest+"TesttimeMPIN.java")	#ms
 
 			replace(fpath+"FP12.java","XXX",tc)
 			replace(fpath+"ECP2.java","XXX",tc)
@@ -173,15 +177,15 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 			replace(fpathTest+"TesttimeMPIN.java","XXX",tc)  #ms
 
 		if cs == "192" :
-			os.system(copytext+"ECP4.java "+fpath+"ECP4.java")
-			os.system(copytext+"FP8.java "+fpath+"FP8.java")
-			os.system(copytext+"FP24.java "+fpath+"FP24.java")
-			os.system(copytext+"PAIR192.java "+fpath+"PAIR192.java")
-			os.system(copytext+"MPIN192.java "+fpath+"MPIN192.java")
-			os.system(copytext+"BLS192.java "+fpath+"BLS192.java")
-			os.system(copytext+"TestMPIN192.java "+fpathTest+"TestMPIN192.java")	#ms
-			os.system(copytext+"TestBLS192.java "+fpathTest+"TestBLS192.java")	#ms
-			os.system(copytext+"TesttimeMPIN192.java "+fpathTest+"TesttimeMPIN192.java")	#ms
+			run_in_shell(copytext+"ECP4.java "+fpath+"ECP4.java")
+			run_in_shell(copytext+"FP8.java "+fpath+"FP8.java")
+			run_in_shell(copytext+"FP24.java "+fpath+"FP24.java")
+			run_in_shell(copytext+"PAIR192.java "+fpath+"PAIR192.java")
+			run_in_shell(copytext+"MPIN192.java "+fpath+"MPIN192.java")
+			run_in_shell(copytext+"BLS192.java "+fpath+"BLS192.java")
+			run_in_shell(copytext+"TestMPIN192.java "+fpathTest+"TestMPIN192.java")	#ms
+			run_in_shell(copytext+"TestBLS192.java "+fpathTest+"TestBLS192.java")	#ms
+			run_in_shell(copytext+"TesttimeMPIN192.java "+fpathTest+"TesttimeMPIN192.java")	#ms
 
 			replace(fpath+"FP8.java","XXX",tc)
 			replace(fpath+"FP24.java","XXX",tc)
@@ -194,16 +198,16 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 			replace(fpathTest+"TesttimeMPIN192.java","XXX",tc)  #ms
 
 		if cs == "256" :
-			os.system(copytext+"FP8.java "+fpath+"FP8.java")
-			os.system(copytext+"ECP8.java "+fpath+"ECP8.java")
-			os.system(copytext+"FP16.java "+fpath+"FP16.java")
-			os.system(copytext+"FP48.java "+fpath+"FP48.java")
-			os.system(copytext+"PAIR256.java "+fpath+"PAIR256.java")
-			os.system(copytext+"MPIN256.java "+fpath+"MPIN256.java")
-			os.system(copytext+"BLS256.java "+fpath+"BLS256.java")
-			os.system(copytext+"TestMPIN256.java "+fpathTest+"TestMPIN256.java")	#ms
-			os.system(copytext+"TestBLS256.java "+fpathTest+"TestBLS256.java")	#ms
-			os.system(copytext+"TesttimeMPIN256.java "+fpathTest+"TesttimeMPIN256.java")	#ms
+			run_in_shell(copytext+"FP8.java "+fpath+"FP8.java")
+			run_in_shell(copytext+"ECP8.java "+fpath+"ECP8.java")
+			run_in_shell(copytext+"FP16.java "+fpath+"FP16.java")
+			run_in_shell(copytext+"FP48.java "+fpath+"FP48.java")
+			run_in_shell(copytext+"PAIR256.java "+fpath+"PAIR256.java")
+			run_in_shell(copytext+"MPIN256.java "+fpath+"MPIN256.java")
+			run_in_shell(copytext+"BLS256.java "+fpath+"BLS256.java")
+			run_in_shell(copytext+"TestMPIN256.java "+fpathTest+"TestMPIN256.java")	#ms
+			run_in_shell(copytext+"TestBLS256.java "+fpathTest+"TestBLS256.java")	#ms
+			run_in_shell(copytext+"TesttimeMPIN256.java "+fpathTest+"TesttimeMPIN256.java")	#ms
 
 			replace(fpath+"FP8.java","XXX",tc)
 			replace(fpath+"FP16.java","XXX",tc)
@@ -218,11 +222,11 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 
 
 
-os.system(makedir + amclpath)
+run_in_shell(makedir + amclpath)
 
-os.system(copytext + "pom.xml " + "amcl" + slashtext + ".")
+run_in_shell(copytext + "pom.xml " + "amcl" + slashtext + ".")
 for file in ['HASH*.java', 'SHA3.java', 'RAND.java', 'AES.java', 'GCM.java', 'NHS.java']:
-	os.system(copytext + file + " " + amclpath+slashtext+".")
+	run_in_shell(copytext + file + " " + amclpath+slashtext+".")
 
 print("Elliptic Curves")
 print("1. ED25519")

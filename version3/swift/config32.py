@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 deltext=""
@@ -12,6 +13,9 @@ if sys.platform.startswith("win") :
 	copytext="copy "
 	deltext="del "
 	slashtext="\\"
+
+def run_in_shell(cmd):
+    subprocess.check_call(cmd, shell=True)
 
 chosen=[]
 cptr=0
@@ -36,14 +40,14 @@ def rsaset(tb,nb,base,ml) :
 	cptr=cptr+1
 
 	fpath="amcl"+slashtext+tb+slashtext
-	os.system("mkdir amcl"+slashtext+tb)
+	run_in_shell("mkdir amcl"+slashtext+tb)
 
-	os.system(copytext+"big.swift "+fpath+"big.swift")
-	os.system(copytext+"config_big.swift "+fpath+"config_big.swift")
-	os.system(copytext+"config_ff.swift "+fpath+"config_ff.swift")
-	os.system(copytext+"dbig.swift "+fpath+"dbig.swift")
-	os.system(copytext+"ff.swift "+fpath+"ff.swift")
-	os.system(copytext+"rsa.swift "+fpath+"rsa.swift")
+	run_in_shell(copytext+"big.swift "+fpath+"big.swift")
+	run_in_shell(copytext+"config_big.swift "+fpath+"config_big.swift")
+	run_in_shell(copytext+"config_ff.swift "+fpath+"config_ff.swift")
+	run_in_shell(copytext+"dbig.swift "+fpath+"dbig.swift")
+	run_in_shell(copytext+"ff.swift "+fpath+"ff.swift")
+	run_in_shell(copytext+"rsa.swift "+fpath+"rsa.swift")
 
 	replace(fpath+"config_big.swift","@NB@",nb)
 	replace(fpath+"config_big.swift","@BASE32@",base)
@@ -51,9 +55,9 @@ def rsaset(tb,nb,base,ml) :
 
 	replace(fpath+"config_ff.swift","@ML@",ml)
 
-	os.system("swiftc -DD32 "+fpath+"*.swift -L. -lamcl -I. -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name "+tb)
-	os.system(deltext+fpath+"*.*")
-	os.system("rmdir amcl"+slashtext+tb)
+	run_in_shell("swiftc -DD32 "+fpath+"*.swift -L. -lamcl -I. -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name "+tb)
+	run_in_shell(deltext+fpath+"*.*")
+	run_in_shell("rmdir amcl"+slashtext+tb)
 
 
 def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
@@ -64,16 +68,16 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	cptr=cptr+1
 
 	fpath="amcl"+slashtext+tc+slashtext
-	os.system("mkdir amcl"+slashtext+tc)
+	run_in_shell("mkdir amcl"+slashtext+tc)
 
-	os.system(copytext+"big.swift "+fpath+"big.swift")
-	os.system(copytext+"config_big.swift "+fpath+"config_big.swift")
-	os.system(copytext+"config_field.swift "+fpath+"config_field.swift")
-	os.system(copytext+"config_curve.swift "+fpath+"config_curve.swift")
-	os.system(copytext+"dbig.swift "+fpath+"dbig.swift")
-	os.system(copytext+"fp.swift "+fpath+"fp.swift")
-	os.system(copytext+"ecp.swift "+fpath+"ecp.swift")
-	os.system(copytext+"rom_"+tc+".swift "+fpath+"rom.swift")
+	run_in_shell(copytext+"big.swift "+fpath+"big.swift")
+	run_in_shell(copytext+"config_big.swift "+fpath+"config_big.swift")
+	run_in_shell(copytext+"config_field.swift "+fpath+"config_field.swift")
+	run_in_shell(copytext+"config_curve.swift "+fpath+"config_curve.swift")
+	run_in_shell(copytext+"dbig.swift "+fpath+"dbig.swift")
+	run_in_shell(copytext+"fp.swift "+fpath+"fp.swift")
+	run_in_shell(copytext+"ecp.swift "+fpath+"ecp.swift")
+	run_in_shell(copytext+"rom_"+tc+".swift "+fpath+"rom.swift")
 
 	replace(fpath+"config_big.swift","@NB@",nb)
 	replace(fpath+"config_big.swift","@BASE32@",base)
@@ -111,47 +115,47 @@ def curveset(tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 
 	if pf != "NOT" :
 
-		os.system(copytext+"fp2.swift "+fpath+"fp2.swift")
-		os.system(copytext+"fp4.swift "+fpath+"fp4.swift")
+		run_in_shell(copytext+"fp2.swift "+fpath+"fp2.swift")
+		run_in_shell(copytext+"fp4.swift "+fpath+"fp4.swift")
 		if cs == "128" :
-			os.system(copytext+"ecp2.swift "+fpath+"ecp2.swift")
-			os.system(copytext+"fp12.swift "+fpath+"fp12.swift")
-			os.system(copytext+"pair.swift "+fpath+"pair.swift")
-			os.system(copytext+"mpin.swift "+fpath+"mpin.swift")
-			os.system(copytext+"bls.swift "+fpath+"bls.swift")
+			run_in_shell(copytext+"ecp2.swift "+fpath+"ecp2.swift")
+			run_in_shell(copytext+"fp12.swift "+fpath+"fp12.swift")
+			run_in_shell(copytext+"pair.swift "+fpath+"pair.swift")
+			run_in_shell(copytext+"mpin.swift "+fpath+"mpin.swift")
+			run_in_shell(copytext+"bls.swift "+fpath+"bls.swift")
 		if cs == "192" :
-			os.system(copytext+"fp8.swift "+fpath+"fp8.swift")
-			os.system(copytext+"ecp4.swift "+fpath+"ecp4.swift")
-			os.system(copytext+"fp24.swift "+fpath+"fp24.swift")
-			os.system(copytext+"pair192.swift "+fpath+"pair192.swift")
-			os.system(copytext+"mpin192.swift "+fpath+"mpin192.swift")
-			os.system(copytext+"bls192.swift "+fpath+"bls192.swift")
+			run_in_shell(copytext+"fp8.swift "+fpath+"fp8.swift")
+			run_in_shell(copytext+"ecp4.swift "+fpath+"ecp4.swift")
+			run_in_shell(copytext+"fp24.swift "+fpath+"fp24.swift")
+			run_in_shell(copytext+"pair192.swift "+fpath+"pair192.swift")
+			run_in_shell(copytext+"mpin192.swift "+fpath+"mpin192.swift")
+			run_in_shell(copytext+"bls192.swift "+fpath+"bls192.swift")
 		if cs == "256" :
-			os.system(copytext+"fp8.swift "+fpath+"fp8.swift")
-			os.system(copytext+"fp16.swift "+fpath+"fp16.swift")
-			os.system(copytext+"ecp8.swift "+fpath+"ecp8.swift")
-			os.system(copytext+"fp48.swift "+fpath+"fp48.swift")
-			os.system(copytext+"pair256.swift "+fpath+"pair256.swift")
-			os.system(copytext+"mpin256.swift "+fpath+"mpin256.swift")
-			os.system(copytext+"bls256.swift "+fpath+"bls256.swift")
+			run_in_shell(copytext+"fp8.swift "+fpath+"fp8.swift")
+			run_in_shell(copytext+"fp16.swift "+fpath+"fp16.swift")
+			run_in_shell(copytext+"ecp8.swift "+fpath+"ecp8.swift")
+			run_in_shell(copytext+"fp48.swift "+fpath+"fp48.swift")
+			run_in_shell(copytext+"pair256.swift "+fpath+"pair256.swift")
+			run_in_shell(copytext+"mpin256.swift "+fpath+"mpin256.swift")
+			run_in_shell(copytext+"bls256.swift "+fpath+"bls256.swift")
 	else :
-		os.system(copytext+"ecdh.swift "+fpath+"ecdh.swift")
+		run_in_shell(copytext+"ecdh.swift "+fpath+"ecdh.swift")
 
 
-	os.system("swiftc -DD32 "+fpath+"*.swift -L. -lamcl -I. -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name "+tc)
-	os.system(deltext+fpath+"*.*")
-	os.system("rmdir amcl"+slashtext+tc)
+	run_in_shell("swiftc -DD32 "+fpath+"*.swift -L. -lamcl -I. -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name "+tc)
+	run_in_shell(deltext+fpath+"*.*")
+	run_in_shell("rmdir amcl"+slashtext+tc)
 
 
-os.system("mkdir amcl")
-os.system(copytext+ "hash*.swift amcl"+slashtext+".")
-os.system(copytext+ "sha3.swift amcl"+slashtext+".")
-os.system(copytext+ "rand.swift amcl"+slashtext+".")
-os.system(copytext+ "aes.swift amcl"+slashtext+".")
-os.system(copytext+ "gcm.swift amcl"+slashtext+".")
-os.system(copytext+ "nhs.swift amcl"+slashtext+".")
+run_in_shell("mkdir amcl")
+run_in_shell(copytext+ "hash*.swift amcl"+slashtext+".")
+run_in_shell(copytext+ "sha3.swift amcl"+slashtext+".")
+run_in_shell(copytext+ "rand.swift amcl"+slashtext+".")
+run_in_shell(copytext+ "aes.swift amcl"+slashtext+".")
+run_in_shell(copytext+ "gcm.swift amcl"+slashtext+".")
+run_in_shell(copytext+ "nhs.swift amcl"+slashtext+".")
 
-os.system("swiftc amcl"+slashtext+"*.swift -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name amcl")
+run_in_shell("swiftc amcl"+slashtext+"*.swift -O -Ounchecked -whole-module-optimization -emit-library -emit-module -module-name amcl")
 
 print("Elliptic Curves")
 print("1. ed25519")
@@ -336,29 +340,29 @@ while ptr<max:
 		rsaset("rsa4096","64","29","8")
 		rsa_selected=True
 
-os.system(deltext+" hash*.swift")
-os.system(deltext+" sha3.swift")
-os.system(deltext+" aes.swift")
-os.system(deltext+" rand.swift")
-os.system(deltext+" gcm.swift")
-os.system(deltext+" nhs.swift")
+run_in_shell(deltext+" hash*.swift")
+run_in_shell(deltext+" sha3.swift")
+run_in_shell(deltext+" aes.swift")
+run_in_shell(deltext+" rand.swift")
+run_in_shell(deltext+" gcm.swift")
+run_in_shell(deltext+" nhs.swift")
 
-os.system(deltext+" big.swift")
-os.system(deltext+" dbig.swift")
-os.system(deltext+" fp*.swift")
-os.system(deltext+" config*.swift")
+run_in_shell(deltext+" big.swift")
+run_in_shell(deltext+" dbig.swift")
+run_in_shell(deltext+" fp*.swift")
+run_in_shell(deltext+" config*.swift")
 
-os.system(deltext+" ecp*.swift")
-os.system(deltext+" ecdh.swift")
-os.system(deltext+" ff.swift")
-os.system(deltext+" rsa.swift")
-os.system(deltext+" pair*.swift")
-os.system(deltext+" mpin*.swift")
-os.system(deltext+" bls*.swift")
-os.system(deltext+" rom*.swift")
+run_in_shell(deltext+" ecp*.swift")
+run_in_shell(deltext+" ecdh.swift")
+run_in_shell(deltext+" ff.swift")
+run_in_shell(deltext+" rsa.swift")
+run_in_shell(deltext+" pair*.swift")
+run_in_shell(deltext+" mpin*.swift")
+run_in_shell(deltext+" bls*.swift")
+run_in_shell(deltext+" rom*.swift")
 
-os.system(deltext+"amcl"+slashtext+"*.*")
-os.system("rmdir amcl")
+run_in_shell(deltext+"amcl"+slashtext+"*.*")
+run_in_shell("rmdir amcl")
 
 # create library
 
