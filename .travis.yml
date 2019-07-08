@@ -7,6 +7,7 @@ env:
     - AMCL_LANG=js
     - AMCL_LANG=rust
     - AMCL_LANG=swift
+    - AMCL_LANG=wasm-c
 
 script:
   - ./scripts/travis.sh

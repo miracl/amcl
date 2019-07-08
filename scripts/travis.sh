@@ -15,6 +15,9 @@ case "$AMCL_LANG" in
   swift)
     ./scripts/travis_swift.sh
     ;;
+  wasm-c)
+    ./scripts/travis_wasm-c.sh
+    ;;
   *)
     echo "Unknown value for AMCL_LANG"
     exit 1
