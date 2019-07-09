@@ -43,6 +43,37 @@ describe("BIG", () => {
       expect(new ctx.BIG(0b011111).nbits()).toEqual(5);
     });
   });
+
+  describe("invmodp", () => {
+    const p = new ctx.BIG(7);
+
+    it("works", () => {
+      {
+        const a = new ctx.BIG(1);
+        a.invmodp(p);
+        expect(ctx.BIG.comp(a, new ctx.BIG(1))).toEqual(0);
+      }
+      {
+        const a = new ctx.BIG(2);
+        a.invmodp(p);
+        expect(ctx.BIG.comp(a, new ctx.BIG(4))).toEqual(0);
+      }
+      {
+        const a = new ctx.BIG(3);
+        a.invmodp(p);
+        expect(ctx.BIG.comp(a, new ctx.BIG(5))).toEqual(0);
+      }
+    });
+
+    it("errors when called on zero", () => {
+      const a = new ctx.BIG(0);
+      a.invmodp(p);
+      // In this case the value 0 indicates an error case. This is valid since 0
+      // is not an element of the multiplactive group.
+      // See https://github.com/miracl/amcl/issues/34#issuecomment-509573252
+      expect(a.iszilch()).toEqual(true);
+    });
+  });
 });
 
 describe("BIGStatic", () => {
