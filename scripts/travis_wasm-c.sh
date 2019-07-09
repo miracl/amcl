@@ -17,6 +17,8 @@ command -v shellcheck > /dev/null && shellcheck "$0"
 # This makes emcc and node available in the current shell
 # shellcheck disable=SC1091
 source emsdk/emsdk_env.sh
+emcc --version
+node --version
 
 #
 # Copy files
