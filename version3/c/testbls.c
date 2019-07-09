@@ -33,31 +33,31 @@ under the License.
 
 #include "randapi.h"
 
-static char message[]="This is a test message";
+static char message[] = "This is a test message";
 
 int bls_BN254(csprng *RNG)
 {
 	int res;
-    char s[BGS_BN254],w[4*BFS_BN254],sig[BFS_BN254+1];
-	octet S= {0,sizeof(s),s};
-    octet W= {0,sizeof(w),w};
-	octet SIG= {0,sizeof(sig),sig};	
+	char s[BGS_BN254], w[4 * BFS_BN254], sig[BFS_BN254 + 1];
+	octet S = {0, sizeof(s), s};
+	octet W = {0, sizeof(w), w};
+	octet SIG = {0, sizeof(sig), sig};
 
-	BLS_BN254_KEY_PAIR_GENERATE(RNG,&S,&W);
+	BLS_BN254_KEY_PAIR_GENERATE(RNG, &S, &W);
 
 	printf("Private key= 0x");
-    OCT_output(&S);
+	OCT_output(&S);
 	printf("Public key= 0x");
-    OCT_output(&W);
+	OCT_output(&W);
 
-	BLS_BN254_SIGN(&SIG,message,&S);
+	BLS_BN254_SIGN(&SIG, message, &S);
 	printf("Signature= 0x");
-    OCT_output(&SIG);
+	OCT_output(&SIG);
 
 	//message[7]='f'; // change the message
 
-	res=BLS_BN254_VERIFY(&SIG,message,&W);
-	if (res==BLS_OK) printf("Signature is OK\n");
+	res = BLS_BN254_VERIFY(&SIG, message, &W);
+	if (res == BLS_OK) printf("Signature is OK\n");
 	else printf("Signature is *NOT* OK\n");
 	return res;
 }
@@ -67,26 +67,26 @@ int bls_BN254(csprng *RNG)
 int bls_BLS383(csprng *RNG)
 {
 	int res;
-    char s[BGS_BLS383],w[4*BFS_BLS383],sig[BFS_BLS383+1];
-	octet S= {0,sizeof(s),s};
-    octet W= {0,sizeof(w),w};
-	octet SIG= {0,sizeof(sig),sig};	
+	char s[BGS_BLS383], w[4 * BFS_BLS383], sig[BFS_BLS383 + 1];
+	octet S = {0, sizeof(s), s};
+	octet W = {0, sizeof(w), w};
+	octet SIG = {0, sizeof(sig), sig};
 
-	BLS_BLS383_KEY_PAIR_GENERATE(RNG,&S,&W);
+	BLS_BLS383_KEY_PAIR_GENERATE(RNG, &S, &W);
 
 	printf("Private key= 0x");
-    OCT_output(&S);
+	OCT_output(&S);
 	printf("Public key= 0x");
-    OCT_output(&W);
+	OCT_output(&W);
 
-	BLS_BLS383_SIGN(&SIG,message,&S);
+	BLS_BLS383_SIGN(&SIG, message, &S);
 	printf("Signature= 0x");
-    OCT_output(&SIG);
+	OCT_output(&SIG);
 
 	//message[7]='f'; // change the message
 
-	res=BLS_BLS383_VERIFY(&SIG,message,&W);
-	if (res==BLS_OK) printf("Signature is OK\n");
+	res = BLS_BLS383_VERIFY(&SIG, message, &W);
+	if (res == BLS_OK) printf("Signature is OK\n");
 	else printf("Signature is *NOT* OK\n");
 	return res;
 }
@@ -94,26 +94,26 @@ int bls_BLS383(csprng *RNG)
 int bls_BLS24(csprng *RNG)
 {
 	int res;
-    char s[BGS_BLS24],w[8*BFS_BLS24],sig[BFS_BLS24+1];
-	octet S= {0,sizeof(s),s};
-    octet W= {0,sizeof(w),w};
-	octet SIG= {0,sizeof(sig),sig};	
+	char s[BGS_BLS24], w[8 * BFS_BLS24], sig[BFS_BLS24 + 1];
+	octet S = {0, sizeof(s), s};
+	octet W = {0, sizeof(w), w};
+	octet SIG = {0, sizeof(sig), sig};
 
-	BLS_BLS24_KEY_PAIR_GENERATE(RNG,&S,&W);
+	BLS_BLS24_KEY_PAIR_GENERATE(RNG, &S, &W);
 
 	printf("Private key= 0x");
-    OCT_output(&S);
+	OCT_output(&S);
 	printf("Public key= 0x");
-    OCT_output(&W);
+	OCT_output(&W);
 
-	BLS_BLS24_SIGN(&SIG,message,&S);
+	BLS_BLS24_SIGN(&SIG, message, &S);
 	printf("Signature= 0x");
-    OCT_output(&SIG);
+	OCT_output(&SIG);
 
 	//message[7]='f'; // change the message
 
-	res=BLS_BLS24_VERIFY(&SIG,message,&W);
-	if (res==BLS_OK) printf("Signature is OK\n");
+	res = BLS_BLS24_VERIFY(&SIG, message, &W);
+	if (res == BLS_OK) printf("Signature is OK\n");
 	else printf("Signature is *NOT* OK\n");
 	return res;
 }
@@ -121,26 +121,26 @@ int bls_BLS24(csprng *RNG)
 int bls_BLS48(csprng *RNG)
 {
 	int res;
-    char s[BGS_BLS48],w[16*BFS_BLS48],sig[BFS_BLS48+1];
-	octet S= {0,sizeof(s),s};
-    octet W= {0,sizeof(w),w};
-	octet SIG= {0,sizeof(sig),sig};	
+	char s[BGS_BLS48], w[16 * BFS_BLS48], sig[BFS_BLS48 + 1];
+	octet S = {0, sizeof(s), s};
+	octet W = {0, sizeof(w), w};
+	octet SIG = {0, sizeof(sig), sig};
 
-	BLS_BLS48_KEY_PAIR_GENERATE(RNG,&S,&W);
+	BLS_BLS48_KEY_PAIR_GENERATE(RNG, &S, &W);
 
 	printf("Private key= 0x");
-    OCT_output(&S);
+	OCT_output(&S);
 	printf("Public key= 0x");
-    OCT_output(&W);
+	OCT_output(&W);
 
-	BLS_BLS48_SIGN(&SIG,message,&S);
+	BLS_BLS48_SIGN(&SIG, message, &S);
 	printf("Signature= 0x");
-    OCT_output(&SIG);
+	OCT_output(&SIG);
 
 	//message[7]='f'; // change the message
 
-	res=BLS_BLS48_VERIFY(&SIG,message,&W);
-	if (res==BLS_OK) printf("Signature is OK\n");
+	res = BLS_BLS48_VERIFY(&SIG, message, &W);
+	if (res == BLS_OK) printf("Signature is OK\n");
 	else printf("Signature is *NOT* OK\n");
 	return res;
 }
@@ -149,25 +149,25 @@ int bls_BLS48(csprng *RNG)
 
 int main()
 {
-    int i,res;
-    unsigned long ran;
+	int i, res;
+	unsigned long ran;
 
 	char raw[100];
-    octet RAW= {0,sizeof(raw),raw};
-    csprng RNG;                // Crypto Strong RNG 
+	octet RAW = {0, sizeof(raw), raw};
+	csprng RNG;                // Crypto Strong RNG
 
-    time((time_t *)&ran);
+	time((time_t *)&ran);
 
-    RAW.len=100;				// fake random seed source 
-    RAW.val[0]=ran;
-    RAW.val[1]=ran>>8;
-    RAW.val[2]=ran>>16;
-    RAW.val[3]=ran>>24;
-    for (i=4; i<100; i++) RAW.val[i]=i;
+	RAW.len = 100;				// fake random seed source
+	RAW.val[0] = ran;
+	RAW.val[1] = ran >> 8;
+	RAW.val[2] = ran >> 16;
+	RAW.val[3] = ran >> 24;
+	for (i = 4; i < 100; i++) RAW.val[i] = i;
 
-    CREATE_CSPRNG(&RNG,&RAW);   // initialise strong RNG 
+	CREATE_CSPRNG(&RNG, &RAW);  // initialise strong RNG
 
-	printf("%d bit build\n",CHUNK);
+	printf("%d bit build\n", CHUNK);
 
 	printf("Testing BLS signature for curve BN254\n");
 	bls_BN254(&RNG);
