@@ -18,6 +18,9 @@ case "$AMCL_LANG" in
   wasm-c)
     ./scripts/travis_wasm-c.sh
     ;;
+  wasm-rust)
+    ./scripts/travis_wasm-rust.sh
+    ;;
   *)
     echo "Unknown value for AMCL_LANG"
     exit 1
