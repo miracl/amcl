@@ -58,7 +58,7 @@ END_OF_INPUT
   #
   # Run examples
   #
-  node testall.js
+  echo 1234 | node testall.js
   node testbls.js
   node testnhs.js
   node benchtest_all.js
