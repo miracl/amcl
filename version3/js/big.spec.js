@@ -53,6 +53,30 @@ describe("BIGStatic", () => {
     expect(ctx.BIG.DNLEN).toEqual(22);
   });
 
+  describe("fromBytes", () => {
+    const tenZeros = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    it("does not work for unpadded bytes", () => {
+      const a = ctx.BIG.fromBytes([13]);
+      expect(ctx.BIG.comp(a, new ctx.BIG(13))).not.toEqual(0);
+    });
+
+    it("works for padded bytes", () => {
+      const a = ctx.BIG.fromBytes([...tenZeros, ...tenZeros, ...tenZeros, 0, 13]);
+      expect(ctx.BIG.comp(a, new ctx.BIG(13))).toEqual(0);
+    });
+
+    it("decodes big endian", () => {
+      const a = ctx.BIG.fromBytes([...tenZeros, ...tenZeros, ...tenZeros, 0x11, 0x22]);
+      expect(ctx.BIG.comp(a, new ctx.BIG(0x1122))).toEqual(0);
+    });
+
+    it("ignores trailing data beyond BIG.MODBYTES bytes", () => {
+      const a = ctx.BIG.fromBytes([...tenZeros, ...tenZeros, ...tenZeros, 0x11, 0x22, 0xaa]);
+      expect(ctx.BIG.comp(a, new ctx.BIG(0x1122))).toEqual(0);
+    });
+  });
+
   describe("comp", () => {
     it("works for a == b", () => {
       const a = new ctx.BIG(5);
