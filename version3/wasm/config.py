@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 deltext=""
@@ -11,6 +12,9 @@ if sys.platform.startswith("darwin")  :
 if sys.platform.startswith("win") :
 	deltext="del"
 	copytext="copy"
+
+def run_in_shell(cmd):
+    subprocess.check_call(cmd, shell=True)
 
 def replace(namefile,oldtext,newtext):
 	f = open(namefile,'r')
@@ -27,59 +31,59 @@ def replace(namefile,oldtext,newtext):
 def rsaset(tb,tff,nb,base,ml) :
 	bd=tb+"_"+base
 	fnameh="config_big_"+bd+".h"
-	os.system(copytext+" config_big.h "+fnameh)
+	run_in_shell(copytext+" config_big.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"@NB@",nb)
 	replace(fnameh,"@BASE@",base)
 
 	fnameh="config_ff_"+tff+".h"
-	os.system(copytext+" config_ff.h "+fnameh)
+	run_in_shell(copytext+" config_ff.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"WWW",tff)
-	replace(fnameh,"@ML@",ml);
+	replace(fnameh,"@ML@",ml)
 
 	fnamec="big_"+bd+".c"
 	fnamebc="big_"+bd+".bc"
 	fnameh="big_"+bd+".h"
 
-	os.system(copytext+" big.c "+fnamec)
-	os.system(copytext+" big.h "+fnameh)
+	run_in_shell(copytext+" big.c "+fnamec)
+	run_in_shell(copytext+" big.h "+fnameh)
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
-	os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+	run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 	fnamec="ff_"+tff+".c"
 	fnamebc="ff_"+tff+".bc"
 	fnameh="ff_"+tff+".h"
 
-	os.system(copytext+" ff.c "+fnamec)
-	os.system(copytext+" ff.h "+fnameh)
+	run_in_shell(copytext+" ff.c "+fnamec)
+	run_in_shell(copytext+" ff.h "+fnameh)
 
 	replace(fnamec,"WWW",tff)
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",bd)
-	os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+	run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 	fnamec="rsa_"+tff+".c"
 	fnamebc="rsa_"+tff+".bc"
 	fnameh="rsa_"+tff+".h"
 
-	os.system(copytext+" rsa.c "+fnamec)
-	os.system(copytext+" rsa.h "+fnameh)
+	run_in_shell(copytext+" rsa.c "+fnamec)
+	run_in_shell(copytext+" rsa.h "+fnameh)
 
 	replace(fnamec,"WWW",tff)
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",bd)
-	os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+	run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	bd=tb+"_"+base
 
 	fnameh="config_big_"+bd+".h"
-	os.system(copytext+" config_big.h "+fnameh)
+	run_in_shell(copytext+" config_big.h "+fnameh)
 
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"@NB@",nb)
@@ -87,7 +91,7 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 
 
 	fnameh="config_field_"+tf+".h"
-	os.system(copytext+" config_field.h "+fnameh)
+	run_in_shell(copytext+" config_field.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"@NBT@",nbt)
@@ -104,8 +108,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 		sh=14
 	replace(fnameh,"@SH@",str(sh))
 
-	fnameh="config_curve_"+tc+".h"	
-	os.system(copytext+" config_curve.h "+fnameh)
+	fnameh="config_curve_"+tc+".h"
+	run_in_shell(copytext+" config_curve.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"ZZZ",tc)
@@ -121,34 +125,34 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	fnamebc="big_"+bd+".bc"
 	fnameh="big_"+bd+".h"
 
-	os.system(copytext+" big.c "+fnamec)
-	os.system(copytext+" big.h "+fnameh)
+	run_in_shell(copytext+" big.c "+fnamec)
+	run_in_shell(copytext+" big.h "+fnameh)
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
-	os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+	run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 	fnamec="fp_"+tf+".c"
 	fnamebc="fp_"+tf+".bc"
 	fnameh="fp_"+tf+".h"
 
-	os.system(copytext+" fp.c "+fnamec)
-	os.system(copytext+" fp.h "+fnameh)
+	run_in_shell(copytext+" fp.c "+fnamec)
+	run_in_shell(copytext+" fp.h "+fnameh)
 
 	replace(fnamec,"YYY",tf)
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+	run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
-	os.system("emcc -O2 rom_field_"+tf+".c -o rom_field_"+tf+".bc");
+	run_in_shell("emcc -O2 rom_field_"+tf+".c -o rom_field_"+tf+".bc")
 
 	fnamec="ecp_"+tc+".c"
 	fnamebc="ecp_"+tc+".bc"
 	fnameh="ecp_"+tc+".h"
 
-	os.system(copytext+" ecp.c "+fnamec)
-	os.system(copytext+" ecp.h "+fnameh)
+	run_in_shell(copytext+" ecp.c "+fnamec)
+	run_in_shell(copytext+" ecp.h "+fnameh)
 
 	replace(fnamec,"ZZZ",tc)
 	replace(fnamec,"YYY",tf)
@@ -156,14 +160,14 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+	run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 	fnamec="ecdh_"+tc+".c"
 	fnamebc="ecdh_"+tc+".bc"
 	fnameh="ecdh_"+tc+".h"
 
-	os.system(copytext+" ecdh.c "+fnamec)
-	os.system(copytext+" ecdh.h "+fnameh)
+	run_in_shell(copytext+" ecdh.c "+fnamec)
+	run_in_shell(copytext+" ecdh.h "+fnameh)
 
 	replace(fnamec,"ZZZ",tc)
 	replace(fnamec,"YYY",tf)
@@ -171,36 +175,36 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+	run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
-	os.system("emcc -O2 rom_curve_"+tc+".c -o rom_curve_"+tc+".bc");
+	run_in_shell("emcc -O2 rom_curve_"+tc+".c -o rom_curve_"+tc+".bc")
 
 	if pf != "NOT" :
 		fnamec="fp2_"+tf+".c"
 		fnamebc="fp2_"+tf+".bc"
 		fnameh="fp2_"+tf+".h"
 
-		os.system(copytext+" fp2.c "+fnamec)
-		os.system(copytext+" fp2.h "+fnameh)
+		run_in_shell(copytext+" fp2.c "+fnamec)
+		run_in_shell(copytext+" fp2.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
-		os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+		run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 		fnamec="fp4_"+tf+".c"
 		fnamebc="fp4_"+tf+".bc"
 		fnameh="fp4_"+tf+".h"
 
-		os.system(copytext+" fp4.c "+fnamec)
-		os.system(copytext+" fp4.h "+fnameh)
+		run_in_shell(copytext+" fp4.c "+fnamec)
+		run_in_shell(copytext+" fp4.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
 		replace(fnamec,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
 		replace(fnameh,"ZZZ",tc)
-		os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+		run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 
 		if cs == "128" :
@@ -208,71 +212,71 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 			fnamebc="fp12_"+tf+".bc"
 			fnameh="fp12_"+tf+".h"
 
-			os.system(copytext+" fp12.c "+fnamec)
-			os.system(copytext+" fp12.h "+fnameh)
+			run_in_shell(copytext+" fp12.c "+fnamec)
+			run_in_shell(copytext+" fp12.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="ecp2_"+tc+".c"
 			fnamebc="ecp2_"+tc+".bc"
 			fnameh="ecp2_"+tc+".h"
 
-			os.system(copytext+" ecp2.c "+fnamec)
-			os.system(copytext+" ecp2.h "+fnameh)
+			run_in_shell(copytext+" ecp2.c "+fnamec)
+			run_in_shell(copytext+" ecp2.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="pair_"+tc+".c"
 			fnamebc="pair_"+tc+".bc"
 			fnameh="pair_"+tc+".h"
 
-			os.system(copytext+" pair.c "+fnamec)
-			os.system(copytext+" pair.h "+fnameh)
+			run_in_shell(copytext+" pair.c "+fnamec)
+			run_in_shell(copytext+" pair.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="mpin_"+tc+".c"
 			fnamebc="mpin_"+tc+".bc"
 			fnameh="mpin_"+tc+".h"
 
-			os.system(copytext+" mpin.c "+fnamec)
-			os.system(copytext+" mpin.h "+fnameh)
+			run_in_shell(copytext+" mpin.c "+fnamec)
+			run_in_shell(copytext+" mpin.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="bls_"+tc+".c"
 			fnamebc="bls_"+tc+".bc"
 			fnameh="bls_"+tc+".h"
 
-			os.system(copytext+" bls.c "+fnamec)
-			os.system(copytext+" bls.h "+fnameh)
+			run_in_shell(copytext+" bls.c "+fnamec)
+			run_in_shell(copytext+" bls.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 
 		if cs == "192" :
@@ -280,86 +284,86 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 			fnamebc="fp8_"+tf+".bc"
 			fnameh="fp8_"+tf+".h"
 
-			os.system(copytext+" fp8.c "+fnamec)
-			os.system(copytext+" fp8.h "+fnameh)
+			run_in_shell(copytext+" fp8.c "+fnamec)
+			run_in_shell(copytext+" fp8.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 
 			fnamec="fp24_"+tf+".c"
 			fnamebc="fp24_"+tf+".bc"
 			fnameh="fp24_"+tf+".h"
 
-			os.system(copytext+" fp24.c "+fnamec)
-			os.system(copytext+" fp24.h "+fnameh)
+			run_in_shell(copytext+" fp24.c "+fnamec)
+			run_in_shell(copytext+" fp24.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="ecp4_"+tc+".c"
 			fnamebc="ecp4_"+tc+".bc"
 			fnameh="ecp4_"+tc+".h"
 
-			os.system(copytext+" ecp4.c "+fnamec)
-			os.system(copytext+" ecp4.h "+fnameh)
+			run_in_shell(copytext+" ecp4.c "+fnamec)
+			run_in_shell(copytext+" ecp4.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="pair192_"+tc+".c"
 			fnamebc="pair192_"+tc+".bc"
 			fnameh="pair192_"+tc+".h"
 
-			os.system(copytext+" pair192.c "+fnamec)
-			os.system(copytext+" pair192.h "+fnameh)
+			run_in_shell(copytext+" pair192.c "+fnamec)
+			run_in_shell(copytext+" pair192.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="mpin192_"+tc+".c"
 			fnamebc="mpin192_"+tc+".bc"
 			fnameh="mpin192_"+tc+".h"
 
-			os.system(copytext+" mpin192.c "+fnamec)
-			os.system(copytext+" mpin192.h "+fnameh)
+			run_in_shell(copytext+" mpin192.c "+fnamec)
+			run_in_shell(copytext+" mpin192.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)		
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="bls192_"+tc+".c"
 			fnamebc="bls192_"+tc+".bc"
 			fnameh="bls192_"+tc+".h"
 
-			os.system(copytext+" bls192.c "+fnamec)
-			os.system(copytext+" bls192.h "+fnameh)
+			run_in_shell(copytext+" bls192.c "+fnamec)
+			run_in_shell(copytext+" bls192.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)	
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 
 		if cs == "256" :
@@ -368,103 +372,103 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 			fnamebc="fp8_"+tf+".bc"
 			fnameh="fp8_"+tf+".h"
 
-			os.system(copytext+" fp8.c "+fnamec)
-			os.system(copytext+" fp8.h "+fnameh)
+			run_in_shell(copytext+" fp8.c "+fnamec)
+			run_in_shell(copytext+" fp8.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 
 			fnamec="ecp8_"+tc+".c"
 			fnamebc="ecp8_"+tc+".bc"
 			fnameh="ecp8_"+tc+".h"
 
-			os.system(copytext+" ecp8.c "+fnamec)
-			os.system(copytext+" ecp8.h "+fnameh)
+			run_in_shell(copytext+" ecp8.c "+fnamec)
+			run_in_shell(copytext+" ecp8.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 
 			fnamec="fp16_"+tf+".c"
 			fnamebc="fp16_"+tf+".bc"
 			fnameh="fp16_"+tf+".h"
 
-			os.system(copytext+" fp16.c "+fnamec)
-			os.system(copytext+" fp16.h "+fnameh)
+			run_in_shell(copytext+" fp16.c "+fnamec)
+			run_in_shell(copytext+" fp16.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 
 			fnamec="fp48_"+tf+".c"
 			fnamebc="fp48_"+tf+".bc"
 			fnameh="fp48_"+tf+".h"
 
-			os.system(copytext+" fp48.c "+fnamec)
-			os.system(copytext+" fp48.h "+fnameh)
+			run_in_shell(copytext+" fp48.c "+fnamec)
+			run_in_shell(copytext+" fp48.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 
 			fnamec="pair256_"+tc+".c"
 			fnamebc="pair256_"+tc+".bc"
 			fnameh="pair256_"+tc+".h"
 
-			os.system(copytext+" pair256.c "+fnamec)
-			os.system(copytext+" pair256.h "+fnameh)
+			run_in_shell(copytext+" pair256.c "+fnamec)
+			run_in_shell(copytext+" pair256.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="mpin256_"+tc+".c"
 			fnamebc="mpin256_"+tc+".bc"
 			fnameh="mpin256_"+tc+".h"
 
-			os.system(copytext+" mpin256.c "+fnamec)
-			os.system(copytext+" mpin256.h "+fnameh)
+			run_in_shell(copytext+" mpin256.c "+fnamec)
+			run_in_shell(copytext+" mpin256.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)				
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 			fnamec="bls256_"+tc+".c"
 			fnamebc="bls256_"+tc+".bc"
 			fnameh="bls256_"+tc+".h"
 
-			os.system(copytext+" bls256.c "+fnamec)
-			os.system(copytext+" bls256.h "+fnameh)
+			run_in_shell(copytext+" bls256.c "+fnamec)
+			run_in_shell(copytext+" bls256.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("emcc -O2 "+fnamec+" -o "+fnamebc)		
+			run_in_shell("emcc -O2 "+fnamec+" -o "+fnamebc)
 
 replace("arch.h","@WL@","32")
 print("Elliptic Curves")
@@ -522,13 +526,13 @@ while ptr<max:
 			break
 	if already:
 		continue
-	
+
 	selection.append(x)
 	ptr=ptr+1
 
 # curveset(big,field,curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly,sextic twist,sign of x,ate bits,curve security)
-# for each curve give names for big, field and curve. In many cases the latter two will be the same. 
-# Typically "big" is the size in bits, always a multiple of 8, "field" describes the modulus, and "curve" is the common name for the elliptic curve   
+# for each curve give names for big, field and curve. In many cases the latter two will be the same.
+# Typically "big" is the size in bits, always a multiple of 8, "field" describes the modulus, and "curve" is the common name for the elliptic curve
 # big_length_bytes is "big" divided by 8
 # Next give the number base used for 32 bit architectures, as n where the base is 2^n (note that these must be fixed for the same "big" name, if is ever re-used for another curve)
 # modulus_bits is the bit length of the modulus, typically the same or slightly smaller than "big"
@@ -656,70 +660,69 @@ while ptr<max:
 		rsa_selected=True
 
 
-os.system(deltext+" big.*")
-os.system(deltext+" fp.*")
-os.system(deltext+" ecp.*")
-os.system(deltext+" ecdh.*")
-os.system(deltext+" ff.*")
-os.system(deltext+" rsa.*")
-os.system(deltext+" config_big.h")
-os.system(deltext+" config_field.h")
-os.system(deltext+" config_curve.h")
-os.system(deltext+" config_ff.h")
-os.system(deltext+" fp2.*")
-os.system(deltext+" fp4.*")
-os.system(deltext+" fp8.*")
-os.system(deltext+" fp16.*")
+run_in_shell(deltext+" big.*")
+run_in_shell(deltext+" fp.*")
+run_in_shell(deltext+" ecp.*")
+run_in_shell(deltext+" ecdh.*")
+run_in_shell(deltext+" ff.*")
+run_in_shell(deltext+" rsa.*")
+run_in_shell(deltext+" config_big.h")
+run_in_shell(deltext+" config_field.h")
+run_in_shell(deltext+" config_curve.h")
+run_in_shell(deltext+" config_ff.h")
+run_in_shell(deltext+" fp2.*")
+run_in_shell(deltext+" fp4.*")
+run_in_shell(deltext+" fp8.*")
+run_in_shell(deltext+" fp16.*")
 
 
-os.system(deltext+" fp12.*")
-os.system(deltext+" fp24.*")
-os.system(deltext+" fp48.*")
+run_in_shell(deltext+" fp12.*")
+run_in_shell(deltext+" fp24.*")
+run_in_shell(deltext+" fp48.*")
 
-os.system(deltext+" ecp2.*")
-os.system(deltext+" ecp4.*")
-os.system(deltext+" ecp8.*")
+run_in_shell(deltext+" ecp2.*")
+run_in_shell(deltext+" ecp4.*")
+run_in_shell(deltext+" ecp8.*")
 
-os.system(deltext+" pair.*")
-os.system(deltext+" mpin.*")
-os.system(deltext+" bls.*")
+run_in_shell(deltext+" pair.*")
+run_in_shell(deltext+" mpin.*")
+run_in_shell(deltext+" bls.*")
 
-os.system(deltext+" pair192.*")
-os.system(deltext+" mpin192.*")
-os.system(deltext+" bls192.*")
+run_in_shell(deltext+" pair192.*")
+run_in_shell(deltext+" mpin192.*")
+run_in_shell(deltext+" bls192.*")
 
-os.system(deltext+" pair256.*")
-os.system(deltext+" mpin256.*")
-os.system(deltext+" bls256.*")
+run_in_shell(deltext+" pair256.*")
+run_in_shell(deltext+" mpin256.*")
+run_in_shell(deltext+" bls256.*")
 
 
 # create library
-os.system("emcc -O2  randapi.c -o randapi.bc")
+run_in_shell("emcc -O2  randapi.c -o randapi.bc")
 if curve_selected :
-	os.system("emcc -O2  ecdh_support.c -o ecdh_support.bc")
+	run_in_shell("emcc -O2  ecdh_support.c -o ecdh_support.bc")
 if rsa_selected :
-	os.system("emcc -O2  rsa_support.c -o rsa_support.bc")
+	run_in_shell("emcc -O2  rsa_support.c -o rsa_support.bc")
 if pfcurve_selected :
-	os.system("emcc -O2  pbc_support.c -o pbc_support.bc")
+	run_in_shell("emcc -O2  pbc_support.c -o pbc_support.bc")
 
-os.system("emcc -O2 hash.c -o hash.bc")
-os.system("emcc -O2 rand.c -o rand.bc")
-os.system("emcc -O2 oct.c -o oct.bc")
-os.system("emcc -O2 aes.c -o aes.bc")
-os.system("emcc -O2 gcm.c -o gcm.bc")
-os.system("emcc -O2 newhope.c -o newhope.bc")
+run_in_shell("emcc -O2 hash.c -o hash.bc")
+run_in_shell("emcc -O2 rand.c -o rand.bc")
+run_in_shell("emcc -O2 oct.c -o oct.bc")
+run_in_shell("emcc -O2 aes.c -o aes.bc")
+run_in_shell("emcc -O2 gcm.c -o gcm.bc")
+run_in_shell("emcc -O2 newhope.c -o newhope.bc")
 
 if sys.platform.startswith("win") :
-	os.system("for %i in (*.bc) do @echo %~nxi >> f.list")
-	os.system("emar rc amcl.a @f.list")
-	os.system(deltext+" f.list")
+	run_in_shell("for %i in (*.bc) do @echo %~nxi >> f.list")
+	run_in_shell("emar rc amcl.a @f.list")
+	run_in_shell(deltext+" f.list")
 
 else :
-	os.system("emar rc amcl.a *.bc")
-	
-os.system(deltext+" *.bc")
+	run_in_shell("emar rc amcl.a *.bc")
 
-#print("Your section was ");	
+run_in_shell(deltext+" *.bc")
+
+#print("Your section was ")
 #for i in range(0,ptr):
 #	print (selection[i])
-

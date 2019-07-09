@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 deltext=""
@@ -11,6 +12,9 @@ if sys.platform.startswith("darwin")  :
 if sys.platform.startswith("win") :
 	deltext="del"
 	copytext="copy"
+
+def run_in_shell(cmd):
+    subprocess.check_call(cmd, shell=True)
 
 def replace(namefile,oldtext,newtext):
 	f = open(namefile,'r')
@@ -27,13 +31,13 @@ def replace(namefile,oldtext,newtext):
 def rsaset(tb,tff,nb,base,ml) :
 	bd="B"+tb+"_"+base
 	fnameh="config_big_"+bd+".h"
-	os.system(copytext+" config_big.h "+fnameh)
+	run_in_shell(copytext+" config_big.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"@NB@",nb)
 	replace(fnameh,"@BASE@",base)
 
 	fnameh="config_ff_"+tff+".h"
-	os.system(copytext+" config_ff.h "+fnameh)
+	run_in_shell(copytext+" config_ff.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"@ML@",ml)
@@ -41,47 +45,47 @@ def rsaset(tb,tff,nb,base,ml) :
 	fnamec="big_"+bd+".cpp"
 	fnameh="big_"+bd+".h"
 
-	os.system(copytext+" big.cpp "+fnamec)
-	os.system(copytext+" big.h "+fnameh)
+	run_in_shell(copytext+" big.cpp "+fnamec)
+	run_in_shell(copytext+" big.h "+fnameh)
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
-	os.system("g++ -O3 -c "+fnamec)
+	run_in_shell("g++ -O3 -c "+fnamec)
 
 	fnamec="ff_"+tff+".cpp"
 	fnameh="ff_"+tff+".h"
 
-	os.system(copytext+" ff.cpp "+fnamec)
-	os.system(copytext+" ff.h "+fnameh)
+	run_in_shell(copytext+" ff.cpp "+fnamec)
+	run_in_shell(copytext+" ff.h "+fnameh)
 
 	replace(fnamec,"WWW",tff)
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",bd)
-	os.system("g++ -O3 -c "+fnamec)
+	run_in_shell("g++ -O3 -c "+fnamec)
 
 	fnamec="rsa_"+tff+".cpp"
 	fnameh="rsa_"+tff+".h"
 
-	os.system(copytext+" rsa.cpp "+fnamec)
-	os.system(copytext+" rsa.h "+fnameh)
+	run_in_shell(copytext+" rsa.cpp "+fnamec)
+	run_in_shell(copytext+" rsa.h "+fnameh)
 
 	replace(fnamec,"WWW",tff)
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"WWW",tff)
 	replace(fnameh,"XXX",bd)
-	os.system("g++ -O3 -c "+fnamec)
+	run_in_shell("g++ -O3 -c "+fnamec)
 
 def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	bd="B"+tb+"_"+base
 	fnameh="config_big_"+bd+".h"
-	os.system(copytext+" config_big.h "+fnameh)
+	run_in_shell(copytext+" config_big.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"@NB@",nb)
 	replace(fnameh,"@BASE@",base)
 
 	fnameh="config_field_"+tf+".h"
-	os.system(copytext+" config_field.h "+fnameh)
+	run_in_shell(copytext+" config_field.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"@NBT@",nbt)
@@ -97,8 +101,8 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 		sh=30
 	replace(fnameh,"@SH@",str(sh))
 
-	fnameh="config_curve_"+tc+".h"	
-	os.system(copytext+" config_curve.h "+fnameh)
+	fnameh="config_curve_"+tc+".h"
+	run_in_shell(copytext+" config_curve.h "+fnameh)
 	replace(fnameh,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"ZZZ",tc)
@@ -114,32 +118,32 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	fnamec="big_"+bd+".cpp"
 	fnameh="big_"+bd+".h"
 
-	os.system(copytext+" big.cpp "+fnamec)
-	os.system(copytext+" big.h "+fnameh)
+	run_in_shell(copytext+" big.cpp "+fnamec)
+	run_in_shell(copytext+" big.h "+fnameh)
 
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"XXX",bd)
-	os.system("g++ -O3 -c "+fnamec)
+	run_in_shell("g++ -O3 -c "+fnamec)
 
 	fnamec="fp_"+tf+".cpp"
 	fnameh="fp_"+tf+".h"
 
-	os.system(copytext+" fp.cpp "+fnamec)
-	os.system(copytext+" fp.h "+fnameh)
+	run_in_shell(copytext+" fp.cpp "+fnamec)
+	run_in_shell(copytext+" fp.h "+fnameh)
 
 	replace(fnamec,"YYY",tf)
 	replace(fnamec,"XXX",bd)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("g++ -O3 -c "+fnamec)
+	run_in_shell("g++ -O3 -c "+fnamec)
 
-	os.system("g++ -O3 -c rom_field_"+tf+".cpp")
+	run_in_shell("g++ -O3 -c rom_field_"+tf+".cpp")
 
 	fnamec="ecp_"+tc+".cpp"
 	fnameh="ecp_"+tc+".h"
 
-	os.system(copytext+" ecp.cpp "+fnamec)
-	os.system(copytext+" ecp.h "+fnameh)
+	run_in_shell(copytext+" ecp.cpp "+fnamec)
+	run_in_shell(copytext+" ecp.h "+fnameh)
 
 	replace(fnamec,"ZZZ",tc)
 	replace(fnamec,"YYY",tf)
@@ -147,13 +151,13 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("g++ -O3 -c "+fnamec)
+	run_in_shell("g++ -O3 -c "+fnamec)
 
 	fnamec="ecdh_"+tc+".cpp"
 	fnameh="ecdh_"+tc+".h"
 
-	os.system(copytext+" ecdh.cpp "+fnamec)
-	os.system(copytext+" ecdh.h "+fnameh)
+	run_in_shell(copytext+" ecdh.cpp "+fnamec)
+	run_in_shell(copytext+" ecdh.h "+fnameh)
 
 	replace(fnamec,"ZZZ",tc)
 	replace(fnamec,"YYY",tf)
@@ -161,280 +165,280 @@ def curveset(tb,tf,tc,nb,base,nbt,m8,mt,ct,pf,stw,sx,ab,cs) :
 	replace(fnameh,"ZZZ",tc)
 	replace(fnameh,"YYY",tf)
 	replace(fnameh,"XXX",bd)
-	os.system("g++ -O3 -c "+fnamec)
+	run_in_shell("g++ -O3 -c "+fnamec)
 
-	os.system("g++ -O3 -c rom_curve_"+tc+".cpp")
+	run_in_shell("g++ -O3 -c rom_curve_"+tc+".cpp")
 
 	if pf != "NOT" :
 		fnamec="fp2_"+tf+".cpp"
 		fnameh="fp2_"+tf+".h"
 
-		os.system(copytext+" fp2.cpp "+fnamec)
-		os.system(copytext+" fp2.h "+fnameh)
+		run_in_shell(copytext+" fp2.cpp "+fnamec)
+		run_in_shell(copytext+" fp2.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
-		os.system("g++ -O3 -c "+fnamec)
+		run_in_shell("g++ -O3 -c "+fnamec)
 
 		fnamec="fp4_"+tf+".cpp"
 		fnameh="fp4_"+tf+".h"
 
-		os.system(copytext+" fp4.cpp "+fnamec)
-		os.system(copytext+" fp4.h "+fnameh)
+		run_in_shell(copytext+" fp4.cpp "+fnamec)
+		run_in_shell(copytext+" fp4.h "+fnameh)
 		replace(fnamec,"YYY",tf)
 		replace(fnamec,"XXX",bd)
 		replace(fnamec,"ZZZ",tc)
 		replace(fnameh,"YYY",tf)
 		replace(fnameh,"XXX",bd)
 		replace(fnameh,"ZZZ",tc)
-		os.system("g++ -O3 -c "+fnamec)
+		run_in_shell("g++ -O3 -c "+fnamec)
 
 		if cs == "128" :
 			fnamec="fp12_"+tf+".cpp"
 			fnameh="fp12_"+tf+".h"
 
-			os.system(copytext+" fp12.cpp "+fnamec)
-			os.system(copytext+" fp12.h "+fnameh)
+			run_in_shell(copytext+" fp12.cpp "+fnamec)
+			run_in_shell(copytext+" fp12.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 			fnamec="ecp2_"+tc+".cpp"
 			fnameh="ecp2_"+tc+".h"
 
-			os.system(copytext+" ecp2.cpp "+fnamec)
-			os.system(copytext+" ecp2.h "+fnameh)
+			run_in_shell(copytext+" ecp2.cpp "+fnamec)
+			run_in_shell(copytext+" ecp2.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 			fnamec="pair_"+tc+".cpp"
 			fnameh="pair_"+tc+".h"
 
-			os.system(copytext+" pair.cpp "+fnamec)
-			os.system(copytext+" pair.h "+fnameh)
+			run_in_shell(copytext+" pair.cpp "+fnamec)
+			run_in_shell(copytext+" pair.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 			fnamec="mpin_"+tc+".cpp"
 			fnameh="mpin_"+tc+".h"
 
-			os.system(copytext+" mpin.cpp "+fnamec)
-			os.system(copytext+" mpin.h "+fnameh)
+			run_in_shell(copytext+" mpin.cpp "+fnamec)
+			run_in_shell(copytext+" mpin.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 
 
 			fnamec="bls_"+tc+".cpp"
 			fnameh="bls_"+tc+".h"
 
-			os.system(copytext+" bls.cpp "+fnamec)
-			os.system(copytext+" bls.h "+fnameh)
+			run_in_shell(copytext+" bls.cpp "+fnamec)
+			run_in_shell(copytext+" bls.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 
 		if cs == "192" :
 			fnamec="fp8_"+tf+".cpp"
 			fnameh="fp8_"+tf+".h"
 
-			os.system(copytext+" fp8.cpp "+fnamec)
-			os.system(copytext+" fp8.h "+fnameh)
+			run_in_shell(copytext+" fp8.cpp "+fnamec)
+			run_in_shell(copytext+" fp8.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 
 			fnamec="fp24_"+tf+".cpp"
 			fnameh="fp24_"+tf+".h"
 
-			os.system(copytext+" fp24.cpp "+fnamec)
-			os.system(copytext+" fp24.h "+fnameh)
+			run_in_shell(copytext+" fp24.cpp "+fnamec)
+			run_in_shell(copytext+" fp24.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 			fnamec="ecp4_"+tc+".cpp"
 			fnameh="ecp4_"+tc+".h"
 
-			os.system(copytext+" ecp4.cpp "+fnamec)
-			os.system(copytext+" ecp4.h "+fnameh)
+			run_in_shell(copytext+" ecp4.cpp "+fnamec)
+			run_in_shell(copytext+" ecp4.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 			fnamec="pair192_"+tc+".cpp"
 			fnameh="pair192_"+tc+".h"
 
-			os.system(copytext+" pair192.cpp "+fnamec)
-			os.system(copytext+" pair192.h "+fnameh)
+			run_in_shell(copytext+" pair192.cpp "+fnamec)
+			run_in_shell(copytext+" pair192.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 			fnamec="mpin192_"+tc+".cpp"
 			fnameh="mpin192_"+tc+".h"
 
-			os.system(copytext+" mpin192.cpp "+fnamec)
-			os.system(copytext+" mpin192.h "+fnameh)
+			run_in_shell(copytext+" mpin192.cpp "+fnamec)
+			run_in_shell(copytext+" mpin192.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 			fnamec="bls192_"+tc+".cpp"
 			fnameh="bls192_"+tc+".h"
 
-			os.system(copytext+" bls192.cpp "+fnamec)
-			os.system(copytext+" bls192.h "+fnameh)
+			run_in_shell(copytext+" bls192.cpp "+fnamec)
+			run_in_shell(copytext+" bls192.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 		if cs == "256" :
 
 			fnamec="fp8_"+tf+".cpp"
 			fnameh="fp8_"+tf+".h"
 
-			os.system(copytext+" fp8.cpp "+fnamec)
-			os.system(copytext+" fp8.h "+fnameh)
+			run_in_shell(copytext+" fp8.cpp "+fnamec)
+			run_in_shell(copytext+" fp8.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 
 			fnamec="ecp8_"+tc+".cpp"
 			fnameh="ecp8_"+tc+".h"
 
-			os.system(copytext+" ecp8.cpp "+fnamec)
-			os.system(copytext+" ecp8.h "+fnameh)
+			run_in_shell(copytext+" ecp8.cpp "+fnamec)
+			run_in_shell(copytext+" ecp8.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 
 			fnamec="fp16_"+tf+".cpp"
 			fnameh="fp16_"+tf+".h"
 
-			os.system(copytext+" fp16.cpp "+fnamec)
-			os.system(copytext+" fp16.h "+fnameh)
+			run_in_shell(copytext+" fp16.cpp "+fnamec)
+			run_in_shell(copytext+" fp16.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 
 			fnamec="fp48_"+tf+".cpp"
 			fnameh="fp48_"+tf+".h"
 
-			os.system(copytext+" fp48.cpp "+fnamec)
-			os.system(copytext+" fp48.h "+fnameh)
+			run_in_shell(copytext+" fp48.cpp "+fnamec)
+			run_in_shell(copytext+" fp48.h "+fnameh)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 
 			fnamec="pair256_"+tc+".cpp"
 			fnameh="pair256_"+tc+".h"
 
-			os.system(copytext+" pair256.cpp "+fnamec)
-			os.system(copytext+" pair256.h "+fnameh)
+			run_in_shell(copytext+" pair256.cpp "+fnamec)
+			run_in_shell(copytext+" pair256.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 			fnamec="mpin256_"+tc+".cpp"
 			fnameh="mpin256_"+tc+".h"
 
-			os.system(copytext+" mpin256.cpp "+fnamec)
-			os.system(copytext+" mpin256.h "+fnameh)
+			run_in_shell(copytext+" mpin256.cpp "+fnamec)
+			run_in_shell(copytext+" mpin256.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 			fnamec="bls256_"+tc+".cpp"
 			fnameh="bls256_"+tc+".h"
 
-			os.system(copytext+" bls256.cpp "+fnamec)
-			os.system(copytext+" bls256.h "+fnameh)
+			run_in_shell(copytext+" bls256.cpp "+fnamec)
+			run_in_shell(copytext+" bls256.h "+fnameh)
 			replace(fnamec,"ZZZ",tc)
 			replace(fnamec,"YYY",tf)
 			replace(fnamec,"XXX",bd)
 			replace(fnameh,"ZZZ",tc)
 			replace(fnameh,"YYY",tf)
 			replace(fnameh,"XXX",bd)
-			os.system("g++ -O3 -c "+fnamec)
+			run_in_shell("g++ -O3 -c "+fnamec)
 
 replace("arch.h","@WL@","64")
 print("Elliptic Curves")
@@ -492,13 +496,13 @@ while ptr<max:
 			break
 	if already:
 		continue
-	
+
 	selection.append(x)
 	ptr=ptr+1
 
 # curveset(big,field,curve,big_length_bytes,bits_in_base,modulus_bits,modulus_mod_8,modulus_type,curve_type,pairing_friendly,sextic twist,sign of x,ate bits,curve security)
-# for each curve give names for big, field and curve. In many cases the latter two will be the same. 
-# Typically "big" is the size in bits, always a multiple of 8, "field" describes the modulus, and "curve" is the common name for the elliptic curve   
+# for each curve give names for big, field and curve. In many cases the latter two will be the same.
+# Typically "big" is the size in bits, always a multiple of 8, "field" describes the modulus, and "curve" is the common name for the elliptic curve
 # big_length_bytes is "big" divided by 8
 # Next give the number base used for 64 bit architectures, as n where the base is 2^n (note that these must be fixed for the same "big" name, if is ever re-used for another curve)
 # modulus_bits is the bit length of the modulus, typically the same or slightly smaller than "big"
@@ -612,7 +616,7 @@ while ptr<max:
 	if x==27:
 		#256 is slower but may allow reuse of 256-bit BIGs used for elliptic curve
 		#512 is faster.. but best is 1024
-		#rsaset("960","RSA15360","120","58","16")  
+		#rsaset("960","RSA15360","120","58","16")
 		rsaset("1024","RSA2048","128","58","2")
 		#rsaset("512","RSA2048","64","60","4")
 		#rsaset("256","RSA2048","32","56","8")
@@ -626,66 +630,66 @@ while ptr<max:
 		rsa_selected=True
 
 
-os.system(deltext+" big.*")
-os.system(deltext+" fp.*")
-os.system(deltext+" ecp.*")
-os.system(deltext+" ecdh.*")
-os.system(deltext+" ff.*")
-os.system(deltext+" rsa.*")
-os.system(deltext+" config_big.h")
-os.system(deltext+" config_field.h")
-os.system(deltext+" config_curve.h")
-os.system(deltext+" config_ff.h")
-os.system(deltext+" fp2.*")
-os.system(deltext+" fp4.*")
-os.system(deltext+" fp8.*")
-os.system(deltext+" fp16.*")
+run_in_shell(deltext+" big.*")
+run_in_shell(deltext+" fp.*")
+run_in_shell(deltext+" ecp.*")
+run_in_shell(deltext+" ecdh.*")
+run_in_shell(deltext+" ff.*")
+run_in_shell(deltext+" rsa.*")
+run_in_shell(deltext+" config_big.h")
+run_in_shell(deltext+" config_field.h")
+run_in_shell(deltext+" config_curve.h")
+run_in_shell(deltext+" config_ff.h")
+run_in_shell(deltext+" fp2.*")
+run_in_shell(deltext+" fp4.*")
+run_in_shell(deltext+" fp8.*")
+run_in_shell(deltext+" fp16.*")
 
-os.system(deltext+" fp12.*")
-os.system(deltext+" fp24.*")
-os.system(deltext+" fp48.*")
+run_in_shell(deltext+" fp12.*")
+run_in_shell(deltext+" fp24.*")
+run_in_shell(deltext+" fp48.*")
 
-os.system(deltext+" ecp2.*")
-os.system(deltext+" ecp4.*")
-os.system(deltext+" ecp8.*")
+run_in_shell(deltext+" ecp2.*")
+run_in_shell(deltext+" ecp4.*")
+run_in_shell(deltext+" ecp8.*")
 
-os.system(deltext+" pair.*")
-os.system(deltext+" mpin.*")
-os.system(deltext+" bls.*")
+run_in_shell(deltext+" pair.*")
+run_in_shell(deltext+" mpin.*")
+run_in_shell(deltext+" bls.*")
 
-os.system(deltext+" pair192.*")
-os.system(deltext+" mpin192.*")
-os.system(deltext+" bls192.*")
+run_in_shell(deltext+" pair192.*")
+run_in_shell(deltext+" mpin192.*")
+run_in_shell(deltext+" bls192.*")
 
-os.system(deltext+" pair256.*")
-os.system(deltext+" mpin256.*")
-os.system(deltext+" bls256.*")
+run_in_shell(deltext+" pair256.*")
+run_in_shell(deltext+" mpin256.*")
+run_in_shell(deltext+" bls256.*")
 
 # create library
-os.system("g++ -O3 -c randapi.cpp")
+run_in_shell("g++ -O3 -c randapi.cpp")
 if curve_selected :
-	os.system("g++ -O3 -c ecdh_support.cpp")
+	run_in_shell("g++ -O3 -c ecdh_support.cpp")
 if rsa_selected :
-	os.system("g++ -O3 -c rsa_support.cpp")
+	run_in_shell("g++ -O3 -c rsa_support.cpp")
 if pfcurve_selected :
-	os.system("g++ -O3 -c pbc_support.cpp")
+	run_in_shell("g++ -O3 -c pbc_support.cpp")
 
-os.system("g++ -O3 -c hash.cpp")
-os.system("g++ -O3 -c rand.cpp")
-os.system("g++ -O3 -c oct.cpp")
-os.system("g++ -O3 -c aes.cpp")
-os.system("g++ -O3 -c gcm.cpp")
-os.system("g++ -O3 -c newhope.cpp")
+run_in_shell("g++ -O3 -c hash.cpp")
+run_in_shell("g++ -O3 -c rand.cpp")
+run_in_shell("g++ -O3 -c oct.cpp")
+run_in_shell("g++ -O3 -c aes.cpp")
+run_in_shell("g++ -O3 -c gcm.cpp")
+run_in_shell("g++ -O3 -c newhope.cpp")
 
 if sys.platform.startswith("win") :
-	os.system("for %i in (*.o) do @echo %~nxi >> f.list")
-	os.system("ar rc amcl.a @f.list")
-	os.system(deltext+" f.list")
+	run_in_shell("for %i in (*.o) do @echo %~nxi >> f.list")
+	run_in_shell("ar rc amcl.a @f.list")
+	run_in_shell(deltext+" f.list")
 
 else :
-	os.system("ar rc amcl.a *.o")
+	run_in_shell("ar rc amcl.a *.o")
 
-os.system(deltext+" *.o")
+run_in_shell(deltext+" *.o")
 
 
 #print("Your section was ")
