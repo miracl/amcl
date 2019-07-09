@@ -17,19 +17,18 @@ specific language governing permissions and limitations
 under the License.
 */
 
+use super::big;
+use super::big::BIG;
 use super::ecp;
 use super::ecp::ECP;
-use super::big::BIG;
 use super::rom;
-use super::big;
 
-use rand::RAND;
+use aes;
+use aes::AES;
 use hash256::HASH256;
 use hash384::HASH384;
 use hash512::HASH512;
-use aes;
-use aes::AES;
-
+use rand::RAND;
 
 pub const INVALID_PUBLIC_KEY: isize = -2;
 pub const ERROR: isize = -3;

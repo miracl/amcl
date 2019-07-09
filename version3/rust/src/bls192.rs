@@ -16,13 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-use std::str;
 use super::ecp::ECP;
 use super::ecp4::ECP4;
+use std::str;
 //use super::fp24::FP24;
+use super::big;
 use super::big::BIG;
 use super::pair192;
-use super::big;
 use super::rom;
 
 use rand::RAND;
@@ -79,15 +79,15 @@ pub fn verify(sig: &[u8], m: &str, w: &[u8]) -> isize {
     let pk = ECP4::frombytes(&w);
     d.neg();
 
-// Use new multi-pairing mechanism 
-    let mut r=pair192::initmp();
-    pair192::another(&mut r,&g,&d);
-    pair192::another(&mut r,&pk,&hm);
-    let mut v=pair192::miller(&r);
+    // Use new multi-pairing mechanism
+    let mut r = pair192::initmp();
+    pair192::another(&mut r, &g, &d);
+    pair192::another(&mut r, &pk, &hm);
+    let mut v = pair192::miller(&r);
 
-//.. or alternatively
-//    let mut v = pair192::ate2(&g, &d, &pk, &hm);
-    
+    //.. or alternatively
+    //    let mut v = pair192::ate2(&g, &d, &pk, &hm);
+
     v = pair192::fexp(&v);
     if v.isunity() {
         return BLS_OK;

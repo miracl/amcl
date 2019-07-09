@@ -20,21 +20,20 @@ under the License.
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
 
+use super::big;
+use super::big::BIG;
 use super::ecp;
 use super::ecp::ECP;
 use super::ecp2::ECP2;
-use super::fp4::FP4;
 use super::fp12::FP12;
-use super::big::BIG;
+use super::fp4::FP4;
 use super::pair;
-use super::big;
 use super::rom;
 
-use rand::RAND;
 use hash256::HASH256;
 use hash384::HASH384;
 use hash512::HASH512;
-
+use rand::RAND;
 
 /* MPIN API Functions */
 
