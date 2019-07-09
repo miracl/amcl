@@ -24,72 +24,67 @@ package org.apache.milagro.amcl.XXX;
 import org.apache.milagro.amcl.RAND;
 import org.apache.milagro.amcl.SHA3;
 
-public class BLS256
-{
-	public static final int BFS=CONFIG_BIG.MODBYTES;
-	public static final int BGS=CONFIG_BIG.MODBYTES;
-	public static final int BLS_OK=0;
-	public static final int BLS_FAIL=-1;
+public class BLS256 {
+	public static final int BFS = CONFIG_BIG.MODBYTES;
+	public static final int BGS = CONFIG_BIG.MODBYTES;
+	public static final int BLS_OK = 0;
+	public static final int BLS_FAIL = -1;
 
 
-/* hash a message to an ECP point, using SHA3 */
+	/* hash a message to an ECP point, using SHA3 */
 
-	static ECP bls_hashit(String m)
-	{
-		SHA3 sh=new SHA3(SHA3.SHAKE256);
-		byte[] hm=new byte[BFS];
-		byte[] t=m.getBytes();
-		for (int i=0;i<t.length;i++)
+	static ECP bls_hashit(String m) {
+		SHA3 sh = new SHA3(SHA3.SHAKE256);
+		byte[] hm = new byte[BFS];
+		byte[] t = m.getBytes();
+		for (int i = 0; i < t.length; i++)
 			sh.process(t[i]);
-		sh.shake(hm,BFS);    
-		ECP P=ECP.mapit(hm);
+		sh.shake(hm, BFS);
+		ECP P = ECP.mapit(hm);
 		return P;
 	}
 
-/* generate key pair, private key S, public key W */
+	/* generate key pair, private key S, public key W */
 
-	public static int KeyPairGenerate(RAND RNG,byte[] S,byte[] W)
-	{
-		ECP8 G=ECP8.generator();
-		BIG q=new BIG(ROM.CURVE_Order);
-		BIG s=BIG.randomnum(q,RNG);
+	public static int KeyPairGenerate(RAND RNG, byte[] S, byte[] W) {
+		ECP8 G = ECP8.generator();
+		BIG q = new BIG(ROM.CURVE_Order);
+		BIG s = BIG.randomnum(q, RNG);
 		s.toBytes(S);
-		G=PAIR256.G2mul(G,s);
+		G = PAIR256.G2mul(G, s);
 		G.toBytes(W);
 		return BLS_OK;
 	}
 
-/* Sign message m using private key S to produce signature SIG */
+	/* Sign message m using private key S to produce signature SIG */
 
-	public static int sign(byte[] SIG,String m,byte[] S)
-	{
-		ECP D=bls_hashit(m);
-		BIG s=BIG.fromBytes(S);
-		D=PAIR256.G1mul(D,s);
-		D.toBytes(SIG,true);
+	public static int sign(byte[] SIG, String m, byte[] S) {
+		ECP D = bls_hashit(m);
+		BIG s = BIG.fromBytes(S);
+		D = PAIR256.G1mul(D, s);
+		D.toBytes(SIG, true);
 		return BLS_OK;
 	}
 
-/* Verify signature given message m, the signature SIG, and the public key W */
+	/* Verify signature given message m, the signature SIG, and the public key W */
 
-	public static int verify(byte[] SIG,String m,byte[] W)
-	{
-		ECP HM=bls_hashit(m);
-		ECP D=ECP.fromBytes(SIG);
-		ECP8 G=ECP8.generator();
-		ECP8 PK=ECP8.fromBytes(W);
+	public static int verify(byte[] SIG, String m, byte[] W) {
+		ECP HM = bls_hashit(m);
+		ECP D = ECP.fromBytes(SIG);
+		ECP8 G = ECP8.generator();
+		ECP8 PK = ECP8.fromBytes(W);
 		D.neg();
 
-// Use new multi-pairing mechanism 
-		FP48[] r=PAIR256.initmp();
-		PAIR256.another(r,G,D);
-		PAIR256.another(r,PK,HM);
-		FP48 v=PAIR256.miller(r);
+// Use new multi-pairing mechanism
+		FP48[] r = PAIR256.initmp();
+		PAIR256.another(r, G, D);
+		PAIR256.another(r, PK, HM);
+		FP48 v = PAIR256.miller(r);
 
 //.. or alternatively
 //		FP48 v=PAIR256.ate2(G,D,PK,HM);
 
-		v=PAIR256.fexp(v);
+		v = PAIR256.fexp(v);
 		if (v.isunity())
 			return BLS_OK;
 		return BLS_FAIL;

@@ -27,74 +27,74 @@ under the License.
 
 /* hash a message to an ECP point, using SHA3 */
 
-static void BLS_HASHIT(ECP_ZZZ *P,char *m)
+static void BLS_HASHIT(ECP_ZZZ *P, char *m)
 {
 	int i;
-    sha3 hs;
+	sha3 hs;
 	char h[MODBYTES_XXX];
-    octet HM= {0,sizeof(h),h};
-	SHA3_init(&hs,SHAKE256);
-    for (i=0;m[i]!=0;i++) SHA3_process(&hs,m[i]);
-    SHA3_shake(&hs,HM.val,MODBYTES_XXX);
-	HM.len=MODBYTES_XXX;
-	ECP_ZZZ_mapit(P,&HM);
+	octet HM = {0, sizeof(h), h};
+	SHA3_init(&hs, SHAKE256);
+	for (i = 0; m[i] != 0; i++) SHA3_process(&hs, m[i]);
+	SHA3_shake(&hs, HM.val, MODBYTES_XXX);
+	HM.len = MODBYTES_XXX;
+	ECP_ZZZ_mapit(P, &HM);
 }
 
 /* generate key pair, private key S, public key W */
 
-int BLS_ZZZ_KEY_PAIR_GENERATE(csprng *RNG,octet* S,octet *W)
+int BLS_ZZZ_KEY_PAIR_GENERATE(csprng *RNG, octet* S, octet *W)
 {
 	ECP4_ZZZ G;
-	BIG_XXX s,q;
-    BIG_XXX_rcopy(q,CURVE_Order_ZZZ);
+	BIG_XXX s, q;
+	BIG_XXX_rcopy(q, CURVE_Order_ZZZ);
 	ECP4_ZZZ_generator(&G);
-	BIG_XXX_randomnum(s,q,RNG);
-    BIG_XXX_toBytes(S->val,s);
-    S->len=MODBYTES_XXX;
-    PAIR_ZZZ_G2mul(&G,s);
-	ECP4_ZZZ_toOctet(W,&G);
+	BIG_XXX_randomnum(s, q, RNG);
+	BIG_XXX_toBytes(S->val, s);
+	S->len = MODBYTES_XXX;
+	PAIR_ZZZ_G2mul(&G, s);
+	ECP4_ZZZ_toOctet(W, &G);
 	return BLS_OK;
 }
 
 /* Sign message m using private key S to produce signature SIG */
 
-int BLS_ZZZ_SIGN(octet *SIG,char *m,octet *S)
+int BLS_ZZZ_SIGN(octet *SIG, char *m, octet *S)
 {
 	BIG_XXX s;
 	ECP_ZZZ D;
-	BLS_HASHIT(&D,m);
-	BIG_XXX_fromBytes(s,S->val);
-	PAIR_ZZZ_G1mul(&D,s);
-	ECP_ZZZ_toOctet(SIG,&D,true); /* compress output */
+	BLS_HASHIT(&D, m);
+	BIG_XXX_fromBytes(s, S->val);
+	PAIR_ZZZ_G1mul(&D, s);
+	ECP_ZZZ_toOctet(SIG, &D, true); /* compress output */
 	return BLS_OK;
 }
 
 /* Verify signature given message m, the signature SIG, and the public key W */
 
-int BLS_ZZZ_VERIFY(octet *SIG,char *m,octet *W)
+int BLS_ZZZ_VERIFY(octet *SIG, char *m, octet *W)
 {
 	FP24_YYY v;
-	ECP4_ZZZ G,PK;
-	ECP_ZZZ D,HM;
-	BLS_HASHIT(&HM,m);
-	ECP_ZZZ_fromOctet(&D,SIG);
+	ECP4_ZZZ G, PK;
+	ECP_ZZZ D, HM;
+	BLS_HASHIT(&HM, m);
+	ECP_ZZZ_fromOctet(&D, SIG);
 	ECP4_ZZZ_generator(&G);
-	ECP4_ZZZ_fromOctet(&PK,W);
+	ECP4_ZZZ_fromOctet(&PK, W);
 	ECP_ZZZ_neg(&D);
 
-// Use new multi-pairing mechanism 
+// Use new multi-pairing mechanism
 
 	FP24_YYY r[ATE_BITS_ZZZ];
 	PAIR_ZZZ_initmp(r);
-	PAIR_ZZZ_another(r,&G,&D);
-	PAIR_ZZZ_another(r,&PK,&HM);
-	PAIR_ZZZ_miller(&v,r);
+	PAIR_ZZZ_another(r, &G, &D);
+	PAIR_ZZZ_another(r, &PK, &HM);
+	PAIR_ZZZ_miller(&v, r);
 
 //.. or alternatively
 //    PAIR_ZZZ_double_ate(&v,&G,&D,&PK,&HM);
 
-    PAIR_ZZZ_fexp(&v);
-    if (FP24_YYY_isunity(&v)) return BLS_OK;
+	PAIR_ZZZ_fexp(&v);
+	if (FP24_YYY_isunity(&v)) return BLS_OK;
 	return BLS_FAIL;
 }
 
