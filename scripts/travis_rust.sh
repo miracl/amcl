@@ -17,7 +17,7 @@ source "$HOME/.cargo/env"
   #
   # Build
   #
-  cargo build --all-features
+  cargo build --all-features --release
 
   #
   # Deploy
