@@ -782,6 +782,7 @@ func (r *BIG) Jacobi(p *BIG) int {
 /* this=1/this mod p. Binary method */
 func (r *BIG) Invmodp(p *BIG) {
 	r.Mod(p)
+	if r.iszilch() {return}
 	u := NewBIGcopy(r)
 
 	v := NewBIGcopy(p)

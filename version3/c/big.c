@@ -1392,7 +1392,14 @@ int BIG_XXX_jacobi(BIG_XXX a,BIG_XXX p)
 void BIG_XXX_invmodp(BIG_XXX r,BIG_XXX a,BIG_XXX p)
 {
     BIG_XXX u,v,x1,x2,t,one;
-    BIG_XXX_mod(a,p);
+    
+	BIG_XXX_mod(a,p);
+	if (BIG_XXX_iszilch(a))
+	{
+		BIG_XXX_zero(r);
+		return;
+	}
+
     BIG_XXX_copy(u,a);
     BIG_XXX_copy(v,p);
     BIG_XXX_one(one);

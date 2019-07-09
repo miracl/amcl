@@ -1365,7 +1365,14 @@ int XXX::BIG_jacobi(BIG a,BIG p)
 void XXX::BIG_invmodp(BIG r,BIG a,BIG p)
 {
     BIG u,v,x1,x2,t,one;
+
     BIG_mod(a,p);
+	if (BIG_iszilch(a))
+	{
+		BIG_zero(r);
+		return;
+	}
+
     BIG_copy(u,a);
     BIG_copy(v,p);
     BIG_one(one);

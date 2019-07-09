@@ -712,7 +712,8 @@ BIG = function(ctx) {
 
     /* this=1/this mod p. Binary method */
     invmodp: function(p) {
-      var u = new BIG(0),
+		if (this.iszilch()) {return;}
+		var u = new BIG(0),
         v = new BIG(0),
         x1 = new BIG(1),
         x2 = new BIG(0),

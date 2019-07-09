@@ -41,6 +41,8 @@ def gcd(x, y):
 def invmodp(a, p):
     n = p
     x = a % n
+    if x == 0:
+        return x
     kn = n
     if x < 0:
         x += n

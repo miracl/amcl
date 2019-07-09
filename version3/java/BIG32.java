@@ -866,6 +866,7 @@ public class BIG {
 	public void invmodp(BIG p)
 	{
 		mod(p);
+		if (iszilch()) return;
 		BIG u=new BIG(this);
 		BIG v=new BIG(p);
 		BIG x1=new BIG(1);

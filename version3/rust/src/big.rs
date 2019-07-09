@@ -795,6 +795,7 @@ impl BIG {
     /* self=1/self mod p. Binary method */
     pub fn invmodp(&mut self, p: &BIG) {
         self.rmod(p);
+	if self.iszilch() {return;}
         let mut u = BIG::new_copy(self);
         let mut v = BIG::new_copy(p);
         let mut x1 = BIG::new_int(1);

@@ -697,6 +697,7 @@ public struct BIG{
     mutating func invmodp(_ p: BIG)
     {
         mod(p)
+	if (iszilch()) {return}
         var u=BIG(self)
         var v=BIG(p)
         var x1=BIG(1)
