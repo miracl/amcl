@@ -17,7 +17,25 @@ source "$HOME/.cargo/env"
   #
   # Build
   #
-  cargo build --all-features
+  cargo build --all-features --release
+
+  rustc TestALL.rs --extern amcl=target/release/libamcl.rlib
+  rustc TestBLS.rs --extern amcl=target/release/libamcl.rlib
+  rustc TestNHS.rs --extern amcl=target/release/libamcl.rlib
+  rustc BenchtestALL.rs --extern amcl=target/release/libamcl.rlib
+
+  #
+  # Run examples
+  #
+  ./TestALL <<END_OF_INPUT
+1234
+1234
+1234
+1234
+END_OF_INPUT
+  ./TestBLS
+  ./TestNHS
+  ./BenchtestALL
 
   #
   # Deploy
