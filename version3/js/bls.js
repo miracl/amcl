@@ -69,7 +69,7 @@ var BLS = function(ctx) {
 
     /* generate key pair, private key S, public key W */
 
-    KeyPairGenerate(rng, S, W) {
+    KeyPairGenerate: function(rng, S, W) {
       var G = ctx.ECP2.generator();
       var q = new ctx.BIG(0);
       q.rcopy(ctx.ROM_CURVE.CURVE_Order);
@@ -83,7 +83,7 @@ var BLS = function(ctx) {
 
     /* Sign message m using private key S to produce signature SIG */
 
-    sign(SIG, m, S) {
+    sign: function(SIG, m, S) {
       var D = this.bls_hashit(m);
       var s = ctx.BIG.fromBytes(S);
       D = ctx.PAIR.G1mul(D, s);
@@ -93,7 +93,7 @@ var BLS = function(ctx) {
 
     /* Verify signature given message m, the signature SIG, and the public key W */
 
-    verify(SIG, m, W) {
+    verify: function(SIG, m, W) {
       var HM = this.bls_hashit(m);
       var D = ctx.ECP.fromBytes(SIG);
       var G = ctx.ECP2.generator();
