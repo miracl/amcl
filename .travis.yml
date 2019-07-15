@@ -4,6 +4,7 @@ language: generic
 env:
   matrix:
     - AMCL_LANG=cpp
+    - AMCL_LANG=java
     - AMCL_LANG=js
     - AMCL_LANG=rust
     - AMCL_LANG=swift
