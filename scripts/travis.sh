@@ -6,6 +6,9 @@ case "$AMCL_LANG" in
   cpp)
     ./scripts/travis_cpp.sh
     ;;
+  java)
+    ./scripts/travis_java.sh
+    ;;
   js)
     ./scripts/travis_js.sh
     ;;
