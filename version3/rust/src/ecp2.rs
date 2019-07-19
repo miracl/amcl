@@ -28,9 +28,9 @@ use std::fmt;
 
 #[derive(Copy, Clone)]
 pub struct ECP2 {
-    x: FP2,
-    y: FP2,
-    z: FP2,
+    pub x: FP2,
+    pub y: FP2,
+    pub z: FP2,
 }
 
 impl PartialEq for ECP2 {

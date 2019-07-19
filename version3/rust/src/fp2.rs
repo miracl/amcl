@@ -27,8 +27,8 @@ use std::fmt;
 
 #[derive(Copy, Clone)]
 pub struct FP2 {
-    a: FP,
-    b: FP,
+    pub a: FP,
+    pub b: FP,
 }
 
 impl PartialEq for FP2 {

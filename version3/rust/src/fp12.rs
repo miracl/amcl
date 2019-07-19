@@ -34,10 +34,10 @@ pub const DENSE: usize=4;
 
 #[derive(Copy, Clone)]
 pub struct FP12 {
-    a: FP4,
-    b: FP4,
-    c: FP4,
-    stype: usize,
+    pub a: FP4,
+    pub b: FP4,
+    pub c: FP4,
+    pub stype: usize,
 }
 
 impl PartialEq for FP12 {

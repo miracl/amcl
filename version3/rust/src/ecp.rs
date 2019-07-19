@@ -29,9 +29,9 @@ use std::fmt;
 
 #[derive(Copy, Clone)]
 pub struct ECP {
-    x: FP,
-    y: FP,
-    z: FP,
+    pub x: FP,
+    pub y: FP,
+    pub z: FP,
 }
 
 impl PartialEq for ECP {
