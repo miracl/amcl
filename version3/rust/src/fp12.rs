@@ -34,10 +34,10 @@ pub const DENSE: usize=4;
 
 #[derive(Copy, Clone)]
 pub struct FP12 {
-    pub a: FP4,
-    pub b: FP4,
-    pub c: FP4,
-    pub stype: usize,
+    a: FP4,
+    b: FP4,
+    c: FP4,
+    stype: usize,
 }
 
 impl PartialEq for FP12 {
@@ -189,6 +189,21 @@ impl FP12 {
         return self.c;
 //        let f = FP4::new_copy(&self.c);
 //        return f;
+    }
+
+    /* replace a by given FP4 */
+    pub fn seta(&mut self, a: FP4) {
+        self.a = a
+    }
+
+    /* replace b by given FP4 */
+    pub fn setb(&mut self, b: FP4) {
+        self.b = b
+    }
+
+    /* replace c by given FP4 */
+    pub fn setc(&mut self, c: FP4) {
+        self.c = c
     }
 
     /* copy self=x */

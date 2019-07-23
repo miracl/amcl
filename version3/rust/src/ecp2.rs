@@ -28,9 +28,9 @@ use std::fmt;
 
 #[derive(Copy, Clone)]
 pub struct ECP2 {
-    pub x: FP2,
-    pub y: FP2,
-    pub z: FP2,
+    x: FP2,
+    y: FP2,
+    z: FP2,
 }
 
 impl PartialEq for ECP2 {
@@ -222,6 +222,21 @@ impl ECP2 {
     /* extract projective z */
     pub fn getpz(&self) -> FP2 {
         return FP2::new_copy(&self.z);
+    }
+
+    /* replace x by given FP2 */
+    pub fn setpx(&mut self, x: FP2) {
+        self.x = x
+    }
+
+    /* replace y by given FP2 */
+    pub fn setpy(&mut self, y: FP2) {
+        self.y = y
+    }
+
+    /* replace z by given FP2 */
+    pub fn setpz(&mut self, z: FP2) {
+        self.z = z
     }
 
     /* convert to byte array */

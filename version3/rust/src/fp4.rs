@@ -135,6 +135,16 @@ impl FP4 {
 //        return f;
     }
 
+    /* replace a by given FP2 */
+    pub fn seta(&mut self, a: FP2) {
+        self.a = a
+    }
+
+    /* replace b by given FP2 */
+    pub fn setb(&mut self, b: FP2) {
+        self.b = b
+    }
+
     /* test self=x */
     pub fn equals(&self, x: &FP4) -> bool {
         return self.a.equals(&x.a) && self.b.equals(&x.b);

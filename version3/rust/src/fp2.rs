@@ -27,8 +27,8 @@ use std::fmt;
 
 #[derive(Copy, Clone)]
 pub struct FP2 {
-    pub a: FP,
-    pub b: FP,
+    a: FP,
+    b: FP,
 }
 
 impl PartialEq for FP2 {
@@ -140,6 +140,16 @@ impl FP2 {
     /* extract b */
     pub fn getb(&mut self) -> BIG {
         return self.b.redc();
+    }
+
+    /* replace a by given FP */
+    pub fn seta(&mut self, a: FP) {
+        self.a = a
+    }
+
+    /* replace b by given FP */
+    pub fn setb(&mut self, b: FP) {
+        self.b = b
     }
 
     /* copy self=x */
