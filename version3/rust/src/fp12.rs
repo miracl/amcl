@@ -191,6 +191,21 @@ impl FP12 {
 //        return f;
     }
 
+    /* replace a by given FP4 */
+    pub fn seta(&mut self, a: FP4) {
+        self.a = a
+    }
+
+    /* replace b by given FP4 */
+    pub fn setb(&mut self, b: FP4) {
+        self.b = b
+    }
+
+    /* replace c by given FP4 */
+    pub fn setc(&mut self, c: FP4) {
+        self.c = c
+    }
+
     /* copy self=x */
     pub fn copy(&mut self, x: &FP12) {
         self.a.copy(&x.a);

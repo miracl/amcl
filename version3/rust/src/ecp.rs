@@ -355,6 +355,21 @@ impl ECP {
         return w;
     }
 
+    /* replace x by given FP */
+    pub fn setpx(&mut self, x: FP) {
+        self.x = x
+    }
+
+    /* replace y by given FP */
+    pub fn setpy(&mut self, y: FP) {
+        self.y = y
+    }
+
+    /* replace z by given FP */
+    pub fn setpz(&mut self, z: FP) {
+        self.z = z
+    }
+
     /* convert to byte array */
     pub fn tobytes(&self, b: &mut [u8], compress: bool) {
         let mb = big::MODBYTES as usize;

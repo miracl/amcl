@@ -142,6 +142,16 @@ impl FP2 {
         return self.b.redc();
     }
 
+    /* replace a by given FP */
+    pub fn seta(&mut self, a: FP) {
+        self.a = a
+    }
+
+    /* replace b by given FP */
+    pub fn setb(&mut self, b: FP) {
+        self.b = b
+    }
+
     /* copy self=x */
     pub fn copy(&mut self, x: &FP2) {
         self.a.copy(&x.a);

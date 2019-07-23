@@ -224,6 +224,21 @@ impl ECP2 {
         return FP2::new_copy(&self.z);
     }
 
+    /* replace x by given FP2 */
+    pub fn setpx(&mut self, x: FP2) {
+        self.x = x
+    }
+
+    /* replace y by given FP2 */
+    pub fn setpy(&mut self, y: FP2) {
+        self.y = y
+    }
+
+    /* replace z by given FP2 */
+    pub fn setpz(&mut self, z: FP2) {
+        self.z = z
+    }
+
     /* convert to byte array */
     pub fn tobytes(&self, b: &mut [u8]) {
         let mut t: [u8; big::MODBYTES as usize] = [0; big::MODBYTES as usize];
