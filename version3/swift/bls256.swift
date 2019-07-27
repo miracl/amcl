@@ -38,7 +38,7 @@ public struct BLS256
     
 /* hash a message to an ECP point, using SHA3 */
 
-    private static func bls_hashit(_ m: String) -> ECP
+    static public func bls_hashit(_ m: String) -> ECP
     {
         var sh=SHA3(SHA3.SHAKE256)
         var hm=[UInt8](repeating: 0,count: BFS)  
