@@ -32,7 +32,7 @@ const BLS_FAIL int = -1
 
 /* hash a message to an ECP point, using SHA3 */
 
-func bls_hash(m string) *ECP {
+func Bls_hash(m string) *ECP {
 	sh := amcl.NewSHA3(amcl.SHA3_SHAKE256)
 	var hm [BFS]byte
 	t := []byte(m)
@@ -59,7 +59,7 @@ func KeyPairGenerate(rng *amcl.RAND, S []byte, W []byte) int {
 /* Sign message m using private key S to produce signature SIG */
 
 func Sign(SIG []byte, m string, S []byte) int {
-	D := bls_hash(m)
+	D := Bls_hash(m)
 	s := FromBytes(S)
 	D = G1mul(D, s)
 	D.ToBytes(SIG, true)
@@ -69,7 +69,7 @@ func Sign(SIG []byte, m string, S []byte) int {
 /* Verify signature given message m, the signature SIG, and the public key W */
 
 func Verify(SIG []byte, m string, W []byte) int {
-	HM := bls_hash(m)
+	HM := Bls_hash(m)
 	D := ECP_fromBytes(SIG)
 	G := ECP2_generator()
 	PK := ECP2_fromBytes(W)

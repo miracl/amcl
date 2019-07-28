@@ -33,7 +33,7 @@ public class BLS {
 
 	/* hash a message to an ECP point, using SHA3 */
 
-	static ECP bls_hashit(String m) {
+	public static ECP bls_hashit(String m) {
 		SHA3 sh = new SHA3(SHA3.SHAKE256);
 		byte[] hm = new byte[BFS];
 		byte[] t = m.getBytes();
