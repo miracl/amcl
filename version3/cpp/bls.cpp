@@ -1,3 +1,4 @@
+
 /*
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -30,7 +31,7 @@ using namespace YYY;
 
 /* hash a message to an ECP point, using SHA3 */
 
-static void BLS_HASHIT(ECP *P, char *m)
+void ZZZ::BLS_HASHIT(ECP *P, char *m)
 {
 	int i;
 	sha3 hs;

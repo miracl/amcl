@@ -44,6 +44,13 @@ under the License.
 
 /* BLS API functions */
 
+/**	@brief Hash to Point
+ *
+	@param P point to be hashed to
+	@param m string to be hashed
+ */
+void BLS_ZZZ_HASHIT(ECP_ZZZ *P, char *m);
+
 /**	@brief Generate Key Pair
  *
 	@param RNG is a pointer to a cryptographically secure random number generator

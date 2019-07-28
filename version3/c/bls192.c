@@ -27,7 +27,7 @@ under the License.
 
 /* hash a message to an ECP point, using SHA3 */
 
-static void BLS_HASHIT(ECP_ZZZ *P, char *m)
+void BLS_ZZZ_HASHIT(ECP_ZZZ *P, char *m)
 {
 	int i;
 	sha3 hs;
@@ -62,7 +62,7 @@ int BLS_ZZZ_SIGN(octet *SIG, char *m, octet *S)
 {
 	BIG_XXX s;
 	ECP_ZZZ D;
-	BLS_HASHIT(&D, m);
+	BLS_ZZZ_HASHIT(&D, m);
 	BIG_XXX_fromBytes(s, S->val);
 	PAIR_ZZZ_G1mul(&D, s);
 	ECP_ZZZ_toOctet(SIG, &D, true); /* compress output */
@@ -76,7 +76,7 @@ int BLS_ZZZ_VERIFY(octet *SIG, char *m, octet *W)
 	FP24_YYY v;
 	ECP4_ZZZ G, PK;
 	ECP_ZZZ D, HM;
-	BLS_HASHIT(&HM, m);
+	BLS_ZZZ_HASHIT(&HM, m);
 	ECP_ZZZ_fromOctet(&D, SIG);
 	ECP4_ZZZ_generator(&G);
 	ECP4_ZZZ_fromOctet(&PK, W);
