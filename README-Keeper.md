@@ -15,7 +15,7 @@ We have created the `keeper` branch from the master branch.  We will probably br
       release_2.0.0                    -- a version used by some clients
 ```
 
-See the (keeper-pythia-client)[https://github.com/Keeper-Security/keeper-pythia-client] project for the actual library versions you should use.
+See the https://github.com/Keeper-Security/keeper-pythia-client project for the actual library versions you should use.
 
 To pull changes from our `master` branch into our `keeper` branch, run:
 ```
@@ -27,11 +27,11 @@ $ git push
 ```  
 
 ## Updating
-The `master` branch is updated by the main AMCL developers.  To pull changes into our master branch, first checkout this project.
+The `master` branch is updated by the main AMCL developers.  To pull changes into our master branch, first checkout our fork (this project).
 Then, on your machine, run:
 
 ```
-$ git pull https://github.com/miracl/amcl.git master
+$ git pull https://github.com/miracl/amcl master
 ```
 
 After resolving any merge conflicts push the changes to the master branch of our fork.
