@@ -1,5 +1,7 @@
 # The Apache Milagro Cryptographic Library
 
+[![Build Status](https://travis-ci.org/miracl/amcl.svg?branch=master)](https://travis-ci.org/miracl/amcl)
+
 AMCL is a multi-lingual Cryptographic library that supports elliptic
 curve cryptography, pairing-friendly curve cryptography, RSA, AES symmetric
 encryption and hash functions. All code is entirely in the supported high-
