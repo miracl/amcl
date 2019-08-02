@@ -105,7 +105,7 @@ public struct BIG{
     static func muladd(_ a: Chunk,_ b: Chunk,_ c: Chunk,_ r: Chunk) -> (Chunk,Chunk)
     {
         let (tp,bt)=a.multipliedFullWidth(by: b)
-        var bot = Chunk(bt&(UInt64(CONFIG_BIG.BMASK))
+        var bot = Chunk(bt&(UInt64(CONFIG_BIG.BMASK)))
         var top = (tp << Chunk(64-CONFIG_BIG.BASEBITS)) | Chunk(bt >> CONFIG_BIG.BASEBITS)
 
         bot+=c; bot+=r
