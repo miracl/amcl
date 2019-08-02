@@ -65,14 +65,14 @@ var MPIN256 = function(ctx) {
     },
 
     stringtobytes: function(s) {
-        var b = [],
-                i;
+      var b = [],
+        i;
 
-        for (i = 0; i < s.length; i+=2) {
-            b.push(parseInt(s.substr(i,2),16));
-        }
+      for (i = 0; i < s.length; i += 2) {
+        b.push(parseInt(s.substr(i, 2), 16));
+      }
 
-        return b;
+      return b;
     },
 
     comparebytes: function(a, b) {
