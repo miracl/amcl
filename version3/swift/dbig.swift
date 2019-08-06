@@ -25,28 +25,28 @@
 //  Copyright (c) 2015 Michael Scott. All rights reserved.
 //
 
-    struct DBIG{
+    public struct DBIG{
     var w=[Chunk](repeating: 0,count: CONFIG_BIG.DNLEN)
-    init() {
+    public init() {
         for i in 0 ..< CONFIG_BIG.DNLEN {w[i]=0}
     }
-    init(_ x: Int)
+    public init(_ x: Int)
     {
         w[0]=Chunk(x);
         for i in 1 ..< CONFIG_BIG.DNLEN {w[i]=0}
     }
-    init(_ x: BIG)
+    public init(_ x: BIG)
     {
         for i in 0 ..< CONFIG_BIG.NLEN {w[i]=x.w[i]}
         w[CONFIG_BIG.NLEN-1]=x.w[CONFIG_BIG.NLEN-1]&CONFIG_BIG.BMASK
         w[CONFIG_BIG.NLEN]=x.w[CONFIG_BIG.NLEN-1]>>Chunk(CONFIG_BIG.BASEBITS)
         for i in CONFIG_BIG.NLEN+1 ..< CONFIG_BIG.DNLEN {w[i]=0}
     }
-    init(_ x: DBIG)
+    public init(_ x: DBIG)
     {
         for i in 0 ..< CONFIG_BIG.DNLEN {w[i]=x.w[i]}
     }
-    init(_ x: [Chunk])
+    public init(_ x: [Chunk])
     {
         for i in 0 ..< CONFIG_BIG.DNLEN {w[i]=x[i]}
     }
@@ -255,7 +255,7 @@
         return bts
     }
     /* Convert to Hex String */
-    func toString() -> String
+    public func toString() -> String
     {
         _ = DBIG()
         var s:String=""

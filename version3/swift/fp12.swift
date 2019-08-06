@@ -66,7 +66,7 @@ public struct FP12
     }
 
     /* Constructors */
-    init(_ d:FP4)
+    public init(_ d:FP4)
     {
         a=FP4(d)
         b=FP4()
@@ -74,7 +74,7 @@ public struct FP12
         stype=FP12.SPARSER
     }
     
-    init()
+    public init()
     {
         a=FP4()
         b=FP4()
@@ -82,7 +82,7 @@ public struct FP12
         stype=FP12.ZERO
     }
 
-    init(_ d:Int)
+    public init(_ d:Int)
     {
         a=FP4(d)
         b=FP4()
@@ -91,7 +91,7 @@ public struct FP12
         else {stype=FP12.SPARSER}
     }
     
-    init(_ d:FP4,_ e:FP4,_ f:FP4)
+    public init(_ d:FP4,_ e:FP4,_ f:FP4)
     {
         a=FP4(d)
         b=FP4(e)
@@ -99,7 +99,7 @@ public struct FP12
         stype=FP12.DENSE
     }
     
-    init(_ x:FP12)
+    public init(_ x:FP12)
     {
         a=FP4(x.a)
         b=FP4(x.b)
@@ -107,7 +107,7 @@ public struct FP12
         stype=x.stype
     }
     /* test x==0 ? */
-    func iszilch() -> Bool
+    public func iszilch() -> Bool
     {
         return a.iszilch() && b.iszilch() && c.iszilch()
     }
@@ -186,7 +186,7 @@ public struct FP12
         stype=x.stype
     }
     /* set self=1 */
-    mutating func one()
+    mutating public func one()
     {
         a.one()
         b.zero()
@@ -195,7 +195,7 @@ public struct FP12
     }
 
     /* set self=0 */
-    mutating func zero()
+    mutating public func zero()
     {
         a.zero()
         b.zero()
@@ -204,14 +204,14 @@ public struct FP12
     }
 
     /* self=conj(self) */
-    mutating func conj()
+    mutating public func conj()
     {
         a.conj()
         b.nconj()
         c.conj()
     }
     /* Granger-Scott Unitary Squaring */
-    mutating func usqr()
+    mutating public func usqr()
     {
         var A=FP4(a)
         var B=FP4(c)
@@ -251,7 +251,7 @@ public struct FP12
     
     }
     /* Chung-Hasan SQR2 method from http://cacr.uwaterloo.ca/techreports/2006/cacr2006-24.pdf */
-    mutating func sqr()
+    mutating public func sqr()
     {
         if (stype==FP12.ONE) {return}
         var A=FP4(a)
@@ -295,7 +295,7 @@ public struct FP12
     }
     
     /* FP12 full multiplication this=this*y */
-    mutating func mul(_ y:FP12)
+    mutating public func mul(_ y:FP12)
     {
         var z0=FP4(a)
         var z1=FP4()
@@ -653,7 +653,7 @@ public struct FP12
         stype=FP12.SPARSE
     }
     /* self=1/self */
-    mutating func inverse()
+    mutating public func inverse()
     {
         var f0=FP4(a)
         var f1=FP4(b)
@@ -718,7 +718,7 @@ public struct FP12
         return t
     }
     /* convert from byte array to FP12 */
-    static func fromBytes(_ w:[UInt8]) -> FP12
+    public static func fromBytes(_ w:[UInt8]) -> FP12
     {
         let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
@@ -770,7 +770,7 @@ public struct FP12
     }
     
     /* convert this to byte array */
-    func toBytes(_ w:inout [UInt8])
+    public func toBytes(_ w:inout [UInt8])
     {
         let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
@@ -810,7 +810,7 @@ public struct FP12
     
     /* self=self^e */
     /* Note this is simple square and multiply, so not side-channel safe */
-    func pow(_ e:BIG) -> FP12
+    public func pow(_ e:BIG) -> FP12
     {
         var sf = FP12(self)
         sf.norm()
@@ -840,7 +840,7 @@ public struct FP12
         return w
     }
     /* constant time powering by small integer of max length bts */
-    mutating func pinpow(_ e:Int32,_ bts:Int32)
+    mutating public func pinpow(_ e:Int32,_ bts:Int32)
     {
         var R=[FP12]()
         R.append(FP12(1))
@@ -899,7 +899,7 @@ public struct FP12
     // Faz-Hernandez & Longa & Sanchez  https://eprint.iacr.org/2013/158.pdf
     // Side channel attack secure 
 
-    static func pow4(_ q:[FP12],_ u:[BIG]) -> FP12
+    static public func pow4(_ q:[FP12],_ u:[BIG]) -> FP12
     {
         var g=[FP12]();
         

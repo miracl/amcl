@@ -132,36 +132,36 @@ public struct FP {
     }
 
 
-    init()
+    public init()
     {
         x=BIG(0)
         xes=1
     }
-    init(_ a: Int)
+    public init(_ a: Int)
     {
         x=BIG(a)
         xes=1
         nres()
     }
-    init(_ a: BIG)
+    public init(_ a: BIG)
     {
         x=BIG(a)
         xes=1
         nres()
     }
-    init(_ a: FP)
+    public init(_ a: FP)
     {
         x=BIG(a.x)
         xes=a.xes
     }
     /* convert to string */
-    func toString() -> String
+    public func toString() -> String
     {
         let s=redc().toString()
         return s
     }
     
-    func toRawString() -> String
+    public func toRawString() -> String
     {
         let s=x.toRawString()
         return s
@@ -252,7 +252,7 @@ public struct FP {
         xes^=(xes^b.xes)&c        
     }
 /* this*=b mod Modulus */
-    mutating func mul(_ b: FP)
+    public mutating func mul(_ b: FP)
     {
 
         if Int64(xes)*Int64(b.xes) > Int64(CONFIG_FIELD.FEXCESS) {reduce()}

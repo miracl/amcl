@@ -35,25 +35,25 @@ public struct FP2
     private var b:FP
 
     /* Constructors */
-    init()
+    public init()
     {
         a=FP()
         b=FP()
     }
 
-    init(_ c: Int)
+    public init(_ c: Int)
     {
         a=FP(c)
         b=FP()
     }
     
-    init(_ x:FP2)
+    public init(_ x:FP2)
     {
         a=FP(x.a)
         b=FP(x.b)
     }
 
-    init(_ c:FP,_ d:FP)
+    public init(_ c:FP,_ d:FP)
     {
         a=FP(c)
         b=FP(d)
@@ -65,13 +65,13 @@ public struct FP2
         b=FP(d)
     }
 
-    init(_ c:FP)
+    public init(_ c:FP)
     {
         a=FP(c)
         b=FP()
     }
     
-    init(_ c:BIG)
+    public init(_ c:BIG)
     {
         a=FP(c)
         b=FP()
@@ -285,12 +285,12 @@ public struct FP2
         return true
     }
     /* output to hex string */
-    func toString() -> String
+    public func toString() -> String
     {
         return ("["+a.toString()+","+b.toString()+"]")
     }
     
-    func toRawString() -> String
+    public func toRawString() -> String
     {
         return ("["+a.toRawString()+","+b.toRawString()+"]")
     }

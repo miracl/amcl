@@ -25,7 +25,7 @@
 //  BIG number class
 //
 
-import amcl
+// import amcl
 
 //#if D32
 //public typealias Chunk = Int32
@@ -53,19 +53,19 @@ public struct BIG{
 
     var w=[Chunk](repeating: 0,count: CONFIG_BIG.NLEN)
 /* Constructors */
-    init() {
+    public init() {
         for i in 0 ..< CONFIG_BIG.NLEN {w[i]=0}
     }
-    init(_ x: Int)
+    public init(_ x: Int)
     {
         w[0]=Chunk(x);
         for i in 1 ..< CONFIG_BIG.NLEN {w[i]=0}
     }
-    init(_ x: BIG)
+    public init(_ x: BIG)
     {
         for i in 0 ..< CONFIG_BIG.NLEN {w[i]=x.w[i]}
     }
-    init(_ x: DBIG)
+    public init(_ x: DBIG)
     {
         for i in 0 ..< CONFIG_BIG.NLEN {w[i]=x.w[i]}
     }
@@ -246,7 +246,7 @@ public struct BIG{
         while c != 0 {c/=2; bts += 1}
         return bts
     }
-    func toRawString() -> String
+    public func toRawString() -> String
     {
         var s:String="("
         for i in 0 ..< CONFIG_BIG.NLEN-1
@@ -262,7 +262,7 @@ public struct BIG{
         return s
     }
 /* Convert to Hex String */
-    func toString() -> String
+    public func toString() -> String
     {
         _ = BIG()
         var s:String=""
@@ -374,11 +374,11 @@ public struct BIG{
         }
         return m;
     }
-    func toBytes(_ b: inout [UInt8])
+    public func toBytes(_ b: inout [UInt8])
     {
         tobytearray(&b,0)
     }
-    static func fromBytes(_ b: [UInt8]) -> BIG
+    public static func fromBytes(_ b: [UInt8]) -> BIG
     {
         return frombytearray(b,0)
     }
@@ -553,7 +553,7 @@ public struct BIG{
         self.norm()
     }
     /* reduce this mod m */
-    mutating func mod(_ m1: BIG)
+    public mutating func mod(_ m1: BIG)
     {
         var k=0
         var m=BIG(m1)
@@ -579,7 +579,7 @@ public struct BIG{
         }
     }
     /* divide this by m */
-    mutating func div(_ m1: BIG)
+    public mutating func div(_ m1: BIG)
     {
         var k=0
         norm()
@@ -615,7 +615,7 @@ public struct BIG{
         }
     }
     /* get 8*CONFIG_BIG.MODBYTES size random number */
-    static func random(_ rng: inout RAND) -> BIG
+    static public func random(_ rng: inout RAND) -> BIG
     {
         var m=BIG();
         var j:Int=0
@@ -694,7 +694,7 @@ public struct BIG{
         else {return -1}
     }
     /* this=1/this mod p. Binary method */
-    mutating func invmodp(_ p: BIG)
+    public mutating func invmodp(_ p: BIG)
     {
         mod(p)
 	if (iszilch()) {return}
@@ -759,7 +759,7 @@ public struct BIG{
     }
     /* return a*b as DBIG */
 #if D32
-    static func mul(_ a: BIG,_ b:BIG) -> DBIG
+    static public func mul(_ a: BIG,_ b:BIG) -> DBIG
     {
         var t:DChunk
         var co:DChunk
@@ -801,7 +801,7 @@ public struct BIG{
     }
     
     /* return a^2 as DBIG */
-    static func sqr(_ a: BIG) -> DBIG
+    static public func sqr(_ a: BIG) -> DBIG
     {
         var t:DChunk
         var co:DChunk
@@ -886,7 +886,7 @@ public struct BIG{
     }
 #endif
 #if D64
-    static func mul(_ a: BIG,_ b:BIG) -> DBIG
+    static public func mul(_ a: BIG,_ b:BIG) -> DBIG
     {
         var c=DBIG()
         var carry:Chunk
@@ -900,7 +900,7 @@ public struct BIG{
         }
         return c
     }
-    static func sqr(_ a: BIG) -> DBIG
+    static public func sqr(_ a: BIG) -> DBIG
     {
         var c=DBIG()
         var carry:Chunk
@@ -997,7 +997,7 @@ public struct BIG{
     }
     
     /* return this^e mod m */
-    mutating func powmod(_ e1: BIG,_ m: BIG) -> BIG
+    mutating public func powmod(_ e1: BIG,_ m: BIG) -> BIG
     {
         norm();
         var e=BIG(e1)
