@@ -33,31 +33,31 @@ public struct FP4 {
     private var b:FP2
 
     /* constructors */
-    init()
+    public init()
     {
         a=FP2()
         b=FP2()
     }
 
-    init(_ c:Int)
+    public init(_ c:Int)
     {
         a=FP2(c)
         b=FP2()
     }
     
-    init(_ x:FP4)
+    public init(_ x:FP4)
     {
         a=FP2(x.a)
         b=FP2(x.b)
     }
     
-    init(_ c:FP2,_ d:FP2)
+    public init(_ c:FP2,_ d:FP2)
     {
         a=FP2(c)
         b=FP2(d)
     }
     
-    init(_ c:FP2)
+    public init(_ c:FP2)
     {
         a=FP2(c)
         b=FP2()
@@ -285,12 +285,12 @@ public struct FP4 {
         norm();
     }
     /* convert this to hex string */
-    func toString() -> String
+    public func toString() -> String
     {
         return ("["+a.toString()+","+b.toString()+"]")
     }
     
-    func toRawString() -> String
+    public func toRawString() -> String
     {
         return ("["+a.toRawString()+","+b.toRawString()+"]")
     }
