@@ -25,7 +25,7 @@
 //
 
 import Foundation
-//import amcl
+import amcl
 
 public struct MPIN
 {
