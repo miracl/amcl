@@ -25,7 +25,7 @@
 //  BIG number class
 //
 
-// import amcl
+import amcl
 
 //#if D32
 //public typealias Chunk = Int32
