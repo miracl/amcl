@@ -31,7 +31,7 @@ public struct ECP {
     private var z:FP
     
    /* Constructor - set to O */
-    init()
+    public init()
     {
         x=FP()
         y=FP(1)
@@ -314,7 +314,7 @@ public struct ECP {
         return z;
     }
     /* convert to byte array */
-    func toBytes(_ b:inout [UInt8],_ compress: Bool)
+    public func toBytes(_ b:inout [UInt8],_ compress: Bool)
     {
         let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
@@ -340,7 +340,7 @@ public struct ECP {
         for i in 0 ..< RM {b[i+RM+1]=t[i]}
     }
     /* convert from byte array to point */
-    static func fromBytes(_ b: [UInt8]) -> ECP
+    public static func fromBytes(_ b: [UInt8]) -> ECP
     {
         let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
@@ -368,7 +368,7 @@ public struct ECP {
 	return ECP()
     }
     /* convert to hex string */
-    func toString() -> String
+    public func toString() -> String
     {
         var W=ECP(); W.copy(self)
         if W.is_infinity() {return "infinity"}

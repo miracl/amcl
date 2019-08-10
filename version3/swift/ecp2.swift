@@ -31,7 +31,7 @@ public struct ECP2 {
     private var z:FP2
     
     /* Constructor - set self=O */
-    init()
+    public init()
     {
         x=FP2()
         y=FP2(1)
@@ -157,7 +157,7 @@ public struct ECP2 {
         return z
     }
     /* convert to byte array */
-    func toBytes(_ b:inout [UInt8])
+    public func toBytes(_ b:inout [UInt8])
     {
         let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
@@ -179,7 +179,7 @@ public struct ECP2 {
             {b[i+3*RM]=t[i]}
     }
     /* convert from byte array to point */
-    static func fromBytes(_ b:[UInt8]) -> ECP2
+    public static func fromBytes(_ b:[UInt8]) -> ECP2
     {
         let RM=Int(CONFIG_BIG.MODBYTES)
         var t=[UInt8](repeating: 0,count: RM)
@@ -200,7 +200,7 @@ public struct ECP2 {
         return ECP2(rx,ry)
     }
 /* convert self to hex string */
-    func toString() -> String
+    public func toString() -> String
     {
         var W=ECP2(); W.copy(self)
         if W.is_infinity() {return "infinity"}
@@ -241,7 +241,7 @@ public struct ECP2 {
         if !y2.equals(rhs) {inf()}
     }
     /* construct this from x - but set to O if not on curve */
-    init(_ ix:FP2)
+    public init(_ ix:FP2)
     {
         x=FP2(ix)
         y=FP2(1)

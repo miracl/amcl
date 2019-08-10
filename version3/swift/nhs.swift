@@ -24,7 +24,7 @@
 //import Foundation
 //import Darwin
 
-//import amcl
+import amcl
 
 /* NewHope Simple API high-level functions  */
 
