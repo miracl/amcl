@@ -1,4 +1,4 @@
-Namespaces are sinulated to separate different curves.
+Namespaces are simulated to separate different curves.
 
 To this end the BIG type is renamed to BIG_XXX, where XXX can be changed to 
 describe the size and layout of the BIG variable. Similarily the FP type 
