@@ -67,3 +67,14 @@ that critical calculations are performed in constant time. This strongly
 mitigates against side-channel attacks. Exception-free formulae are
 now used for Weierstrass elliptic curves. A new standardised script
 builds for the same set of curves across all languages.
+
+---------------------------------------------
+
+# Contributors
+
+The following people have contributed to the AMCL library
+
+- Mike Scott
+- Kealan McCusker
+- Alessandro Budroni
+- Samuele Andreoli
