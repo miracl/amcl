@@ -108,7 +108,7 @@ void YYY::FP48_zero(FP48 *w)
 /* SU= 16 */
 int YYY::FP48_equals(FP48 *x,FP48 *y)
 {
-    if (FP16_equals(&(x->a),&(y->a)) && FP16_equals(&(x->b),&(y->b)) && FP16_equals(&(x->b),&(y->b)))
+    if (FP16_equals(&(x->a),&(y->a)) && FP16_equals(&(x->b),&(y->b)) && FP16_equals(&(x->c),&(y->c)))
         return 1;
     return 0;
 }

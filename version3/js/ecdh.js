@@ -90,6 +90,8 @@ var ECDH = function(ctx) {
         H = new ctx.HASH512();
       }
 
+      H.process_array(A);
+
       if (n > 0) {
         H.process_num(n);
       }
