@@ -107,7 +107,7 @@ void YYY::FP12_zero(FP12 *w)
 /* SU= 16 */
 int YYY::FP12_equals(FP12 *x,FP12 *y)
 {
-    if (FP4_equals(&(x->a),&(y->a)) && FP4_equals(&(x->b),&(y->b)) && FP4_equals(&(x->b),&(y->b)))
+    if (FP4_equals(&(x->a),&(y->a)) && FP4_equals(&(x->b),&(y->b)) && FP4_equals(&(x->c),&(y->c)))
         return 1;
     return 0;
 }

@@ -108,7 +108,7 @@ void YYY::FP24_zero(FP24 *w)
 /* SU= 16 */
 int YYY::FP24_equals(FP24 *x,FP24 *y)
 {
-    if (FP8_equals(&(x->a),&(y->a)) && FP8_equals(&(x->b),&(y->b)) && FP8_equals(&(x->b),&(y->b)))
+    if (FP8_equals(&(x->a),&(y->a)) && FP8_equals(&(x->b),&(y->b)) && FP8_equals(&(x->c),&(y->c)))
         return 1;
     return 0;
 }
