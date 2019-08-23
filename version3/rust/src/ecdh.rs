@@ -210,7 +210,7 @@ pub fn pbkdf2(sha: usize, pass: &[u8], salt: &[u8], rep: usize, olen: usize, k: 
                 f[k] ^= u[k]
             }
         }
-        for j in 0..EFS {
+        for j in 0..sha {
             if kp < olen {
                 k[kp] = f[j]
             }
