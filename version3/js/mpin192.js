@@ -64,6 +64,17 @@ var MPIN192 = function(ctx) {
       return s;
     },
 
+    asciitobytes: function(s) {
+        var b = [],
+            i;
+
+        for (i = 0; i < s.length; i++) {
+            b.push(s.charCodeAt(i));
+        }
+
+        return b;
+    },
+
     stringtobytes: function(s) {
       var b = [],
         i;

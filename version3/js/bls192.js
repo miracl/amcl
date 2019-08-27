@@ -44,6 +44,18 @@ var BLS192 = function(ctx) {
       return s;
     },
 
+    asciitobytes: function(s) {
+        var b = [],
+            i;
+
+        for (i = 0; i < s.length; i++) {
+            b.push(s.charCodeAt(i));
+        }
+
+        return b;
+    },
+
+
     stringtobytes: function(s) {
       var b = [],
         i;
@@ -60,7 +72,7 @@ var BLS192 = function(ctx) {
     bls_hashit: function(m) {
       var sh = new ctx.SHA3(ctx.SHA3.SHAKE256);
       var hm = [];
-      var t = this.stringtobytes(m);
+      var t = this.asciitobytes(m);
       for (var i = 0; i < t.length; i++) sh.process(t[i]);
       sh.shake(hm, this.BFS);
       var P = ctx.ECP.mapit(hm);

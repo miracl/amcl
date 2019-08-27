@@ -102,7 +102,7 @@ function ed25519() {
 
 	mywindow.document.write("Alice's Passphrase= " + pp + "<br>");
 
-	var PW=ctx.ECDH.stringtobytes(pp);
+	var PW=ctx.ECDH.asciitobytes(pp);
 /* private key S0 of size EGS bytes derived from Password and Salt */
 	var S0=ctx.ECDH.PBKDF2(sha,PW,SALT,1000,EGS);
 
@@ -225,7 +225,7 @@ function nist256() {
 
 	mywindow.document.write("Alice's Passphrase= " + pp + "<br>");
 
-	var PW=ctx.ECDH.stringtobytes(pp);
+	var PW=ctx.ECDH.asciitobytes(pp);
 /* private key S0 of size EGS bytes derived from Password and Salt */
 	var S0=ctx.ECDH.PBKDF2(sha,PW,SALT,1000,EGS);
 
@@ -351,7 +351,7 @@ function goldilocks() {
 
 	mywindow.document.write("Alice's Passphrase= " + pp + "<br>");
 
-	var PW=ctx.ECDH.stringtobytes(pp);
+	var PW=ctx.ECDH.asciitobytes(pp);
 /* private key S0 of size EGS bytes derived from Password and Salt */
 	var S0=ctx.ECDH.PBKDF2(sha,PW,SALT,1000,EGS);
 
@@ -602,7 +602,7 @@ function bn254() {
  
  /* Create Client Identity */
  	var IDstr = "testUser@miracl.com";
-	var CLIENT_ID = ctx.MPIN.stringtobytes(IDstr);  
+	var CLIENT_ID = ctx.MPIN.asciitobytes(IDstr);  
 	HCID=ctx.MPIN.HASH_ID(sha,CLIENT_ID);  /* Either Client or TA calculates Hash(ID) - you decide! */
 		
 	mywindow.document.write("Client ID= "+ctx.MPIN.bytestostring(CLIENT_ID) + "<br>");
@@ -847,7 +847,7 @@ function bls383() {
  
  /* Create Client Identity */
  	var IDstr = "testUser@miracl.com";
-	var CLIENT_ID = ctx.MPIN.stringtobytes(IDstr);  
+	var CLIENT_ID = ctx.MPIN.asciitobytes(IDstr);  
 	HCID=ctx.MPIN.HASH_ID(sha,CLIENT_ID);  /* Either Client or TA calculates Hash(ID) - you decide! */
 		
 	mywindow.document.write("Client ID= "+ctx.MPIN.bytestostring(CLIENT_ID) + "<br>");
@@ -1093,7 +1093,7 @@ function bls24() {
  
  /* Create Client Identity */
  	var IDstr = "testUser@miracl.com";
-	var CLIENT_ID = ctx.MPIN192.stringtobytes(IDstr);  
+	var CLIENT_ID = ctx.MPIN192.asciitobytes(IDstr);  
 	HCID=ctx.MPIN192.HASH_ID(sha,CLIENT_ID);  /* Either Client or TA calculates Hash(ID) - you decide! */
 		
 	mywindow.document.write("Client ID= "+ctx.MPIN192.bytestostring(CLIENT_ID) + "<br>");
@@ -1337,7 +1337,7 @@ function bls48() {
 	mywindow.document.write("M-Pin Master Secret s: 0x"+ctx.MPIN256.bytestostring(S) + "<br>");
  // Create Client Identity 
  	var IDstr = "testUser@miracl.com";
-	var CLIENT_ID = ctx.MPIN256.stringtobytes(IDstr);  
+	var CLIENT_ID = ctx.MPIN256.asciitobytes(IDstr);  
 	HCID=ctx.MPIN256.HASH_ID(sha,CLIENT_ID);  // Either Client or TA calculates Hash(ID) - you decide! 
 		
 	mywindow.document.write("Client ID= "+ctx.MPIN256.bytestostring(CLIENT_ID) + "<br>");
