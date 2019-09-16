@@ -7,6 +7,7 @@ IMPORTANT NOTICE. Further active development of this library will now take place
 at https://github.com/miracl/core. It is not intended to add any new features
 to this version, although it will continue to be maintained for bug fixes.
 
+---------------------------------------
 
 AMCL is a multi-lingual Cryptographic library that supports elliptic
 curve cryptography, pairing-friendly curve cryptography, RSA, AES symmetric
