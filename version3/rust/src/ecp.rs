@@ -444,6 +444,7 @@ impl ECP {
     pub fn tostring(&self) -> String {
         let mut W = ECP::new();
         W.copy(self);
+        W.affine();
         if W.is_infinity() {
             return String::from("infinity");
         }

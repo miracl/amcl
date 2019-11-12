@@ -121,8 +121,8 @@ def sqrtmodp(a, p):
 
 
 def crt(rp, p, rq, q):
-    c = inverse(p, q)
-    t = modmult(c, rq - rp, q)
+    c = invmodp(p, q)
+    t = modmul(c, rq - rp, q)
     return t * p + rp
 
 # find jacobi symbol for (x/p). Only defined for
