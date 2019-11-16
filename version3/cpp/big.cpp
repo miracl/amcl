@@ -575,7 +575,7 @@ void XXX::BIG_mul(DBIG c,BIG a,BIG b)
     {
         s+=d[k];
         t=co+s;
-        for (i=k; i>=1+k/2; i--) t+=(dchunk)(a[i]-a[k-i])*(b[k-i]-b[i]);
+        for (i=1+k/2;i<=k;i++) t+=(dchunk)(a[i]-a[k-i])*(b[k-i]-b[i]);
         c[k]=(chunk)t&BMASK_XXX;
         co=t>>BASEBITS_XXX;
     }
@@ -583,7 +583,7 @@ void XXX::BIG_mul(DBIG c,BIG a,BIG b)
     {
         s-=d[k-NLEN_XXX];
         t=co+s;
-        for (i=NLEN_XXX-1; i>=1+k/2; i--) t+=(dchunk)(a[i]-a[k-i])*(b[k-i]-b[i]);
+        for (i=1+k/2;i<NLEN_XXX;i++) t+=(dchunk)(a[i]-a[k-i])*(b[k-i]-b[i]);
         c[k]=(chunk)t&BMASK_XXX;
         co=t>>BASEBITS_XXX;
     }
@@ -741,7 +741,7 @@ void XXX::BIG_monty(BIG a,BIG md,chunk MC,DBIG d)
     for (k=1; k<NLEN_XXX; k++)
     {
         t=c+s+(dchunk)v[0]*md[k];
-        for (i=k-1; i>k/2; i--) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
+        for (i=1+k/2;i<k;i++) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
         v[k]=((chunk)t*MC)&BMASK_XXX;
         t+=(dchunk)v[k]*md[0];
         c=(t>>BASEBITS_XXX)+d[k+1];
@@ -751,7 +751,7 @@ void XXX::BIG_monty(BIG a,BIG md,chunk MC,DBIG d)
     for (k=NLEN_XXX; k<2*NLEN_XXX-1; k++)
     {
         t=c+s;
-        for (i=NLEN_XXX-1; i>=1+k/2; i--) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
+        for (i=1+k/2;i<NLEN_XXX;i++) t+=(dchunk)(v[k-i]-v[i])*(md[i]-md[k-i]);
         a[k-NLEN_XXX]=(chunk)t&BMASK_XXX;
         c=(t>>BASEBITS_XXX)+d[k+1];
         s-=dd[k-NLEN_XXX+1];
