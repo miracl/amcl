@@ -47,7 +47,6 @@ public class AES {
 
 	private static final byte[] InCo={(byte)0xB,(byte)0xD,(byte)0x9,(byte)0xE};  /* Inverse Coefficients */
 
-	public static final int KS=16; /* Key Size in bytes */
 	public static final int BS=16; /* Block Size */
 
 	private static final byte[] ptab=
@@ -328,7 +327,7 @@ public class AES {
 
 /* Initialise cipher */
 	public boolean init(int m,int nk,byte[] key,byte[] iv)
-	{	/* Key=16 bytes */
+	{
 		/* Key Scheduler. Create expanded encryption key */
 		int i,j,k,N,nr;
 		int [] CipherKey=new int[8];
