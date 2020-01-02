@@ -11,6 +11,10 @@ env:
     - AMCL_LANG=wasm-c
     - AMCL_LANG=wasm-rust
 
+matrix:
+  allow_failures:
+    - env: AMCL_LANG=wasm-rust
+
 script:
   - ./scripts/travis.sh
 
