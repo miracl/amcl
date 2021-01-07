@@ -9,6 +9,41 @@ repository = "https://github.com/milagro-crypto/amcl"
 
 [dependencies]
 
+[[bench]]
+name = "benchtest-all"
+harness = false
+required-features = [
+    "bn254",
+    "bn254CX",
+    "ansii",
+    "bls24",
+    "bls48",
+    "bls381",
+    "bls383",
+    "bls461",
+    "brainpool",
+    "c25519",
+    "c41417",
+    "ed25519",
+    "fp256bn",
+    "fp512bn",
+    "goldilocks",
+    "hifive",
+    "nist256",
+    "nist384",
+    "nist521",
+    "nums256e",
+    "nums256w",
+    "nums384e",
+    "nums384w",
+    "nums512e",
+    "nums512w",
+    "secp256k1",
+    "rsa2048",
+    "rsa3072",
+    "rsa4096",
+]
+
 [lib]
 name = "amcl"
 path = "src/lib.rs"
