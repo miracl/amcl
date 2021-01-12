@@ -4,8 +4,13 @@
 
 
 IMPORTANT NOTICE. Further active development of this library will now take place
-at https://github.com/miracl/core. It is not intended to add any new features
-to this version, although it will continue to be maintained for bug fixes.
+at https://github.com/miracl/core. This is now also under the same Apache-2.0 
+license
+
+
+It is not intended to add any new features to this version, and it will not 
+continue to be maintained for bug fixes.
+
 
 ---------------------------------------
 
